@@ -101,7 +101,9 @@ jobs:
             if [ -n "${{ vars.EMAIL_FROM }}" ] && [ -z "${{ secrets.RESEND_API_KEY }}" ]; then
               echo 'RESEND_API_KEY=obolo-resend-api-key:latest'
             fi
-            if [ -n "${{ vars.STRIPE_PUBLISHABLE_KEY }}" ]; then
+            # (or, without Google Cloud console access: the GitHub Actions secrets STRIPE_SECRET_KEY and
+            # STRIPE_WEBHOOK_SECRET, passed below)
+            if [ -n "${{ vars.STRIPE_PUBLISHABLE_KEY }}" ] && [ -z "${{ secrets.STRIPE_SECRET_KEY }}" ]; then
               echo 'STRIPE_SECRET_KEY=obolo-stripe-secret-key:latest'
               echo 'STRIPE_WEBHOOK_SECRET=obolo-stripe-webhook-secret:latest'
             fi
@@ -154,6 +156,8 @@ jobs:
             BUNNY_CDN_HOST=${{ vars.BUNNY_CDN_HOST }}
             STRIPE_PUBLISHABLE_KEY=${{ vars.STRIPE_PUBLISHABLE_KEY }}
             STRIPE_PRICE_ID=${{ vars.STRIPE_PRICE_ID }}
+            ${{ secrets.STRIPE_SECRET_KEY != '' && format('STRIPE_SECRET_KEY={0}', secrets.STRIPE_SECRET_KEY) || 'STRIPE_KEY_SOURCE=secret-manager' }}
+            ${{ secrets.STRIPE_SECRET_KEY != '' && format('STRIPE_WEBHOOK_SECRET={0}', secrets.STRIPE_WEBHOOK_SECRET || 'PLACEHOLDER') || 'STRIPE_WEBHOOK_SOURCE=secret-manager' }}
             COMMS_MEMBERS_ONLY=${{ vars.COMMS_MEMBERS_ONLY || 'true' }}
             AGORA_APP_ID=${{ vars.AGORA_APP_ID }}
             FIREBASE_PROJECT_ID=${{ vars.FIREBASE_PROJECT_ID }}
