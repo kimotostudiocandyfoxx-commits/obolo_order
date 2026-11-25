@@ -414,6 +414,13 @@
       "when": 1795617840626,
       "tag": "0058_mercury_continent_pictures",
       "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1795619840626,
+      "tag": "0059_jupiter_continent_pictures",
+      "breakpoints": true
     }
   ]
 }
