@@ -7,6 +7,7 @@ import { BATI_PERSONALITY_IDS } from './batiPersona';
 import { BATI_ROLES } from './batiMemory';
 import { MakeConfirm } from './makeConfirm';
 import { SpellTags } from './spell';
+import { SongLyrics } from './lyrics';
 
 export const RequestCodeBody = z.object({
   email: z.string().trim().toLowerCase().email().max(254),
@@ -448,6 +449,13 @@ export const FullSongBody = SingBody.omit({ melody: true, instrumentalUrl: true,
   confirm: MakeConfirm.optional(),
   /** R11: the spell said yes to (its English is what is made; MakeConfirm.spell is its key) */
   spell: SpellTags.optional(),
+  /**
+   * R13: the lyrics with their metatags said yes to (スペル入りの歌詞): sung exactly as shown — the server derives
+   * `sections` from them and the yes covers them too (songSpellKey)
+   */
+  lyrics: SongLyrics.optional(),
+  /** a song with lyrics (R13) has more blocks than the older 6 sections (2番, 大サビ) */
+  sections: SingBody.shape.sections.element.array().min(1).max(16),
 });
 export type FullSongBody = z.infer<typeof FullSongBody>;
 
