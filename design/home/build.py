@@ -168,7 +168,10 @@ for pl in ['mars','venus','uranus','pluto','neptune']:
 for k in ['saturn','jupiter','mercury','mars','venus','uranus','pluto','neptune']:
     f=f'{O}/picon-{k}.jpg'
     if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((140,140),Image.LANCZOS); A['picon-'+k]=uri(o,86)
-for nm in ['map','edm','hiphop','ballad','rock','chill']:
+for nm in ['me','edm','hiphop','ballad','rock','chill','citypop','anison','jazz','matsuri','rain']:
+    f=f'{O}/isl-mercury-{nm}.jpg'
+    if os.path.exists(f): o=unwhite(Image.open(f)); bb=o.getbbox(); o=o.crop(bb) if bb else o; o.thumbnail((380,380),Image.LANCZOS); A[f'isl-mercury-{nm}']=uri(o,84)
+for nm in ['map','sea','edm','hiphop','ballad','rock','chill','citypop','anison','jazz','matsuri','rain']:
     f=f'{O}/exp-mercury-{nm}.jpg'
     if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A[f'exp-mercury-{nm}']=uri(im,76)
 VD=os.environ.get('VOICE_DIR')
