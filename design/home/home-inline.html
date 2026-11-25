@@ -23,8 +23,9 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .fg{position:absolute;inset:0;background-size:cover;background-position:center bottom;transform:scale(1.04);transition:transform 8s ease-out,filter .6s;z-index:7;pointer-events:none}
 .partying .fg{filter:brightness(.5) saturate(1.3)}
 .sky{position:absolute;inset:0}
-.sh,.bf,.g5f{touch-action:none}
+.sh,.bf,.g5f,.exp .eb{touch-action:none}
 .phone img{-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
+.exp .eb.dragging{z-index:3;filter:drop-shadow(0 12px 14px rgba(0,0,0,.35));cursor:grabbing}
 .sh.dragging,.bf.dragging,.g5f.dragging{z-index:9!important;filter:drop-shadow(0 12px 14px rgba(0,0,0,.35))!important;cursor:grabbing}
 .phone.s6 .bg{filter:blur(1.4px) brightness(.85) saturate(1.1);background-size:auto 109.4%!important;background-position:center top!important}
 .s6floor{position:absolute;left:0;right:0;bottom:0;background-repeat:repeat-x;background-color:#e9c6ee;background-position:center top;pointer-events:none}
@@ -588,6 +589,7 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .exp.land .rg,.exp.land .dice{display:none}
 .exp .rname{pointer-events:none;position:absolute;left:50%;top:12%;transform:translate(-50%,-50%) scale(.6);opacity:0;z-index:3;font:900 clamp(30px,10vw,44px)/1 'Dela Gothic One',var(--f-body);color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.35),0 0 24px rgba(0,0,0,.5);white-space:nowrap;transition:opacity .4s .4s,transform .6s .4s cubic-bezier(.2,1.6,.4,1)}
 .exp.land .rname{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.exp:not(.land) .rname{transition:opacity .12s}
 .exp.land.show .rname,.exp.land.auto .rname{opacity:0;transition:opacity .2s}
 .exp .eb{position:absolute;left:0;top:0;width:100px;height:116px;margin:-58px 0 0 -50px;cursor:pointer;z-index:2;will-change:transform}
 .exp .eb img{width:100px;height:100px;object-fit:contain;filter:drop-shadow(0 6px 6px rgba(0,30,60,.35))}
@@ -1031,8 +1033,9 @@ function expLand(r){const ex=$('exp'),c=EXP[EX.pl],em=$('emap');closeSearch();en
   setTimeout(()=>{$('eland').style.backgroundImage=`url(${A['exp-'+EX.pl+'-'+r.k]||''})`;$('rname').textContent=r.n;$('rname').style.fontSize=r.n.length>6?Math.max(24,Math.floor(300/r.n.length))+'px':'';$('etitle').textContent='';ex.className='exp on land';EX.region=r;eplayIcon(false);efavPaint();spawnStrangers(r)},700)}
 function spawnStrangers(r){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,ex=$('exp');const pool=drift(EX.pl,r.k);const ws=pool.slice(0,7).sort(()=>Math.random()-.5);
   EX.boats=ws.map((w,i)=>{const n=w.by;const S=MSLOT[i%7],e=document.createElement('div');e.className='eb';e.innerHTML=`<img alt="" src="${A['ship3-'+((i%4)+1)]||''}"><span>${w.mine?'★ じぶん':n}</span>`;ex.appendChild(e);
-    const b={n,i,e,sc:S[1],lane:S[0],x:[.2,.62,.12,.48,.84,.3,.7][i]*W,v:(10+(i%4)*4)*(i%2?-1:1)*(.6+S[1]*.5),title:w.title,w};e.onclick=()=>{if(EX.auto){clearTimeout(EX.auto.tm);if(EX.open)EX.open.close();EX.auto.n++;EX.auto.tm=setTimeout(autoNext,(expShow(b,{auto:true})||60)*1000+400)}else expShow(b)};return b});
-  let last=performance.now();const step=now=>{const dt=Math.min(.05,(now-last)/1000);last=now;const ts=now/1000;for(const b of EX.boats){if(b.e.classList.contains('held'))continue;b.x+=b.v*dt;if(b.x>W+60)b.x=-60;if(b.x<-60)b.x=W+60;const y=b.lane*H+Math.sin(ts*1.6+b.i)*4;b.y=y;b.e.style.transform=`translate3d(${b.x}px,${y}px,0) scale(${b.sc})`;b.e.querySelector('img').style.transform=b.v<0?'scaleX(-1)':''}EX.raf=requestAnimationFrame(step)};EX.raf=requestAnimationFrame(step)}
+    const b={n,i,e,sc:S[1],lane:S[0],x:[.2,.62,.12,.48,.84,.3,.7][i]*W,v:(10+(i%4)*4)*(i%2?-1:1)*(.6+S[1]*.5),title:w.title,w};const tap=()=>{if(EX.auto){clearTimeout(EX.auto.tm);if(EX.open)EX.open.close();EX.auto.n++;EX.auto.tm=setTimeout(autoNext,(expShow(b,{auto:true})||60)*1000+400)}else expShow(b)};
+    dragify(b,e,tap,()=>{const H=ph.clientHeight;b.lane=clamp(b.y/H,.42,.9);b.sc=lerpPts(b.lane,[[.5,.5],[.69,.78],[.83,1.08]]);b.x=clamp(b.x,-40,W+40)});return b});
+  let last=performance.now();const step=now=>{const dt=Math.min(.05,(now-last)/1000);last=now;const ts=now/1000;for(const b of EX.boats){if(b.e.classList.contains('held')||b.drag)continue;b.x+=b.v*dt;if(b.x>W+60)b.x=-60;if(b.x<-60)b.x=W+60;const y=b.lane*H+Math.sin(ts*1.6+b.i)*4;b.y=y;b.e.style.transform=`translate3d(${b.x}px,${y}px,0) scale(${b.sc})`;b.e.querySelector('img').style.transform=b.v<0?'scaleX(-1)':''}EX.raf=requestAnimationFrame(step)};EX.raf=requestAnimationFrame(step)}
 const ASET=5;
 function eplayIcon(on){const b=$('eplay');b.classList.toggle('on',on);b.setAttribute('aria-label',on?'止める':'流す');b.innerHTML='<span class="rec"></span><span class="lbl"></span><svg viewBox="0 0 24 24" aria-hidden="true">'+(on?'<rect class="pl" x="6" y="6" width="12" height="12" rx="3"/>':'<path class="pl" d="M8.5 5.6c0-1.1 1.2-1.8 2.2-1.2l8.6 5.5c.9.6.9 1.9 0 2.5l-8.6 5.5c-1 .6-2.2-.1-2.2-1.2z"/>')+'</svg>'}
 function pierPos(e,x,y,s){const ph=$('phone');e.style.transform=`translate3d(${x*ph.clientWidth}px,${y*ph.clientHeight}px,0) translate(-50%,-50%) scale(${s})`}
