@@ -443,6 +443,18 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .prof .pgal .fr.t-game{aspect-ratio:.72;border:5px solid #141428;outline:2px solid #ff4fd8;border-radius:10px}
 .prof .pgal .fr.t-goods{border:0;outline:0;border-radius:8px 8px 14px 14px;box-shadow:0 10px 18px rgba(0,0,0,.35),inset 0 0 0 999px rgba(0,0,0,0)}
 .prof .pgal .fr.t-goods::before,.prof .pgal .fr.t-goods::after{display:none}
+.ttl.pk{display:flex;align-items:center;gap:8px;cursor:pointer;touch-action:none;-webkit-tap-highlight-color:transparent}
+.ttl.pk img.pic{width:42px;height:42px;object-fit:contain;filter:drop-shadow(0 3px 6px rgba(0,0,0,.35));transition:transform .2s}
+.ttl.pk:active img.pic{transform:scale(.92)}
+.ttl.pk .tw{display:flex;flex-direction:column;line-height:1.05}
+.pstrip{position:absolute;left:0;right:0;top:0;height:132px;z-index:45;background:linear-gradient(rgba(10,6,24,.85),rgba(10,6,24,.55) 70%,transparent);opacity:0;pointer-events:none;transition:opacity .25s}
+.pstrip.on{opacity:1;pointer-events:auto}
+.pstrip .sc{display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x mandatory;padding:14px calc(50% - 38px) 0;scrollbar-width:none;height:100%;box-sizing:border-box}
+.pstrip .sc::-webkit-scrollbar{display:none}
+.pstrip button{flex:0 0 76px;scroll-snap-align:center;border:0;background:none;color:#fff;display:flex;flex-direction:column;align-items:center;gap:4px;font:900 11px var(--f-body);opacity:.55;transform:scale(.8);transition:transform .2s,opacity .2s;cursor:pointer}
+.pstrip button img{width:58px;height:58px;object-fit:contain;filter:drop-shadow(0 4px 8px rgba(0,0,0,.4))}
+.pstrip button.mid{opacity:1;transform:scale(1.12)}
+.pstrip .hint{position:absolute;left:0;right:0;bottom:6px;text-align:center;font:800 10px var(--f-body);color:rgba(255,255,255,.75);pointer-events:none}
 .puni{position:absolute;left:0;top:0;z-index:6;cursor:grab;touch-action:none;will-change:transform}
 .puni img{width:100%;height:100%;object-fit:contain;pointer-events:none;border-radius:50%}
 .puni.talk{z-index:7}
@@ -518,6 +530,7 @@ button:focus-visible,.item:focus-visible,.home:focus-visible{outline:3px solid v
   <div class="fw" id="fw" aria-hidden="true"><div class="sky2"></div></div>
   <div class="fest" id="fest" aria-hidden="true"><div class="dusk"></div><div class="glow"></div></div>
   <div class="camfx" id="camfx" aria-hidden="true"></div>
+  <div class="pstrip" id="pstrip" aria-label="星をえらぶ"><div class="sc" id="psc"></div><div class="hint">← スクロールして、行きたい星で止める →</div></div>
   <div class="prof" id="prof" aria-hidden="true"><div class="pbg" id="pbg"></div><div class="prec" id="prec"></div><div class="pgal" id="pgal" hidden></div><div class="pbeach" id="pbeach" hidden></div><div class="pstage" id="pstage"></div><div class="phead"><button class="pback" id="pback" type="button" aria-label="もどる">←</button><div class="pwho"><img id="pwimg" alt=""><span id="pwname"></span></div></div><div class="pdachi" id="pdachi"></div><button class="ptop-back" id="pback2" type="button" aria-label="もどる">←</button><div class="pswipe" id="pswipe" hidden>← スワイプで次のダチ →</div></div>
   <div class="hv" id="hv" aria-hidden="true"><div class="hvbg" id="hvbg"></div><div class="hvfx" id="hvfx"></div><div class="vig"></div><div class="glow2"></div><div class="hvstage" id="hvstage"></div><div class="hvback" id="hvback"><img alt=""></div><div class="lb t"></div><div class="lb b"></div><div class="flash"></div></div>
   <div class="spinwrap" id="spinwrap"><div class="spinner"></div></div>
@@ -578,7 +591,7 @@ function render(){
   const c=P[cur];document.documentElement.style.setProperty('--accent',c.accent);
   const bgi=(mode==='anime'&&A['bg2-'+cur])||A['bg-'+cur];$('bg').style.backgroundImage=bgi?`url(${bgi})`:'linear-gradient(#335,#113)';
   document.querySelectorAll('#mode button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===mode));
-  $('ttl').innerHTML=`<small>${c.en}</small>${c.name}`;$('say').innerHTML=c.say;
+  $('ttl').classList.toggle('pk',!!A['picon-'+cur]);$('ttl').innerHTML=A['picon-'+cur]?`<img class="pic" alt="" src="${A['picon-'+cur]}"><span class="tw"><small>${c.en}</small>${c.name}</span>`:`<small>${c.en}</small>${c.name}`;$('say').innerHTML=c.say;
   $('plate').textContent=`${ME}の${c.place}`;$('plate').hidden=cur==='saturn';setCta(false);$('home').setAttribute('aria-label',`${ME}の${c.place}`);
   $('oshiN').textContent=oshi.size;
   const rw=$('resWrap');rw.innerHTML='';
@@ -740,6 +753,22 @@ function pop(r){
   setTimeout(()=>{c.style.display='none';if(!QUEUE.length&&rolls.every(x=>x.gone)){const d=document.createElement('div');d.className='done';d.textContent='🎉 今日のコロリン、全部聞いたね！';sky.appendChild(d)}},3600);
 }
 function stopRoll(){cancelAnimationFrame(raf);rolls=[]}
+/* ---- planet picker: touch the planet icon, slide, stop on the one you want ---- */
+(function(){const ORDER=Object.keys(P);let open=false,drag=null,settle=0;const sc=()=>$('psc'),strip=()=>$('pstrip');
+  const fill=()=>{sc().innerHTML=ORDER.map(k=>`<button type="button" data-k="${k}"><img alt="" src="${A['picon-'+k]||''}">${P[k].name}</button>`).join('');sc().querySelectorAll('button').forEach(b=>b.onclick=()=>{centerOn(b.dataset.k,true);setTimeout(()=>choose(b.dataset.k),260)})};
+  const items=()=>[...sc().querySelectorAll('button')];
+  const mid=()=>{const s=sc(),c=s.scrollLeft+s.clientWidth/2;let best=null,bd=1e9;items().forEach(b=>{const d=Math.abs(b.offsetLeft+b.offsetWidth/2-c);if(d<bd){bd=d;best=b}});items().forEach(b=>b.classList.toggle('mid',b===best));return best};
+  const centerOn=(k,smooth)=>{const b=items().find(x=>x.dataset.k===k);if(!b)return;const s=sc();s.scrollTo({left:b.offsetLeft+b.offsetWidth/2-s.clientWidth/2,behavior:smooth?'smooth':'auto'});};
+  const show=()=>{if(!items().length)fill();open=true;strip().classList.add('on');centerOn(cur,false);mid()};
+  const hide=()=>{open=false;strip().classList.remove('on')};
+  const choose=k=>{hide();if(k&&k!==cur){if(typeof closeProf==='function'&&PROF)closeProf();cur=k;render()}};
+  const queue=()=>{clearTimeout(settle);settle=setTimeout(()=>{if(!open||drag)return;const b=mid();if(b)choose(b.dataset.k)},420)};
+  document.addEventListener('pointerdown',ev=>{const t=ev.target.closest('#ttl.pk');if(!t)return;ev.preventDefault();show();drag={x:ev.clientX,sl:sc().scrollLeft,moved:0}});
+  document.addEventListener('pointermove',ev=>{if(!drag)return;const dx=ev.clientX-drag.x;drag.moved=Math.max(drag.moved,Math.abs(dx));sc().style.scrollSnapType='none';sc().scrollLeft=drag.sl-dx*1.6;mid()});
+  document.addEventListener('pointerup',()=>{if(!drag)return;const moved=drag.moved;drag=null;sc().style.scrollSnapType='';if(moved<6){return}const b=mid();if(b)centerOn(b.dataset.k,true);queue()});
+  document.addEventListener('scroll',ev=>{if(ev.target&&ev.target.id==='psc'&&open){mid();if(!drag)queue()}},true);
+  document.addEventListener('pointerdown',ev=>{if(open&&!ev.target.closest('#pstrip,#ttl'))hide()});
+})();
 /* ---- Mars / Venus / Uranus / Pluto / Neptune: one template ---- */
 const G5={mars:{t:'mv',place:'シアター',home:[.79,.54],titles:['ネオンの夜','走れ','パーティー','夜のバラード','はじまりの歌'],c:'#ff5fd2'},
   venus:{t:'radio',place:'ブース',home:[.72,.38],titles:['深夜のひとりごと','ラーメン報告','ねこラジオ','夏の作戦会議','月夜の雑談'],c:'#ffb36b'},

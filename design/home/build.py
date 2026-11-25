@@ -165,6 +165,9 @@ for pl in ['mars','venus','uranus','pluto','neptune']:
     for k in 'user kimorin monban mikie brother sister'.split():
         f=f'{O}/p5-{pl}-{k}.jpg'
         if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((220,220),Image.LANCZOS); A[f'p5-{pl}-{k}']=uri(o,84)
+for k in ['saturn','jupiter','mercury','mars','venus','uranus','pluto','neptune']:
+    f=f'{O}/picon-{k}.jpg'
+    if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((140,140),Image.LANCZOS); A['picon-'+k]=uri(o,86)
 VD=os.environ.get('VOICE_DIR')
 if VD:
     for n in range(1,6):
