@@ -68,3 +68,20 @@ describe('R12 (day 4): the story’s compass and spell book lines have their mom
     expect(c.compass?.[0].text).toContain('コンパス');
   });
 });
+
+describe('R13: プロンプト / 呪文 / 指示文 are the spell (typed or said)', () => {
+  const table: [string, Partial<ToolCtx>, ReturnType<typeof toolStep>][] = [
+    ['プロンプト見せて', { plan: true }, { do: 'show' }],
+    ['プロンプト見せて', { cast: true, castDone: true, spell: true }, { do: 'show' }],
+    ['プロンプト見せて', {}, { do: 'noSpell' }],
+    ['プロンプト出して', {}, { do: 'bookOpen' }],
+    ['プロンプト出して', { plan: true }, { do: 'show' }],
+    ['ぷろんぷと見せて', { plan: true }, { do: 'show' }],
+    ['このプロンプト保存して', { cast: true, castDone: true, spell: true }, { do: 'save' }],
+    ['プロンプト集見せて', { plan: true }, { do: 'bookOpen' }],
+    ['この画像のプロンプト読んで', {}, { do: 'compassOpen' }],
+    ['夏の海のプロンプト使って', {}, { do: 'use', query: '夏の海', named: true }],
+    ['プロンプトにピアノ足して', { plan: true }, null],
+  ];
+  it.each(table)('%s %o', (said, c, want) => expect(toolStep(said, ctx(c))).toEqual(want));
+});

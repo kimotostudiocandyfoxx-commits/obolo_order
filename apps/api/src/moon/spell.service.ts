@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import type { LlmProvider } from '@obolo/ai';
-import { SPELL_MAX_TAGS, spellEdit, spellFrom, spellNormalize, spellOfAnswers, type SpellBody, type SpellKind, type SpellTag, type SpellView } from '@obolo/shared';
+import { isSpellWord, SPELL_MAX_TAGS, spellEdit, spellFrom, spellNormalize, spellOfAnswers, type SpellBody, type SpellKind, type SpellTag, type SpellView } from '@obolo/shared';
 import { LLM } from '../infra/tokens';
 
 const WHAT: Record<SpellKind, string> = { song: 'a song', art: 'a picture', video: 'a music video', look: "the member's own look", bati: "the buddy's outfit", novel: 'a serial novel for teenagers (its world, hero, tone, length)', chapter: "the next chapter of a novel (what happens, its mood, a new character)", game: 'a tiny HTML5 canvas game (its genre, hero, rules, goal, difficulty, look)' };
@@ -62,7 +62,7 @@ export function mergeSpell(kind: SpellKind, base: SpellView, pairs: unknown, ext
     return m ? { ...t, en: m.en } : t;
   };
   const tags = base.tags.map(english);
-  const more = extras ? got.filter((g) => !tags.some((t) => t.ja === g.ja || t.en.toLowerCase() === g.en.toLowerCase() || (t.group === g.group && ['genre', 'tempo', 'voice', 'style', 'composition', 'camera'].includes(g.group)))).slice(0, 3) : [];
+  const more = extras ? got.filter((g) => !isSpellWord(g.ja) && !tags.some((t) => t.ja === g.ja || t.en.toLowerCase() === g.en.toLowerCase() || (t.group === g.group && ['genre', 'tempo', 'voice', 'style', 'composition', 'camera'].includes(g.group)))).slice(0, 3) : [];
   // a book's / a game's spell stays at its few talismans (SPELL_MAX_TAGS): no extras past it
   const room = Math.max(0, SPELL_MAX_TAGS[kind] - tags.length);
   const extra = more.slice(0, room);

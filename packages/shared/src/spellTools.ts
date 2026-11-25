@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { SpellTags, spellDefaultLabels, spellFrom, type SpellKind, type SpellTag } from './spell';
+import { SpellTags, spellDefaultLabels, spellFrom, spellSaid, type SpellKind, type SpellTag } from './spell';
 import { SongLyrics } from './lyrics';
 
 /**
@@ -148,7 +148,7 @@ const kana = (s: string) => s.replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c
 const norm = (s: string) => kana(s.toLowerCase().replace(/[\s　、。,.!！?？「」『』"'・ー〜~]/g, ''));
 /** the words around a name: 「スペルブックの『夏の海のやつ』を使って」 → 夏の海 */
 export function spellQuery(said: string): string {
-  return said
+  return spellSaid(said)
     .replace(/スペルブック(の|から|に)?/g, '')
     .replace(/(を|は|の|で|が)?(使って|つかって|使いたい|つかいたい|使おう|使う|つかう|出して|だして|見せて|みせて|開いて|ひらいて|見たい|みたい|にして|で作って|でつくって|もとにして|捨てて|すてて|捨てる|すてる|捨てたい|処分して|消して|けして)(ください|ほしい|くれる|くれ|ね|よ|！|!)*.*$/, '')
     .replace(/(の)?(やつ|ヤツ|スペル|の?呪文)$/g, '')
@@ -252,6 +252,8 @@ export function shouldSuggestBook(m: SpellToolMemory): boolean {
 export type SpellToolIntent =
   | { tool: 'compass' }
   | { tool: 'book' }
+  /** R13: 「スペル（プロンプト）見せて」 — the spell now; `out`: 出して (no spell now → the book) */
+  | { tool: 'show'; out: boolean }
   | { tool: 'close' }
   | { tool: 'page'; step: 1 | -1 }
   | { tool: 'save' }
@@ -265,21 +267,27 @@ const ASK_OUT = /(出して|だして|出てきて|見せて|みせて|ちょう
  * mean it then)
  */
 export function spellToolIntent(text: string, open = false): SpellToolIntent | null {
-  const t = text.replace(/[\s、,]/g, '').trim();
+  // R13: プロンプト / 呪文 / 指示文 are the spell (プロンプト集 the book)
+  const t = spellSaid(text).replace(/[\s、,]/g, '').trim();
   if (!t) return null;
   if (/コンパス/.test(t) && (ASK_OUT.test(t) || /^コンパス[!！。？?]*$/.test(t))) return { tool: 'compass' };
+  // R13: 「この画像のスペル読んで」「この写真のプロンプト教えて」 — the compass reads it
+  if (/スペル(?!ブック)/.test(t) && /(画像|がぞう|写真|しゃしん|絵|イラスト|動画|リンク|URL|ＵＲＬ|曲|これ|それ)の?スペル/i.test(t) && /(読んで|よんで|読み取って|よみとって|読みとって|読める|よめる|読みたい|よみたい|教えて|おしえて|知りたい|しりたい|調べて|しらべて|出して|だして|見せて|みせて)/.test(t)) return { tool: 'compass' };
   const rename = t.match(/(?:名前|なまえ)を?[「『]?(.+?)[」』]?(?:に|って)(?:して|変えて|かえて|する|しよう|しといて|しておいて)/) ?? t.match(/[「『]?(.+?)[」』]?って(?:名前|なまえ)に(?:して|する|しよう)/);
   if (rename && rename[1] && !/スペルブック/.test(rename[1])) return { tool: 'rename', name: spellNameClean(rename[1]) };
   const discard = t.match(/^(.+?)(?:は|を|も)?(?:捨てて|すてて|捨てる|すてる|捨てたい|すてたい|処分して)/);
   if (discard && spellQuery(t)) return { tool: 'discard', query: spellQuery(t) };
   if (/スペルブック/.test(t) && /(しまって|しまっ(と|て)いて|しまっとこ|入れて|いれて|保存)/.test(t)) return { tool: 'save' };
-  if (/^(それ|これ|いまの|今の|このスペル|そのスペル|スペル)?(を|は)?(しまって|しまっといて|しまっておいて|しまっとこ|しまおう|とっておいて|取っておいて|とっといて|保存して|ほぞんして)/.test(t)) return { tool: 'save' };
+  if (/^(それ|これ|いまの|今の|このスペル|そのスペル|スペル)?(を|は)?(しまって|しまっといて|しまっておいて|しまっとこ|しまおう|とっておいて|取っておいて|とっといて|保存(?!しない|しなく|しちゃだめ)|ほぞん(?!しない|しなく))/.test(t)) return { tool: 'save' };
   if (open && /(とじて|閉じて|しめて|閉めて|もういい|おしまい)/.test(t)) return { tool: 'close' };
   if (open && /(次|つぎ|めくって|めくる|ページ|先)/.test(t) && !/(前|まえ|もど)/.test(t) && !/(使|つか)/.test(t)) return { tool: 'page', step: 1 };
   if (open && /(前|まえ|もど)/.test(t) && !/(使|つか)/.test(t)) return { tool: 'page', step: -1 };
   if (/スペルブック/.test(t) && (ASK_OUT.test(t) || /^スペルブック[!！。？?]*$/.test(t)) && !spellQuery(t)) return { tool: 'book' };
+  // R13: 「スペル見せて」「いまのプロンプト出して」「スペルは？」 — the spell now (none: 出して opens the book)
+  const show = t.match(/^(?:それ|これ|いまの|今の|この|その|さっきの)?スペル(?:を|は|って)?(見せて|みせて|見たい|みたい|出して|だして|出てきて|ちょうだい|教えて|おしえて|どれ|どんなの|どんな|なに|何|もう一回|もういっかい|もう一度|もういちど)?(?:ください|ほしい|くれる|くれ|ね|よ|かな|だっけ|なの|？|\?|！|!|。)*$/);
+  if (show) return { tool: 'show', out: /出して|だして|出てきて|ちょうだい/.test(show[1] ?? '') };
   const use = /(を|の|で)?(使って|つかって|使いたい|つかいたい|使おう|使う|つかう|もとにして|で作って|でつくって|にして)/.test(t);
-  if (use && spellQuery(t)) return { tool: 'use', query: spellQuery(t), named: /スペルブック/.test(t) || open };
+  if (use && spellQuery(t)) return { tool: 'use', query: spellQuery(t), named: /スペル(ブック)?(を|の|で)?(使|つか)/.test(t) || /スペルブック/.test(t) || open };
   return null;
 }
 
@@ -320,6 +328,10 @@ export const SPELL_TOOL_LINES = {
   bookDropAsk: '『{spell}』を、スペルブックから捨てていい？',
   bookDropped: '『{spell}』は、捨てたよ。',
   bookDropNot: 'じゃあ、とっておくね。',
+  /** R13: 「プロンプト見せて」 — the spell now, shown again (always スペル, never correcting the word) */
+  spellShow: 'このスペルだね！',
+  /** R13: 「プロンプト見せて」 with no spell yet */
+  spellNone: 'まだスペルはないみたい。どんなのを作る？　言ってくれたら、いっしょにスペルにするよ。',
 } as const;
 export const SPELL_TOOL_LINE_TEXTS: string[] = Object.values(SPELL_TOOL_LINES);
 

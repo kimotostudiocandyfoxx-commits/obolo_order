@@ -76,3 +76,13 @@ describe('client 2026-11-24: {bati} answers — never the menu', () => {
     expect(conversational(detect('夜の海の絵を描いて', false))).toBe(false);
   });
 });
+
+describe('R13: プロンプト / 呪文 in a request are the spell', () => {
+  it('an edit of the work, a making with the spell; the word is never what to make', () => {
+    expect(detect('プロンプトにピアノ足して', true)).toMatchObject({ kind: 'refine' });
+    expect(detect('呪文で作って', false)).toMatchObject({ kind: 'makeAny' });
+    const it0 = detect('プロンプトで夜の海の絵を描いて', false);
+    expect(it0).toMatchObject({ kind: 'make', what: 'art' });
+    expect(it0.kind === 'make' && it0.content).not.toMatch(/プロンプト/);
+  });
+});

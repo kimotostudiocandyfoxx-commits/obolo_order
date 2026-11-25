@@ -758,6 +758,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       cast: !!lastCast.current,
       castDone: !!lastCast.current?.done,
       kept: !!lastCast.current?.kept,
+      spell: !!lastCast.current,
       mem: toolMemory(),
     });
     // the spell waiting for its yes stays (the book's words go before it); a new spell replaces it
@@ -784,6 +785,26 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       case 'bookOpen':
         keepPlan();
         void openBook();
+        return true;
+      case 'show': {
+        // R13: 「プロンプト見せて」 — the spell waiting for its yes floats up again; else the one cast last comes back as the spell
+        if (p && 'plan' in p) {
+          keepPlan();
+          const pa = p.plan;
+          setFloating((f) => ({ id: uid(), kind: pa.plan.kind, look: spellLookFor(pa.plan.kind), tags: pa.plan.tags, removed: [], price: pa.price, have: f?.have ?? null }));
+          sayT(SPELL_TOOL_LINES.spellShow);
+          return true;
+        }
+        const c = lastCast.current;
+        if (!c) {
+          sayT(SPELL_TOOL_LINES.spellNone);
+          return true;
+        }
+        void propose(c.kind as AtelierKind, '', undefined, {}, undefined, { tags: c.tags, added: [], removed: [] }, { lead: [SPELL_TOOL_LINES.spellShow] });
+        return true;
+      }
+      case 'noSpell':
+        sayT(SPELL_TOOL_LINES.spellNone);
         return true;
       case 'bookClose':
         bookAway();

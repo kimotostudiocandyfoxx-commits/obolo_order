@@ -1,4 +1,4 @@
-import { isHappy, isNo, shouldOfferSave, spellToolIntent, SPELL_BOOK_KINDS, SPELL_TOOL_MEMORY_EMPTY, youtubeLink, type SpellBookKind, type SpellKind, type SpellToolMemory } from '@obolo/shared';
+import { isHappy, isNo, shouldOfferSave, spellSaid, spellToolIntent, SPELL_BOOK_KINDS, SPELL_TOOL_MEMORY_EMPTY, youtubeLink, type SpellBookKind, type SpellKind, type SpellToolMemory } from '@obolo/shared';
 import { isYes } from './plan';
 
 /**
@@ -20,12 +20,17 @@ export type ToolCtx = {
   castDone: boolean;
   /** that spell is in the book already */
   kept: boolean;
+  /** R13: a spell to show now (one waiting for its yes, or the one cast last) */
+  spell?: boolean;
   mem: SpellToolMemory;
 };
 export type ToolAction =
   | { do: 'compassLink'; url: string }
   | { do: 'compassOpen' }
   | { do: 'bookOpen' }
+  /** R13: 「スペル（プロンプト）見せて」 — the spell now shown again; `none`: there is no spell yet ({bati} offers to make one) */
+  | { do: 'show' }
+  | { do: 'noSpell' }
   | { do: 'bookClose'; quiet?: boolean }
   | { do: 'page'; step: 1 | -1 }
   | { do: 'save' }
@@ -39,7 +44,8 @@ export type ToolAction =
 const SAVE_YES = /^(しまって|しまっといて|しまっておいて|しまう|入れて|いれて|保存|お願い|おねがい|よろしく)/;
 
 export function toolStep(text: string, c: ToolCtx): ToolAction | null {
-  const t = text.trim();
+  // R13: プロンプト / 呪文 / 指示文 are said for the spell
+  const t = spellSaid(text.trim());
   const url = youtubeLink(t);
   if (url) return { do: 'compassLink', url };
   if (c.asked && c.asked !== 'compass') {
@@ -54,6 +60,10 @@ export function toolStep(text: string, c: ToolCtx): ToolAction | null {
         return { do: 'compassOpen' };
       case 'book':
         return { do: 'bookOpen' };
+      case 'show':
+        // 「プロンプト出して」 with no spell now is the book; 「プロンプト見せて」 with none: {bati} says so
+        if (c.spell || c.plan) return { do: 'show' };
+        return it.out ? { do: 'bookOpen' } : { do: 'noSpell' };
       case 'close':
         return { do: 'bookClose' };
       case 'page':

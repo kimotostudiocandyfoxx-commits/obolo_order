@@ -1,4 +1,4 @@
-import type { BluenaPlanet, ItemMarkId, MarkNames } from '@obolo/shared';
+import { spellSaid, type BluenaPlanet, type ItemMarkId, type MarkNames } from '@obolo/shared';
 import type { AtelierKind } from '@/lib/atelier/unlock';
 
 /**
@@ -102,7 +102,8 @@ export function detectFind(text: string, names?: MarkNames): Extract<Intent, { k
 }
 
 export function detect(text: string, hasCard: boolean, names?: MarkNames): Intent {
-  const t = text.trim();
+  // R13: プロンプト / 呪文 / 指示文 are the spell
+  const t = spellSaid(text.trim());
   const found = detectFind(t, names);
   if (found) return found;
   let kinds = WORDS.filter(([, re]) => re.test(t)).map(([k]) => k);

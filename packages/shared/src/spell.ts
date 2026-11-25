@@ -286,9 +286,28 @@ const GREETING = /^(ヤッホー|やっほー|やっほ|ヤッホ|こんにち�
 const BY_MAGIC = /(魔法|まほう|スペル)で(?=(作|つく|描|か|生成|お願い|おねがい))/g;
 /** a free word that is only request / filler (never a talisman) */
 const NOT_CONTENT = /^(魔法|まほう|スペル|欲しい|ほしい|ヤッホー|やっほー|やっほ|なんだけど|んだけど|だけど|けど|お願い|おねがい|ください|よろしく|です|ます|だよ|かな|ような|ように|よう|みたい|みたいな|感じ|かんじ|ね|よ|な|もの|やつ|なにか|何か|なんか|一つ|ひとつ|一枚|いちまい|新しい|あたらしい|新しく|あたらしく)$/;
+/**
+ * R13 (client): in the app a generation prompt is a 「スペル」, but members also say プロンプト (ぷろんぷと, ﾌﾟﾛﾝﾌﾟﾄ,
+ * prompt), 呪文 (じゅもん), 指示文 or プロンプト文 — all of them mean the spell ({bati} answers with スペル, never
+ * correcting). A collection of them (プロンプト集 / 呪文帳 …) is the スペルブック.
+ */
+const SPELL_ALIAS = String.raw`(?:プロンプト|ぷろんぷと|ﾌﾟﾛﾝﾌﾟﾄ|(?<![A-Za-zＡ-Ｚａ-ｚ])(?:prompts?|ｐｒｏｍｐｔ[ｓ]?)(?![A-Za-zＡ-Ｚａ-ｚ])|呪文|じゅもん|ジュモン|ｼﾞｭﾓﾝ|指示文|しじぶん)(?:文|ぶん)?`;
+const SPELL_ALIAS_BOOK = new RegExp(`(?:${SPELL_ALIAS}|スペル)(?:集|しゅう|帳|ちょう|書|ブック|ぶっく|一覧|いちらん|リスト|ノート)`, 'gi');
+const SPELL_ALIAS_ONE = new RegExp(SPELL_ALIAS, 'gi');
+/** the member's words with プロンプト / 呪文 / 指示文 (and their collections) said as スペル / スペルブック */
+export function spellSaid(text: string): string {
+  return text.replace(SPELL_ALIAS_BOOK, 'スペルブック').replace(SPELL_ALIAS_ONE, 'スペル');
+}
+/** a word that only names the spell itself (スペル, プロンプト, 呪文 …, このスペル): never a talisman */
+export function isSpellWord(word: string): boolean {
+  return /^(この|その|あの|いまの|今の)?スペル(ブック)?$/.test(spellSaid(word.trim()));
+}
+/** 「このスペルに」「プロンプトを」: the spell named as the thing being changed (not what it is about) */
+const THE_SPELL = /(この|その|あの|いまの|今の)?スペル(ブック)?(に|を|で|の|は|から|へ|も|って)?(?!で(作|つく|描|か|生成|お願い|おねがい))/g;
+
 /** the words with the request taken off (kept: what it is about, the dictionary words) */
 export function spellWordsOnly(said: string): string {
-  return said.trim().replace(GREETING, '').replace(BY_MAGIC, '、');
+  return spellSaid(said.trim()).replace(GREETING, '').replace(BY_MAGIC, '、').replace(THE_SPELL, '、');
 }
 
 /** the free words (what it is about) as tags: common ones from THEMES, others as they are (their English: the words) */
@@ -298,7 +317,7 @@ function themes(rest: string): SpellTag[] {
     .replace(ASKING, '、')
     .split(/[、。,.!！?？\s　]+|(?<=[\p{sc=Han}\p{sc=Katakana}ー])(?:の|と|や|で|に|を|が|は|な)(?=.)|の(?=[\p{sc=Han}\p{sc=Katakana}])/u)
     .map((c) => c.replace(/^(の|や|で|に|を|が|は|な)+|(の|と|や|で|に|を|が|は|な|も|感じ|っぽい|みたいな?|する|して|した|ような|ように|よう|なんだけど|んだけど|だけど|けど)+$/g, '').trim())
-    .filter((c) => c && !FILLER.test(c) && !NOT_CONTENT.test(c));
+    .filter((c) => c && !FILLER.test(c) && !NOT_CONTENT.test(c) && !isSpellWord(c));
   const out: SpellTag[] = [];
   for (const c of chunks) {
     const t = THEMES.find(([re]) => re.test(c));

@@ -28,4 +28,10 @@ describe('R12: the Moon compass prompts', () => {
     expect(BATI_CHARACTER.ja).toContain('このスペル、スペルブックにしまっておく？');
     expect(BATI_CHARACTER.en).toMatch(/compass \(コンパス\).*spell book \(スペルブック\)/s);
   });
+  it('R13: Bati takes プロンプト / 呪文 / 指示文 as the spell and answers with スペル, never correcting', () => {
+    expect(BATI_CHARACTER.ja).toMatch(/「プロンプト」「呪文」「指示文」と呼んでも、スペルのこととして受けとめ/);
+    expect(BATI_CHARACTER.ja).toContain('いつも「スペル」と言う');
+    expect(BATI_CHARACTER.ja).toContain('言い直させない');
+    expect(BATI_CHARACTER.en).toMatch(/プロンプト, 呪文, 指示文 or "prompt", take it as the spell and always answer with スペル, never correcting/);
+  });
 });
