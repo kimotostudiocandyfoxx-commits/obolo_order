@@ -142,8 +142,8 @@ export const RUNWARE_PRICES: Record<string, number> = {
   'runware:400@2': 0.003, // FLUX.2 [klein] 9B
   'alibaba:qwen-image@2.1-turbo': 0.01,
   'bytedance:seedream@5.0-pro': 0.045, // ≈ ¥2–7 a picture at 1024 (p90 ≈ ¥7)
-  'ace-step-1.5-xl-sft:60s': 0.009, // ACE-Step 1.5 XL SFT, 60 s of song at 50 steps (scales with the length)
-  'minimax:music@2.6': 0.15, // MiniMax Music 2.6, one clip
+  'runware:ace-step@v1.5-xl-sft': 0.009, // ACE-Step 1.5 XL SFT, ≈ 60 s of song at 50 steps, scales with the length (Music lab: $0.009)
+  'minimax:music@2.6': 0.15, // MiniMax Music 2.6, one clip (Music lab: $0.15)
 };
 
 /** the pricing knobs that are not provider list prices (all set from the API's env) */
