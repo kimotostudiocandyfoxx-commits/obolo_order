@@ -896,6 +896,14 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     // R11: the plan waiting for a yes — a yes starts it, any other words change it
     if (p && 'plan' in p) {
       if (isYes(text)) return void accept(p.plan);
+      // R12: 「魔法で作って欲しい」 (making, nothing to change) is a yes; 「画像を作りたい」 (the same kind, nothing to change)
+      // changes nothing — {bati} asks again
+      const said = detect(text, false, markNames());
+      if (said.kind === 'makeAny' && isBare(said.content)) return void accept(p.plan);
+      if (said.kind === 'make' && said.what === p.plan.plan.kind && isBare(said.content)) {
+        setPending(p);
+        return sayT(isCraftKind(p.plan.plan.kind) ? craftConfirmLine(p.plan.plan.kind, p.plan.prev) : MOON_LINES.confirm);
+      }
       return void propose(p.plan.plan.kind, text, p.plan.prev, p.plan.opts, p.plan);
     }
     if (p && 'radioName' in p) {
