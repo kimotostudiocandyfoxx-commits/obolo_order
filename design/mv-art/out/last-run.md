@@ -1,24 +1,23 @@
-# UI art — 2026-11-25T08:40:37.070Z
+# UI art — 2026-11-25T09:03:15.179Z
 
-Seedream 5.0 Pro / 20枚 / 約7円
+Seedream 5.0 Pro / 19枚 / 約123円
 
-- ✅ exp-jupiter-anime-pier
-- ❌ exp-jupiter-anime: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 0.0995 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ exp-jupiter-cats-pier: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 0.0995 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ exp-jupiter-cats: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 0.0995 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ exp-jupiter-mono-pier: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 0.0995 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ exp-jupiter-mono: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 0.0995 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ exp-jupiter-nightview-pier: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 0.0995 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ exp-jupiter-nightview: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 0.0995 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ exp-jupiter-oil-pier: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 0.0995 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ exp-jupiter-oil: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 0.0995 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ exp-jupiter-pixel-pier: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 0.0995 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ exp-jupiter-pixel: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 0.0995 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ exp-jupiter-retropop-pier: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 0.0995 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ exp-jupiter-retropop: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 0.0995 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ exp-jupiter-wamodern-pier: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 0.0995 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ exp-jupiter-wamodern: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 0.0995 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ exp-jupiter-watercolor-pier: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 0.0995 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ exp-jupiter-watercolor: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 0.0995 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ exp-jupiter-yumekawa-pier: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 0.0995 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ exp-jupiter-yumekawa: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 0.0995 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
+- ✅ exp-jupiter-cats
+- ✅ exp-jupiter-cats-pier
+- ✅ exp-jupiter-mono
+- ✅ exp-jupiter-mono-pier
+- ✅ exp-jupiter-nightview
+- ✅ exp-jupiter-nightview-pier
+- ✅ exp-jupiter-oil
+- ✅ exp-jupiter-oil-pier
+- ✅ exp-jupiter-pixel-pier
+- ✅ exp-jupiter-retropop
+- ✅ exp-jupiter-retropop-pier
+- ✅ exp-jupiter-wamodern
+- ✅ exp-jupiter-wamodern-pier
+- ✅ exp-jupiter-watercolor
+- ✅ exp-jupiter-watercolor-pier
+- ✅ exp-jupiter-yumekawa
+- ✅ exp-jupiter-yumekawa-pier
+- ❌ exp-jupiter-anime: Error: 520 {}
+- ❌ exp-jupiter-pixel: Error: 520 {}

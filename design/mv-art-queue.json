@@ -11851,23 +11851,6 @@
   ],
   "redo": [
     "exp-jupiter-anime",
-    "exp-jupiter-cats",
-    "exp-jupiter-cats-pier",
-    "exp-jupiter-mono",
-    "exp-jupiter-mono-pier",
-    "exp-jupiter-nightview",
-    "exp-jupiter-nightview-pier",
-    "exp-jupiter-oil",
-    "exp-jupiter-oil-pier",
-    "exp-jupiter-pixel",
-    "exp-jupiter-pixel-pier",
-    "exp-jupiter-retropop",
-    "exp-jupiter-retropop-pier",
-    "exp-jupiter-wamodern",
-    "exp-jupiter-wamodern-pier",
-    "exp-jupiter-watercolor",
-    "exp-jupiter-watercolor-pier",
-    "exp-jupiter-yumekawa",
-    "exp-jupiter-yumekawa-pier"
+    "exp-jupiter-pixel"
   ]
 }
