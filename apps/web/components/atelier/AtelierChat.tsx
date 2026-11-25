@@ -710,7 +710,9 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       setBusy(true);
       if (!rule.undo) castNow(1400);
       try {
-        const r = await getApi().songTweak(id, rule.undo ? { undo: true } : { said: text.slice(0, 200) }, { lyrics: card.lyrics, seconds: card.tweak?.seconds });
+        // (the demo works from the lyrics as sung; the API keeps them itself)
+        const sung = card.tweak?.lyrics0 ?? card.lyrics;
+        const r = await getApi().songTweak(id, rule.undo ? { undo: true } : { said: text.slice(0, 200) }, { lyrics: sung, seconds: card.tweak?.seconds });
         if (r.status === 'paid') {
           sayT(SONG_LINES.editPaid);
           return void run('song', text, card);
@@ -719,7 +721,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
         if (r.status === 'first') sayT(SONG_LINES.editFirst);
         else if (r.status === 'missing') sayT(SONG_LINES.editMissing);
         else {
-          const next: Work = { ...card, ...(r.song ? { audio: r.song.url } : {}), ...(r.lyrics ? { lyrics: r.lyrics } : {}), tweak: { versions: r.versions, what: r.status === 'done' ? r.what : undefined, seconds: r.song?.seconds ?? card.tweak?.seconds } };
+          const next: Work = { ...card, ...(r.song ? { audio: r.song.url } : {}), ...(r.lyrics ? { lyrics: r.lyrics } : {}), tweak: { versions: r.versions, what: r.status === 'done' ? r.what : undefined, seconds: r.song?.seconds ?? card.tweak?.seconds, ...(sung ? { lyrics0: sung } : {}) } };
           putLast(next);
           if (r.status === 'done') sayT(SONG_LINES.editDone, { what: r.what ?? '' });
           else sayT(SONG_LINES.editUndo);
