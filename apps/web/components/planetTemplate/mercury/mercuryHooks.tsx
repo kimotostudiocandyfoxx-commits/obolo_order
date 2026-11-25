@@ -3,10 +3,8 @@
 import type { HomeWork, PlanetSongView } from '@obolo/shared';
 import { useEffect, useState } from 'react';
 import { PIER_PATH, SHIP_FRONT } from '@/lib/planetTemplate/mercury';
-import type { SkySource } from '@/lib/planetTemplate/sky';
 import type { TemplateHooks } from '../PlanetTemplateHome';
 import type { ProfileMiddleSlot } from '../Profile';
-import { SkyExplore } from '../sky/SkyExplore';
 import type { OpenWork, WorkOpener } from '../WorkView';
 import { SongStage } from './SongStage';
 import m from './Mercury.module.css';
@@ -88,15 +86,10 @@ export const mercuryBeach: ProfileMiddleSlot = ({ person, open, current }) =>
   );
 
 /**
- * 水星's hooks for the common template (handoff 02): the opener (§2 / §3 / §4), the beach (§4), and the sky (pinch in:
- * じぶんの空, search, travel, continents) when a sky source is given. The numbers (seven ships on MSLOT, the sea only,
+ * 水星's hooks for the common template (handoff 02): the opener (§2 / §3 / §4) and the beach (§4); the sky (06) is
+ * planetHooks' (sky/skyKits.tsx). The numbers (seven ships on MSLOT, the sea only,
  * the pier at night) are lib/planetTemplate/config.ts.
  */
-export function mercuryHooks(o: { load: (w: HomeWork) => Promise<PlanetSongView | null>; sky: SkySource | null; me: { name: string; figure: string | null; back: string | null; dance?: string | null } }): TemplateHooks {
-  const opener = mercuryOpener(o.load);
-  return {
-    opener,
-    profileMiddle: mercuryBeach,
-    sky: o.sky ? (h) => <SkyExplore planet="mercury" source={o.sky!} me={o.me} onClose={h.close} toast={h.toast} /> : undefined,
-  };
+export function mercuryHooks(o: { load: (w: HomeWork) => Promise<PlanetSongView | null> }): TemplateHooks {
+  return { opener: mercuryOpener(o.load), profileMiddle: mercuryBeach };
 }

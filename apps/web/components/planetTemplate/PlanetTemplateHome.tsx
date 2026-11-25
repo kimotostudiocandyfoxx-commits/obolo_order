@@ -8,7 +8,7 @@ import type { Body } from '@/lib/planetTemplate/motion';
 import { dancerOf, peopleOf, type HomePerson } from '@/lib/planetTemplate/people';
 import { SAMPLE_OWN_FIGURE } from '@/lib/planetTemplate/sample';
 import { nameFont, shadesOf } from '@/lib/planetTemplate/saturn';
-import { pinchOf } from '@/lib/planetTemplate/sky';
+import { PinchTracker, WheelPinch } from '@/lib/planetTemplate/pinch';
 import { PlayView, type PlayStage } from './PlayView';
 import { Profile, type ProfileMiddleSlot, type ProfilePerson } from './Profile';
 import { Shades } from './saturn/Shades';
@@ -43,7 +43,7 @@ export interface TemplateHooks {
   figure?: FigureSlot;
   /** 3-2 / 3-3 numbers: where a figure may stay, ▶'s intro delay, how long a work stays (templateConfig) */
   config?: Partial<Omit<PlanetTemplateConfig, 'planet'>>;
-  /** the sky (pinch in on the home; Mercury first, M-R295): drawn over the home while open */
+  /** the sky (06: pinch in on the home, M-R295): drawn over the home while open */
   sky?: (o: SkyOpen) => ReactNode;
   /** ▶ the planet's own stage in the view from your place, in place of the visitors one at a time (Saturn: the groove) */
   playStage?: PlayStage;
@@ -127,7 +127,8 @@ export function PlanetTemplateHome({ planet, view, me, hooks = {}, onSwitchPlane
   const mo = useRef(new Map<number, Body>());
   const els = useRef(new Map<number, HTMLDivElement>());
   const shadows = useRef(new Map<number, HTMLElement>());
-  const fingers = useRef(new Map<number, { x: number; y: number }>());
+  const pinch = useRef(new PinchTracker());
+  const wheel = useRef(new WheelPinch());
   for (const st of crowd.seats) if (!mo.current.has(st.n)) mo.current.set(st.n, motion.spawn(st.slot, st.n, size.W, size.H));
   useEffect(() => {
     const live = new Set(crowd.seats.map((x) => x.n));
@@ -201,7 +202,7 @@ export function PlanetTemplateHome({ planet, view, me, hooks = {}, onSwitchPlane
   }, []);
   const figureHandlers = (n: number, p: HomePerson) => ({
     onPointerDown: (e: React.PointerEvent<HTMLDivElement>) => {
-      if (e.button > 0 || fingers.current.size >= 2) return;
+      if (e.button > 0 || pinch.current.count >= 2) return;
       const b = mo.current.get(n);
       if (!b) return;
       press.current = {
@@ -235,7 +236,7 @@ export function PlanetTemplateHome({ planet, view, me, hooks = {}, onSwitchPlane
         b.drag = true;
         e.currentTarget.classList.add(s.dragging);
       }
-      if (d.moved && fingers.current.size >= 2) {
+      if (d.moved && pinch.current.count >= 2) {
         // the pinch wins: let go where it is
         press.current = null;
         b.drag = false;
@@ -301,7 +302,6 @@ export function PlanetTemplateHome({ planet, view, me, hooks = {}, onSwitchPlane
 
   // --- the sky: pinch in (or ctrl + wheel on a computer) goes up; the first visit says how, once (M-R295) ---------
   const skyOn = !!(cfg.sky && hooks.sky);
-  const pinch = useRef<{ d0: number; fired: boolean } | null>(null);
   const openSky = useCallback(() => {
     setOpened(null);
     setPlaying(null);
@@ -320,10 +320,15 @@ export function PlanetTemplateHome({ planet, view, me, hooks = {}, onSwitchPlane
     const id = setTimeout(() => toast('✌️ 2本の指でつまむと、空から探せるよ'), 900);
     return () => clearTimeout(id);
   }, [skyOn, toast]);
-  const twoFingers = () => {
-    const a = [...fingers.current.values()];
-    return a.length === 2 ? Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y) : 0;
-  };
+  // 06 §1: the sky's pictures are read when the planet opens (so going up does not wait for them)
+  useEffect(() => {
+    if (!skyOn || !cfg.sky) return;
+    for (const src of [cfg.sky.sea, cfg.sky.me]) {
+      const im = new Image();
+      im.src = src;
+      im.decode?.().catch(() => undefined);
+    }
+  }, [skyOn, cfg.sky]);
 
   // --- 3-5 the profile ---------------------------------------------------------------------------------------
   const own: ProfilePerson = {
@@ -364,33 +369,18 @@ export function PlanetTemplateHome({ planet, view, me, hooks = {}, onSwitchPlane
   return (
     <div
       ref={root}
-      className={`${s.root} ${opened ? `${cfg.openLook.dim === false ? '' : s.dim} ${s.opened}` : ''}`}
+      className={`${s.root} ${opened ? `${cfg.openLook.dim === false ? '' : s.dim} ${s.opened}` : ''} ${sky ? s.skyUp : ''}`}
       style={vars}
-      onPointerDownCapture={(e) => {
-        fingers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
-        if (fingers.current.size === 2) pinch.current = { d0: twoFingers(), fired: false };
-      }}
+      onPointerDownCapture={(e) => pinch.current.down(e.pointerId, e.clientX, e.clientY)}
       onPointerMoveCapture={(e) => {
-        if (!fingers.current.has(e.pointerId)) return;
-        fingers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
-        const pc = pinch.current;
-        if (!pc || pc.fired || !pc.d0 || fingers.current.size !== 2) return;
-        if (skyOn && !sky && !profile && pinchOf(twoFingers() / pc.d0) === 'in') {
-          pc.fired = true;
-          openSky();
-        }
+        // two fingers closing (0.72×) go up to the sky; a drag already going lets go (figureHandlers)
+        if (pinch.current.move(e.pointerId, e.clientX, e.clientY) === 'in' && skyOn && !sky && !profile) openSky();
       }}
-      onPointerUpCapture={(e) => {
-        fingers.current.delete(e.pointerId);
-        if (fingers.current.size < 2) pinch.current = null;
-      }}
-      onPointerCancelCapture={(e) => {
-        fingers.current.delete(e.pointerId);
-        if (fingers.current.size < 2) pinch.current = null;
-      }}
+      onPointerUpCapture={(e) => pinch.current.up(e.pointerId)}
+      onPointerCancelCapture={(e) => pinch.current.up(e.pointerId)}
       onWheel={(e) => {
-        // a trackpad pinch on a computer arrives as ctrl + wheel
-        if (e.ctrlKey && e.deltaY > 4 && skyOn && !sky && !profile) openSky();
+        // a trackpad pinch on a computer arrives as ctrl + wheel (once per gesture)
+        if (wheel.current.of(e, performance.now()) === 'in' && skyOn && !sky && !profile) openSky();
       }}
       onDragStart={(e) => e.preventDefault()}
       data-testid="planet-template"

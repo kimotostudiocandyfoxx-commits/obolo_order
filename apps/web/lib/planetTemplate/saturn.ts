@@ -22,13 +22,15 @@ export interface Floor {
   W: number;
   H: number;
 }
-export function floorOf(W: number, H: number): Floor {
+/** a record floor on a 9:16 picture (fractions): the home's REC, or a plaza's landed scene (06) */
+export type FloorRec = { cx: number; cy: number; rx: number; ry: number };
+export function floorOf(W: number, H: number, rec: FloorRec = REC): Floor {
   const k = Math.max(W / 9, H / 16);
   const bw = 9 * k;
   const bh = 16 * k;
   const x0 = (W - bw) / 2;
   const y0 = (H - bh) / 2;
-  return { cx: x0 + REC.cx * bw, cy: y0 + REC.cy * bh, rx: REC.rx * bw, ry: REC.ry * bh, W, H };
+  return { cx: x0 + rec.cx * bw, cy: y0 + rec.cy * bh, rx: rec.rx * bw, ry: rec.ry * bh, W, H };
 }
 
 /** the size by depth: the back of the record (gz −1) 0.58×, the front (gz +1) 1.18× */
@@ -200,14 +202,18 @@ export function throwOf(f: Floor, vx: number, vy: number): { vgx: number; vgz: n
 }
 
 /** 04 §1: eight kororins on the record floor (the rest wait and fall in from above as ones are popped) */
-export const floorMotion: FigureMotion = {
+export const floorMotion: FigureMotion = floorMotionOn(REC);
+
+/** kororins hopping on a record floor `rec` (the home's; 06: a plaza's landed scene, seven at most) */
+export function floorMotionOn(rec: FloorRec, max: number = HOME_MAX): FigureMotion {
+  return {
   kind: 'floor',
-  max: HOME_MAX,
+  max,
   slotRow: () => 1,
   slotSize: () => 1,
   spawn(_slot, n, W, H) {
     const b = makeBody({ i: n, floor: floorStart(n, H) });
-    place(b, floorOf(W, H));
+    place(b, floorOf(W, H, rec));
     return b;
   },
   step(b, dt, W, H, pace = 1) {
@@ -215,10 +221,10 @@ export const floorMotion: FigureMotion = {
     if (!st) return;
     const d = dt * pace;
     b.t += d;
-    floorStep(st, b.i, b.t, d, floorOf(W, H));
+    floorStep(st, b.i, b.t, d, floorOf(W, H, rec));
   },
   settle(bodies, dt, W, H) {
-    const f = floorOf(W, H);
+    const f = floorOf(W, H, rec);
     const live = bodies.filter((b) => b.floor);
     for (let k = 0; k < 2; k++)
       for (let i = 0; i < live.length; i++)
@@ -236,7 +242,7 @@ export const floorMotion: FigureMotion = {
   drag(b, W, H) {
     const st = b.floor;
     if (!st) return;
-    const f = floorOf(W, H);
+    const f = floorOf(W, H, rec);
     const g = toGround(f, b.x, b.y + st.R * 0.3);
     st.gx = g.gx;
     st.gz = g.gz;
@@ -249,7 +255,7 @@ export const floorMotion: FigureMotion = {
   drop(b, W, H) {
     const st = b.floor;
     if (!st) return;
-    const f = floorOf(W, H);
+    const f = floorOf(W, H, rec);
     const t = throwOf(f, b.vx, b.vy);
     st.vgx = t.vgx;
     st.vgz = t.vgz;
@@ -257,6 +263,7 @@ export const floorMotion: FigureMotion = {
     st.wv += 4.5;
   },
 };
+}
 
 /** the sunglasses (shown while the music plays): round 7 in 10, the others 3 (the prototype's shades) */
 export type Shades = 'round' | 'way' | 'star' | 'heart';

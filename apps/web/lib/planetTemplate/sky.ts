@@ -19,10 +19,10 @@ import type { Api } from '@/lib/api';
 import { SAMPLE_LYRICS, SAMPLE_SONGS, sampleSongOf, sampleSongUrl, shipStandIn } from './mercury';
 
 /**
- * 空から探す on Mercury (decisions M-R295〜M-R312; prototype expOpen / drawSky / openSearch / tripGo / expLand): じぶんの空
+ * 空から探す (handoff 06; decisions M-R295〜M-R312; prototype expOpen / drawSky / openSearch / tripGo / expLand): じぶんの空
  * (your island and five favourite continents), 〔🔍 大陸をさがす〕, 〔✈ 旅〕, landing on a continent and the songs that
  * drifted there. The screens read a SkySource: the API (docs/planets.md 2-4 / 2-5) or, in the preview's sample mode,
- * the prototype's continents and songs kept in the browser.
+ * the prototype's continents and works (Mercury's songs, Jupiter's arts, Saturn's voices) kept in the browser.
  */
 
 /**
@@ -51,10 +51,8 @@ export const TRIP_SLOTS: readonly (readonly [number, number, number])[] = [
   [0.79, 0.6, 0.42],
   [0.5, 0.8, 0.5],
 ];
-/** a pinch closer than this (ratio of the fingers' distance) goes up to the sky / back from a continent; wider comes home */
-export const PINCH_IN = 0.72;
-export const PINCH_OUT = 1.35;
-export const pinchOf = (ratio: number): 'in' | 'out' | null => (ratio < PINCH_IN ? 'in' : ratio > PINCH_OUT ? 'out' : null);
+/** the pinch's numbers and detection live in pinch.ts (the home and the sky share them) */
+export { PINCH_IN, PINCH_OUT, pinchOf } from './pinch';
 
 /** a work on a continent */
 export type LandWork = ContinentLandingView['works'][number];
@@ -123,15 +121,21 @@ export function apiSky(api: Api, planet: HomePlanet): SkySource {
 
 // --- the sample (the prototype's ten continents and their songs, kept in this browser) ------------------------------
 
-const C = (key: string, name: string, tags: string[], rule: ContinentRule): ContinentView => ({
-  key,
-  planet: 'mercury',
-  name,
-  creator: null,
-  rule,
-  tags,
-  pictures: { sky: `/planets/continents/mercury/${key}-sky.webp`, land: `/planets/continents/mercury/${key}-land.webp`, shore: `/planets/continents/mercury/${key}-shore.webp` },
-});
+/** a sample continent: the operator's (creator null — the prototype's 「by Nagi」 are not members, M-R317) with its three pictures */
+const continentOf =
+  (planet: HomePlanet) =>
+  (key: string, name: string, tags: string[], rule: ContinentRule): ContinentView => ({
+    key,
+    planet,
+    name,
+    creator: null,
+    rule,
+    tags,
+    pictures: { sky: `/planets/continents/${planet}/${key}-sky.webp`, land: `/planets/continents/${planet}/${key}-land.webp`, shore: `/planets/continents/${planet}/${key}-shore.webp` },
+  });
+const C = continentOf('mercury');
+const J = continentOf('jupiter');
+const S = continentOf('saturn');
 /** the prototype's CONT.mercury / RULE.mercury (the same as the API's seed, migration 0056) */
 export const SAMPLE_CONTINENTS: ContinentView[] = [
   C('edm', 'EDM大陸', ['EDM', 'ダンス', 'フェス', 'アゲ'], { g: ['EDM'], m: ['ダンス', 'フェス'], bpm: [118, 999] }),
@@ -145,6 +149,35 @@ export const SAMPLE_CONTINENTS: ContinentView[] = [
   C('matsuri', '夏祭りの島', ['夏', '和風', '祭り', 'アゲ'], { g: [], m: ['祭り', '和風', '夏'] }),
   C('rain', '雨音の島', ['雨', 'チル', '作業用', 'しっとり'], { g: [], m: ['雨'] }),
 ];
+/** the prototype's CONT.jupiter / RULE.jupiter (the API's seed, migration 0056; pictures 0059) */
+export const SAMPLE_GLADES: ContinentView[] = [
+  J('watercolor', '水彩の森', ['水彩', 'やさしい', 'パステル'], { g: ['水彩'], m: ['やさしい', 'パステル'] }),
+  J('anime', 'アニメ塗りの丘', ['アニメ塗り', 'キラキラ', '人物'], { g: ['アニメ塗り'], m: ['キラキラ', '人物'] }),
+  J('pixel', 'ドット絵の村', ['ドット絵', 'レトロ', 'ゲーム'], { g: ['ドット絵'], m: ['ゲーム', 'レトロ'] }),
+  J('oil', '油絵の金の森', ['油絵', 'あたたか', '風景'], { g: ['油絵'], m: ['あたたか'] }),
+  J('yumekawa', 'ゆめかわの花畑', ['ゆめかわ', 'パステル', 'かわいい'], { g: ['ゆめかわ'], m: ['パステル', 'かわいい'] }),
+  J('cats', 'ねこの森', ['ねこ', 'どうぶつ', 'かわいい'], { g: [], m: ['ねこ', 'どうぶつ'] }),
+  J('nightview', '夜景の丘', ['夜', '夜景', 'つめたい'], { g: [], m: ['夜景', '夜'] }),
+  J('wamodern', '和モダンの庭', ['和風', '和モダン', '花'], { g: ['和モダン'], m: ['和風'] }),
+  J('retropop', 'レトロポップ広場', ['レトロ', 'ポップ', 'あざやか'], { g: ['レトロ', 'ポップ'], m: ['ポップ', 'あざやか'] }),
+  J('mono', 'モノクロの森', ['モノクロ', '白黒', 'かっこいい'], { g: ['モノクロ'], m: ['白黒'] }),
+];
+/** the prototype's CONT.saturn / RULE.saturn (M-R316's plazas: the API's seed, migration 0057; pictures 0060) */
+export const SAMPLE_PLAZAS: ContinentView[] = [
+  S('chat', 'おしゃべり広場', ['雑談', 'ゆるい', '日常'], { g: ['雑談'], m: ['ゆるい', '日常'] }),
+  S('koi', '恋バナの部屋', ['恋バナ', 'ドキドキ', '好きな人'], { g: ['恋バナ'], m: ['好きな人', 'ドキドキ'] }),
+  S('oshi', '推し語りステージ', ['推し', 'アイドル', 'ライブ'], { g: ['推し'], m: ['アイドル', 'ライブ'] }),
+  S('school', '放課後テラス', ['学校', '部活', 'テスト'], { g: ['学校'], m: ['部活', 'テスト'] }),
+  S('night', '夜ふかしラウンジ', ['夜', '眠れない', '深夜'], { g: ['夜'], m: ['深夜', '眠れない'] }),
+  S('game', 'ゲーム実況の島', ['ゲーム', '実況', '対戦'], { g: ['ゲーム'], m: ['対戦', '実況'] }),
+  S('warai', 'お笑い劇場', ['お笑い', 'ボケ', 'ツッコミ'], { g: ['お笑い'], m: ['ボケ', 'ツッコミ'] }),
+  S('anime', 'アニメ語りカフェ', ['アニメ', 'マンガ', '名シーン'], { g: ['アニメ'], m: ['名シーン', 'マンガ'] }),
+  S('asa', 'おはよう広場', ['朝', 'おはよう', '元気'], { g: ['朝'], m: ['おはよう', '元気'] }),
+  S('nemui', 'ねむねむ星', ['眠い', 'ゆるい', 'おやすみ'], { g: ['眠い'], m: ['おやすみ'] }),
+];
+/** the sample continents of a planet (the five have none yet: 06 leaves them to 05's worlds) */
+export const sampleContinentsOf = (planet: HomePlanet): ContinentView[] => (planet === 'mercury' ? SAMPLE_CONTINENTS : planet === 'jupiter' ? SAMPLE_GLADES : planet === 'saturn' ? SAMPLE_PLAZAS : []);
+
 /** the prototype's GSONG: which sample song plays for a genre */
 const GSONG: Record<string, number> = { EDM: 3, ヒップホップ: 2, バラード: 4, ロック: 5, ローファイ: 1, シティポップ: 1, アニソン: 3, ジャズ: 4, 'J-POP': 3 };
 /** the prototype's WORKS.mercury: strangers' songs with their tags (title, by, genre, bpm, moods) */
@@ -181,6 +214,74 @@ export function sampleSkyWorks(now = Date.now()): (HomeWork & { tags: WorkTags }
   });
 }
 
+/** the prototype's WORKS.jupiter: strangers' arts (title, by, style, moods) */
+const ARTS: [string, string, string, string[]][] = [
+  ['雨上がりの町', 'みお', '水彩', ['やさしい', '風景']], ['花びらの午後', 'はるか', '水彩', ['パステル', '花']], ['にじむ夕焼け', 'そら', '水彩', ['あたたか', '風景']], ['窓辺のねこ', 'みお', '水彩', ['ねこ', 'やさしい']],
+  ['放課後の屋上', 'ショウ', 'アニメ塗り', ['人物', '青春']], ['星の魔法少女', 'ぽんず', 'アニメ塗り', ['キラキラ', '人物']], ['夏の約束', 'YUZU', 'アニメ塗り', ['人物', '夏']], ['桜の帰り道', 'ことね', 'アニメ塗り', ['花', '人物']],
+  ['8bitの勇者', 'タク', 'ドット絵', ['ゲーム', 'レトロ']], ['ピクセル商店街', 'kei', 'ドット絵', ['レトロ', '夜']], ['ドットのねこ', 'ぽんず', 'ドット絵', ['ねこ', 'かわいい']],
+  ['金色の森', 'REN', '油絵', ['あたたか', '風景']], ['ひまわりの丘', 'そら', '油絵', ['花', '夏']], ['港の朝', 'Nagi', '油絵', ['風景', 'あたたか']],
+  ['ゆめかわユニコーン', 'ぽんず', 'ゆめかわ', ['パステル', 'かわいい']], ['わたあめの空', 'はるか', 'ゆめかわ', ['パステル', '空']], ['ハートの雲', 'YUZU', 'ゆめかわ', ['かわいい', '空']],
+  ['こたつねこ', 'みお', 'アニメ塗り', ['ねこ', 'どうぶつ']], ['ねこの昼寝', 'はるか', '水彩', ['ねこ', 'どうぶつ']],
+  ['ネオンの夜', 'REN', 'アニメ塗り', ['夜景', '夜']], ['屋上から見た街', 'Nagi', '油絵', ['夜景', 'つめたい']], ['真夜中の駅', 'kei', 'モノクロ', ['夜', 'つめたい']],
+  ['鳥居と月', 'ことね', '和モダン', ['和風', '夜']], ['金魚と風鈴', 'はるか', '水彩', ['和風', '夏']], ['椿の庭', 'ことね', '和モダン', ['花', '和風']],
+  ['レコード少女', 'YUZU', 'レトロ', ['ポップ', 'あざやか']], ['70sドライブ', 'Rio', 'レトロ', ['ポップ', '夏']], ['ソーダ水', 'そら', 'ポップ', ['あざやか', '夏']],
+  ['影のダンス', 'kei', 'モノクロ', ['白黒', 'かっこいい']], ['墨の龍', 'タク', 'モノクロ', ['和風', 'かっこいい']], ['白い朝', 'REN', 'モノクロ', ['白黒', '風景']],
+];
+/** the prototype's WORKS.saturn: strangers' kororins (their words, by, topic, moods) */
+const VOICES: [string, string, string, string[]][] = [
+  ['今日なにしてた？', 'Rio', '雑談', ['ゆるい', '日常']], ['コンビニの新作、当たりだった', 'そら', '雑談', ['日常']], ['雨の日ってなんか好き', 'みお', '雑談', ['ゆるい']], ['最近ハマってること聞いて', 'YUZU', '雑談', ['日常']],
+  ['好きな人と目が合った…！', 'はるか', '恋バナ', ['ドキドキ', '好きな人']], ['LINEの返事が来ない', 'ことね', '恋バナ', ['好きな人']], ['告白ってどうやるの', 'REN', '恋バナ', ['ドキドキ']], ['片思い3か月目', 'みお', '恋バナ', ['好きな人', '夜']],
+  ['推しのライブ当たった！', 'YUZU', '推し', ['ライブ', 'アイドル']], ['推しの新曲、神すぎる', 'ぽんず', '推し', ['アイドル']], ['推しが尊い、以上', 'はるか', '推し', ['アイドル']], ['ペンライトの色、何にする？', 'ことね', '推し', ['ライブ']],
+  ['部活おわった〜', 'そら', '学校', ['部活']], ['明日テストなの忘れてた', 'ショウ', '学校', ['テスト']], ['文化祭の準備たのしい', 'Nagi', '学校', ['日常']], ['先生の口ぐせがツボ', 'kei', '学校', ['お笑い']],
+  ['眠れない人、いる？', 'REN', '夜', ['眠れない', '深夜']], ['深夜のラーメンは正義', 'タク', '夜', ['深夜']], ['星がきれいだよ', 'Nagi', '夜', ['夜']], ['2時なのに目が冴えてる', 'kei', '夜', ['眠れない']],
+  ['ランクやっと上がった！', 'タク', 'ゲーム', ['対戦']], ['このボス強すぎない？', 'ショウ', 'ゲーム', ['実況']], ['一緒にやる人募集〜', 'Rio', 'ゲーム', ['対戦']],
+  ['今日いちばん笑ったこと', 'ショウ', 'お笑い', ['ボケ']], ['ツッコミ待ちです', 'kei', 'お笑い', ['ツッコミ', 'ボケ']], ['犬が靴下を盗んでいった', 'そら', 'お笑い', ['日常', 'ボケ']],
+  ['最終回で泣いた', 'ぽんず', 'アニメ', ['名シーン']], ['今期いちばん好きなアニメ', 'ことね', 'アニメ', ['マンガ']], ['あのシーン、何回も見ちゃう', 'YUZU', 'アニメ', ['名シーン']],
+  ['おはよう！今日もがんばろ', 'はるか', '朝', ['おはよう', '元気']], ['朝ごはん、パン派？ごはん派？', 'Rio', '朝', ['おはよう']], ['今日は晴れ！', 'そら', '朝', ['元気']],
+  ['もう眠い…おやすみ', 'みお', '眠い', ['おやすみ', 'ゆるい']], ['布団から出られない', 'kei', '眠い', ['ゆるい']], ['いい夢みてね', 'はるか', '眠い', ['おやすみ']],
+];
+/** a sample stranger's look: one of the prototype's five cast pictures, the same for the same name */
+const LOOKS = ['mikie', 'kimorin', 'monban', 'brother', 'sister'] as const;
+export const sampleLookOf = (name: string) => {
+  let h = 0;
+  for (const ch of name) h = (h * 31 + ch.codePointAt(0)!) >>> 0;
+  return LOOKS[h % LOOKS.length];
+};
+
+/** the sample's strangers' works on a planet as the API would send them (Mercury's songs, Jupiter's arts, Saturn's voices) */
+export function sampleWorksOf(planet: HomePlanet, now = Date.now()): (HomeWork & { tags: WorkTags })[] {
+  const at = (i: number) => new Date(now - i * 3_600_000).toISOString();
+  if (planet === 'jupiter')
+    return ARTS.map(([title, by, style, moods], i) => ({
+      id: `sky-j${i}`,
+      kind: 'jupiter_post',
+      author: { id: `sky-${by}`, name: by, pic: null, figure: `/planets/sample/fig-jupiter-${sampleLookOf(by)}.webp` },
+      rel: 'stranger',
+      text: '',
+      title,
+      url: `/planets/sample/art-${(i % 5) + 1}.webp`,
+      thumbUrl: `/planets/sample/art-${(i % 5) + 1}.webp`,
+      flownAt: at(i),
+      demo: true,
+      tags: { main: style, moods },
+    }));
+  if (planet === 'saturn')
+    return VOICES.map(([words, by, topic, moods], i) => ({
+      id: `sky-s${i}`,
+      kind: 'saturn_post',
+      author: { id: `sky-${by}`, name: by, pic: null, figure: `/planets/sample/chibi-${sampleLookOf(by)}.webp`, ball: `/planets/sample/fig-saturn-${sampleLookOf(by)}.webp` },
+      rel: 'stranger',
+      text: words,
+      url: null,
+      thumbUrl: null,
+      flownAt: at(i),
+      demo: true,
+      tags: { main: topic, moods },
+    }));
+  if (planet === 'mercury') return sampleSkyWorks(now);
+  return [];
+}
+
 /** where the sample's works drift (the same workScore ≥ 2 as the API), best first, the same score at random */
 export function sampleDrift(rule: ContinentRule, works: (HomeWork & { tags: WorkTags })[], rand: () => number = Math.random): LandWork[] {
   return works
@@ -211,10 +312,10 @@ const store = {
 
 /** the preview's sky with nobody signed in: the prototype's continents and songs; your five kept in this browser */
 export function sampleSky(planet: HomePlanet = 'mercury', rand: () => number = Math.random): SkySource {
-  const cs = SAMPLE_CONTINENTS;
+  const cs = sampleContinentsOf(planet);
   let favs = favouritesOf(store.get(planet), cs);
   const seen = new Map<string, number>();
-  const works = sampleSkyWorks();
+  const works = sampleWorksOf(planet);
   const keep = (f: FavouriteSlots) => {
     favs = f;
     store.set(planet, f);
@@ -239,7 +340,8 @@ export function sampleSky(planet: HomePlanet = 'mercury', rand: () => number = M
       return keys.map((k) => cs.find((c) => c.key === k)!);
     },
     async land(key) {
-      const c = cs.find((x) => x.key === key) ?? cs[0];
+      const c = cs.find((x) => x.key === key);
+      if (!c) throw new Error('Unknown continent');
       seen.set(key, Date.now());
       return { continent: c, young: false, works: sampleDrift(c.rule, works, rand) };
     },

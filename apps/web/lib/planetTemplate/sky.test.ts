@@ -85,3 +85,29 @@ describe('the search shows no tags (M-R310)', () => {
     expect(SEARCH_PLACEHOLDER).toBe('大陸の名前・ジャンル');
   });
 });
+
+describe('the sample sky on Jupiter and Saturn (06)', () => {
+  it('Jupiter: the ten glades, the operator’s first five; arts drift by their style and moods', async () => {
+    const s = sampleSky('jupiter', seq());
+    const v = await s.sky();
+    expect(v.continents).toHaveLength(10);
+    expect(v.continents.every((c) => c.creator === null)).toBe(true);
+    expect(v.favourites).toEqual(['watercolor', 'anime', 'pixel', 'oil', 'yumekawa']);
+    const l = await s.land('cats');
+    expect(l.continent.pictures.shore).toBe('/planets/continents/jupiter/cats-shore.webp');
+    expect(l.works.map((w) => w.title)).toContain('こたつねこ');
+    expect(l.works.every((w) => w.kind === 'jupiter_post' && !!w.url && !!w.author.figure)).toBe(true);
+  });
+  it('Saturn: the ten plazas; kororins drift by their topic, with the ball and the chibi', async () => {
+    const s = sampleSky('saturn', seq());
+    const v = await s.sky();
+    expect(v.continents.map((c) => c.key)).toEqual(['chat', 'koi', 'oshi', 'school', 'night', 'game', 'warai', 'anime', 'asa', 'nemui']);
+    const l = await s.land('koi');
+    expect(l.works.length).toBeGreaterThan(2);
+    expect(l.works.every((w) => w.kind === 'saturn_post' && !!w.text && !!w.author.ball && !!w.author.figure)).toBe(true);
+    expect((await s.search('', '推し'))[0].key).toBe('oshi');
+  });
+  it('the five have no sample continents yet (06: their sky follows 05’s worlds)', async () => {
+    expect((await sampleSky('neptune', seq()).sky()).continents).toEqual([]);
+  });
+});

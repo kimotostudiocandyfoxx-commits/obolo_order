@@ -69,7 +69,8 @@ export interface PlanetTemplateConfig {
     /** said when every work has been seen (null: nothing) */
     doneLine: string | null;
   };
-  /** the sky (handoff 06, Mercury first): the sea seen from above and your island on it; null = no sky yet */
+  /** the sky (handoff 06): the sea seen from above and your island on it (public/planets/continents/<planet>/); null = no
+   * sky yet (the five: 06 leaves their sky, continents and pictures to 05's worlds) */
   sky: { sea: string; me: string } | null;
 }
 
@@ -101,6 +102,9 @@ const fiveOwn = (p: FivePlanet): Partial<Omit<PlanetTemplateConfig, 'planet'>> =
   play: { path: DEFAULT_PLAY_PATH, untilDone: p === 'mars', night: false, fireworks: false, fireflies: false, dance: { x: PLACE[p][0], y: PLACE[p][1] }, danceAs: 'dance', doneLine: ALL_SEEN_FIVE },
 });
 
+/** 06: the sky's two pictures (the sea from above, your island) */
+const skyOf = (p: HomePlanet) => ({ sea: `/planets/continents/${p}/sea.webp`, me: `/planets/continents/${p}/me.webp` });
+
 /** each planet's own numbers (the 02〜 documents) over the common template */
 const OWN: Partial<Record<HomePlanet, Partial<Omit<PlanetTemplateConfig, 'planet'>>>> = {
   ...Object.fromEntries(FIVE_PLANETS.map((p) => [p, fiveOwn(p)])),
@@ -110,6 +114,7 @@ const OWN: Partial<Record<HomePlanet, Partial<Omit<PlanetTemplateConfig, 'planet
     introMs: PORCH_INTRO_MS,
     holdMs: PORCH_HOLD_MS,
     play: { path: PORCH_PATH, untilDone: false, night: true, fireworks: false, fireflies: true, dance: JTREE, danceAs: 'figure', doneLine: ALL_SEEN },
+    sky: skyOf('jupiter'),
   },
   // 02 水星: seven ships on the sea lanes (MSLOT), on the sea only; a song opens with a deep zoom; ▶ is the pier at night
   mercury: {
@@ -118,7 +123,7 @@ const OWN: Partial<Record<HomePlanet, Partial<Omit<PlanetTemplateConfig, 'planet
     standIn: shipStandIn,
     openLook: { scale: 1.65, blur: 5, bright: 0.55 },
     play: { path: PIER_PATH, untilDone: true, night: true, fireworks: true, fireflies: false, dance: MHOUSE, danceAs: 'dance', doneLine: ALL_HEARD },
-    sky: { sea: '/planets/continents/mercury/sea.webp', me: '/planets/continents/mercury/me.webp' },
+    sky: skyOf('mercury'),
   },
   // 04 土星: not the rows — eight kororins hop on the record floor with depth (your own among them); a tap pops one where
   // it is (the home stays); ▶ you fall onto the record and the kororins ride its groove (the first talks at ~2.3 s)
@@ -129,6 +134,7 @@ const OWN: Partial<Record<HomePlanet, Partial<Omit<PlanetTemplateConfig, 'planet
     openLook: { scale: 1, blur: 0, bright: 1, dim: false },
     introMs: Math.round(firstVoiceMs()),
     play: { path: DEFAULT_PLAY_PATH, untilDone: true, night: false, fireworks: false, fireflies: false, dance: { ...NEEDLE, from: 'sky', ms: DROP_MS }, danceAs: 'dance', doneLine: KORORIN_ALL_HEARD },
+    sky: skyOf('saturn'),
   },
 };
 
