@@ -23,7 +23,7 @@ const CSS = `
 @keyframes ls-glow{0%{background-color:rgba(160,235,255,0);text-shadow:0 0 1px #fff,0 0 4px #9becff,0 0 9px rgba(63,182,255,.6)}25%{background-color:rgba(160,235,255,.26);text-shadow:0 0 2px #fff,0 0 9px #c4f4ff,0 0 20px #3fb6ff,0 0 32px rgba(120,200,255,.9)}100%{background-color:rgba(160,235,255,.1);text-shadow:0 0 1px #fff,0 0 5px #9becff,0 0 12px rgba(63,182,255,.75)}}
 @keyframes ls-shimmer{0%{background-position:-120% 0}100%{background-position:220% 0}}
 @keyframes ls-mote{0%,100%{opacity:.25;transform:translateY(0)}50%{opacity:.9;transform:translateY(-6px)}}
-@keyframes ls-tag-gone{0%{opacity:1;filter:none;transform:none;max-height:40px}40%{opacity:1;filter:brightness(2.2) blur(1px)}100%{opacity:0;filter:brightness(3) blur(8px);transform:translateY(-24px) scale(1.15);max-height:0}}
+@keyframes ls-tag-gone{0%{opacity:1;filter:none;transform:none}25%{opacity:1;filter:brightness(2.4) drop-shadow(0 0 8px #bfe9ff)}100%{opacity:0;filter:brightness(3) blur(7px);transform:translateY(34px) rotate(14deg) scale(.85)}}
 @media (prefers-reduced-motion: reduce){[data-lyric-sheet] *{animation-iteration-count:1!important}}
 `;
 
@@ -32,7 +32,7 @@ function MetaTag({ label, kind, mode, delay, testid }: { label: string; kind: 's
   const seed = seedOf(label);
   const tilt = (((seed % 7) - 3) * 0.5).toFixed(1);
   const hint = kind === 'hint';
-  const anim = mode === 'drop' ? `hk-in .95s cubic-bezier(.2,.8,.3,1) ${delay}ms both` : mode === 'fall' ? `ls-tag-gone 1.1s ease-in ${delay}ms forwards` : `ls-row .6s ease-out ${delay}ms both`;
+  const anim = mode === 'drop' ? `hk-in .95s cubic-bezier(.2,.8,.3,1) ${delay}ms both` : mode === 'fall' ? `ls-tag-gone 1.9s cubic-bezier(.5,0,.8,.5) ${delay + 250}ms forwards` : `ls-row .6s ease-out ${delay}ms both`;
   return (
     <span className="relative inline-block align-middle" style={{ ['--tilt' as string]: `${tilt}deg`, animation: anim }} data-lyric-tag={label} data-lyric-tag-kind={kind} data-lyric-tag-mode={mode} data-testid={testid}>
       <span className="block" style={{ animation: `hk-glow ${3.4 + (seed % 5) * 0.3}s ease-in-out ${(seed % 7) * -400}ms infinite`, transform: `rotate(${tilt}deg)` }}>
@@ -79,7 +79,7 @@ function TagRow({ label, hints, gone, fresh, newHints, delay }: { label: string;
  * the sheet: `cx` its centre line, `top` / `height` its place in the stage (stage px), `width` its width. The rows come in
  * one by one the first time; afterwards only what changed moves.
  */
-export function LyricSheet({ sheet, cx, top, width, height, casting }: { sheet: FloatLyrics; cx: number; top: number; width: number; height: number; casting?: boolean }) {
+export function LyricSheet({ sheet, cx, top, width, height, casting, foot = 0 }: { sheet: FloatLyrics; cx: number; top: number; width: number; height: number; casting?: boolean; /** room at its foot (the mana words float there) */ foot?: number }) {
   useSpellFont('hikari');
   const { lyrics, change } = sheet;
   const labels = useMemo(() => lyricBlockLabels(lyrics), [lyrics]);
@@ -127,10 +127,10 @@ export function LyricSheet({ sheet, cx, top, width, height, casting }: { sheet: 
         className="absolute inset-0"
         style={{
           borderRadius: 14,
-          background: 'linear-gradient(180deg, rgba(150,225,255,.17), rgba(70,140,230,.11) 40%, rgba(40,90,190,.13) 100%)',
-          boxShadow: 'inset 0 0 0 1px rgba(205,246,255,.38), inset 0 0 22px rgba(160,230,255,.22), 0 0 28px rgba(80,180,255,.22)',
-          backdropFilter: 'blur(7px) saturate(1.15)',
-          WebkitBackdropFilter: 'blur(7px) saturate(1.15)',
+          background: 'linear-gradient(180deg, rgba(120,200,255,.26), rgba(22,58,130,.42) 18%, rgba(14,40,104,.5) 82%, rgba(40,110,210,.34) 100%)',
+          boxShadow: 'inset 0 0 0 1px rgba(205,246,255,.42), inset 0 1px 0 rgba(235,252,255,.55), inset 0 0 26px rgba(150,225,255,.24), 0 0 30px rgba(80,180,255,.26)',
+          backdropFilter: 'blur(11px) saturate(1.2)',
+          WebkitBackdropFilter: 'blur(11px) saturate(1.2)',
         }}
       />
       {/* a slow sheen across it */}
@@ -142,8 +142,8 @@ export function LyricSheet({ sheet, cx, top, width, height, casting }: { sheet: 
       </div>
       <div
         ref={box}
-        className="relative h-full overflow-y-auto overscroll-contain px-[14px] py-[12px]"
-        style={{ WebkitMaskImage: 'linear-gradient(180deg, transparent 0, #000 12px, #000 calc(100% - 16px), transparent 100%)', maskImage: 'linear-gradient(180deg, transparent 0, #000 12px, #000 calc(100% - 16px), transparent 100%)', scrollbarWidth: 'none' } as CSSProperties}
+        className="relative overflow-y-auto overscroll-contain px-[14px] pt-[12px] pb-[8px]"
+        style={{ height: `calc(100% - ${foot}px)`, WebkitMaskImage: 'linear-gradient(180deg, transparent 0, #000 12px, #000 calc(100% - 16px), transparent 100%)', maskImage: 'linear-gradient(180deg, transparent 0, #000 12px, #000 calc(100% - 16px), transparent 100%)', scrollbarWidth: 'none' } as CSSProperties}
         data-testid="lyric-sheet-scroll"
       >
         {lyrics.blocks.map((b, i) => {

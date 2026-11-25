@@ -347,7 +347,6 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     if (twoPart && !plan.lyrics) {
       // the style talismans come out first (「曲調のスペルはこんなんだね。」); meanwhile {bati} writes the lyrics
       const t0 = Date.now();
-      setBusy(true);
       const base = extra?.lyrics ?? prev?.lyrics;
       const got: LyricsView = base
         ? { lyrics: base, how: 'new' }
@@ -357,7 +356,6 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       // the talismans finish coming in before the sheet (each 230 ms, then a breath)
       const wait = 1400 + plan.tags.length * 230 - (Date.now() - t0);
       if (wait > 0) await new Promise((r) => setTimeout(r, wait));
-      setBusy(false);
       if (floatingRef.current?.id !== fid) return;
       showLyrics(fid, got, null);
       const lead = got.declined === 'copy' ? SONG_LINES.lyricsCopy : got.declined === 'flagged' ? SONG_LINES.lyricsFlagged : got.how === 'own' ? SONG_LINES.lyricsOwn : SONG_LINES.songLyrics;
@@ -1539,10 +1537,11 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
                   const sc = m.w >= 700 ? 0.74 : 0.62;
                   const sheetW = Math.min(m.w - 28, 540);
                   const layout = floatLayout(floating.look, floating.tags, m.w, (sheetW + 10) / sc);
-                  const manaTop = floating.price > 0 ? bottom - 22 : bottom;
+                  // the sheet comes down over the bowl's far rim (the mana words float in its foot)
+                  const sheetBottom = Math.min(b.y + 2, bottom + 40);
+                  const manaTop = sheetBottom - 30;
                   const roof = m.top + (m.w >= 700 ? 150 : 104);
                   const styleH = layout.height * sc;
-                  const sheetBottom = manaTop - 8;
                   const sheetH = Math.max(170, Math.min(m.w >= 700 ? 520 : 420, sheetBottom - roof - styleH - 10));
                   const sheetTop = sheetBottom - sheetH;
                   const styleBottom = sheetTop - 6;
@@ -1551,8 +1550,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
                     node: (
                       <>
                         {toolNode}
+                        <LyricSheet key={`${floating.id}-sheet`} sheet={floating.lyrics} cx={b.x} top={sheetTop} width={sheetW} height={sheetH} casting={floating.casting} foot={floating.price > 0 ? 30 : 0} />
                         <FloatingSpell key={floating.id} spell={floating} layout={layout} cx={b.x} bottom={styleBottom} bowl={b} scale={sc} onTap={tapTag} from={from0} manaTop={manaTop} />
-                        <LyricSheet key={`${floating.id}-sheet`} sheet={floating.lyrics} cx={b.x} top={sheetTop} width={sheetW} height={sheetH} casting={floating.casting} />
                       </>
                     ),
                   };
