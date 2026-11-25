@@ -7,7 +7,7 @@ const holes = (t: string) => [...new Set([...t.matchAll(/\{[a-z_]+\}/g)].map((m)
 
 describe("M-R253 §6: {bati}'s Moon atelier lines", () => {
   it('every fixed line has all the common styles, with the same placeholders', () => {
-    expect(MOON_LINE_TEXTS).toHaveLength(39);
+    expect(MOON_LINE_TEXTS).toHaveLength(40);
     for (const line of MOON_LINE_TEXTS) {
       const v = BATI_VARIANTS[line];
       expect(v, line).toBeDefined();

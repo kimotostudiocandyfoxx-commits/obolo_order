@@ -288,20 +288,24 @@ export const MOON_LINES = {
   back: ['よし、作り始めた！　だいたい{n}分。できたころに、このトークに戻ってきてね。', '{n}分くらい、かかりそう。できたら、このトークで見せるね。'],
   backBig: 'これは、ちょっと大物。だいたい{n}分。できたころに、このトークに戻ってきてね。',
   /**
-   * R11 (client): before anything that spends mana — a vague ask gets one question (with a few ideas as chips), a clear
-   * one a plan; the plan's card shows the mana it takes and the mana you have; only a yes starts it ({short} = the mana missing)
+   * R11 (client): before anything that spends mana — a vague ask gets one question (a few ideas inside the sentence, no
+   * chips), a clear one a spell; only a yes in words starts it ({short} = the mana missing)
    */
   ask: {
-    song: 'いいね！　どんな曲にする？　気分やテーマを教えて。',
-    art: 'いいね！　どんな絵にする？　描きたいものを教えて。',
-    video: 'いいね！　どんな映像にする？　雰囲気を教えて。',
-    look: 'いいね！　どんなふうに変える？',
-    bati: 'いいね！　どんなかっこうにする？',
+    song: 'いいね！　どんな曲にする？　「明るいポップ」とか「しっとりバラード」とか、気分やテーマを教えて。',
+    art: 'いいね！　どんな絵にする？　「夜の海とクジラ」とか「星空の街」とか、描きたいものを教えて。',
+    video: 'いいね！　どんな映像にする？　「夜空をとぶ」とか「海辺をさんぽ」とか、雰囲気を教えて。',
+    look: 'いいね！　どんなふうに変える？　「もっとかっこよく」とか「ふんわりかわいく」とか、言ってみて。',
+    bati: 'いいね！　どんなかっこうにする？　「魔法使い」とか「宇宙飛行士」とか、言ってみて。',
   },
-  /** the spell (スペル): the line before its 木札 card (the card shows the mana and the buttons) */
+  /**
+   * the spell (スペル): the line as its talismans appear in the sky over the bowl (the mana floats under them), and the
+   * question after it — no buttons: a yes in words casts it, any other words change it ({tag} = a talisman tapped)
+   */
   plan: 'じゃあ、こういうスペルになるね。',
   replan: 'スペルを、こう変えたよ。',
-  change: 'どこを変える？　「〇〇も足して」「〇〇は外して」みたいに言ってね。',
+  confirm: 'このスペルで作る？　それとも、どこか変える？',
+  tapHint: '外したいなら、「{tag}は外して」って言ってね。',
   start: 'よし、作るね！',
   noMana: 'ごめん、マナが{short}たりないみたい。',
   /** ③ late; the second time its own line */

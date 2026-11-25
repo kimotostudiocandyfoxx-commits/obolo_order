@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, type CSSProperties } from 'react';
 import type { SpellTag } from '@obolo/shared';
 
 /**
  * Client 2026-11-24: 「スペルの札をもっと魔法っぽく — 木札よりキョンシーのおでこのお札みたいに。文字も。何パターンか見せて」.
- * Five talisman looks for the spell card (all approved 2026-11-25; the 木札 is gone): the work kind picks one
- * (SPELL_LOOK_BY_KIND). Each look brings its own tag, card frame, mana line, chip style, motions (in / away) and one Google Font
- * (OFL), loaded only when that look is shown.
+ * Five talisman looks for the spell (all approved 2026-11-25; the 木札 is gone): the work kind picks one
+ * (SPELL_LOOK_BY_KIND). Each look brings its own talisman, motions (in / away) and one Google Font (OFL), loaded only
+ * when that look is shown. They float in the temple sky over the bowl (FloatingSpell.tsx), no card behind them.
  *   A reifu     霊符 — the jiangshi talisman: long yellow strips, cinnabar brush, 勅令 and a 月 seal, red glow; burns away
  *   B tenfu     天符 — celestial ofuda: night-indigo paper, gold leaf rule, crescent and stars, glowing gold; turns to stardust
  *   C rune      ルーン巻物 — tiny parchment scrolls on rods, burnt edges, rune lines, ink with a violet shimmer; burns away
@@ -43,7 +43,7 @@ const FONT: Record<TalismanLook, { family: string; css: string | null }> = {
   hikari: { family: '"Yusei Magic"', css: null },
   jufu: { family: '"Kaisei Decol"', css: 'Kaisei+Decol:wght@700' },
 };
-const face = (look: TalismanLook) => `${FONT[look].family}, "Shippori Mincho", "Hiragino Mincho ProN", serif`;
+export const face = (look: TalismanLook) => `${FONT[look].family}, "Shippori Mincho", "Hiragino Mincho ProN", serif`;
 
 /** only the font of the look in use, fetched once when it is first shown (display=swap) */
 export function useSpellFont(look: TalismanLook) {
@@ -392,140 +392,4 @@ function Jufu({ tag, mode, delay, onDrop, tilt }: TalismanProps & { tilt: number
 export function Talisman({ look, tilt, ...p }: TalismanProps & { look: TalismanLook; tilt: number }) {
   const C = { reifu: Reifu, tenfu: Tenfu, rune: Rune, hikari: Hikari, jufu: Jufu }[look];
   return <C {...p} tilt={tilt} />;
-}
-
-/* ───────────────────────── the card around them ───────────────────────── */
-export interface LookFrame {
-  card: CSSProperties;
-  cardClass: string;
-  title: CSSProperties;
-  row: string;
-  rule: string;
-  mana: CSSProperties;
-  price: CSSProperties;
-  have: CSSProperties;
-  short: CSSProperties;
-  /** behind the tags (stars, a watermark circle, light ripples) */
-  back?: ReactNode;
-  titleMark?: ReactNode;
-}
-
-export const FRAME: Record<TalismanLook, LookFrame> = {
-  reifu: {
-    cardClass: 'rounded-[10px]',
-    card: {
-      background: `radial-gradient(ellipse 90% 60% at 50% 0%, rgba(190,40,20,.42), transparent 70%), radial-gradient(ellipse 80% 50% at 50% 100%, rgba(120,20,10,.35), transparent 70%), ${GRAIN}, linear-gradient(180deg, #24110d, #140808)`,
-      backgroundBlendMode: 'normal, normal, overlay, normal',
-      boxShadow: 'inset 0 0 0 1px rgba(214,90,50,.35), inset 0 0 22px rgba(0,0,0,.65), 0 0 16px rgba(220,50,20,.22)',
-      color: '#f0d8a8',
-    },
-    title: { fontFamily: face('reifu'), color: '#f2c64e', letterSpacing: '.28em', fontSize: 13, textShadow: '0 0 6px rgba(255,120,40,.55)' },
-    titleMark: <span className="ml-auto block h-[13px] w-[13px] rotate-[6deg] text-center text-[9px] leading-[13px] text-[#ffe9b0]" style={{ background: '#b51a0e', fontFamily: face('reifu') }}>符</span>,
-    row: 'items-stretch justify-center gap-x-[3px] gap-y-2',
-    rule: 'border-[#d4583a]/30',
-    mana: { color: '#ecd3a0' },
-    price: { color: '#ffd45a', textShadow: '0 0 8px rgba(255,140,40,.8)', fontFamily: face('reifu'), fontSize: 18 },
-    have: { color: 'rgba(240,216,168,.7)' },
-    short: { color: '#ff7a5c', fontWeight: 600 },
-  },
-  tenfu: {
-    cardClass: 'rounded-[6px]',
-    card: {
-      background: `${STARS}, radial-gradient(1px 1px at 30% 50%, #fff, transparent 60%), radial-gradient(1px 1px at 70% 65%, #fff, transparent 60%), radial-gradient(ellipse 80% 55% at 50% 0%, rgba(80,100,210,.4), transparent 70%), linear-gradient(180deg, #172056, #0b1033)`,
-      boxShadow: 'inset 0 0 0 1px #d8b45c, inset 0 0 0 4px #0f1640, inset 0 0 0 5px rgba(216,180,92,.5), 0 0 18px rgba(255,200,100,.18)',
-      color: '#ecdcae',
-    },
-    title: { fontFamily: face('tenfu'), color: '#f0cf7a', letterSpacing: '.3em', fontSize: 12.5, textShadow: '0 0 6px rgba(255,210,120,.7)' },
-    back: (
-      <>
-        {/* a crescent low in the corner, and gold corner pieces */}
-        <span aria-hidden className="pointer-events-none absolute right-[14px] top-[9px] block h-[22px] w-[22px] rounded-full" style={{ boxShadow: '5px -3px 0 0 rgba(243,210,122,.85)', filter: 'drop-shadow(0 0 6px rgba(255,214,120,.8))', animation: 'tf-card 5s ease-in-out infinite' }} />
-        {(['left-[6px] top-[6px] border-l border-t', 'right-[6px] top-[6px] border-r border-t', 'left-[6px] bottom-[6px] border-l border-b', 'right-[6px] bottom-[6px] border-r border-b'] as const).map((c) => (
-          <span key={c} aria-hidden className={`pointer-events-none absolute h-[12px] w-[12px] border-[#e6c46c] ${c}`} style={{ borderWidth: undefined }} />
-        ))}
-      </>
-    ),
-    row: 'items-center justify-center gap-x-[3px] gap-y-[5px]',
-    rule: 'border-[#d8b45c]/35',
-    mana: { color: '#e9d9a6' },
-    price: { fontFamily: face('tenfu'), fontSize: 18, color: '#ffe08a', textShadow: '0 0 8px rgba(255,210,110,.9)' },
-    have: { color: 'rgba(233,217,166,.7)' },
-    short: { color: '#ff8f7a', fontWeight: 600 },
-  },
-  rune: {
-    cardClass: 'rounded-[8px]',
-    card: {
-      background: `radial-gradient(ellipse 85% 70% at 50% 45%, rgba(110,70,40,.35), transparent 75%), ${GRAIN}, linear-gradient(160deg, #3b2616, #24160c 70%, #1c1009)`,
-      backgroundBlendMode: 'normal, overlay, normal',
-      boxShadow: 'inset 0 0 0 1px rgba(200,150,80,.45), inset 0 0 0 4px rgba(30,16,8,.9), inset 0 0 0 5px rgba(200,150,80,.25), inset 0 0 28px rgba(0,0,0,.6)',
-      color: '#ead6ad',
-    },
-    title: { fontFamily: face('rune'), fontWeight: 700, color: '#e8cf98', letterSpacing: '.26em', fontSize: 12.5 },
-    back: <MagicCircle rich className="pointer-events-none absolute left-1/2 top-1/2 h-[190px] w-[190px] -translate-x-1/2 -translate-y-1/2 text-[#c79a55]" style={{ opacity: 0.12, animation: 'jf-spin 90s linear infinite' }} />,
-    row: 'items-center justify-center gap-x-[4px] gap-y-[5px]',
-    rule: 'border-[#c8964f]/30',
-    mana: { color: '#e6d1a6' },
-    price: { fontFamily: face('rune'), fontWeight: 700, fontSize: 18, color: '#c9b3ff', textShadow: '0 0 8px rgba(140,100,255,.8)' },
-    have: { color: 'rgba(230,209,166,.7)' },
-    short: { color: '#ff9a7a', fontWeight: 600 },
-  },
-  hikari: {
-    cardClass: 'rounded-[14px]',
-    card: {
-      background: 'radial-gradient(ellipse 70% 45% at 50% 105%, rgba(80,200,255,.35), transparent 70%), radial-gradient(ellipse 60% 40% at 20% 10%, rgba(120,190,255,.18), transparent 70%), linear-gradient(180deg, rgba(14,34,84,.94), rgba(6,18,52,.96))',
-      boxShadow: 'inset 0 0 0 1px rgba(150,225,255,.45), inset 0 1px 0 rgba(220,250,255,.35), 0 0 18px rgba(70,180,255,.28)',
-      color: '#d8f4ff',
-    },
-    title: { fontFamily: face('hikari'), color: '#bff0ff', letterSpacing: '.28em', fontSize: 13, textShadow: '0 0 6px #45c4ff' },
-    back: (
-      <>
-        <span aria-hidden className="pointer-events-none absolute left-1/2 top-[58%] block h-[120px] w-[260px] rounded-[50%] border border-[rgba(140,225,255,.35)]" style={{ animation: 'hk-ripple 4.5s ease-out infinite' }} />
-        <span aria-hidden className="pointer-events-none absolute left-1/2 top-[58%] block h-[120px] w-[260px] rounded-[50%] border border-[rgba(140,225,255,.3)]" style={{ animation: 'hk-ripple 4.5s ease-out 2.25s infinite' }} />
-      </>
-    ),
-    row: 'items-center justify-center gap-x-[3px] gap-y-[3px]',
-    rule: 'border-[#8fe0ff]/25',
-    mana: { color: '#cdeeff' },
-    price: { fontFamily: face('hikari'), fontSize: 19, color: '#f2fdff', textShadow: '0 0 6px #7fe3ff, 0 0 12px #3bb8ff' },
-    have: { color: 'rgba(205,238,255,.7)' },
-    short: { color: '#ffb0a0', fontWeight: 600 },
-  },
-  jufu: {
-    cardClass: 'rounded-[4px]',
-    card: {
-      background: `${FIBRE_W}, ${GRAIN}, radial-gradient(ellipse at 50% 50%, #f7f0e1, #ece0c8)`,
-      backgroundBlendMode: 'multiply, multiply, normal',
-      boxShadow: 'inset 0 0 0 1px rgba(190,40,20,.55), inset 0 0 0 3.5px #f3eadb, inset 0 0 0 4.5px rgba(190,40,20,.35), 0 2px 8px rgba(60,20,0,.25)',
-      color: '#2a1a14',
-    },
-    title: { fontFamily: face('jufu'), fontWeight: 700, color: '#2a1a14', letterSpacing: '.3em', fontSize: 12.5 },
-    titleMark: (
-      <span className="ml-auto flex h-[18px] w-[18px] rotate-[-8deg] items-center justify-center rounded-full text-[9.5px] font-bold leading-none text-[#c8261a]" style={{ boxShadow: 'inset 0 0 0 1.5px #c8261a', fontFamily: face('jufu'), opacity: 0.85 }}>
-        呪
-      </span>
-    ),
-    back: <MagicCircle rich className="pointer-events-none absolute left-1/2 top-[52%] h-[200px] w-[200px] -translate-x-1/2 -translate-y-1/2 text-[#c8261a]" style={{ opacity: 0.13, animation: 'jf-spin 80s linear infinite' }} />,
-    row: 'items-center justify-center gap-x-[2px] gap-y-[4px]',
-    rule: 'border-[#c8261a]/25',
-    mana: { color: '#3a2a20' },
-    price: { fontFamily: face('jufu'), fontWeight: 700, fontSize: 18, color: '#c8261a' },
-    have: { color: 'rgba(58,42,32,.7)' },
-    short: { color: '#c8261a', fontWeight: 700 },
-  },
-};
-
-/** the bubble's chips under a card in this look (〔このスペルで作って〕〔変える〕) */
-export function spellChipStyle(look: TalismanLook): CSSProperties {
-  switch (look) {
-    case 'reifu':
-      return { fontFamily: face('reifu'), fontWeight: 400, fontSize: 14, color: '#a8120a', borderRadius: 3, background: `${FIBRE_V}, linear-gradient(180deg, #f6dc6a, #e8bb3a)`, backgroundBlendMode: 'multiply, normal', boxShadow: 'inset 0 0 0 1px rgba(168,18,10,.45), 0 0 8px rgba(255,90,40,.35), 0 2px 3px rgba(60,10,0,.35)' };
-    case 'tenfu':
-      return { fontFamily: face('tenfu'), fontWeight: 400, fontSize: 14, color: '#f3d382', borderRadius: 4, background: 'linear-gradient(180deg, #212d68, #10173f)', boxShadow: 'inset 0 0 0 1px #d8b45c, 0 0 9px rgba(255,205,110,.3)', textShadow: '0 0 5px rgba(255,210,120,.7)' };
-    case 'rune':
-      return { fontFamily: face('rune'), fontWeight: 700, fontSize: 13.5, color: '#3a1d0b', borderRadius: 4, background: `linear-gradient(180deg, rgba(70,28,6,.5) 0, transparent 5px, transparent calc(100% - 5px), rgba(70,28,6,.5) 100%), ${GRAIN}, linear-gradient(180deg, #f1dfb2, #dcbd85)`, backgroundBlendMode: 'normal, multiply, normal', boxShadow: '0 0 0 1px rgba(90,50,20,.5), 0 2px 3px rgba(40,20,5,.35)' };
-    case 'hikari':
-      return { fontFamily: face('hikari'), fontSize: 14.5, color: '#f2fdff', borderRadius: 999, background: 'linear-gradient(180deg, rgba(60,140,220,.85), rgba(20,60,140,.9))', boxShadow: 'inset 0 0 0 1px rgba(200,245,255,.7), 0 0 12px rgba(90,205,255,.55)', textShadow: '0 0 5px #8fe8ff' };
-    case 'jufu':
-      return { fontFamily: face('jufu'), fontWeight: 700, fontSize: 13.5, color: '#ff5a36', borderRadius: 3, background: 'linear-gradient(180deg, #2a1a18, #120b0b)', boxShadow: 'inset 0 0 0 1px rgba(214,58,32,.6), 0 2px 4px rgba(40,10,0,.35)', textShadow: '0 0 4px rgba(255,70,30,.6)' };
-  }
 }

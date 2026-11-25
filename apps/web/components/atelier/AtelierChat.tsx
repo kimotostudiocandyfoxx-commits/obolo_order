@@ -10,7 +10,7 @@ import { BATI_COLOR, batiLook, characterLook, SELF_COLOR, selfLook, selfTone } f
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { batiLine, batiLineVoiceOf } from '@/lib/onboarding/batiLine';
-import { atelierMakeCost, spellDrop, spellFrom, spellKey, type SpellView, HOME_OF_WORK, PLANET_HOMES, TALK_BUBBLE_COLOUR, TALK_COLOR_KEY, type ChangeResult, type Me, changeableById, changeLines, changeRequest, etaMinutes, fillLine, homecomingSay, MOON_LINES, type RefineTarget, type WorkMaterial, batiDaysLeftLine, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId } from '@obolo/shared';
+import { atelierMakeCost, spellFrom, spellKey, type SpellTag, type SpellView, HOME_OF_WORK, PLANET_HOMES, TALK_BUBBLE_COLOUR, TALK_COLOR_KEY, type ChangeResult, type Me, changeableById, changeLines, changeRequest, etaMinutes, fillLine, homecomingSay, MOON_LINES, type RefineTarget, type WorkMaterial, batiDaysLeftLine, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId } from '@obolo/shared';
 import { useMarkRing } from '@/components/finds/MarkRing';
 import { viewsOf } from '@/lib/story/views';
 import { markNames } from '@/lib/finds/marks';
@@ -37,9 +37,9 @@ import { clipItem } from './BluenaClip';
 import { useClipSend } from '@/lib/clip/useClip';
 import { BowlFx, TEMPLE_PLATE, type BowlState } from './BowlFx';
 import { faceTo, FLIES, uid, versionsOf, type Msg, type Work } from './work';
-import { CHANGE, IDEA_CHIPS, isYes, planOf, spellKindOf, YES, type Plan } from './plan';
-import { SpellCard } from './SpellCard';
-import { spellChipStyle, spellLookFor } from './spellLooks';
+import { isYes, planOf, spellKindOf, type Plan } from './plan';
+import { FloatingSpell, floatLayout, MANA_H, SpellRecord, type FloatSpell } from './FloatingSpell';
+import { spellLookFor } from './spellLooks';
 
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 const TAUGHT_KEY = 'obolo.atelier.taught';
@@ -266,15 +266,15 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
 
   /**
    * R11 (client): a making. Free → at once. One that spends mana never starts on the ask: a vague ask gets one question
-   * (with a few ideas as chips); otherwise {bati} says its plan with a card (what, the mana it takes, the mana you have)
-   * and waits for the yes (〔これで作って〕 or 「OK」「いいよ」「作って」); other words change the plan.
+   * (a few ideas inside the sentence); otherwise {bati} lays out the spell (its talismans float over the bowl, the mana
+   * under them) and asks; a yes in words (「OK」「いいよ」「作って」) casts it, other words change it — no buttons.
    */
   const run = (kind: AtelierKind, prompt: string, prev?: Work, opts: MakeOpts = {}) => {
     const cost = story?.test ? null : atelierMakeCost(kind, day);
     if (!cost || opts.confirm) return start(kind, prompt, prev, opts);
     if (!prev && !opts.materials?.length && isBare(prompt)) {
       setPending({ kind });
-      return sayT(MOON_LINES.ask[kind as keyof typeof MOON_LINES.ask] ?? ASK[kind], {}, IDEA_CHIPS[kind]);
+      return sayT(MOON_LINES.ask[kind as keyof typeof MOON_LINES.ask] ?? ASK[kind]);
     }
     return propose(kind, prompt, prev, opts);
   };
@@ -284,8 +284,9 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       .then((w) => w.manaBalance)
       .catch(() => null);
   /**
-   * the spell (スペル) and its 木札 card: fresh for the words, or `before` changed by them (`view`: a change already made,
-   * a tag taken off)
+   * the spell (スペル): fresh for the words, or `before` changed by them (`view`: a change already made). Its talismans
+   * float in the sky over the bowl (FloatingSpell, the scene's `stage`); the talk keeps 「じゃあ、こういうスペルになるね。」
+   * with a small record of it, and {bati}'s question 「このスペルで作る？　それとも、どこか変える？」
    */
   const propose = async (kind: AtelierKind, said: string, prev: Work | undefined, opts: MakeOpts, before?: PlanAsk, view?: SpellView) => {
     const cost = atelierMakeCost(kind, day);
@@ -304,16 +305,25 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     const plan = planOf(kind, v);
     const id = uid();
     const text = tline(before ? MOON_LINES.replan : MOON_LINES.plan);
-    setMsgs((m) => [...m, { id, who: 'bati', text, chips: [YES, CHANGE], plan: { kind, tags: plan.tags, added: plan.added, removed: plan.removed, price: cost.mana, have } }]);
+    setMsgs((m) => [...m, { id, who: 'bati', text, plan: { kind, tags: plan.tags, price: cost.mana, have } }, { id: uid(), who: 'bati', text: tline(MOON_LINES.confirm) }]);
+    setFloating((f) => ({ id: before && f ? f.id : id, kind, look: spellLookFor(kind), tags: plan.tags, removed: before ? plan.removed : [], price: cost.mana, have }));
+    hinted.current.clear();
     // a redo is asked with the change's own words (the card's words carry over); a new one with the spell's
     setPending({ plan: { id, plan, prompt: prev ? (before ? `${before.prompt}、${said}` : said) : plan.words, prev, opts, price: cost.mana } });
   };
-  /** a tag taken off the card by tapping its ✕ */
-  const dropTag = (pa: PlanAsk, en: string) => {
-    const sk = spellKindOf(pa.plan.kind);
-    if (!sk || pa.plan.tags.length <= 1) return;
-    setPending(null);
-    void propose(pa.plan.kind, '', pa.prev, pa.opts, pa, spellDrop(pa.plan.tags, en));
+  /** the spell floating over the bowl (from its first showing through its changes, until it is cast) */
+  const [floating, setFloating] = useState<FloatSpell | null>(null);
+  /** a talisman tapped: it wobbles; {bati} says, once a talisman, how to take it off (no ✕, no buttons) */
+  const hinted = useRef(new Set<string>());
+  const tapTag = (t: SpellTag) => {
+    if (hinted.current.has(t.en) || hinted.current.size >= 2) return;
+    hinted.current.add(t.en);
+    sayT(MOON_LINES.tapHint, { tag: t.ja });
+  };
+  /** the cast: the talismans fly down into the bowl, then they are gone */
+  const castSpell = () => {
+    setFloating((f) => (f ? { ...f, removed: [], casting: true } : f));
+    setTimeout(() => setFloating((f) => (f?.casting ? null : f)), 2200);
   };
   const markPlan = (id: string, done: 'yes' | 'changed' | 'short') => setMsgs((m) => m.map((x) => (x.id === id && x.who === 'bati' && x.plan ? { ...x, plan: { ...x.plan, done } } : x)));
   const accepted = useRef(new Set<string>());
@@ -326,6 +336,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     const have = await manaNow();
     if (have != null && have < pa.price) {
       markPlan(pa.id, 'short');
+      setFloating(null);
       sayT(MOON_LINES.noMana, { short: pa.price - have });
       // no story here: only a member is offered the mana gems (NoManaNotice)
       window.dispatchEvent(new CustomEvent('obolo:nomana', { detail: { plain: true } }));
@@ -333,6 +344,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     }
     sayT(MOON_LINES.start);
     castNow();
+    castSpell();
     const sk = spellKindOf(pa.plan.kind);
     void start(pa.plan.kind, pa.prompt, pa.prev, { ...pa.opts, plan: pa.plan, confirm: { id: yesId(), price: pa.price, ...(sk ? { spell: spellKey(sk, pa.plan.tags) } : {}) } });
   };
@@ -550,15 +562,6 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   };
 
   const chip = (label: string, from?: string) => {
-    // R11: the plan card's buttons and the ideas under {bati}'s question
-    const p = pending;
-    if (p && 'plan' in p && (!from || from === p.plan.id) && (label === YES || label === CHANGE)) {
-      setMsgs((m) => [...m, { id: uid(), who: 'me', text: label }]);
-      if (label === YES) return void accept(p.plan);
-      return sayT(MOON_LINES.change);
-    }
-    if (label === YES || label === CHANGE) return;
-    if (p && 'kind' in p && IDEA_CHIPS[p.kind]?.includes(label)) return send(label);
     const k = (Object.keys(KIND_WORD) as AtelierKind[]).find((x) => KIND_WORD[x] === label);
     setMsgs((m) => [...m, { id: uid(), who: 'me', text: label }]);
     if (!story && changeAsk(label, true)) return;
@@ -896,15 +899,12 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
               : undefined,
             name: m.speaker && story ? story.speaker(m.speaker).name : undefined,
             // client 2026-11-24: a picture right in the talk (where it came from, small under it); R11: the plan's card
-            extra: m.pic ? <PicBubble pic={m.pic} /> : m.plan ? <SpellCard spell={m.plan} onDrop={pending && 'plan' in pending && pending.plan.id === m.id && !m.plan.done ? (en) => dropTag(pending.plan, en) : undefined} /> : undefined,
+            // client 2026-11-25: the spell itself floats over the bowl; the talk keeps a small record of it
+            extra: m.pic ? <PicBubble pic={m.pic} /> : m.plan ? <SpellRecord tags={m.plan.tags} /> : undefined,
             chips: m.changed
               ? [{ label: m.changed.undone ? '元に戻した' : '元に戻す', onPick: () => undoChange(m.id), disabled: busy || !!m.changed.undone }]
               : m.plan
-                ? m.plan.done === 'yes'
-                  ? [{ label: 'OK！', onPick: () => undefined, disabled: true, style: spellChipStyle(spellLookFor(m.plan.kind)) }]
-                  : m.plan.done
-                    ? undefined
-                    : m.chips?.map((c) => ({ label: c, onPick: () => chip(c, m.id), disabled: busy || !(pending && 'plan' in pending && pending.plan.id === m.id), style: spellChipStyle(spellLookFor(m.plan?.kind ?? '')) }))
+                ? undefined
                 : m.chips?.map((c) => ({ label: c, onPick: () => chip(c), disabled: busy })),
           }
         : {
@@ -993,6 +993,20 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
         place={TEMPLE_PLATE.src}
         placeAspect={TEMPLE_PLATE.aspect}
         placeFx={(m) => <BowlFx state={bowl} at={m.at} scale={m.scale} reduced={reducedMotion} />}
+        // client 2026-11-25: the spell's talismans in the sky over the bowl (the talk ends above them)
+        stage={
+          floating
+            ? (m) => {
+                const b = m.at(TEMPLE_PLATE.bowl.u, TEMPLE_PLATE.bowl.v);
+                const bottom = b.y - TEMPLE_PLATE.bowl.w * m.scale * 0.13;
+                const layout = floatLayout(floating.look, floating.tags, m.w);
+                const need = layout.height + (floating.price > 0 ? MANA_H : 0);
+                // room for at least a short line of the talk above them
+                const scale = Math.max(0.6, Math.min(1, (bottom - (m.top + 110)) / need));
+                return { top: bottom - need * scale, node: <FloatingSpell key={floating.id} spell={floating} layout={layout} cx={b.x} bottom={bottom} bowl={b} scale={scale} onTap={tapTag} /> };
+              }
+            : undefined
+        }
         // R10 (client): {bati} in the middle, facing you, a step in front of the bowl (big enough to hide its lower rim);
         // only while it casts (the bowl glows: something is being made or changed) it goes to the left and casts into the
         // bowl behind it, then comes back to the middle

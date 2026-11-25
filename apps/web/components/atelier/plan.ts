@@ -3,9 +3,9 @@ import type { AtelierKind } from '@/lib/atelier/unlock';
 
 /**
  * R11 (client): before anything that spends mana {bati} lays out the スペル (spell) it will cast — 「じゃあ、こういうスペルに
- * なるね」 and a row of small wooden tags (木札), each in Japanese (the English behind them is never shown). The member
- * says yes (〔このスペルで作って〕 or 「OK」「いいよ」「作って」), changes it in words (「ピアノも足して」「暗いのは外して」) or
- * takes a tag off. The yes is tied to exactly that tag set, and the work is made from it.
+ * なるね」 and its talismans floating over the bowl, each in Japanese (the English behind them is never shown), then
+ * 「このスペルで作る？　それとも、どこか変える？」. No buttons: the member says yes in words (「OK」「いいよ」「作って」) or
+ * changes it in words (「ピアノも足して」「暗いのは外して」). The yes is tied to exactly that tag set, and the work is made from it.
  */
 export type Genre = 'pop' | 'rock' | 'hiphop' | 'ballad' | 'edm';
 export type Plan = {
@@ -30,19 +30,6 @@ export function planOf(kind: AtelierKind, v: SpellView): Plan {
   const genre = GENRE[v.tags.find((t) => t.group === 'genre')?.en ?? ''];
   return { kind, tags: v.tags, added: v.added, removed: v.removed, genre, words: (about.length ? spellWords(about) : spellWords(v.tags)).slice(0, 60) };
 }
-
-/** the few ideas offered under {bati}'s question when the ask was vague (tapping one answers it) */
-export const IDEA_CHIPS: Partial<Record<AtelierKind, string[]>> = {
-  song: ['明るいポップ', 'しっとりバラード', '元気なロック'],
-  art: ['夜の海とクジラ', 'ふわふわの動物', '星空の街'],
-  video: ['夜空をとぶ', '海辺をさんぽ', 'ネオンの街'],
-  look: ['もっとかっこよく', 'ふんわりかわいく', '宇宙っぽく'],
-  bati: ['魔法使い', 'パジャマ', '宇宙飛行士'],
-};
-
-/** the plan card's buttons */
-export const YES = 'このスペルで作って';
-export const CHANGE = '変える';
 
 const YES_WORDS = ['このスペルで作って', 'このスペルで', 'これで作って', 'それで作って', 'おねがいします', 'お願いします', 'おねがい', 'お願い', 'よろしく', 'オッケー', 'おっけー', 'オーケー', 'ok', 'okay', 'おけ', 'いいよ', 'いいね', 'いいです', 'うん', 'はい', 'それで', 'これで', 'そのまま', 'ばっちり', 'だいじょうぶ', '大丈夫', 'gogo', 'go', '作って', 'つくって', 'やって', 'いこう', 'よし'];
 /**

@@ -81,8 +81,7 @@ export type TalkItem = {
   card?: { thumb: ReactNode; full?: ReactNode; label?: string };
   /** a voice message: a play button in the bubble (the speaker's mouth moves while it plays) */
   voice?: { url: string | null; seconds: number | null };
-  /** `style`: a chip dressed for its card (the spell card's talisman look) */
-  chips?: { label: string; onPick: () => void; disabled?: boolean; style?: React.CSSProperties }[];
+  chips?: { label: string; onPick: () => void; disabled?: boolean }[];
   /** under the words: the pages looked up, a map, a note */
   extra?: ReactNode;
   /** still being written (streaming) */
@@ -223,6 +222,7 @@ export function TalkScene({
   otsStand,
   placeAspect,
   placeFx,
+  stage,
   onReachTop,
 }: {
   /** R10: the log scrolled to its top — older lines are asked for (they come in above, where you are reading stays) */
@@ -243,6 +243,13 @@ export function TalkScene({
    * picture width.
    */
   placeFx?: (m: { at: (u: number, v: number) => { x: number; y: number }; scale: number }) => ReactNode;
+  /**
+   * client 2026-11-25: something in the scene's air over the place (the spell's talismans floating over the bowl): drawn
+   * in screen px over the place and under the talk (it stays while the talk scrolls); `at(u, v)` maps a point of the
+   * place picture to the screen, `top` = the lowest the bar lets it reach. It returns where it starts (`top`): the talk
+   * ends above it.
+   */
+  stage?: (m: { w: number; h: number; top: number; at: (u: number, v: number) => { x: number; y: number }; scale: number }) => { node: ReactNode; top: number } | null;
   /**
    * client 2026-11-24 (iPad, R7): the whole talk as a log — every bubble in one column over the place, the past ones
    * moving up and fading out toward the top; scrolling up reads back the whole talk, scrolling down returns to now (no
@@ -846,7 +853,8 @@ export function TalkScene({
   const heads = ots ? stageTop + stageH * 0.1 : chest ? stageTop - 6 : stageTop + stageH * (row.length ? headAt : 0.16) * (rows.length > 1 && !backRow.length ? 0.5 : 1);
   // the bubbles stack from just above the heads; each at most half the free room tall (a long one scrolls inside)
   const room = Math.max(120, heads - (barH + top + 56) - 48);
-  const bubbleBottom = h - heads + 8;
+  const staged = stage && cover ? stage({ w, h, top: barH + top, at: (u, v) => ({ x: cover.ox + u * cover.dw - w * 0.04, y: cover.oy + v * cover.dh - h * 0.04 }), scale: cover.dw }) : null;
+  const bubbleBottom = Math.max(h - heads + 8, staged ? h - staged.top + 6 : 0);
   // the camera's side: the one speaking (a group pushes toward them the same way)
   /** R10: a partner standing in the middle of the over-the-shoulder ({bati} before the bowl): its bubbles sit over it */
   const centred = (id: string) => ots && !byId.get(id)?.self && Math.abs((spots.get(id)?.x ?? 0) - 0.5) < 0.12;
@@ -1361,6 +1369,7 @@ export function TalkScene({
       )}
 
       {/* the bubbles: two at most over the heads (the newest lower), 62 px from the sides */}
+      {staged && <div className="pointer-events-none absolute inset-0 z-[7]">{staged.node}</div>}
       {lines === 'bubbles' && log && (
         <TalkLog
           onReachTop={onReachTop}
@@ -1676,7 +1685,7 @@ function Bubble({
       <div
 
         className={`relative min-h-0 ${grow ? 'flex flex-col' : ''}`}
-        style={{ color: ink, ...box }}
+        style={{ color: ink, ['--talk-ink' as string]: ink, ...box }}
       >
         <div className={`${pad} ${story ? 'font-medium' : 'font-bold'} leading-[1.6] ${grow || (maxH && shape !== 'burst') ? 'no-scrollbar min-h-0 overflow-y-auto overscroll-contain' : ''}`} style={{ ...(maxH && shape !== 'burst' ? { maxHeight: maxH } : {}), ...(shape === 'whisper' ? { fontFamily: "'Klee One', " + TALK_FONT, fontWeight: 600 } : {}) }} onClick={clamp ? onOpen : (e) => !(e.target as HTMLElement).closest('button,a') && onReplay()}>
           {item.voice && (
@@ -1708,7 +1717,7 @@ function Bubble({
         {item.chips && item.chips.length > 0 && !clamp && (
           <div className="flex flex-wrap gap-1.5 px-4 pb-3 -mt-1">
             {item.chips.map((c) => (
-              <button key={c.label} onClick={c.onPick} disabled={c.disabled} className="rounded-full px-3 py-1.5 text-[13px] font-bold disabled:opacity-40" style={{ background: `${ink}1a`, color: ink, boxShadow: `inset 0 0 0 1px ${ink}33`, ...c.style }}>
+              <button key={c.label} onClick={c.onPick} disabled={c.disabled} className="rounded-full px-3 py-1.5 text-[13px] font-bold disabled:opacity-40" style={{ background: `${ink}1a`, color: ink, boxShadow: `inset 0 0 0 1px ${ink}33` }}>
                 {c.label}
               </button>
             ))}
