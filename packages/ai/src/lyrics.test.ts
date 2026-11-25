@@ -33,3 +33,13 @@ describe('R13: the lyrics writer (LYRICS_MODEL)', () => {
     expect(parseLyricsAnswer('nonsense').lyrics).toBeNull();
   });
 });
+
+import { parseSongTweak, songTweakSystem } from './prompts/songTweak';
+describe('R13: free song changes by the model (when the rules did not understand)', () => {
+  it('reads valid ops only; a studio change is paid', () => {
+    expect(songTweakSystem()).toMatch(/karaoke = instrumental/);
+    expect(parseSongTweak('{"ops":[{"op":"tempo","factor":1.1},{"op":"tempo","factor":9},{"op":"cut","part":{"cycle":2}}],"paid":null}').ops).toEqual([{ op: 'tempo', factor: 1.1 }, { op: 'cut', part: { cycle: 2 } }]);
+    expect(parseSongTweak('{"ops":[],"paid":"voice"}')).toEqual({ ops: [], paid: 'voice' });
+    expect(parseSongTweak('nope')).toEqual({ ops: [] });
+  });
+});

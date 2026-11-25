@@ -7,6 +7,7 @@ export * from './prompts/bati';
 export * from './prompts/memory';
 export * from './prompts/compass';
 export * from './prompts/lyrics';
+export * from './prompts/songTweak';
 export * from './prompts/story';
 export * from './images';
 export * from './song';

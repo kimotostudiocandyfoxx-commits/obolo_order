@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, Inject, Param, ParseUUIDPipe, Post, Req, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
-import { ComposeChatBody, ComposeDesignBody, InstrumentalBody, SingBody, SongEditBody, FullSongBody, lyricsSections, songSpellKey, spellPrompt } from '@obolo/shared';
+import { ComposeChatBody, ComposeDesignBody, InstrumentalBody, SingBody, SongEditBody, FullSongBody, lyricsSections, songSpellKey, spellPrompt, SongTweakBody, SONG_TWEAKS_PER_HOUR } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
@@ -9,6 +9,7 @@ import { KV } from '../infra/tokens';
 import { ComposeService } from './compose.service';
 import { JobsService } from '../jobs/jobs.service';
 import { SongService } from './song.service';
+import { SongTweakService } from './song-tweak.service';
 import { Database } from '../db/db';
 import { LedgerService } from '../wallet/ledger.service';
 import { startConfirmed } from '../wallet/confirmed';
@@ -20,6 +21,7 @@ export class ComposeController {
   constructor(
     private readonly compose: ComposeService,
     private readonly songs: SongService,
+    private readonly tweaks: SongTweakService,
     private readonly jobs: JobsService,
     private readonly ledger: LedgerService,
     private readonly db: Database,
@@ -109,6 +111,19 @@ export class ComposeController {
     // a genre edit runs the GPU: it also counts as an instrumental (P-MER-4)
     if (b.command?.action === 'GENRE_EDIT' || b.command?.action === 'SONG_EXTEND') await rateLimit(this.kv, `compose-inst:${userId}`, 30, 86400);
     return this.songs.edit(userId, id, b, `${req.protocol}://${req.get('host')}`);
+  }
+
+  /**
+   * R13: a finished song changed for free (no mana) — tempo, key, a part cut / again, length, fades, balance, karaoke,
+   * room — rendered on our side from its stems; 「元に戻して」 one back. A change that needs the studio is answered `paid`.
+   * SONG_TWEAKS_PER_HOUR a member (each runs ffmpeg here).
+   */
+  @Post('songs/:id/tweak')
+  @HttpCode(200)
+  async tweak(@UserId() userId: string, @Param('id', ParseUUIDPipe) id: string, @Body() body: unknown, @Req() req: Request) {
+    const b = parseBody(SongTweakBody, body);
+    if (!b.undo) await rateLimit(this.kv, `compose-tweak:${userId}`, SONG_TWEAKS_PER_HOUR, 3600);
+    return this.tweaks.tweak(userId, id, b, `${req.protocol}://${req.get('host')}`);
   }
 
   /** 保存する (the client also buries it in the island). */
