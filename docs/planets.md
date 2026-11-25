@@ -58,6 +58,16 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 - **惑星ごとの差しこみ口**（02 以降の文書で埋める。どれも初期値あり）：`hooks.opener`（作品の開き方。初期値：絵・ことば・題を大きく＋「by 名前」、音は再生）、`hooks.profileMiddle`（プロフィールの中身。初期値：作品の2列）、`hooks.config.allowed`（姿を置ける所。水星は海の上だけ — 数字は 02）、`hooks.config.introMs`（▶から最初の作品まで。土星 2300ms）、`hooks.config.holdMs`（1つの作品を見せる長さ。火星 9000ms）、`place`・`art`。
 - 絵：背景・眺め・プロフィールの部屋・惑星のアイコンは試作（design/home/home-inline.html）から書き出したもの。土星は「レコードの床」の版。
 
+## 02 水星（引き継ぎ planets-02-mercury.md）
+まだ見比べ用の **`/planets-preview/mercury`** だけ（本番の水星の画面はそのまま。切りかえは 02 に書かれていない）。見本は `?sample=1`。スクリーンショットは `docs/handoff/shots/mercury-*.jpg`（390×844）。
+- 置き方は惑星ごと（`config.motion`）：木星などは今まで通り JSLOT で漂う（`driftMotion`）。水星は `sailMotion`（`lib/planetTemplate/mercury.ts`）：試作の **MSLOT**（奥2・中3・手前2＝7隻、`[高さ, 大きさ, 段]`）の航路を左右に進み、画面の端から反対側へ回りこむ。波で上下・傾く。速さは試作の `(10+((i·7)%4)·4)·(奇数の枠は左)·(0.6+大きさ·0.5)` px/秒。ドラッグは海の上だけ（`seaOnly`：高さ .56〜.9、大きさ `[[.6,.5],[.69,.78],[.83,1.08]]`、段の境 .64／.78）。8人目からは順番待ち。
+- §2 タップ：船が手前（画面の .5／.84、2.15倍）へ、ホームが寄ってぼける。0.45秒でその曲（もう一度タップするまでループ、M-R282）と**ピクチャーディスク**（ジャケットが円盤いっぱい・溝・穴）。歌詞は曲の時間に合わせて1行ずつ（左から白く色づく・次の行がうすく下）。2.2秒で曲名（曲ごとの字体と出方：試作の5曲は試作の組、ほかはジャンルから。字の種類で大きさ）。曲名の読み上げは `titleVoice` があれば鳴らす（今は無い：null）。「NOW PLAYING」・by は出さない。
+- データ：`GET /planet-works/planet_post/:id/song` → `PlanetSongView`（音・ジャケット・曲名・`titleVoice`・`lyrics: [{t, end, text}]`）。歌詞の時間は曲の作りから計算（MV の焼きこみ歌詞と同じ `compose/lyrics.ts timedLyrics`）。歌詞の無い曲・曲の元が無い投稿は歌詞なし。見られるのは、作った人・ダチ／推し・その曲が public で流れ着く人だけ。
+- §3 ▶：自分（`/me chibiPic`、見本は試作の踊る絵）が家から飛び出す → 夜の桟橋（花火）、右下に後ろ姿。船が左から来て手前で止まり、ディスク・曲名・歌詞・曲を**最後まで**、終わると右へ去って次。全部で「🏝 今日の曲、全部聴いたね！」。■・画面タップで止める。（`config.play`：道すじ・`untilDone`・夜・花火・踊り）
+- §4 プロフィール：浜辺にその人の曲のレコードがスタンドに立って並ぶ（横スクロール）。タップでディスク・曲名・歌詞・曲（そのレコードも回る）。
+- 空（06 の先取り・M-R295〜M-R312）：ホームで2本指でつまむ（PC は ctrl+ホイール）と「じぶんの空」（じぶんの島＋お気に入り5大陸）。〔🔍 大陸をさがす〕・☆（5つ埋まっていれば「どの島と入れかえる？」→ 島をタップ）・〔✈ 旅〕（まだ見ていない6大陸）。島をタップで降りる：流れ着いた知らない人の船が航行（海の上だけドラッグ可）、タップで曲＋作った人（船の姿と名前）＋☆（ブルーナ）♡（推す）⋯（表示しない／通報）。右上▶で岸（`shore_url`）から1隻ずつ、止めるまでずっと。つまむ／← で空へ、空で広げる／じぶんの島でホームへ。15歳未満には作品が出ない。データは 2-4／2-5 の API。見本は試作の10大陸と曲（ブラウザの中だけ）。
+- 大陸の絵：水星の10大陸 ×3枚（空の島・降りた景色・岸）を試作から書き出し（`public/planets/continents/mercury/`、migration `0058` で URL を入れた）。残りは木星・土星の 60 枚。
+
 ## API
 | | |
 |---|---|
@@ -72,11 +82,12 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 | `PUT /planet-works/:kind/:id/save {on}` ・ `GET /planet-works/saved` | ☆ ブルーナ |
 | `POST /planet-works/:kind/:id/report` ・ `…/hide` | 通報（＋作品の非表示＋その人を一方向に非表示）・見えなくする（前から） |
 | `POST /admin/planet-works-backfill?limit=` | 前の作品のタグ・チェック |
+| `GET /planet-works/planet_post/:id/song` | 02 水星：曲を開く（音・ジャケット・曲名・歌詞と時間） |
 | `GET /planet-home/:planet` | 前から。作品に `tags`、自分の作品に `visibility`・`heldReason` が付いた |
 
 ## まだのこと
 - 公開範囲の初期値（依頼主の答え待ち。今は dachi）。
-- 大陸の絵 90枚。
+- 大陸の絵：水星の30枚は入った（0058）。木星・土星の60枚。
 - MV・ラジオ・グッズ・物語・ゲームのタグの値（02 以降）。
 - 木星のスタイル：アートのスペルの style に **ゆめかわ・和モダン・レトロ・ポップ** を足した（`packages/shared/src/spell.ts`、スペルのモデルの案内 `packages/ai/src/prompts/spell.ts` も）。これからのアートはその広場に画風でも流れ着く。
 - 絵の自動チェック（P-MOD-1）。
