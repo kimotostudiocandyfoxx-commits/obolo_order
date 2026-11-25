@@ -1,4 +1,4 @@
-import { PLANET_FIGURES, type PlanetFigure, type PlanetFigures } from '@obolo/shared';
+import { PLANET_FIGURES, type FigureWings, type PlanetFigure, type PlanetFigures } from '@obolo/shared';
 
 /** paintings per figure per look in one job (one + one retry, like the Saturn mini figure M-R262) */
 export const FIGURE_RUN_TRIES = 2;
@@ -25,4 +25,39 @@ export function figuresOf(store: FigureStore | null | undefined, look: string | 
 export function figuresToMake(store: FigureStore | null | undefined, look: string): PlanetFigure[] {
   const e = store?.[look] ?? {};
   return PLANET_FIGURES.filter((f) => !e[f] && Number(e[triesKey(f)] ?? 0) < FIGURE_TRIES);
+}
+/** 03 §1: the measured wing cut of the look's Jupiter figure (null: not measured, could not be, or no figure) */
+export function wingsOf(store: FigureStore | null | undefined, look: string | null | undefined): FigureWings | null {
+  const e = look ? store?.[look] : undefined;
+  return e?.jupiter ? decodeWings(e[WINGS_KEY]) : null;
+}
+/** the looks whose Jupiter figure is made but its wings were never measured (the backfill) */
+export const wingsToMeasure = (store: FigureStore | null | undefined): string[] =>
+  Object.entries(store ?? {})
+    .filter(([, e]) => e.jupiter && !e[WINGS_KEY])
+    .map(([look]) => look);
+
+// --- 03 §1 the Jupiter figure's wing cut (measured in wings.ts) ---------------------------------------------------
+
+/** the cut lies this much (percent of the width) outside the face's edge */
+export const WING_MARGIN = 3;
+/** a cut is kept only inside these bounds (percent of the width) */
+export const WING_BOUNDS = { minL: 5, maxL: 45, minR: 55, maxR: 95, minBody: 20 } as const;
+/** a cut that keeps the face in the body and leaves wings on both sides, else null */
+export function saneWings(l: number, r: number): FigureWings | null {
+  const b = WING_BOUNDS;
+  const L = Math.max(b.minL, l);
+  const R = Math.min(b.maxR, r);
+  if (L > b.maxL || R < b.minR || R - L < b.minBody) return null;
+  // the face was clamped away (it reaches past the bounds): the cut would cross it
+  if (l < b.minL - WING_MARGIN || r > b.maxR + WING_MARGIN) return null;
+  return { l: L, r: R };
+}
+
+/** how the cut is kept with the figures (planet_figures[look]['jupiter#wings']): "l,r", or "none" when it could not be measured */
+export const WINGS_KEY = 'jupiter#wings';
+export const encodeWings = (w: FigureWings | null): string => (w ? `${w.l},${w.r}` : 'none');
+export function decodeWings(v: string | null | undefined): FigureWings | null {
+  const m = /^(\d{1,2}),(\d{1,2})$/.exec(v ?? '');
+  return m ? saneWings(Number(m[1]), Number(m[2])) : null;
 }

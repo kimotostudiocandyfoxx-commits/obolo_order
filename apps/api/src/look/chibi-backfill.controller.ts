@@ -9,7 +9,8 @@ import { Database } from '../db/db';
 import { users } from '../db/schema';
 import type { KvStore } from '../infra/kv';
 import { KV } from '../infra/tokens';
-import { FIGURE_TRIES, triesKey } from './figures.service';
+import { FIGURE_TRIES, PlanetFiguresService, triesKey } from './figures.service';
+import { WINGS_KEY } from './figures';
 import { LookService } from './look.service';
 
 /** a figure of the look worn now that is not made and still has tries left */
@@ -38,6 +39,7 @@ export class ChibiBackfillController {
     private readonly look: LookService,
     @Inject(CONFIG) private readonly cfg: AppConfig,
     @Inject(KV) private readonly kv: KvStore,
+    private readonly figures: PlanetFiguresService,
   ) {}
 
   @Post(['chibi-backfill', 'figures-backfill'])
@@ -55,5 +57,40 @@ export class ChibiBackfillController {
     const origin = `${req.protocol}://${req.get('host')}`;
     for (const r of rows) if (r.look) await this.look.enqueueFigures(r.id, origin, r.look, false, true);
     return { queued: rows.length, tries: FIGURE_TRIES };
+  }
+
+  /**
+   * 03 §1 backfill (admin token only): the wing cut of Jupiter figures painted before it was measured — read from the
+   * stored picture and measured here (CPU only, nothing painted, no provider), `limit` members at a time (default 50,
+   * at most 500), oldest first. One that cannot be measured is kept as 'none' (the default cut) and not tried again.
+   *   curl -X POST -H "x-admin-token: …" "https://<api>/admin/wings-backfill?limit=50"
+   */
+  @Post('wings-backfill')
+  @HttpCode(200)
+  async wings(@Headers('x-admin-token') token: string | undefined, @Ip() ip: string, @Query('limit') limit?: string) {
+    await rateLimit(this.kv, `admin:${ip}`, 120, 600);
+    assertAdmin(this.cfg, token);
+    const n = Math.max(1, Math.min(500, Number(limit) || 50));
+    // any kept look with a Jupiter figure and no cut yet
+    const rows = await this.db.read
+      .select({ id: users.id })
+      .from(users)
+      .where(
+        and(
+          isNull(users.deletedAt),
+          isNotNull(users.planetFigures),
+          sql`EXISTS (SELECT 1 FROM jsonb_each(${users.planetFigures}) e WHERE (e.value ->> 'jupiter') IS NOT NULL AND (e.value ->> ${WINGS_KEY}) IS NULL)`,
+        ),
+      )
+      .orderBy(users.createdAt)
+      .limit(n);
+    let measured = 0;
+    let fallback = 0;
+    for (const r of rows) {
+      const got = await this.figures.measureMissingWings(r.id).catch(() => ({ measured: 0, fallback: 0 }));
+      measured += got.measured;
+      fallback += got.fallback;
+    }
+    return { members: rows.length, measured, fallback };
   }
 }

@@ -13,7 +13,8 @@ import { cutoutWhite } from '../media/cutout';
 import { chooseKey, cutoutChecked, KEY_WORDS, type KeyName } from '../media/keying';
 import { MediaService } from '../media/media.service';
 import { costScope } from '../wallet/cost-scope';
-import { FIGURE_CONCURRENCY, FIGURE_RUN_TRIES, FIGURE_SIDE, FIGURE_TRIES, figuresOf, figuresToMake, triesKey, type FigureStore } from './figures';
+import { FIGURE_CONCURRENCY, FIGURE_RUN_TRIES, FIGURE_SIDE, FIGURE_TRIES, figuresOf, figuresToMake, triesKey, wingsToMeasure, encodeWings, WINGS_KEY, type FigureStore } from './figures';
+import { measureWings } from './wings';
 
 export { FIGURE_CONCURRENCY, FIGURE_RUN_TRIES, FIGURE_TRIES, figuresOf, figuresToMake, triesKey, type FigureStore };
 
@@ -139,7 +140,9 @@ export class PlanetFiguresService {
           try {
             const png = await this.paint(f, src, key);
             const m = await this.media.storeImage(p.userId, 'avatar', 'image/png', png, p.origin);
-            await this.patch(p.userId, of, { [f]: m.url });
+            // 03 §1: the butterfly's wing cut, measured on the cut-out picture (kept with it; 'none': the default cut)
+            const wings: Record<string, string> = f === 'jupiter' ? { [WINGS_KEY]: encodeWings(await measureWings(png).catch(() => null)) } : {};
+            await this.patch(p.userId, of, { [f]: m.url, ...wings });
             if (f === 'saturnChibi') {
               const now = await this.row(p.userId);
               if (now?.avatarUrl === of) await this.setChibi(p.userId, m.url);
@@ -155,5 +158,27 @@ export class PlanetFiguresService {
     const after = await this.row(p.userId);
     const chibi = figuresOf(after?.planetFigures, of).saturnChibi;
     if (after?.avatarUrl === of && chibi && after.chibiPicUrl !== chibi) await this.setChibi(p.userId, chibi);
+  }
+
+  /**
+   * 03 §1 backfill: the wing cut of every kept look's Jupiter figure painted before the cut was measured (no painting,
+   * no provider: the stored picture is read and measured). Returns how many were measured and how many fell back.
+   */
+  async measureMissingWings(userId: string): Promise<{ measured: number; fallback: number }> {
+    const u = await this.row(userId);
+    let measured = 0;
+    let fallback = 0;
+    for (const look of wingsToMeasure(u?.planetFigures)) {
+      const url = u?.planetFigures?.[look]?.jupiter;
+      if (!url) continue;
+      const png = await this.media.bytesByUrl(userId, url).catch(() => null);
+      // the picture could not be read this time: left for the next run
+      if (!png) continue;
+      const w = await measureWings(png).catch(() => null);
+      if (w) measured++;
+      else fallback++;
+      await this.patch(userId, look, { [WINGS_KEY]: encodeWings(w) });
+    }
+    return { measured, fallback };
   }
 }

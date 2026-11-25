@@ -25,6 +25,7 @@ import { dachiOf, notHidden, notPersonHidden, viewerIsYoung } from '../common/ch
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
 import { follows, jupiterPosts, planetHomes, planetPosts, planetWorkMeta, radioShows, saturnPosts, userBlocks, users } from '../db/schema';
+import { decodeWings, WINGS_KEY } from '../look/figures';
 import { isPublicWork, metaView } from './planet-works.service';
 
 /**
@@ -140,13 +141,13 @@ export const personWhere = (s: Store, viewerId: string, kind: PlanetWorkKind, pe
 export const farWhere = (s: Store, viewerId: string, kind: PlanetWorkKind, since: Date): SQL =>
   sql`(${s.live} AND ${s.flownAt} > ${since} AND ${s.userId} <> ${viewerId} AND ${s.userId} NOT IN (${followsOf(viewerId)}) AND NOT ${viewerIsYoung(viewerId)} AND NOT ${authorIsYoung(s.userId)} AND ${notHidden(viewerId, kind, s.id)} AND ${notPersonHidden(viewerId, s.userId)} AND NOT ${blockedWith(viewerId, s.userId)} AND ${isPublicWork(kind, s.id)})`;
 
-type Row = { id: string; userId: string; flownAt: Date | string; text: string | null; title: string | null; url: string | null; thumb: string | null; seconds: number | null; name: string; pic: string | null; chibi?: string | null; kPic?: number | null; figure?: string | null; ball?: string | null };
+type Row = { id: string; userId: string; flownAt: Date | string; text: string | null; title: string | null; url: string | null; thumb: string | null; seconds: number | null; name: string; pic: string | null; chibi?: string | null; kPic?: number | null; figure?: string | null; ball?: string | null; wings?: string | null };
 
 export function toWork(r: Row, kind: PlanetWorkKind, rel: HomeRel): HomeWork {
   return {
     id: r.id,
     kind,
-    author: { id: r.userId, name: r.name, pic: r.pic, chibi: r.chibi ?? null, kororin: kororinOf({ pic: r.kPic }), figure: r.figure ?? null, ball: r.ball ?? null },
+    author: { id: r.userId, name: r.name, pic: r.pic, chibi: r.chibi ?? null, kororin: kororinOf({ pic: r.kPic }), figure: r.figure ?? null, ball: r.ball ?? null, ...(r.wings !== undefined ? { wings: r.figure ? decodeWings(r.wings) : null } : {}) },
     rel,
     text: r.text ?? '',
     title: r.title || undefined,
@@ -164,7 +165,8 @@ export class PlanetHomeService {
   /** `planet`: the maker's figure on it (client 2026-11-25: the figures of the look they wear now) and, on Saturn, their ball */
   private async rows(s: Store, where: SQL, order: SQL, limit: number, planet?: HomePlanet): Promise<Row[]> {
     const fig = (f: string) => sql<string | null>`(${users.planetFigures} -> ${users.avatarUrl} ->> ${f})`;
-    const extra = planet ? { figure: fig(PLANET_FIGURE_OF[planet]), ...(planet === 'saturn' ? { ball: fig('saturnBall') } : {}) } : {};
+    // Jupiter (03 §1): also where that figure is cut into wings and body
+    const extra = planet ? { figure: fig(PLANET_FIGURE_OF[planet]), ...(planet === 'saturn' ? { ball: fig('saturnBall') } : {}), ...(planet === 'jupiter' ? { wings: fig(WINGS_KEY) } : {}) } : {};
     return (await this.db.read
       .select({ id: s.id, userId: s.userId, flownAt: s.flownAt, text: s.text, title: s.title, url: s.url, thumb: s.thumb, seconds: s.seconds, name: users.displayName, pic: users.puniPicUrl, chibi: users.chibiPicUrl, kPic: users.kororinPic, ...extra })
       .from(s.t as typeof saturnPosts)

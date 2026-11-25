@@ -31,7 +31,7 @@ import { users, wallets } from '../db/schema';
 import { LedgerService } from '../wallet/ledger.service';
 import { activeBati, batiSummaries, batiViewExtra, lookHistory } from '../look/batis';
 import { talkLookOf } from '../look/talk';
-import { figuresOf } from '../look/figures';
+import { figuresOf, wingsOf } from '../look/figures';
 import { lookBackOf, lookLockedOf } from '../look/lock';
 import { activeMember, isTester } from './tester';
 
@@ -116,6 +116,8 @@ export function toMe(u: typeof users.$inferSelect): Me {
     chibiPic: u.chibiPicUrl ?? null,
     // client 2026-11-25: the look's figures on every home planet
     planetFigures: figuresOf(u.planetFigures, u.avatarUrl),
+    // 03 §1: where the Jupiter figure is cut into wings and body (null: the default cut)
+    figureWings: wingsOf(u.planetFigures, u.avatarUrl),
     kororin: kororinOf({ pic: u.kororinPic }),
     butterfly: u.butterflyUrl ?? null,
     story: Object.fromEntries(Object.entries(u.onboardingJson ?? {}).filter(([k]) => /^(d\d+|l2|sys)\./.test(k))),

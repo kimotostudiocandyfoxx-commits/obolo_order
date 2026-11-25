@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { PLANET_FLY_MS, type PlanetWorkKind } from './flying';
 import { seesOnlyDachi } from './schemas';
+import type { FigureWings } from './planetFigures';
 import type { HomePlanet } from './planetHomeConfig';
 import type { WorkTags, WorkVisibility } from './planetWorks';
 
@@ -24,7 +25,8 @@ export interface HomeWork {
   /** pic: the puni face; chibi: the 2-heads mini figure that jumps out of the popped ball (M-R262; a round face until made) */
   /** M-R275: the maker's chosen kororin picture (1–24; none: not chosen yet) */
   /** client 2026-11-25: figure = the maker's own figure on this planet (Saturn: the chibi out of the ball); ball = their Saturn kororin ball in their own pattern */
-  author: { id: string; name: string; pic?: string | null; chibi?: string | null; kororin?: KororinChoice | null; figure?: string | null; ball?: string | null };
+  /** wings (Jupiter): where that figure is cut into wings and body (measured when it was painted; none = the default cut) */
+  author: { id: string; name: string; pic?: string | null; chibi?: string | null; kororin?: KororinChoice | null; figure?: string | null; ball?: string | null; wings?: FigureWings | null };
   rel: HomeRel;
   /** the words (Saturn: what was blown in, shown while it sings) */
   text: string;

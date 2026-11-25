@@ -475,7 +475,7 @@ export function PlanetTemplateHome({ planet, view, me, hooks = {}, onSwitchPlane
               {...figureHandlers(st.n, st.person)}
             >
               {motion.kind === 'sail' && <i className={s.wake} />}
-              {hooks.figure && (st.person.figure || cfg.standIn) ? hooks.figure({ src: picOf(st.person), i: st.n }) : <img className={s.body} src={picOf(st.person)} alt="" draggable={false} />}
+              {hooks.figure && (st.person.figure || cfg.standIn) ? hooks.figure({ src: picOf(st.person), i: st.n, wings: st.person.figure ? st.person.wings : null }) : <img className={s.body} src={picOf(st.person)} alt="" draggable={false} />}
               {!st.person.figure && !cfg.standIn && st.person.face && <img className={s.face} src={st.person.face} alt="" draggable={false} />}
               {motion.kind === 'floor' ? (
                 <>

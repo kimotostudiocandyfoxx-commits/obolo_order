@@ -1,4 +1,4 @@
-import { figureFor, PLANET_HOMES, type HomePlanet, type HomeRel, type HomeWork, type PlanetFigures, type PlanetHomeView } from '@obolo/shared';
+import { figureFor, PLANET_HOMES, type FigureWings, type HomePlanet, type HomeRel, type HomeWork, type PlanetFigures, type PlanetHomeView } from '@obolo/shared';
 
 /** one ダチ・推し on the home: their riding figure on this planet and the works they flew here (newest first) */
 export interface HomePerson {
@@ -7,6 +7,8 @@ export interface HomePerson {
   rel: HomeRel;
   /** their figure on this planet (figureFor: Saturn the kororin ball, Jupiter the butterfly, Mercury the ship …) */
   figure: string | null;
+  /** Jupiter: where their figure is cut into wings and body (measured when painted; none: the default cut) */
+  wings?: FigureWings | null;
   /** no figure painted yet: the planet's sprite with their face on it */
   sprite: string;
   face: string | null;
@@ -45,7 +47,7 @@ export function peopleOf(view: PlanetHomeView | null | undefined): HomePerson[] 
   for (const w of works) {
     let p = by.get(w.author.id);
     if (!p) {
-      p = { id: w.author.id, name: w.author.name, rel: w.rel, figure: figureOfAuthor(w.author, planet), chibi: planet === 'saturn' ? (w.author.figure ?? w.author.chibi ?? null) : null, sprite: PLANET_HOMES[planet].art.sprite, face: w.author.pic ?? null, works: [] };
+      p = { id: w.author.id, name: w.author.name, rel: w.rel, figure: figureOfAuthor(w.author, planet), wings: w.author.wings ?? null, chibi: planet === 'saturn' ? (w.author.figure ?? w.author.chibi ?? null) : null, sprite: PLANET_HOMES[planet].art.sprite, face: w.author.pic ?? null, works: [] };
       by.set(w.author.id, p);
     }
     p.works.push(w);

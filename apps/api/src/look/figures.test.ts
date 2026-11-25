@@ -1,8 +1,10 @@
+import sharp from 'sharp';
 import { describe, expect, it, vi } from 'vitest';
 import { PLANET_FIGURES, type PlanetFigure } from '@obolo/shared';
 import { costScope, type CostCtx } from '../wallet/cost-scope';
 import { featureOfJob } from '../wallet/cost-scope';
 import { FIGURE_RUN_TRIES, FIGURE_TRIES, PlanetFiguresService, figuresOf, figuresToMake, triesKey, type FigureStore } from './figures.service';
+import { wingsOf, WINGS_KEY } from './figures';
 
 vi.mock('../media/keying', async (orig) => ({
   ...(await orig<typeof import('../media/keying')>()),
@@ -141,5 +143,38 @@ describe('client 2026-11-25: the planet figures of a look (one job, all nine)', 
       await s.make({ userId: 'u1', origin: 'https://api', paid: { kind: 'profileLook', job: 'make:profileLook:u1:ok:1' } });
       expect(costScope.get()).toMatchObject({ kind: 'profileLook', job: 'make:profileLook:u1:ok:1', paid: true });
     });
+  });
+
+  it("03 §1: the butterfly's wing cut is kept with it ('none' when the picture cannot be measured); the backfill measures the stored one", async () => {
+    const row = { avatarUrl: LOOK, chibiPicUrl: null, planetFigures: null as FigureStore | null };
+    const { s } = make(row);
+    await s.make({ userId: 'u1', origin: 'https://api' });
+    // the mocked cut-out is no picture: measured as nothing, the default cut
+    expect(row.planetFigures![LOOK][WINGS_KEY]).toBe('none');
+    expect(Object.keys(row.planetFigures![LOOK]).filter((k) => k.endsWith('#wings'))).toEqual([WINGS_KEY]);
+    expect(wingsOf(row.planetFigures, LOOK)).toBeNull();
+    // a figure of before (no cut yet): the backfill reads its picture and measures it — nothing is painted
+    const W = 200;
+    const px = Buffer.alloc(W * W * 4);
+    for (let y = 0; y < W; y++)
+      for (let x = 0; x < W; x++) {
+        const wing = ((x - 40) / 38) ** 2 + ((y - 90) / 60) ** 2 <= 1 || ((x - 160) / 38) ** 2 + ((y - 90) / 60) ** 2 <= 1;
+        const face = ((x - 100) / 28) ** 2 + ((y - 60) / 26) ** 2 <= 1;
+        const body = ((x - 100) / 24) ** 2 + ((y - 130) / 50) ** 2 <= 1;
+        const c = face ? [255, 222, 196, 255] : body ? [240, 120, 160, 255] : wing ? [120, 170, 255, 255] : [0, 0, 0, 0];
+        px.set(c, (y * W + x) * 4);
+      }
+    const png = await sharp(px, { raw: { width: W, height: W, channels: 4 } }).png().toBuffer();
+    const old = { avatarUrl: LOOK, chibiPicUrl: null, planetFigures: { [LOOK]: { jupiter: 'https://x/j.png' }, 'https://x/old-look.png': { jupiter: 'https://x/j0.png', [WINGS_KEY]: '20,72' } } as FigureStore };
+    const b = make(old);
+    (b.s as unknown as { media: { bytesByUrl: unknown } }).media.bytesByUrl = async () => png;
+    expect(await b.s.measureMissingWings('u1')).toEqual({ measured: 1, fallback: 0 });
+    const w = wingsOf(old.planetFigures, LOOK)!;
+    expect(w.l).toBeLessThanOrEqual(36);
+    expect(w.r).toBeGreaterThanOrEqual(64);
+    expect(old.planetFigures['https://x/old-look.png'][WINGS_KEY]).toBe('20,72');
+    expect(b.painted).toHaveLength(0);
+    // measured once: never again
+    expect(await b.s.measureMissingWings('u1')).toEqual({ measured: 0, fallback: 0 });
   });
 });

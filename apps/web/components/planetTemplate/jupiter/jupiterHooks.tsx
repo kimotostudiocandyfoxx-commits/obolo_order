@@ -1,6 +1,6 @@
 'use client';
 
-import type { HomeWork, WorkTags } from '@obolo/shared';
+import type { FigureWings, HomeWork, WorkTags } from '@obolo/shared';
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import {
   artTitleOf,
@@ -32,8 +32,8 @@ import type { FigureSlot, OpenWork, WorkOpener } from '../WorkView';
 import j from './Jupiter.module.css';
 
 /** §1 a butterfly: only its wings flap, from the body's edges; the body is drawn over them (never the face behind a wing) */
-export function Wings({ src, i, fill = false }: { src: string; i: number; fill?: boolean }) {
-  const p = wingParts(wingCutOf(src));
+export function Wings({ src, i, fill = false, wings }: { src: string; i: number; fill?: boolean; wings?: FigureWings | null }) {
+  const p = wingParts(wingCutOf(src, wings));
   return (
     <div className={`${j.wg} ${fill ? j.fill : ''}`} style={{ ['--fl' as string]: `${flapSeconds(i)}s` }} data-testid="wings">
       <img className={j.wl} src={src} alt="" draggable={false} style={{ clipPath: p.left.clip, transformOrigin: p.left.origin }} />
@@ -42,7 +42,7 @@ export function Wings({ src, i, fill = false }: { src: string; i: number; fill?:
     </div>
   );
 }
-export const butterfly: FigureSlot = ({ src, i, fill }) => <Wings src={src} i={i} fill={fill} />;
+export const butterfly: FigureSlot = ({ src, i, fill, wings }) => <Wings src={src} i={i} fill={fill} wings={wings} />;
 
 /** after two frames (so a transition runs from where it was placed) */
 function useNextFrame() {
@@ -152,7 +152,7 @@ function HomeOpen({ o }: { o: OpenWork }) {
       {s.shown && <ScrollArt art={artOf(o.work)} title={artTitleOf(o.work)} tags={o.work.tags} closing={s.closing} />}
       {o.figure && (
         <div className={`${j.fly} ${s.closing ? j.gone : ''}`} style={{ transform: pos }} data-testid="front-butterfly">
-          <Wings src={o.figure} i={0} />
+          <Wings src={o.figure} i={0} wings={o.person.figure === o.figure ? o.person.wings : null} />
         </div>
       )}
       {named && !s.closing && (

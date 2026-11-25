@@ -26,6 +26,7 @@ import { notHidden, notPersonHidden } from '../common/child';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
 import { continents, continentSeen, planetHomes, planetWorkMeta, users } from '../db/schema';
+import { WINGS_KEY } from '../look/figures';
 import { authorIsYoung, blockedWith, storeOf, toWork } from './planet-home.service';
 
 type ContinentRow = typeof continents.$inferSelect & { creatorName?: string | null };
@@ -123,8 +124,9 @@ export class ContinentsService {
     const where = continentWhere(viewerId, planet);
     if (!s || !kind || !where) return [];
     const fig = sql<string | null>`(${users.planetFigures} -> ${users.avatarUrl} ->> ${PLANET_FIGURE_OF[planet]})`;
+    const wings: Record<string, SQL> = planet === 'jupiter' ? { wings: sql<string | null>`(${users.planetFigures} -> ${users.avatarUrl} ->> ${WINGS_KEY})` } : {};
     return (await this.db.read
-      .select({ id: s.id, userId: s.userId, flownAt: s.flownAt, text: s.text, title: s.title, url: s.url, thumb: s.thumb, seconds: s.seconds, name: users.displayName, pic: users.puniPicUrl, chibi: users.chibiPicUrl, kPic: users.kororinPic, figure: fig, main: planetWorkMeta.main, moods: planetWorkMeta.moodsJson, bpm: planetWorkMeta.bpm })
+      .select({ id: s.id, userId: s.userId, flownAt: s.flownAt, text: s.text, title: s.title, url: s.url, thumb: s.thumb, seconds: s.seconds, name: users.displayName, pic: users.puniPicUrl, chibi: users.chibiPicUrl, kPic: users.kororinPic, figure: fig, ...wings, main: planetWorkMeta.main, moods: planetWorkMeta.moodsJson, bpm: planetWorkMeta.bpm })
       .from(s.t as never)
       .innerJoin(users, sql`${users.id} = ${s.userId}`)
       .innerJoin(planetWorkMeta, sql`${planetWorkMeta.kind} = ${kind} AND ${planetWorkMeta.workId} = ${s.id}`)

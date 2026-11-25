@@ -29,6 +29,16 @@ export const PLANET_FIGURE_OF: Record<HomePlanet, PlanetFigure> = {
 /** a member's figures of the look worn now (figure → picture URL; a missing one is still being made, or failed) */
 export type PlanetFigures = Partial<Record<PlanetFigure, string>>;
 
+/**
+ * 03 §1 (Jupiter): where the butterfly figure is cut into its wings and body, in percent of the picture's width — the
+ * left wing 0 → l, the right wing r → 100, the body l → r (never a wing over the face). Measured on the painted figure
+ * by the look code (apps/api/src/look/wings.ts); none = not measured or could not be: the default cut.
+ */
+export interface FigureWings {
+  l: number;
+  r: number;
+}
+
 /** which picture use paints a figure: the Saturn chibi on SATURN_CHIBI_MODEL (klein 4B), the rest on PLANET_CHIBI_MODEL / SATURN_BALL_MODEL (Qwen) */
 export const FIGURE_PAINTER: Record<PlanetFigure, 'saturnChibi' | 'saturnBall' | 'planetChibi'> = {
   saturnChibi: 'saturnChibi',

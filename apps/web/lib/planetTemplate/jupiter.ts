@@ -1,4 +1,4 @@
-import type { WorkTags } from '@obolo/shared';
+import type { FigureWings, WorkTags } from '@obolo/shared';
 import type { PlayPath } from './config';
 import type { TitleMotion, TitleStyle } from './mercury';
 
@@ -24,13 +24,17 @@ export const WING_CUTS: Record<string, WingCut> = {
   brother: [24, 77],
   sister: [22, 70],
 };
-/** a figure not in the table (every real figure, until the look code stores its own cut: open question in docs/planets.md) */
+/** a figure whose cut could not be measured (the look code measures each member's figure when it is painted: author.wings) */
 export const DEFAULT_WING_CUT: WingCut = [18, 76];
 /** the wings overlap the body by this much (percent), so no gap shows at the hinge */
 export const WING_OVERLAP = 2;
 
-/** the cut for a figure picture: the sample's characters by name (fig-jupiter-<name>.webp / chibi4-<name>), else the default */
-export function wingCutOf(src: string | null | undefined, cuts: Record<string, WingCut> = WING_CUTS): WingCut {
+/**
+ * the cut for a figure picture: the member's own, measured when it was painted (`wings`, from the feed's author.wings or
+ * GET /me figureWings); else the sample's characters by name (fig-jupiter-<name>.webp / chibi4-<name>); else the default
+ */
+export function wingCutOf(src: string | null | undefined, wings?: FigureWings | null, cuts: Record<string, WingCut> = WING_CUTS): WingCut {
+  if (wings && wings.l > 0 && wings.r < 100 && wings.r - wings.l >= 20) return [wings.l, wings.r];
   const m = /(?:fig-jupiter-|chibi4-)([a-z]+)\.webp/.exec(src ?? '');
   return (m && cuts[m[1]]) || DEFAULT_WING_CUT;
 }

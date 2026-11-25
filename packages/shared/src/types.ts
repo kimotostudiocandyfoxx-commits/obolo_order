@@ -4,7 +4,7 @@ import type { PuniLook } from './puni';
 import type { BatiCustomStyle, BatiEggKind, BatiPersonality } from './batiPersona';
 import type { BatiMemory, BatiRole } from './batiMemory';
 import type { TalkBeat, TalkFace, TalkLook, TalkMotion } from './talk';
-import type { PlanetFigures } from './planetFigures';
+import type { FigureWings, PlanetFigures } from './planetFigures';
 
 /** API response shapes. Kept framework-free so web, api and future native shells share them. */
 
@@ -85,6 +85,8 @@ export interface Me {
    * planets' chibis), made in the background after each look; a missing one is still being made
    */
   planetFigures?: PlanetFigures;
+  /** 03 §1: where your Jupiter figure is cut into wings and body (measured when painted; null = the default cut) */
+  figureWings?: FigureWings | null;
   /** M-R275: the chosen kororin picture (1–24); unset = not chosen yet */
   kororin?: { pic: number } | null;
   /** Jupiter: your painted butterfly (🦋 蝶を描いてもらう) */

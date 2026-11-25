@@ -37,6 +37,15 @@ describe('03 §1 the butterflies: only the wings move', () => {
     expect(wingCutOf(null)).toEqual(DEFAULT_WING_CUT);
   });
 
+  it("a member's own figure is cut where it was measured (author.wings); the default only when that failed", () => {
+    expect(wingCutOf('https://cdn/look/abc.png', { l: 23, r: 71 })).toEqual([23, 71]);
+    expect(wingCutOf('https://cdn/look/abc.png', null)).toEqual(DEFAULT_WING_CUT);
+    // a cut that makes no sense is not used
+    expect(wingCutOf('https://cdn/look/abc.png', { l: 60, r: 65 })).toEqual(DEFAULT_WING_CUT);
+    // the measured cut goes before the sample's table
+    expect(wingCutOf('/planets/sample/fig-jupiter-monban.webp', { l: 20, r: 70 })).toEqual([20, 70]);
+  });
+
   it('keeps each wing outside the body (the face) but for the small hinge overlap, hinged at the body edge', () => {
     for (const cut of [...Object.values(WING_CUTS), DEFAULT_WING_CUT]) {
       const [L, R] = cut;

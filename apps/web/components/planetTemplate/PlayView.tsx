@@ -171,7 +171,7 @@ export function PlayView({
             className={`${s.visitor} ${phase === 'open' ? s.bobbing : ''} ${path.front ? s.front : ''}`}
             style={{ transform: `translate3d(${at.x * 100}cqw, ${at.y * 100}cqh, 0) scale(${at.size})`, opacity: phase === 'out' ? 0 : 1, transitionDuration: `${moveMs}ms, ${phase === 'out' ? 1000 : 500}ms` }}
           >
-            {figure && (p.figure || cfg.standIn) ? figure({ src: fig, i: k, fill: true }) : <img src={fig} alt="" draggable={false} />}
+            {figure && (p.figure || cfg.standIn) ? figure({ src: fig, i: k, fill: true, wings: p.figure ? p.wings : null }) : <img src={fig} alt="" draggable={false} />}
             {phase !== 'open' && <span className={s.nm}>{p.name}</span>}
           </div>
         )}
