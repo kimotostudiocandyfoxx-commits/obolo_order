@@ -111,7 +111,19 @@ export function personaToneLines(p: BuddyPersona, locale: 'ja' | 'en'): string {
 export interface BatiAbilities {
   search?: boolean;
   draw?: boolean;
+  /** R12: this chat makes works (the Moon atelier): a making request is tagged [make <kind>] and the screen makes it */
+  make?: boolean;
 }
+
+/**
+ * R12 (client): in the Moon atelier a request to MAKE a work is the screen's making (questions → spell → OK), never a
+ * picture search and never the chat's own quick drawing. Also a follow-up that refers back to an earlier request
+ * (「魔法で作って欲しい」 after asking for a whale picture) is that earlier kind.
+ */
+export const BATI_MAKE_RULE = {
+  ja: `- [make 種類]：この画面で作品を作ってほしい頼み。種類は art（絵・画像・イラスト・アートを作って／描いて／ほしい）、song（曲・歌・音楽）、video（映像・動画・MV・ムービー）、novel（本・小説・物語・お話）、game（ゲーム）、voice（コロリン）、radio（ラジオ）のどれか一つ（例：[make art]）。前の会話の頼みの続き（「魔法で作って」「それ作って」「やっぱり作って」）も、前に頼まれた種類で [make …] にする。2行目に、短い一言だけ（作るのは画面の魔法。「作ったよ」「作り始めた」とは言わない）。あるものを見たい・探したいだけ（「〜の絵を見せて」「〜の写真ある？」「〜ってどんな見た目？」）は [make] にしない。[make] は [draw] より先。`,
+  en: `- [make <kind>]: the user asks this screen to MAKE a work. kind is one of art (a picture / image / illustration to make or draw), song (a song, music), video (a video, MV), novel (a book, a story), game, voice (a コロリン), radio (e.g. [make art]). A follow-up that refers back to an earlier request ("make it with magic", "make that") takes the earlier kind. From the second line one short sentence only (the screen makes it; never say it is made or started). Only wanting to SEE an existing picture is not [make]. [make] comes before [draw].`,
+} as const;
 
 /**
  * The one-call rules plus the two extra kinds (M-R208): `[search]` (a fact to look up: the answer comes from a web
@@ -167,6 +179,7 @@ export function batiOneCallRules(locale: 'ja' | 'en', can: BatiAbilities = {}): 
         '- [draw]：「〜の絵を見せて」「〜を描いて」「〜ってどんな見た目？」など、絵を見たい時。1行目に [draw] と、描くものを英語で短く（12語まで、子ども向けで安全な内容）同じ行に書く（例：[draw] a giant panda eating bamboo in a forest）。2行目から、絵をわたす一言を1文で（例：パンダの絵を描いてみたよ！）。',
       );
     else extra.push('- 今日は、もう絵を描けない。絵を頼まれたら [normal] で「今日は、もう絵を描けないんだ。また明日ね」とやさしく答える。');
+    if (can.make) extra.push(BATI_MAKE_RULE.ja);
     extra.push('- [worry] や [danger] の言葉は、[search] にも [draw] にもしない。実在の人の顔・こわい絵・大人向けの絵は描かない（[normal] で、やさしく断る）。');
   } else {
     extra.push('[Looking up and drawing]');
@@ -180,6 +193,7 @@ export function batiOneCallRules(locale: 'ja' | 'en', can: BatiAbilities = {}): 
         '- [draw]: the user wants to see a picture ("show me a picture of…", "draw…", "what does … look like?"). On the first line write [draw] and, on the same line, what to draw in short English (12 words at most, child-safe), e.g. "[draw] a giant panda eating bamboo in a forest". From the second line, one sentence handing over the picture.',
       );
     else extra.push('- No more pictures today: if asked to draw, answer [normal] and kindly say you cannot draw any more today.');
+    if (can.make) extra.push(BATI_MAKE_RULE.en);
     extra.push('- Never [search] or [draw] a worry or a danger. Do not draw real people, scary or grown-up pictures (answer [normal] and kindly decline).');
   }
   return `${base}\n${extra.join('\n')}`;
@@ -195,8 +209,12 @@ export function batiSort(can: BatiAbilities = {}): string {
     extra.push('"search": inside "normal", a factual question that must be checked or is current — news, weather, results, prices, dates, numbers, people, companies, shops, places. Not everyday knowledge (パンダは何を食べるの？ is normal).');
   if (can.draw)
     extra.push('"draw: <what to draw, short child-safe English>": inside "normal", the child wants to see a picture (〜の絵を見せて / 〜を描いて / 〜ってどんな見た目？), e.g. draw: a giant panda eating bamboo. Never real people, scary or grown-up pictures (those are normal).');
+  if (can.make)
+    extra.push(
+      '"make <kind>": inside "normal", the child asks this screen to MAKE a work — kind is one of art (a picture / image / illustration to make or draw: 画像を作って, 絵を描いて, イラストほしい), song (曲 / 歌 / 音楽), video (動画 / 映像 / MV), novel (本 / 小説 / 物語), game (ゲーム), voice (コロリン), radio (ラジオ), e.g. make art. A follow-up that refers back to an earlier request in the conversation (魔法で作って欲しい, それ作って) takes the earlier kind. Only wanting to see or find an existing picture (〜の絵を見せて / 〜の写真ある？) is not make. make comes before draw.',
+    );
   if (!extra.length) return BATI_SORT;
-  return `${BATI_SORT}\n${extra.join('\n')}\nworry and danger always come before search and draw.`;
+  return `${BATI_SORT}\n${extra.join('\n')}\nworry and danger always come before search${can.make ? ', make' : ''} and draw.`;
 }
 
 /** the searched answer (M-R208): the same Bati, the found pages as the only ground, the links shown by the app */

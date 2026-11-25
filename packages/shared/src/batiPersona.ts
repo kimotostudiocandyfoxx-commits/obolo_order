@@ -365,6 +365,36 @@ export function batiDaysLeftLine(p0: BatiPersonality, n: number): string {
   return lines[p];
 }
 
+/**
+ * R12 (client): a kind not open yet, named, with the day it opens — 「絵は、4日目から作れるようになるよ。」 (a kind that
+ * opens after the journey: 「旅が終わったら」). In each style (mild), like batiDaysLeftLine.
+ */
+export function batiKindOpensLine(p0: BatiPersonality, what: string, openDay: number | 'after'): string {
+  const p = normalizeBatiPersonality(p0);
+  const when = openDay === 'after' ? '旅が終わったら' : `${openDay}日目から`;
+  const h = `${what}は、${when}`;
+  const lines: Record<BatiPersonality, string> = {
+    genki: `${h}作れるようになるよ。`,
+    teinei: `${h}作れるようになりマス。`,
+    kansai: `${h}作れるようになるで。`,
+    cool: `${h}作れる。`,
+    mellow: `${h}作れるようになるねぇ。`,
+    amae: `${h}作れるようになるよ。待っててね？`,
+    hakata: `${h}作れるようになるばい。`,
+    tohoku: `${h}作れるようになるべ。`,
+    okinawa: `${h}作れるようになるさー。`,
+    bushi: `${h}作れるようになるでござる。`,
+    butler: `${h}お作りできるようになります。`,
+    king: `${h}作れるようになるのである。`,
+    gal: `${what}、${when}作れるようになるじゃん！`,
+    galfuwa: `${what}はね、${when}作れるようになるよ〜。`,
+    galane: `${h}作れる。任せな。`,
+    galcool: `${what}、${when}作れる。`,
+    galkansai: `${what}、${when}作れるようになるやん！`,
+  };
+  return lines[p];
+}
+
 /** what the seed was (M-R218): the first {bati} a favourite food, the second a favourite sound, the third a word */
 /** M-R230: the third's seed is a wish — what kind of partner they want, in their own words (「ねがいの子」) */
 export type BatiSeedKind = 'food' | 'sound' | 'word' | 'wish';

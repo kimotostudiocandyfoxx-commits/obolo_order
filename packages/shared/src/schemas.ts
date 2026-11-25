@@ -78,6 +78,16 @@ export type UpdateBuddyProfileBody = z.infer<typeof UpdateBuddyProfileBody>;
 export const BuddyChatBody = z.object({
   text: z.string().trim().min(1).max(2000),
   locale: z.enum(LOCALES).optional(),
+  /**
+   * R12: the talk's own recent turns, oldest first, without this message (the Moon atelier's chat: what was made, asked
+   * and answered there — also the lines the app said itself). Used instead of the stored history when sent.
+   */
+  history: z
+    .array(z.object({ role: z.enum(['user', 'buddy']), text: z.string().max(1200) }))
+    .max(60)
+    .optional(),
+  /** R12: the chat can make works (the Moon atelier): the reply may say it is a making request (`make`) */
+  canMake: z.boolean().optional(),
 });
 export type BuddyChatBody = z.infer<typeof BuddyChatBody>;
 /** 〔🖼 絵で見る〕 under one of Bati's answers */

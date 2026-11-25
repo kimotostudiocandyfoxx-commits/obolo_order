@@ -325,7 +325,12 @@ export interface BuddyChatResponse {
   quota: BuddyQuotaView;
   /** a worry about oneself or something dangerous: the app shows no 〔🖼 絵で見る〕 under it */
   kind?: 'normal' | 'worry' | 'danger';
+  /** R12 (`canMake` chats): the message asks to make a work of this kind — the app's making flow takes it over */
+  make?: BuddyMakeKind;
 }
+/** R12: the kinds the Moon atelier makes, as the reply's classification names them */
+export const BUDDY_MAKE_KINDS = ['art', 'song', 'video', 'novel', 'game', 'voice', 'radio'] as const;
+export type BuddyMakeKind = (typeof BUDDY_MAKE_KINDS)[number];
 
 export interface SaturnPostView {
   id: string;

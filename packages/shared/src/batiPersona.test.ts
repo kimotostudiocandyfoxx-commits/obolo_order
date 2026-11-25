@@ -17,6 +17,7 @@ import {
   pickBatiTrait,
   BATI_TRAITS,
   batiDaysLeftLine,
+  batiKindOpensLine,
   batiDefaultCall,
   batiPersonalityFromSeed,
   batiRuleTransform,
@@ -119,6 +120,15 @@ describe("{bati}'s way of speaking (M-R225 / M-R226)", () => {
     expect(batiDaysLeftLine('genki', 2)).toBe('それは、あと2日で作れるようになるよ。');
     expect(batiDaysLeftLine('teinei', 2)).toContain('マス');
     for (const p of BATI_PERSONALITY_IDS) expect(batiDaysLeftLine(p, 5)).toMatch(/5/);
+  });
+
+  it('R12: a kind not open yet is named, with the day it opens', () => {
+    expect(batiKindOpensLine('genki', '絵', 4)).toBe('絵は、4日目から作れるようになるよ。');
+    expect(batiKindOpensLine('genki', '本', 'after')).toBe('本は、旅が終わったら作れるようになるよ。');
+    for (const p of BATI_PERSONALITY_IDS) {
+      expect(batiKindOpensLine(p, '曲', 5)).toMatch(/曲/);
+      expect(batiKindOpensLine(p, '曲', 5)).toMatch(/5日目から/);
+    }
   });
 
   it('the card\'s trait is one word from the list', () => {

@@ -48,9 +48,9 @@ export class BuddyController {
   @Post('chat')
   @HttpCode(200)
   async chat(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
-    const { text, locale } = parseBody(BuddyChatBody, body);
+    const { text, locale, history, canMake } = parseBody(BuddyChatBody, body);
     await rateLimit(this.kv, `buddy:${userId}`, 12, 60);
-    return this.buddy.chat(userId, text, locale, undefined, origin(req));
+    return this.buddy.chat(userId, text, locale, undefined, origin(req), { history, canMake });
   }
 
   /**
@@ -60,7 +60,7 @@ export class BuddyController {
    */
   @Post('chat/stream')
   async chatStream(@UserId() userId: string, @Body() body: unknown, @Req() req: Request, @Res() res: Response) {
-    const { text, locale } = parseBody(BuddyChatBody, body);
+    const { text, locale, history, canMake } = parseBody(BuddyChatBody, body);
     await rateLimit(this.kv, `buddy:${userId}`, 12, 60);
     res.status(200);
     res.setHeader('content-type', 'text/event-stream; charset=utf-8');
@@ -69,7 +69,7 @@ export class BuddyController {
     res.flushHeaders();
     const send = (event: string, data: unknown) => res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
     try {
-      const out = await this.buddy.chat(userId, text, locale, (piece) => send('text', { text: piece }), origin(req));
+      const out = await this.buddy.chat(userId, text, locale, (piece) => send('text', { text: piece }), origin(req), { history, canMake });
       send('done', out);
     } catch (err) {
       const e = err as { getResponse?: () => { error?: { code?: string } } };

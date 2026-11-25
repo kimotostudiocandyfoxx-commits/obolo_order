@@ -1,4 +1,4 @@
-import { BATI_REPLY_LENGTH, BATI_ROLE_TALK, MEMORY_LINES, isTalkFace, isTalkMotion, readBeats, talkSentences, type BatiRole, type BuddyPersona, type Locale, type TalkBeat, type TalkFace, type TalkMotion } from '@obolo/shared';
+import { BATI_REPLY_LENGTH, BATI_ROLE_TALK, BUDDY_MAKE_KINDS, type BuddyMakeKind, MEMORY_LINES, isTalkFace, isTalkMotion, readBeats, talkSentences, type BatiRole, type BuddyPersona, type Locale, type TalkBeat, type TalkFace, type TalkMotion } from '@obolo/shared';
 import { LlmRefusalError } from './claude';
 import { BATI_CHARACTER, BATI_DANGER, BATI_SEARCH, BATI_WORRY, batiOneCallRules, batiPersonaBlock, batiSort, personaToneLines, type BatiAbilities, type BatiSelfView } from './prompts/bati';
 import { MEMORY_SUMMARY_PROMPT } from './prompts/memory';
@@ -96,6 +96,8 @@ export interface BuddyAnswer {
   motion?: TalkMotion;
   /** M-R238: each sentence's face and motion, from the same first line (a JSON array) */
   faces?: TalkBeat[];
+  /** R12 (`can.make`): a request to make a work of this kind (the screen's making flow takes it over) */
+  make?: BuddyMakeKind;
 }
 
 /**
@@ -122,18 +124,19 @@ async function answerOf(
   onText?: (piece: string) => void,
   can: BatiAbilities = {},
 ): Promise<BuddyAnswer> {
-  const abilities = { search: !!can.search && !!llm.search, draw: !!can.draw };
+  const abilities = { search: !!can.search && !!llm.search, draw: !!can.draw, make: !!can.make };
   if (llm.oneCall) return buddyAnswerOneCall(llm, ctx, history, onText, abilities);
   const last = history[history.length - 1]?.text ?? '';
   const [sorted, plain] = await Promise.all([
     llm
-      .chat({ system: batiSort(abilities), history: [{ role: 'user', text: last }], temperature: 0, maxOutputTokens: 50 })
+      .chat({ system: batiSort(abilities), history: [{ role: 'user', text: abilities.make ? sortInput(history) : last }], temperature: 0, maxOutputTokens: 50 })
       .then(readSort)
       .catch((): Sorted => ({ kind: 'normal' })),
     llm.chat({ system: buildBuddySystemPrompt(ctx), history, temperature: 0.6, maxOutputTokens: 600 }),
   ]);
   const { kind } = sorted;
   if (kind === 'normal') {
+    if (sorted.want === 'make' && abilities.make && sorted.make) return { text: tidyAnswer(plain), kind, make: sorted.make };
     if (sorted.want === 'search' && abilities.search) {
       const found = await searched(llm, ctx, history);
       if (found) return found;
@@ -149,7 +152,24 @@ async function answerOf(
   return { text: tidyAnswer(text, kind) || fallbackAnswer(kind, ctx.locale), kind };
 }
 
-type Sorted = { kind: BuddyAnswerKind; want?: 'search' | 'draw'; draw?: string };
+type Sorted = { kind: BuddyAnswerKind; want?: 'search' | 'draw' | 'make'; draw?: string; make?: BuddyMakeKind };
+
+/**
+ * R12: the sorting reads the last message with the few turns before it (a follow-up such as 「魔法で作って欲しい」 is
+ * the earlier request); without `make` it reads the last message only, as before
+ */
+export function sortInput(history: ChatTurn[]): string {
+  const last = history[history.length - 1]?.text ?? '';
+  const before = history.slice(-7, -1).map((t) => `${t.role === 'user' ? 'child' : 'bati'}: ${t.text.slice(0, 200)}`);
+  return before.length ? `(earlier)\n${before.join('\n')}\n(the message to classify)\n${last}` : last;
+}
+
+/** "art" / "picture" … → the making kind (anything else: none) */
+export function makeKindOf(word: string | undefined): BuddyMakeKind | undefined {
+  const w = (word ?? '').toLowerCase();
+  const alias: Record<string, BuddyMakeKind> = { picture: 'art', image: 'art', drawing: 'art', illustration: 'art', music: 'song', mv: 'video', movie: 'video', book: 'novel', story: 'novel', kororin: 'voice' };
+  return (BUDDY_MAKE_KINDS as readonly string[]).includes(w) ? (w as BuddyMakeKind) : alias[w];
+}
 
 /** the sorting's one word ("worry" / "danger" / "search" / "draw: …" / "normal") */
 export function readSort(out: string): Sorted {
@@ -158,6 +178,10 @@ export function readSort(out: string): Sorted {
   if (word === 'worry' || (!word && /worry/i.test(t))) return { kind: 'worry' };
   if (word === 'danger') return { kind: 'danger' };
   if (word === 'search') return { kind: 'normal', want: 'search' };
+  if (word === 'make') {
+    const make = makeKindOf(/^make\s*[:：-]?\s*\[?\s*([a-z]+)/i.exec(t)?.[1]);
+    return make ? { kind: 'normal', want: 'make', make } : { kind: 'normal' };
+  }
   if (word === 'draw') {
     const draw = cleanDraw(t.replace(/^draw\s*\]?\s*[:：-]?\s*/i, ''));
     return draw ? { kind: 'normal', want: 'draw', draw } : { kind: 'normal' };
@@ -207,8 +231,8 @@ async function buddyAnswerOneCall(llm: LlmProvider, ctx: BuddyContext, history: 
     }
     throw err;
   }
-  const { kind, body, want, draw, face, motion, faces } = parseTagged(raw);
-  const answer = await oneCallAnswer(llm, ctx, history, onText, can, { kind, body, raw, want, draw });
+  const { kind, body, want, draw, face, motion, faces, make } = parseTagged(raw);
+  const answer = want === 'make' && can.make && make ? { text: tidyAnswer(body), kind, make } : await oneCallAnswer(llm, ctx, history, onText, can, { kind, body, raw, want: want === 'make' ? undefined : want, draw });
   // the beats are cut to the answer's own sentences (a search answers in other words: its first beat only)
   const n = talkSentences(answer.text).length;
   const beats = faces?.length ? faces.slice(0, want === 'search' ? 1 : Math.max(1, n)) : undefined;
@@ -254,7 +278,7 @@ const TAG = /^\s*(?:\[\s*(normal|worry|danger|search|draw)\s*\][ \t]*([^\r\n]*)|
  * "[worry]\n…" → the kind and the answer; no tag = an ordinary answer. "[search]" asks for a web search,
  * "[draw] <what to draw>" for a picture (both ordinary).
  */
-export function parseTagged(input: string): { kind: BuddyAnswerKind; body: string; want?: 'search' | 'draw'; draw?: string; face?: TalkFace; motion?: TalkMotion; faces?: TalkBeat[] } {
+export function parseTagged(input: string): { kind: BuddyAnswerKind; body: string; want?: 'search' | 'draw' | 'make'; draw?: string; make?: BuddyMakeKind; face?: TalkFace; motion?: TalkMotion; faces?: TalkBeat[] } {
   const { face, motion, faces, rest: raw } = readFaceTag(input);
   const look = { ...(face ? { face } : {}), ...(motion ? { motion } : {}), ...(faces ? { faces } : {}) };
   return { ...parseKind(raw), ...look };
@@ -291,7 +315,16 @@ export function readFaceTag(raw: string): { face?: TalkFace; motion?: TalkMotion
   return { ...(face ? { face } : {}), ...(motion && motion !== 'none' ? { motion } : {}), rest: raw.slice(m[0].length) };
 }
 
-function parseKind(raw: string): { kind: BuddyAnswerKind; body: string; want?: 'search' | 'draw'; draw?: string } {
+// R12: "[make art] …" — a request to make a work (the kind in the tag)
+const MAKE_TAG = /^\s*\[\s*make[\s:：-]*([a-z]+)\s*\][ \t]*([^\r\n]*)(?:\r?\n|$)/i;
+
+function parseKind(raw: string): { kind: BuddyAnswerKind; body: string; want?: 'search' | 'draw' | 'make'; draw?: string; make?: BuddyMakeKind } {
+  const mk = MAKE_TAG.exec(raw);
+  if (mk) {
+    const make = makeKindOf(mk[1]);
+    const body = `${mk[2]}\n${raw.slice(mk[0].length)}`.trim();
+    return make ? { kind: 'normal', body, want: 'make', make } : { kind: 'normal', body };
+  }
   const m = TAG.exec(raw);
   if (!m) return { kind: 'normal', body: raw.trim() };
   const tag = (m[1] ?? m[3]).toLowerCase();
@@ -312,7 +345,7 @@ function parseKind(raw: string): { kind: BuddyAnswerKind; body: string; want?: '
  */
 export class TaggedSplitter {
   kind: BuddyAnswerKind | null = null;
-  want: 'search' | 'draw' | undefined;
+  want: 'search' | 'draw' | 'make' | undefined;
   /** M-R234: the expression on the first line ("{smile hop}"), once read */
   face: TalkFace | undefined;
   motion: TalkMotion | undefined;
@@ -349,10 +382,10 @@ export class TaggedSplitter {
       const m = TAG.exec(this.head);
       const rest = m ? `${p.want === 'draw' ? '' : (m[2] ?? '')}${this.head.slice(m[0].length)}` : this.head;
       this.head = '';
-      if (this.kind === 'normal' && this.want !== 'search') this.feed(rest);
+      if (this.kind === 'normal' && this.want !== 'search' && this.want !== 'make') this.feed(rest);
       return;
     }
-    if (this.kind === 'normal' && this.want !== 'search') this.feed(piece);
+    if (this.kind === 'normal' && this.want !== 'search' && this.want !== 'make') this.feed(piece);
   }
   private feed(piece: string) {
     if (!this.onText) return;

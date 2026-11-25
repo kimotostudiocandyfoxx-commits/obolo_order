@@ -90,8 +90,27 @@ export const SUBSCRIPTION_PRICE_JPY = 88;
 
 /** Buddy memory: summarise every N new messages (PLACEHOLDER P-MOON-3). */
 export const BUDDY_SUMMARY_EVERY = 10;
-/** Buddy memory: number of recent messages sent verbatim to the LLM. */
-export const BUDDY_CONTEXT_MESSAGES = 20;
+/**
+ * Buddy memory: number of recent messages sent verbatim to the LLM. R12 (client: "it forgets the message from two
+ * turns ago"): 40 messages = the last 20 turns, bounded by BUDDY_CONTEXT_CHARS (newest kept).
+ */
+export const BUDDY_CONTEXT_MESSAGES = 40;
+/** the recent turns' size bound (about 4–6k tokens of Japanese): the oldest turns are dropped first */
+export const BUDDY_CONTEXT_CHARS = 8000;
+
+/** R12: the recent turns, newest last, cut to the message count and the size bound (the newest are kept whole) */
+export function contextWindow<T extends { text: string }>(turns: readonly T[], maxMessages = BUDDY_CONTEXT_MESSAGES, maxChars = BUDDY_CONTEXT_CHARS): T[] {
+  const out: T[] = [];
+  let size = 0;
+  for (let i = turns.length - 1; i >= 0 && out.length < maxMessages; i--) {
+    const t = turns[i];
+    if (!t.text) continue;
+    if (size + t.text.length > maxChars && out.length) break;
+    size += t.text.length;
+    out.unshift(t);
+  }
+  return out;
+}
 
 /** Business-day boundary for daily quotas. Spec does not say; PLACEHOLDER (P-MOON-2). */
 export const QUOTA_TIMEZONE = 'Asia/Tokyo';

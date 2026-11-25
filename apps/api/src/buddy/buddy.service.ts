@@ -3,6 +3,8 @@ import { batiChatPicturePrompt, buddyAnswer, talkBeatsMarked, ChatTurn, DEFAULT_
 import { buddyQuotaDecision, idempotencyKey } from '@obolo/ledger';
 import {
   BUDDY_CONTEXT_MESSAGES,
+  contextWindow,
+  type BuddyMakeKind,
   BUDDY_OVERAGE_MANA,
   BUDDY_SUMMARY_EVERY,
   BuddyChatResponse,
@@ -50,6 +52,21 @@ const toView = (m: typeof buddyMessages.$inferSelect): BuddyMessageView => ({
 
 /** a picture in the chat may take this long; after it, the answer comes without one */
 const DRAW_TIMEOUT_MS = 60_000;
+
+/** R12: what the chat is sent with — the talk's own recent turns, and whether it can make works (the Moon atelier) */
+export type ChatOpts = { history?: { role: 'user' | 'buddy'; text: string }[]; canMake?: boolean };
+
+/**
+ * R12: the turns {bati} answers with — the recent ones (the last 20 turns, bounded by size: contextWindow), oldest
+ * first, then this message (a copy of it at the end of the sent turns is not repeated)
+ */
+export function chatHistory(text: string, turns: { role: 'user' | 'buddy'; text: string }[]): ChatTurn[] {
+  const t = [...turns];
+  if (t.length && t[t.length - 1].role === 'user' && t[t.length - 1].text.trim() === text.trim()) t.pop();
+  const out: ChatTurn[] = contextWindow(t).map((m) => ({ role: m.role === 'buddy' ? ('assistant' as const) : ('user' as const), text: m.text }));
+  out.push({ role: 'user', text });
+  return out;
+}
 
 /**
  * M-R208 caps, counted per day in Redis (shared by every instance): looked-up answers per member and for everyone
@@ -180,7 +197,7 @@ export class BuddyService implements OnModuleInit {
   }
 
   /** `onText`: the ordinary answer as it is written (POST /buddy/chat/stream); the saved reply comes at the end */
-  async chat(userId: string, text: string, localeOverride?: Locale, onText?: (piece: string) => void, origin = ''): Promise<BuddyChatResponse> {
+  async chat(userId: string, text: string, localeOverride?: Locale, onText?: (piece: string) => void, origin = '', opts: ChatOpts = {}): Promise<BuddyChatResponse> {
     const profile = await this.ensureProfile(userId);
     const [user] = await this.db.write.select().from(users).where(eq(users.id, userId));
     const [wallet] = await this.db.write.select().from(wallets).where(eq(wallets.userId, userId));
@@ -198,24 +215,25 @@ export class BuddyService implements OnModuleInit {
       throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'BUDDY_QUOTA', 'Daily Buddy message quota reached');
     }
 
-    // --- Context: recent turns verbatim + long-term memory summary.
-    const recent = await this.db.write
-      .select()
-      .from(buddyMessages)
-      .where(eq(buddyMessages.userId, userId))
-      .orderBy(desc(buddyMessages.createdAt))
-      .limit(BUDDY_CONTEXT_MESSAGES);
-    const history: ChatTurn[] = recent
-      .reverse()
-      .map((m) => ({ role: m.role === 'buddy' ? ('assistant' as const) : ('user' as const), text: m.text }));
-    history.push({ role: 'user', text });
+    // --- Context: recent turns verbatim + long-term memory summary. R12: the talk's own turns when the app sends them
+    // (the Moon atelier: its making questions and lines are not in the stored history), else the stored ones; the last
+    // 20 turns, bounded by size (contextWindow).
+    const recent = opts.history
+      ? []
+      : await this.db.write
+          .select()
+          .from(buddyMessages)
+          .where(eq(buddyMessages.userId, userId))
+          .orderBy(desc(buddyMessages.createdAt))
+          .limit(BUDDY_CONTEXT_MESSAGES);
+    const history = chatHistory(text, opts.history ?? [...recent].reverse().map((m) => ({ role: m.role === 'buddy' ? ('buddy' as const) : ('user' as const), text: m.text })));
 
     // M-R222: only the member's own 「覚えといて」 keeps something ({bati} never asks); 「〇〇って呼んで」 changes the 呼び方
     let remembered: { text: string; result: RememberResult } | undefined;
     let calledAs: string | undefined;
     let me = user;
     if (activeBati(user) && this.memory) {
-      const ask = rememberRequest(text, [...recent].reverse().filter((m) => m.role === 'user').pop()?.text);
+      const ask = rememberRequest(text, [...history].slice(0, -1).filter((m) => m.role === 'user').pop()?.text);
       const call = ask ? null : callRequest(text);
       if (ask) {
         const r = await this.memory.remember(userId, ask).catch(() => null);
@@ -241,13 +259,14 @@ export class BuddyService implements OnModuleInit {
     let face: TalkFace | undefined;
     let motion: TalkMotion | undefined;
     let faces: TalkBeat[] | undefined;
+    let make: BuddyMakeKind | undefined;
     // M-R238: your own words' faces, sentence by sentence — one small call beside the reply (the rules if it fails)
     // M-R243: with its entrances, shapes and marks
     const mine = talkBeatsMarked(this.llm, text, { self: true, timeoutMs: 3000 }).catch(() => ({ faces: ruleBeats(text, true), marked: undefined as string | undefined }));
     // M-R208: whether Bati may look it up / draw today (a used cap turns it off, the talk goes on)
-    const can = await this.caps.abilities(userId).catch(() => ({ search: false, draw: false }));
+    const can = { ...(await this.caps.abilities(userId).catch(() => ({ search: false, draw: false }))), make: !!opts.canMake };
     try {
-      ({ text: replyText, kind: replyKind, sources, draw, face, motion, faces } = await buddyAnswer(
+      ({ text: replyText, kind: replyKind, sources, draw, face, motion, faces, make } = await buddyAnswer(
         this.llm,
         {
           // the member's own {bati}, named on the Moon, answers under its own name (story chat 2026-11-02)
@@ -326,6 +345,7 @@ export class BuddyService implements OnModuleInit {
       reply: toView(result.b),
       quota: { usedToday: used, freeDaily: this.cfg.BUDDY_FREE_DAILY },
       kind: replyKind,
+      ...(make && replyKind === 'normal' ? { make } : {}),
     };
   }
 

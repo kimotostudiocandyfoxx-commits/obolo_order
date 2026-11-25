@@ -19,13 +19,16 @@ export class PictureService {
   constructor(@Inject(LLM) private readonly llm: LlmProvider) {}
 
   async find(userId: string, question: string, answer?: string): Promise<BuddyPicture | null> {
-    if ((await moderateText(question, this.llm)).flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'MODERATION', 'この質問の絵は、出せないよ');
+    // R12 (speed): the question's check and its search words at once; the found title's check and its Japanese at once
+    const [mod, terms] = await Promise.all([moderateText(question, this.llm), this.terms(question, answer).catch(() => ({ term: '', space: false, must: '' }))]);
+    if (mod.flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'MODERATION', 'この質問の絵は、出せないよ');
     try {
-      const q = await this.terms(question, answer);
+      const q = terms;
       let pic = q.space ? await this.nasa(q.term, q.must) : await this.commons(q.term, q.must);
       pic ??= q.space ? await this.commons(q.term, q.must) : await this.nasa(q.term, q.must);
-      if (pic && (await moderateText(`${pic.title}`, this.llm)).flagged) pic = null;
-      return pic ? { ...pic, title: await this.jaTitle(pic.title), free: true } : null;
+      if (!pic) return null;
+      const [titleMod, ja] = await Promise.all([moderateText(`${pic.title}`, this.llm), this.jaTitle(pic.title)]);
+      return titleMod.flagged ? null : { ...pic, title: ja, free: true };
     } catch (e) {
       this.log.warn(`picture failed: ${String(e)}`);
       return null;
