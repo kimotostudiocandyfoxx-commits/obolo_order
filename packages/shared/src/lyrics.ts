@@ -293,7 +293,7 @@ export function lyricsNormalize(raw: unknown): SongLyrics | null {
     const section = lyricSectionOf(parts[0] ?? '') ?? 'verse';
     const hintWords = [...parts.slice(1), ...(Array.isArray(x.hints) ? x.hints : []), ...(Array.isArray(x.modifiers) ? x.modifiers : [])].filter((h): h is string => typeof h === 'string');
     const hints = [...new Set(hintWords.map(lyricHintOf).filter((h): h is LyricHint => !!h))].slice(0, LYRIC_HINTS_PER_BLOCK);
-    const lines = S[section].sung || section === 'outro' || section === 'intro' ? cleanLines(Array.isArray(x.lines) ? x.lines.filter((l): l is string => typeof l === 'string') : typeof x.lines === 'string' ? x.lines.split('\n') : []).slice(0, 8) : [];
+    const lines = S[section].sung || section === 'outro' || section === 'intro' || section === 'build' ? cleanLines(Array.isArray(x.lines) ? x.lines.filter((l): l is string => typeof l === 'string') : typeof x.lines === 'string' ? x.lines.split('\n') : []).slice(0, 8) : [];
     const room = LYRIC_LINES_MAX - total;
     const kept = lines.slice(0, Math.max(0, room));
     if (S[section].sung && !kept.length) continue;

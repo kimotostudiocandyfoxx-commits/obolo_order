@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger, Optional, type OnModuleInit } from '@nestjs/common';
-import { fillNames, speakText, spokenChars, storyVoiceFilter, storyVoicePrompt, type LineVoicesBody, type LineVoicesView, type NameLines } from '@obolo/shared';
+import { BATI_VOICE_SPEED, batiSpeakSpeed, fillNames, speakText, spokenChars, storyVoiceFilter, storyVoicePrompt, type LineVoicesBody, type LineVoicesView, type NameLines } from '@obolo/shared';
 import { and, eq, inArray } from 'drizzle-orm';
 import { createHash } from 'node:crypto';
 import { spawn } from 'node:child_process';
@@ -139,7 +139,9 @@ export class LineVoiceService implements OnModuleInit {
    */
   async batiSays(userId: string, text: string, origin: string): Promise<{ url: string } | null> {
     // client 2026-11-24 (the Moon chat speaks too): the same words are read once a day per person (a cached file)
-    const cacheKey = `bs:${userId}:${createHash('sha256').update(speakText(text)).digest('hex').slice(0, 32)}`;
+    // R14: {bati}'s speaking speed (BATI_VOICE_SPEED) is part of the file — a new speed reads the words again
+    const speed = batiSpeakSpeed(1, this.cfg.BATI_VOICE_SPEED ?? BATI_VOICE_SPEED);
+    const cacheKey = `bs:${userId}:${createHash('sha256').update(`${speakText(text)}|${speed}`).digest('hex').slice(0, 32)}`;
     const cached = await this.kv.get(cacheKey).catch(() => null);
     if (cached) return { url: cached };
     // every voice counts toward the day's read-aloud limit (DAILY, shared with the story's line voices) — Fish too
@@ -158,7 +160,9 @@ export class LineVoiceService implements OnModuleInit {
     // M-R250: the prepared voice for this {bati}'s egg and personality (no voice of the member's own)
     const dv = await this.batiVoice?.defaultVoice(userId).catch(() => null);
     const spec = { ...bati.spec, model: undefined, ...(dv ? { voice: dv.gemini, pitch: dv.pitch } : {}) };
-    const p: JobPayloads['voice.line'] = { userId, hash: '', origin, who: 'バティ', text, spec, brief: bati.brief, model: BATI_SAYS_MODEL, tempo: nl.tempo };
+    // R14: quicker and punchier — asked of the voice, and the story's tempo × BATI_VOICE_SPEED (ffmpeg atempo: the pitch stays)
+    const brief = `${bati.brief ?? ''} Lively, crisp and punchy delivery, no dragging pauses`.trim();
+    const p: JobPayloads['voice.line'] = { userId, hash: '', origin, who: 'バティ', text, spec: { ...spec, brief: spec.brief ? `${spec.brief}. Lively, crisp and punchy delivery` : undefined }, brief, model: BATI_SAYS_MODEL, tempo: nl.tempo * speed };
     const mp3 = await this.slot(() => this.gemini(p, storyVoiceFilter(p.spec, p.tempo)));
     const m = await this.media.storeAudio(userId, 'audio/mpeg', mp3, origin);
     return keep(m.url);

@@ -11,3 +11,5 @@ export const NOVEL_LLM = Symbol('NOVEL_LLM');
 export const GAME_LLM = Symbol('GAME_LLM');
 /** R13: a song's lyrics with metatags (LYRICS_MODEL: Gemini Flash now, Claude by config) */
 export const LYRICS_LLM = Symbol('LYRICS_LLM');
+/** R14: the model that builds a spell first (SPELL_MODEL: Gemini Flash now, Claude by config) */
+export const SPELL_LLM = Symbol('SPELL_LLM');

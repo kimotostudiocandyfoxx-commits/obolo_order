@@ -1,6 +1,7 @@
 import { BATI_VOICE_BASE_SEMITONES, BATI_VOICE_TUNING, batiVoicePitch, batiVoiceTuning, MEDIA_CONSENT_VERSION } from '@obolo/shared';
 import { describe, expect, it, vi } from 'vitest';
 import { BatiVoiceService, canUseMedia, hasMediaConsent } from './bati-voice.service';
+import { fishVoiceModels } from './voice-models';
 import type { VoiceModels } from './voice-models';
 
 /** the API error's code ({ error: { code } }) */
@@ -9,7 +10,7 @@ const code = (e: unknown) => ((e as { getResponse?: () => { error?: { code?: str
 const U = 'a0000000-0000-4000-8000-000000000001';
 
 /** a service over a little world in memory: one user row, the media store, the queue and a fake voice-model provider */
-function world(o: { consent?: boolean; enabled?: boolean; age?: number | null; guardian?: boolean; defaultVoice?: string } = {}) {
+function world(o: { consent?: boolean; enabled?: boolean; age?: number | null; guardian?: boolean; defaultVoice?: string; speed?: number } = {}) {
   const user: Record<string, unknown> = {
     id: U,
     voiceBatiId: null,
@@ -54,7 +55,7 @@ function world(o: { consent?: boolean; enabled?: boolean; age?: number | null; g
     remove: vi.fn(async (id: string) => void models.gone.push(id)),
     speak: vi.fn(async (id: string, text: string) => Buffer.from(id.startsWith('model-') ? `tts:${text}` : `tts@${id}:${text}`)),
   };
-  const s = new BatiVoiceService({} as never, media as never, queue as never, models, { FISH_DEFAULT_VOICE_ID: o.defaultVoice });
+  const s = new BatiVoiceService({} as never, media as never, queue as never, models, { FISH_DEFAULT_VOICE_ID: o.defaultVoice, ...(o.speed ? { BATI_VOICE_SPEED: o.speed } : {}) });
   // ffmpeg stands in: the bytes marked with the semitones they were shifted by
   const shifts: number[] = [];
   s.convert = async (input, semitones) => {
@@ -209,5 +210,32 @@ describe('the 2nd / 3rd {bati}: the same base voice, a little changed by persona
       expect(await world().s.speak(U, 'やぁ')).toBeNull();
       expect(await world({ enabled: false, defaultVoice: 'default-bati' }).s.speak(U, 'やぁ')).toBeNull();
     });
+  });
+});
+
+describe('R14 (client 2026-11-25): {bati} speaks faster and punchier (BATI_VOICE_SPEED)', () => {
+  it('the speed goes to the TTS with every line: 1.2 by default, the setting when set, × the {bati}’s own', async () => {
+    const w = world({ defaultVoice: 'default-bati' });
+    await w.s.speak(U, 'やぁ');
+    expect(w.models.speak).toHaveBeenLastCalledWith('default-bati', 'やぁ', 1.2);
+    const v = world({ defaultVoice: 'default-bati', speed: 1.35 });
+    await v.s.speak(U, 'やぁ');
+    expect(v.models.speak).toHaveBeenLastCalledWith('default-bati', 'やぁ', 1.35);
+    expect(v.s.speed(0.9)).toBe(1.22);
+    expect(world({ speed: 2 }).s.speed(1.1)).toBe(2);
+  });
+  it('Fish gets it as prosody.speed (the pitch stays: no sped-up playback)', async () => {
+    const sent: { body: string; headers: Record<string, string> }[] = [];
+    const real = globalThis.fetch;
+    globalThis.fetch = (async (_url: string, init: { body: string; headers: Record<string, string> }) => {
+      sent.push(init);
+      return new Response(new Uint8Array([1, 2, 3]), { status: 200 });
+    }) as never;
+    try {
+      await fishVoiceModels({ FISH_API_KEY: 'k', FISH_MODEL: 's2.1-pro' }).speak('voice-1', 'こんにちは', 1.2);
+    } finally {
+      globalThis.fetch = real;
+    }
+    expect(JSON.parse(sent[0].body)).toMatchObject({ text: 'こんにちは', reference_id: 'voice-1', prosody: { speed: 1.2, volume: 0 } });
   });
 });

@@ -5,7 +5,7 @@ import { Database } from '../db/db';
 import { createEmailSender } from './email';
 import { createKv, KvStore } from './kv';
 import { BullQueue, CloudTasksQueue, InlineQueue, JobQueue } from './queue';
-import { BUDDY_LLM, EMAIL, GAME_LLM, IMAGES, KV, LLM, LOOK_IMAGES, LYRICS_LLM, NOVEL_LLM, QUEUE } from './tokens';
+import { BUDDY_LLM, EMAIL, GAME_LLM, IMAGES, KV, LLM, LOOK_IMAGES, LYRICS_LLM, NOVEL_LLM, QUEUE, SPELL_LLM } from './tokens';
 
 @Global()
 @Module({
@@ -97,6 +97,17 @@ import { BUDDY_LLM, EMAIL, GAME_LLM, IMAGES, KV, LLM, LOOK_IMAGES, LYRICS_LLM, N
         return llm;
       },
     },
+    // R14: every spell is built by the model first (SPELL_MODEL)
+    {
+      provide: SPELL_LLM,
+      inject: [CONFIG],
+      useFactory: (c: AppConfig): LlmProvider => {
+        const log = new Logger('LLM');
+        const llm = createTaskLlm(c.SPELL_MODEL, { geminiApiKey: c.GEMINI_API_KEY, anthropicApiKey: c.ANTHROPIC_API_KEY, openaiApiKey: c.OPENAI_API_KEY }, { timeoutMs: c.SPELL_MODEL_TIMEOUT_MS, onError: (p, e) => log.warn(`spell: ${p} failed, next: ${String(e)}`) });
+        log.log(`spell chain: ${llm.name}`);
+        return llm;
+      },
+    },
     {
       provide: GAME_LLM,
       inject: [CONFIG],
@@ -108,7 +119,7 @@ import { BUDDY_LLM, EMAIL, GAME_LLM, IMAGES, KV, LLM, LOOK_IMAGES, LYRICS_LLM, N
       },
     },
   ],
-  exports: [CONFIG, Database, KV, QUEUE, EMAIL, LLM, BUDDY_LLM, NOVEL_LLM, GAME_LLM, LYRICS_LLM, IMAGES, LOOK_IMAGES],
+  exports: [CONFIG, Database, KV, QUEUE, EMAIL, LLM, BUDDY_LLM, NOVEL_LLM, GAME_LLM, LYRICS_LLM, SPELL_LLM, IMAGES, LOOK_IMAGES],
 })
 export class InfraModule implements OnApplicationShutdown {
   constructor(

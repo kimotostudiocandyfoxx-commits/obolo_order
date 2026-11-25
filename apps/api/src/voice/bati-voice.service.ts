@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable, Logger, type OnModuleInit } from '@nestjs/common';
-import { BATI_VOICE_BASE_SEMITONES, BATI_VOICE_MAX_SECONDS, BATI_VOICE_MIN_SECONDS, batiDefaultVoice, batiVoiceTuning, type BatiVoiceBody, type Me } from '@obolo/shared';
+import { BATI_VOICE_BASE_SEMITONES, BATI_VOICE_MAX_SECONDS, BATI_VOICE_MIN_SECONDS, BATI_VOICE_SPEED, batiDefaultVoice, batiSpeakSpeed, batiVoiceTuning, type BatiVoiceBody, type Me } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { CONFIG, type AppConfig } from '../config';
@@ -43,7 +43,7 @@ export class BatiVoiceService implements OnModuleInit {
     @Inject(QUEUE) private readonly queue: JobQueue,
     @Inject(VOICE_MODELS) private readonly models: VoiceModels,
     /** FISH_DEFAULT_VOICE_ID: the shared default {bati} voice model (iPad feedback; scripts/make-default-bati-voice.ts) */
-    @Inject(CONFIG) private readonly cfg: Partial<Pick<AppConfig, 'FISH_DEFAULT_VOICE_ID'>> = {},
+    @Inject(CONFIG) private readonly cfg: Partial<Pick<AppConfig, 'FISH_DEFAULT_VOICE_ID' | 'BATI_VOICE_SPEED'>> = {},
   ) {}
 
   onModuleInit() {
@@ -154,8 +154,14 @@ export class BatiVoiceService implements OnModuleInit {
     const ref = this.voiceRef(u);
     if (!u || !ref) return null;
     const tune = this.tuning(u);
-    const mp3 = await this.models.speak(ref, text, tune.speed);
+    // R14 (client 2026-11-25: 「速く、歯切れよく」): Fish's own speed (prosody.speed keeps the pitch), × the {bati}'s own
+    const mp3 = await this.models.speak(ref, text, this.speed(tune.speed));
     return tune.semitones ? this.convert(mp3, tune.semitones) : mp3;
+  }
+
+  /** R14: the speed {bati} speaks at in the Moon chat (BATI_VOICE_SPEED × the {bati}'s own) */
+  speed(own = 1): number {
+    return batiSpeakSpeed(own, this.cfg.BATI_VOICE_SPEED ?? BATI_VOICE_SPEED);
   }
 
   /** M-R250: the prepared voice for the member's active {bati} (egg × personality), when no own voice is used */

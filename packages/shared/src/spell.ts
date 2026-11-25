@@ -585,6 +585,21 @@ export function songGenreNamed(said: string): boolean {
   return named('song', spellWordsOnly(said)).tags.some((t) => t.group === 'genre');
 }
 
+/** R14: the dictionary talismans the words name themselves (what the member said always wins over the model's) */
+export function spellNamedTags(kind: SpellKind, said: string): SpellTag[] {
+  return named(kind, spellWordsOnly(said)).tags;
+}
+
+/**
+ * R14: a label that is only the request (作って, 曲, お願い, 違うよ, スペル …) and never a talisman — the model's tags go
+ * through the same stop list as the words
+ */
+export function spellRequestWord(kind: SpellKind, ja: string): boolean {
+  if (isSpellWord(ja) || NOT_CONTENT.test(ja.trim()) || FILLER.test(ja.trim())) return true;
+  const n = named(kind, spellWordsOnly(ja));
+  return !n.tags.length && !themes(n.rest).length;
+}
+
 /** R14: the words name a song's sound (a genre, a tempo, an instrument, a voice) — with a correction, a style change */
 export function songStyleNamed(said: string): boolean {
   return named('song', spellWordsOnly(said)).tags.some((t) => ['genre', 'tempo', 'instrument', 'voice'].includes(t.group));

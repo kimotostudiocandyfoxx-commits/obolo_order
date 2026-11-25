@@ -1,4 +1,4 @@
-import { LYRIC_HINT_DEFS, LYRIC_SECTION_DEFS, lyricsNormalize, lyricsSheet, spellPrompt, spellWords, type SongLyrics, type SpellTag } from '@obolo/shared';
+import { genreLyricsGuide, LYRIC_HINT_DEFS, LYRIC_SECTION_DEFS, lyricsNormalize, lyricsSheet, spellPrompt, spellWords, type SongLyrics, type SpellTag } from '@obolo/shared';
 
 /**
  * R13 (client 2026-11-25): {bati} writes a song's スペル入りの歌詞 — Japanese lyrics in blocks, each opened by a metatag the
@@ -10,7 +10,7 @@ import { LYRIC_HINT_DEFS, LYRIC_SECTION_DEFS, lyricsNormalize, lyricsSheet, spel
  * pasted ones are answered with {"copy": true} plus original lyrics in that mood.
  */
 const SECTIONS = Object.values(LYRIC_SECTION_DEFS)
-  .map((d) => `${d.en}${d.sung ? '' : ' (instrumental, no lines)'}`)
+  .map((d) => `${d.en}${d.sung ? '' : d.en === 'Build' ? ' (the rise before a drop; a short chanted phrase or none)' : ' (instrumental, no lines)'}`)
   .join(', ');
 const HINTS = Object.values(LYRIC_HINT_DEFS)
   .map((d) => d.en)
@@ -24,6 +24,7 @@ export function lyricsSystem(): string {
     `Structure tags (use only these): ${SECTIONS}.`,
     `Performance tags (optional, at most 2 per block, only when they help): ${HINTS}.`,
     'A usual song: Intro, Verse, Pre-Chorus, Chorus, Bridge, Final Chorus, Outro (about 18–26 sung lines). A short one may drop the Bridge. A second verse (2番) is a Verse + Pre-Chorus + Chorus after the first Chorus.',
+    'The lyrics always follow the style spell and its genre guidance: their structure, density and words fit the genre (psytrance / techno / trance: few short repeated, hypnotic, mantra-like phrases with many Build / Drop / Instrumental blocks; a ballad: full heartfelt verses; hip hop: rhythmic rap verses; idol pop: a chant-along chorus).',
     'Lines: natural singable Japanese (mostly hiragana and easy kanji), 6–14 characters, 2–6 lines per block, one breath each; lines in the same position have similar length; the chorus has a short hook that repeats; one core image through the song (no adjective stacking, no mixed metaphors). No tags, brackets or English inside the lines. Never write the tags as lyrics.',
     'Original lyrics only: never write or quote the lyrics of an existing song, a real singer or band, a brand or a character. If the user pasted lyrics that are clearly from an existing published song, answer with "copy": true and write NEW original lyrics in that mood and theme instead (never reuse its lines).',
     'Nothing sexual, violent, hateful, scary or about self-harm; kind words only. The tags agree with the style (a guitar solo only if a guitar fits; whispered only in a quiet part).',
@@ -32,7 +33,9 @@ export function lyricsSystem(): string {
 }
 
 export function lyricsRequest(a: LyricsAsk): string {
-  const style = `Style spell: ${spellPrompt('song', a.tags)} (in Japanese: ${spellWords(a.tags)})`;
+  // R14 (client 2026-11-25: psytrance came back with lyrics nothing like psytrance): the style talismans and the genre's
+  // own guidance (how it is sung: full verses / sparse mantra-like phrases / almost none) go with every ask
+  const style = [`Style spell: ${spellPrompt('song', a.tags)} (in Japanese: ${spellWords(a.tags)})`, `Style tags: ${a.tags.map((t) => `${t.group}=${t.en}`).join('; ')}`, genreLyricsGuide(a.tags)].join('\n');
   if (a.mode === 'new') return [style, `The user's request (Japanese): ${a.said}`, 'Write the lyrics.'].join('\n');
   if (a.mode === 'own')
     return [

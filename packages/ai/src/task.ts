@@ -17,6 +17,8 @@ export const TASK_MODEL_DEFAULTS = {
   game: 'gemini:gemini-2.5-pro,gemini:gemini-2.5-flash',
   /** R13: a song's lyrics with metatags (Japanese, short, JSON): Flash-class; Claude later by LYRICS_MODEL only */
   lyrics: 'gemini:gemini-2.5-flash,gemini:gemini-flash-latest',
+  /** R14: every スペル is built by the model first (short JSON, must be quick): Flash-class; Claude by SPELL_MODEL */
+  spell: 'gemini:gemini-2.5-flash,gemini:gemini-flash-latest',
 } as const;
 export type TaskName = keyof typeof TASK_MODEL_DEFAULTS;
 

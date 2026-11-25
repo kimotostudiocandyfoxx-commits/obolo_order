@@ -92,6 +92,18 @@ const Env = z.object({
   /** R13: the model a song's lyrics with metatags are written with (a chain like NOVEL_MODEL; Claude later = change this) */
   LYRICS_MODEL: z.string().default('gemini:gemini-2.5-flash,gemini:gemini-flash-latest'),
   LYRICS_MODEL_TIMEOUT_MS: z.coerce.number().min(5_000).max(120_000).default(30_000),
+  /**
+   * R14 (client 2026-11-25: 「サイケデリックトランスの曲」 came back as a pop spell): the model that builds every スペル first
+   * (POST /moon/spell; a chain like LYRICS_MODEL — Claude = e.g. claude:claude-haiku-4-5,gemini:gemini-2.5-flash); the
+   * rules only fill what it left empty, or stand alone when it fails
+   */
+  SPELL_MODEL: z.string().default('gemini:gemini-2.5-flash,gemini:gemini-flash-latest'),
+  SPELL_MODEL_TIMEOUT_MS: z.coerce.number().min(2_000).max(60_000).default(9_000),
+  /**
+   * R14 (client 2026-11-25, iPad: 「バティの話すスピードが少し遅い」): how fast {bati} speaks in the Moon chat (Fish
+   * prosody.speed; the Gemini fallback's pitch-keeping tempo) — 1 = the voice as made; each {bati}'s own speed on top
+   */
+  BATI_VOICE_SPEED: z.coerce.number().min(0.5).max(2).default(1.2),
 
   /** Stripe (the Eclipse day 7, ¥88/month). Without the secret key the payment runs in demo mode
    *  (no charge) — once it is set, POST /me/order is refused and only a paid Checkout counts. */
