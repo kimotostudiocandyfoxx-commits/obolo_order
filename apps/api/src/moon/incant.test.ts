@@ -16,7 +16,7 @@ describe('R17: the secret spell — only a member who says the passphrase', () =
   it('a member saying 「上級魔法で…」 gets a grant, the price and the request; the grant is good for the yes', async () => {
     const s = incant({}, true);
     const r = await s.incant('u1', '上級魔法で、夏の曲を唱えて');
-    expect(r).toMatchObject({ premium: true, price: 30, request: '夏の曲を唱えて' });
+    expect(r).toMatchObject({ premium: true, price: 30, request: '夏の曲を作って' });
     if (!r.premium) throw new Error('no');
     expect(await s.check('u1', r.grant)).toBe(true);
     expect(await s.check('u2', r.grant)).toBe(false);

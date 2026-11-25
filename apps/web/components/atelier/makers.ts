@@ -55,7 +55,8 @@ export type MakeOpts = {
 };
 
 /** the review page's stand-in times (M-R253 §4): a 2-minute one (said up front) and a 20-second one (waited in place) */
-export const DEMO_SECONDS: Partial<Record<AtelierKind | 'videoEdit', number>> = { song: 120, video: 120, art: 20, videoEdit: 12 };
+// R17: a song is sung on Runware now (fast); the secret spell's engine takes about 1m45s
+export const DEMO_SECONDS: Partial<Record<AtelierKind | 'videoEdit' | 'songPremium', number>> = { song: 25, songPremium: 105, video: 120, art: 20, videoEdit: 12 };
 
 /** §3: what a material gives the next work — its words (a kororin's, a song's title), its picture, its song */
 export function materialWords(ms: Work[] = []): string {
@@ -135,7 +136,7 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
       const words = prev?.kind === 'song' ? `${prev.prompt}。${asked}` : asked;
       if (!ctx.live) {
         // the review page: a 2-minute stand-in job, then the offline sketch (finishJob)
-        const job = await api.demoJob({ seconds: DEMO_SECONDS.song!, failTimes: 0, pay: pay(opts.premium ? 'songPremium' : 'song') });
+        const job = await api.demoJob({ seconds: (opts.premium ? DEMO_SECONDS.songPremium : DEMO_SECONDS.song)!, failTimes: 0, pay: pay(opts.premium ? 'songPremium' : 'song') });
         return { ...base, prompt: words, status: 'making', ...(opts.premium ? { premium: true, spell } : {}), ...(lyrics ? { lyrics, title: lyrics.title } : {}), started: { job, what: 'song', words, extra: { ...(opts.plan?.genre ? { genre: opts.plan.genre } : {}), ...(lyrics?.title ? { songTitle: lyrics.title } : {}) } } };
       }
       // R13: the design (tempo, key, chords) goes with the lyrics said yes to; the song is sung from exactly those

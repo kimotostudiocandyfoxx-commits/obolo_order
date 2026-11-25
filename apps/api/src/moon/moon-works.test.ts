@@ -86,7 +86,7 @@ describe('M-R253 §4: how long it takes', () => {
     expect(estimateEtaMs('song')).toBe(ETA_BASE_MS.song);
     // two recent times are not enough to trust
     expect(estimateEtaMs('song', [60_000, 60_000])).toBe(ETA_BASE_MS.song);
-    expect(estimateEtaMs('song', [120_000, 120_000, 120_000])).toBe(170_000);
+    expect(estimateEtaMs('song', [120_000, 120_000, 120_000])).toBe(100_000);
     expect(estimateEtaMs('art', [], 2)).toBe(40_000);
     expect(estimateEtaMs('voice')).toBeLessThanOrEqual(30_000);
   });

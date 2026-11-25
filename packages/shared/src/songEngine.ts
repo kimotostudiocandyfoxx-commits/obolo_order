@@ -246,7 +246,9 @@ export function premiumRequest(said: string, words: string[]): string | null {
     rest = rest.replace(re, ' ');
   }
   rest = rest.replace(/^[\s、。,.!?！？「」『』…・]+|[\s、。,.!?！？「」『』…・]+$/g, '').trim();
-  return /^(お願い|おねがい|頼む|たのむ|作って|つくって|唱えて|となえて|して|ね|よ)?(します|ね|よ|！)*$/.test(rest) ? '' : rest;
+  if (/^(お願い|おねがい|頼む|たのむ|作って|つくって|唱えて|となえて|して|ね|よ)?(します|ね|よ|！)*$/.test(rest)) return '';
+  // 「…を唱えて」 is a making (the spell reads 作って; 唱えて is not a talisman)
+  return rest.replace(/(唱|とな)えて/g, '作って');
 }
 
 /** the passphrases from the setting (comma-, | - or 、-separated); unset / empty: `defaults` */

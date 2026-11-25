@@ -80,7 +80,7 @@ describe('R17: the secret spell on Runware (MiniMax Music 2.6)', () => {
     expect(saidPremiumWords('上級 魔法で！', w)).toBe(true);
     expect(saidPremiumWords('夏の曲を作って', w)).toBe(false);
     expect(saidPremiumWords('上級の曲', w)).toBe(false);
-    expect(premiumRequest('上級魔法で、夏の曲を唱えて', w)).toBe('夏の曲を唱えて');
+    expect(premiumRequest('上級魔法で、夏の曲を唱えて', w)).toBe('夏の曲を作って');
     expect(premiumRequest('上級魔法でお願い', w)).toBe('');
     expect(premiumRequest('上級魔法で作って', w)).toBe('');
     expect(premiumRequest('じょうきゅうまほうで、海のバラード', w)).toBe('海のバラード');

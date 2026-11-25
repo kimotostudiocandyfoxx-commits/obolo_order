@@ -145,3 +145,5 @@
 - ふだんの曲は Runware の ACE-Step 1.5 XL SFT に替える方向（速い・安い）。自前の GPU は、歌と伴奏を分ける作業と自分の声で歌う機能に残す。
 - 上級魔法（マナを多く使う高品質）は Runware の MiniMax Music 2.6。Mureka は予備。
 - 値段は上の式で決める。
+- R17 で実装：MUSIC_PROVIDER（runware 既定／gpu）、MUSIC_RUNWARE_KEY（obolo-seedream-api-key）。Runware が失敗したら自前 GPU で歌う。自前 GPU は、歌と伴奏を分ける・歌詞の行の時間・自分の声が要る直し（カラオケ、声の大きさ、2番カットなど）を最初に頼まれた時だけ起こす（/split）。
+- 上級魔法は UI に出さず、バティもすすめない。会員が合言葉を言った時だけ（合言葉はサーバーだけが持つ：PREMIUM_SPELL_WORDS、PREMIUM_SPELL=off で止める）。物語には出さない（口コミだけ）。
