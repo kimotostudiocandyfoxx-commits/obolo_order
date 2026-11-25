@@ -183,6 +183,22 @@ if VD:
         if os.path.exists(f): A[f'stitle-{n}']='data:audio/mpeg;base64,'+base64.b64encode(open(f,'rb').read()).decode()
         f=f'{VD}/title-{n}.mp3'
         if os.path.exists(f): A[f'vtitle-{n}']='data:audio/mpeg;base64,'+base64.b64encode(open(f,'rb').read()).decode()
+# Saturn side-view stage (M-R300): flat backdrop + level pebble ground + speaker walls
+f=f'{O}/sat6-bg.jpg'
+if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A['bg6-saturn']=uri(im,78)
+f=f'{O}/sat6-floor.jpg'
+if os.path.exists(f):
+    o=unwhite(Image.open(f)); bb=o.getbbox(); o=o.crop(bb) if bb else o; o.thumbnail((1200,600),Image.LANCZOS)
+    w_,h_=o.size; top=int(h_*.3); body=o.crop((0,top,w_,h_)); bh=body.size[1]; ov=int(bh*.35)
+    canvas=Image.new('RGBA',(w_,h_+2*(bh-ov)),(0,0,0,0)); canvas.paste(o,(0,0),o); y=h_-ov
+    grad=Image.linear_gradient('L').resize((w_,ov)); 
+    for k in range(2):
+        piece=body.transpose(Image.FLIP_LEFT_RIGHT) if k%2==0 else body.copy(); m=Image.new('L',piece.size,255); m.paste(grad,(0,0)); 
+        canvas.paste(piece,(0,y),m); y+=bh-ov
+    A['sat6-floor']=uri(canvas,82)
+f=f'{O}/sat6-spk.jpg'
+if os.path.exists(f):
+    o=unwhite(Image.open(f)); bb=o.getbbox(); o=o.crop(bb) if bb else o; o.thumbnail((300,600),Image.LANCZOS); A['sat6-spk']=uri(o,84)
 SAT=os.environ.get('SATURN_BG','home2-bg-saturn-cutea3')
 RECMASK=H+{'2':'/saturn-record-mask2.png','3':'/saturn-record-mask3.png'}.get(SAT[-1],'/saturn-record-mask.png')
 if SAT and os.path.exists(f'{O}/{SAT}.jpg'): im=Image.open(f'{O}/{SAT}.jpg').convert('RGB'); im.thumbnail((720,1280)); A['bg2-saturn']=uri(im,78)
