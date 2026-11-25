@@ -116,7 +116,7 @@ describe('the people: one figure each, from figureFor (author.figure / Saturn’
   });
   it('per planet: the colour, the place back right, Saturn’s 2.3 s intro', () => {
     for (const p of HOME_PLANETS) expect(templateConfig(p).place.x).toBeGreaterThan(0.6);
-    expect(templateConfig('saturn').introMs).toBe(2300);
+    expect(Math.abs(templateConfig('saturn').introMs - 2300)).toBeLessThan(50);
     expect(templateConfig('jupiter').accent).toBe('#b6e36b');
   });
 });

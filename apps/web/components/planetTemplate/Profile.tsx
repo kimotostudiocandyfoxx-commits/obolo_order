@@ -10,6 +10,8 @@ export interface ProfilePerson {
   id: string;
   name: string;
   figure: string | null;
+  /** Saturn: the chibi that pops out of their kororins */
+  chibi?: string | null;
   works: HomeWork[];
   mine?: boolean;
 }
@@ -53,6 +55,7 @@ export function Profile({
   onPick,
   onBack,
   middle = defaultProfileMiddle,
+  full = false,
   onOpen,
   openedId = null,
 }: {
@@ -62,6 +65,8 @@ export function Profile({
   onPick: (id: string) => void;
   onBack: () => void;
   middle?: ProfileMiddleSlot;
+  /** the middle takes the whole screen (under the top row and the name): Saturn's 2D stage */
+  full?: boolean;
   onOpen: (person: ProfilePerson, w: HomeWork) => void;
   openedId?: string | null;
 }) {
@@ -69,7 +74,7 @@ export function Profile({
   const who = people.find((p) => p.id === current) ?? people[0];
   if (!who) return null;
   return (
-    <div className={s.prof} style={{ backgroundImage: `url(${cfg.art.profile})` }} data-testid="profile">
+    <div className={s.prof} style={{ backgroundImage: `url(${cfg.art.profile})` }} data-testid="profile" data-planet={planet}>
       <div className={s.profTop}>
         <button type="button" className={s.profBack} onClick={onBack} aria-label="もどる">
           ←
@@ -83,7 +88,7 @@ export function Profile({
           ))}
         </div>
       </div>
-      <div className={s.profMid}>{middle({ planet, person: who, open: (w) => onOpen(who, w), current: openedId })}</div>
+      <div className={`${s.profMid} ${full ? s.profFull : ''}`}>{middle({ planet, person: who, open: (w) => onOpen(who, w), current: openedId })}</div>
       <div className={s.profWho}>
         {who.figure ? <img src={who.figure} alt="" draggable={false} /> : null}
         <span>{who.name}</span>

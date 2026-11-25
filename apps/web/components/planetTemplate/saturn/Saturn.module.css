@@ -1,0 +1,281 @@
+/* 04 土星 (handoff planets-04-saturn.md; the prototype's .chibi / .bub / .orb / .ppile) */
+
+/* §1 a kororin popped on the home */
+.popLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 96;
+  pointer-events: none;
+}
+.popBall {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 58px;
+  height: 58px;
+  margin: -29px 0 0 -29px;
+  transform-origin: 50% 88%;
+}
+.popBall img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  animation: burst 0.16s ease-out forwards;
+}
+@keyframes burst {
+  to {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+.drop {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  margin: -4px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff, rgba(255, 255, 255, 0.4) 60%, transparent 70%);
+  pointer-events: none;
+  animation: drop 0.65s ease-out forwards;
+}
+@keyframes drop {
+  to {
+    transform: translate(var(--dx), var(--dy)) scale(0.3);
+    opacity: 0;
+  }
+}
+.chibi {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  margin: -120px 0 0 -75px;
+  animation: chibiIn 0.45s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+  filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.35));
+}
+.chibi img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.chibi.wave {
+  animation: wave 0.5s ease-in-out 2;
+}
+.chibi.away {
+  transition: left 0.65s ease-in, top 0.65s ease-in, transform 0.65s ease-in, opacity 0.65s;
+  transform: scale(0.15);
+  opacity: 0;
+}
+@keyframes chibiIn {
+  0% {
+    transform: translateY(40px) scale(0.2);
+    opacity: 0;
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+@keyframes wave {
+  50% {
+    transform: rotate(-8deg) translateY(-6px);
+  }
+}
+/* the words above, 「by 名前」 small below */
+.bub,
+.bubo {
+  position: absolute;
+  font: 900 12px var(--font-sans);
+  background: rgba(255, 255, 255, 0.95);
+  color: #2a1630;
+  border-radius: 14px;
+  padding: 6px 10px;
+  white-space: nowrap;
+  max-width: 86vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  pointer-events: auto;
+}
+.bub {
+  transform: translate(-50%, -100%);
+  animation: fadein 0.2s both;
+}
+.by {
+  display: block;
+  margin: 2px 0 0 auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: 800 9px var(--font-sans);
+  color: #8a6a9a;
+  text-align: right;
+  letter-spacing: 0.02em;
+  text-decoration: underline;
+  text-decoration-color: rgba(138, 106, 154, 0.4);
+  cursor: pointer;
+}
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+}
+
+/* §2 ▶ the groove */
+.groove {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 2;
+}
+.orb {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 92px;
+  height: 92px;
+  will-change: transform;
+}
+.orb.popped {
+  width: 120px;
+  height: 120px;
+}
+.orbBall,
+.orbChibi {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.4));
+}
+.orbChibi {
+  animation: chibiIn 0.4s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+.bubo {
+  left: 50%;
+  bottom: 100%;
+  transform: translate(-50%, -6px);
+}
+
+/* §3 the profile's 2D stage: the club blurred behind, the stone ground, a speaker at each side */
+.stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  touch-action: none;
+}
+.club {
+  position: absolute;
+  inset: -4px;
+  background-size: auto 109.4%;
+  background-position: center top;
+  background-repeat: no-repeat;
+  filter: blur(1.4px) brightness(0.85) saturate(1.1);
+}
+.ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: calc(70% - 18px);
+  background-repeat: repeat-x;
+  background-position: center top;
+  background-color: #e9c6ee;
+}
+.speaker {
+  position: absolute;
+  bottom: calc(30% - 12px);
+  width: 15%;
+  height: auto;
+  z-index: 3;
+  pointer-events: none;
+  filter: drop-shadow(0 6px 12px rgba(20, 0, 40, 0.5));
+}
+.left {
+  left: 0;
+}
+.right {
+  right: 0;
+  transform: scaleX(-1);
+}
+.pb {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  touch-action: none;
+  cursor: grab;
+  will-change: transform;
+  transition: opacity 0.15s;
+}
+.pb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 5px rgba(40, 0, 60, 0.35));
+  pointer-events: none;
+}
+.isNew::after {
+  content: 'NEW';
+  position: absolute;
+  left: 50%;
+  top: -12px;
+  transform: translateX(-50%);
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: #ff5fa8;
+  color: #fff;
+  font: 900 8px var(--font-sans);
+}
+.pPop {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+.pChibi {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 170px;
+  height: 170px;
+  margin: -85px;
+  animation: chibiIn 0.45s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+  filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.35));
+}
+.pChibi img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.pBub {
+  position: absolute;
+  left: 50%;
+  top: calc(46% - 120px);
+  transform: translate(-50%, -100%);
+  max-width: 86%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 900 13px var(--font-sans);
+  background: rgba(255, 255, 255, 0.96);
+  color: #2a1630;
+  border-radius: 14px;
+  padding: 7px 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  animation: fadein 0.2s 0.24s both;
+}
+.none {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font: 800 13px var(--font-sans);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+@media (prefers-reduced-motion: reduce) {
+  .chibi,
+  .orbChibi,
+  .pChibi {
+    animation: none;
+  }
+}

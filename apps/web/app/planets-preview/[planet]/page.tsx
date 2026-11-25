@@ -1,6 +1,6 @@
 'use client';
 
-import { isHomePlanet, type HomePlanet, type Me, type PlanetHomeView } from '@obolo/shared';
+import { figureFor, isHomePlanet, type HomePlanet, type Me, type PlanetHomeView } from '@obolo/shared';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { PlanetTemplateHome, type TemplateMe } from '@/components/planetTemplate/PlanetTemplateHome';
@@ -8,11 +8,15 @@ import { planetHooks } from '@/components/planetTemplate/planetHooks';
 import { getApi } from '@/lib/api';
 import { ownFigure } from '@/lib/planetTemplate/people';
 import { SAMPLE_OWN_FIGURE, templateSample } from '@/lib/planetTemplate/sample';
+import { samplePast } from '@/lib/planetTemplate/saturn';
 import { apiSky, sampleSky, songOf } from '@/lib/planetTemplate/sky';
 import { viewsOf } from '@/lib/story/views';
 
 /** the sample's you, dancing out of your house on Mercury's ▶ (the prototype's picture) */
 const SAMPLE_DANCE = '/planets/sample/dance-user.webp';
+
+/** Saturn: the chibi out of your kororin (figureFor's chibi, else your chibi picture; the sample: the prototype's) */
+const chibiOf = (me: Me | null, sample: boolean) => figureFor(me?.planetFigures, 'saturn').url ?? me?.chibiPic ?? (sample ? '/planets/sample/chibi-user.webp' : null);
 
 /** your back in the view from your place: your look's own (GET /me lookBack), else the talk's stand-in */
 const backOf = (me: Me | null) => me?.lookBack ?? viewsOf('talk-user')?.back ?? '/planets/back.webp';
@@ -35,7 +39,7 @@ function Preview() {
     let live = true;
     const sample = (me: Me | null) => ({
       view: templateSample(planet),
-      me: { name: me?.displayName || 'ミナト★', figure: ownFigure(me?.planetFigures, planet) ?? SAMPLE_OWN_FIGURE(planet), back: backOf(me), dance: me?.chibiPic ?? SAMPLE_DANCE },
+      me: { name: me?.displayName || 'ミナト★', figure: ownFigure(me?.planetFigures, planet) ?? SAMPLE_OWN_FIGURE(planet), back: backOf(me), dance: me?.chibiPic ?? SAMPLE_DANCE, chibi: chibiOf(me, true) },
       sample: true,
     });
     (async () => {
@@ -44,7 +48,7 @@ function Preview() {
       if (forced) return sample(me);
       const view = await api.planetHome(planet).catch(() => null);
       if (!view || !view.live || !view.around.length) return sample(me);
-      return { view, me: { name: me?.displayName || view.owner.name, figure: ownFigure(me?.planetFigures, planet), back: backOf(me), dance: me?.chibiPic ?? null }, sample: false };
+      return { view, me: { name: me?.displayName || view.owner.name, figure: ownFigure(me?.planetFigures, planet), back: backOf(me), dance: me?.chibiPic ?? null, chibi: chibiOf(me, false) }, sample: false };
     })().then((d) => live && setData(d));
     return () => {
       live = false;
@@ -59,6 +63,13 @@ function Preview() {
       load: data.sample ? (w) => songOf(null, w) : (w) => songOf(api, w),
       sky: data.sample ? sampleSky(planet) : apiSky(api, planet),
       me: data.me,
+      // 04 §3: a person's past kororins (GET /planet-home/<planet>/person/:id; the sample: 18 of yours, 10–13 of a dachi)
+      past: data.sample
+        ? async (p) => samplePast(p)
+        : async (p) => {
+            const v = await api.planetPerson(planet, p.id).catch(() => null);
+            return v?.works.length ? v.works : p.works;
+          },
     });
   }, [data, planet]);
 

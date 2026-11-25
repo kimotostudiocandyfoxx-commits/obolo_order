@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { PathPoint, PlanetTemplateConfig } from '@/lib/planetTemplate/config';
 import type { HomePerson } from '@/lib/planetTemplate/people';
 import { defaultOpener, type FigureSlot, type WorkOpener } from './WorkView';
@@ -21,6 +21,14 @@ function Fireflies({ n = 18 }: { n?: number }) {
     </div>
   );
 }
+/** a planet's own play stage (Saturn: the kororins ride the record's groove): it shows the works and says when all are done */
+export interface PlayStageProps {
+  cfg: PlanetTemplateConfig;
+  people: HomePerson[];
+  onEnd: (finished: boolean) => void;
+  openProfile: (id: string) => void;
+}
+export type PlayStage = (o: PlayStageProps) => ReactNode;
 /** you dance out of your place for this long before the view turns (the prototype's playM: 0.9 s) */
 const DANCE_MS = 900;
 /** a work the planet shows until it is done never stays longer than this (a song that never ends) */
@@ -41,6 +49,7 @@ export function PlayView({
   dancer,
   opener = defaultOpener,
   figure,
+  stage,
   onEnd,
   openProfile,
 }: {
@@ -52,6 +61,8 @@ export function PlayView({
   opener?: WorkOpener;
   /** the planet's way of drawing a figure (Jupiter: flapping wings); none: the picture */
   figure?: FigureSlot;
+  /** the planet's own stage in place of the visitors (Saturn's groove) */
+  stage?: PlayStage;
   onEnd: (finished: boolean) => void;
   openProfile: (id: string) => void;
 }) {
@@ -105,8 +116,8 @@ export function PlayView({
         } else T(() => leave(i), cfg.holdMs);
       }, path.arriveMs + 40);
     };
-    T(() => setOn(true), dance ? DANCE_MS : 16);
-    T(() => one(0), cfg.introMs);
+    T(() => setOn(true), dance ? (dance.ms ?? DANCE_MS) : 16);
+    if (!stage) T(() => one(0), cfg.introMs);
     let fw: ReturnType<typeof setInterval> | null = null;
     if (cfg.play.fireworks) {
       let n = 0;
@@ -124,7 +135,7 @@ export function PlayView({
       timers.current = [];
       if (fw) clearInterval(fw);
     };
-  }, [people, cfg, path, dance]);
+  }, [people, cfg, path, dance, stage]);
 
   const p = k >= 0 ? people[k] : null;
   const work = p?.works[0];
@@ -132,11 +143,11 @@ export function PlayView({
   return (
     <>
       {dance && dancer && (
-        <div className={s.dancer} style={{ left: `${dance.x * 100}%`, top: `${dance.y * 100}%` }} data-testid="play-dancer">
+        <div className={`${s.dancer} ${dance.from === 'sky' ? s.fall : ''}`} style={{ left: `${dance.x * 100}%`, top: `${dance.y * 100}%`, animationDuration: dance.ms ? `${dance.ms}ms` : undefined }} data-testid="play-dancer">
           <img src={dancer} alt="" draggable={false} />
         </div>
       )}
-      <div className={`${s.hv} ${on ? s.on : ''} ${phase === 'open' ? s.zoom : ''} ${cfg.play.night ? s.night : ''}`} onClick={() => end.current(false)} data-testid="play-view">
+      <div className={`${s.hv} ${on ? s.on : ''} ${phase === 'open' && !stage ? s.zoom : ''} ${cfg.play.night ? s.night : ''}`} onClick={() => end.current(false)} data-testid="play-view" data-planet={cfg.planet}>
         <div className={s.hvbg} style={{ backgroundImage: `url(${cfg.art.view})` }} />
         <div className={s.vig} />
         {cfg.play.night && <div className={s.glow} />}
@@ -148,6 +159,7 @@ export function PlayView({
             ))}
           </div>
         ))}
+        {stage?.({ cfg, people, onEnd: (f) => end.current(f), openProfile })}
         {back && (
           <div className={s.back} data-testid="play-back">
             <img src={back} alt="" draggable={false} />

@@ -3,6 +3,7 @@ import { anywhere, PLAY_HOLD_MS, PLAY_INTRO_MS, type AllowedArea } from './layou
 import { ALL_SEEN, JTREE, PORCH_HOLD_MS, PORCH_INTRO_MS, PORCH_PATH } from './jupiter';
 import { ALL_HEARD, HOME_SEA, MHOUSE, PIER_PATH, sailMotion, seaOnly, shipStandIn } from './mercury';
 import { driftMotion, type FigureMotion } from './motion';
+import { ALL_HEARD as KORORIN_ALL_HEARD, DROP_MS, firstVoiceMs, floorMotion, NEEDLE, TONEARM } from './saturn';
 
 /** a point of the play view (fractions of the screen) and the size there */
 export interface PathPoint {
@@ -41,8 +42,12 @@ export interface PlanetTemplateConfig {
   allowed: AllowedArea;
   /** a figure not painted yet (null: the planet's sprite with their face) */
   standIn: ((personId: string) => string) | null;
-  /** a work opened: how far the home behind it zooms and dims */
-  openLook: { scale: number; blur: number; bright: number };
+  /** a work opened: how far the home behind it zooms and dims (`dim` false: the home stays as it is, Saturn's pop) */
+  openLook: { scale: number; blur: number; bright: number; dim?: boolean };
+  /** your own figure on the home too, with the others (Saturn: your kororin is on the floor; no name on it) */
+  ownOnHome: boolean;
+  /** a second tap target for your place (fractions of the 9:16 picture, from → to; Saturn: the tonearm) */
+  placeArm: { x0: number; y0: number; x1: number; y1: number } | null;
   /** 3-3: ▶ → the first work arrives (ms). Saturn: 2.3 s (M-R304) */
   introMs: number;
   /** 3-3: how long one work stays in front of you (ms); `untilDone`: until it has finished (Mercury: the whole song) */
@@ -55,8 +60,9 @@ export interface PlanetTemplateConfig {
     fireworks: boolean;
     /** fireflies over the view (Jupiter's porch, 03 §3) */
     fireflies: boolean;
-    /** you dance out of your place first (fractions of the screen), then the view turns */
-    dance: { x: number; y: number } | null;
+    /** you dance out of your place first (fractions of the screen), then the view turns. `from: 'sky'`: you fall onto it
+     * instead (Saturn: onto the record), `ms`: how long before the view turns */
+    dance: { x: number; y: number; from?: 'place' | 'sky'; ms?: number } | null;
     /** who comes out: your dancing picture (Mercury) or your figure on this planet (Jupiter: your butterfly) */
     danceAs: 'dance' | 'figure';
     /** said when every work has been seen (null: nothing) */
@@ -101,6 +107,16 @@ const OWN: Partial<Record<HomePlanet, Partial<Omit<PlanetTemplateConfig, 'planet
     play: { path: PIER_PATH, untilDone: true, night: true, fireworks: true, fireflies: false, dance: MHOUSE, danceAs: 'dance', doneLine: ALL_HEARD },
     sky: { sea: '/planets/continents/mercury/sea.webp', me: '/planets/continents/mercury/me.webp' },
   },
+  // 04 土星: not the rows — eight kororins hop on the record floor with depth (your own among them); a tap pops one where
+  // it is (the home stays); ▶ you fall onto the record and the kororins ride its groove (the first talks at ~2.3 s)
+  saturn: {
+    motion: floorMotion,
+    ownOnHome: true,
+    placeArm: TONEARM,
+    openLook: { scale: 1, blur: 0, bright: 1, dim: false },
+    introMs: Math.round(firstVoiceMs()),
+    play: { path: DEFAULT_PLAY_PATH, untilDone: true, night: false, fireworks: false, fireflies: false, dance: { ...NEEDLE, from: 'sky', ms: DROP_MS }, danceAs: 'dance', doneLine: KORORIN_ALL_HEARD },
+  },
 };
 
 export function templateConfig(planet: HomePlanet, over: Partial<Omit<PlanetTemplateConfig, 'planet'>> = {}): PlanetTemplateConfig {
@@ -116,7 +132,9 @@ export function templateConfig(planet: HomePlanet, over: Partial<Omit<PlanetTemp
     allowed: anywhere,
     standIn: null,
     openLook: { scale: 1.12, blur: 2.5, bright: 0.7 },
-    introMs: planet === 'saturn' ? 2300 : PLAY_INTRO_MS,
+    ownOnHome: false,
+    placeArm: null,
+    introMs: PLAY_INTRO_MS,
     holdMs: planet === 'mars' ? PLAY_HOLD_MS.long : PLAY_HOLD_MS.default,
     play: { path: DEFAULT_PLAY_PATH, untilDone: false, night: false, fireworks: false, fireflies: false, dance: null, danceAs: 'dance', doneLine: null },
     sky: null,

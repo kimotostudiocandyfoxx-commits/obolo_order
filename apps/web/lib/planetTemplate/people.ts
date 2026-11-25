@@ -10,6 +10,8 @@ export interface HomePerson {
   /** no figure painted yet: the planet's sprite with their face on it */
   sprite: string;
   face: string | null;
+  /** Saturn: the chibi that pops out of their kororin (author.figure, figureFor's chibi; else their older chibi picture) */
+  chibi?: string | null;
   works: HomeWork[];
 }
 
@@ -43,7 +45,7 @@ export function peopleOf(view: PlanetHomeView | null | undefined): HomePerson[] 
   for (const w of works) {
     let p = by.get(w.author.id);
     if (!p) {
-      p = { id: w.author.id, name: w.author.name, rel: w.rel, figure: figureOfAuthor(w.author, planet), sprite: PLANET_HOMES[planet].art.sprite, face: w.author.pic ?? null, works: [] };
+      p = { id: w.author.id, name: w.author.name, rel: w.rel, figure: figureOfAuthor(w.author, planet), chibi: planet === 'saturn' ? (w.author.figure ?? w.author.chibi ?? null) : null, sprite: PLANET_HOMES[planet].art.sprite, face: w.author.pic ?? null, works: [] };
       by.set(w.author.id, p);
     }
     p.works.push(w);

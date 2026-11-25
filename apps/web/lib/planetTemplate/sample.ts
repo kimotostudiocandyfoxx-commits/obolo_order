@@ -37,7 +37,7 @@ export function templateSample(planet: HomePlanet, now = Date.now()): PlanetHome
     return {
       id: `${planet}-s${i}`,
       kind,
-      author: { id: rel === 'own' ? 'me' : `u-${name}`, name, pic: null, figure: planet === 'saturn' ? null : fig, ball: planet === 'saturn' ? fig : null },
+      author: { id: rel === 'own' ? 'me' : `u-${name}`, name, pic: null, figure: planet === 'saturn' ? `/planets/sample/chibi-${pic}.webp` : fig, ball: planet === 'saturn' ? fig : null },
       rel,
       text: WORDS[i % WORDS.length],
       // 03 Jupiter: the prototype's five arts and their titles (never 「〜のアート」, M-R310)
