@@ -33,7 +33,7 @@ export function PhotoRelic({ file: f }: { file: ClipFile }) {
   return (
     <Relic
       id={f.id}
-      aura="rgba(170,200,255,.34)"
+      aura="rgba(170,205,255,.42)"
       mote="#eaf2ff"
       label={`写真「${f.name}」を大きく見る`}
       testId="relic-photo"
@@ -205,7 +205,7 @@ export function SoundOrb({ look, size, on, level, progress, measured, mark }: { 
 export function RelicWords({ main, sub, look, align = 'center', width }: { main: string; sub?: ReactNode; look?: { ink: string; glow: string; font?: string }; align?: 'center' | 'left'; width?: string }) {
   const ink = look?.ink ?? '#eef2ff';
   return (
-    <span className={`block ${align === 'center' ? 'text-center' : ''}`} style={{ width, maxWidth: width ?? 220 }}>
+    <span className={`block rounded-[40%] px-2 py-1 ${align === 'center' ? 'text-center' : ''}`} style={{ width, maxWidth: width ?? 220, background: 'radial-gradient(ellipse at center, rgba(6,10,36,.5), rgba(6,10,36,.22) 55%, transparent 75%)' }}>
       <span className="line-clamp-2 block text-[13px] font-semibold leading-snug tracking-[.04em]" style={{ color: ink, fontFamily: look?.font ?? RELIC_SERIF, textShadow: `0 0 2px rgba(4,8,30,.95), 0 1px 3px rgba(4,8,30,.9), 0 0 10px ${look?.glow ?? 'rgba(150,190,255,.6)'}` }}>
         {main}
       </span>
@@ -256,7 +256,7 @@ export function Scroll({ width, seal, children, paper = 'linear-gradient(180deg,
   return (
     <span className="relative block" style={{ width, ...style }}>
       {rodEl(true)}
-      <span className="relative -my-[3px] block px-4 pb-6 pt-4" style={{ background: paper, boxShadow: 'inset 0 6px 8px -4px rgba(80,50,10,.45), inset 0 -6px 8px -4px rgba(80,50,10,.45), 0 10px 22px rgba(1,3,20,.5)' }}>
+      <span className="relative -my-[3px] block" style={{ padding: 'calc(16px * var(--rs, 1)) calc(16px * var(--rs, 1)) calc(24px * var(--rs, 1))', background: paper, boxShadow: 'inset 0 6px 8px -4px rgba(80,50,10,.45), inset 0 -6px 8px -4px rgba(80,50,10,.45), 0 10px 22px rgba(1,3,20,.5)' }}>
         <span aria-hidden className="pointer-events-none absolute inset-0 opacity-60" style={{ backgroundImage: 'repeating-linear-gradient(180deg, transparent 0 17px, rgba(120,85,30,.13) 17px 18px)', backgroundPosition: '0 30px' }} />
         <span className="relative block">{children}</span>
       </span>
@@ -282,7 +282,7 @@ export function DocRelic({ file: f }: { file: ClipFile }) {
   const base = f.name.replace(/\.[a-z0-9]{1,5}$/i, '');
   return (
     <Relic id={f.id} aura="rgba(255,214,140,.26)" mote="#ffe7b0" label={`${seal.word}「${f.name}」をひらく`} testId="relic-doc" onTap={() => setTimeout(() => void openDoc(f), 260)}>
-      <Scroll width={relicW(0.66)} seal={<WaxSeal {...seal} style={{ right: -10, bottom: 4 }} />}>
+      <Scroll width={relicW(0.66)} seal={<WaxSeal {...seal} style={{ right: -5, bottom: 4 }} />}>
         <span className="block text-[9.5px] tracking-[.3em] text-[#7a5520]">{seal.word === 'TXT' || seal.word === 'CSV' ? '書きつけ' : seal.word === 'ZIP' ? 'たばね' : '文書'}</span>
         <span className="mt-1 line-clamp-3 block break-all text-[13.5px] font-bold leading-[1.45] text-[#3a2408]" style={{ fontFamily: RELIC_SERIF }}>
           {base}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CLUSTER_GAP_MS, CLUSTER_MAX, clusterPerRow, clusterSpots, floatParams, groupRelics, itemIndexOf, sealOf } from './layout';
+import { CLUSTER_GAP_MS, CLUSTER_MAX, CLUSTER_OVERLAP, clusterPerRow, clusterSpots, floatParams, groupRelics, itemIndexOf, sealOf } from './layout';
 
 describe('relics: float', () => {
   it('is steady per id, gentle, and neighbours are out of phase', () => {
@@ -19,21 +19,24 @@ describe('relics: float', () => {
 
 describe('relics: cluster', () => {
   it('one relic sits plain', () => {
-    expect(clusterSpots(1)).toEqual([{ scale: 1, dy: 0, dx: 0, rot: 0, z: 1 }]);
+    expect(clusterSpots(1)).toEqual([{ scale: 1, row: 0, col: 0, dy: 0, rot: 0, z: 1 }]);
   });
-  it('several are smaller, staggered, leaning different ways, overlapping', () => {
+  it('several are smaller, staggered, leaning different ways, in rows', () => {
     const s = clusterSpots(3);
     expect(s).toHaveLength(3);
     expect(s.every((x) => x.scale < 1)).toBe(true);
     expect(s[1].dy).toBeGreaterThan(s[0].dy);
     expect(new Set(s.map((x) => Math.sign(x.rot))).size).toBe(2);
-    expect(s[1].dx).toBeLessThan(0);
+    expect(s.map((x) => x.row)).toEqual([0, 0, 0]);
+    expect(clusterSpots(5, 3).map((x) => x.row)).toEqual([0, 0, 0, 1, 1]);
     expect(clusterSpots(2)[0].scale).toBeGreaterThan(clusterSpots(4)[0].scale);
   });
-  it('three to a row on an iPad, two on a phone', () => {
-    expect(clusterPerRow(390)).toBe(2);
-    expect(clusterPerRow(820)).toBe(3);
-    expect(clusterSpots(3, 3)[2].dy).toBe(0);
+  it('fits a phone row: three fanned at the cluster scale stay inside the talk', () => {
+    const w = 218; // the relic width at 390
+    const s = clusterSpots(3)[0].scale * w;
+    expect(s + 2 * s * (1 - CLUSTER_OVERLAP)).toBeLessThan(390 - 32);
+    expect(clusterPerRow(390)).toBe(3);
+    expect(clusterPerRow(820)).toBe(4);
   });
 });
 

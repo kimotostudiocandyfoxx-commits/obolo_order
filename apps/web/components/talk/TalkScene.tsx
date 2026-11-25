@@ -92,6 +92,8 @@ export type TalkItem = {
   relics?: ReactNode[];
   /** what the relics are, in words (the drawer's row of a line that has no words) */
   relicLabel?: string;
+  /** the relics are all pictures: fanned, overlapping a little */
+  relicFan?: boolean;
   /** still being written (streaming) */
   live?: boolean;
   /** M-R236: where its ★ / mark is kept (a small ★ at the bubble's / コロリン's top right; a long press opens the ring) */
@@ -1683,7 +1685,7 @@ function Bubble({
           : {},
   );
   // R12: only relics (a file, a work, a lone URL): no bubble, they float on the sender's side
-  const relics = item.relics?.length ? <RelicCluster mine={mine}>{item.relics}</RelicCluster> : null;
+  const relics = item.relics?.length ? <RelicCluster mine={mine} fan={item.relicFan}>{item.relics}</RelicCluster> : null;
   if (relics && !item.text && !item.voice && !item.card && !item.extra && !item.chips?.length && !clamp) {
     return (
       <div className={`${passive ? 'pointer-events-none' : 'pointer-events-auto'} relative flex max-w-full flex-col ${mine ? 'items-end self-end' : center ? 'items-center self-center' : 'items-start self-start'}`} data-relic-line>
@@ -1828,6 +1830,8 @@ export function Marked({ text, upto, marks }: { text: string; upto?: number; /**
 function TalkLog<U>({ top, bottom, units, keyOf, render, live, onReachTop }: { onReachTop?: () => void; top: number; bottom: number; units: U[]; keyOf: (u: U) => string; render: (u: U, newest: boolean) => ReactNode; /** the characters out of the line being said (follows it while typed) */ live: number }) {
   const box = useRef<HTMLDivElement>(null);
   const [atEnd, setAtEnd] = useState(true);
+  /** R12: the log's height — a relic is never taller than about half of it (the Bati chat's short log) */
+  const [room, setRoom] = useState(0);
   const atEndRef = useRef(true);
   const last = units.length ? keyOf(units[units.length - 1]) : '';
   // R10: older lines came in above: keep the line being read where it was
@@ -1846,6 +1850,8 @@ function TalkLog<U>({ top, bottom, units, keyOf, render, live, onReachTop }: { o
   const asked = useRef(0);
   // (a scroll the log makes itself is not the reader leaving the bottom: a smooth one passes through the middle)
   const selfScrollUntil = useRef(0);
+  /** when the reader last touched / wheeled the log */
+  const touched = useRef(-1e9);
   const toEnd = (smooth: boolean) => {
     const el = box.current;
     if (!el) return;
@@ -1862,7 +1868,10 @@ function TalkLog<U>({ top, bottom, units, keyOf, render, live, onReachTop }: { o
   useEffect(() => {
     const el = inner.current;
     if (!el || typeof ResizeObserver === 'undefined') return;
-    const ro = new ResizeObserver(() => atEndRef.current && toEnd(false));
+    const ro = new ResizeObserver(() => {
+      if (box.current) setRoom(box.current.clientHeight);
+      if (atEndRef.current) toEnd(false);
+    });
     ro.observe(el);
     // the log's own box changes too (the keyboard up and down, the bar's height): stay at the newest
     if (box.current) ro.observe(box.current);
@@ -1873,10 +1882,16 @@ function TalkLog<U>({ top, bottom, units, keyOf, render, live, onReachTop }: { o
       <div
         ref={box}
         data-talk-log
+        onPointerDown={() => (touched.current = performance.now())}
+        onTouchMove={() => (touched.current = performance.now())}
+        onWheel={() => (touched.current = performance.now())}
+        onKeyDown={() => (touched.current = performance.now())}
         onScroll={(e) => {
           const el = e.currentTarget;
           const end = el.scrollHeight - el.scrollTop - el.clientHeight < 48;
           if (!end && performance.now() < selfScrollUntil.current) return;
+          // R12: only the reader leaves the bottom — a picture / relic growing as it loads is not a scroll up
+          if (!end && atEndRef.current && performance.now() - touched.current > 1500) return toEnd(false);
           if (onReachTop && el.scrollTop < 40 && Date.now() - asked.current > 800) {
             asked.current = Date.now();
             onReachTop();
@@ -1885,7 +1900,7 @@ function TalkLog<U>({ top, bottom, units, keyOf, render, live, onReachTop }: { o
           if (end !== atEnd) setAtEnd(end);
         }}
         className="no-scrollbar pointer-events-auto absolute inset-x-0 z-[8] overflow-y-auto overscroll-contain px-4"
-        style={{ top, bottom, WebkitMaskImage: 'linear-gradient(to bottom, transparent 0, rgba(0,0,0,.25) 9%, #000 34%)', maskImage: 'linear-gradient(to bottom, transparent 0, rgba(0,0,0,.25) 9%, #000 34%)' }}
+        style={{ top, bottom, ['--relic-room' as string]: room ? `${Math.round(Math.max(150, room * 0.56))}px` : undefined, WebkitMaskImage: 'linear-gradient(to bottom, transparent 0, rgba(0,0,0,.25) 9%, #000 34%)', maskImage: 'linear-gradient(to bottom, transparent 0, rgba(0,0,0,.25) 9%, #000 34%)' }}
       >
         <div ref={inner} className="flex min-h-full flex-col justify-end gap-2.5 pb-1 pt-[30%]">
           {units.map((u, k) => (

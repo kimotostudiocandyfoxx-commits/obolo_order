@@ -159,6 +159,7 @@ import {
   clipType,
   type ClipFile,
   type LinkPreview,
+  wordsAndLinks,
 } from '@obolo/shared';
 import { demoEggOf, demoBatiEgg, demoBatiForget, demoBatiMemory, demoBatiNew, demoBatiRole, demoBatiSpeech, demoBatiSwitch, demoBatiSync } from './demoBati';
 import { demoBati, demoFromReference, demoNeoLooks, demoRefine, demoStickerArt } from '@/lib/look';
@@ -342,6 +343,9 @@ function cannedReply(text: string, name: string, memory: string[], locale: Local
   if (has('疲れ', 'つかれ', '眠', 'ねむ')) return `今日もおつかれさま✨ 水星でゆったりした曲でも聴く？`;
   if (has('音楽', '曲', 'うた', '歌')) return `音楽の話、大好き！🎵 最近どんな曲にハマってる？`;
   if (remembered && Math.random() < 0.5) return `そういえば前に「${remembered}」って言ってたよね。ちゃんと覚えてるよ😊`;
+  // R12: a pasted link is answered as a link (not read back letter by letter)
+  const { words, urls } = wordsAndLinks(text);
+  if (urls.length) return words ? `「${words.slice(0, 20)}」…そのリンク、あとでいっしょに見よう🌙` : 'リンク、うけとったよ🌙 どんなところだろう？';
   return `「${text.slice(0, 24)}」かぁ！もっと聞かせて✨`;
 }
 

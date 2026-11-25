@@ -2,7 +2,7 @@
 
 import { Children, createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
-import { clusterPerRow, clusterSpots, floatParams, relicSeed } from '@/lib/relic/layout';
+import { CLUSTER_OVERLAP, clusterPerRow, clusterSpots, floatParams, relicSeed } from '@/lib/relic/layout';
 
 /**
  * R12 (client 2026-11-25): 「画像を貼ったとき、普通のチャットアプリみたいにベタっと貼るのは味気ない。スペルみたいにふわっと浮かせて、
@@ -26,6 +26,7 @@ export const RELIC_CSS = `
 @keyframes rl-twinkle{0%,100%{opacity:.25;transform:scale(.6) rotate(0)}50%{opacity:1;transform:scale(1.1) rotate(45deg)}}
 @keyframes rl-sheen{0%,72%{transform:translateX(-140%) skewX(-18deg)}100%{transform:translateX(260%) skewX(-18deg)}}
 @keyframes rl-spin{to{transform:rotate(360deg)}}
+@keyframes rl-blink{0%,100%{opacity:.25}50%{opacity:1}}
 @keyframes rl-ripple{0%{transform:translate(-50%,-50%) scale(.86);opacity:.55}100%{transform:translate(-50%,-50%) scale(1.45);opacity:0}}
 @keyframes rl-tap{0%{transform:scale(1)}35%{transform:scale(1.07);filter:brightness(1.45)}100%{transform:scale(1)}}
 @keyframes rl-portal{0%{transform:scale(1);filter:none}55%{transform:scale(1.16);filter:brightness(1.9) saturate(1.3)}100%{transform:scale(.94);filter:brightness(2.6) blur(2px);opacity:.35}}
@@ -88,14 +89,14 @@ export type RelicProps = {
   testId?: string;
 };
 
-export function Relic({ id, aura, mote, label, onTap, floor = true, spread = 26, tapFx = 'pulse', under, children, className, style, testId }: RelicProps) {
+export function Relic({ id, aura, mote, label, onTap, floor = true, spread = 34, tapFx = 'pulse', under, children, className, style, testId }: RelicProps) {
   useRelicCss();
   const { scale, k } = useRelicSlot();
   const f = floatParams(id, k);
   const box = useRef<HTMLButtonElement>(null);
   const [tap, setTap] = useState(0);
   const seed = relicSeed(id);
-  const motes = MOTE_SPOTS.map((m, i) => ({ ...m, d: 3.2 + ((seed >>> i) % 5) * 0.45, delay: -(((seed >>> (i * 3)) % 40) / 10) }));
+  const motes = MOTE_SPOTS.map((m, i) => ({ ...m, d: 3.4 + ((seed >>> i) % 5) * 0.5, delay: -(((seed >>> (i * 3)) % 40) / 10) - i * 0.7 }));
   return (
     <div data-relic className={`relative ${className ?? ''}`} style={{ ['--rs' as string]: scale, ...style }} data-testid={testId}>
       <div style={{ animation: 'rl-in 1.1s cubic-bezier(.25,.8,.3,1) both' }}>
@@ -138,12 +139,17 @@ export function Relic({ id, aura, mote, label, onTap, floor = true, spread = 26,
               key={i}
               aria-hidden
               className="pointer-events-none absolute block rounded-full"
-              style={{ left: `${m.x}%`, top: `${m.y}%`, width: m.s, height: m.s, background: mote ?? '#fff', boxShadow: `0 0 6px ${mote ?? '#fff'}`, ['--mx' as string]: `${m.mx}px`, ['--my' as string]: `${m.my}px`, animation: `rl-mote ${m.d}s ease-out ${m.delay}s infinite`, opacity: 0 }}
+              style={{ left: `${m.x}%`, top: `${m.y}%`, width: m.s, height: m.s, background: mote ?? '#fff', boxShadow: `0 0 4px #fff, 0 0 9px ${mote ?? '#fff'}`, ['--mx' as string]: `${m.mx}px`, ['--my' as string]: `${m.my}px`, animation: `rl-mote ${m.d}s ease-out ${m.delay}s infinite`, opacity: 0 }}
             />
           ))}
         </div>
         {/* its shadow on the floor (breathes against the bob) */}
-        {floor && <span aria-hidden className="pointer-events-none absolute left-1/2 block h-[10px] w-[64%] rounded-[50%]" style={{ bottom: -15, background: 'radial-gradient(ellipse at center, rgba(2,4,20,.6), transparent 70%)', animation: `rl-floor ${f.dur}s ease-in-out ${f.delay}s infinite`, transform: 'translateX(-50%)' }} />}
+        {floor && (
+          <>
+            <span aria-hidden className="pointer-events-none absolute left-1/2 block h-[22px] w-[92%] rounded-[50%]" style={{ bottom: -24, background: `radial-gradient(ellipse at center, ${aura}, transparent 70%)`, animation: `rl-floor ${f.dur}s ease-in-out ${f.delay}s infinite`, transform: 'translateX(-50%)' }} />
+            <span aria-hidden className="pointer-events-none absolute left-1/2 block h-[9px] w-[58%] rounded-[50%]" style={{ bottom: -17, background: 'radial-gradient(ellipse at center, rgba(2,4,20,.62), transparent 70%)', animation: `rl-floor ${f.dur}s ease-in-out ${f.delay}s infinite`, transform: 'translateX(-50%)' }} />
+          </>
+        )}
         </div>
         {under && <div className="relative mt-[18px]">{under}</div>}
       </div>
@@ -153,12 +159,14 @@ export function Relic({ id, aura, mote, label, onTap, floor = true, spread = 26,
 
 /** where the motes start (% of the relic) and where they drift (px) */
 const MOTE_SPOTS = [
-  { x: -4, y: 70, s: 3, mx: -10, my: -34 },
-  { x: 102, y: 40, s: 2.5, mx: 9, my: -30 },
-  { x: 18, y: -4, s: 2, mx: -4, my: -26 },
-  { x: 88, y: 92, s: 3, mx: 12, my: -38 },
-  { x: 55, y: -6, s: 2, mx: 5, my: -22 },
-];
+  { x: -6, y: 72, s: 3.5, mx: -12, my: -40 },
+  { x: 103, y: 38, s: 3, mx: 10, my: -34 },
+  { x: 16, y: -5, s: 2.5, mx: -5, my: -28 },
+  { x: 90, y: 94, s: 3.5, mx: 14, my: -44 },
+  { x: 56, y: -7, s: 2.5, mx: 6, my: -26 },
+  { x: -3, y: 22, s: 2, mx: -9, my: -30 },
+  { x: 104, y: 80, s: 2, mx: 8, my: -36 },
+]
 
 /** a small four-point star (the corners of a frame, a portal's rim) */
 export function Glint({ size = 9, color = '#fff', style }: { size?: number; color?: string; style?: CSSProperties }) {
@@ -171,35 +179,32 @@ export function Glint({ size = 9, color = '#fff', style }: { size?: number; colo
 
 // ---- several sent together ----
 
-function useWidth() {
-  const [w, setW] = useState(390);
-  useEffect(() => {
-    const on = () => setW(window.innerWidth);
-    on();
-    window.addEventListener('resize', on);
-    return () => window.removeEventListener('resize', on);
-  }, []);
-  return w;
-}
-
 /**
  * the relics of one message (or of several sent together): one floats plain; several as a small cluster (each a little
  * smaller, staggered, leaning its own way, overlapping slightly, out of phase), the sender's side first
  */
-export function RelicCluster({ children, mine }: { children: ReactNode; mine: boolean }) {
+export function RelicCluster({ children, mine, fan = false }: { children: ReactNode; mine: boolean; /** pictures only: fanned, overlapping (other things side by side, nothing hidden) */ fan?: boolean }) {
   const items = Children.toArray(children);
-  const perRow = clusterPerRow(useWidth());
+  // (the talk is a phone-wide column on an iPad too: three to a row everywhere)
+  const perRow = clusterPerRow(390);
   const spots = clusterSpots(items.length, perRow);
+  const rows: number[][] = [];
+  spots.forEach((s, i) => (rows[s.row] ??= []).push(i));
   return (
-    <div className={`flex flex-wrap items-start ${mine ? 'flex-row-reverse' : ''} ${items.length > 1 ? 'pb-4' : ''}`} style={{ ['--relic-w' as string]: 'clamp(176px, 56vw, 268px)', paddingTop: 8 }} data-relic-cluster={items.length}>
-      {items.map((c, i) => {
-        const s = spots[i];
-        return (
-          <div key={i} className="relative" style={{ transform: `translate(${mine ? -s.dx : s.dx}px, ${s.dy}px) rotate(${s.rot}deg)`, zIndex: s.z, margin: items.length > 1 ? '0 2px 6px' : undefined }}>
-            <SlotCtx.Provider value={{ scale: s.scale, k: i }}>{c}</SlotCtx.Provider>
-          </div>
-        );
-      })}
+    <div className={`flex flex-col ${mine ? 'items-end' : 'items-start'} ${items.length > 1 ? 'pb-6' : ''}`} style={{ ['--relic-w' as string]: 'min(clamp(176px, 56vw, 268px), var(--relic-room, 999px))', padding: `8px ${items.length > 1 ? 10 : 8}px ${items.length > 1 ? 24 : 0}px` }} data-relic-cluster={items.length}>
+      {rows.map((r, ri) => (
+        <div key={ri} className={`flex items-start ${mine ? 'flex-row-reverse' : ''}`} style={{ marginTop: ri ? -6 : 0 }}>
+          {r.map((i) => {
+            const s = spots[i];
+            const overlap = s.col ? (fan ? `calc(var(--relic-w) * ${s.scale * -CLUSTER_OVERLAP})` : '6px') : undefined;
+            return (
+              <div key={i} className="relative" style={{ transform: `translateY(${s.dy}px) rotate(${mine ? -s.rot : s.rot}deg)`, zIndex: s.z, [mine ? 'marginRight' : 'marginLeft']: overlap }}>
+                <SlotCtx.Provider value={{ scale: s.scale, k: i }}>{items[i]}</SlotCtx.Provider>
+              </div>
+            );
+          })}
+        </div>
+      ))}
     </div>
   );
 }

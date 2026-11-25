@@ -267,7 +267,7 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
       faces: m.faces,
       voice: m.kind === 'voice' ? { url: m.audioUrl, seconds: m.seconds } : undefined,
       mark: { kind: 'dachi_message' as const, id: m.id },
-      ...(relics.length ? { relics, relicLabel: g.length > 1 ? `${label}ほか${g.length - 1}つ` : label } : {}),
+      ...(relics.length ? { relics, relicLabel: g.length > 1 ? `${label}ほか${g.length - 1}つ` : label, relicFan: g.every((i) => parts[i].m.file?.kind === 'photo') } : {}),
     };
   });
 

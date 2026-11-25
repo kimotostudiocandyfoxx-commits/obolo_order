@@ -52,8 +52,8 @@ function BookRelic({ id, card, full }: { id: string; card: DachiWorkCard; full?:
             </span>
             {/* the cinnabar border and the brush title */}
             <span aria-hidden className="absolute bottom-[7%] left-[22%] right-[8%] top-[7%] rounded-[2px]" style={{ border: '2px solid #b3261e', boxShadow: 'inset 0 0 0 3px rgba(179,38,30,.25)' }} />
-            <span className="absolute bottom-[12%] left-[22%] right-[8%] top-[11%] flex justify-center">
-              <span className="line-clamp-1 text-center leading-[1.05] text-[#a3150c]" style={{ writingMode: 'vertical-rl', fontFamily: face('reifu'), fontSize: 'calc(var(--relic-w, 230px) * var(--rs, 1) * .085)', maxHeight: '100%', overflow: 'hidden', textShadow: '0 0 1px rgba(255,240,200,.6)' }}>
+            <span className="absolute bottom-[30%] left-[24%] right-[10%] top-[11%] flex justify-center overflow-hidden">
+              <span className="text-center leading-[1.1] text-[#a3150c]" style={{ writingMode: 'vertical-rl', fontFamily: face('reifu'), fontSize: 'calc(var(--relic-w, 230px) * var(--rs, 1) * .075)', maxHeight: '100%', overflow: 'hidden', textShadow: '0 0 1px rgba(255,240,200,.6)' }}>
                 {title.slice(0, 10)}
               </span>
             </span>
@@ -113,7 +113,13 @@ function SoundWorkRelic({ id, card }: { id: string; card: DachiWorkCard }) {
       // Saturn's ring around the little planet
       <span aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 block rounded-[50%]" style={{ width: size * 1.55, height: size * 0.42, translate: '-50% -50%', rotate: '-14deg', border: `${Math.max(2, size * 0.05)}px solid rgba(246,227,180,.85)`, boxShadow: '0 0 8px rgba(246,210,140,.7)', clipPath: 'polygon(0 45%, 100% 45%, 100% 100%, 0 100%)' }} />
     ) : k === 'radio' ? (
-      <span aria-hidden className="pointer-events-none absolute -top-[14%] left-1/2 block h-[22%] w-[2px] -translate-x-1/2 rounded bg-[#fff3a8]" style={{ boxShadow: '0 0 6px #ffe680' }} />
+      <>
+        <span aria-hidden className="pointer-events-none absolute -top-[14%] left-1/2 block h-[22%] w-[2px] -translate-x-1/2 rounded bg-[#fff3a8]" style={{ boxShadow: '0 0 6px #ffe680' }} />
+        <svg aria-hidden viewBox="0 0 40 16" className="pointer-events-none absolute left-1/2 -translate-x-1/2" style={{ top: '-34%', width: size * 0.62 }} fill="none" stroke="#fff3a8" strokeLinecap="round">
+          <path d="M13 12a9 9 0 0 1 14 0" strokeWidth="1.6" style={{ animation: 'rl-blink 2.4s ease-in-out infinite' }} />
+          <path d="M8 9a15 15 0 0 1 24 0" strokeWidth="1.3" opacity=".7" style={{ animation: 'rl-blink 2.4s ease-in-out -.8s infinite' }} />
+        </svg>
+      </>
     ) : (
       <span aria-hidden className="pointer-events-none absolute right-[16%] top-[12%] text-[15px]" style={{ color: '#ffffff', textShadow: '0 0 6px #7fe3ff' }}>
         ♪

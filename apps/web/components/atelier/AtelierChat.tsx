@@ -34,7 +34,17 @@ import { Teach } from './Teach';
 import { KindMark, WorkCard } from './WorkCard';
 import { ChangePreview } from './ChangePreview';
 import { DeviceButton } from './DeviceButton';
-import { clipItem } from './BluenaClip';
+import { ClipRelic } from '@/components/relic/ClipRelics';
+import { PortalRelic } from '@/components/relic/PortalRelic';
+import { CLUSTER_MAX } from '@/lib/relic/layout';
+import { linkDomain, wordsAndLinks, type ClipFile } from '@obolo/shared';
+
+/** R12: your line in the Bati chat — a file handed over floats as its relic; a URL in your words becomes a portal */
+function meItem(m: { id: string; text: string; file?: ClipFile | null }): TalkItem {
+  const { words, urls } = m.file ? { words: m.text, urls: [] as string[] } : wordsAndLinks(m.text);
+  const relics = m.file ? [<ClipRelic key={m.id} file={m.file} />] : urls.map((u, k) => <PortalRelic key={`${m.id}-${k}`} id={`${m.id}-${k}`} url={u} />);
+  return { id: m.id, who: 'me', text: words, mark: { kind: 'local', id: m.id }, ...(relics.length ? { relics, relicLabel: m.file ? `📎 ${m.file.name}` : `🔗 ${linkDomain(urls[0])}`, relicFan: m.file?.kind === 'photo' } : {}) };
+}
 import { useClipSend } from '@/lib/clip/useClip';
 import { BowlFx, TEMPLE_PLATE, type BowlState } from './BowlFx';
 import { faceTo, FLIES, uid, versionsOf, type Msg, type Work } from './work';
@@ -1294,9 +1304,9 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     // back view painted yet)
     { id: 'me', name: me?.displayName ?? '', look: selfLook(me), color: SELF_COLOR, tone: selfTone(me), self: true, avatar: me?.lookIcon, views: viewsOf('talk-user') },
   ];
-  const items: TalkItem[] = msgs.filter((m) => !hidden(m)).map((m) =>
+  const itemsRaw: TalkItem[] = msgs.filter((m) => !hidden(m)).map((m) =>
     m.who === 'me'
-      ? { id: m.id, who: 'me', text: m.text, mark: { kind: 'local', id: m.id }, ...(m.file ? clipItem(m.file) : {}) }
+      ? meItem(m)
       : m.who === 'bati'
         ? {
             id: m.id,
@@ -1345,6 +1355,14 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
             },
           },
   );
+  // R12: files handed over together float as one cluster (the run of your relic-only lines)
+  const items = itemsRaw.reduce<TalkItem[]>((out, it) => {
+    const prev = out[out.length - 1];
+    const only = (x: TalkItem) => x.who === 'me' && !x.text && !!x.relics?.length;
+    if (prev && only(prev) && only(it) && prev.relics!.length < CLUSTER_MAX) out[out.length - 1] = { ...prev, relics: [...prev.relics!, ...it.relics!], relicLabel: `${prev.relicLabel?.replace(/ほか\d+つ$/, '')}ほか${prev.relics!.length}つ`, relicFan: prev.relicFan && it.relicFan };
+    else out.push(it);
+    return out;
+  }, []);
   // R9 (client): making something — the bowl's water glows while it is made; when it is done, the work rises out of it
   const [rising, setRising] = useState<{ key: string; image?: string | null; kind: AtelierKind } | null>(null);
   const workState = useRef(new Map<string, string>());

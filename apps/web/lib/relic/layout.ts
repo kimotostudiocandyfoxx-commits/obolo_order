@@ -37,36 +37,35 @@ export function floatParams(id: string, k = 0): FloatParams {
 export type ClusterSpot = {
   /** the relic's scale in the cluster (several are a little smaller than one) */
   scale: number;
-  /** offset from its place in the row (px at scale 1): staggered heights and a small overlap */
+  /** its row and its place in the row (rows of `perRow`, fanned: each overlaps the one before a little) */
+  row: number;
+  col: number;
+  /** a staggered height (px) and its own lean (deg) */
   dy: number;
-  dx: number;
   rot: number;
   z: number;
 };
 
 /**
- * several relics sent together: a small cluster — in a row that wraps (two to a row on a phone, three on an iPad), each a
- * little smaller, every other one lower, leaning a different way, overlapping slightly; the sender's side first.
+ * several relics sent together: a small fanned cluster — rows of `perRow` (three), each a little smaller, every other one
+ * lower, leaning its own way, overlapping the one before; the sender's side first (the caller mirrors it for "mine").
  */
-export function clusterSpots(n: number, perRow = 2): ClusterSpot[] {
-  if (n <= 1) return [{ scale: 1, dy: 0, dx: 0, rot: 0, z: 1 }];
-  const scale = n === 2 ? 0.8 : perRow >= 3 ? 0.74 : 0.7;
-  const rots = [-3.2, 2.6, -1.4, 3.4, -2.6, 1.8];
+export function clusterSpots(n: number, perRow = 3): ClusterSpot[] {
+  if (n <= 1) return [{ scale: 1, row: 0, col: 0, dy: 0, rot: 0, z: 1 }];
+  const scale = n === 2 ? 0.74 : 0.6;
+  const rots = [-4, 3.2, -2, 3.6, -3, 2.2];
   return Array.from({ length: n }, (_, i) => {
     const col = i % perRow;
     const row = Math.floor(i / perRow);
-    return {
-      scale,
-      dy: (col % 2 ? 18 : 0) - row * 10,
-      dx: col === 0 ? 0 : -12 * col,
-      rot: rots[i % rots.length],
-      z: n - i + (col % 2 ? 0 : 1),
-    };
+    return { scale, row, col, dy: col % 2 ? 22 : 0, rot: rots[i % rots.length], z: 10 + (col % 2 ? 1 : 2) - row };
   });
 }
 
+/** how much of a relic the next one in its row covers (of its width) */
+export const CLUSTER_OVERLAP = 0.22;
+
 /** how many relics go in a cluster's row at this talk width */
-export const clusterPerRow = (width: number) => (width >= 700 ? 3 : 2);
+export const clusterPerRow = (width: number) => (width >= 700 ? 4 : 3);
 
 export type GroupIn = { who: string; at: number; relicOnly: boolean };
 /** messages within this long of the one before (same sender, relics only) float together */
