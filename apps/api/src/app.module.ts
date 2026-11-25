@@ -82,6 +82,8 @@ import { UsersService } from './users/users.service';
 import { LedgerService } from './wallet/ledger.service';
 import { ManaAdminController } from './wallet/mana-admin.controller';
 import { ManaCheckService } from './wallet/mana-check.service';
+import { CostService } from './wallet/cost.service';
+import { ManaPricesController } from './wallet/mana-prices.controller';
 import { WalletController } from './wallet/wallet.controller';
 
 /** One module for the demo; split per planet (spec §4.3) as the surface grows. */
@@ -130,6 +132,7 @@ import { WalletController } from './wallet/wallet.controller';
     SpellToolsController,
     CraftController,
     LinksController,
+    ManaPricesController,
   ],
   providers: [
     AuthGuard,
@@ -138,6 +141,7 @@ import { WalletController } from './wallet/wallet.controller';
     TesterService,
     LedgerService,
     ManaCheckService,
+    CostService,
     BuddyService,
     PictureService,
     CompassService,

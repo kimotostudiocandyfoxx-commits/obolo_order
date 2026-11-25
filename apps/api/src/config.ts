@@ -198,6 +198,25 @@ const Env = z.object({
   /** Cloud Run GPU service that makes Mercury instrumentals (gpu/music). Unset = not available yet. */
   MUSIC_URL: secret(),
 
+  /**
+   * Client 2026-11-25 (docs/マナの値段.md): mana = ceil((cost + Stripe's fee share) × (1 + MANA_MARGIN)), 1 yen = 1 mana.
+   * STRIPE_FEE_RATE is Stripe's share of the yen that bought the mana; a fixed fee per charge (STRIPE_FEE_FIXED_JPY) is
+   * spread over a typical charge (STRIPE_FEE_BASE_JPY, the ¥88 month).
+   */
+  STRIPE_FEE_RATE: z.coerce.number().min(0).max(0.3).default(0.036),
+  STRIPE_FEE_FIXED_JPY: z.coerce.number().min(0).max(100).default(0),
+  STRIPE_FEE_BASE_JPY: z.coerce.number().min(1).default(88),
+  MANA_MARGIN: z.coerce.number().min(0).max(1).default(0.08),
+  /** the USD→JPY rate when no month is set in fx_rates (GitHub variable FX_USD_JPY; conservative = a weak yen) */
+  FX_USD_JPY: z.coerce.number().min(50).max(500).default(160),
+  /** our Cloud Run GPU (L4 + its CPU / memory) and CPU (the API, renders) per second, in yen */
+  GPU_SECOND_JPY: z.coerce.number().min(0).default(0.05),
+  CPU_SECOND_JPY: z.coerce.number().min(0).default(0.01),
+  /** a making's price follows its recorded costs (p90) once this many makings were recorded in the last 30 days */
+  COST_REFINE_MIN_SAMPLES: z.coerce.number().min(3).default(20),
+  /** cost recording on (false: provider calls are not recorded and no small costs are taken) */
+  COST_RECORDING: bool(true),
+
   BUDDY_FREE_DAILY: z.coerce.number().default(30),
   /** M-R208: web searches {bati} may make for one member a day (each ~1–5 yen), and for everyone together (cost ceiling) */
   BUDDY_SEARCH_DAILY: z.coerce.number().default(30),

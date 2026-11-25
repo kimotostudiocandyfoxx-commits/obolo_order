@@ -4,11 +4,13 @@ import { HttpException } from '@nestjs/common';
 import { describe, expect, it } from 'vitest';
 import type { Database } from '../db/db';
 import { startConfirmed } from './confirmed';
+import { costScope } from './cost-scope';
+import { setPriceSource } from './price-book';
 import { LedgerService, type ManaEntryInput, type Tx } from './ledger.service';
 
 /** the ledger's rules over an in-memory wallet (the DB primitives replaced; charge() itself is the real one) */
 class MemLedger extends LedgerService {
-  balance = 10;
+  balance = 100;
   rows: ManaEntryInput[] = [];
   protected override async lockedBalance() {
     return this.balance;
@@ -58,7 +60,7 @@ describe('R11: a paid making from the Moon atelier is charged only with the yes'
     const f = fakes();
     expect(await code(startConfirmed({ ledger: l, db, ...f, userId: 'u1', kind: 'song', required: true }))).toBe('428 CONFIRM_REQUIRED');
     expect(l.rows).toHaveLength(0);
-    expect(l.balance).toBe(10);
+    expect(l.balance).toBe(100);
     expect(f.made).toHaveLength(0);
   });
   it('the price charged is the price shown; another price is refused', async () => {
@@ -69,7 +71,7 @@ describe('R11: a paid making from the Moon atelier is charged only with the yes'
     const job = await startConfirmed({ ledger: l, db, ...f, userId: 'u1', kind: 'song', confirm: yes(), required: true });
     expect(job.id).toBe('job1');
     expect(l.rows.map((r) => r.delta)).toEqual([-MAKE_COST.song]);
-    expect(l.balance).toBe(10 - MAKE_COST.song);
+    expect(l.balance).toBe(100 - MAKE_COST.song);
   });
   it('the same yes twice (a double tap) is one charge and one job', async () => {
     const l = new MemLedger();
@@ -79,7 +81,7 @@ describe('R11: a paid making from the Moon atelier is charged only with the yes'
     expect(b.id).toBe(a.id);
     expect(f.made).toEqual(['job1']);
     expect(l.rows).toHaveLength(1);
-    expect(l.balance).toBe(10 - MAKE_COST.song);
+    expect(l.balance).toBe(100 - MAKE_COST.song);
   });
   it('not enough mana: 402, nothing charged, no job', async () => {
     const l = new MemLedger();
@@ -94,7 +96,7 @@ describe('R11: a paid making from the Moon atelier is charged only with the yes'
     const f = fakes();
     const r = await code(startConfirmed({ ledger: l, db, ...f, userId: 'u1', kind: 'mv', confirm: yes(MAKE_COST.mv), required: true, create: async () => Promise.reject(new Error('queue down')) }));
     expect(r).toContain('queue down');
-    expect(l.balance).toBe(10);
+    expect(l.balance).toBe(100);
     expect(l.rows.map((x) => x.reason)).toEqual(['generation', 'refund']);
   });
   it('the yes is tied to the spell: the work is charged only with exactly that tag set', async () => {
@@ -121,13 +123,38 @@ describe('R11: a paid making from the Moon atelier is charged only with the yes'
     expect(l.rows).toHaveLength(0);
     await startConfirmed({ ledger: l, db, ...f, userId: 'u1', kind: 'song', confirm: ok, spell: songSpellKey(tags, lyrics), required: true });
     expect(l.rows).toHaveLength(1);
-    expect(l.balance).toBe(10 - MAKE_COST.song);
-    expect(MAKE_COST.song).toBe(2);
+    expect(l.balance).toBe(100 - MAKE_COST.song);
+  });
+  it('client 2026-11-25: the live price (cost + fee + 8%) is what the yes must carry and what is charged', async () => {
+    const l = new MemLedger();
+    setPriceSource(async () => ({ ...MAKE_COST, song: 17 }));
+    try {
+      const f = fakes();
+      // the fallback price is not the price now: refused, nothing taken
+      if (MAKE_COST.song !== 17) expect(await code(startConfirmed({ ledger: l, db, ...f, userId: 'u1', kind: 'song', confirm: yes(), required: true }))).toBe('409 PRICE_CHANGED');
+      await startConfirmed({ ledger: l, db, ...f, userId: 'u1', kind: 'song', confirm: yes(17), required: true });
+      expect(l.rows.map((r) => r.delta)).toEqual([-17]);
+      // and a refund gives back exactly what was taken
+      const fee = await l.charge(db, 'u1', 'song');
+      await fee.refund();
+      expect(l.rows.map((r) => r.delta)).toEqual([-17, -17, 17]);
+    } finally {
+      setPriceSource(null);
+    }
+  });
+  it('the charge marks the scope as that paid making (its costs are not small costs)', async () => {
+    const l = new MemLedger();
+    const seen = await costScope.run({ feature: 'songEdit', userId: 'u1' }, async () => {
+      await l.charge(db, 'u1', 'song');
+      return costScope.get();
+    });
+    expect(seen).toMatchObject({ kind: 'song', paid: true, userId: 'u1' });
+    expect(seen?.job).toMatch(/^make:song:u1:/);
   });
   it('the planets’ own studios (not the atelier) keep charging as before', async () => {
     const l = new MemLedger();
     const fee = await l.charge(db, 'u1', 'song');
     expect(fee.repeat).toBe(false);
-    expect(l.balance).toBe(10 - MAKE_COST.song);
+    expect(l.balance).toBe(100 - MAKE_COST.song);
   });
 });

@@ -1,3 +1,4 @@
+import { meterFish } from '@obolo/ai';
 import { HttpStatus, Logger } from '@nestjs/common';
 import { apiError } from '../common/errors';
 import { packMsg } from './msgpack';
@@ -74,5 +75,6 @@ export async function textToSpeech(key: string, model: string, o: TtsOptions): P
     signal: AbortSignal.timeout(240_000),
   });
   if (!res.ok) await fail(res, 'tts');
+  meterFish(model, o.text);
   return Buffer.from(await res.arrayBuffer());
 }

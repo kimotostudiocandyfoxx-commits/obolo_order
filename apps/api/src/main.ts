@@ -9,6 +9,7 @@ import { AllExceptionsFilter } from './common/errors';
 import { loadConfig } from './config';
 import { Database } from './db/db';
 import { runMigrations } from './db/migrate';
+import { costScope, featureOfPath } from './wallet/cost-scope';
 
 export function parseOrigins(spec: string): (string | RegExp)[] {
   return spec
@@ -23,6 +24,8 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: false });
   app.set('trust proxy', true); // Cloud Run sits behind Google's front end
   app.disable('x-powered-by');
+  // client 2026-11-25: every provider cost of a request is filed under its member and feature (wallet/cost-scope.ts)
+  app.use((req: express.Request, _res: express.Response, next: express.NextFunction) => costScope.run({ feature: featureOfPath(req.path) }, next));
   app.use('/media/voice', express.raw({ type: 'audio/*', limit: VOICE_MAX_BYTES }));
   // the NEO look can start from a reference image (sent once, never stored)
   app.use('/me/look', express.json({ limit: '3mb' }));

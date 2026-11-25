@@ -1,12 +1,14 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { applyDelta, assertInteger, LedgerError, ManaReason } from '@obolo/ledger';
-import { CHARGE_ERROR_WORDS, confirmKey, decideCharge, MAKE_COST, type ChargeError, type MakeConfirm, type MakeKind } from '@obolo/shared';
+import { CHARGE_ERROR_WORDS, confirmKey, decideCharge, type ChargeError, type MakeConfirm, type MakeKind } from '@obolo/shared';
 import { randomUUID } from 'node:crypto';
 import { apiError } from '../common/errors';
 import { and, asc, eq, isNull, sql } from 'drizzle-orm';
 import type { Database, Db } from '../db/db';
 import { manaLedger, users, wallets } from '../db/schema';
+import { costScope } from './cost-scope';
 import { GENESIS, manaRowHash } from './mana-chain';
+import { livePrice } from './price-book';
 
 export type Tx = Parameters<Parameters<Db['transaction']>[0]>[0];
 
@@ -115,6 +117,11 @@ export class LedgerService {
     return wallet.manaBalance;
   }
 
+  /** a making's price now (the live price list; its fallback without one) */
+  protected async priceOf(kind: MakeKind): Promise<number> {
+    return livePrice(kind);
+  }
+
   /** a ledger row with this idempotency key is there already */
   protected async applied(tx: Tx, key: string): Promise<boolean> {
     const [dupe] = await tx.select({ id: manaLedger.id }).from(manaLedger).where(eq(manaLedger.idempotencyKey, key)).limit(1);
@@ -130,28 +137,34 @@ export class LedgerService {
    * yes again is no new charge (`repeat`: the caller hands back what the first one started, never a second making).
    */
   async charge(db: Database, userId: string, kind: MakeKind, refId?: string, opts: { confirm?: MakeConfirm; required?: boolean; /** spellKey of the spell the request carries */ spell?: string | null } = {}): Promise<{ refund: () => Promise<void>; repeat: boolean }> {
-    const amount = MAKE_COST[kind];
+    // client 2026-11-25: the live price (manaFor of the making's estimated cost at this month's FX) — the same list the
+    // confirm card showed; a yes to another price is refused (PRICE_CHANGED), never charged at a new one
+    const price = await this.priceOf(kind);
     const key = opts.confirm ? confirmKey(userId, kind, opts.confirm) : `make:${kind}:${userId}:${randomUUID()}`;
     let repeat = false;
+    let amount = 0;
     try {
       await db.write.transaction(async (tx) => {
         const balance = await this.lockedBalance(tx, userId);
-        const d = decideCharge({ kind, confirm: opts.confirm, required: !!opts.required, spell: opts.spell ?? null, balance, applied: !!opts.confirm && (await this.applied(tx, key)) });
+        const d = decideCharge({ kind, price, confirm: opts.confirm, required: !!opts.required, spell: opts.spell ?? null, balance, applied: !!opts.confirm && (await this.applied(tx, key)) });
         if ('error' in d) throw chargeRefused(d.error);
         if (d.do === 'repeat') {
           repeat = true;
           return;
         }
+        amount = d.amount;
         await this.applyMana(tx, { userId, delta: -d.amount, reason: 'generation', idempotencyKey: key, refType: kind, refId });
       });
     } catch (e) {
       if (e instanceof LedgerError) throw chargeRefused('NO_MANA');
       throw e;
     }
+    // the work this request does next (and the job it queues) is this paid making: its costs are compared with its mana
+    if (!repeat) costScope.tag({ kind, job: key, paid: true });
     return {
       repeat,
       refund: async () => {
-        if (repeat) return;
+        if (repeat || !amount) return;
         await db.write.transaction((tx) => this.applyMana(tx, { userId, delta: amount, reason: 'refund', idempotencyKey: `${key}:refund`, refType: kind, refId }));
       },
     };

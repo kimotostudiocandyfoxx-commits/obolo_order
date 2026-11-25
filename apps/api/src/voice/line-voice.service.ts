@@ -1,3 +1,4 @@
+import { meteredGemini } from '@obolo/ai';
 import { Inject, Injectable, Logger, Optional, type OnModuleInit } from '@nestjs/common';
 import { BATI_VOICE_SPEED, batiSpeakSpeed, fillNames, speakText, spokenChars, storyVoiceFilter, storyVoicePrompt, type LineVoicesBody, type LineVoicesView, type NameLines } from '@obolo/shared';
 import { and, eq, inArray } from 'drizzle-orm';
@@ -228,7 +229,7 @@ export class LineVoiceService implements OnModuleInit {
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseModalities: ['AUDIO'], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: p.spec.voice } } } } }),
         signal: AbortSignal.timeout(120_000),
       });
-      const j = (await res.json().catch(() => ({}))) as { candidates?: { content?: { parts?: { inlineData?: { data?: string; mimeType?: string } }[] } }[]; error?: { message: string } };
+      const j = meteredGemini(p.model, await res.json().catch(() => ({}))) as { candidates?: { content?: { parts?: { inlineData?: { data?: string; mimeType?: string } }[] } }[]; error?: { message: string } };
       const part = j.candidates?.[0]?.content?.parts?.find((x) => x.inlineData?.data);
       if (!part) {
         // busy, or a short line it would not voice this time (finishReason OTHER): try again

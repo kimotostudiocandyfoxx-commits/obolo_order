@@ -1,3 +1,4 @@
+import { meteredGemini } from '@obolo/ai';
 import { Logger } from '@nestjs/common';
 
 /**
@@ -158,7 +159,7 @@ export async function planMv(i: PlanInput, apiKey: string | undefined, model: st
       signal: AbortSignal.timeout(60_000),
     });
     if (!res.ok) throw new Error(`${res.status} ${(await res.text()).slice(0, 200)}`);
-    const json = (await res.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
+    const json = meteredGemini(model, await res.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
     const text = json.candidates?.[0]?.content?.parts?.map((p) => p.text ?? '').join('') ?? '';
     return normalizePlan(JSON.parse(text) as MvPlan, i);
   } catch (e) {

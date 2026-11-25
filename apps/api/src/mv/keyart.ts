@@ -1,3 +1,4 @@
+import { meteredGemini, meterRunware, reportCost, timed } from '@obolo/ai';
 import { Logger } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import sharp from 'sharp';
@@ -116,7 +117,7 @@ export class KeyArtist {
     const tags = scenes.map((s) => s.tags);
     const out: (Buffer | null)[] = tags.map(() => null);
     if (this.o.paintUrl) {
-      const got = await this.gpuPaint(scenes, seed, opt).catch((e) => {
+      const got = await timed('gpu', 'paint', () => this.gpuPaint(scenes, seed, opt)).catch((e) => {
         log.warn(`gpu paint: ${String(e).slice(0, 200)}`);
         return [] as (Buffer | null)[];
       });
@@ -219,6 +220,8 @@ export class KeyArtist {
       if (status !== 'TASK_STATUS_SUCCEED') continue;
       const out = j.images?.[0];
       // kids-friendly app: a picture the NSFW check does not pass is never used
+      // Novita does not say the cost: its list price (Qwen-Image ≈ ¥3 a picture)
+      reportCost({ provider: 'novita', model: kind, usd: 0.02, units: { pictures: 1 }, exact: false });
       if (!out?.image_url || (out.nsfw_detection_result && out.nsfw_detection_result.valid === false)) return null;
       const pic = await fetch(out.image_url, { signal: AbortSignal.timeout(60_000) });
       return pic.ok ? Buffer.from(await pic.arrayBuffer()) : null;
@@ -245,12 +248,14 @@ export class KeyArtist {
           numberResults: 1,
           outputType: 'URL',
           outputFormat: 'PNG',
+          includeCost: true,
         },
       ]),
       signal: AbortSignal.timeout(90_000),
     });
     if (!res.ok) throw new Error(`${res.status} ${(await res.text()).slice(0, 200)}`);
-    const json = (await res.json()) as { data?: { imageURL?: string }[] };
+    const json = (await res.json()) as { data?: { imageURL?: string; cost?: number }[] };
+    meterRunware(String(this.o.runwareModel), json.data ?? []);
     const url = json.data?.[0]?.imageURL;
     if (!url) return null;
     const img = await fetch(url, { signal: AbortSignal.timeout(60_000) });
@@ -276,7 +281,7 @@ export class KeyArtist {
       signal: AbortSignal.timeout(90_000),
     });
     if (!res.ok) throw new Error(`${res.status} ${(await res.text()).slice(0, 200)}`);
-    const json = (await res.json()) as { candidates?: { content?: { parts?: { inlineData?: { data?: string } }[] } }[] };
+    const json = meteredGemini(this.o.geminiModel, await res.json()) as { candidates?: { content?: { parts?: { inlineData?: { data?: string } }[] } }[] };
     const data = json.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data)?.inlineData?.data;
     return data ? Buffer.from(data, 'base64') : null;
   }

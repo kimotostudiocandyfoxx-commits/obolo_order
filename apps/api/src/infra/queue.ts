@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { Queue } from 'bullmq';
+import { scopedHandler } from '../wallet/cost-scope';
 import { createRedis } from './kv';
 
 /**
@@ -48,7 +49,7 @@ export class InlineQueue implements JobQueue {
   private readonly handlers = new Map<JobName, JobHandler<JobName>>();
   private readonly running = new Set<string>();
   register<N extends JobName>(name: N, handler: JobHandler<N>) {
-    this.handlers.set(name, handler as JobHandler<JobName>);
+    this.handlers.set(name, scopedHandler(name, handler) as JobHandler<JobName>);
   }
   getHandler(name: string) {
     return this.handlers.get(name as JobName);
@@ -76,7 +77,7 @@ export class BullQueue implements JobQueue {
   }
   /** Handlers are registered everywhere but only executed by the worker process (src/worker.ts). */
   register<N extends JobName>(name: N, handler: JobHandler<N>) {
-    this.handlers.set(name, handler as JobHandler<JobName>);
+    this.handlers.set(name, scopedHandler(name, handler) as JobHandler<JobName>);
   }
   getHandler(name: string) {
     return this.handlers.get(name as JobName);
@@ -107,7 +108,7 @@ export class CloudTasksQueue implements JobQueue {
   private readonly handlers = new Map<JobName, JobHandler<JobName>>();
   constructor(private readonly o: { queue: string; target: string; invoker: string; deadlineSeconds: number }) {}
   register<N extends JobName>(name: N, handler: JobHandler<N>) {
-    this.handlers.set(name, handler as JobHandler<JobName>);
+    this.handlers.set(name, scopedHandler(name, handler) as JobHandler<JobName>);
   }
   getHandler(name: string) {
     return this.handlers.get(name as JobName);

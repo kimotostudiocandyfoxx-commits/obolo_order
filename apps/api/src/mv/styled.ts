@@ -1,3 +1,4 @@
+import { meterRunware } from '@obolo/ai';
 import { Logger } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import sharp from 'sharp';
@@ -53,10 +54,15 @@ export class StyledPainter {
     const res = await fetch(API, {
       method: 'POST',
       headers: { 'content-type': 'application/json', authorization: `Bearer ${this.o.key}` },
-      body: JSON.stringify(tasks),
+      // client 2026-11-25: every task asks for its cost (recorded per making, docs/マナの値段.md)
+      body: JSON.stringify(tasks.map((t) => (t.taskType === 'imageInference' ? { ...t, includeCost: true } : t))),
       signal: AbortSignal.timeout(timeoutMs),
     });
     const j = (await res.json().catch(() => ({}))) as { data?: RunwareImage[]; errors?: { message?: string; code?: string }[] };
+    const models = new Map(tasks.map((t) => [String(t.taskUUID), String(t.model ?? 'runware')]));
+    const byModel = new Map<string, RunwareImage[]>();
+    for (const d of j.data ?? []) if (d && models.has(String(d.taskUUID))) byModel.set(models.get(String(d.taskUUID))!, [...(byModel.get(models.get(String(d.taskUUID))!) ?? []), d]);
+    for (const [model, results] of byModel) meterRunware(model, results);
     if (!res.ok || (j.errors?.length && !j.data?.length)) throw new Error(`runware ${res.status} ${JSON.stringify(j.errors ?? j).slice(0, 300)}`);
     for (const e of j.errors ?? []) log.warn(`runware: ${e.code} ${e.message}`);
     return j.data ?? [];

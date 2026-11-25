@@ -3,6 +3,7 @@ import type { Request } from 'express';
 import { apiError } from '../common/errors';
 import type { KvStore } from '../infra/kv';
 import { KV } from '../infra/tokens';
+import { costScope } from '../wallet/cost-scope';
 
 export interface AuthedRequest extends Request {
   userId: string;
@@ -25,6 +26,7 @@ export class AuthGuard implements CanActivate {
     if (!userId) throw apiError(HttpStatus.UNAUTHORIZED, 'UNAUTHENTICATED', 'Session expired');
     if (await this.kv.get(suspendedKey(userId))) throw apiError(HttpStatus.FORBIDDEN, 'ACCOUNT_SUSPENDED', 'This account is suspended');
     req.userId = userId;
+    costScope.tag({ userId });
     return true;
   }
 }

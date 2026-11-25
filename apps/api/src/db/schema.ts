@@ -15,6 +15,7 @@ import {
   check,
   customType,
   date,
+  doublePrecision,
   index,
   integer,
   jsonb,
@@ -180,6 +181,68 @@ export const manaLedger = pgTable(
     uniqueIndex('mana_ledger_user_seq_uq').on(t.userId, t.seq),
   ],
 );
+
+/**
+ * Client 2026-11-25 (docs/マナの値段.md): what each piece of work really cost us — one row per provider call (Runware
+ * `cost`, Gemini / Claude tokens, Fish characters, our GPU / CPU seconds). `kind` is the paid making (MakeKind) when
+ * `paid`, else the free feature (UsageFeature). `job` groups one making's rows (its p90 refines the price).
+ * Yen are fractional here (a chat reply is ¥0.03): this is a cost log, not a ledger.
+ */
+export const genCosts = pgTable(
+  'gen_costs',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id'),
+    kind: text('kind').notNull(),
+    paid: boolean('paid').notNull().default(false),
+    job: text('job'),
+    provider: text('provider').notNull(),
+    model: text('model').notNull(),
+    costUsd: doublePrecision('cost_usd').notNull().default(0),
+    seconds: doublePrecision('seconds').notNull().default(0),
+    costJpy: doublePrecision('cost_jpy').notNull(),
+    fx: doublePrecision('fx').notNull(),
+    exact: boolean('exact').notNull().default(false),
+    units: jsonb('units').$type<Record<string, number>>(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('gen_costs_kind_idx').on(t.kind, t.createdAt), index('gen_costs_user_idx').on(t.userId, t.createdAt), index('gen_costs_job_idx').on(t.job)],
+);
+
+/**
+ * The small costs of the free features waiting per member (yen, less than one mana's worth) and what was taken /
+ * absorbed so far. `rows` numbers the member's usage ledger rows (their idempotency keys: usage:{user}:{n}).
+ */
+export const usageAccruals = pgTable('usage_accruals', {
+  userId: uuid('user_id')
+    .primaryKey()
+    .references(() => users.id),
+  pendingJpy: doublePrecision('pending_jpy').notNull().default(0),
+  takenMana: integer('taken_mana').notNull().default(0),
+  absorbedMana: integer('absorbed_mana').notNull().default(0),
+  absorbedJpy: doublePrecision('absorbed_jpy').notNull().default(0),
+  rows: integer('rows').notNull().default(0),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** USD→JPY per month (YYYY-MM, Japan time), set by the operator for the next month (PUT /admin/mana/fx) */
+export const fxRates = pgTable('fx_rates', {
+  month: text('month').primaryKey(),
+  usdJpy: doublePrecision('usd_jpy').notNull(),
+  note: text('note'),
+  setAt: timestamp('set_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+/**
+ * The refined cost of each making (p90 of its recorded costs, yen) — written by the daily check when a kind has enough
+ * recorded makings; absent = the seed table (MAKE_COST_ESTIMATE). The quoted mana is manaFor(cost_jpy) at read time.
+ */
+export const makeCostEstimates = pgTable('make_cost_estimates', {
+  kind: text('kind').primaryKey(),
+  costJpy: doublePrecision('cost_jpy').notNull(),
+  samples: integer('samples').notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
 
 /** Ledger B — EARNINGS (JPY). Append-only. */
 export const earningsLedger = pgTable(

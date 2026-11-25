@@ -358,6 +358,13 @@
       "when": 1795575433093,
       "tag": "0050_spell_book_lyrics",
       "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1795593498892,
+      "tag": "0051_mana_costs",
+      "breakpoints": true
     }
   ]
 }

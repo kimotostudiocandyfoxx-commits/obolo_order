@@ -50,6 +50,12 @@ export function meterGemini(model: string, usage: GeminiUsage | null | undefined
   });
 }
 
+/** a raw Gemini REST response, metered from its usageMetadata, handed back as it is */
+export function meteredGemini<T>(model: string, json: T): T {
+  meterGemini(model, (json as { usageMetadata?: GeminiUsage } | null)?.usageMetadata);
+  return json;
+}
+
 /** a Claude call: its usage × the model's token price (CLAUDE_PRICES) */
 export function meterClaude(model: string, usage: ClaudeUsage | null | undefined): void {
   if (!usage) return;

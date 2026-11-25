@@ -1,3 +1,4 @@
+import { meteredGemini } from '@obolo/ai';
 import { Logger } from '@nestjs/common';
 import sharp from 'sharp';
 import type { MvEffect, MvMotion, MvPlan, MvSegment, MvTextEffect } from './plan';
@@ -58,7 +59,7 @@ export async function describeHero(picture: Buffer | null, apiKey: string | unde
       signal: AbortSignal.timeout(30_000),
     });
     if (!res.ok) throw new Error(`${res.status}`);
-    const json = (await res.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
+    const json = meteredGemini(model, await res.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
     const tags = (JSON.parse(json.candidates?.[0]?.content?.parts?.map((p) => p.text ?? '').join('') ?? '{}') as { tags?: string }).tags ?? '';
     return clean(tags) || DEFAULT_HERO;
   } catch (e) {
@@ -229,7 +230,7 @@ export async function planStory(i: StoryInput, apiKey: string | undefined, model
       signal: AbortSignal.timeout(60_000),
     });
     if (!res.ok) throw new Error(`${res.status} ${(await res.text()).slice(0, 200)}`);
-    const json = (await res.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
+    const json = meteredGemini(model, await res.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
     const text = json.candidates?.[0]?.content?.parts?.map((p) => p.text ?? '').join('') ?? '';
     return normalizeStory(JSON.parse(text) as StoryPlan, i);
   } catch (e) {

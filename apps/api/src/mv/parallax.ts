@@ -1,3 +1,4 @@
+import { meteredGemini } from '@obolo/ai';
 import { Logger } from '@nestjs/common';
 import { readFile, writeFile } from 'node:fs/promises';
 import sharp from 'sharp';
@@ -64,7 +65,7 @@ Neighbouring pictures should not repeat the same move; vary it like a real film.
       signal: AbortSignal.timeout(60_000),
     });
     if (!res.ok) throw new Error(`gemini ${res.status}`);
-    const j = (await res.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
+    const j = meteredGemini(model, await res.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
     const got = JSON.parse(j.candidates?.[0]?.content?.parts?.[0]?.text ?? '[]') as Partial<Parallax>[];
     const clamp = (v: unknown, lo: number, hi: number, d: number) => (typeof v === 'number' && Number.isFinite(v) ? Math.max(lo, Math.min(hi, v)) : d);
     // m13: Gemini chose dolly-in for 6 of 13 — a move used more than its share gives way to the next unused one

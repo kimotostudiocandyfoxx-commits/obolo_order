@@ -1,3 +1,4 @@
+import { timed } from '@obolo/ai';
 import { HttpStatus, Logger } from '@nestjs/common';
 import { lyricsSheet, type FullSongBody, type InstrumentalBody } from '@obolo/shared';
 import { apiError } from '../common/errors';
@@ -32,6 +33,11 @@ export async function musicStatus(baseUrl: string): Promise<Record<string, unkno
 
 /** Ask the GPU service for an instrumental. Returns AAC (audio/mp4) bytes. */
 export async function generateInstrumental(baseUrl: string, body: InstrumentalBody): Promise<{ data: Buffer; seconds: number }> {
+  // client 2026-11-25: our GPU's seconds are this making's cost (GPU_SECOND_JPY)
+  return timed('gpu', 'music:instrumental', () => instrumentalOnGpu(baseUrl, body));
+}
+
+async function instrumentalOnGpu(baseUrl: string, body: InstrumentalBody): Promise<{ data: Buffer; seconds: number }> {
   const url = baseUrl.replace(/\/$/, '');
   const token = await idToken(url);
   let res: Response;
@@ -86,6 +92,11 @@ export async function generateSong(
   /** POST /extend: the finished song (`src`) kept up to `keep` seconds, the rest newly sung */
   extend?: { src: Buffer; keep: number },
 ): Promise<MadeSong> {
+  // client 2026-11-25: our GPU's seconds are this making's cost (GPU_SECOND_JPY)
+  return timed('gpu', extend ? 'music:extend' : 'music:song', () => songOnGpu(baseUrl, body, extend));
+}
+
+async function songOnGpu(baseUrl: string, body: FullSongBody & { prompt: string; voice?: Buffer | null; similarity?: number }, extend?: { src: Buffer; keep: number }): Promise<MadeSong> {
   const url = baseUrl.replace(/\/$/, '');
   const token = await idToken(url);
   let res: Response;

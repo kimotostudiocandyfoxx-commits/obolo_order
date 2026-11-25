@@ -1,3 +1,4 @@
+import { timed } from '@obolo/ai';
 import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { MV_MAX_MATERIALS, MV_MAX_SECONDS, spellPrompt, VIDEO_DEFAULTS, videoParams, videoWindow, type AddMvMaterialBody, type MvEditBody, type MvMaterial, type MvProjectView, type SongMix, type SongPhrase, type SpellTag, type VideoCut, type VideoParams } from '@obolo/shared';
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
@@ -253,6 +254,10 @@ export class MvService {
    * No video-generation model is used: the pictures are moved and joined by ffmpeg.
    */
   async story(userId: string, id: string, origin: string, mood: string, tags?: SpellTag[]): Promise<MvProjectView> {
+    return timed('cpu', 'mv:story', () => this.storyOnCpu(userId, id, origin, mood, tags));
+  }
+
+  private async storyOnCpu(userId: string, id: string, origin: string, mood: string, tags?: SpellTag[]): Promise<MvProjectView> {
     const p = await this.begin(userId, id);
     const s = await this.song(userId, p.songId);
     const params = tags ? videoParams(tags) : this.legacyParams();
@@ -395,6 +400,10 @@ export class MvService {
    * move — CPU only, so it costs little (MAKE_COST.mvPictures).
    */
   async pictures(userId: string, id: string, origin: string, tags: SpellTag[]): Promise<MvProjectView> {
+    return timed('cpu', 'mv:pictures', () => this.picturesOnCpu(userId, id, origin, tags));
+  }
+
+  private async picturesOnCpu(userId: string, id: string, origin: string, tags: SpellTag[]): Promise<MvProjectView> {
     const params = videoParams(tags);
     const urls = await this.ownPictures(userId, id, params.scenes);
     if (!urls.length) throw apiError(HttpStatus.BAD_REQUEST, 'NO_PICTURES', 'No pictures to move yet');
@@ -422,6 +431,10 @@ export class MvService {
    * the length, the part of the song, the colours). Re-rendered on the CPU from the kept pictures: no new picture, no mana.
    */
   async edit(userId: string, id: string, origin: string, body: MvEditBody): Promise<MvProjectView> {
+    return timed('cpu', 'mv:edit', () => this.editOnCpu(userId, id, origin, body));
+  }
+
+  private async editOnCpu(userId: string, id: string, origin: string, body: MvEditBody): Promise<MvProjectView> {
     const p0 = await this.row(userId, id);
     const cut = this.cutOf(p0);
     const order = [...new Set(body.order.filter((k) => k >= 0 && k < cut.scenes.length))];
@@ -442,6 +455,10 @@ export class MvService {
 
   /** R13: some scenes painted again from a small spell (MAKE_COST.mvRedraw), then the video re-rendered */
   async redraw(userId: string, id: string, origin: string, body: { scenes: number[]; spell: SpellTag[] }): Promise<MvProjectView> {
+    return timed('cpu', 'mv:redraw', () => this.redrawOnCpu(userId, id, origin, body));
+  }
+
+  private async redrawOnCpu(userId: string, id: string, origin: string, body: { scenes: number[]; spell: SpellTag[] }): Promise<MvProjectView> {
     const p0 = await this.row(userId, id);
     const cut = this.cutOf(p0);
     const ks = [...new Set(body.scenes.filter((k) => k >= 0 && k < cut.scenes.length))];
@@ -606,6 +623,10 @@ export class MvService {
 
   /** The same MV with the lyric lines on it (the picture is not edited again). */
   async withLyrics(userId: string, id: string, origin: string): Promise<MvProjectView> {
+    return timed('cpu', 'mv:lyrics', () => this.withLyricsOnCpu(userId, id, origin));
+  }
+
+  private async withLyricsOnCpu(userId: string, id: string, origin: string): Promise<MvProjectView> {
     const p = await this.row(userId, id);
     if (!p.videoUrl) throw apiError(HttpStatus.BAD_REQUEST, 'NO_MV', 'Make the MV first');
     const s = await this.song(userId, p.songId);

@@ -63,7 +63,7 @@ const code = async (p: Promise<unknown>) => {
 };
 
 class MemLedger extends LedgerService {
-  balance = 40;
+  balance = 200;
   rows: ManaEntryInput[] = [];
   protected override async lockedBalance() {
     return this.balance;
@@ -167,7 +167,7 @@ describe('ゲーム: code checked, one repair round, mana back when it fails', (
     expect(prompt).toContain('Previous code:');
     expect(g2.tags.find((t) => t.group === 'level')?.ja).toBe('むずかしい');
   });
-  it('charged once per yes (12 first, 3 a tweak); a failed build and a game that does not run give the mana back, once', async () => {
+  it('charged once per yes (the game price first, the tweak price after); a failed build and a game that does not run give the mana back, once', async () => {
     const l = new MemLedger();
     const { db } = fakeDb();
     const job = { id: 'j1', kind: 'game', status: 'queued' } as JobView;
@@ -178,11 +178,11 @@ describe('ゲーム: code checked, one repair round, mana back when it fails', (
     await startConfirmed({ ledger: l, db, ...f, userId: 'u1', kind: 'game', confirm: yes, spell: yes.spell, required: true });
     // the same yes again (a double tap): no second charge
     expect(await code(startConfirmed({ ledger: l, db, ...f, userId: 'u1', kind: 'game', confirm: yes, spell: yes.spell, required: true }))).toBe('ALREADY_STARTED');
-    expect(l.balance).toBe(40 - MAKE_COST.game);
+    expect(l.balance).toBe(200 - MAKE_COST.game);
     const s = new GameService(mock as never, mock as never, db, l, kv());
     expect(await s.refundJob('u1', input)).toBe(MAKE_COST.game);
     expect(await s.refundJob('u1', input)).toBe(0);
-    expect(l.balance).toBe(40);
+    expect(l.balance).toBe(200);
     // a yes never charged gives nothing back
     expect(await s.refundJob('u1', { ...input, confirm: { ...yes, id: '00000000-0000-4000-8000-000000000001' } })).toBe(0);
   });
@@ -197,7 +197,7 @@ describe('ゲーム: code checked, one repair round, mana back when it fails', (
     const tweak = { id: '11111111-2b4c-4d5e-8f90-1a2b3c4d5e6f', price: MAKE_COST.gameTweak };
     await startConfirmed({ ledger: l, db, ...f, userId: 'u1', kind: 'gameTweak', confirm: tweak, spell: null, required: false });
     await s.make('u1', { ...input, gameId: g.id, kind: 'gameTweak', confirm: tweak });
-    expect(l.balance).toBe(40 - MAKE_COST.game - MAKE_COST.gameTweak);
+    expect(l.balance).toBe(200 - MAKE_COST.game - MAKE_COST.gameTweak);
     expect(await s.broken('u1', g.id, { version: 1, reason: 'TypeError' })).toEqual({ refunded: MAKE_COST.gameTweak });
     expect(await s.broken('u1', g.id, { version: 1, reason: 'TypeError' })).toEqual({ refunded: 0 });
     expect((tables.get(games)![0] as { active: number }).active).toBe(0);

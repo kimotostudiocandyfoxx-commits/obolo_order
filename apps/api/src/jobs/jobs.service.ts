@@ -11,6 +11,7 @@ import { QUEUE } from '../infra/tokens';
 import { MvService } from '../mv/mv.service';
 import { GameService, type GameJobInput } from '../craft/game.service';
 import { PushService } from '../push/push.service';
+import { costScope, type CostCtx } from '../wallet/cost-scope';
 import { LedgerService } from '../wallet/ledger.service';
 
 type Row = typeof jobs.$inferSelect;
@@ -27,6 +28,9 @@ type Inputs = {
   /** client 2026-11-25: a game built or tweaked (its yes: the mana goes back when it fails for good) */
   game: GameJobInput;
 };
+
+/** what a job's free costs are filed under (its paid making comes from the charge's scope) */
+const FEATURE_OF: Record<JobKind, CostCtx['feature']> = { song: 'songEdit', 'mv-story': 'videoEdit', 'mv-edit': 'videoEdit', 'mv-lyrics': 'videoEdit', demo: 'other', game: 'other' };
 
 /** what each job is timed as (M-R253 §4) */
 export const ETA_OF: Record<JobKind, EtaKind> = { song: 'song', 'mv-story': 'mv', 'mv-lyrics': 'mv', demo: 'demo', game: 'game', 'mv-edit': 'mvEdit' };
@@ -70,9 +74,13 @@ export class JobsService implements OnModuleInit {
 
   async create<K extends JobKind>(userId: string, kind: K, input: Inputs[K]): Promise<JobView> {
     const etaMs = await this.estimate(kind, input);
+    // client 2026-11-25: the paid making this request charged (LedgerService.charge tagged the scope) goes with the job,
+    // so the job's provider costs are that making's (one `job` key: the yes's ledger key)
+    const s = costScope.get();
+    const cost = s?.paid && s.kind ? { kind: s.kind, job: s.job, paid: true } : undefined;
     const [row] = await this.db.write
       .insert(jobs)
-      .values({ userId, kind, inputJson: input as unknown as Record<string, unknown>, etaMs, etaAt: new Date(Date.now() + etaMs) })
+      .values({ userId, kind, inputJson: { ...(input as unknown as Record<string, unknown>), ...(cost ? { _cost: cost } : {}) }, etaMs, etaAt: new Date(Date.now() + etaMs) })
       .returning();
     try {
       await this.queue.enqueue('jobs.run', { jobId: row.id });
@@ -159,6 +167,13 @@ export class JobsService implements OnModuleInit {
   async run(jobId: string): Promise<void> {
     const row = await this.load(jobId);
     if (!row || row.status === 'done' || row.status === 'failed') return;
+    // its provider costs: the paid making it was charged as, else a free feature of the member (a re-render, a free song)
+    const paid = (row.inputJson as { _cost?: { kind: CostCtx['kind']; job?: string; paid?: boolean } } | null)?._cost;
+    return costScope.run({ userId: row.userId, feature: FEATURE_OF[row.kind as JobKind] ?? 'other', ...(paid ? { kind: paid.kind, job: paid.job ?? row.id, paid: true } : { job: row.id }) }, () => this.runScoped(row));
+  }
+
+  private async runScoped(row: Row): Promise<void> {
+    const jobId = row.id;
     if (row.status === 'running' && row.startedAt && Date.now() - row.startedAt.getTime() < LOST_AFTER_MS) return; // already running elsewhere
     const attempts = row.attempts + 1;
     await this.patch(jobId, { status: 'running', stage: row.attempts ? 'retrying' : 'start', attempts, startedAt: new Date() });
