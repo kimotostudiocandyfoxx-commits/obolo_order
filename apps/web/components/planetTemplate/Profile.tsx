@@ -20,6 +20,8 @@ export interface ProfileMiddle {
   person: ProfilePerson;
   /** a work tapped in the middle (opens it the planet's way) */
   open: (w: HomeWork) => void;
+  /** the work opened now (from the middle), if any */
+  current: string | null;
 }
 export type ProfileMiddleSlot = (m: ProfileMiddle) => ReactNode;
 
@@ -52,6 +54,7 @@ export function Profile({
   onBack,
   middle = defaultProfileMiddle,
   onOpen,
+  openedId = null,
 }: {
   planet: HomePlanet;
   people: ProfilePerson[];
@@ -60,6 +63,7 @@ export function Profile({
   onBack: () => void;
   middle?: ProfileMiddleSlot;
   onOpen: (person: ProfilePerson, w: HomeWork) => void;
+  openedId?: string | null;
 }) {
   const cfg = templateConfig(planet);
   const who = people.find((p) => p.id === current) ?? people[0];
@@ -79,7 +83,7 @@ export function Profile({
           ))}
         </div>
       </div>
-      <div className={s.profMid}>{middle({ planet, person: who, open: (w) => onOpen(who, w) })}</div>
+      <div className={s.profMid}>{middle({ planet, person: who, open: (w) => onOpen(who, w), current: openedId })}</div>
       <div className={s.profWho}>
         {who.figure ? <img src={who.figure} alt="" draggable={false} /> : null}
         <span>{who.name}</span>

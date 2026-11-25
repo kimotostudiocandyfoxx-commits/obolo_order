@@ -1,29 +1,30 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import type { PlanetTemplateConfig } from '@/lib/planetTemplate/config';
+import type { PathPoint, PlanetTemplateConfig } from '@/lib/planetTemplate/config';
 import type { HomePerson } from '@/lib/planetTemplate/people';
 import { defaultOpener, type WorkOpener } from './WorkView';
 import s from './PlanetTemplate.module.css';
 
 type Phase = 'in' | 'open' | 'out';
-/** where a visitor comes from, sits, leaves to (fractions of the screen) and how big it is there */
-const FROM = { x: 0.4, y: 0.2, size: 0.3 };
-const SIT = { x: 0.18, y: 0.86, size: 1 };
-const AWAY = { x: 0.9, y: 0.15, size: 0.3 };
-const ARRIVE_MS = 900;
-const LEAVE_MS = 800;
+/** you dance out of your place for this long before the view turns (the prototype's playM: 0.9 s) */
+const DANCE_MS = 900;
+/** a work the planet shows until it is done never stays longer than this (a song that never ends) */
+const DONE_MAX_MS = 8 * 60_000;
 
 /**
  * 3-3 the view from your place: the screen turns to what you see from your place, your back at the bottom right (only
  * its left half on the screen; GET /me lookBack, else the stand-in). The ダチ's works come one at a time — the maker's
- * figure flies in, the work opens, then it goes and the next comes. The last one heard → it ends by itself. ■ or a
- * tap on the screen stops it (the owner of this view: the ■ is the home's play button).
+ * figure comes in, the work opens, then it goes and the next comes. The last one seen → it ends by itself (`finished`).
+ * ■ or a tap on the screen stops it (the owner of this view: the ■ is the home's play button).
+ * Per planet (config.play): the path the visitor takes, whether a work stays until it is done (Mercury: the whole song),
+ * the view at night with fireworks, and you dancing out of your place first (Mercury, 02 §3).
  */
 export function PlayView({
   cfg,
   people,
   back,
+  dancer,
   opener = defaultOpener,
   onEnd,
   openProfile,
@@ -31,65 +32,121 @@ export function PlayView({
   cfg: PlanetTemplateConfig;
   people: HomePerson[];
   back: string | null;
+  /** you, dancing out of your place (Mercury); null: the view turns at once */
+  dancer?: string | null;
   opener?: WorkOpener;
-  onEnd: () => void;
+  onEnd: (finished: boolean) => void;
   openProfile: (id: string) => void;
 }) {
+  const path = cfg.play.path;
+  const dance = cfg.play.dance && dancer ? cfg.play.dance : null;
   const [on, setOn] = useState(false);
   const [k, setK] = useState(-1);
   const [phase, setPhase] = useState<Phase>('in');
-  const [at, setAt] = useState(FROM);
+  const [at, setAt] = useState<PathPoint>(path.from);
+  const [moveMs, setMoveMs] = useState(0);
+  const [bursts, setBursts] = useState<{ id: number; x: number; y: number; c: string }[]>([]);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const done = useRef<(() => void) | null>(null);
   const end = useRef(onEnd);
   end.current = onEnd;
 
   useEffect(() => {
     const T = (f: () => void, ms: number) => timers.current.push(setTimeout(f, ms));
+    const leave = (i: number) => {
+      done.current = null;
+      setPhase('out');
+      setMoveMs(path.leaveMs);
+      setAt(path.away);
+      T(() => one(i + 1), path.leaveMs);
+    };
     const one = (i: number) => {
-      if (i >= people.length) return end.current();
+      if (i >= people.length) return end.current(true);
       setK(i);
       setPhase('in');
-      setAt(FROM);
-      // two frames: the visitor is placed at FROM, then moves (its transition)
-      T(() => setAt(SIT), 30);
-      T(() => setPhase('open'), ARRIVE_MS);
+      setMoveMs(0);
+      setAt(path.from);
+      // two frames: the visitor is placed at `from`, then moves (its transition)
       T(() => {
-        setPhase('out');
-        setAt(AWAY);
-      }, ARRIVE_MS + cfg.holdMs);
-      T(() => one(i + 1), ARRIVE_MS + cfg.holdMs + LEAVE_MS);
+        setMoveMs(path.arriveMs);
+        setAt(path.sit);
+      }, 40);
+      T(() => {
+        setPhase('open');
+        if (path.front) {
+          setMoveMs(450);
+          setAt(path.front);
+        }
+        if (cfg.play.untilDone) {
+          let left = false;
+          done.current = () => {
+            if (left) return;
+            left = true;
+            leave(i);
+          };
+          T(() => done.current?.(), DONE_MAX_MS);
+        } else T(() => leave(i), cfg.holdMs);
+      }, path.arriveMs + 40);
     };
-    requestAnimationFrame(() => setOn(true));
+    T(() => setOn(true), dance ? DANCE_MS : 16);
     T(() => one(0), cfg.introMs);
+    let fw: ReturnType<typeof setInterval> | null = null;
+    if (cfg.play.fireworks) {
+      let n = 0;
+      const cols = ['#ff5fa2', '#ffd84d', '#6fe3ff', '#b48cff', '#7dffb0', '#ff8a4d'];
+      fw = setInterval(() => {
+        if (Math.random() > 0.8) return;
+        const id = ++n;
+        setBursts((b) => [...b.slice(-3), { id, x: 0.15 + Math.random() * 0.7, y: 0.14 + Math.random() * 0.16, c: cols[Math.floor(Math.random() * cols.length)] }]);
+        T(() => setBursts((b) => b.filter((x) => x.id !== id)), 1600);
+      }, 1300);
+    }
     const ts = timers.current;
     return () => {
       ts.forEach(clearTimeout);
       timers.current = [];
+      if (fw) clearInterval(fw);
     };
-  }, [people, cfg.holdMs, cfg.introMs]);
+  }, [people, cfg, path, dance]);
 
   const p = k >= 0 ? people[k] : null;
   const work = p?.works[0];
+  const fig = p ? (p.figure ?? cfg.standIn?.(p.id) ?? p.sprite) : null;
   return (
-    <div className={`${s.hv} ${on ? s.on : ''} ${phase === 'open' ? s.zoom : ''}`} onClick={() => end.current()} data-testid="play-view">
-      <div className={s.hvbg} style={{ backgroundImage: `url(${cfg.art.view})` }} />
-      <div className={s.vig} />
-      {back && (
-        <div className={s.back} data-testid="play-back">
-          <img src={back} alt="" draggable={false} />
+    <>
+      {dance && dancer && (
+        <div className={s.dancer} style={{ left: `${dance.x * 100}%`, top: `${dance.y * 100}%` }} data-testid="play-dancer">
+          <img src={dancer} alt="" draggable={false} />
         </div>
       )}
-      {p && (
-        <div
-          key={`${p.id}-${k}`}
-          className={s.visitor}
-          style={{ transform: `translate3d(${at.x * 100}cqw, ${at.y * 100}cqh, 0) scale(${at.size})`, opacity: phase === 'out' ? 0 : 1 }}
-        >
-          <img src={p.figure ?? p.sprite} alt="" draggable={false} />
-          <span className={s.nm}>{p.name}</span>
-        </div>
-      )}
-      {p && work && phase === 'open' && opener({ person: p, work, inPlay: true, close: () => undefined, openProfile })}
-    </div>
+      <div className={`${s.hv} ${on ? s.on : ''} ${phase === 'open' ? s.zoom : ''} ${cfg.play.night ? s.night : ''}`} onClick={() => end.current(false)} data-testid="play-view">
+        <div className={s.hvbg} style={{ backgroundImage: `url(${cfg.art.view})` }} />
+        <div className={s.vig} />
+        {cfg.play.night && <div className={s.glow} />}
+        {bursts.map((b) => (
+          <div key={b.id} className={s.burst} style={{ left: `${b.x * 100}%`, top: `${b.y * 100}%`, ['--c' as string]: b.c }}>
+            {Array.from({ length: 24 }, (_, j) => (
+              <i key={j} style={{ ['--a' as string]: `${(j / 24) * 360}deg`, ['--r' as string]: `${50 + ((j * 37) % 30)}px` }} />
+            ))}
+          </div>
+        ))}
+        {back && (
+          <div className={s.back} data-testid="play-back">
+            <img src={back} alt="" draggable={false} />
+          </div>
+        )}
+        {p && fig && (
+          <div
+            key={`${p.id}-${k}`}
+            className={`${s.visitor} ${phase === 'open' ? s.bobbing : ''} ${path.front ? s.front : ''}`}
+            style={{ transform: `translate3d(${at.x * 100}cqw, ${at.y * 100}cqh, 0) scale(${at.size})`, opacity: phase === 'out' ? 0 : 1, transitionDuration: `${moveMs}ms, ${phase === 'out' ? 1000 : 500}ms` }}
+          >
+            <img src={fig} alt="" draggable={false} />
+            {phase !== 'open' && <span className={s.nm}>{p.name}</span>}
+          </div>
+        )}
+        {p && work && phase === 'open' && opener({ person: p, work, inPlay: true, where: 'play', figure: fig, close: () => undefined, onDone: () => done.current?.(), openProfile })}
+      </div>
+    </>
   );
 }

@@ -26,8 +26,8 @@
   transition: transform 0.45s cubic-bezier(0.3, 0.9, 0.3, 1), filter 0.45s;
 }
 .dim .stage {
-  transform: translate(-50%, -50%) scale(1.12);
-  filter: blur(2.5px) brightness(0.7);
+  transform: translate(-50%, -50%) scale(var(--open-scale, 1.12));
+  filter: blur(var(--open-blur, 2.5px)) brightness(var(--open-bright, 0.7));
 }
 .place {
   position: absolute;
@@ -110,6 +110,61 @@
   opacity: 0;
   transition: opacity 0.3s;
   pointer-events: none;
+}
+
+/* 02 Mercury: a ship on the sea lanes (the prototype's .sh: anchored at its waterline, the picture faces its way) */
+.fig[data-motion='sail'] {
+  width: 92px;
+  height: 120px;
+  margin: -90px 0 0 -46px;
+}
+.fig[data-motion='sail'] img.body {
+  position: absolute;
+  left: -14px;
+  top: 14px;
+  width: 120px;
+  height: 106px;
+  animation: none;
+  filter: drop-shadow(0 6px 6px rgba(0, 40, 80, 0.35));
+}
+.fig[data-flip='1'] img.body {
+  transform: scaleX(-1);
+}
+.fig[data-motion='sail'] .nm {
+  top: 116px;
+}
+.fig[data-motion='sail'][data-row='2'] .nm {
+  font-size: 8px;
+}
+.wake {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 108px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0) 70%);
+  animation: wk 1.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* a short line at the bottom (all heard, the sky's hint, ☆ / ♡) */
+.toast {
+  position: absolute;
+  left: 50%;
+  bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+  z-index: 60;
+  transform: translateX(-50%);
+  max-width: calc(100% - 32px);
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(10, 16, 40, 0.78);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  font: 800 13px var(--font-sans);
+  text-align: center;
+  pointer-events: none;
+  animation: toastin 0.3s cubic-bezier(0.2, 1.4, 0.4, 1) both;
 }
 
 /* 3-4 the top bar */
@@ -339,6 +394,68 @@
   font: 900 10px var(--font-sans);
   white-space: nowrap;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+/* Mercury's ▶: you dance out of your house first */
+.dancer {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  margin: -110px 0 0 -60px;
+  z-index: 14;
+  pointer-events: none;
+  animation: dance 1.5s cubic-bezier(0.3, 1.4, 0.5, 1) both;
+}
+.dancer img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 10px rgba(0, 30, 60, 0.35));
+}
+/* the view at night (Mercury's pier) and its fireworks */
+.night .hvbg {
+  filter: brightness(0.62) saturate(1.15) hue-rotate(-8deg);
+}
+.night.zoom .hvbg {
+  filter: blur(3px) brightness(0.45);
+}
+.glow {
+  position: absolute;
+  left: 8%;
+  top: 72%;
+  width: 70%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(255, 190, 100, 0.5), rgba(255, 160, 70, 0.15) 45%, transparent 70%);
+  animation: gl 2.4s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+.burst {
+  position: absolute;
+  width: 0;
+  height: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.burst i {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  margin: -2px;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 0 6px 2px var(--c);
+  animation: fwp 1.5s cubic-bezier(0.1, 0.7, 0.3, 1) forwards;
+}
+/* a ship coming to your pier (the prototype's .vis: 150 × 134) */
+.visitor.front {
+  width: 150px;
+  height: 134px;
+  margin: -67px 0 0 -75px;
+  z-index: 11;
+}
+.visitor.bobbing img {
+  animation: bop 0.5s ease-in-out infinite alternate;
 }
 
 /* a work in front of you (the default opener) */
@@ -576,10 +693,75 @@
     transform: scale(1.25);
   }
 }
+@keyframes wk {
+  50% {
+    transform: scaleX(1.25);
+    opacity: 0.6;
+  }
+}
+@keyframes toastin {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+}
+@keyframes dance {
+  0% {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  45% {
+    transform: translateY(-46px) scale(0.9) rotate(-6deg);
+  }
+  70% {
+    transform: translateY(40px) scale(0.9) rotate(6deg);
+  }
+  100% {
+    transform: translateY(40px) scale(0.9);
+    opacity: 0;
+  }
+}
+@keyframes gl {
+  to {
+    opacity: 0.6;
+  }
+}
+@keyframes fwp {
+  0% {
+    transform: rotate(var(--a)) translateX(0);
+  }
+  70% {
+    opacity: 1;
+  }
+  to {
+    transform: rotate(var(--a)) translateX(var(--r)) translateY(26px);
+    opacity: 0;
+  }
+}
+@keyframes bop {
+  from {
+    transform: translateY(0) rotate(-4deg);
+  }
+  to {
+    transform: translateY(-8px) rotate(4deg);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
+  .wake,
+  .visitor.bobbing img,
   .fig img.body,
   .place::before,
   .play::after {
     animation: none;
   }
+}
+
+/* a work open on the home: the play button steps aside (the title takes the top) */
+.opened .play {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
 }

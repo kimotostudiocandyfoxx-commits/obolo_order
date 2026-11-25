@@ -560,6 +560,36 @@ export class DemoApi implements Api {
     return talkDays(ms.map((m) => ({ id: m.id, at: m.createdAt, who: m.fromMe ? 'me' : (m.character ?? f.thread), text: m.text ?? m.work?.title ?? '' })), (id) => marks[`dachi_message:${id}`], f, local);
   }
 
+  /** the demo has no Mercury songs or continents of its own (the planet preview shows its sample instead) */
+  private notInDemo(): never {
+    throw new ApiError(404, 'NOT_FOUND', 'Not in the demo');
+  }
+  async planetSong(_id: string): Promise<never> {
+    return this.notInDemo();
+  }
+  async continentSky(_planet: HomePlanet): Promise<never> {
+    return this.notInDemo();
+  }
+  async continentFavourite(_planet: HomePlanet, _key: string, _on: boolean, _slot?: number): Promise<never> {
+    return this.notInDemo();
+  }
+  async continentSearch(_planet: HomePlanet, _q: string, _tag?: string | null): Promise<never> {
+    return this.notInDemo();
+  }
+  async continentTravel(_planet: HomePlanet, _n?: number): Promise<never> {
+    return this.notInDemo();
+  }
+  async continentLand(_planet: HomePlanet, _key: string): Promise<never> {
+    return this.notInDemo();
+  }
+  async continentVisit(_planet: HomePlanet, _key: string): Promise<never> {
+    return this.notInDemo();
+  }
+  async savePlanetWork(_kind: PlanetWorkKind, _id: string, on: boolean) {
+    await sleep(150);
+    return { saved: on };
+  }
+
   async hidePlanetWork(kind: PlanetWorkKind, id: string, on: boolean) {
     const viewer = this.uid();
     const key = `${kind}:${id}`;

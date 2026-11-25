@@ -1,4 +1,5 @@
 import type { LinkPreview } from '@obolo/shared';
+import type { ContinentLandingView, ContinentSkyView, ContinentView, FavouriteSlots, PlanetSongView } from '@obolo/shared';
 import type { IncantBody, IncantView } from '@obolo/shared';
 import type { LyricsBody, LyricsView, SongLyrics, SongTweakBody, SongTweakResult, SongVoiceBody, SongVoiceQuoteView, SongVoiceUseView, SongVoiceVersion } from '@obolo/shared';
 import type { BookView, CompassSpell, GameBrokenBody, GameBuildBody, GameView, MoonCompassBody, NovelChapterBody, SaveSpellBody, SaveSpellResult, SavedSpell } from '@obolo/shared';
@@ -470,6 +471,22 @@ export interface Api {
   hidePlanetWork(kind: PlanetWorkKind, id: string, on: boolean): Promise<{ hidden: boolean }>;
   /** M-R213: 〔通報〕 a stranger's planet work */
   reportPlanetWork(kind: PlanetWorkKind, id: string, body: PlanetWorkReportBody): Promise<void>;
+  /** 02 §2 (M-R288): a Mercury song opened — sound, jacket, title, timed lyrics */
+  planetSong(id: string): Promise<PlanetSongView>;
+  /** 2-4 / 2-5 じぶんの空: the continents and your five */
+  continentSky(planet: HomePlanet): Promise<ContinentSkyView>;
+  /** ☆ one continent (409 FULL when five: swap with `slot`) */
+  continentFavourite(planet: HomePlanet, key: string, on: boolean, slot?: number): Promise<{ favourites: FavouriteSlots }>;
+  /** 〔🔍 大陸をさがす〕 (best first, the same score at random; `count` = public works drifted there) */
+  continentSearch(planet: HomePlanet, q: string, tag?: string | null): Promise<ContinentView[]>;
+  /** 〔✈ 旅〕 six unseen continents first (M-R312) */
+  continentTravel(planet: HomePlanet, n?: number): Promise<ContinentView[]>;
+  /** 降りる: the continent and the works drifted there */
+  continentLand(planet: HomePlanet, key: string): Promise<ContinentLandingView>;
+  /** landed (the seen record) */
+  continentVisit(planet: HomePlanet, key: string): Promise<{ ok: true }>;
+  /** ☆ a work into Bluena (M-R309) */
+  savePlanetWork(kind: PlanetWorkKind, id: string, on: boolean): Promise<{ saved: boolean }>;
   /** M-R258 星のホーム: own forever / dachi and 推し 88 hours / a few strangers far (none under 15) */
   planetHome(planet: HomePlanet): Promise<PlanetHomeView>;
   /** opened now (the next visit sparkles what came after); answers the visit before */

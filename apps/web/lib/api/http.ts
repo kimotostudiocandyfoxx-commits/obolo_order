@@ -828,6 +828,31 @@ export class HttpApi implements Api {
   findTalkDays(f: Parameters<Api['findTalkDays']>[0]) {
     return this.req<Awaited<ReturnType<Api['findTalkDays']>>>('GET', `/finds/talks${findQs(f)}`);
   }
+  planetSong(id: string) {
+    return this.req<Awaited<ReturnType<Api['planetSong']>>>('GET', `/planet-works/planet_post/${encodeURIComponent(id)}/song`);
+  }
+  continentSky(planet: Parameters<Api['continentSky']>[0]) {
+    return this.req<Awaited<ReturnType<Api['continentSky']>>>('GET', `/planet-continents/${planet}`);
+  }
+  continentFavourite(planet: Parameters<Api['continentFavourite']>[0], key: string, on: boolean, slot?: number) {
+    return this.req<Awaited<ReturnType<Api['continentFavourite']>>>('PUT', `/planet-continents/${planet}/${encodeURIComponent(key)}/favourite`, slot == null ? { on } : { on, slot });
+  }
+  continentSearch(planet: Parameters<Api['continentSearch']>[0], q: string, tag?: string | null) {
+    const qs = new URLSearchParams({ q, ...(tag ? { tag } : {}) });
+    return this.req<Awaited<ReturnType<Api['continentSearch']>>>('GET', `/planet-continents/${planet}/search?${qs}`);
+  }
+  continentTravel(planet: Parameters<Api['continentTravel']>[0], n?: number) {
+    return this.req<Awaited<ReturnType<Api['continentTravel']>>>('GET', `/planet-continents/${planet}/travel${n ? `?n=${n}` : ''}`);
+  }
+  continentLand(planet: Parameters<Api['continentLand']>[0], key: string) {
+    return this.req<Awaited<ReturnType<Api['continentLand']>>>('GET', `/planet-continents/${planet}/${encodeURIComponent(key)}`);
+  }
+  continentVisit(planet: Parameters<Api['continentVisit']>[0], key: string) {
+    return this.req<{ ok: true }>('POST', `/planet-continents/${planet}/${encodeURIComponent(key)}/visit`);
+  }
+  savePlanetWork(kind: Parameters<Api['savePlanetWork']>[0], id: string, on: boolean) {
+    return this.req<{ saved: boolean }>('PUT', `/planet-works/${kind}/${id}/save`, { on });
+  }
   hidePlanetWork(kind: Parameters<Api['hidePlanetWork']>[0], id: string, on: boolean) {
     return this.req<{ hidden: boolean }>('POST', `/planet-works/${kind}/${id}/hide`, { on });
   }

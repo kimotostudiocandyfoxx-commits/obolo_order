@@ -1,0 +1,348 @@
+/* 水星 (handoff 02; prototype design/home/template.html .sh / .vinyl.cd / .lyr / .kin / .pdisc) */
+
+/* a song opened: over the home (the home behind zooms and dims: the template's openLook) */
+.open {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  container-type: size;
+  overflow: hidden;
+}
+.open.clear {
+  background: rgba(6, 10, 30, 0.35);
+}
+
+/* the ship tapped, in front of the disc (the same box as the ships on the sea, so it sails on from where it was) */
+.ship {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 92px;
+  height: 120px;
+  margin: -90px 0 0 -46px;
+  z-index: 12;
+  transition: transform 0.5s cubic-bezier(0.25, 0.9, 0.3, 1.1), opacity 0.3s;
+  pointer-events: none;
+}
+.ship img {
+  position: absolute;
+  left: -14px;
+  top: 14px;
+  width: 120px;
+  height: 106px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 6px rgba(0, 40, 80, 0.35));
+}
+.ship.bob img {
+  animation: bop 0.42s ease-in-out infinite alternate;
+}
+
+/* the picture disc: the jacket over the whole disc, grooves, a gloss, the hole (M-R288) */
+.disc {
+  position: absolute;
+  left: 50%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  z-index: 10;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.6);
+  opacity: 0;
+  transition: opacity 0.4s, transform 0.6s cubic-bezier(0.2, 1.3, 0.4, 1);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45), 0 0 0 3px #101014, 0 0 0 4px rgba(255, 255, 255, 0.15);
+}
+.disc.on {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+.disc .sp {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #223 center / cover no-repeat;
+  animation: vspin 2.6s linear infinite;
+}
+.disc .sp::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle, rgba(0, 0, 0, 0) 0 1.6px, rgba(0, 0, 0, 0.22) 1.9px 2.3px, rgba(0, 0, 0, 0) 2.6px 3.4px),
+    conic-gradient(from 20deg, rgba(255, 255, 255, 0) 0 8%, rgba(255, 255, 255, 0.28) 12%, rgba(255, 255, 255, 0) 18% 50%, rgba(255, 255, 255, 0.2) 60%, rgba(255, 255, 255, 0) 66%);
+}
+.disc .sp::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 16%;
+  height: 16%;
+  margin: -8%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #0a0a10 0 18%, #f3eadb 20% 100%);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.55), inset 0 0 0 3px rgba(0, 0, 0, 0.15);
+}
+
+/* the lyrics: the line sung now fills white from the left, the next one small and faint under it */
+.lyr {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  z-index: 13;
+  pointer-events: none;
+  text-align: center;
+}
+.lyr .ln {
+  font: 900 clamp(18px, 5.8vw, 25px) / 1.25 var(--font-sans);
+  letter-spacing: 0.04em;
+  background: linear-gradient(90deg, #fff 0 var(--p, 0%), rgba(255, 255, 255, 0.38) var(--p, 0%));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 6px rgba(0, 20, 60, 0.7));
+  transition: opacity 0.3s, transform 0.35s cubic-bezier(0.2, 1, 0.3, 1);
+  min-height: 1.25em;
+}
+.lyr .nx {
+  margin-top: 6px;
+  font: 800 13px/1.2 var(--font-sans);
+  color: rgba(255, 255, 255, 0.55);
+  text-shadow: 0 1px 4px rgba(0, 20, 60, 0.8);
+  transition: opacity 0.3s;
+}
+.lyr.swap .ln {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* the title: letter by letter, in the song's font and entrance */
+.kin {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 14;
+  pointer-events: none;
+  text-align: center;
+  width: 92%;
+  --kc2: #bdf0ff;
+  --kg: rgba(56, 200, 255, 0.6);
+}
+.tt {
+  margin-top: 8px;
+  font-weight: 900;
+  font-size: clamp(26px, 8.6vw, 38px);
+  line-height: 1.08;
+  letter-spacing: 0.01em;
+  word-break: keep-all;
+}
+.tt span {
+  display: inline-block;
+  background: linear-gradient(180deg, #fff 30%, var(--kc2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.35)) drop-shadow(0 0 14px var(--kg));
+  opacity: 0;
+  transform: translateY(18px) scale(0.6) rotate(-6deg);
+  transition: opacity 0.25s, transform 0.45s cubic-bezier(0.2, 1.8, 0.4, 1);
+}
+.kin.on .tt span {
+  opacity: 1;
+  transform: none;
+}
+.tt .kj {
+  font-size: 1.14em;
+}
+.tt .hr {
+  font-size: 0.8em;
+}
+.tt .kt {
+  font-size: 1em;
+}
+.tt .lt {
+  font-size: 0.92em;
+}
+.a_float .tt span {
+  transform: translateY(14px);
+  filter: blur(8px);
+  transition: opacity 0.7s, transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.9s;
+}
+.a_float.on .tt span {
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.35)) drop-shadow(0 0 14px var(--kg));
+}
+.a_slam .tt span {
+  transform: scale(2.6) translateY(-6px);
+  transition: opacity 0.12s, transform 0.32s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.a_slam.on .tt {
+  animation: kshake 0.35s 0.55s;
+}
+.a_glitch .tt span {
+  transform: translateX(var(--gx, 6px)) skewX(-12deg);
+  transition: opacity 0.05s, transform 0.18s steps(3);
+}
+.a_glitch.on .tt {
+  animation: kglitch 1.4s 0.3s steps(1) 1;
+}
+.a_brush .tt {
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 1.1s cubic-bezier(0.6, 0.1, 0.2, 1) 0.15s;
+}
+.a_brush.on .tt {
+  clip-path: inset(-20% -5% -20% 0);
+}
+.a_brush .tt span {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+.a_pop {
+  /* the default entrance: each letter pops in (the .tt span rules above) */
+  --kmotion: pop;
+}
+
+/* 02 §4 the beach: records standing on stands, in a row you scroll sideways */
+.beach {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  gap: 18px;
+  padding: 0 24px 36px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+}
+.beach::-webkit-scrollbar {
+  display: none;
+}
+.rec {
+  position: relative;
+  flex: 0 0 auto;
+  scroll-snap-align: center;
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.dk {
+  position: relative;
+  display: block;
+  border-radius: 50%;
+  background: #223 center / cover no-repeat;
+  box-shadow: 0 14px 22px rgba(60, 20, 0, 0.45), 0 0 0 3px #101014;
+}
+.dk::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle, rgba(0, 0, 0, 0) 0 1.6px, rgba(0, 0, 0, 0.22) 1.9px 2.3px, rgba(0, 0, 0, 0) 2.6px 3.4px),
+    conic-gradient(from 20deg, rgba(255, 255, 255, 0) 0 8%, rgba(255, 255, 255, 0.28) 12%, rgba(255, 255, 255, 0) 18% 50%, rgba(255, 255, 255, 0.2) 60%, rgba(255, 255, 255, 0) 66%);
+}
+.dk::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 16%;
+  height: 16%;
+  margin: -8%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #0a0a10 0 18%, #f3eadb 20% 100%);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.55);
+}
+.rec.on .dk {
+  animation: vspin 2.6s linear infinite;
+}
+.stand {
+  display: block;
+  width: 56%;
+  height: 16px;
+  margin-top: -10px;
+  border-radius: 4px 4px 6px 6px;
+  background: linear-gradient(#c58a4e, #8a5526);
+  box-shadow: 0 6px 8px rgba(60, 20, 0, 0.35);
+}
+.t2 {
+  margin-top: 6px;
+  font: 800 10px var(--font-sans);
+  color: #fff;
+  white-space: nowrap;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+.none {
+  padding: 40px 24px;
+  text-align: center;
+  font: 700 13px var(--font-sans);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+@keyframes vspin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes bop {
+  from {
+    transform: translateY(0) rotate(-4deg);
+  }
+  to {
+    transform: translateY(-8px) rotate(4deg);
+  }
+}
+@keyframes kshake {
+  20% {
+    transform: translate(-4px, 2px);
+  }
+  40% {
+    transform: translate(4px, -2px);
+  }
+  60% {
+    transform: translate(-3px, 1px);
+  }
+  80% {
+    transform: translate(2px, 0);
+  }
+}
+@keyframes kglitch {
+  0% {
+    transform: none;
+  }
+  8% {
+    transform: translate(3px, 0);
+    filter: drop-shadow(-3px 0 0 #ff2a6d) drop-shadow(3px 0 0 #05d9e8);
+  }
+  16% {
+    transform: translate(-3px, 1px);
+  }
+  24% {
+    transform: none;
+    filter: drop-shadow(2px 0 0 #ff2a6d) drop-shadow(-2px 0 0 #05d9e8);
+  }
+  40% {
+    filter: none;
+  }
+  52% {
+    transform: translate(2px, 0);
+    filter: drop-shadow(-2px 0 0 #ff2a6d) drop-shadow(2px 0 0 #05d9e8);
+  }
+  60%,
+  100% {
+    transform: none;
+    filter: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .disc .sp,
+  .rec.on .dk,
+  .ship.bob img {
+    animation: none;
+  }
+}

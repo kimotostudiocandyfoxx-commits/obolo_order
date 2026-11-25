@@ -2,12 +2,17 @@
 
 import { isHomePlanet, type HomePlanet, type Me, type PlanetHomeView } from '@obolo/shared';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { PlanetTemplateHome, type TemplateMe } from '@/components/planetTemplate/PlanetTemplateHome';
+import { planetHooks } from '@/components/planetTemplate/planetHooks';
 import { getApi } from '@/lib/api';
 import { ownFigure } from '@/lib/planetTemplate/people';
 import { SAMPLE_OWN_FIGURE, templateSample } from '@/lib/planetTemplate/sample';
+import { apiSky, sampleSky, songOf } from '@/lib/planetTemplate/sky';
 import { viewsOf } from '@/lib/story/views';
+
+/** the sample's you, dancing out of your house on Mercury's ▶ (the prototype's picture) */
+const SAMPLE_DANCE = '/planets/sample/dance-user.webp';
 
 /** your back in the view from your place: your look's own (GET /me lookBack), else the talk's stand-in */
 const backOf = (me: Me | null) => me?.lookBack ?? viewsOf('talk-user')?.back ?? '/planets/back.webp';
@@ -28,19 +33,34 @@ function Preview() {
 
   useEffect(() => {
     let live = true;
-    const sample = (me: Me | null) => ({ view: templateSample(planet), me: { name: me?.displayName || 'ミナト★', figure: ownFigure(me?.planetFigures, planet) ?? SAMPLE_OWN_FIGURE(planet), back: backOf(me) }, sample: true });
+    const sample = (me: Me | null) => ({
+      view: templateSample(planet),
+      me: { name: me?.displayName || 'ミナト★', figure: ownFigure(me?.planetFigures, planet) ?? SAMPLE_OWN_FIGURE(planet), back: backOf(me), dance: me?.chibiPic ?? SAMPLE_DANCE },
+      sample: true,
+    });
     (async () => {
       const api = getApi();
       const me = await api.me().catch(() => null);
       if (forced) return sample(me);
       const view = await api.planetHome(planet).catch(() => null);
       if (!view || !view.live || !view.around.length) return sample(me);
-      return { view, me: { name: me?.displayName || view.owner.name, figure: ownFigure(me?.planetFigures, planet), back: backOf(me) }, sample: false };
+      return { view, me: { name: me?.displayName || view.owner.name, figure: ownFigure(me?.planetFigures, planet), back: backOf(me), dance: me?.chibiPic ?? null }, sample: false };
     })().then((d) => live && setData(d));
     return () => {
       live = false;
     };
   }, [planet, forced]);
+
+  // the planet's own hooks (02 Mercury: its opener, the beach, the sky); the sample's songs and sky stay in the browser
+  const hooks = useMemo(() => {
+    if (!data) return undefined;
+    const api = getApi();
+    return planetHooks(planet, {
+      load: data.sample ? (w) => songOf(null, w) : (w) => songOf(api, w),
+      sky: data.sample ? sampleSky(planet) : apiSky(api, planet),
+      me: data.me,
+    });
+  }, [data, planet]);
 
   return (
     <main className="relative h-svh w-full overflow-hidden bg-[#04050d]" data-sample={data?.sample ? '1' : '0'}>
@@ -50,6 +70,7 @@ function Preview() {
           planet={planet}
           view={data.view}
           me={data.me}
+          hooks={hooks}
           onSwitchPlanet={(p) => router.replace(`/planets-preview/${p}${forced ? '?sample=1' : ''}`)}
         />
       )}

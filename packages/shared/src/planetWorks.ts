@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type { PlanetWorkKind } from './flying';
 import type { HomePlanet } from './planetHomeConfig';
+import type { HomeWork } from './planetHome';
 import { PLANET_FIGURE_OF, type PlanetFigure, type PlanetFigures } from './planetFigures';
 import type { SpellTag } from './spell';
 import { songGenreOf } from './songGenres';
@@ -457,6 +458,20 @@ export function figureFor(figures: PlanetFigures | null | undefined, planet: Hom
   const figure = PLANET_FIGURE_OF[planet];
   const f = figures ?? {};
   return { planet, ride: PLANET_RIDE[planet], figure, url: f[figure] ?? null, ...(planet === 'saturn' ? { ball: f.saturnBall ?? null } : {}) };
+}
+
+/** GET /planet-continents/:planet — じぶんの空: the planet's continents and your five slots (null = empty) */
+export interface ContinentSkyView {
+  planet: HomePlanet;
+  continents: ContinentView[];
+  favourites: FavouriteSlots;
+}
+
+/** GET /planet-continents/:planet/:key — landed: the works drifted there (none for a viewer under 15) */
+export interface ContinentLandingView<W = HomeWork> {
+  continent: ContinentView;
+  young: boolean;
+  works: (W & { tags: WorkTags; score: number })[];
 }
 
 // --- 02 Mercury: a song opened (handoff planets-02-mercury.md §2, M-R288) -------------------------------------------

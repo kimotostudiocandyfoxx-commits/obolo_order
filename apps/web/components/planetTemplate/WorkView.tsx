@@ -11,7 +11,15 @@ export interface OpenWork {
   work: HomeWork;
   /** in the play view (it closes by itself; no background of its own) */
   inPlay?: boolean;
+  /** where it was opened: tapped on the home, in the play view (▶), from a profile */
+  where?: 'home' | 'play' | 'profile';
+  /** tapped on the home: where the figure was (px) and its size, so it can come to the front from there */
+  from?: { x: number; y: number; size: number; flip?: boolean } | null;
+  /** the figure's picture as it floats (its figure, or the planet's stand-in) */
+  figure?: string | null;
   close: () => void;
+  /** the play view waits for this when the planet shows a work until it has finished (Mercury: the whole song) */
+  onDone?: () => void;
   openProfile: (personId: string) => void;
 }
 /** 3-2 per planet: how a work opens (02〜: the scroll on Jupiter, the CD and lyrics on Mercury, the kororin popping on Saturn …) */

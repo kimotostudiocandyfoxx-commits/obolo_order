@@ -1,4 +1,5 @@
 import { PLANET_HOMES, type HomePlanet, type HomeRel, type HomeWork, type PlanetHomeView } from '@obolo/shared';
+import { SAMPLE_SONGS, sampleSongUrl } from './mercury';
 
 /**
  * The preview's sample home (/planets-preview/<planet>?sample=1, and when the app runs without the API): the story
@@ -27,6 +28,11 @@ export function templateSample(planet: HomePlanet, now = Date.now()): PlanetHome
   const work = (i: number, name: string, pic: string, rel: HomeRel, h: number): HomeWork => {
     const fig = `/planets/sample/fig-${planet}-${pic}.webp`;
     const art = `/planets/sample/art-${(i % 5) + 1}.webp`;
+    if (planet === 'mercury') {
+      // 02: the prototype's five songs (popSh's ji: its picture is the jacket printed over the disc)
+      const k = ((i * 2 + [...name].length) % 5) + 1;
+      return { id: `mercury-s${i}`, kind, author: { id: rel === 'own' ? 'me' : `u-${name}`, name, pic: null, figure: fig }, rel, text: '', title: SAMPLE_SONGS[k - 1], url: sampleSongUrl(k), thumbUrl: `/planets/sample/art-${k}.webp`, flownAt: at(h), demo: true };
+    }
     return {
       id: `${planet}-s${i}`,
       kind,
@@ -46,8 +52,12 @@ export function templateSample(planet: HomePlanet, now = Date.now()): PlanetHome
     owner: { id: 'me', name: 'ミナト★' },
     young: false,
     lastVisitAt: at(12),
-    own: [0, 1, 2, 3].map((i) => work(100 + i, 'ミナト★', 'user', 'own', 30 + i * 40)),
-    around: CAST.map(([n, p, r], i) => work(i, n, p, r, 1 + i * 3)),
+    // Mercury: your eight records on the beach, and each friend's past songs (the prototype's profile)
+    own: Array.from({ length: planet === 'mercury' ? 8 : 4 }, (_, i) => work(100 + i, 'ミナト★', 'user', 'own', 30 + i * 40)),
+    around: [
+      ...CAST.map(([n, p, r], i) => work(i, n, p, r, 1 + i * 3)),
+      ...(planet === 'mercury' ? CAST.flatMap(([n, p, r], i) => Array.from({ length: 3 + ([...n].length % 3) }, (_, j) => work(20 + i * 10 + j, n, p, r, 40 + i * 3 + j))) : []),
+    ],
     far: [],
   };
 }

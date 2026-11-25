@@ -1,5 +1,23 @@
 import { PLANET_HOMES, type HomePlanet } from '@obolo/shared';
 import { anywhere, PLAY_HOLD_MS, PLAY_INTRO_MS, type AllowedArea } from './layout';
+import { ALL_HEARD, HOME_SEA, MHOUSE, PIER_PATH, sailMotion, seaOnly, shipStandIn } from './mercury';
+import { driftMotion, type FigureMotion } from './motion';
+
+/** a point of the play view (fractions of the screen) and the size there */
+export interface PathPoint {
+  x: number;
+  y: number;
+  size: number;
+}
+/** 3-3: how a visitor comes to you in the play view: from → sit (the work opens; `front`: then it comes closer) → away */
+export interface PlayPath {
+  from: PathPoint;
+  sit: PathPoint;
+  front?: PathPoint;
+  away: PathPoint;
+  arriveMs: number;
+  leaveMs: number;
+}
 
 /**
  * 惑星ホームの共通の型 — what changes per planet, as data and hooks. The per-planet documents (02〜) fill the hooks
@@ -16,19 +34,38 @@ export interface PlanetTemplateConfig {
   art: { home: string; view: string; profile: string };
   /** your place on the backdrop (fractions of the 9:16 picture), back right; tapped → your profile */
   place: { x: number; y: number };
-  /** 3-2: where a figure may stay (Mercury: the sea only — the hook; its numbers come with 02) */
+  /** 3-1 / 3-2: how the figures move and how many float at once (Mercury: the ships' sea lanes, 02 §1) */
+  motion: FigureMotion;
+  /** 3-2: where a figure may stay (Mercury: the sea only) */
   allowed: AllowedArea;
+  /** a figure not painted yet (null: the planet's sprite with their face) */
+  standIn: ((personId: string) => string) | null;
+  /** a work opened: how far the home behind it zooms and dims */
+  openLook: { scale: number; blur: number; bright: number };
   /** 3-3: ▶ → the first work arrives (ms). Saturn: 2.3 s (M-R304) */
   introMs: number;
-  /** 3-3: how long one work stays in front of you (ms) */
+  /** 3-3: how long one work stays in front of you (ms); `untilDone`: until it has finished (Mercury: the whole song) */
   holdMs: number;
+  play: {
+    path: PlayPath;
+    untilDone: boolean;
+    /** the view at night, fireworks over it (Mercury's pier, 02 §3) */
+    night: boolean;
+    fireworks: boolean;
+    /** you dance out of your place first (fractions of the screen), then the view turns */
+    dance: { x: number; y: number } | null;
+    /** said when every work has been seen (null: nothing) */
+    doneLine: string | null;
+  };
+  /** the sky (handoff 06, Mercury first): the sea seen from above and your island on it; null = no sky yet */
+  sky: { sea: string; me: string } | null;
 }
 
 /** the prototype's places (G5[pl].home, JTREE, MHOUSE, the record's label) */
 const PLACE: Record<HomePlanet, [number, number]> = {
   saturn: [0.72, 0.52],
   jupiter: [0.74, 0.62],
-  mercury: [0.77, 0.53],
+  mercury: [MHOUSE.x, MHOUSE.y],
   mars: [0.79, 0.54],
   venus: [0.72, 0.38],
   uranus: [0.8, 0.48],
@@ -37,6 +74,22 @@ const PLACE: Record<HomePlanet, [number, number]> = {
 };
 
 const art = (p: HomePlanet) => ({ home: `/planets/bg-${p}.webp`, view: `/planets/hv-${p}.webp`, profile: `/planets/prof-${p}.webp` });
+
+/** the common play path (the template's default: the visitor flies down to you, the work opens, it flies off) */
+export const DEFAULT_PLAY_PATH: PlayPath = { from: { x: 0.4, y: 0.2, size: 0.3 }, sit: { x: 0.18, y: 0.86, size: 1 }, away: { x: 0.9, y: 0.15, size: 0.3 }, arriveMs: 900, leaveMs: 800 };
+
+/** each planet's own numbers (the 02〜 documents) over the common template */
+const OWN: Partial<Record<HomePlanet, Partial<Omit<PlanetTemplateConfig, 'planet'>>>> = {
+  // 02 水星: seven ships on the sea lanes (MSLOT), on the sea only; a song opens with a deep zoom; ▶ is the pier at night
+  mercury: {
+    motion: sailMotion(HOME_SEA),
+    allowed: seaOnly(HOME_SEA),
+    standIn: shipStandIn,
+    openLook: { scale: 1.65, blur: 5, bright: 0.55 },
+    play: { path: PIER_PATH, untilDone: true, night: true, fireworks: true, dance: MHOUSE, doneLine: ALL_HEARD },
+    sky: { sea: '/planets/continents/mercury/sea.webp', me: '/planets/continents/mercury/me.webp' },
+  },
+};
 
 export function templateConfig(planet: HomePlanet, over: Partial<Omit<PlanetTemplateConfig, 'planet'>> = {}): PlanetTemplateConfig {
   const h = PLANET_HOMES[planet];
@@ -47,9 +100,15 @@ export function templateConfig(planet: HomePlanet, over: Partial<Omit<PlanetTemp
     icon: `/planets/icon-${planet}.webp`,
     art: art(planet),
     place: { x: PLACE[planet][0], y: PLACE[planet][1] },
+    motion: driftMotion,
     allowed: anywhere,
+    standIn: null,
+    openLook: { scale: 1.12, blur: 2.5, bright: 0.7 },
     introMs: planet === 'saturn' ? 2300 : PLAY_INTRO_MS,
     holdMs: planet === 'mars' ? PLAY_HOLD_MS.long : PLAY_HOLD_MS.default,
+    play: { path: DEFAULT_PLAY_PATH, untilDone: false, night: false, fireworks: false, dance: null, doneLine: null },
+    sky: null,
+    ...OWN[planet],
     ...over,
   };
 }
