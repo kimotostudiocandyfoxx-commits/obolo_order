@@ -357,6 +357,18 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .pdisc .stand{width:56%;height:16px;margin-top:-10px;border-radius:4px 4px 6px 6px;background:linear-gradient(#c58a4e,#8a5526);box-shadow:0 6px 8px rgba(60,20,0,.35)}
 .pdisc .tt2{margin-top:6px;font:800 10px var(--f-body);color:#fff;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.8)}
 .pdisc.on .dk{animation:vspin 2.6s linear infinite}
+.prof .phead{top:auto!important;bottom:0;justify-content:center;padding:0 14px 18px!important;background:linear-gradient(transparent,rgba(30,10,50,.5))}
+.prof .phead .pback{display:none}
+.prof .pwho{padding:6px 16px 6px 8px}.prof .pwho img{width:40px;height:40px}.prof .pwho span{font-size:15px}
+.prof .pdachi{top:0;bottom:auto!important;padding:12px 12px 10px 60px!important;background:linear-gradient(rgba(30,10,50,.55),transparent)!important;align-items:flex-start}
+.prof .pdachi .lab{display:none}
+.prof .pdachi button{width:54px}.prof .pdachi img{width:44px;height:44px}
+.prof .pdachi button.cur img{filter:drop-shadow(0 0 0 #fff) drop-shadow(0 0 6px #fff)}.prof .pdachi button.cur{color:#fff;font-weight:900}
+.prof .ptop-back{position:absolute;left:12px;top:16px;z-index:5;width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.5);background:rgba(30,10,50,.35);color:#fff;font:900 18px var(--f-body);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);cursor:pointer}
+.prof .pgal{top:92px!important;bottom:76px!important}
+.prof .pbeach{bottom:78px!important}
+.prof .pswipe{display:none!important}
+.armdoor{position:absolute;height:44px;z-index:7;cursor:pointer;border:0;background:none;transform-origin:0 50%}
 .prof .pball{position:absolute;width:44px;height:44px;margin:-22px;cursor:pointer;transition:opacity .25s}
 .prof .pball img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 5px rgba(20,0,40,.45));animation:pbob 2.6s ease-in-out infinite}
 @keyframes pbob{50%{transform:translateY(-3px)}}
@@ -464,7 +476,7 @@ button:focus-visible,.item:focus-visible,.home:focus-visible{outline:3px solid v
   <div class="fw" id="fw" aria-hidden="true"><div class="sky2"></div></div>
   <div class="fest" id="fest" aria-hidden="true"><div class="dusk"></div><div class="glow"></div></div>
   <div class="camfx" id="camfx" aria-hidden="true"></div>
-  <div class="prof" id="prof" aria-hidden="true"><div class="pbg" id="pbg"></div><div class="prec" id="prec"></div><div class="pgal" id="pgal" hidden></div><div class="pbeach" id="pbeach" hidden></div><div class="pstage" id="pstage"></div><div class="phead"><button class="pback" id="pback" type="button" aria-label="もどる">←</button><div class="pwho"><img id="pwimg" alt=""><span id="pwname"></span></div></div><div class="pdachi" id="pdachi"></div><div class="pswipe" id="pswipe" hidden>← スワイプで次のダチ →</div></div>
+  <div class="prof" id="prof" aria-hidden="true"><div class="pbg" id="pbg"></div><div class="prec" id="prec"></div><div class="pgal" id="pgal" hidden></div><div class="pbeach" id="pbeach" hidden></div><div class="pstage" id="pstage"></div><div class="phead"><button class="pback" id="pback" type="button" aria-label="もどる">←</button><div class="pwho"><img id="pwimg" alt=""><span id="pwname"></span></div></div><div class="pdachi" id="pdachi"></div><button class="ptop-back" id="pback2" type="button" aria-label="もどる">←</button><div class="pswipe" id="pswipe" hidden>← スワイプで次のダチ →</div></div>
   <div class="hv" id="hv" aria-hidden="true"><div class="hvbg" id="hvbg"></div><div class="hvfx" id="hvfx"></div><div class="vig"></div><div class="glow2"></div><div class="hvstage" id="hvstage"></div><div class="hvback" id="hvback"><img alt=""></div><div class="lb t"></div><div class="lb b"></div><div class="flash"></div></div>
   <div class="spinwrap" id="spinwrap"><div class="spinner"></div></div>
   <div class="sky" id="sky"></div>
@@ -534,7 +546,7 @@ function render(){
   if(isS&&A['rec-mask']){$('tint').style.webkitMaskImage=$('tint').style.maskImage=`url(${A['rec-mask']})`}
   $('home').classList.remove('ghost');$('home').style.left='';$('home').style.top='';stopRoll();stopJup();stopMer();if(cur==='mercury'&&mode==='anime'&&A['bg3-mercury']){$('bg').style.backgroundImage=`url(${A['bg3-mercury']})`;$('plate').hidden=true;rw.innerHTML='';$('home').classList.add('ghost');$('home').style.left=(MHOUSE[0]*100)+'%';$('home').style.top=(MHOUSE[1]*100)+'%';setupMer();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));return}
   if(cur==='jupiter'&&mode==='anime'&&A['bg3-jupiter']){$('bg').style.backgroundImage=`url(${A['bg3-jupiter']})`;$('plate').hidden=true;rw.innerHTML='';$('home').classList.add('ghost');$('home').style.left=(JTREE[0]*100)+'%';$('home').style.top=(JTREE[1]*100)+'%';setupJup();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));return}
-  if(cur==='saturn'&&A['bg2-saturn-top']){const d=document.createElement('button');d.type='button';d.className='recdoor';d.setAttribute('aria-label','自分のレコードを開く');d.style.left=(RECLBL[0]*100)+'%';d.style.top=(RECLBL[1]*100)+'%';d.onclick=()=>openProf(ME);$('sky').appendChild(d)}
+  if(cur==='saturn'&&A['bg2-saturn-top']){const d=document.createElement('button');d.type='button';d.className='recdoor';d.setAttribute('aria-label','自分のレコードを開く');d.style.left=(RECLBL[0]*100)+'%';d.style.top=(RECLBL[1]*100)+'%';d.onclick=()=>openProf(ME);$('sky').appendChild(d);const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,ax=.6*W,ay=.505*H,bx=.99*W,by=.465*H,am=document.createElement('button');am.type='button';am.className='armdoor';am.setAttribute('aria-label','自分のレコードを開く');am.style.left=ax+'px';am.style.top=(ay-22)+'px';am.style.width=Math.hypot(bx-ax,by-ay)+'px';am.style.transform=`rotate(${Math.atan2(by-ay,bx-ax)}rad)`;am.onclick=()=>openProf(ME);$('sky').appendChild(am)}
   if(cur==='saturn'){if(window.MYKORO===undefined&&!window.__picked&&!A['kor4-user']){window.__picked=1;korPicker(()=>{$('sky').innerHTML='';setupRoll()})}setupRoll();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));closeAll();return}
   const spots=[[20,33],[72,31],[46,27],[84,44],[15,47],[58,41],[33,40]];
   const list=[...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n))];
@@ -705,8 +717,8 @@ function openProfS(name,pl){const pr=$('prof'),ph=$('phone'),W=ph.clientWidth,H=
     b.style.left=(50+r*100*Math.cos(a))+'%';b.style.top=(50+r*100*Math.sin(a))+'%';b.style.width=b.style.height=(38+f*12)+'px';b.innerHTML=`<img alt="" src="${korImg(name,j)}">`;rc.appendChild(b);balls.push({b,j});
     b.addEventListener('pointerup',ev=>{if(PROF&&PROF.moved<6)pastPop(name,j,b)})}
   $('pwimg').src=PICON[pl](name,0);$('pwname').textContent=name;
-  const dl=$('pdachi');dl.innerHTML='';dl.hidden=!mine;$('pswipe').hidden=mine;
-  if(mine){dl.innerHTML=`<span class="lab">${{saturn:'ダチのレコード',jupiter:'ダチのアトリエ',mercury:'ダチの島'}[pl]}</span>`+PDACHI.map(d=>`<button type="button" data-n="${d}"><img alt="" src="${PICON[pl](d,0)}">${d}</button>`).join('');dl.querySelectorAll('button').forEach(x=>x.onclick=()=>openProf(x.dataset.n,pl))}
+  const dl=$('pdachi');dl.innerHTML='';dl.hidden=false;$('pswipe').hidden=true;
+  {const people=[ME,...PDACHI];dl.innerHTML=`<span class="lab">${{saturn:'ダチのレコード',jupiter:'ダチのアトリエ',mercury:'ダチの島'}[pl]}</span>`+people.map(d=>`<button type="button" data-n="${d}" class="${d===name?'cur':''}"><img alt="" src="${PICON[pl](d,0)}">${d===ME?'じぶん':d}</button>`).join('');dl.querySelectorAll('button').forEach(x=>x.onclick=()=>{if(x.dataset.n!==name)openProf(x.dataset.n,pl)})}
   PROF={name,pl,ang:PROF&&PROF.name===name?PROF.ang:0,vel:0,moved:0,balls};setRot();pr.classList.add('on');pr.setAttribute('aria-hidden','false');whoosh()}
 function profArt(name,ai){if(PART)return;const st=$('pstage');st.style.pointerEvents='auto';const art=openArt(st,{img:A['jart-'+ai]||'',title:JART[ai-1]});popSound();const tk='vtitle-'+ai;if(A[tk])playVoice(tk);
   const t0=performance.now();PART={t0,close(){art.close();st.style.pointerEvents='none';PART=null}};st.onclick=()=>{if(PART&&performance.now()-PART.t0>300)PART.close()}}
@@ -727,7 +739,7 @@ function pastPop(name,j,b){const st=$('pstage');if(st.childElementCount)return;p
   // swipe left/right on a dachi's record (outside the record) to visit the next dachi
   let sw=null;document.addEventListener('pointerdown',ev=>{if(PROF&&PROF.name!==ME&&ev.target.closest('#prof')&&!ev.target.closest('#prec,.phead,#pbeach,#pgal'))sw={x:ev.clientX,y:ev.clientY}});
   document.addEventListener('pointerup',ev=>{if(!sw||!PROF){sw=null;return}const dx=ev.clientX-sw.x,dy=ev.clientY-sw.y;sw=null;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)){const i=PDACHI.indexOf(PROF.name),nx=PDACHI[(i+(dx<0?1:-1)+PDACHI.length)%PDACHI.length];openProf(nx,PROF.pl)}});
-  document.addEventListener('click',ev=>{if(ev.target.closest('#pback'))closeProf();const by=ev.target.closest('.by2');if(by){ev.stopPropagation();openProf(by.textContent.replace(/^by\s*/,''))}},true);
+  document.addEventListener('click',ev=>{if(ev.target.closest('#pback,#pback2'))closeProf();const by=ev.target.closest('.by2');if(by){ev.stopPropagation();openProf(by.textContent.replace(/^by\s*/,''))}},true);
 })();
 document.addEventListener('click',e=>{const b=e.target.closest('#tstyle button');if(!b)return;window.TST=b.dataset.t;document.querySelectorAll('#tstyle button').forEach(x=>x.setAttribute('aria-pressed',x===b))});
 document.addEventListener('click',e=>{const b=e.target.closest('#bstyle button');if(!b)return;window.BST=b.dataset.b;document.querySelectorAll('#bstyle button').forEach(x=>x.setAttribute('aria-pressed',x===b));render()});
