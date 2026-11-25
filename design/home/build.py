@@ -213,5 +213,16 @@ if SAT.startswith('home2-bg-saturn-cutea') and os.path.exists(RECMASK):
     fg=(~mk)&(yy>cy)&((~inside)|(yy>cy+.6*ry))
     al=Image.fromarray((fg*255).astype('uint8')).filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(1.6))
     fi=src.convert('RGBA'); fi.putalpha(al); fi.thumbnail((720,1280)); A['sat-fg']=uri(fi,82)
+# EXTERN=1: pictures and sounds go to files next to the page (a/<key>.<ext>) instead of being inlined, so the page stays small
+if os.environ.get('EXTERN'):
+    import re as _re
+    AD=os.path.join(os.path.dirname(os.path.abspath(os.environ.get('OUT_HTML') or H+'/home-inline.html')),'a'); os.makedirs(AD,exist_ok=True)
+    for k,v in list(A.items()):
+        m=_re.match(r'data:(image|audio)/([a-z0-9.+-]+);base64,',v) if isinstance(v,str) else None
+        if not m or len(v)<6000: continue
+        ext={'jpeg':'jpg','svg+xml':'svg','mpeg':'mp3'}.get(m.group(2),m.group(2)); fn=_re.sub(r'[^A-Za-z0-9_-]','_',k)+'.'+ext
+        raw=base64.b64decode(v[m.end():]); fp=os.path.join(AD,fn)
+        if not (os.path.exists(fp) and open(fp,'rb').read()==raw): open(fp,'wb').write(raw)
+        A[k]='a/'+fn
 t=open(H+'/template.html').read().replace('/*ASSETS*/{}',json.dumps(A))
 open(os.environ.get('OUT_HTML') or H+'/home-inline.html','w').write(t); print(len(A),'assets',round(len(t)/1e6,2),'MB')
