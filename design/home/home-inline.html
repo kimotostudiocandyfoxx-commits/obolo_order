@@ -895,9 +895,6 @@ function drawSky(){const pl=EX.pl,em=$('emap'),f=favGet(pl);em.querySelectorAll(
     const c=k&&contOf(pl,k);b.innerHTML=c?islInner(pl,c):'<div class="ph"></div><b>＋ さがす</b>';b.onclick=ev=>{ev.stopPropagation();if(EX.swap){doSwap(i);return}if(c)expLand({...c,x:S[0],y:S[1]});else openSearch()};em.appendChild(b)});
   const m=document.createElement('button');m.type='button';m.className='isl me';m.style.left=EME[0]*100+'%';m.style.top=EME[1]*100+'%';m.style.width=EME[2]*100+'%';
   const s=islImg(pl,'me');m.innerHTML=(s?`<img alt="" src="${s}">`:'<div class="ph"></div>')+'<b>じぶんの島</b>';
-  const fr=[...PDACHI.slice(0,4),...[...oshi].filter(n=>!PDACHI.includes(n)).slice(0,2)],pos=[[-6,8],[96,6],[-12,48],[102,46],[16,-12],[80,-14]];
-  fr.forEach((n,j)=>{const d=document.createElement('span');d.className='fr';const P=pos[j];d.style.left=P[0]+'%';d.style.top=P[1]+'%';d.style.animationDelay=(-j*.4)+'s';
-    d.style.backgroundImage=`url(${PDACHI.includes(n)?(A['chibi4-'+CHB(n)]||A['chibi-'+CHB(n)]||''):korImg(n,0)})`;if(!PDACHI.includes(n))d.innerHTML='<i>💗</i>';m.appendChild(d)});
   m.onclick=ev=>{ev.stopPropagation();if(EX.swap)return;expClose()};em.appendChild(m)}
 function startSwap(c){const ex=$('exp');EX.swap=c;$('eswapimg').src=islImg(EX.pl,c.k)||A['isl-'+EX.pl+'-me']||'';$('eswap').querySelector('p').textContent=`「${c.n}」をどの島と入れかえる？`;ex.classList.add('swapping')}
 function endSwap(){if(!EX)return;EX.swap=null;$('exp').classList.remove('swapping')}
