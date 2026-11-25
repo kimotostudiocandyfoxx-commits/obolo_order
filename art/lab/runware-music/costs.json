@@ -1,0 +1,12 @@
+{
+  "1-ace-step-xl-sft": {
+    "cost_usd": 0.009,
+    "seconds": 12.8,
+    "model": "runware:ace-step@v1.5-xl-sft"
+  },
+  "2-minimax-music-2-6": {
+    "cost_usd": 0.15,
+    "seconds": 105.8,
+    "model": "minimax:music@2.6"
+  }
+}
