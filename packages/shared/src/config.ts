@@ -49,9 +49,10 @@ export const findManaGem = (id: string): ManaGem | undefined => MANA_GEMS.find((
  */
 export const STARTER_GEM_MANA = 40;
 /**
- * What making costs (the story's table, D08-S002). Voice kororins, photo / words-only jackets, delivering and DJ are free.
+ * What making costs: client 2026-11-25 — no fixed numbers any more. MAKE_COST (manaPrice.ts) is the fallback of the price
+ * rule (manaFor: cost + Stripe's fee + 8%); the API serves and charges the live prices. Voice kororins, photo /
+ * words-only jackets, delivering and DJ spend no mana with a yes (their small costs are added up: manaPrice.ts accrueUsage).
  */
-export const MAKE_COST = { look: 3, kororinDesign: 3, jacketArt: 3, song: 2, mv: 8, story: 1, game: 12, gameTweak: 3, mvPictures: 2, mvRedraw: 2 } as const;
 /**
  * R13 (client 2026-11-25, docs/動画の作り方.md): a video is pictures that move — no video-generation model. `mv` paints a
  * new picture per scene (FLUX.2 klein, ~0.2 yen a picture) and moves them; `mvPictures` moves the member's own pictures
@@ -71,7 +72,6 @@ export const NOVEL_MAX_CHAPTERS = 30;
 export const GAME_BUILDS_PER_DAY = 20;
 /** games a member can report as not running (the mana given back) per day */
 export const GAME_REFUNDS_PER_DAY = 3;
-export type MakeKind = keyof typeof MAKE_COST;
 /**
  * Bati's room (the Moon, P-BATI-ROOM): rounds a day per member of dressing up the Bati, and of Bati's magic on the
  * member's own look. Free during the first journey; after it each round takes the look's mana (MAKE_COST.look).

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { BATI_VARIANTS } from './batiVariants';
-import { MAKE_COST, NOVEL_CHAPTERS_PER_DAY } from './config';
+import { NOVEL_CHAPTERS_PER_DAY } from './config';
+import { MAKE_COST } from './manaPrice';
 import { CRAFT_LINE_TEXTS, CRAFT_QUESTIONS, GAME_CSP, gameDocument, gameLevel, gameSystem, gameUser, novelSystem, novelUser, questionsFor, validateGameCode, chapterChars } from './craft';
 import { demoChapter, demoGame } from './craftDemo';
 import { canFlyHome, homePlanetOf, KIND_HOME_PLANET } from './finds';
@@ -93,14 +94,18 @@ describe('ゲーム: questions → spell (mana) → code in the harness → twea
     expect(ja(spellEdit('game', t, 'もっとかんたんに').added)).toEqual(['かんたん']);
   });
   it('the first build and each tweak cost what MAKE_COST says, with the yes', () => {
-    expect(MAKE_COST.game).toBe(12);
-    expect(MAKE_COST.gameTweak).toBe(3);
-    expect(atelierMakeCost('game', 3)).toEqual({ kind: 'game', mana: 12 });
-    expect(atelierMakeCost('game', 3, true)).toEqual({ kind: 'gameTweak', mana: 3 });
-    const yes = { id: '7d1f6a3e-2b4c-4d5e-8f90-1a2b3c4d5e6f', price: 12, spell: 'game-5-x' };
-    expect(decideCharge({ kind: 'game', confirm: yes, required: true, balance: 40, applied: false, spell: 'game-5-x' })).toEqual({ do: 'charge', amount: 12 });
-    expect(decideCharge({ kind: 'gameTweak', confirm: yes, required: true, balance: 40, applied: false, spell: 'game-5-x' })).toEqual({ error: 'PRICE_CHANGED' });
-    expect(decideCharge({ kind: 'game', required: true, balance: 40, applied: false })).toEqual({ error: 'CONFIRM_REQUIRED' });
+    expect(MAKE_COST.gameTweak).toBeLessThan(MAKE_COST.game);
+    expect(atelierMakeCost('game', 3)).toEqual({ kind: 'game', mana: MAKE_COST.game });
+    expect(atelierMakeCost('game', 3, true)).toEqual({ kind: 'gameTweak', mana: MAKE_COST.gameTweak });
+    // the live price list wins over the fallback
+    expect(atelierMakeCost('game', 3, false, { ...MAKE_COST, game: 70 })).toEqual({ kind: 'game', mana: 70 });
+    const yes = { id: '7d1f6a3e-2b4c-4d5e-8f90-1a2b3c4d5e6f', price: MAKE_COST.game, spell: 'game-5-x' };
+    expect(decideCharge({ kind: 'game', confirm: yes, required: true, balance: 999, applied: false, spell: 'game-5-x' })).toEqual({ do: 'charge', amount: MAKE_COST.game });
+    expect(decideCharge({ kind: 'gameTweak', confirm: yes, required: true, balance: 999, applied: false, spell: 'game-5-x' })).toEqual({ error: 'PRICE_CHANGED' });
+    expect(decideCharge({ kind: 'game', required: true, balance: 999, applied: false })).toEqual({ error: 'CONFIRM_REQUIRED' });
+    // the price shown is what is charged: a price moved since the yes is refused, the same price is taken exactly
+    expect(decideCharge({ kind: 'game', confirm: { ...yes, price: 70 }, required: true, balance: 999, applied: false, spell: 'game-5-x', price: 70 })).toEqual({ do: 'charge', amount: 70 });
+    expect(decideCharge({ kind: 'game', confirm: yes, required: true, balance: 999, applied: false, spell: 'game-5-x', price: 70 })).toEqual({ error: 'PRICE_CHANGED' });
   });
   it('the code is checked: network, eval, other windows, html, endless loops and size are refused', () => {
     const ok = 'function game(G) { var x = 0; return { start: function () { x = 0; }, update: function (dt) { x += dt; }, draw: function () { G.circle(x, 10, 5); } }; }';

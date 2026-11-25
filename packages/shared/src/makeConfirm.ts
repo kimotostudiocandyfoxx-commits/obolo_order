@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { MAKE_COST, type MakeKind } from './config';
+import { MAKE_COST, type MakeKind, type ManaPrices } from './manaPrice';
 import { JOURNEY_DONE } from './journey';
 
 /**
@@ -21,11 +21,16 @@ export type MakeConfirm = z.infer<typeof MakeConfirm>;
  * What a making in the Moon atelier costs (MAKE_COST), or null when it is free. Free: the kororin (a voice), the radio
  * show, lookups, pictures found. The look and {bati}'s dress-up are free during the first journey (the API's rule).
  */
-export function atelierMakeCost(kind: string, journeyDay: number | null | undefined, /** a game recast / tweaked (not its first build) */ recast = false): { kind: MakeKind; mana: number } | null {
+export function atelierMakeCost(
+  kind: string,
+  journeyDay: number | null | undefined,
+  /** a game recast / tweaked (not its first build) */ recast = false,
+  /** the live prices (GET /mana/prices); the price rule's fallback until they arrive */ prices: Readonly<ManaPrices> = MAKE_COST,
+): { kind: MakeKind; mana: number } | null {
   const done = (journeyDay ?? JOURNEY_DONE) >= JOURNEY_DONE;
   // client 2026-11-25: a game spends mana (its first build, then each tweak); a book's chapters are free ('novel': null)
   const k: MakeKind | null = kind === 'song' ? 'song' : kind === 'art' ? 'jacketArt' : kind === 'video' ? 'mv' : kind === 'game' ? (recast ? 'gameTweak' : 'game') : (kind === 'look' || kind === 'bati') && done ? 'look' : null;
-  return k ? { kind: k, mana: MAKE_COST[k] } : null;
+  return k ? { kind: k, mana: prices[k] ?? MAKE_COST[k] } : null;
 }
 
 /** the ledger's idempotency key for one yes (the same yes twice is one charge) */
@@ -41,8 +46,16 @@ export type ChargeDecision = { do: 'charge'; amount: number } | { do: 'repeat' }
  * nothing is charged; a price other than the one shown → nothing is charged; a yes already charged → a repeat (no new
  * charge); not enough mana → nothing is charged; else exactly the price shown is taken.
  */
-export function decideCharge(o: { kind: MakeKind; confirm?: MakeConfirm | null; required: boolean; balance: number; applied: boolean; /** spellKey of the spell the request carries (none: null) */ spell?: string | null }): ChargeDecision {
-  const amount = MAKE_COST[o.kind];
+export function decideCharge(o: {
+  kind: MakeKind;
+  confirm?: MakeConfirm | null;
+  required: boolean;
+  balance: number;
+  applied: boolean;
+  /** spellKey of the spell the request carries (none: null) */ spell?: string | null;
+  /** the kind's price now (the API's live price list); the fallback price when not given */ price?: number;
+}): ChargeDecision {
+  const amount = o.price ?? MAKE_COST[o.kind];
   if (o.required && !o.confirm) return { error: 'CONFIRM_REQUIRED' };
   if (o.confirm && o.confirm.price !== amount) return { error: 'PRICE_CHANGED' };
   // the spell carried must be the one said yes to (and one said yes to must be carried)

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { MAKE_COST } from './config';
+import { MAKE_COST, type ManaPrices } from './manaPrice';
 import { MakeConfirm } from './makeConfirm';
 import { SpellTags, type SpellGroup, type SpellTag } from './spell';
 
@@ -82,8 +82,8 @@ export function videoParams(tags: SpellTag[]): VideoParams {
 }
 
 /** what a video's spell costs: painted scenes (MAKE_COST.mv) or the member's own pictures moved (MAKE_COST.mvPictures) */
-export function videoCost(tags: SpellTag[]): { kind: 'mv' | 'mvPictures'; mana: number } {
-  return videoParams(tags).purpose === 'pictures' ? { kind: 'mvPictures', mana: MAKE_COST.mvPictures } : { kind: 'mv', mana: MAKE_COST.mv };
+export function videoCost(tags: SpellTag[], prices: Readonly<ManaPrices> = MAKE_COST): { kind: 'mv' | 'mvPictures'; mana: number } {
+  return videoParams(tags).purpose === 'pictures' ? { kind: 'mvPictures', mana: prices.mvPictures } : { kind: 'mv', mana: prices.mv };
 }
 
 // --- the song: picked by its name ----------------------------------------------------------------------------------

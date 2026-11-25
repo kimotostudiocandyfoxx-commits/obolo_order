@@ -3,6 +3,7 @@ export * from './journey';
 export * from './neo';
 export * from './neoVoice';
 export * from './config';
+export * from './manaPrice';
 export * from './schemas';
 export * from './types';
 export * from './voice';

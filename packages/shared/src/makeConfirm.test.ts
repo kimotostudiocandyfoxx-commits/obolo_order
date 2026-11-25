@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { MAKE_COST } from './config';
+import { MAKE_COST } from './manaPrice';
 import { JOURNEY_DONE } from './journey';
 import { atelierMakeCost, confirmKey, decideCharge, MakeConfirm } from './makeConfirm';
 import { FullSongBody, StickerArtBody } from './schemas';

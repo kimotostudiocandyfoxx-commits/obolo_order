@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BATI_VARIANTS } from './batiVariants';
-import { MAKE_COST } from './config';
+import { MAKE_COST } from './manaPrice';
 import { CRAFT_QUESTIONS } from './craft';
 import { spellEdit, spellFrom, spellOfAnswers, spellPrompt, type SpellTag } from './spell';
 import { pickSong, sceneRefs, sceneTimes, songTag, VIDEO_DEFAULTS, VIDEO_LINE_TEXTS, VIDEO_QUESTIONS, videoCost, videoEdit, videoParams, videoWindow, withSong, type VideoCut } from './video';
@@ -27,7 +27,7 @@ describe('R13: a video spell → the pipeline settings', () => {
     // the member's own pictures: nothing painted, the cheap price, no painting touch on the spell
     expect(videoCost(tags)).toEqual({ kind: 'mvPictures', mana: MAKE_COST.mvPictures });
     expect(tags.some((t) => t.group === 'style')).toBe(false);
-    expect(MAKE_COST.mvPictures).toBeLessThanOrEqual(2);
+    expect(MAKE_COST.mvPictures).toBeLessThan(MAKE_COST.mv);
     expect(videoParams(spellFrom('video', 'お話のスライドで、ゆっくりズーム、12場面、1分、パッと切りかえ'))).toMatchObject({ purpose: 'slideshow', camera: 'zoom', pace: 'slow', scenes: 12, length: 'minute', transition: 'cut' });
     expect(videoParams(spellFrom('video', '空から見たカメラで'))).toMatchObject({ camera: 'fly' });
   });
