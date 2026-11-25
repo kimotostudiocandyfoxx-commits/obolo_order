@@ -106,7 +106,7 @@ const P = (x: number, y: number, size: number): ShorePoint => ({ x, y, size });
 const FIVE_SKY: SkyPlanet = { land: 'flutter', shore: { from: P(0.5, -0.12, 0.35), to: P(0.22, 0.86, 0.95), out: P(0.5, -0.2, 0.3) }, holdMs: 5200, whoTop: 0.79, home: 'きみの星', works: '作品' };
 
 export const SKY_PLANETS: Record<HomePlanet, SkyPlanet> = {
-  mercury: { land: 'sail', shore: { from: P(-0.2, 0.5, 0.35), to: P(0.24, 0.86, 1.05), out: P(1.25, 0.55, 0.45) }, holdMs: null, whoTop: 0.73, home: 'きみの島', works: '曲' },
+  mercury: { land: 'sail', shore: { from: P(-0.2, 0.5, 0.35), to: P(0.22, 0.86, 0.9), out: P(1.25, 0.55, 0.45) }, holdMs: null, whoTop: 0.73, home: 'きみの島', works: '曲' },
   jupiter: { land: 'flutter', shore: { from: P(0.5, 0.08, 0.3), to: P(0.17, 0.86, 0.9), out: P(0.5, -0.2, 0.3) }, holdMs: 7000, whoTop: 0.76, home: 'きみの森', works: 'アート' },
   saturn: { land: 'floor', shore: { from: P(0.5, -0.1, 0.4), to: P(0.5, 0.62, 1.25), out: P(1.2, 0.5, 0.6) }, holdMs: 5000, whoTop: 0.72, home: 'きみのレコード', works: '声' },
   mars: { ...FIVE_SKY, holdMs: null, works: 'MV' },
