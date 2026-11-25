@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
 import { applyMixEdit, type ChatTurn, type LlmProvider, moderateText, parseSingDirection, parseSongEdit, phraseText, singDirectionSystem, songEditSystem } from '@obolo/ai';
-import { lyricBlockKeys, lyricBlockLabels, lyricsPrompt, type FullSongBody, type SingBody, type SingDirection, type SongEditBody, type SongEditCommand, type SongEditResult, type SongLyrics, type SongMix, type SongPhrase, type SongView, type VoiceSlot } from '@obolo/shared';
+import { lyricBlockKeys, lyricBlockLabels, lyricsPrompt, lyricsSheet, normalSongTask, premiumSongTask, repaintSongTask, songSeconds, type MusicProvider, type RunwareAudioTask, type FullSongBody, type SingBody, type SingDirection, type SongEditBody, type SongEditCommand, type SongEditResult, type SongLyrics, type SongMix, type SongPhrase, type SongView, type VoiceSlot } from '@obolo/shared';
 import { and, desc, eq, isNotNull, isNull, sql } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { AppConfig, CONFIG } from '../config';
@@ -10,7 +11,9 @@ import { LLM } from '../infra/tokens';
 import { MediaService } from '../media/media.service';
 import { VoiceService } from '../voice/voice.service';
 import { guideWav, mixStems, preparePhrase, renderSong } from './mix';
-import { generateInstrumental, generateSong, type MadeSong } from './music.client';
+import { generateInstrumental, generateSong, splitSong, type MadeSong } from './music.client';
+import { audioSeconds, runwareAudio, type RunwareSong } from './runware-music';
+import type { TweakDesign } from './song-tweak.service';
 
 /** What is stored in songs.design_json. */
 interface StoredDesign {
@@ -24,8 +27,19 @@ interface StoredDesign {
   instrumentalPrompt: string;
   /** the design melody split per line (for the optional Fish guide, P-VOICE-5) */
   lineMelody: { midi: number | null; beats: number }[][];
-  /** 'acestep' = sung by the music studio as one take (2026-10-09); absent = Fish line by line */
-  engine?: 'acestep';
+  /**
+   * 'acestep' = sung by the music studio as one take (2026-10-09); absent = Fish line by line; R17 'runware' = sung on
+   * Runware (one mix): `vocalsUrl` / `guideUrl` come once our GPU split it (SongService.split), the line times with them
+   */
+  engine?: 'acestep' | 'runware';
+  /** R17: sung by the secret spell's engine */
+  premium?: boolean;
+  /** R17 runware: the song as Runware made it (MP3; what the split and a repaint start from) */
+  sourceUrl?: string;
+  /** R17 runware: Runware's own cost of the song (USD) and the task */
+  cost?: { usd: number | null; model: string; taskUUID: string };
+  /** R17 runware: whether the line times are real (the split's alignment) or spread over the song */
+  timed?: boolean;
   /** acestep: the vocal stem (HTDemucs; in the member's voice when Seed-VC could) — the instrumental stem is songs.instrumental_url */
   vocalsUrl?: string;
   /** acestep: the studio's own vocal before the voice change (for swapping voices later) */
@@ -211,9 +225,94 @@ export class SongService {
    * with the lyrics, HTDemucs splits vocals / instrumental (both kept for re-mixes), the studio's
    * lyric alignment gives each line its time (MV lyrics, edits).
    */
+  /**
+   * R17 (client 2026-11-25): which engine sings — the secret spell: MiniMax Music 2.6 on Runware (no fallback: its mana
+   * comes back and {bati} offers the normal spell); a normal song: ACE-Step 1.5 XL SFT on Runware (MUSIC_PROVIDER
+   * 'runware', the default, with MUSIC_RUNWARE_KEY), our own GPU when MUSIC_PROVIDER is 'gpu', when there is no key, or
+   * when Runware fails and the GPU is there.
+   */
   async createFull(userId: string, body: FullSongBody, origin: string): Promise<SongView> {
     const lyrics = body.sections.flatMap((s) => s.lines.map((l) => l.text)).join('\n');
     if ((await moderateText(lyrics)).flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'CONTENT_FLAGGED', 'This cannot be sung');
+    const premium = !!body.premium;
+    if (premium && !this.cfg.MUSIC_RUNWARE_KEY) throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'MUSIC_OFF', 'The music studio is not connected yet');
+    if (premium || this.provider() === 'runware') {
+      try {
+        return await this.createRunware(userId, body, origin, premium);
+      } catch (e) {
+        if (premium || !this.cfg.MUSIC_URL) throw e;
+        this.log.warn(`runware song failed, our GPU sings it: ${why(e)}`);
+      }
+    }
+    return this.createGpu(userId, body, origin);
+  }
+
+  /** R17: where a normal song is sung (Runware unless set to the GPU or without its key) */
+  provider(): MusicProvider {
+    return this.cfg.MUSIC_PROVIDER !== 'gpu' && this.cfg.MUSIC_RUNWARE_KEY ? 'runware' : 'gpu';
+  }
+
+  /** R17: one Runware task (a method, so the tests stand in for it) */
+  protected runware(task: RunwareAudioTask): Promise<RunwareSong> {
+    return runwareAudio(this.cfg.MUSIC_RUNWARE_KEY!, task);
+  }
+  protected audioSeconds(data: Buffer): Promise<number> {
+    return audioSeconds(data);
+  }
+
+  /** R17: the song sung on Runware — one mix (MP3); its stems and line times come later from our GPU, when needed */
+  private async createRunware(userId: string, body: FullSongBody, origin: string, premium: boolean): Promise<SongView> {
+    const lyrics: SongLyrics = body.lyrics ?? { blocks: body.sections.map((s) => ({ section: s.name, hints: [], lines: s.lines.map((l) => l.text).slice(0, 8) })) };
+    const style = songPrompt(body.instrumentalPrompt, body.genre);
+    const seconds = songSeconds({ tags: body.spell, lyrics, seconds: body.seconds, bpm: body.bpm });
+    const task = premium
+      ? premiumSongTask({ taskUUID: randomUUID(), prompt: style, lyrics })
+      : normalSongTask({ taskUUID: randomUUID(), prompt: lyricsPrompt(style, lyrics), lyrics, seconds, language: 'ja', bpm: body.bpm, keyRoot: body.keyRoot, scale: body.scale });
+    const got = await this.runware(task);
+    const secs = (await this.audioSeconds(got.data)) || seconds;
+    const mixM = await this.media.storeAudio(userId, 'audio/mpeg', got.data, origin);
+    const lines = body.lyrics ? lyricLinesOf(body.lyrics) : body.sections.flatMap((s) => s.lines.map((l) => ({ section: s.name, text: l.text })));
+    const phrases = timedPhrases(lines, { lines: [], seconds: secs }, body.bpm, mixM.url);
+    const design: StoredDesign = {
+      genre: body.genre,
+      mood: body.mood,
+      bpm: body.bpm,
+      keyRoot: body.keyRoot,
+      scale: body.scale,
+      progression: body.progression,
+      seconds: secs,
+      instrumentalPrompt: task.positivePrompt,
+      lineMelody: [],
+      engine: 'runware',
+      ...(premium ? { premium: true } : {}),
+      sourceUrl: mixM.url,
+      voiced: false,
+      cost: { usd: got.costUsd, model: got.model, taskUUID: got.taskUUID },
+      ...(body.lyrics ? { lyrics: body.lyrics } : {}),
+    };
+    const mix: SongMix = { ...DEFAULT_MIX, gaps: phrases.map(() => 0) };
+    const [row] = await this.db.write
+      .insert(songs)
+      .values({
+        userId,
+        title: body.title,
+        designJson: design as unknown as Record<string, unknown>,
+        // not split yet: the mix stands in for the instrumental until our GPU splits it (design.vocalsUrl then)
+        instrumentalUrl: mixM.url,
+        phrasesJson: phrases as unknown as Record<string, unknown>[],
+        mixJson: mix as unknown as Record<string, unknown>,
+        directionJson: PLAIN_DIRECTION as unknown as Record<string, unknown>,
+        mixUrl: mixM.url,
+        seconds: secs,
+        ...(body.from === 'atelier' ? { savedAt: new Date() } : {}),
+      })
+      .returning();
+    this.log.log(`song ${row.id} ${userId} "${body.title}" sung on Runware (${got.model}${premium ? ', secret spell' : ''}) ${secs}s in ${Math.round(got.ms / 1000)}s, cost ${got.costUsd ?? '?'} USD`);
+    return this.view(row);
+  }
+
+  /** the song sung by our own GPU (ACE-Step + HTDemucs + Seed-VC in one go): MUSIC_PROVIDER 'gpu', or the fallback */
+  private async createGpu(userId: string, body: FullSongBody, origin: string): Promise<SongView> {
     if (!this.cfg.MUSIC_URL) throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'MUSIC_OFF', 'The music studio is not connected yet');
     // R13: the lyric tags' words join the caption (ACE-Step: caption and lyric tags agree)
     const prompt = lyricsPrompt(songPrompt(body.instrumentalPrompt, body.genre), body.lyrics);
@@ -263,6 +362,48 @@ export class SongService {
       `song ${row.id} ${userId} "${body.title}" sung by the studio (${made.voiced ? 'member voice' : 'studio voice'}: ${made.voiceNote}), ${phrases.length} lines (${made.lines.length} timed) ${made.seconds}s`,
     );
     return this.view(row);
+  }
+
+  /**
+   * R17: a song sung on Runware split on our GPU — the vocal and the instrumental (HTDemucs), the lyric lines timed, and
+   * with `voice` sung in the member's own voice (Seed-VC). Run by the song-split job, only when a change first needs it
+   * (karaoke, the voice louder, a part cut / again, another voice); the stems are kept (no second split).
+   */
+  async split(userId: string, id: string, origin: string, o: { voice?: boolean } = {}): Promise<SongView> {
+    const row = await this.owned(userId, id);
+    const d = row.designJson as unknown as StoredDesign & TweakDesign;
+    if (d.vocalsUrl && (!o.voice || d.voiced)) return this.view(row);
+    if (!this.cfg.MUSIC_URL) throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'MUSIC_OFF', 'The music studio is not connected yet');
+    const src = await this.media.audioByUrl(userId, d.sourceUrl ?? d.original?.mixUrl ?? row.mixUrl);
+    if (!src) throw apiError(HttpStatus.NOT_FOUND, 'INSTRUMENTAL_NOT_FOUND', 'The song is missing');
+    const was = (d.original?.phrases ?? (row.phrasesJson as unknown as SongPhrase[])).map((p) => ({ section: p.section, text: p.text, label: p.label, block: p.block }));
+    const lines = d.lyrics ? lyricLinesOf(d.lyrics) : was;
+    const voice = o.voice ? await this.voiceSample(userId) : null;
+    const made = await splitSong(this.cfg.MUSIC_URL, { audio: src, lyrics: lines.map((l) => ({ section: l.section, text: l.text })), ...(d.lyrics ? { sheet: lyricsSheet(d.lyrics) } : {}), voice });
+    const [vocM, instM, guideM, mixM] = await Promise.all([
+      this.media.storeAudio(userId, 'audio/mp4', made.vocals, origin),
+      this.media.storeAudio(userId, 'audio/mp4', made.instrumental, origin),
+      this.media.storeAudio(userId, 'audio/mp4', made.guide, origin),
+      made.voiced ? this.media.storeAudio(userId, 'audio/mp4', made.mix, origin) : Promise.resolve(null),
+    ]);
+    const seconds = made.seconds || d.original?.seconds || row.seconds || d.seconds;
+    const phrases = timedPhrases(lines, { lines: made.lines, seconds }, d.bpm, vocM.url);
+    // the free changes are made from the original: now with its stems and real line times (in the member's voice: a new mix)
+    const original = { mixUrl: mixM?.url ?? d.original?.mixUrl ?? row.mixUrl, seconds, phrases };
+    const design = { ...d, vocalsUrl: vocM.url, guideUrl: guideM.url, voiced: made.voiced, timed: made.lines.length > 0, original, ...(o.voice ? { voiceTried: true } : {}) };
+    const untouched = !d.tweaks?.length;
+    const [nr] = await this.db.write
+      .update(songs)
+      .set({
+        designJson: design as unknown as Record<string, unknown>,
+        instrumentalUrl: instM.url,
+        ...(untouched ? { phrasesJson: phrases as unknown as Record<string, unknown>[], mixUrl: original.mixUrl, seconds } : {}),
+        updatedAt: new Date(),
+      })
+      .where(eq(songs.id, row.id))
+      .returning();
+    this.log.log(`song ${row.id} split on our GPU: ${made.lines.length}/${lines.length} lines timed, voice ${made.voiced ? 'member' : 'studio'} (${made.voiceNote})`);
+    return this.view(nr);
   }
 
   /** The member's own voice recording (Seed-VC reference), if they registered after 2026-10-09. */
@@ -367,7 +508,7 @@ export class SongService {
       command = parsed.command;
     }
 
-    if (design.engine === 'acestep') return this.editFull(userId, origin, row, design, phrases, mix, command, reply, partner);
+    if (design.engine === 'acestep' || design.engine === 'runware') return this.editFull(userId, origin, row, design, phrases, mix, command, reply, partner);
 
     let instrumentalUrl = row.instrumentalUrl;
     switch (command.action) {
@@ -466,8 +607,24 @@ export class SongService {
     partner: { name: string; isBati: boolean },
   ): Promise<SongEditResult> {
     const say = (bati: string, ken: string) => (partner.isBati ? bati : ken);
+    // R17: a song from Runware is one mix — a re-mix of its parts, or the member's own voice, needs our GPU's split first
+    const voiceSwap = command.action === 'VOICE_REPLACE' && command.slot === 'self';
+    if (design.engine === 'runware' && this.cfg.MUSIC_URL && (voiceSwap || ((command.action === 'VOLUME_TEMPO_EDIT' || command.action === 'TIMING_EDIT') && !design.vocalsUrl))) {
+      try {
+        const v = await this.split(userId, row.id, origin, { voice: voiceSwap });
+        if (voiceSwap) return { reply: reply || say('できたよ！聴いてみて。', 'できたケン！聴いてみろ。'), action: command.action, song: v };
+        row = await this.owned(userId, row.id);
+        design = row.designJson as unknown as StoredDesign;
+        phrases = row.phrasesJson as unknown as SongPhrase[];
+      } catch (e) {
+        if (e instanceof HttpException && (e.getResponse() as { error?: { code?: string } })?.error?.code === 'MUSIC_WARMING') {
+          return { reply: reply || say('音楽スタジオを起こしてるところ…準備できたら自動で作り直すね！', 'スタジオを起こしてるケン…準備できたら自動で作り直すぞ！'), action: command.action, song: this.view(row), pending: 'MUSIC_WARMING', command };
+        }
+        throw e;
+      }
+    }
     let instrumentalUrl = row.instrumentalUrl;
-    let vocalsUrl = design.vocalsUrl!;
+    let vocalsUrl: string | undefined = design.vocalsUrl;
     let mixUrl: string;
     let seconds: number;
     if (command.action === 'VOICE_REPLACE') {
@@ -475,6 +632,7 @@ export class SongService {
     }
     if (command.action === 'VOLUME_TEMPO_EDIT' || command.action === 'TIMING_EDIT') {
       mix = applyMixEdit(mix, command, phrases.length);
+      if (!vocalsUrl) throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'MUSIC_OFF', 'The music studio is not connected yet');
       const [inst, voc] = await Promise.all([this.media.audioByUrl(userId, instrumentalUrl), this.media.audioByUrl(userId, vocalsUrl)]);
       if (!inst || !voc) throw apiError(HttpStatus.NOT_FOUND, 'INSTRUMENTAL_NOT_FOUND', 'A part of the song is missing');
       let out: { data: Buffer; seconds: number };
@@ -488,7 +646,7 @@ export class SongService {
       seconds = out.seconds;
     } else {
       // LYRICS_EDIT / GENRE_EDIT: the whole song again; SONG_EXTEND: the song kept, new parts sung after it
-      if (!this.cfg.MUSIC_URL) throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'MUSIC_OFF', 'The music studio is not connected yet');
+      if (!this.cfg.MUSIC_URL && this.provider() !== 'runware') throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'MUSIC_OFF', 'The music studio is not connected yet');
       let lines = phrases.map((p) => ({ section: p.section, text: p.text }));
       let length = design.seconds;
       if (command.action === 'SONG_EXTEND') {
@@ -515,9 +673,19 @@ export class SongService {
         if (last && last.name === l.section && last.lines.length < 8) last.lines.push({ text: l.text, beats: 8 });
         else sections.push({ name: l.section, lines: [{ text: l.text, beats: 8 }] });
       }
+      if (this.provider() === 'runware') {
+        // R17: sung again on Runware (a longer song: the song kept and continued — ACE-Step audio to audio — when it can)
+        const again = await this.resingRunware(userId, origin, row, design, lines, length, command.action === 'SONG_EXTEND');
+        mixUrl = again.mixUrl;
+        seconds = again.seconds;
+        instrumentalUrl = again.mixUrl;
+        vocalsUrl = undefined;
+        phrases = again.phrases;
+        mix = { ...DEFAULT_MIX, gaps: phrases.map(() => 0) };
+      } else {
       let made: MadeSong;
       try {
-        made = await generateSong(this.cfg.MUSIC_URL, {
+        made = await generateSong(this.cfg.MUSIC_URL!, {
           title: row.title,
           genre: design.genre,
           mood: design.mood,
@@ -558,6 +726,8 @@ export class SongService {
       seconds = made.seconds;
       phrases = timedPhrases(lines, made, design.bpm, vocalsUrl);
       mix = { ...DEFAULT_MIX, gaps: phrases.map(() => 0) };
+      design.engine = 'acestep';
+      }
     }
     const oldVocals = design.vocalsUrl;
     design.vocalsUrl = vocalsUrl;
@@ -580,6 +750,46 @@ export class SongService {
     }
     this.log.log(`song ${row.id} edit (studio) ${JSON.stringify(command)}`);
     return { reply: reply || say('できたよ！聴いてみて。', 'できたケン！聴いてみろ。'), action: command.action, song: this.view(nr) };
+  }
+
+  /**
+   * R17: a song from the chat edits sung again on Runware: a longer one (SONG_EXTEND) continues the song as it is (ACE-Step
+   * audio to audio: the kept part, the new lines repainted after it), else — or when that fails — the whole song again.
+   * The result is one mix again (the stems come from our GPU when a change needs them).
+   */
+  private async resingRunware(userId: string, origin: string, row: SongRow, design: StoredDesign, lines: { section: SongPhrase['section']; text: string }[], length: number, extend: boolean) {
+    const lyrics: SongLyrics = { blocks: [] };
+    for (const l of lines) {
+      const last = lyrics.blocks[lyrics.blocks.length - 1];
+      if (last && last.section === l.section && last.lines.length < 8) last.lines.push(l.text);
+      else lyrics.blocks.push({ section: l.section, hints: [], lines: [l.text] });
+    }
+    const seconds = songSeconds({ lyrics, seconds: length, bpm: design.bpm });
+    const base = { prompt: design.instrumentalPrompt, lyrics, seconds, language: 'ja', bpm: design.bpm, keyRoot: design.keyRoot, scale: design.scale };
+    let got: RunwareSong | null = null;
+    if (extend) {
+      const src = await this.media.audioByUrl(userId, design.sourceUrl ?? row.mixUrl);
+      const kept = row.seconds ?? design.seconds;
+      if (src && kept + 5 < seconds) {
+        const audio = 'data:audio/mpeg;base64,' + src.toString('base64');
+        got = await this.runware(repaintSongTask({ ...base, taskUUID: randomUUID(), audio, start: Math.max(0, kept - 1), end: seconds })).catch((e) => {
+          this.log.warn(`runware extend failed, the whole song again: ${why(e)}`);
+          return null;
+        });
+      }
+    }
+    got ??= await this.runware(normalSongTask({ ...base, taskUUID: randomUUID() }));
+    const secs = (await this.audioSeconds(got.data)) || seconds;
+    const m = await this.media.storeAudio(userId, 'audio/mpeg', got.data, origin);
+    design.engine = 'runware';
+    design.sourceUrl = m.url;
+    design.guideUrl = undefined;
+    design.voiced = false;
+    design.timed = false;
+    design.cost = { usd: got.costUsd, model: got.model, taskUUID: got.taskUUID };
+    design.seconds = secs;
+    this.log.log(`song ${row.id} sung again on Runware ${secs}s, cost ${got.costUsd ?? '?'} USD`);
+    return { mixUrl: m.url, seconds: secs, phrases: timedPhrases(lines, { lines: [], seconds: secs }, design.bpm, m.url) };
   }
 
   /** Sing some lines again (lyrics or voice changed); the others are kept as they are. */

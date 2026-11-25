@@ -197,6 +197,17 @@ const Env = z.object({
 
   /** Cloud Run GPU service that makes Mercury instrumentals (gpu/music). Unset = not available yet. */
   MUSIC_URL: secret(),
+  /**
+   * R17 (client 2026-11-25): where songs are sung — 'runware' (ACE-Step 1.5 XL SFT on Runware, default) or 'gpu' (our own
+   * ACE-Step on Cloud Run, the old path; also the fallback when Runware fails or has no key). Our GPU still splits a song
+   * (stems, line times) and sings it in the member's voice, lazily (song-split jobs).
+   */
+  MUSIC_PROVIDER: z.preprocess((v) => (v === '' ? undefined : v), z.enum(['runware', 'gpu']).default('runware')),
+  /** R17: the Runware key for songs (the secret obolo-seedream-api-key, like the looks and the MVs) */
+  MUSIC_RUNWARE_KEY: secret(),
+  /** R17: the secret spell ('off' turns it off for everyone) and its passphrases (comma-separated; default 「上級魔法で」) */
+  PREMIUM_SPELL: z.preprocess((v) => (v === '' ? undefined : v), z.enum(['on', 'off']).default('on')),
+  PREMIUM_SPELL_WORDS: secret(),
 
   /**
    * Client 2026-11-25 (docs/マナの値段.md): mana = ceil((cost + Stripe's fee share) × (1 + MANA_MARGIN)), 1 yen = 1 mana.

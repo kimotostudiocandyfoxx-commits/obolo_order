@@ -1,4 +1,4 @@
-import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, Logger, Optional } from '@nestjs/common';
 import { parseSongTweak, songTweakSystem, type LlmProvider } from '@obolo/ai';
 import {
   blockSpans,
@@ -11,6 +11,7 @@ import {
   tweakPlan,
   tweakSegments,
   tweakWhat,
+  tweakNeedsSplit,
   type Segment,
   type SongLyrics,
   type SongPhrase,
@@ -25,13 +26,23 @@ import { songs } from '../db/schema';
 import { LLM } from '../infra/tokens';
 import { MediaService } from '../media/media.service';
 import { renderTweak } from './tweak';
+import { JobsService } from '../jobs/jobs.service';
 
 type SongRow = typeof songs.$inferSelect;
+/** R17: 「自分の声で」 — the member's own recorded voice (not another voice: that is sung again) */
+const OWN_VOICE = /自分の声|わたしの声|私の声|ボクの声|僕の声|ぼくの声|俺の声|おれの声|うちの声/;
+const OWN_VOICE_WHAT = 'あなたの声に';
 /** one version after the original: the ops from the original, and what they made */
 export type TweakVersion = { ops: SongTweakOp[]; mixUrl: string; seconds: number; phrases: SongPhrase[]; at: string };
 /** what songs.design_json keeps for the free changes (next to the song's design) */
 export type TweakDesign = {
-  engine?: 'acestep';
+  /** R17 'runware': one mix until our GPU split it (vocalsUrl then) */
+  engine?: 'acestep' | 'runware';
+  /** R17 runware: the song as Runware made it */
+  sourceUrl?: string;
+  /** R17: the vocal is in the member's own voice (Seed-VC on our GPU); voiceTried: it was asked once (no recording: no) */
+  voiced?: boolean;
+  voiceTried?: boolean;
   bpm: number;
   vocalsUrl?: string;
   lyrics?: SongLyrics;
@@ -53,6 +64,7 @@ export class SongTweakService {
     @Inject(LLM) private readonly llm: LlmProvider,
     private readonly db: Database,
     private readonly media: MediaService,
+    @Optional() private readonly jobs?: JobsService,
   ) {}
 
   async tweak(userId: string, id: string, body: SongTweakBody, origin: string): Promise<SongTweakResult> {
@@ -68,7 +80,12 @@ export class SongTweakService {
     else if (body.said) {
       const p = parseTweak(body.said);
       if (p.undo) undo = true;
-      else if (p.paid) return { status: 'paid', paid: p.paid, ...base };
+      else if (p.paid === 'voice' && OWN_VOICE.test(body.said) && d.engine === 'runware') {
+        // R17: 「自分の声で歌って」 — our GPU sings it in the member's recorded voice (Seed-VC), once; free like a re-mix
+        if (d.voiced) return { status: 'done', what: OWN_VOICE_WHAT, song: { url: row.mixUrl, seconds: row.seconds ?? original.seconds, phrases: row.phrasesJson as unknown as SongPhrase[] }, ...base };
+        const jobId = d.voiceTried ? null : await this.startSplit(userId, id, origin, true);
+        return jobId ? { status: 'wait', jobId, ...base } : { status: 'paid', paid: p.paid, ...base };
+      } else if (p.paid) return { status: 'paid', paid: p.paid, ...base };
       else if (p.ops.length) ops = p.ops;
       else {
         const m = await this.byModel(body.said);
@@ -89,14 +106,25 @@ export class SongTweakService {
       return r.success ? [r.data] : [];
     });
     if (!ops.length) return { status: 'none', ...base };
-    if (d.engine !== 'acestep' || !d.vocalsUrl || !row.instrumentalUrl) return { status: 'paid', paid: 'melody', ...base };
     const all = [...nowOps, ...ops];
     const plan = tweakPlan(all);
+    // R17: a song from Runware is one mix — tempo, key, length and fades are made from it; the voice / the music apart or
+    // a part cut / again need our GPU's split first (once: a job; {bati} says 「ちょっと待ってね」, then the same words again)
+    const runware = d.engine === 'runware';
+    if (runware && !d.vocalsUrl && tweakNeedsSplit(plan)) {
+      const jobId = await this.startSplit(userId, id, origin);
+      if (!jobId) return { status: 'paid', paid: 'melody', ...base };
+      return { status: 'wait', jobId, ...base };
+    }
+    if ((d.engine !== 'acestep' && !runware) || (!runware && !d.vocalsUrl) || !row.instrumentalUrl) return { status: 'paid', paid: 'melody', ...base };
     const spans = blockSpans(original.phrases, d.bpm, original.seconds);
     const { segments, missing } = tweakSegments(spans, original.seconds, plan);
     if (missing && ops.every((o) => o.op === 'cut' || o.op === 'repeat')) return { status: 'missing', ...base };
     const moved = tweakPhrases(original.phrases, d.bpm, segments, plan, original.seconds);
-    const out = await this.render(userId, { instrumentalUrl: row.instrumentalUrl, vocalsUrl: d.vocalsUrl, segments, plan, seconds: original.seconds, total: moved.seconds });
+    const out = d.vocalsUrl
+      ? await this.render(userId, { instrumentalUrl: row.instrumentalUrl, vocalsUrl: d.vocalsUrl, segments, plan, seconds: original.seconds, total: moved.seconds })
+      : // the mix alone (no stems yet): it stands in as the music, the voice part of the plan is not used
+        await this.render(userId, { instrumentalUrl: d.sourceUrl ?? original.mixUrl, vocalsUrl: d.sourceUrl ?? original.mixUrl, segments, plan: { ...plan, stem: 'instrumental' }, seconds: original.seconds, total: moved.seconds });
     const mixUrl = await this.store(userId, out.data, origin);
     history.push({ ops: all, mixUrl, seconds: out.seconds, phrases: moved.phrases, at: new Date().toISOString() });
     // the oldest versions after the original go first
@@ -121,6 +149,14 @@ export class SongTweakService {
   }
 
   // --- the table and the audio (only the member's own song) ----------------------------------------------------------
+
+  /** R17: the song's split on our GPU (a job; the one already running is reused); null when there is no GPU / no jobs */
+  protected async startSplit(userId: string, id: string, origin: string, voice = false): Promise<string | null> {
+    if (!this.jobs) return null;
+    const running = (await this.jobs.active(userId)).find((j) => j.kind === 'song-split');
+    if (running) return running.id;
+    return (await this.jobs.create(userId, 'song-split', { songId: id, origin, ...(voice ? { voice: true } : {}) })).id;
+  }
 
   protected async load(userId: string, id: string): Promise<SongRow> {
     const [row] = await this.db.write

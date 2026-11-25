@@ -13,6 +13,9 @@ import { SongTweakService } from './song-tweak.service';
 import { Database } from '../db/db';
 import { LedgerService } from '../wallet/ledger.service';
 import { startConfirmed } from '../wallet/confirmed';
+import { IncantService } from '../moon/incant.service';
+import { apiError } from '../common/errors';
+import { HttpStatus } from '@nestjs/common';
 
 /** Mercury 作曲 (see ComposeService). */
 @Controller('compose')
@@ -26,6 +29,7 @@ export class ComposeController {
     private readonly ledger: LedgerService,
     private readonly db: Database,
     @Inject(KV) private readonly kv: KvStore,
+    private readonly incants: IncantService,
   ) {}
 
   @Post('chat')
@@ -76,14 +80,17 @@ export class ComposeController {
     // R11: the work is made from exactly the spell said yes to (its English); R13: and sung from exactly the lyrics said
     // yes to (their sections come from them, not from the request)
     const styled = spell ? { ...rest, instrumentalPrompt: spellPrompt('song', spell).slice(0, 500) } : rest;
-    const song = b.lyrics ? { ...styled, sections: lyricsSections(b.lyrics), ...(b.lyrics.title && !b.title ? { title: b.lyrics.title } : {}) } : styled;
+    const sung = b.lyrics ? { ...styled, sections: lyricsSections(b.lyrics), ...(b.lyrics.title && !b.title ? { title: b.lyrics.title } : {}) } : styled;
+    // R17: the spell's talismans go with the job (its length); the secret spell only with a member's live grant
+    const song = { ...sung, ...(spell ? { spell } : {}) };
+    if (b.premium && !(await this.incants.check(userId, b.premium))) throw apiError(HttpStatus.FORBIDDEN, 'SPELL_CHANGED', 'スペルが変わったみたい。もう一回、たしかめてね。');
     return startConfirmed({
       ledger: this.ledger,
       db: this.db,
       kv: this.kv,
       jobs: this.jobs,
       userId,
-      kind: 'song',
+      kind: b.premium ? 'songPremium' : 'song',
       confirm,
       spell: songSpellKey(spell, b.lyrics),
       required: b.from === 'atelier',

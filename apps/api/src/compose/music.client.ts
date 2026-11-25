@@ -154,3 +154,52 @@ async function songOnGpu(baseUrl: string, body: FullSongBody & { prompt: string;
     instrumental: Buffer.from(j.instrumental, 'base64'),
   };
 }
+
+/**
+ * R17: POST /split — a song made elsewhere (Runware) split on our GPU (HTDemucs), its lyric lines timed (Whisper on the
+ * vocal, matched to the lyrics) and, with a recording, sung in the member's voice (Seed-VC). No song is generated: it
+ * is called lazily, only when a change first needs the stems / the times or the member's voice. AAC stems back.
+ */
+export async function splitSong(
+  baseUrl: string,
+  body: { audio: Buffer; lyrics: { section: string; text: string }[]; sheet?: string; language?: string; voice?: Buffer | null; similarity?: number },
+): Promise<MadeSong> {
+  const url = baseUrl.replace(/\/$/, '');
+  const token = await idToken(url);
+  let res: Response;
+  try {
+    res = await fetch(`${url}/split`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}) },
+      body: JSON.stringify({
+        audio: body.audio.toString('base64'),
+        lyrics: body.lyrics.slice(0, 48),
+        ...(body.sheet ? { sheet: body.sheet } : {}),
+        language: body.language ?? 'ja',
+        ...(body.voice ? { voice: body.voice.toString('base64'), similarity: body.similarity ?? 0.7 } : {}),
+      }),
+      signal: AbortSignal.timeout(600_000),
+    });
+  } catch (e) {
+    log.warn(`music service unreachable: ${String(e)}`);
+    throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'MUSIC_WARMING', 'The music studio is starting up');
+  }
+  if (res.status === 503 || res.status === 429) throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'MUSIC_WARMING', 'The music studio is starting up');
+  if (!res.ok) {
+    const text = (await res.text().catch(() => '')).slice(0, 200);
+    log.warn(`music service split ${res.status}: ${text}`);
+    throw apiError(HttpStatus.BAD_GATEWAY, 'MUSIC_FAILED', `The song could not be split (${res.status}): ${text}`);
+  }
+  const j = (await res.json()) as { seconds: number; lines?: MadeSong['lines']; mix: string; vocals: string; guide?: string; instrumental: string; voiced?: boolean; voiceNote?: string };
+  log.log(`song split ${j.seconds}s, ${j.lines?.length ?? 0} line times, voice: ${j.voiced ? 'member' : 'studio'}`);
+  return {
+    seconds: Number(j.seconds) || 0,
+    lines: Array.isArray(j.lines) ? j.lines : [],
+    mix: Buffer.from(j.mix, 'base64'),
+    vocals: Buffer.from(j.vocals, 'base64'),
+    guide: Buffer.from(j.guide ?? j.vocals, 'base64'),
+    instrumental: Buffer.from(j.instrumental, 'base64'),
+    voiced: !!j.voiced,
+    voiceNote: String(j.voiceNote ?? ''),
+  };
+}

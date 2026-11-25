@@ -7,7 +7,7 @@ environment (/opt/svc: PyTorch 2.4, transformers 4.46 as Seed-VC pins them), nex
 as a small local HTTP server that app.py starts and calls:
 
 POST /convert {source, target, out, steps, cfg} (wav paths)  → {ok, shift, seconds}
-POST /transcribe {path, language}                           → {ok, text}  (Whisper: which take sang the words)
+POST /transcribe {path, language, timestamps?}              → {ok, text, chunks?}  (Whisper: which take sang the words; R17 line times)
 GET  /health                                                → {ready, error}
 
 `python svc_worker.py download` fetches the checkpoints at image build time (no GPU needed).
@@ -171,11 +171,32 @@ def asr():
     return models["asr"]
 
 
-def transcribe(path: str, language: str = "ja") -> dict:
+def transcribe(path: str, language: str = "ja", timestamps: bool = False) -> dict:
+    """What was sung; with `timestamps` (R17: a Runware song's lines timed after the split) also the pieces heard with
+    their times ([{text, start, end}], word level when Whisper can, else its segments)."""
     t = time.time()
-    out = asr()(path, chunk_length_s=30, batch_size=4, generate_kwargs={"language": language, "task": "transcribe"})
+    kw = {"chunk_length_s": 30, "batch_size": 4, "generate_kwargs": {"language": language, "task": "transcribe"}}
+    chunks = None
+    if timestamps:
+        for how in ("word", True):
+            try:
+                out = asr()(path, return_timestamps=how, **kw)
+                chunks = [
+                    {"text": c.get("text", ""), "start": float(c["timestamp"][0] or 0), "end": float(c["timestamp"][1] if c["timestamp"][1] is not None else (c["timestamp"][0] or 0))}
+                    for c in (out.get("chunks") or [])
+                ]
+                break
+            except Exception as e:  # noqa: BLE001 — word times are not there for every model: segments then
+                print(f"timestamps={how} failed: {e!r}", flush=True)
+        else:
+            out = asr()(path, **kw)
+    else:
+        out = asr()(path, **kw)
     text = out["text"] if isinstance(out, dict) else str(out)
-    return {"ok": True, "text": text.strip(), "seconds": round(time.time() - t, 1)}
+    res = {"ok": True, "text": text.strip(), "seconds": round(time.time() - t, 1)}
+    if chunks is not None:
+        res["chunks"] = chunks
+    return res
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -197,7 +218,7 @@ class Handler(BaseHTTPRequestHandler):
             req = json.loads(self.rfile.read(int(self.headers.get("content-length", "0"))) or b"{}")
             with lock:
                 if self.path.startswith("/transcribe"):
-                    res = transcribe(req["path"], req.get("language", "ja"))
+                    res = transcribe(req["path"], req.get("language", "ja"), bool(req.get("timestamps")))
                 else:
                     res = convert(req["source"], req["target"], req["out"], int(req.get("steps", 30)), float(req.get("cfg", 0.7)), float(req.get("lift", 0)))
             self._send(200, res)

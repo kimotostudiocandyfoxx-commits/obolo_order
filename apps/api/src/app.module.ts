@@ -35,6 +35,7 @@ import { MoonWorksController } from './moon/moon-works.controller';
 import { MoonWorksService } from './moon/moon-works.service';
 import { SpellController } from './moon/spell.controller';
 import { SpellService } from './moon/spell.service';
+import { IncantService } from './moon/incant.service';
 import { LyricsService } from './moon/lyrics.service';
 import { SpellToolsController } from './moon/spell-tools.controller';
 import { SpellBookService } from './moon/spell-book.service';
@@ -177,6 +178,7 @@ import { WalletController } from './wallet/wallet.controller';
     FindsService,
     MoonWorksService,
     SpellService,
+    IncantService,
     LyricsService,
     SpellBookService,
     MoonCompassService,

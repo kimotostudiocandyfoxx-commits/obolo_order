@@ -66,6 +66,10 @@ jobs:
             echo 'ADMIN_TOKEN=obolo-admin-token:latest'
             # the looks and the Bati are painted by Seedream (client decision 2026-10-25)
             echo 'LOOK_RUNWARE_KEY=obolo-seedream-api-key:latest'
+            # R17: songs are sung on Runware (ACE-Step 1.5 XL SFT; the secret spell: MiniMax Music 2.6) with the same key.
+            # MUSIC_PROVIDER=gpu (variable) goes back to our own GPU; PREMIUM_SPELL=off turns the secret spell off;
+            # PREMIUM_SPELL_WORDS sets its passphrases (separated by | — default 「上級魔法で」)
+            echo 'MUSIC_RUNWARE_KEY=obolo-seedream-api-key:latest'
             # Fish Audio voices: switched on once the key is in Secret Manager (FISH_ENABLED=true).
             # {bati}'s default voice until a member's own is made: the variable FISH_DEFAULT_VOICE_ID (env_vars below),
             # the model id printed by the "Default Bati voice" workflow (make-default-bati-voice.yml)
@@ -192,6 +196,9 @@ jobs:
             GPU_SECOND_JPY=${{ vars.GPU_SECOND_JPY || '0.05' }}
             CPU_SECOND_JPY=${{ vars.CPU_SECOND_JPY || '0.01' }}
             MUSIC_URL=${{ vars.MUSIC_REGION && format('https://obolo-music-{0}.{1}.run.app', vars.GCP_PROJECT_NUMBER, vars.MUSIC_REGION) || '' }}
+            MUSIC_PROVIDER=${{ vars.MUSIC_PROVIDER || 'runware' }}
+            PREMIUM_SPELL=${{ vars.PREMIUM_SPELL || 'on' }}
+            PREMIUM_SPELL_WORDS=${{ vars.PREMIUM_SPELL_WORDS }}
           secrets: ${{ steps.sec.outputs.list }}
 
       - name: Check it is up

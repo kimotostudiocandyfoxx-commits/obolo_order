@@ -776,6 +776,108 @@ def song(r: SongReq):
         raise HTTPException(500, f"song failed: {e!r}"[:400]) from e
 
 
+class SplitReq(BaseModel):
+    """R17: a song made elsewhere (Runware) — split, its lines timed, and (with a recording) sung in the member's voice.
+    Nothing is generated: the API calls this lazily, only when a change first needs the stems / the times / the voice."""
+
+    audio: str = Field(max_length=16_000_000)
+    lyrics: list[LyricLine] = Field(min_length=1, max_length=48)
+    sheet: str | None = Field(None, max_length=4000)
+    language: str = Field("ja", max_length=8)
+    voice: str | None = Field(None, max_length=3_000_000)
+    similarity: float = Field(0.7, ge=0, le=1)
+    voiceSteps: int = Field(30, ge=10, le=100)
+    voicePrep: str = "clean"
+    voiceLift: float = Field(0.0, ge=0, le=12)
+
+
+def norm_ja(t: str) -> str:
+    import re
+    import unicodedata
+
+    t = unicodedata.normalize("NFKC", t)
+    t = "".join(chr(ord(c) - 0x60) if "ァ" <= c <= "ヶ" else c for c in t)  # katakana → hiragana
+    return re.sub(r"[\s、。，．,.!?！？「」『』()（）ー〜~…・-]", "", t)
+
+
+def align_lines(lines: list[str], chunks: list[dict], seconds: float) -> list[dict]:
+    """Each lyric line's time from what Whisper heard on the vocal (pieces with times): the heard characters get times
+    (spread inside their piece), the lyric characters are matched to them (difflib), a line runs from its first matched
+    character to its last; a line with no match sits between its neighbours. Every line comes back, in order."""
+    import difflib
+
+    heard, times = [], []
+    for c in chunks:
+        s = norm_ja(c.get("text", ""))
+        if not s:
+            continue
+        a, b = float(c.get("start", 0)), float(c.get("end", 0))
+        b = max(b, a + 0.2)
+        for k, ch in enumerate(s):
+            heard.append(ch)
+            times.append(a + (b - a) * (k + 0.5) / len(s))
+    want, owner = [], []
+    for i, l in enumerate(lines):
+        for ch in norm_ja(l):
+            want.append(ch)
+            owner.append(i)
+    span: list[list[float]] = [[] for _ in lines]
+    if heard and want:
+        for m in difflib.SequenceMatcher(None, want, heard, autojunk=False).get_matching_blocks():
+            for k in range(m.size):
+                span[owner[m.a + k]].append(times[m.b + k])
+    out: list[dict | None] = [{"start": min(t), "end": max(t)} if len(t) >= 2 else None for t in span]
+    # lines not heard: between their neighbours (or spread at the ends)
+    for i, o in enumerate(out):
+        if o is not None:
+            continue
+        prev = next((out[j]["end"] for j in range(i - 1, -1, -1) if out[j]), None)
+        nxt = next((out[j]["start"] for j in range(i + 1, len(out)) if out[j]), None)
+        a = prev if prev is not None else (0.0 if nxt is None else max(0.0, nxt - 4.0))
+        b = nxt if nxt is not None else min(seconds, a + 4.0)
+        out[i] = {"start": a, "end": max(a + 0.5, b)}
+    return [{"text": lines[i], "start": round(o["start"], 2), "end": round(o["end"], 2)} for i, o in enumerate(out)]
+
+
+@app.post("/split")
+def split(r: SplitReq):
+    """R17: split + align only (HTDemucs, Whisper line times; Seed-VC with a recording) — for a Runware song."""
+    import base64
+
+    if state["error"]:
+        raise HTTPException(500, f"model failed to load: {state['error'][:300]}")
+    t0 = time.time()
+    try:
+        with gen_lock, tempfile.TemporaryDirectory() as d:
+            src_in = os.path.join(d, "src_in")
+            with open(src_in, "wb") as f:
+                f.write(base64.b64decode(r.audio))
+            wav = os.path.join(d, "song.wav")
+            subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", src_in, "-ar", "48000", "-ac", "2", wav], check=True)
+            seconds = len(read_audio(wav)[0]) / 48000
+            vocals, inst = separate(wav, d)
+            lines: list[dict] = []
+            mono = vocals + ".16k.wav"
+            subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", vocals, "-ac", "1", "-ar", "16000", mono], check=True)
+            try:
+                res = svc_call("POST", "/transcribe", {"path": mono, "language": r.language, "timestamps": True}, timeout=300)
+                if res.get("ok") and res.get("chunks"):
+                    lines = align_lines([l.text for l in r.lyrics], res["chunks"], seconds)
+                else:
+                    print(f"split: no line times ({res.get('error')})", flush=True)
+            except Exception as e:  # noqa: BLE001 — the stems are still good without the times
+                print(f"split: line times failed {e!r}", flush=True)
+            sr = SongReq(prompt="split", lyrics=r.lyrics, seconds=max(10.0, min(180.0, seconds)), language=r.language, voice=r.voice, similarity=r.similarity, voiceSteps=r.voiceSteps, voicePrep=r.voicePrep, voiceLift=r.voiceLift, takes=1)
+            payload = finish_song(None, wav, lines, sr, seconds, d, t0, split=(vocals, inst))  # type: ignore[arg-type]
+            payload["seconds"] = round(seconds, 1)
+            return payload
+    except HTTPException:
+        raise
+    except Exception as e:  # noqa: BLE001
+        traceback.print_exc()
+        raise HTTPException(500, f"split failed: {e!r}"[:400]) from e
+
+
 def sung_score(vocals: str, r: "SongReq") -> tuple[float, str]:
     """How much of the lyrics a take really sang: Whisper's hearing vs the lyrics (0–1, -1 if unknown)."""
     import difflib

@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { LYRIC_HINT_DEFS, lyricsCaption, lyricsSheet, type LyricSection, type SongLyrics } from './lyrics';
 import type { SpellTag } from './spell';
 import type { TweakPlan } from './songTweak';
@@ -214,6 +215,12 @@ export function tweakNeedsSplit(plan: Pick<TweakPlan, 'cuts' | 'repeats' | 'voca
 
 // --- 上級魔法 (the secret spell) -------------------------------------------------------------------------------------
 
+/** POST /moon/incant: words a member said to {bati} in the atelier (checked on the server only) */
+export const IncantBody = z.object({ said: z.string().trim().min(1).max(400) });
+export type IncantBody = z.infer<typeof IncantBody>;
+/** not the passphrase, not a member, or turned off: always just { premium: false } (no sign the spell exists) */
+export type IncantView = { premium: false } | { premium: true; grant: string; price: number; /** the words after the passphrase ('' = none) */ request: string };
+
 /**
  * the passphrase (client 2026-11-25: 「上級魔法で」, word of mouth only — never in the story): a message that has it
  * (「上級魔法で、夏の曲を唱えて」「上級魔法でお願い」「じょうきゅうまほうで」) is the secret spell, the rest the request.
@@ -253,7 +260,8 @@ export function premiumRequest(said: string, words: string[]): string | null {
 /** the passphrases from the setting ('' / unset: the default) */
 export function premiumWords(setting: string | undefined | null): string[] {
   const list = (setting ?? '')
-    .split(',')
+    // commas (as asked), or | and 、 (a deploy's env list splits on commas)
+    .split(/[,|、，]/)
     .map((w) => w.trim())
     .filter(Boolean);
   return list.length ? list : PREMIUM_WORDS_DEFAULT;

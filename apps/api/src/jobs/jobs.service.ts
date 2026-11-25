@@ -27,13 +27,15 @@ type Inputs = {
   demo: DemoJobBody;
   /** client 2026-11-25: a game built or tweaked (its yes: the mana goes back when it fails for good) */
   game: GameJobInput;
+  /** R17: a finished song split on our GPU (stems, line times; `voice`: sung in the member's voice too) — when a change first needs it */
+  'song-split': { songId: string; origin: string; voice?: boolean };
 };
 
 /** what a job's free costs are filed under (its paid making comes from the charge's scope) */
 const FEATURE_OF: Record<JobKind, CostCtx['feature']> = { song: 'songEdit', 'mv-story': 'videoEdit', 'mv-edit': 'videoEdit', 'mv-lyrics': 'videoEdit', demo: 'other', game: 'other' };
 
 /** what each job is timed as (M-R253 §4) */
-export const ETA_OF: Record<JobKind, EtaKind> = { song: 'song', 'mv-story': 'mv', 'mv-lyrics': 'mv', demo: 'demo', game: 'game', 'mv-edit': 'mvEdit' };
+export const ETA_OF: Record<JobKind, EtaKind> = { song: 'song', 'mv-story': 'mv', 'mv-lyrics': 'mv', demo: 'demo', game: 'game', 'mv-edit': 'mvEdit', 'song-split': 'mvEdit' };
 type Patch = Partial<typeof jobs.$inferInsert>;
 
 /** A job running longer than this was lost (its instance went away): the member may try again. */
@@ -225,6 +227,20 @@ export class JobsService implements OnModuleInit {
           }
         }
       }
+      case 'song-split': {
+        const input = row.inputJson as unknown as Inputs['song-split'];
+        const until = Date.now() + WARM_WAIT_MS;
+        for (;;) {
+          try {
+            await this.stage(row.id, 'splitting');
+            return { song: await this.songs.split(row.userId, input.songId, input.origin, { voice: !!input.voice }) };
+          } catch (e) {
+            if (errorOf(e).code !== 'MUSIC_WARMING' || Date.now() > until) throw e;
+            await this.stage(row.id, 'warming');
+            await new Promise((r) => setTimeout(r, 15_000));
+          }
+        }
+      }
       case 'mv-story': {
         const input = row.inputJson as unknown as Inputs['mv-story'];
         await this.stage(row.id, 'painting');
@@ -260,9 +276,10 @@ export class JobsService implements OnModuleInit {
   }
 
   /** R16: a paid song that could not be made gives its mana back (once per yes) */
-  protected async refundSong(userId: string, input: { confirm?: MakeConfirm }): Promise<number> {
+  protected async refundSong(userId: string, input: { confirm?: MakeConfirm; body?: { premium?: string } }): Promise<number> {
     if (!input.confirm) return 0;
-    return this.ledger.refundYes(this.db, userId, 'song', input.confirm).catch((e) => {
+    // R17: the secret spell's yes was charged as its own kind
+    return this.ledger.refundYes(this.db, userId, input.body?.premium ? 'songPremium' : 'song', input.confirm).catch((e) => {
       this.log.error(`song refund failed for ${userId}: ${String(e)}`);
       return 0;
     });
@@ -298,6 +315,8 @@ export class JobsService implements OnModuleInit {
    * it opens that card there.
    */
   private async notify(row: Row, ok: boolean, result?: Record<string, unknown> | null) {
+    // R17: a split is a short wait in the talk (the change follows it), not a work of its own
+    if (row.kind === 'song-split') return;
     const input = row.inputJson as { from?: string; body?: { from?: string; title?: string } };
     const atelier = input.from === 'atelier' || input.body?.from === 'atelier' || row.kind === 'demo';
     const url = atelier ? `/moon/atelier?job=${row.id}` : row.kind === 'song' ? '/mercury' : '/mars';
