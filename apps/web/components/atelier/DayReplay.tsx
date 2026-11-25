@@ -11,6 +11,7 @@ import { workMarkRef } from '@/lib/finds/works';
 import { usePartner } from '@/lib/partner';
 import { BATI_COLOR, batiLook, characterLook, SELF_COLOR, selfLook, selfTone } from '@/lib/talk/looks';
 import { BowlFx } from './BowlFx';
+import { useCastWait } from './CastClock';
 import { keepFace } from './makers';
 import { refreshWork, stale } from './refresh';
 import { batiTalkPlace } from './temple';
@@ -78,6 +79,9 @@ export function BatiDay({ day, at, onBack }: { day: string; /** M-R253 §5: open
       ? { id: m.id, who: 'bati', text: m.work.status === 'making' ? '' : (m.work.title ?? ''), mark: { kind: 'local', id: m.id }, card: { label: m.work.title ?? m.work.prompt, thumb: <WorkThumb w={m.work} />, full: <DayCard id={m.work.id} fallback={m.work} /> } }
       : { id: m.id, who: m.who === 'me' ? 'me' : 'bati', text: m.text, mark: { kind: 'local', id: m.id } },
   );
+  // R18: a work of the day still being made — the bowl glows divinely and the clock counts down (the refreshed time)
+  const reducedMotion = typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  const wait = useCastWait(msgs, reducedMotion);
   const get = (id: string) => allRef.current.find((m): m is Extract<Msg, { who: 'work' }> => m.who === 'work' && m.work.id === id)?.work;
   return (
     <Fresh.Provider value={{ get, look, put }}>
@@ -94,7 +98,8 @@ export function BatiDay({ day, at, onBack }: { day: string; /** M-R253 §5: open
           items={items}
           framing="ots"
           {...batiTalkPlace()}
-          placeFx={(m) => <BowlFx state="idle" at={m.at} scale={m.scale} reduced />}
+          placeFx={(m) => <BowlFx state={wait.rise ? { rise: wait.rise } : wait.active ? 'divine' : 'idle'} at={m.at} scale={m.scale} reduced={reducedMotion} tint={wait.palette} paused={wait.hidden} />}
+          stage={wait.stage}
           top={4}
           fixedSelfFace={me?.story?.[TALK_FIXED_FACE_KEY] === '1'}
           onRing={(it, at) => it.mark && ring.open(it.mark.kind, it.mark.id, at)}

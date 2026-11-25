@@ -54,6 +54,7 @@ function meItem(m: { id: string; text: string; file?: ClipFile | null }): TalkIt
 }
 import { useClipSend } from '@/lib/clip/useClip';
 import { BowlFx, TEMPLE_PLATE, type BowlState } from './BowlFx';
+import { useCastWait } from './CastClock';
 import { faceTo, FLIES, uid, versionsOf, type Msg, type Work } from './work';
 import { isYes, planOf, spellKindOf, type Plan } from './plan';
 import { FloatingSpell, floatLayout, MANA_H, SpellRecord, type FloatSpell } from './FloatingSpell';
@@ -1961,9 +1962,11 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   // left; a slow one still running after the cast keeps a soft shimmer with {bati} back in the middle
   const quickMaking = msgs.some((m) => m.who === 'work' && m.work.status === 'making' && !m.work.job?.long);
   const slowMaking = msgs.some((m) => m.who === 'work' && m.work.status === 'making' && !!m.work.job?.long);
-  const bowl: BowlState = rising ? { rise: rising } : castTill > 0 || quickMaking ? 'glow' : slowMaking ? 'shimmer' : 'idle';
-  const casting = bowl === 'glow' || typeof bowl === 'object';
   const reducedMotion = typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  // R18 (client): a work waited for — the bowl glows divinely and the arcane clock over it counts down (the talk ends above it)
+  const wait = useCastWait(msgs, reducedMotion);
+  const bowl: BowlState = rising ? { rise: rising } : castTill > 0 || quickMaking ? 'glow' : slowMaking ? (wait.active ? 'divine' : 'shimmer') : wait.showing ? 'divine' : 'idle';
+  const casting = bowl === 'glow' || typeof bowl === 'object';
 
   // a slow card does not keep {bati} 'thinking' (you may go away meanwhile)
   const making = msgs.some((m) => m.who === 'work' && m.work.status === 'making' && !m.work.job?.long);
@@ -2007,7 +2010,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
         // song on its day had no bowl and no cast: the story kept its own place then)
         place={TEMPLE_PLATE.src}
         placeAspect={TEMPLE_PLATE.aspect}
-        placeFx={(m) => <BowlFx state={bowl} at={m.at} scale={m.scale} reduced={reducedMotion} />}
+        placeFx={(m) => <BowlFx state={bowl} at={m.at} scale={m.scale} reduced={reducedMotion} tint={wait.palette} paused={wait.hidden} />}
         // client 2026-11-25: the spell's talismans in the sky over the bowl (the talk ends above them)
         stage={
           floating || tool
@@ -2071,7 +2074,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
                   ),
                 };
               }
-            : undefined
+            : wait.stage
         }
         // R10 (client): {bati} in the middle, facing you, a step in front of the bowl (big enough to hide its lower rim);
         // only while it casts (the bowl glows: something is being made or changed) it goes to the left and casts into the
