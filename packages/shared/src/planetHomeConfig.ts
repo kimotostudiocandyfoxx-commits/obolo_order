@@ -217,7 +217,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
     releaseOrder: 4,
   },
   // Uranus / Pluto / Neptune: words from the story team's template (design/home); Pluto's books and Neptune's games are
-  // the Moon's (books / games, flown by POST /moon/books|games/:id/fly, handoff 05); Uranus has no store of goods yet
+  // the Moon's (books / games, flown by POST /moon/books|games/:id/fly, handoff 05); Uranus' goods too (POST /moon/goods/:id/fly)
   uranus: {
     planet: 'uranus',
     en: 'URANUS',
@@ -225,7 +225,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
     cta: '中に入る',
     verb: '見る',
     name: '天王星',
-    store: null,
+    store: 'goods',
     work: 'グッズ',
     place: 'お店',
     inside: 'お店',

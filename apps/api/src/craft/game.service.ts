@@ -11,7 +11,7 @@ import { GAME_CHEAP_LLM, GAME_LLM, GAME_TRIAL_LLM, KV, LLM } from '../infra/toke
 import { LedgerService } from '../wallet/ledger.service';
 import { PlanetWorksService } from '../planets/planet-works.service';
 import { seesWork } from '../planets/planet-songs.service';
-import { gameFacts, gameView, notFound, sentTo, type GameRow } from './craft.store';
+import { gameFacts, gameView, notFound, ownArt, sentTo, type GameRow } from './craft.store';
 
 /** what a game job carries (the yes too: its mana goes back when the build fails for good) */
 export type GameJobInput = { gameId?: string; tags: SpellTag[]; said?: string; confirm: MakeConfirm; kind: GameMakeKind; from: 'atelier'; /** R17: the trial's template */ template?: GameTemplateId };
@@ -113,6 +113,22 @@ export class GameService {
     await this.db.write.update(games).set({ flownAt, updatedAt: new Date() }).where(eq(games.id, row.id));
     if (on) await this.works?.tag('game', row.id, gameFacts(row));
     return { id: row.id, flownAt: flownAt?.toISOString() ?? null };
+  }
+
+  /**
+   * story 2026-11-25: the case's picture — one of the member's own arts (a Jupiter root of theirs: an art {bati} painted
+   * for it is one too, made and paid as any art), or null for the neon face. Neptune's case shows it.
+   */
+  async cover(userId: string, id: string, rootId: string | null): Promise<GameView> {
+    const row = await this.own(userId, id);
+    const root = rootId ? await ownArt(this.db, userId, rootId) : null;
+    if (rootId && !root) throw notFound('Art');
+    const [saved] = await this.db.write
+      .update(games)
+      .set({ coverUrl: root?.url ?? null, coverRootId: root?.id ?? null, updatedAt: new Date() })
+      .where(eq(games.id, row.id))
+      .returning();
+    return gameView(saved ?? { ...row, coverUrl: root?.url ?? null, coverRootId: root?.id ?? null });
   }
 
   /** before the charge: the words are checked and a tweak's game is the member's own */

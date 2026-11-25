@@ -48,6 +48,7 @@ import { SpellBookService } from './moon/spell-book.service';
 import { MoonCompassService } from './moon/moon-compass.service';
 import { CraftController } from './craft/craft.controller';
 import { GameService } from './craft/game.service';
+import { GoodsService } from './craft/goods.service';
 import { NovelService } from './craft/novel.service';
 import { InfraModule } from './infra/infra.module';
 import { LinksController } from './links/links.controller';
@@ -224,6 +225,7 @@ import { StorageWorksService } from './storage/storage-works.service';
     MoonCompassService,
     NovelService,
     GameService,
+    GoodsService,
     LinksService,
   ],
 })

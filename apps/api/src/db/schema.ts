@@ -1104,9 +1104,37 @@ export const games = pgTable(
     active: integer('active').notNull().default(0),
     homePlanet: text('home_planet').notNull().default('neptune'),
     flownAt: timestamp('flown_at', { withTimezone: true }),
+    /** story 2026-11-25: the case's picture — one of the member's arts (or one {bati} painted for it); null: the neon face */
+    coverUrl: text('cover_url'),
+    coverRootId: uuid('cover_root_id'),
     ...timestamps,
   },
   (t) => [index('games_user_idx').on(t.userId, t.createdAt)],
+);
+
+/**
+ * Story session 2026-11-25 (グッズ): a goods item made in the Moon atelier — one of the six kinds with one of the
+ * member's own arts (a Jupiter root) printed on it. Nothing is painted: the art's picture (`art_url`, the root's file,
+ * shared not copied) is composited onto the kind's mock-up by the app. Home: Uranus, once flown (`flown_at`).
+ */
+export const goods = pgTable(
+  'goods',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    /** トート / Tシャツ / ステッカー / アクスタ / マグカップ / 缶バッジ (GOODS_KINDS) */
+    kind: text('kind').notNull(),
+    /** the art it was made from (no foreign key: a thrown-away art leaves the print as it was) */
+    rootId: uuid('root_id'),
+    artUrl: text('art_url').notNull(),
+    title: text('title').notNull(),
+    homePlanet: text('home_planet').notNull().default('uranus'),
+    flownAt: timestamp('flown_at', { withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [index('goods_user_idx').on(t.userId, t.createdAt), index('goods_flown_idx').on(t.flownAt)],
 );
 
 /**

@@ -435,6 +435,13 @@
       "when": 1795621261475,
       "tag": "0061_art_titles",
       "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1795622707997,
+      "tag": "0062_goods_game_covers",
+      "breakpoints": true
     }
   ]
 }

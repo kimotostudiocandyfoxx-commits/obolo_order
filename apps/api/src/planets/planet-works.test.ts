@@ -139,7 +139,8 @@ describe('2-2 a dachi work never reaches continents, search, travel or the far s
     expect(r.sql).toContain('NOT EXISTS (SELECT 1 FROM work_hides h');
     expect(r.sql).toContain('user_blocks b');
     expect(r.sql).toContain('SELECT 1 FROM users a WHERE a.id = "planet_posts"."user_id"');
-    expect(continentWhere('me', 'uranus')).toBeNull();
+    // story 2026-11-25: Uranus' goods are read the same way
+    expect(render(continentWhere('me', 'uranus')!).sql).toContain(`"goods"."deleted_at" IS NULL AND "goods"."flown_at" IS NOT NULL`);
   });
   it('the far scenery of a home asks the same (a work with no row is never public)', () => {
     const r = render(farWhere(storeOf('jupiter')!, 'me', 'jupiter_post', flyingSince()));

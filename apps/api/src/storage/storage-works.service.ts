@@ -15,10 +15,11 @@ export const WORK_TABLES: Record<RemovableWorkKind, string> = {
   radio_show: 'radio_shows',
   book: 'books',
   game: 'games',
+  goods: 'goods',
 };
 
 /** the member's own rows that may still point at a file (a file one of them uses is kept) */
-export const REF_TABLES = ['songs', 'saturn_posts', 'jupiter_roots', 'jupiter_posts', 'mars_backstage', 'radio_shows', 'planet_posts', 'mv_projects', 'books', 'games', 'moon_works'] as const;
+export const REF_TABLES = ['songs', 'saturn_posts', 'jupiter_roots', 'jupiter_posts', 'mars_backstage', 'radio_shows', 'planet_posts', 'mv_projects', 'books', 'games', 'goods', 'moon_works'] as const;
 
 /** every http(s) URL in a row's text (the files its columns and JSON point at) */
 export function urlsIn(text: string): string[] {

@@ -32,11 +32,17 @@ describe('05 the stores of the five planets', () => {
     expect(render(s.live).sql).toBe('("games"."deleted_at" IS NULL AND "games"."flown_at" IS NOT NULL)');
     expect(render(s.text).sql).toContain(`"games"."versions_json" -> "games"."active" ->> 'howTo'`);
     expect(render(s.title).sql).toContain(`"games"."title"`);
+    // story 2026-11-25: the case shows its picture (one of the maker's arts); none: the app's neon face
+    expect(render(s.thumb).sql).toBe('"games"."cover_url"');
   });
-  it('Uranus: nothing makes goods yet (no store: the home answers with your place only); Mars / Venus as before', () => {
-    expect(PLANET_HOMES.uranus.store).toBeNull();
-    expect(storeOf('uranus')).toBeNull();
-    expect(render(workSeenWhere('me', 'uranus')).sql).toBe('FALSE');
+  it('Uranus (story 2026-11-25): goods once flown; the words are its kind (the mock-up drawn), the picture its art; Mars / Venus as before', () => {
+    expect(PLANET_HOMES.uranus.store).toBe('goods');
+    const s = storeOf('uranus')!;
+    expect(render(s.live).sql).toBe('("goods"."deleted_at" IS NULL AND "goods"."flown_at" IS NOT NULL)');
+    expect(render(s.text).sql).toBe('"goods"."kind"');
+    expect(render(s.thumb).sql).toBe('"goods"."art_url"');
+    expect(render(workSeenWhere('me', 'uranus')).sql).toContain('"goods"."user_id" = $');
+    expect(PLANET_WORK_KINDS).toContain('goods');
     expect(PLANET_HOMES.mars.store).toBe('planet_post');
     expect(PLANET_HOMES.venus.store).toBe('radio_show');
     expect(PLANET_WORK_KINDS).toEqual(expect.arrayContaining(['book', 'game']));
@@ -109,5 +115,21 @@ describe('05 the backfill', () => {
     expect(t).toMatchObject({ main: 'ローファイ', moods: expect.arrayContaining(['チル']) });
     // the joins it reads through (kept honest if a table is renamed)
     expect([marsBackstage, mvProjects, songs, radioShows, books, games].every(Boolean)).toBe(true);
+  });
+});
+
+describe('Venus (story 2026-11-25): a show’s topic from the text model, as Saturn’s kororin; the word rules as the fallback', () => {
+  const facts: WorkFacts = { userId: 'u', planet: 'venus', tags: { main: '雑談', moods: ['深夜', 'トーク'], bpm: null }, words: '好きな人の話をするラジオ' };
+  it('the model’s topic; the moods stay how the show is spoken', async () => {
+    const seen: string[] = [];
+    const svc = new PlanetWorksService({} as never, { name: 'gemini', chat: async (r: { history: { text: string }[] }) => (seen.push(r.history[0].text), '{"topic":"恋バナ"}') } as never);
+    expect(await svc.tagsFor('radio_show', facts)).toEqual({ main: '恋バナ', moods: ['深夜', 'トーク'], bpm: null });
+    expect(seen[0]).toContain('好きな人の話をするラジオ');
+  });
+  it('a failing model (or offline) keeps the word rules’ topic', async () => {
+    const down = new PlanetWorksService({} as never, { name: 'gemini', chat: async () => Promise.reject(new Error('quota')) } as never);
+    expect(await down.tagsFor('radio_show', facts)).toEqual(facts.tags);
+    const off = new PlanetWorksService({} as never, { name: 'mock', chat: async () => 'OK' } as never);
+    expect(await off.tagsFor('radio_show', facts)).toEqual(facts.tags);
   });
 });

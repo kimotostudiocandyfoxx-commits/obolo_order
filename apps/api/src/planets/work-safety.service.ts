@@ -3,7 +3,7 @@ import type { PlanetWorkKind, PlanetWorkReportBody } from '@obolo/shared';
 import { and, eq } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
-import { books, games, jupiterPosts, personHides, planetPosts, radioShows, saturnPosts, userReports, workHides } from '../db/schema';
+import { books, games, goods, jupiterPosts, personHides, planetPosts, radioShows, saturnPosts, userReports, workHides } from '../db/schema';
 
 /**
  * M-R213: a stranger's work on a planet's wide place carries 〔通報〕 and 〔見えなくする〕.
@@ -20,7 +20,7 @@ export class WorkSafetyService {
 
   /** the work's maker (null when it does not exist) */
   protected async author(kind: PlanetWorkKind, id: string): Promise<string | null> {
-    const t = kind === 'saturn_post' ? saturnPosts : kind === 'jupiter_post' ? jupiterPosts : kind === 'planet_post' ? planetPosts : kind === 'book' ? books : kind === 'game' ? games : radioShows;
+    const t = kind === 'saturn_post' ? saturnPosts : kind === 'jupiter_post' ? jupiterPosts : kind === 'planet_post' ? planetPosts : kind === 'book' ? books : kind === 'game' ? games : kind === 'goods' ? goods : radioShows;
     const [r] = await this.db.read.select({ u: t.userId }).from(t as typeof radioShows).where(eq(t.id, id));
     return r?.u ?? null;
   }

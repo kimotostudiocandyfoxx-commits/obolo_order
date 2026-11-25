@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { spellFrom } from '@obolo/shared';
 import { MockProvider } from './providers';
 import type { ChatRequest, LlmProvider } from './types';
-import { readVoiceTopic, VOICE_TOPIC_SYSTEM, voiceTopicTags } from './voiceTopic';
+import { readVoiceTopic, SHOW_TOPIC_SYSTEM, showTopicTags, VOICE_TOPIC_SYSTEM, voiceTopicTags } from './voiceTopic';
 import { spellSystem } from './prompts/spell';
 
 const model = (answer: string | Error, seen: ChatRequest[] = []): LlmProvider =>
@@ -51,5 +51,26 @@ describe('M-R317: the art spell knows ゆめかわ・和モダン・レトロ・
     // a song's ポップ is still the song genre
     expect(spellFrom('song', 'ポップな曲').find((t) => t.group === 'genre')?.ja).toBe('ポップ');
     expect(spellSystem('art')).toMatch(/ゆめかわ.*和モダン.*レトロ.*ポップ/);
+  });
+});
+
+describe('Venus (story 2026-11-25): a radio show’s topic from the text model, the word rules as the fallback', () => {
+  it('asks once, small and at temperature 0, with the title (and the talk when there is one); the topic only', async () => {
+    const seen: ChatRequest[] = [];
+    const t = await showTopicTags('深夜の恋バナ相談室', '好きな人に告白したい人の話', model('{"topic":"恋バナ"}', seen));
+    expect(t).toEqual({ main: '恋バナ', moods: [], bpm: null });
+    expect(seen).toHaveLength(1);
+    expect(seen[0].temperature).toBe(0);
+    expect(seen[0].maxOutputTokens).toBeLessThanOrEqual(60);
+    expect(seen[0].history[0].text).toContain('深夜の恋バナ相談室');
+    expect(seen[0].history[0].text).toContain('告白');
+    expect(SHOW_TOPIC_SYSTEM).toContain('雑談');
+  });
+  it('an unknown topic is 雑談; offline, a failure or an unreadable answer is null (the word rules stand)', async () => {
+    expect((await showTopicTags('料理ラジオ', null, model('{"topic":"料理"}')))?.main).toBe('雑談');
+    expect(await showTopicTags('x', null, model(new Error('quota')))).toBeNull();
+    expect(await showTopicTags('x', null, model('chat'))).toBeNull();
+    expect(await showTopicTags('推しラジオ', null, new MockProvider())).toBeNull();
+    expect(await showTopicTags('  ', null, model('{"topic":"推し"}'))).toBeNull();
   });
 });

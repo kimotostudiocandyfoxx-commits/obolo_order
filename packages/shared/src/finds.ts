@@ -22,7 +22,7 @@ export const MAX_STARS = 3;
  * radio show); utterances: buddy_messages, dachi_messages; `local` = something kept on the device only (the atelier's
  * looks / pictures / its {bati} talk, the demo's songs) — its id is the device's own.
  */
-export const MARKED_KINDS = ['saturn_post', 'jupiter_root', 'song', 'mars_backstage', 'radio_show', 'buddy_message', 'dachi_message', 'local', 'book', 'game'] as const;
+export const MARKED_KINDS = ['saturn_post', 'jupiter_root', 'song', 'mars_backstage', 'radio_show', 'buddy_message', 'dachi_message', 'local', 'book', 'game', 'goods'] as const;
 export type MarkedKind = (typeof MARKED_KINDS)[number];
 
 export interface ItemMarkView {
@@ -66,7 +66,8 @@ export const KIND_HOME_PLANET = { voice: 'saturn', art: 'jupiter', song: 'mercur
 export type HomedKind = keyof typeof KIND_HOME_PLANET;
 export const homePlanetOf = (kind: string): BluenaPlanet | null => (KIND_HOME_PLANET as Record<string, BluenaPlanet>)[kind] ?? null;
 /** the kinds whose planet has its screen and its 〔星へ飛ばす〕 now (the others keep their home planet as data only) */
-export const FLY_READY_KINDS = ['voice', 'art', 'song', 'video', 'radio'] as const;
+// story 2026-11-25: goods (Uranus), books (Pluto) and games (Neptune) fly too, now their homes show them
+export const FLY_READY_KINDS = ['voice', 'art', 'song', 'video', 'radio', 'goods', 'novel', 'game'] as const;
 export const canFlyHome = (kind: string): boolean => (FLY_READY_KINDS as readonly string[]).includes(kind);
 
 /** a work as Bluena's list shows it (newest first) */

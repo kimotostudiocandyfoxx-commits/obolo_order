@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
-import { LlmProvider, moderateText, voiceTopicTags } from '@obolo/ai';
+import { LlmProvider, moderateText, showTopicTags, voiceTopicTags } from '@obolo/ai';
 import {
   artTags,
   effectiveVisibility,
@@ -19,8 +19,8 @@ import {
 import { and, desc, eq, inArray, isNull, sql, type SQL } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
-import { bluenaSaves, books, games, jupiterPosts, jupiterRoots, marsBackstage, mvProjects, personHides, planetPosts, planetWorkMeta, radioShows, saturnPosts, songs, userBlocks } from '../db/schema';
-import { bookFacts, gameFacts } from '../craft/craft.store';
+import { bluenaSaves, books, games, goods, jupiterPosts, jupiterRoots, marsBackstage, mvProjects, personHides, planetPosts, planetWorkMeta, radioShows, saturnPosts, songs, userBlocks } from '../db/schema';
+import { bookFacts, gameFacts, goodsFacts } from '../craft/craft.store';
 import { LLM } from '../infra/tokens';
 
 type Meta = typeof planetWorkMeta.$inferSelect;
@@ -32,6 +32,8 @@ export interface WorkFacts {
   tags: WorkTags;
   /** the title / words that go through the automatic check before the work may go public */
   words: string;
+  /** Venus: what is said about / in the show, when it is known (its topic reads it with the title) */
+  talk?: string | null;
 }
 
 /**
@@ -84,6 +86,12 @@ export class PlanetWorksService {
    * null = not known (the model failed): the work keeps no topic and the backfill asks again.
    */
   async tagsFor(kind: PlanetWorkKind, facts: WorkFacts): Promise<WorkTags> {
+    // story 2026-11-25 Venus: a show's topic is asked of the same model (its title, and what is said in it when known);
+    // its moods stay how it is spoken (radioTags); the word rules stand when the model has no answer
+    if (kind === 'radio_show') {
+      const t = await showTopicTags(facts.words, facts.talk, this.llm).catch(() => null);
+      return t?.main ? { ...facts.tags, main: t.main } : facts.tags;
+    }
     if (kind !== 'saturn_post' || facts.tags.main) return facts.tags;
     return (await voiceTopicTags(facts.words, this.llm).catch(() => null)) ?? facts.tags;
   }
@@ -122,6 +130,14 @@ export class PlanetWorksService {
     if (kind === 'game') {
       const [r] = await this.db.read.select().from(games).where(and(eq(games.id, id), isNull(games.deletedAt)));
       return r ? gameFacts(r) : null;
+    }
+    if (kind === 'goods') {
+      const [r] = await this.db.read
+        .select({ userId: goods.userId, kind: goods.kind, title: goods.title, spell: jupiterRoots.spellJson })
+        .from(goods)
+        .leftJoin(jupiterRoots, eq(jupiterRoots.id, goods.rootId))
+        .where(and(eq(goods.id, id), isNull(goods.deletedAt)));
+      return r ? goodsFacts(r, r.spell) : null;
     }
     if (kind === 'jupiter_post') {
       const [r] = await this.db.read
@@ -247,7 +263,7 @@ export class PlanetWorksService {
    */
   async backfill(limit = 200): Promise<Record<PlanetWorkKind, number>> {
     const missing = (kind: PlanetWorkKind, id: SQL) => sql`NOT EXISTS (SELECT 1 FROM planet_work_meta pm WHERE pm.kind = ${kind} AND pm.work_id = ${id})`;
-    const pick = async (kind: PlanetWorkKind, t: typeof planetPosts | typeof jupiterPosts | typeof saturnPosts | typeof radioShows | typeof books | typeof games, extra?: SQL) =>
+    const pick = async (kind: PlanetWorkKind, t: typeof planetPosts | typeof jupiterPosts | typeof saturnPosts | typeof radioShows | typeof books | typeof games | typeof goods, extra?: SQL) =>
       (
         await this.db.read
           .select({ id: t.id })
@@ -256,7 +272,7 @@ export class PlanetWorksService {
           .orderBy(t.createdAt)
           .limit(limit)
       ).map((r) => r.id);
-    const done = { saturn_post: 0, jupiter_post: 0, planet_post: 0, radio_show: 0, book: 0, game: 0 } as Record<PlanetWorkKind, number>;
+    const done = { saturn_post: 0, jupiter_post: 0, planet_post: 0, radio_show: 0, goods: 0, book: 0, game: 0 } as Record<PlanetWorkKind, number>;
     const lists: [PlanetWorkKind, string[]][] = [
       ['planet_post', await pick('planet_post', planetPosts)],
       ['jupiter_post', await pick('jupiter_post', jupiterPosts)],

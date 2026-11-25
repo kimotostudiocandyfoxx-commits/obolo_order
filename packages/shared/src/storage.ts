@@ -238,7 +238,7 @@ export type StorageExpandResult = { status: 'charged' | 'repeat' | 'already'; vi
 export const StorageToldBody = z.object({ what: z.enum(['near', 'grace', 'lapsed']) });
 
 /** the found work kinds that can be thrown away from Bluena (DELETE /storage/works/:kind/:id) */
-export const REMOVABLE_WORK_KINDS = ['song', 'saturn_post', 'jupiter_root', 'mars_backstage', 'radio_show', 'book', 'game'] as const;
+export const REMOVABLE_WORK_KINDS = ['song', 'saturn_post', 'jupiter_root', 'mars_backstage', 'radio_show', 'book', 'game', 'goods'] as const;
 export type RemovableWorkKind = (typeof REMOVABLE_WORK_KINDS)[number];
 export const isRemovableWorkKind = (k: string): k is RemovableWorkKind => (REMOVABLE_WORK_KINDS as readonly string[]).includes(k);
 export type RemoveWorkResult = { removed: number; freedBytes: number; view: StorageView };

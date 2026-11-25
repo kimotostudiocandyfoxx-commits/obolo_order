@@ -142,6 +142,9 @@ export type GameBrokenBody = z.infer<typeof GameBrokenBody>;
 /** 05: POST /moon/books/:id/fly · /moon/games/:id/fly — to its home planet (Pluto / Neptune), or back (`on: false`) */
 export const CraftFlyBody = z.object({ on: z.boolean().default(true) });
 export type CraftFlyBody = z.infer<typeof CraftFlyBody>;
+/** story 2026-11-25: PUT /moon/games/:id/cover — one of the member's own arts (a Jupiter root of theirs) on the case; null: the neon face */
+export const GameCoverBody = z.object({ rootId: z.string().uuid().nullable() });
+export type GameCoverBody = z.infer<typeof GameCoverBody>;
 
 export interface GameView {
   id: string;
@@ -155,6 +158,8 @@ export interface GameView {
   code: string;
   /** its home planet (KIND_HOME_PLANET.game: Neptune), stored with the game */
   home: BluenaPlanet;
+  /** story 2026-11-25: the case's picture (one of the member's arts, or one {bati} painted for it); null: the neon face */
+  cover?: string | null;
   createdAt: string;
   updatedAt: string;
 }

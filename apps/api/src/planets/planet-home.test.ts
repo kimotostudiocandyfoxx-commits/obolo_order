@@ -107,10 +107,8 @@ describe('PlanetHomeService', () => {
     expect(v.young).toBe(true);
     expect(v.far).toEqual([]);
   });
-  it('feed: a planet with no store yet answers with your place only', async () => {
-    const db = fakeDb([[{ id: 'me', name: 'ネオ', onboarding: {} }], []]);
-    const v = await new PlanetHomeService(db as never).feed('me', 'uranus', now);
-    expect(v).toMatchObject({ live: false, own: [], around: [], far: [], young: true });
+  it('feed: every planet has its store now (story 2026-11-25: Uranus’ goods were the last)', () => {
+    for (const p of Object.keys(PLANET_HOMES) as (keyof typeof PLANET_HOMES)[]) expect(storeOf(p), p).not.toBeNull();
   });
   it('〔推す〕: a young viewer cannot push a stranger, nor anyone a young stranger; a dachi stays in the list', async () => {
     const svc = (answers: unknown[], writes: unknown[] = []) => new PlanetHomeService(fakeDb(answers, writes) as never);

@@ -17,6 +17,7 @@ import { VIDEO_VARIANTS } from './videoVariants';
 import { BLUENA_VARIANTS } from './bluenaVariants';
 import { STORAGE_VARIANTS } from './storageVariants';
 import { ART_TITLE_VARIANTS } from './artTitle';
+import { GOODS_VARIANTS } from './goods';
 
 export type BatiVariantSet = Record<Exclude<BatiOrdinaryPersonality, 'genki'>, string>;
 
@@ -35,6 +36,8 @@ export const BATI_VARIANTS: Record<string, BatiVariantSet> = {
   ...STORAGE_VARIANTS,
   // story 2026-11-25: an art's title, proposed and changed in the talk (artTitle.ts; PROVISIONAL)
   ...ART_TITLE_VARIANTS,
+  // story 2026-11-25: グッズ in the Moon atelier and a game's case art (goods.ts; PROVISIONAL)
+  ...GOODS_VARIANTS,
   "……やぁ！": {
     teinei: "……こんにちは！",
     kansai: "……まいど！",

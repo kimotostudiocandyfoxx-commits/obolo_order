@@ -24,7 +24,7 @@ import { and, eq, inArray, isNull, or, sql, type SQL } from 'drizzle-orm';
 import { dachiOf, notHidden, notPersonHidden, viewerIsYoung } from '../common/child';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
-import { books, follows, games, jupiterPosts, planetHomes, planetPosts, planetWorkMeta, radioShows, saturnPosts, userBlocks, users } from '../db/schema';
+import { books, follows, games, goods, jupiterPosts, planetHomes, planetPosts, planetWorkMeta, radioShows, saturnPosts, userBlocks, users } from '../db/schema';
 import { decodeWings, WINGS_KEY } from '../look/figures';
 import { isPublicWork, metaView } from './planet-works.service';
 
@@ -39,7 +39,7 @@ import { isPublicWork, metaView } from './planet-works.service';
 
 /** one planet store, seen the same way: who made it, when it was flown, what plays */
 type Store = {
-  t: typeof saturnPosts | typeof jupiterPosts | typeof planetPosts | typeof radioShows | typeof books | typeof games;
+  t: typeof saturnPosts | typeof jupiterPosts | typeof planetPosts | typeof radioShows | typeof goods | typeof books | typeof games;
   id: SQL;
   userId: SQL;
   flownAt: SQL;
@@ -111,6 +111,21 @@ export function storeOf(planet: HomePlanet): Store | null {
         seconds: sql`${radioShows.seconds}`,
         live: sql`(${radioShows.deletedAt} IS NULL AND ${radioShows.removedAt} IS NULL AND ${radioShows.status} = 'public' AND ${radioShows.publishedAt} IS NOT NULL)`,
       };
+    // story 2026-11-25 Uranus: a goods item made on the Moon, once flown (POST /moon/goods/:id/fly). Its words are its kind
+    // (the app draws that mock-up), its picture the art printed on it
+    case 'goods':
+      return {
+        t: goods,
+        id: sql`${goods.id}`,
+        userId: sql`${goods.userId}`,
+        flownAt: sql`${goods.flownAt}`,
+        text: sql`${goods.kind}`,
+        title: sql`${goods.title}`,
+        url: sql`NULL::text`,
+        thumb: sql`${goods.artUrl}`,
+        seconds: sql`NULL::real`,
+        live: sql`(${goods.deletedAt} IS NULL AND ${goods.flownAt} IS NOT NULL)`,
+      };
     // 05 Pluto: a book made on the Moon, once flown (POST /moon/books/:id/fly). Its words are the opening of its first
     // chapter (the open book's right page), its picture the painted cover (none: the page is plain paper)
     case 'book':
@@ -137,7 +152,8 @@ export function storeOf(planet: HomePlanet): Store | null {
         text: sql`COALESCE(${games.versionsJson} -> ${games.active} ->> 'howTo', '')`,
         title: sql`COALESCE(NULLIF(${games.versionsJson} -> ${games.active} ->> 'title', ''), ${games.title})`,
         url: sql`NULL::text`,
-        thumb: sql`NULL::text`,
+        // story 2026-11-25: the case's picture (one of the maker's arts); none: the app's neon face
+        thumb: sql`${games.coverUrl}`,
         seconds: sql`NULL::real`,
         live: sql`(${games.deletedAt} IS NULL AND ${games.flownAt} IS NOT NULL)`,
       };
@@ -336,7 +352,9 @@ export class PlanetHomeService {
       n = (await this.db.write.update(planetPosts).set({ deletedAt: new Date() }).where(and(eq(planetPosts.id, id), eq(planetPosts.userId, userId), eq(planetPosts.planet, cfg.storePlanet!), isNull(planetPosts.deletedAt))).returning({ id: planetPosts.id })).length;
     else if (cfg.store === 'radio_show')
       n = (await this.db.write.update(radioShows).set({ status: 'private', publishedAt: null, updatedAt: new Date() }).where(and(eq(radioShows.id, id), eq(radioShows.userId, userId))).returning({ id: radioShows.id })).length;
-    // 05: a book / a game goes back to the Moon only (not flown; the work itself stays)
+    // 05: a book / a game / a goods item goes back to the Moon only (not flown; the work itself stays)
+    else if (cfg.store === 'goods')
+      n = (await this.db.write.update(goods).set({ flownAt: null, updatedAt: new Date() }).where(and(eq(goods.id, id), eq(goods.userId, userId), isNull(goods.deletedAt))).returning({ id: goods.id })).length;
     else if (cfg.store === 'book')
       n = (await this.db.write.update(books).set({ flownAt: null, updatedAt: new Date() }).where(and(eq(books.id, id), eq(books.userId, userId), isNull(books.deletedAt))).returning({ id: books.id })).length;
     else if (cfg.store === 'game')

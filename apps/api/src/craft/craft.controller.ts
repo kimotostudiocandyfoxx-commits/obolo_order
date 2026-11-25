@@ -1,6 +1,6 @@
-import { Body, Controller, Get, HttpCode, Inject, Param, ParseUUIDPipe, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Inject, Param, ParseUUIDPipe, Post, Put, UseGuards } from '@nestjs/common';
 import { HttpStatus } from '@nestjs/common';
-import { CraftFlyBody, GAME_BUILDS_PER_DAY, GameBrokenBody, GameBuildBody, gameMakeKind, NovelChapterBody, spellKey } from '@obolo/shared';
+import { CraftFlyBody, GAME_BUILDS_PER_DAY, GameBrokenBody, GameBuildBody, GameCoverBody, gameMakeKind, GoodsMakeBody, NovelChapterBody, spellKey } from '@obolo/shared';
 import { apiError } from '../common/errors';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
@@ -12,6 +12,7 @@ import { JobsService } from '../jobs/jobs.service';
 import { startConfirmed } from '../wallet/confirmed';
 import { LedgerService } from '../wallet/ledger.service';
 import { GameService } from './game.service';
+import { GoodsService } from './goods.service';
 import { NovelService } from './novel.service';
 
 /**
@@ -29,6 +30,7 @@ export class CraftController {
     private readonly ledger: LedgerService,
     private readonly db: Database,
     @Inject(KV) private readonly kv: KvStore,
+    private readonly goods: GoodsService,
   ) {}
 
   @Post('novel/chapter')
@@ -98,6 +100,38 @@ export class CraftController {
   @HttpCode(200)
   flyGame(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string, @Body() body: unknown) {
     return this.games.fly(userId, id, parseBody(CraftFlyBody, body ?? {}).on);
+  }
+
+  /** story 2026-11-25: the case's picture — one of the member's own arts ({rootId}), or null for the neon face */
+  @Put('games/:id/cover')
+  cover(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string, @Body() body: unknown) {
+    return this.games.cover(userId, id, parseBody(GameCoverBody, body).rootId);
+  }
+
+  /** story 2026-11-25 (グッズ): a kind + one of the member's own arts — free, made at once (GOODS_PER_DAY a day) */
+  @Post('goods')
+  @HttpCode(200)
+  async makeGoods(@UserId() userId: string, @Body() body: unknown) {
+    await rateLimit(this.kv, `goods-make:${userId}`, 10, 60);
+    return this.goods.make(userId, parseBody(GoodsMakeBody, body));
+  }
+
+  @Get('goods')
+  goodsList(@UserId() userId: string) {
+    return this.goods.list(userId);
+  }
+
+  /** the maker's own, one a ダチ was sent, or one the viewer's Uranus home reaches once flown */
+  @Get('goods/:id')
+  goodsOne(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string) {
+    return this.goods.read(userId, id);
+  }
+
+  /** to the Uranus home ({on: false}: back to the Moon) */
+  @Post('goods/:id/fly')
+  @HttpCode(200)
+  flyGoods(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string, @Body() body: unknown) {
+    return this.goods.fly(userId, id, parseBody(CraftFlyBody, body ?? {}).on);
   }
 
   /** the sandbox said the version does not run: its mana back (see GameService.broken) */

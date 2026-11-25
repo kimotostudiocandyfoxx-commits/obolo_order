@@ -168,12 +168,13 @@ describe("{bati}'s book and game lines", () => {
 });
 
 describe('each Moon-made kind has one home planet', () => {
-  it('kororin → Saturn … book → Pluto, game → Neptune; only the planets with a screen can be flown to today', () => {
+  it('kororin → Saturn … book → Pluto, game → Neptune; every planet with its home can be flown to (story 2026-11-25: goods, books, games too)', () => {
     expect(KIND_HOME_PLANET).toEqual({ voice: 'saturn', art: 'jupiter', song: 'mercury', video: 'mars', radio: 'venus', goods: 'uranus', novel: 'pluto', book: 'pluto', game: 'neptune' });
     expect(homePlanetOf('game')).toBe('neptune');
     expect(homePlanetOf('look')).toBeNull();
     expect(canFlyHome('song')).toBe(true);
-    expect(canFlyHome('novel')).toBe(false);
-    expect(HOME_OF_WORK).toEqual({ voice: 'saturn', art: 'jupiter', song: 'mercury', video: 'mars', radio: 'venus' });
+    expect(canFlyHome('novel')).toBe(true);
+    expect(canFlyHome('look')).toBe(false);
+    expect(HOME_OF_WORK).toEqual({ voice: 'saturn', art: 'jupiter', song: 'mercury', video: 'mars', radio: 'venus', goods: 'uranus', novel: 'pluto', game: 'neptune' });
   });
 });

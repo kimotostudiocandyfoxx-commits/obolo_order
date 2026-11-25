@@ -300,10 +300,12 @@ const GOODS_KIND_OF: [RegExp, string][] = [
   [/マグ|mug|カップ/i, 'マグカップ'],
   [/缶バッジ|缶バッチ|バッジ|badge/i, '缶バッジ'],
 ];
+/** the goods kind named in words (「マグで」→ マグカップ), else null */
+export const goodsKindOfWords = (words: string | null | undefined): string | null => GOODS_KIND_OF.find(([re]) => re.test(words ?? ''))?.[1] ?? null;
 /** 2-1 Uranus: the goods' kind, and the printed art's style first, then its moods (artTags of its spell) */
 export function goodsTags(kind: string | null | undefined, artSpell?: readonly SpellTag[] | null, style?: string | null): WorkTags {
   const k = (kind ?? '').trim();
-  const main = GOODS_KIND_OF.find(([re]) => re.test(k))?.[1] ?? (k ? clean(k).slice(0, 20) || null : null);
+  const main = goodsKindOfWords(k) ?? (k ? clean(k).slice(0, 20) || null : null);
   const art = artTags(artSpell, style);
   return { main, moods: [...(art.main ? [art.main] : []), ...art.moods].slice(0, WORK_MOODS_MAX), bpm: null };
 }
