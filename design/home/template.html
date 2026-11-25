@@ -1147,7 +1147,7 @@ let EX=null;
 const DEC=[];function predecode(keys){keys.forEach(k=>{if(!A[k]||DEC.some(x=>x.k===k))return;const im=new Image();im.src=A[k];DEC.push({k,im});if(im.decode)im.decode().catch(()=>{})})}
 let BLUENA=new Set((()=>{try{return JSON.parse(localStorage.getItem('obolo-bluena')||'[]')}catch(e){return[]}})());
 const hasSky=pl=>!!(CONT[pl]&&A['exp-'+pl+'-sea']);
-function expOpen(){if(!hasSky(cur))return;if(typeof MV!=='undefined'&&MV)stopM();if(MBUSY)MBUSY.close();const ex=$('exp'),ph=$('phone');whoosh();
+function expOpen(){if(!hasSky(cur))return;setTimeout(()=>{if(EX)$('sky').style.visibility='hidden'},800);if(typeof MV!=='undefined'&&MV)stopM();if(MBUSY)MBUSY.close();const ex=$('exp'),ph=$('phone');whoosh();
   $('bg').style.transition='transform .8s cubic-bezier(.5,0,.2,1)';$('bg').style.transform='scale(1.12)';
   $('emap').style.backgroundImage=`url(${A['exp-'+cur+'-sea']||A['exp-'+cur+'-map']||''})`;$('emap').classList.remove('dive');$('emap').style.transform='';$('emap').style.opacity='';ex.querySelectorAll('.rg').forEach(e=>e.remove());
   $('etitle').textContent=P[cur].name+'の海を空から';ex.className='exp on';EX={pl:cur,boats:[],raf:0};drawSky();requestAnimationFrame(()=>requestAnimationFrame(()=>ex.classList.add('map')))}
@@ -1162,10 +1162,10 @@ function expOpen(){if(!hasSky(cur))return;if(typeof MV!=='undefined'&&MV)stopM()
   // trackpad pinch on a computer arrives as ctrl+wheel
   document.addEventListener('wheel',ev=>{if(!ev.ctrlKey||!ev.target.closest('#phone'))return;ev.preventDefault();if(ev.deltaY>4&&EX&&EX.region)expToMap();else if(ev.deltaY>4&&!EX&&hasSky(cur)&&!PROF)expOpen();else if(ev.deltaY<-4&&EX&&!EX.region)expClose()},{passive:false});
 })();
-function expClose(){const ex=$('exp');expLeave();closeSearch();endSwap();ex.className='exp';$('bg').style.transform='';setTimeout(()=>{$('bg').style.transition=''},900);EX=null}
+function expClose(){$('sky').style.visibility='';const ex=$('exp');expLeave();closeSearch();endSwap();ex.className='exp';$('bg').style.transform='';setTimeout(()=>{$('bg').style.transition=''},900);EX=null}
 function expLeave(){if(!EX)return;autoStop();cancelAnimationFrame(EX.raf);EX.boats.forEach(b=>b.e.remove());EX.boats=[];$('estage').innerHTML='';if(EX.open)EX.open.close();stopSong()}
 function expLand(r){const ex=$('exp'),c=EXP[EX.pl],em=$('emap');closeSearch();endSwap();if(EX.region){expLeave();EX.region=null;ex.className='exp on map'}whoosh();em.style.transformOrigin=`${r.x*100}% ${r.y*100}%`;em.style.transform='scale(3.2)';em.classList.add('dive');
-  setTimeout(()=>{$('eland').style.backgroundImage=`url(${A['exp-'+EX.pl+'-'+r.k]||A['bg3-'+EX.pl]||A['bg5-'+EX.pl]||''})`;$('rname').textContent=r.n;$('rname').style.fontSize=Math.min(44,Math.floor($('phone').clientWidth*.6/r.n.length))+'px';$('etitle').textContent='';ex.className='exp on land';EX.region=r;eplayIcon(false);efavPaint();spawnStrangers(r)},700)}
+  setTimeout(()=>{$('eland').style.backgroundImage=`url(${A['exp-'+EX.pl+'-'+r.k]||A['bg3-'+EX.pl]||A['bg5-'+EX.pl]||''})`;$('rname').textContent=r.n;$('rname').style.fontSize=Math.min(44,Math.floor($('phone').clientWidth*.46/r.n.length))+'px';$('etitle').textContent='';ex.className='exp on land';EX.region=r;eplayIcon(false);efavPaint();spawnStrangers(r)},700)}
 const SKYV={
   mercury:{motion:'sail',hint:'の海',rider:(w,i)=>`<img alt="" src="${A['ship3-'+((i%4)+1)]||''}">`,
     tag:w=>`#${w.genre} ${w.bpm}BPM ${w.mood.slice(0,2).map(x=>'#'+x).join(' ')}`,
@@ -1173,7 +1173,7 @@ const SKYV={
     show(b,st,o){const r=EX.region,sk='song-'+((b.w&&b.w.song)||o.song||r.song||1),vn=vinyl(st,A['jart-'+((b.i%5)+1)]||'','50%','36%','74%');if(vn&&vn.el)vn.el.style.zIndex='1';const dur=playSong(sk);lyricsStart(st,sk,'63%');
       const kt=kinTitle(st,{top:'7%',label:'',noby:1,title:b.title,by:b.n,c:'#38c8ff',c2:'#bdf0ff',g:'rgba(56,200,255,.6)'});return{dur,whoTop:'73%',close(){lyricsStop();vn.out();kt.out();stopSong()}}}},
   saturn:{motion:'flutter',kind:'kor',hint:'の輪',rider:(w,i)=>`<img alt="" src="${korImg(w.by,i)}">`,tag:w=>'',
-    pierFrom:[.5,-.1,.4],pierTo:[.5,.62,1.7],pierOut:[1.2,.5,.6],
+    pierFrom:[.5,-.1,.4],pierTo:[.5,.6,1.25],pierOut:[1.2,.5,.6],
     show(b,st,o){const pier=$('exp').classList.contains('pier'),k=document.createElement('div');k.className='skor';
       k.innerHTML=(pier?'':`<img alt="" src="${korImg(b.n,b.i)}">`)+'<div class="sbub"></div>';k.querySelector('.sbub').textContent='「'+b.title+'」';st.appendChild(k);popSound();
       const vk='voice-'+String((b.w.v||1)).padStart(2,'0');const tm=setTimeout(()=>{if(A[vk])playVoice(vk)},260);
