@@ -81,9 +81,9 @@ const Env = z.object({
    * from the comparison (.github/workflows/runware-art-test.yml). Set them as GitHub Variables of the same name.
    */
   ART_MODEL: z.string().optional(),
-  LOOK_MODEL: z.string().default('bytedance:seedream@5.0-pro'),
-  BATI_MODEL: z.string().default('bytedance:seedream@5.0-pro'),
-  KORORIN_MODEL: z.string().default('bytedance:seedream@5.0-pro'),
+  LOOK_MODEL: z.string().default('runware:400@4'),
+  BATI_MODEL: z.string().default('bytedance:seedream@5.0-flash'),
+  KORORIN_MODEL: z.string().default('runware:400@4'),
   /** the look rounds of the first journey (free): four to pick from (M-R173, four touches) */
   LOOK_CANDIDATES: z.coerce.number().int().min(1).max(4).default(4),
   /** R17: a paid look / dress-up round (after the journey, the atelier's row of pictures): two to pick from, not four */

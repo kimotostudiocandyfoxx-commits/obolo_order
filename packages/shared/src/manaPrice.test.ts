@@ -135,9 +135,10 @@ describe('the quoted mana', () => {
     const p = manaPrices(undefined, undefined, {}, klein);
     expect(p.jacketArt).toBeLessThanOrEqual(0.5);
     expect(p.look).toBeLessThanOrEqual(1);
-    expect(p.kororinDesign).toBeLessThan(MAKE_COST.kororinDesign);
-    // the paid look round paints 2 (a row to pick from), not 4
-    expect(MAKE_COST_ESTIMATE.look.usd).toBeCloseTo(2 * RUNWARE_REF_PRICES['bytedance:seedream@5.0-pro'] + 0.0005, 6);
+    const pro = manaPrices(undefined, undefined, {}, makeCostEstimates({ ...DEFAULT_MAKE_SETUP, lookModel: 'bytedance:seedream@5.0-pro', batiModel: 'bytedance:seedream@5.0-pro', kororinModel: 'bytedance:seedream@5.0-pro' }));
+    expect(p.kororinDesign).toBeLessThan(pro.kororinDesign);
+    // the paid look round paints 2 (a row to pick from), not 4; R17 defaults: klein for the look, Seedream 5.0 Flash for {bati}
+    expect(MAKE_COST_ESTIMATE.look.usd).toBeCloseTo(Math.max(2 * pictureUsd('runware:400@4', true), 2 * pictureUsd('bytedance:seedream@5.0-flash', true)) + 0.0005, 6);
     expect(pictureUsd('gemini-2.5-flash-image')).toBe(0.039);
     expect(pictureUsd('civitai:123@456')).toBeLessThan(0.01);
     expect(pictureUsd('someone:new@1')).toBeGreaterThanOrEqual(0.05);

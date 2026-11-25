@@ -308,10 +308,11 @@ export interface MakeSetup {
 }
 
 export const DEFAULT_MAKE_SETUP: MakeSetup = {
-  artModel: 'gemini-2.5-flash-image',
-  lookModel: 'bytedance:seedream@5.0-pro',
-  batiModel: 'bytedance:seedream@5.0-pro',
-  kororinModel: 'bytedance:seedream@5.0-pro',
+  // R17 (client 2026-11-25, art/lab/runware-art): FLUX.2 klein for art / looks / kororin, Seedream 5.0 Flash for {bati}
+  artModel: 'runware:400@2',
+  lookModel: 'runware:400@4',
+  batiModel: 'bytedance:seedream@5.0-flash',
+  kororinModel: 'runware:400@4',
   paidLookCandidates: 2,
   kororinCandidates: 4,
   gameTrialModel: 'gemini:gemini-2.5-flash-lite',

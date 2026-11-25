@@ -189,17 +189,17 @@ jobs:
             FISH_DEFAULT_VOICE_ID=${{ vars.FISH_DEFAULT_VOICE_ID }}
             # R17 (docs/マナの値段.md): the model of each picture use (a Runware AIR id or a Gemini image model) and the
             # pictures per round; the game tiers' chains. Empty = the defaults in apps/api/src/config.ts (R16's models)
-            ART_MODEL=${{ vars.ART_MODEL }}
-            LOOK_MODEL=${{ vars.LOOK_MODEL || 'bytedance:seedream@5.0-pro' }}
-            BATI_MODEL=${{ vars.BATI_MODEL || 'bytedance:seedream@5.0-pro' }}
-            KORORIN_MODEL=${{ vars.KORORIN_MODEL || 'bytedance:seedream@5.0-pro' }}
+            ART_MODEL=${{ vars.ART_MODEL || 'runware:400@2' }}
+            LOOK_MODEL=${{ vars.LOOK_MODEL || 'runware:400@4' }}
+            BATI_MODEL=${{ vars.BATI_MODEL || 'bytedance:seedream@5.0-flash' }}
+            KORORIN_MODEL=${{ vars.KORORIN_MODEL || 'runware:400@4' }}
             LOOK_CANDIDATES=${{ vars.LOOK_CANDIDATES || '4' }}
             PAID_LOOK_CANDIDATES=${{ vars.PAID_LOOK_CANDIDATES || '2' }}
             KORORIN_CANDIDATES=${{ vars.KORORIN_CANDIDATES || '4' }}
             GAME_MODEL_TRIAL=${{ vars.GAME_MODEL_TRIAL || 'gemini:gemini-2.5-flash-lite?think=0,gemini:gemini-2.5-flash?think=0' }}
             GAME_MODEL_CHEAP=${{ vars.GAME_MODEL_CHEAP || 'gemini:gemini-2.5-flash?think=4096,gemini:gemini-flash-latest?think=4096' }}
             GAME_MODEL_FULL=${{ vars.GAME_MODEL_FULL || vars.GAME_MODEL || 'gemini:gemini-2.5-pro,gemini:gemini-2.5-flash' }}
-            COST_REFINE_SINCE=${{ vars.COST_REFINE_SINCE }}
+            COST_REFINE_SINCE=${{ vars.COST_REFINE_SINCE || '2026-11-25' }}
             # docs/マナの値段.md: the price rule's knobs (defaults = the client's decision 2026-11-25)
             STRIPE_FEE_RATE=${{ vars.STRIPE_FEE_RATE || '0.036' }}
             STRIPE_FEE_FIXED_JPY=${{ vars.STRIPE_FEE_FIXED_JPY || '0' }}
