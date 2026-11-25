@@ -701,10 +701,14 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 @keyframes spin{to{background-position:0 0;filter:hue-rotate(40deg)}}
 @media (prefers-reduced-motion:reduce){.item,.item.new::after,.home::before,.spin.on{animation:none}.bg{transition:none}}
 button:focus-visible,.item:focus-visible,.home:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+
+.pagelink{display:block;width:fit-content;margin:6px auto 10px;padding:7px 14px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);color:#fff;font:800 12px var(--f-body);text-decoration:none}
+.pagelink[hidden]{display:none}
 </style>
 <div class="switch" id="mode" role="toolbar" aria-label="絵のタッチ"><button type="button" data-m="anime" aria-pressed="true">アニメ版</button><button type="button" data-m="toy" aria-pressed="false">箱庭版</button></div>
 <div class="switch" id="satmode" role="toolbar" aria-label="土星の見せ方" hidden><button type="button" data-s="d">土星：今の版（真下に落ちる）</button><button type="button" data-s="e">奥行き版（床に沿って）</button></div>
 <div class="switch" id="switch" role="toolbar" aria-label="星を切りかえる"></div>
+<a class="pagelink" id="pagelink" hidden target="_top"></a>
 
 <div class="phone" id="phone">
   <div class="bg" id="bg"></div>
@@ -739,6 +743,7 @@ button:focus-visible,.item:focus-visible,.home:focus-visible{outline:3px solid v
 </div>
 <script>
 const A=/*ASSETS*/{};
+const PAGELINK=/*PAGELINK*/null;if(PAGELINK){const l=document.getElementById('pagelink');l.href=PAGELINK.href;l.textContent=PAGELINK.label;l.hidden=false}
 const ME='ミナト★';
 const PEOPLE=[{n:'MIKIE⭐︎DRILL',k:'dachi',inv:1},{n:'KIMORIN⭐︎',k:'dachi'},{n:'ユウキ',k:'dachi'},{n:'たこ焼きシスター',k:'oshi'},{n:'nana',k:'oshi'}];
 const FAR=['はるか','ショウ','れい','ぽんず','kei','みお'];
@@ -1216,7 +1221,7 @@ const SKYV={
       return{dur:5,whoTop:'72%',close(){clearTimeout(tm);k.remove()}}}},
   ...Object.fromEntries([['mars','ufo',14],['venus','radio',6],['uranus','balloon',5],['pluto','book',6],['neptune','bubble',5]].map(([pl,sp,dur])=>[pl,{motion:'flutter',hint:'',rider:(w,i)=>`<img alt="" src="${A['sp2-'+sp]||A['sp-'+sp]||''}">`,tag:w=>'',
     pierFrom:[.5,-.1,.35],pierTo:[.2,.88,.9],pierOut:[1.2,.3,.4],
-    show(b,st,o){const v=viewer(st,pl,{ai:b.w.ai||1,title:b.title});return{dur,whoTop:'78%',close(){v.close()}}}}])),
+    show(b,st,o){const v=viewer(st,pl,{ai:b.w.ai||1,title:b.title,n:b.n});return{dur,whoTop:'7.5%',close(){v.close()}}}}])),
   jupiter:{motion:'flutter',hint:'の森',rider:(w,i)=>`<img alt="" src="${A['bfly3-'+((i%4)+1)]||''}"><i class="eart" style="background-image:url(${A['jart-'+(w.ai||1)]||''})"></i>`,
     tag:w=>`#${w.genre} ${w.mood.slice(0,2).map(x=>'#'+x).join(' ')}`,
     pierFrom:[.5,.08,.3],pierTo:[.2,.86,.95],pierOut:[.5,-.2,.3],
