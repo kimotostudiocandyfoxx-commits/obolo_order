@@ -1,5 +1,6 @@
 import {
   MAKE_COST,
+  type ManaPrices,
   pickSong,
   spellNamedGroups,
   VIDEO_LINES,
@@ -99,9 +100,9 @@ export function fixVideoSpell(v: SpellView, said: string): SpellView {
   return { ...v, tags };
 }
 
-/** what the spell costs: painted scenes (8), your own pictures moved (2), a scene painted again (2) */
-export function videoPrice(tags: SpellTag[], redraw?: number[]): number {
-  return redraw?.length ? MAKE_COST.mvRedraw : videoCost(tags).mana;
+/** what the spell costs: painted scenes (mv), your own pictures moved (mvPictures), a scene painted again (mvRedraw) — the live prices */
+export function videoPrice(tags: SpellTag[], redraw?: number[], prices: Readonly<ManaPrices> = MAKE_COST): number {
+  return redraw?.length ? prices.mvRedraw : videoCost(tags, prices).mana;
 }
 
 /** the words after a video: a free change, a scene to paint again, or nothing (talk / a new spell) */

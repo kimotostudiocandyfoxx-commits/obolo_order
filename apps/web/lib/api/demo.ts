@@ -652,6 +652,11 @@ export class DemoApi implements Api {
     return u;
   }
 
+  /** the demo charges the price rule's fallback list (MAKE_COST), like the server without a live list */
+  async manaPrices() {
+    return { ...MAKE_COST };
+  }
+
   async wallet() {
     const w = this.s.wallets[this.uid()];
     const exp = new Date(w.lastActivity);

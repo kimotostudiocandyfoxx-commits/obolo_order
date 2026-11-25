@@ -70,6 +70,9 @@ export class HttpApi implements Api {
   wallet() {
     return this.req<Awaited<ReturnType<Api['wallet']>>>('GET', '/wallet');
   }
+  async manaPrices() {
+    return (await this.req<{ prices: Awaited<ReturnType<Api['manaPrices']>> }>('GET', '/mana/prices')).prices;
+  }
   buddyProfile() {
     return this.req<Awaited<ReturnType<Api['buddyProfile']>>>('GET', '/buddy/profile');
   }

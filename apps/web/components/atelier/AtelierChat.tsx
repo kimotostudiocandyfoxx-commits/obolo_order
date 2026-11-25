@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { TalkComposer } from '@/components/talk/TalkComposer';
 import { talkMuted, TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/TalkScene';
 import { batiVoiceUrl, speakable } from '@/lib/atelier/batiSpeak';
+import { loadManaPrices, manaPricesNow } from '@/lib/manaPrices';
 import { canPlay, loadClip, playClip, readyClip, VOICE_WAIT_MS } from '@/lib/voice/webVoice';
 import { BARGE_FADE_MS, onBargeIn } from '@/lib/voice/barge';
 import { restyleAnswer, songStyleChange } from './songTurn';
@@ -172,6 +173,10 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   const test = !!story?.test;
   const ctx = useMemo(() => (test ? { ...realCtx, test } : realCtx), [realCtx, test]);
 
+  // client 2026-11-25: the live mana prices, ready before the first confirm card
+  useEffect(() => {
+    void loadManaPrices();
+  }, []);
   // the talk is kept for the left drawer (the works themselves are in Bluena)
   useEffect(() => {
     if (story?.mode === 'fly') return;
@@ -315,7 +320,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
    * under them) and asks; a yes in words (「OK」「いいよ」「作って」) casts it, other words change it — no buttons.
    */
   const run = (kind: AtelierKind, prompt: string, prev?: Work, opts: MakeOpts = {}) => {
-    const cost = story?.test ? null : atelierMakeCost(kind, day, kind === 'game' && !!prev);
+    const cost = story?.test ? null : atelierMakeCost(kind, day, kind === 'game' && !!prev, manaPricesNow());
     if ((!cost && !(isCraftKind(kind) && !story)) || opts.confirm) return start(kind, prompt, prev, opts);
     if (!prev && !opts.materials?.length && isBare(prompt)) {
       setPending({ kind });
@@ -347,7 +352,9 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   const propose = async (kind: AtelierKind, said: string, prev: Work | undefined, opts: MakeOpts, before?: PlanAsk, view?: SpellView, extra?: { lead?: [string, Record<string, string>?]; from?: 'compass' | 'book'; lyrics?: SongLyrics }) => {
     // client 2026-11-25: a book's spell is free (no mana words), a game's tweak costs its own; a chapter has its own spell
     const craft = isCraftKind(kind);
-    const cost = atelierMakeCost(kind, day, kind === 'game' && !!prev) ?? (craft ? { kind: 'game' as const, mana: 0 } : null);
+    // client 2026-11-25: the live price (re-read at most once a minute) — the card shows it, the yes carries it
+    await loadManaPrices();
+    const cost = atelierMakeCost(kind, day, kind === 'game' && !!prev, manaPricesNow()) ?? (craft ? { kind: 'game' as const, mana: 0 } : null);
     const sk = craftSpellKind(kind, prev) ?? spellKindOf(kind);
     if (!cost || !sk) return start(kind, said, prev, opts);
     // R13: a song's spell has two parts — the style talismans, then the lyrics with metatags (not in a story day's script)
@@ -384,7 +391,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     // R13: a video's spell has exactly one song talisman (picked by its name); its price follows what it is for
     const vv = kind === 'video' ? fixVideoSpell(v, said) : v;
     const plan0 = planOf(kind, vv);
-    const price = kind === 'video' ? videoPrice(vv.tags, opts.redraw) : cost.mana;
+    const price = kind === 'video' ? videoPrice(vv.tags, opts.redraw, manaPricesNow()) : cost.mana;
     // R13: the lyrics carry over a change of the style talismans; a fresh song gets them written for its style
     const plan: Plan = twoPart && before?.plan.lyrics ? { ...plan0, lyrics: before.plan.lyrics } : plan0;
     const id = uid();
@@ -691,7 +698,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     // R12: a kept spell that fits the words — {bati} offers it now and then (「スペルブックの『…』をもとにする？」)
     if (suggestFromBook(kind, content)) return;
     // R11: one that spends mana: {bati}'s question or plan first (run)
-    if (atelierMakeCost(kind, day)) return void run(kind, content);
+    if (atelierMakeCost(kind, day, false, manaPricesNow())) return void run(kind, content);
     if (isBare(content)) {
       setPending({ kind });
       return say(ASK[kind]);

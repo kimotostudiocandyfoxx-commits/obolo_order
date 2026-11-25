@@ -150,6 +150,7 @@ const ja = {
       conversion_bonus: '交換ボーナス',
       expiry: '失効',
       admin_adjust: '調整',
+      usage: 'つかったマナ（おしゃべり・声など）',
       refund: '返金',
     } as Record<string, string>,
   },

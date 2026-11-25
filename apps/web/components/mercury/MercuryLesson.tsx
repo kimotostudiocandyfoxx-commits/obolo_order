@@ -1,6 +1,9 @@
 'use client';
 
-import type { SongDesign } from '@obolo/shared';
+import { MAKE_COST, type SongDesign } from '@obolo/shared';
+
+/** the song's mana telop (client 2026-11-25: the price rule's number, never a fixed 2) */
+const SONG_MANA = `−${MAKE_COST.song}マナ`;
 import { useEffect, useRef, useState } from 'react';
 import { KIMORIN_JACKET, Sticker, saveSpell } from '@/components/jupiter/JupiterLesson';
 import { Big, LessonShell, NextButton, Panel, Soft, type CoachLine } from '@/components/onboarding/LessonShell';
@@ -364,7 +367,7 @@ export function MercuryLesson({
     try {
       setSong(await api.sing(d, setStage));
       setPhase('song');
-      setCue({ who: 'guide', text: '−2マナ' });
+      setCue({ who: 'guide', text: SONG_MANA });
     } catch {
       setPhase('failed');
       said({ who: 'bati', text: '魔法陣、ちょっと凍っちゃった……。歌詞は残ってるよ。もう1回唱えてもいい？' });
@@ -471,7 +474,7 @@ export function MercuryLesson({
   else if (phase === 'mana') coach = { text: '作曲に、マナを使います。いいですか？' };
   else if (phase === 'writing') coach = { text: '歌詞を考えています…' };
   else if (phase === 'singing' && stage === 'warming') coach = { text: '♪ 作曲中…　音のスタジオが、目をさましています' };
-  else if (phase === 'song' && cue?.text === '−2マナ') actions = <NextButton onClick={() => setCue({ who: 'guide', text: '聴いたら〔この曲にする〕を押します（押すまでは、しまいません）' })} />;
+  else if (phase === 'song' && cue?.text === SONG_MANA) actions = <NextButton onClick={() => setCue({ who: 'guide', text: '聴いたら〔この曲にする〕を押します（押すまでは、しまいません）' })} />;
   else if (phase === 'after') {
     coach = ab?.k === 'line' ? lineOf(ab.l) : ab?.k === 'bar' ? { text: ab.lit === 0 ? '〔海図〕を押す' : '下の右の〔myアイランド〕を押す' } : ab?.k === 'oshi' && oshi === 'here' ? { text: 'タップすると聴けます（押した時だけ鳴ります）' } : null;
     if (ab?.k === 'line') actions = <NextButton onClick={anext} />;

@@ -151,6 +151,7 @@ const en: Messages = {
       conversion_bonus: 'Conversion bonus',
       expiry: 'Expired',
       admin_adjust: 'Adjustment',
+      usage: 'Mana used (chat, voice and more)',
       refund: 'Refund',
     },
   },

@@ -105,6 +105,8 @@ export interface Api {
   me(): Promise<Me>;
   updateMe(body: UpdateProfileBody): Promise<Me>;
   wallet(): Promise<WalletView>;
+  /** client 2026-11-25: the mana of each making now (the price rule: cost + Stripe's fee + 8%) */
+  manaPrices(): Promise<import('@obolo/shared').ManaPrices>;
   buddyProfile(): Promise<BuddyProfileView>;
   updateBuddyProfile(body: UpdateBuddyProfileBody): Promise<BuddyProfileView>;
   buddyMessages(cursor?: string): Promise<Paged<BuddyMessageView>>;
