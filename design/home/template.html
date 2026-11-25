@@ -543,15 +543,15 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .exp.map .rg{opacity:1}
 .exp .rg b{display:block;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.92);color:#123;font:900 12px var(--f-body);box-shadow:0 6px 16px rgba(0,30,60,.35);white-space:nowrap}
 .exp .rg i{width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.4),0 0 16px #fff;animation:kdot 1.2s ease-in-out infinite alternate}
-.exp .etop{position:absolute;left:12px;right:12px;top:14px;display:flex;align-items:center;gap:10px;z-index:3}
+.exp .etop{position:absolute;left:12px;right:12px;top:14px;display:flex;align-items:center;gap:10px;z-index:6;pointer-events:none}.exp .etop>*{pointer-events:auto}
 .exp .eback{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.6);background:rgba(20,30,60,.4);color:#fff;font:900 18px var(--f-body);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);cursor:pointer}
 .exp .etitle{font:900 15px var(--f-body);color:#fff;text-shadow:0 2px 8px rgba(0,20,50,.8)}
 .exp .dice{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);z-index:3;padding:10px 18px;border-radius:999px;border:0;background:linear-gradient(135deg,#fff,#cfefff);color:#123;font:900 13px var(--f-body);box-shadow:0 8px 20px rgba(0,30,60,.4);cursor:pointer;opacity:0;transition:opacity .4s .6s}
 .exp.map .dice{opacity:1}
-.exp .eland{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transform:scale(1.25);transition:opacity .5s,transform .9s cubic-bezier(.2,.8,.2,1)}
+.exp .eland{pointer-events:none;position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transform:scale(1.25);transition:opacity .5s,transform .9s cubic-bezier(.2,.8,.2,1)}
 .exp.land .eland{opacity:1;transform:none}
 .exp.land .rg,.exp.land .dice{display:none}
-.exp .rname{position:absolute;left:50%;top:12%;transform:translate(-50%,-50%) scale(.6);opacity:0;z-index:3;font:900 clamp(30px,10vw,44px)/1 'Dela Gothic One',var(--f-body);color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.35),0 0 24px rgba(0,0,0,.5);white-space:nowrap;transition:opacity .4s .4s,transform .6s .4s cubic-bezier(.2,1.6,.4,1)}
+.exp .rname{pointer-events:none;position:absolute;left:50%;top:12%;transform:translate(-50%,-50%) scale(.6);opacity:0;z-index:3;font:900 clamp(30px,10vw,44px)/1 'Dela Gothic One',var(--f-body);color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.35),0 0 24px rgba(0,0,0,.5);white-space:nowrap;transition:opacity .4s .4s,transform .6s .4s cubic-bezier(.2,1.6,.4,1)}
 .exp.land .rname{opacity:1;transform:translate(-50%,-50%) scale(1)}
 .exp.land.show .rname,.exp.land.auto .rname{opacity:0;transition:opacity .2s}
 .exp .eb{position:absolute;left:0;top:0;width:100px;height:116px;margin:-58px 0 0 -50px;cursor:pointer;z-index:2;will-change:transform}
@@ -882,6 +882,27 @@ const CONT={mercury:[
   {k:'matsuri',n:'夏祭りの島',tags:['夏','和風','祭り','アゲ'],by:'ことね',song:2},
   {k:'rain',n:'雨音の島',tags:['雨','チル','作業用','しっとり'],by:'みお',song:1}]};
 Object.assign(EXP.mercury.titles,{citypop:['ミッドナイト湾岸','シーサイドFM','PLASTIC'],anison:['きらめき変身','最終回のあと','START!!'],jazz:['ブルーノート','月夜のサックス','Cafe 2AM'],matsuri:['花火のあとで','金魚すくい','夏の終わり'],rain:['雨やどり','傘の下','窓のしずく']});
+/* songs carry tags from the moment they are made (genre / tempo / mood come from the spell settings);
+   each continent has a rule, and every public song that matches it drifts to that continent on its own */
+const GSONG={EDM:3,'ヒップホップ':2,'バラード':4,'ロック':5,'ローファイ':1,'シティポップ':1,'アニソン':3,'ジャズ':4,'J-POP':3};
+const WORKS={mercury:[
+ ['ネオンダイブ','Rio','EDM',128,['アゲ','夜']],['光の洪水','YUZU','EDM',126,['フェス','アゲ']],['BASS SKY','タク','EDM',140,['アゲ']],['真夏のドロップ','REN','EDM',124,['夏','アゲ']],['ミラーボール惑星','ショウ','EDM',122,['ダンス','夜']],
+ ['路地裏フロウ','kei','ヒップホップ',92,['ストリート','夜']],['夕焼けサイファー','ショウ','ヒップホップ',88,['ストリート']],['BOOM BAP','タク','ヒップホップ',90,['ストリート']],['放課後ライム','そら','ヒップホップ',96,['青春']],['チルホップ日和','Nagi','ヒップホップ',84,['チル','作業用']],
+ ['月のうた','ことね','バラード',72,['しっとり','泣ける','夜']],['灯台まで','みお','バラード',76,['しっとり']],['やさしい夜','はるか','バラード',68,['泣ける','夜']],['さよならの駅','REN','バラード',74,['泣ける']],['雨のあとで','みお','バラード',70,['雨','しっとり']],
+ ['マグマハート','タク','ロック',168,['熱い']],['火山ライブ','YUZU','ロック',172,['熱い','フェス']],['走れ','そら','ロック',180,['青春','熱い']],['ガレージの夏','REN','ロック',160,['夏','青春']],['轟音ダイアリー','kei','ロック',176,['熱い']],
+ ['ひるねの午後','ぽんず','ローファイ',78,['チル','作業用']],['ラグーン','Nagi','ローファイ',82,['チル']],['ゆらゆら','はるか','ローファイ',80,['チル','夏']],['深夜2時の勉強','そら','ローファイ',75,['作業用','夜']],['しずくの部屋','みお','ローファイ',72,['雨','作業用']],
+ ['ミッドナイト湾岸','Nagi','シティポップ',112,['夜ドライブ','夜','80s']],['シーサイドFM','はるか','シティポップ',108,['夏','80s']],['PLASTIC','Rio','シティポップ',116,['夜ドライブ','おしゃれ']],['トワイライト通り','ことね','シティポップ',104,['夜','おしゃれ']],
+ ['きらめき変身','ぽんず','アニソン',150,['アニメ','アゲ']],['最終回のあと','ことね','アニソン',138,['アニメ','泣ける']],['START!!','YUZU','アニソン',160,['アニメ','アゲ','青春']],['魔法少女は眠らない','ぽんず','アニソン',146,['アニメ','夜']],
+ ['ブルーノート','kei','ジャズ',96,['おしゃれ','夜']],['月夜のサックス','ショウ','ジャズ',88,['おしゃれ','夜']],['Cafe 2AM','Nagi','ジャズ',84,['おしゃれ','作業用']],['雨のピアノ','みお','ジャズ',80,['雨','しっとり']],
+ ['花火のあとで','ことね','J-POP',118,['夏','祭り','泣ける']],['金魚すくい','はるか','J-POP',124,['夏','祭り','和風']],['夏の終わり','そら','J-POP',110,['夏','しっとり']],['盆おどりリミックス','タク','EDM',130,['祭り','和風','アゲ']],
+ ['雨やどり','みお','J-POP',92,['雨','しっとり']],['傘の下','REN','バラード',78,['雨','泣ける']],['窓のしずく','ぽんず','ローファイ',70,['雨','チル']]
+].map(([title,by,genre,bpm,mood])=>({title,by,genre,bpm,mood,song:GSONG[genre]||1}))};
+// your own songs drift too (same rule, nothing to do by hand)
+WORKS.mercury.push(...[['夏のはじまり','J-POP',120,['夏','青春']],['チルな午後','ローファイ',80,['チル','作業用']],['パーティー','EDM',128,['アゲ','ダンス']],['夜のバラード','バラード',70,['しっとり','夜']],['走れ','ロック',176,['熱い','青春']]].map(([title,genre,bpm,mood],i)=>({title,by:ME,genre,bpm,mood,song:i+1,mine:1})));
+const RULE={edm:{g:['EDM'],m:['ダンス','フェス'],bpm:[118,999]},hiphop:{g:['ヒップホップ'],m:['ストリート']},ballad:{g:['バラード'],m:['しっとり'],bpm:[0,90]},rock:{g:['ロック'],m:['熱い']},chill:{g:['ローファイ'],m:['チル','作業用'],bpm:[0,100]},
+  citypop:{g:['シティポップ'],m:['夜ドライブ','80s']},anison:{g:['アニソン'],m:['アニメ']},jazz:{g:['ジャズ'],m:['おしゃれ']},matsuri:{g:[],m:['祭り','和風','夏']},rain:{g:[],m:['雨']}};
+function workScore(w,k){const R=RULE[k];if(!R)return 0;let s=0;if(R.g.includes(w.genre))s+=3;s+=w.mood.filter(x=>R.m.includes(x)).length*2;if(R.bpm&&s>0&&(w.bpm<R.bpm[0]||w.bpm>R.bpm[1]))s-=2;return s}
+function drift(pl,k){return (WORKS[pl]||[]).map(w=>({w,s:workScore(w,k)})).filter(x=>x.s>=2&&!(x.w.mine&&false)).sort((a,b)=>b.s-a.s||Math.random()-.5).map(x=>x.w)}
 const ESLOT=[[.25,.2,.37],[.76,.23,.37],[.5,.37,.32],[.21,.55,.42],[.8,.57,.42]],EME=[.5,.85,.56];
 const FAVN=5;let FAV={};
 function favGet(pl){if(FAV[pl])return FAV[pl];let v=null;try{v=JSON.parse(localStorage.getItem('obolo-sky-'+pl)||'null')}catch(e){}
@@ -916,9 +937,9 @@ function closeSearch(){$('esheet').classList.remove('on');try{$('eq').blur()}cat
 function searchList(){const pl=EX.pl,q=$('eq').value.trim().replace(/^#/,'').toLowerCase(),f=favGet(pl),L=$('eslist');
   const sc=c=>{let s=0;if(q){if(c.n.toLowerCase().includes(q))s+=3;if(c.tags.some(g=>g.toLowerCase().includes(q)))s+=2;if(c.by&&c.by.toLowerCase().includes(q))s+=1;if(!s)return -1}if(ESTAG){if(!c.tags.includes(ESTAG))return -1;s+=1}return s};
   const rs=CONT[pl].map(c=>({c,s:sc(c)})).filter(x=>x.s>=0).sort((a,b)=>b.s-a.s||EX.rk[a.c.k]-EX.rk[b.c.k]);
-  L.innerHTML=`<div class="cap">${q||ESTAG?rs.length+'件':'みんなが作った大陸'}</div>`+(rs.length?'':'<div class="cap none">見つからなかった… 別のことばで探してみて</div>');
+  L.innerHTML=`<div class="cap">${q||ESTAG?rs.length+'件':'大陸いちらん'}</div>`+(rs.length?'':'<div class="cap none">見つからなかった… 別のことばで探してみて</div>');
   rs.forEach(({c})=>{const r=document.createElement('div');r.className='esr';const on=f.includes(c.k);
-    r.innerHTML=`<div class="th" style="background-image:url(${islImg(pl,c.k)})"></div><div class="t"><b>${c.n}</b><small>${c.tags.map(g=>'#'+g).join(' ')} · ${c.by?'by '+c.by:'公式'}</small></div><button type="button" class="st${on?' on':''}" aria-label="お気に入り">${on?'★':'☆'}</button><button type="button" class="go">降りる</button>`;
+    r.innerHTML=`<div class="th" style="background-image:url(${islImg(pl,c.k)})"></div><div class="t"><b>${c.n}</b><small>🌊 ${drift(pl,c.k).length}曲 · ${c.tags.map(g=>'#'+g).join(' ')} · ${c.by?'by '+c.by:'公式'}</small></div><button type="button" class="st${on?' on':''}" aria-label="お気に入り">${on?'★':'☆'}</button><button type="button" class="go">降りる</button>`;
     r.querySelector('.go').onclick=()=>{closeSearch();expLand({...c,x:.5,y:.45})};
     r.querySelector('.st').onclick=()=>{const ff=favGet(pl);if(ff.includes(c.k)){ff[ff.indexOf(c.k)]=null;favSave(pl);drawSky();toast('☆ '+c.n+' をはずしたよ');searchList();return}
       const res=addFav(c);if(res==='added'){drawSky();chime();toast('☆ '+c.n+' をじぶんの空に追加');searchList()}else if(res==='full'){closeSearch();startSwap(c)}};
@@ -952,16 +973,16 @@ function expClose(){const ex=$('exp');expLeave();closeSearch();endSwap();ex.clas
 function expLeave(){if(!EX)return;autoStop();cancelAnimationFrame(EX.raf);EX.boats.forEach(b=>b.e.remove());EX.boats=[];$('estage').innerHTML='';if(EX.open)EX.open.close();stopSong()}
 function expLand(r){const ex=$('exp'),c=EXP[EX.pl],em=$('emap');closeSearch();endSwap();if(EX.region){expLeave();EX.region=null;ex.className='exp on map'}whoosh();em.style.transformOrigin=`${r.x*100}% ${r.y*100}%`;em.style.transform='scale(3.2)';em.classList.add('dive');
   setTimeout(()=>{$('eland').style.backgroundImage=`url(${A['exp-'+EX.pl+'-'+r.k]||''})`;$('rname').textContent=r.n;$('rname').style.fontSize=r.n.length>6?Math.max(24,Math.floor(300/r.n.length))+'px':'';$('etitle').textContent='';ex.className='exp on land';EX.region=r;eplayIcon(false);efavPaint();spawnStrangers(r)},700)}
-function spawnStrangers(r){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,ex=$('exp');const names=[...STRANGERS].sort(()=>Math.random()-.5).slice(0,7);
-  EX.boats=names.map((n,i)=>{const S=MSLOT[i%7],e=document.createElement('div');e.className='eb';e.innerHTML=`<img alt="" src="${A['ship3-'+((i%4)+1)]||''}"><span>${n}</span>`;ex.appendChild(e);
-    const b={n,i,e,sc:S[1],lane:S[0],x:[.2,.62,.12,.48,.84,.3,.7][i]*W,v:(10+(i%4)*4)*(i%2?-1:1)*(.6+S[1]*.5),title:EXP[EX.pl].titles[r.k][i%3]};e.onclick=()=>{if(EX.auto){clearTimeout(EX.auto.tm);if(EX.open)EX.open.close();EX.auto.n++;EX.auto.tm=setTimeout(autoNext,(expShow(b,{auto:true,song:EX.region.song})||60)*1000+400)}else expShow(b)};return b});
+function spawnStrangers(r){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,ex=$('exp');const pool=drift(EX.pl,r.k);const ws=pool.slice(0,7).sort(()=>Math.random()-.5);
+  EX.boats=ws.map((w,i)=>{const n=w.by;const S=MSLOT[i%7],e=document.createElement('div');e.className='eb';e.innerHTML=`<img alt="" src="${A['ship3-'+((i%4)+1)]||''}"><span>${w.mine?'★ じぶん':n}</span>`;ex.appendChild(e);
+    const b={n,i,e,sc:S[1],lane:S[0],x:[.2,.62,.12,.48,.84,.3,.7][i]*W,v:(10+(i%4)*4)*(i%2?-1:1)*(.6+S[1]*.5),title:w.title,w};e.onclick=()=>{if(EX.auto){clearTimeout(EX.auto.tm);if(EX.open)EX.open.close();EX.auto.n++;EX.auto.tm=setTimeout(autoNext,(expShow(b,{auto:true})||60)*1000+400)}else expShow(b)};return b});
   let last=performance.now();const step=now=>{const dt=Math.min(.05,(now-last)/1000);last=now;const ts=now/1000;for(const b of EX.boats){if(b.e.classList.contains('held'))continue;b.x+=b.v*dt;if(b.x>W+60)b.x=-60;if(b.x<-60)b.x=W+60;const y=b.lane*H+Math.sin(ts*1.6+b.i)*4;b.y=y;b.e.style.transform=`translate3d(${b.x}px,${y}px,0) scale(${b.sc})`;b.e.querySelector('img').style.transform=b.v<0?'scaleX(-1)':''}EX.raf=requestAnimationFrame(step)};EX.raf=requestAnimationFrame(step)}
 const ASET=5;
 function eplayIcon(on){const b=$('eplay');b.classList.toggle('on',on);b.setAttribute('aria-label',on?'止める':'流す');b.innerHTML='<span class="rec"></span><span class="lbl"></span><svg viewBox="0 0 24 24" aria-hidden="true">'+(on?'<rect class="pl" x="6" y="6" width="12" height="12" rx="3"/>':'<path class="pl" d="M8.5 5.6c0-1.1 1.2-1.8 2.2-1.2l8.6 5.5c.9.6.9 1.9 0 2.5l-8.6 5.5c-1 .6-2.2-.1-2.2-1.2z"/>')+'</svg>'}
 function autoStart(){if(!EX||!EX.region)return;if(EX.open)EX.open.close();const order=[...EX.boats].sort(()=>Math.random()-.5);EX.auto={order,n:0,tm:0};$('trav').querySelector('img').src=A['udance-1']||A['chibi-user']||'';$('exp').classList.add('auto');eplayIcon(true);autoNext()}
 function autoNext(){const a=EX&&EX.auto;if(!a)return;if(EX.open)EX.open.close();
   const b=a.order.filter(x=>!x.hidden)[a.n%Math.max(1,a.order.filter(x=>!x.hidden).length)];if(!b){autoStop();return}a.n++;
-  const d=expShow(b,{auto:true,song:((EX.region.song-1+a.n-1)%5)+1});a.tm=setTimeout(autoNext,(d||60)*1000+400)}
+  const d=expShow(b,{auto:true});a.tm=setTimeout(autoNext,(d||60)*1000+400)}
 function autoAsk(){const st=$('estage'),c=EXP[EX.pl],rs=c.regions,i=rs.indexOf(EX.region),nb=rs[(i+1)%rs.length];st.style.pointerEvents='auto';
   const w=document.createElement('div');w.className='aend';w.innerHTML=`<p>${ASET}曲きいたよ</p><small>ここで少しひと休み。このあとどうする？</small><button class="m" data-a="more">▶ もっと聴く</button><button data-a="next">🧭 となりの${nb.n}へ</button><button data-a="dice">🎲 どこかに降りる</button>`;st.appendChild(w);requestAnimationFrame(()=>w.classList.add('on'));chime();
   EX.auto.panel=w;w.onclick=ev=>{const k=ev.target.closest('button');if(!k)return;ev.stopPropagation();w.remove();EX.auto.panel=null;st.style.pointerEvents='none';
@@ -972,14 +993,14 @@ function repMenu(b,st,anchor){const old=st.querySelector('.repmenu');if(old){old
   m.onclick=ev=>{const k=ev.target.closest('button');if(!k)return;ev.stopPropagation();m.remove();b.hidden=true;b.e.style.display='none';toast(k.dataset.a==='rep'?'⚑ 通報したよ。もう表示されないよ':'🙈 '+b.n+' は表示しないよ');
     if(EX.auto){clearTimeout(EX.auto.tm);autoNext()}else if(EX.open){EX.open.close();st.style.pointerEvents='none'}}}
 function expShow(b,o){o=o||{};if(EX.open)return;const ex=$('exp'),st=$('estage');b.e.classList.add('held');ex.classList.add('show');splash();const r=EX.region;
-  const sk='song-'+(o.song||r.song),vn=vinyl(st,A['jart-'+((b.i%5)+1)]||'','50%','36%','74%');const dur=playSong(sk);lyricsStart(st,sk,'63%');const kt=kinTitle(st,{top:'7%',label:'',noby:1,title:b.title,by:b.n,c:'#38c8ff',c2:'#bdf0ff',g:'rgba(56,200,255,.6)'});
-  const who=document.createElement('div');who.className='whotag';who.style.left='50%';who.style.top='60%';who.style.fontSize='13px';who.textContent='by '+b.n;st.appendChild(who);
-  const ob=document.createElement('button');ob.type='button';ob.className='oshib'+(oshi.has(b.n)?' done':'');ob.textContent=oshi.has(b.n)?'♡ 推してる':'♡ 推す';st.appendChild(ob);requestAnimationFrame(()=>ob.classList.add('on'));
+  const sk='song-'+((b.w&&b.w.song)||o.song||r.song),vn=vinyl(st,A['jart-'+((b.i%5)+1)]||'','50%','36%','74%');const dur=playSong(sk);lyricsStart(st,sk,'63%');const kt=kinTitle(st,{top:'7%',label:'',noby:1,title:b.title,by:b.n,c:'#38c8ff',c2:'#bdf0ff',g:'rgba(56,200,255,.6)'});
+  const who=document.createElement('div');who.className='whotag';who.style.left='50%';who.style.top='60%';who.style.fontSize='13px';who.textContent='by '+(b.w&&b.w.mine?'じぶん':b.n)+(b.w?`  ·  #${b.w.genre} ${b.w.bpm}BPM ${b.w.mood.slice(0,2).map(x=>'#'+x).join(' ')}`:'');st.appendChild(who);
+  const ob=document.createElement('button');ob.type='button';if(b.w&&b.w.mine)ob.style.display='none';ob.className='oshib'+(oshi.has(b.n)?' done':'');ob.textContent=oshi.has(b.n)?'♡ 推してる':'♡ 推す';st.appendChild(ob);requestAnimationFrame(()=>ob.classList.add('on'));
   ob.onclick=ev=>{ev.stopPropagation();if(oshi.has(b.n))return;oshi.add(b.n);ob.classList.add('done');ob.textContent='♡ 推してる';chime();
     for(let k=0;k<12;k++){const h=document.createElement('i');h.className='heartp';h.textContent='💗';h.style.left='50%';h.style.top='88%';h.style.setProperty('--dx',(Math.random()*160-80)+'px');h.style.setProperty('--dy',(-60-Math.random()*120)+'px');st.appendChild(h);setTimeout(()=>h.remove(),1000)}
     toast('💗 '+b.n+' を推しにしたよ')};
   const rb=document.createElement('button');rb.type='button';rb.className='repb';rb.setAttribute('aria-label','通報・非表示');rb.textContent='⋯';st.appendChild(rb);rb.onclick=ev=>{ev.stopPropagation();repMenu(b,st)};
-  const t0=performance.now();EX.open={close(){lyricsStop();vn.out();kt.out();who.remove();ob.remove();rb.remove();const m=st.querySelector('.repmenu');if(m)m.remove();stopSong();ex.classList.remove('show');b.e.classList.remove('held');EX.open=null}};
+  const t0=performance.now();EX.open={close(){st.style.pointerEvents='none';lyricsStop();vn.out();kt.out();who.remove();ob.remove();rb.remove();const m=st.querySelector('.repmenu');if(m)m.remove();stopSong();ex.classList.remove('show');b.e.classList.remove('held');EX.open=null}};
   st.style.pointerEvents='auto';st.onclick=ev=>{if(ev.target.closest('.oshib,.repb,.repmenu,.aend'))return;if(performance.now()-t0>300){if(EX.auto){autoStop();return}EX.open&&EX.open.close();st.style.pointerEvents='none'}};return dur}
 document.addEventListener('click',ev=>{if(ev.target.closest('#skybtn'))expOpen();if(ev.target.closest('#eback')){if(EX&&EX.region)expToMap();else if(EX&&EX.swap)endSwap();else expClose()}
   if(ev.target.closest('#eplay')&&EX){if(EX.auto)autoStop();else autoStart()}
