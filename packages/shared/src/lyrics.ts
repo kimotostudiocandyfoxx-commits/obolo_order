@@ -246,8 +246,8 @@ function cleanLines(lines: string[]): string[] {
   for (const raw of lines) {
     const t = raw
       .replace(/\[[^\]]*\]|〔[^〕]*〕/g, ' ')
-      .replace(/^[\s「『"'・\-–—*]+|[\s」』"']+$/g, '')
-      .replace(/\s+/g, ' ')
+      .replace(/^[ \t「『"'・\-–—*]+|[ \t」』"']+$/g, '')
+      .replace(/[ \t]+/g, ' ')
       .trim();
     if (!t) continue;
     if ([...t].length <= LYRIC_LINE_MAX) {

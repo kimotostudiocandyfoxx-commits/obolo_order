@@ -8,12 +8,15 @@ import type { ChatRequest, LlmProvider } from './types';
  * on to the next. Providers: gemini, claude, openai. A step whose key is not set is skipped; nothing usable → the mock.
  *   NOVEL_MODEL=gemini:gemini-2.5-flash,gemini:gemini-flash-latest
  *   GAME_MODEL=gemini:gemini-2.5-pro,gemini:gemini-2.5-flash      (later: claude:claude-opus-…,gemini:gemini-2.5-pro)
+ *   LYRICS_MODEL=gemini:gemini-2.5-flash,gemini:gemini-flash-latest
  */
 export const TASK_MODEL_DEFAULTS = {
   /** a book's chapters: Flash-class (long Japanese prose, cheap) */
   novel: 'gemini:gemini-2.5-flash,gemini:gemini-flash-latest',
   /** a game's code: Pro-class, Flash behind it for a timeout / the quota */
   game: 'gemini:gemini-2.5-pro,gemini:gemini-2.5-flash',
+  /** R13: a song's lyrics with metatags (Japanese, short, JSON): Flash-class; Claude later by LYRICS_MODEL only */
+  lyrics: 'gemini:gemini-2.5-flash,gemini:gemini-flash-latest',
 } as const;
 export type TaskName = keyof typeof TASK_MODEL_DEFAULTS;
 
