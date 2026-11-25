@@ -603,6 +603,25 @@ export function lyricsSecondVerse(l: SongLyrics): SongLyrics {
   return { ...l, blocks: [...l.blocks.slice(0, lastChorus + 1), ...cycle, ...l.blocks.slice(lastChorus + 1)] };
 }
 
+/**
+ * R17: a Cメロ (bridge) and a last chorus by rule when the model cannot write them (「Cメロも足して」「大サビも」): before
+ * the outro; the bridge's lines new, the last chorus the chorus again. Unchanged when it has one or there is no room.
+ */
+export function lyricsWithBridge(l: SongLyrics): SongLyrics {
+  if (l.blocks.some((b) => b.section === 'bridge' || b.section === 'final-chorus')) return l;
+  const chorus = [...l.blocks].reverse().find((b) => b.section === 'chorus' && b.lines.length);
+  if (!chorus) return l;
+  const bridge = ['しずかな夜に　ひとりきり', 'そっと　名前を　よんでみる'];
+  const total = l.blocks.reduce((a, b) => a + b.lines.length, 0) + bridge.length + chorus.lines.length;
+  if (total > LYRIC_LINES_MAX || l.blocks.length + 2 > LYRIC_BLOCKS_MAX) return l;
+  const at = l.blocks[l.blocks.length - 1]?.section === 'outro' ? l.blocks.length - 1 : l.blocks.length;
+  const add: LyricBlock[] = [
+    { section: 'bridge', hints: ['whispered'], lines: bridge },
+    { section: 'final-chorus', hints: ['powerful'], lines: chorus.lines },
+  ];
+  return { ...l, blocks: [...l.blocks.slice(0, at), ...add, ...l.blocks.slice(at)] };
+}
+
 /** what a change did, for the sheet's motion: new blocks / tags drop in, changed lines glow, removed ones fall away */
 export interface LyricsChange {
   newBlocks: string[];
@@ -646,10 +665,27 @@ export function lyricsDiff(before: Pick<SongLyrics, 'blocks'> | null | undefined
 const aboutOf = (tags: SpellTag[]) => tags.filter((t) => t.group === 'theme').map((t) => t.ja);
 
 /**
- * original lyrics by rule from the style spell (the model failing must not stop the song; the review demo's lyrics):
- * intro → verse → pre-chorus (盛り上げ) → chorus (ハモり) → bridge (ささやき) → final chorus → outro (フェードアウト)
+ * R17 (client 2026-11-25: 「バティは1番だけ書く。2番・Cメロ・大サビは頼まれた時だけ」): what more than one verse the words
+ * or the spell ask for — a 2番 (「2番も作って」「フルで」「長め」「2分」…), a Cメロ and a last chorus (「Cメロも」「大サビ」
+ * 「フルで」「3分」…). Nothing asked: one verse, about a minute.
  */
-export function lyricsFallback(tags: SpellTag[]): SongLyrics {
+export function lyricsAsked(said: string | null | undefined, tags: SpellTag[] = []): { second: boolean; bridge: boolean } {
+  const s = (said ?? '').normalize('NFKC');
+  const len = tags.find((t) => t.group === 'length');
+  const lenSec = len ? (/3分|3 minutes|フル|full/i.test(`${len.ja} ${len.en}`) ? 180 : /2分|2 minutes/i.test(`${len.ja} ${len.en}`) ? 120 : /1分半|90/.test(`${len.ja} ${len.en}`) ? 90 : 0) : 0;
+  const full = /フルで|フルコーラス|フルサイズ|フルバージョン|フルの曲|ぜんぶ入り|全部入り/.test(s) || lenSec >= 180;
+  const second = full || lenSec >= 120 || /[2-4二三四]番|二番目|セカンド/.test(s);
+  const bridge = full || /Cメロ|cメロ|Dメロ|ブリッジ|大サビ|ラスサビ|最後のサビ|さいごのサビ/.test(s);
+  return { second, bridge };
+}
+
+/**
+ * original lyrics by rule from the style spell (the model failing must not stop the song; the review demo's lyrics).
+ * R17: one verse by default — intro → verse → pre-chorus (盛り上げ) → chorus (ハモり) → outro (フェードアウト), about a
+ * minute; a 2番 (verse, pre-chorus, chorus again) and a bridge (ささやき) + final chorus only when `said` / the spell asks
+ * for them (lyricsAsked). A mostly instrumental genre keeps its own sparse build / drop shape.
+ */
+export function lyricsFallback(tags: SpellTag[], said?: string | null): SongLyrics {
   const about = aboutOf(tags);
   const a = about[0] ?? 'きみ';
   const b = about[1] ?? '空';
@@ -678,6 +714,8 @@ export function lyricsFallback(tags: SpellTag[]): SongLyrics {
   const pre = sad ? ['胸のおくで　ゆれる灯り', 'まだ　消えないで'] : ['胸のおくで　なにかが鳴る', 'もうすぐ　とどきそう'];
   const chorus = sad ? [`${a}の　うたを　うたうよ`, `${b}の　むこうの　きみまで`, 'なみだも　いつか　ひかりになる', 'わすれないで　ずっと'] : [`ひかれ　ひかれ　${a}のうた`, `${b}まで　とどけ　この声`, 'ふたりで　見つけた　あの光', 'わすれない　ずっと'];
   const bridge = sad ? ['夜があけたら', 'もう一度　はじめよう'] : ['しずかな夜に　ひとりきり', 'そっと　名前を　よんでみる'];
+  const verse2 = sad ? ['夕やけの道　ならんだ影', 'ことばはいらない　わらいあう', 'ちいさな星が　ひとつ光って', 'あしたへ　つづいてく'] : ['あの日の約束　ポケットに', 'つよがりなんて　もういらない', 'ほどけた靴ひも　むすびなおして', 'もういちど　前を向く'];
+  const more = lyricsAsked(said, tags);
   return {
     title: `${a}のうた`.slice(0, 40),
     blocks: [
@@ -685,8 +723,19 @@ export function lyricsFallback(tags: SpellTag[]): SongLyrics {
       { section: 'verse', hints: [], lines: verse },
       { section: 'pre-chorus', hints: ['building'], lines: pre },
       { section: 'chorus', hints: ['harmonies'], lines: chorus },
-      { section: 'bridge', hints: ['whispered'], lines: bridge },
-      { section: 'final-chorus', hints: ['powerful'], lines: chorus },
+      ...(more.second
+        ? [
+            { section: 'verse' as const, hints: [], lines: verse2 },
+            { section: 'pre-chorus' as const, hints: ['building' as const], lines: pre },
+            { section: 'chorus' as const, hints: ['harmonies' as const], lines: chorus },
+          ]
+        : []),
+      ...(more.bridge
+        ? [
+            { section: 'bridge' as const, hints: ['whispered' as const], lines: bridge },
+            { section: 'final-chorus' as const, hints: ['powerful' as const], lines: chorus },
+          ]
+        : []),
       { section: 'outro', hints: ['fade'], lines: [] },
     ],
   };
@@ -694,6 +743,12 @@ export function lyricsFallback(tags: SpellTag[]): SongLyrics {
 
 /** the review demo's stand-in for the model's lyric changes (「サビをもっと明るく」「2番を足して」) */
 export function lyricsDemoEdit(l: SongLyrics, said: string): SongLyrics | null {
+  // R17: 「Cメロも足して」「大サビもほしい」 — a bridge and a last chorus (with a 2番 too when both are asked)
+  if (/Cメロ|Ｃメロ|ブリッジ|大サビ|ラスサビ/.test(said) && /足|たし|追加|入れ|ほしい|欲しい|つく|作|も$|もお願い/.test(said)) {
+    const withTwo = /[2２二]番/.test(said) ? (lyricsDemoEdit(l, '2番を足して') ?? l) : l;
+    const more = lyricsWithBridge(withTwo);
+    return more === l ? null : more;
+  }
   if (/[0-9０-９二三2-3]番/.test(said) && /足|たし|追加|入れ|ほしい|欲しい|つく|作/.test(said)) {
     const more = lyricsSecondVerse(l);
     if (more === l) return null;

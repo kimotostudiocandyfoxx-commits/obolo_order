@@ -420,7 +420,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
         ? { lyrics: base, how: 'new' }
         : await getApi()
             .moonLyrics({ tags: plan.tags, said: (own ? `歌詞はこれで：${own}` : asked || plan.words || 'おまかせ').slice(0, 1200) })
-            .catch((): LyricsView => ({ lyrics: lyricsFallback(plan.tags), how: 'new' }));
+            .catch((): LyricsView => ({ lyrics: lyricsFallback(plan.tags, asked || plan.words), how: 'new' }));
       // the talismans finish coming in before the sheet (each 230 ms, then a breath)
       const wait = 1400 + plan.tags.length * 230 - (Date.now() - t0);
       if (wait > 0) await new Promise((r) => setTimeout(r, wait));

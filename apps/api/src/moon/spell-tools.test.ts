@@ -57,7 +57,7 @@ describe('R12 spell book: POST/GET/PATCH/DELETE /moon/spellbook', () => {
   it('R13: a song spell keeps both parts — style talismans and the lyrics with metatags — and gives both back', async () => {
     const { s, rows } = bookOf();
     const tags = spellFrom('song', '夏の海のポップ');
-    const lyrics = lyricsFallback(tags);
+    const lyrics = lyricsFallback(tags, 'Cメロも');
     const a = await s.save('u1', { kind: 'song', tags, lyrics });
     expect(a.lyrics).toEqual(lyrics);
     expect(rows[0].spellKey).toBe(songSpellKey(a.tags, lyrics));

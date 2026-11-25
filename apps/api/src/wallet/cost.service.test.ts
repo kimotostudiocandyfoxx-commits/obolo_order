@@ -194,11 +194,11 @@ describe('the daily margin report', () => {
         { kind: 'game', count: 2, mana: 2 * MAKE_COST.game },
       ],
       costs: [
-        { kind: 'song', paid: true, costJpy: 10 * 5 },
+        { kind: 'song', paid: true, costJpy: 10 * 2 },
         { kind: 'game', paid: true, costJpy: 2 * 90 },
         { kind: 'chat', paid: false, costJpy: 3 },
       ],
-      jobs: [...Array(10).fill({ kind: 'song', costJpy: 5 }), { kind: 'game', costJpy: 85 }, { kind: 'game', costJpy: 95 }],
+      jobs: [...Array(10).fill({ kind: 'song', costJpy: 2 }), { kind: 'game', costJpy: 85 }, { kind: 'game', costJpy: 95 }],
       usageMana: 4,
       absorbed: { mana: 1, jpy: 0.89 },
     };

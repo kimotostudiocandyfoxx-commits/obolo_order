@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { LyricsService } from './lyrics.service';
 
 const tags = spellFrom('song', '夏の海の明るい曲');
-const base = lyricsFallback(tags);
+const base = lyricsFallback(tags, 'Cメロも');
 const writer = (answer: string | (() => Promise<string>)) => {
   const calls: string[] = [];
   return {

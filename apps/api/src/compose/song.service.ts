@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { applyMixEdit, type ChatTurn, type LlmProvider, moderateText, parseSingDirection, parseSongEdit, phraseText, singDirectionSystem, songEditSystem } from '@obolo/ai';
-import { lyricBlockKeys, lyricBlockLabels, lyricsPrompt, lyricsSheet, normalSongTask, premiumSongTask, repaintSongTask, songSeconds, type MusicProvider, type RunwareAudioTask, type FullSongBody, type SingBody, type SingDirection, type SongEditBody, type SongEditCommand, type SongEditResult, type SongLyrics, type SongMix, type SongPhrase, type SongView, type VoiceSlot } from '@obolo/shared';
+import { lyricBlockKeys, lyricBlockLabels, lyricsPrompt, lyricsSheet, normalSongTask, phrasesAtTempo, premiumSongTask, repaintSongTask, SONG_DEFAULT_TEMPO, songGenSeconds, songSeconds, type MusicProvider, type RunwareAudioTask, type FullSongBody, type SingBody, type SingDirection, type SongEditBody, type SongEditCommand, type SongEditResult, type SongLyrics, type SongMix, type SongPhrase, type SongView, type VoiceSlot } from '@obolo/shared';
 import { and, desc, eq, isNotNull, isNull, sql } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { AppConfig, CONFIG } from '../config';
@@ -13,6 +13,7 @@ import { VoiceService } from '../voice/voice.service';
 import { guideWav, mixStems, preparePhrase, renderSong } from './mix';
 import { generateInstrumental, generateSong, splitSong, type MadeSong } from './music.client';
 import { audioSeconds, runwareAudio, type RunwareSong } from './runware-music';
+import { stretchSong } from './tweak';
 import type { TweakDesign } from './song-tweak.service';
 
 /** What is stored in songs.design_json. */
@@ -259,12 +260,40 @@ export class SongService {
   protected audioSeconds(data: Buffer): Promise<number> {
     return audioSeconds(data);
   }
+  /** R17: the take made `tempo` faster, the pitch kept (a method, so the tests stand in for it) */
+  protected stretch(data: Buffer, tempo: number): Promise<{ data: Buffer; seconds: number }> {
+    return stretchSong(data, tempo);
+  }
+  /** R17: the tempo a song is delivered at (SONG_DEFAULT_TEMPO, 1.2 — the app's signature; 1 = as sung) */
+  songTempo(): number {
+    const t = this.cfg.SONG_DEFAULT_TEMPO ?? SONG_DEFAULT_TEMPO;
+    return Number.isFinite(t) && t >= 1 ? t : 1;
+  }
+
+  /**
+   * R17: the take as delivered — `tempo` faster with the pitch kept, stored next to the take (which stays the original);
+   * the lyric times ÷ tempo. A stretch that fails delivers the take as it is (tempo 1), never no song.
+   */
+  private async deliver(userId: string, origin: string, take: { url: string; data: Buffer; seconds: number; phrases: SongPhrase[] }, tempo: number): Promise<{ mixUrl: string; seconds: number; phrases: SongPhrase[]; tempo: number }> {
+    if (Math.abs(tempo - 1) < 0.001) return { mixUrl: take.url, seconds: take.seconds, phrases: take.phrases, tempo: 1 };
+    try {
+      const fast = await this.stretch(take.data, tempo);
+      const m = await this.media.storeAudio(userId, 'audio/mp4', fast.data, origin);
+      const phrases = phrasesAtTempo(take.phrases, tempo).map((p) => (p.url === take.url ? { ...p, url: m.url } : p));
+      return { mixUrl: m.url, seconds: fast.seconds || Math.round((take.seconds / tempo) * 10) / 10, phrases, tempo };
+    } catch (e) {
+      this.log.warn(`song tempo ${tempo}× failed, delivered as sung: ${why(e)}`);
+      return { mixUrl: take.url, seconds: take.seconds, phrases: take.phrases, tempo: 1 };
+    }
+  }
 
   /** R17: the song sung on Runware — one mix (MP3); its stems and line times come later from our GPU, when needed */
   private async createRunware(userId: string, body: FullSongBody, origin: string, premium: boolean): Promise<SongView> {
     const lyrics: SongLyrics = body.lyrics ?? { blocks: body.sections.map((s) => ({ section: s.name, hints: [], lines: s.lines.map((l) => l.text).slice(0, 8) })) };
     const style = songPrompt(body.instrumentalPrompt, body.genre);
-    const seconds = songSeconds({ tags: body.spell, lyrics, seconds: body.seconds, bpm: body.bpm });
+    // R17: the length delivered (a minute unless the lyrics or the member say more), sung `tempo` longer, then made faster
+    const tempo = this.songTempo();
+    const seconds = songGenSeconds(songSeconds({ tags: body.spell, lyrics, bpm: body.bpm }), tempo);
     const task = premium
       ? premiumSongTask({ taskUUID: randomUUID(), prompt: style, lyrics })
       : normalSongTask({ taskUUID: randomUUID(), prompt: lyricsPrompt(style, lyrics), lyrics, seconds, language: 'ja', bpm: body.bpm, keyRoot: body.keyRoot, scale: body.scale });
@@ -273,7 +302,8 @@ export class SongService {
     const mixM = await this.media.storeAudio(userId, 'audio/mpeg', got.data, origin);
     const lines = body.lyrics ? lyricLinesOf(body.lyrics) : body.sections.flatMap((s) => s.lines.map((l) => ({ section: s.name, text: l.text })));
     const phrases = timedPhrases(lines, { lines: [], seconds: secs }, body.bpm, mixM.url);
-    const design: StoredDesign = {
+    const out = await this.deliver(userId, origin, { url: mixM.url, data: got.data, seconds: secs, phrases }, tempo);
+    const design: StoredDesign & TweakDesign = {
       genre: body.genre,
       mood: body.mood,
       bpm: body.bpm,
@@ -289,8 +319,10 @@ export class SongService {
       voiced: false,
       cost: { usd: got.costUsd, model: got.model, taskUUID: got.taskUUID },
       ...(body.lyrics ? { lyrics: body.lyrics } : {}),
+      // R17: the take as sung is the original every free change is made from (at `tempo`); `first` is what was delivered
+      ...(out.tempo !== 1 ? { tempo: out.tempo, original: { mixUrl: mixM.url, seconds: secs, phrases }, first: { mixUrl: out.mixUrl, seconds: out.seconds, phrases: out.phrases } } : {}),
     };
-    const mix: SongMix = { ...DEFAULT_MIX, gaps: phrases.map(() => 0) };
+    const mix: SongMix = { ...DEFAULT_MIX, gaps: out.phrases.map(() => 0) };
     const [row] = await this.db.write
       .insert(songs)
       .values({
@@ -299,15 +331,15 @@ export class SongService {
         designJson: design as unknown as Record<string, unknown>,
         // not split yet: the mix stands in for the instrumental until our GPU splits it (design.vocalsUrl then)
         instrumentalUrl: mixM.url,
-        phrasesJson: phrases as unknown as Record<string, unknown>[],
+        phrasesJson: out.phrases as unknown as Record<string, unknown>[],
         mixJson: mix as unknown as Record<string, unknown>,
         directionJson: PLAIN_DIRECTION as unknown as Record<string, unknown>,
-        mixUrl: mixM.url,
-        seconds: secs,
+        mixUrl: out.mixUrl,
+        seconds: out.seconds,
         ...(body.from === 'atelier' ? { savedAt: new Date() } : {}),
       })
       .returning();
-    this.log.log(`song ${row.id} ${userId} "${body.title}" sung on Runware (${got.model}${premium ? ', secret spell' : ''}) ${secs}s in ${Math.round(got.ms / 1000)}s, cost ${got.costUsd ?? '?'} USD`);
+    this.log.log(`song ${row.id} ${userId} "${body.title}" sung on Runware (${got.model}${premium ? ', secret spell' : ''}) ${secs}s, delivered ${out.tempo}× ${out.seconds}s in ${Math.round(got.ms / 1000)}s, cost ${got.costUsd ?? '?'} USD`);
     return this.view(row);
   }
 
@@ -390,14 +422,22 @@ export class SongService {
     const phrases = timedPhrases(lines, { lines: made.lines, seconds }, d.bpm, vocM.url);
     // the free changes are made from the original: now with its stems and real line times (in the member's voice: a new mix)
     const original = { mixUrl: mixM?.url ?? d.original?.mixUrl ?? row.mixUrl, seconds, phrases };
-    const design = { ...d, vocalsUrl: vocM.url, guideUrl: guideM.url, voiced: made.voiced, timed: made.lines.length > 0, original, ...(o.voice ? { voiceTried: true } : {}) };
+    // R17: the split is of the take as sung (1.0×); what the member hears is at the song's tempo — its line times ÷ tempo,
+    // and a new mix in their own voice made faster too
+    const tempo = d.tempo ?? 1;
+    let shown: { mixUrl: string; seconds: number; phrases: SongPhrase[] } = original;
+    if (tempo !== 1) {
+      const sung = mixM ? await this.deliver(userId, origin, { url: mixM.url, data: made.mix, seconds, phrases }, tempo) : null;
+      shown = sung ?? { mixUrl: d.first?.mixUrl ?? row.mixUrl ?? original.mixUrl, seconds: d.first?.seconds ?? row.seconds ?? Math.round((seconds / tempo) * 10) / 10, phrases: phrasesAtTempo(phrases, tempo) };
+    }
+    const design = { ...d, vocalsUrl: vocM.url, guideUrl: guideM.url, voiced: made.voiced, timed: made.lines.length > 0, original, ...(tempo !== 1 ? { first: shown } : {}), ...(o.voice ? { voiceTried: true } : {}) };
     const untouched = !d.tweaks?.length;
     const [nr] = await this.db.write
       .update(songs)
       .set({
         designJson: design as unknown as Record<string, unknown>,
         instrumentalUrl: instM.url,
-        ...(untouched ? { phrasesJson: phrases as unknown as Record<string, unknown>[], mixUrl: original.mixUrl, seconds } : {}),
+        ...(untouched ? { phrasesJson: shown.phrases as unknown as Record<string, unknown>[], mixUrl: shown.mixUrl, seconds: shown.seconds } : {}),
         updatedAt: new Date(),
       })
       .where(eq(songs.id, row.id))
@@ -637,7 +677,8 @@ export class SongService {
       if (!inst || !voc) throw apiError(HttpStatus.NOT_FOUND, 'INSTRUMENTAL_NOT_FOUND', 'A part of the song is missing');
       let out: { data: Buffer; seconds: number };
       try {
-        out = await mixStems({ instrumental: inst, vocals: voc, bpm: design.bpm, mix });
+        // R17: the stems are the take as sung — the song's own tempo folded into the mix's
+        out = await mixStems({ instrumental: inst, vocals: voc, bpm: design.bpm, mix: { ...mix, tempo: mix.tempo * ((design as StoredDesign & TweakDesign).tempo ?? 1) } });
       } catch (e) {
         this.log.warn(`stem mix failed: ${String(e)}`);
         throw apiError(HttpStatus.BAD_GATEWAY, 'MIX_FAILED', `The song could not be mixed: ${why(e)}`);
@@ -678,7 +719,8 @@ export class SongService {
         const again = await this.resingRunware(userId, origin, row, design, lines, length, command.action === 'SONG_EXTEND');
         mixUrl = again.mixUrl;
         seconds = again.seconds;
-        instrumentalUrl = again.mixUrl;
+        // the take stands in for the instrumental until our GPU splits it
+        instrumentalUrl = again.takeUrl;
         vocalsUrl = undefined;
         phrases = again.phrases;
         mix = { ...DEFAULT_MIX, gaps: phrases.map(() => 0) };
@@ -727,6 +769,8 @@ export class SongService {
       phrases = timedPhrases(lines, made, design.bpm, vocalsUrl);
       mix = { ...DEFAULT_MIX, gaps: phrases.map(() => 0) };
       design.engine = 'acestep';
+      // (our GPU's take is delivered as sung)
+      Object.assign(design, { tempo: undefined, first: undefined });
       }
     }
     const oldVocals = design.vocalsUrl;
@@ -764,13 +808,18 @@ export class SongService {
       if (last && last.section === l.section && last.lines.length < 8) last.lines.push(l.text);
       else lyrics.blocks.push({ section: l.section, hints: [], lines: [l.text] });
     }
-    const seconds = songSeconds({ lyrics, seconds: length, bpm: design.bpm });
+    // R17: `length` is of the take as sung; the song delivered at the tempo is that ÷ tempo (at least), sung × tempo again
+    const td = design as StoredDesign & TweakDesign;
+    const tempo = this.songTempo();
+    const was = td.tempo ?? 1;
+    const seconds = songGenSeconds(songSeconds({ lyrics, atLeast: length / was, bpm: design.bpm }), tempo);
     const base = { prompt: design.instrumentalPrompt, lyrics, seconds, language: 'ja', bpm: design.bpm, keyRoot: design.keyRoot, scale: design.scale };
     let got: RunwareSong | null = null;
     if (extend) {
       const src = await this.media.audioByUrl(userId, design.sourceUrl ?? row.mixUrl);
-      const kept = row.seconds ?? design.seconds;
-      if (src && kept + 5 < seconds) {
+      const kept = was !== 1 ? (td.original?.seconds ?? (row.seconds ?? design.seconds) * was) : (row.seconds ?? design.seconds);
+      // (the take is continued at its own tempo: only when the song keeps it)
+      if (src && kept + 5 < seconds && Math.abs(was - tempo) < 0.001) {
         const audio = 'data:audio/mpeg;base64,' + src.toString('base64');
         got = await this.runware(repaintSongTask({ ...base, taskUUID: randomUUID(), audio, start: Math.max(0, kept - 1), end: seconds })).catch((e) => {
           this.log.warn(`runware extend failed, the whole song again: ${why(e)}`);
@@ -788,8 +837,15 @@ export class SongService {
     design.timed = false;
     design.cost = { usd: got.costUsd, model: got.model, taskUUID: got.taskUUID };
     design.seconds = secs;
-    this.log.log(`song ${row.id} sung again on Runware ${secs}s, cost ${got.costUsd ?? '?'} USD`);
-    return { mixUrl: m.url, seconds: secs, phrases: timedPhrases(lines, { lines: [], seconds: secs }, design.bpm, m.url) };
+    const phrases = timedPhrases(lines, { lines: [], seconds: secs }, design.bpm, m.url);
+    const out = await this.deliver(userId, origin, { url: m.url, data: got.data, seconds: secs, phrases }, tempo);
+    // a new take: the free changes start again from it (the old versions were of the song before)
+    td.tempo = out.tempo !== 1 ? out.tempo : undefined;
+    td.original = out.tempo !== 1 ? { mixUrl: m.url, seconds: secs, phrases } : undefined;
+    td.first = out.tempo !== 1 ? { mixUrl: out.mixUrl, seconds: out.seconds, phrases: out.phrases } : undefined;
+    td.tweaks = undefined;
+    this.log.log(`song ${row.id} sung again on Runware ${secs}s, delivered ${out.tempo}× ${out.seconds}s, cost ${got.costUsd ?? '?'} USD`);
+    return { mixUrl: out.mixUrl, takeUrl: m.url, seconds: out.seconds, phrases: out.phrases };
   }
 
   /** Sing some lines again (lyrics or voice changed); the others are kept as they are. */

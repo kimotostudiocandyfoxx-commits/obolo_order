@@ -18,8 +18,8 @@ export const SongPart = z.union([z.object({ cycle: z.number().int().min(1).max(4
 export type SongPart = z.infer<typeof SongPart>;
 
 export const SongTweakOp = z.discriminatedUnion('op', [
-  /** the whole song faster / slower (pitch kept) */
-  z.object({ op: z.literal('tempo'), factor: z.number().min(0.75).max(1.3) }),
+  /** the whole song faster / slower (pitch kept); R17 `to`: the tempo itself (1 = as it was sung: 「元の速さで」) */
+  z.object({ op: z.literal('tempo'), factor: z.number().min(0.75).max(1.3), to: z.number().min(0.7).max(1.5).optional() }),
   /** the key up / down in semitones (tempo kept) */
   z.object({ op: z.literal('key'), semitones: z.number().int().min(-5).max(5) }),
   /** a part taken out (crossfaded at the join) */
@@ -111,8 +111,9 @@ export function parseTweak(said0: string): TweakParse {
     return { ops: [], paid: /歌詞|[「『]/.test(said) ? 'lyrics' : 'extend' };
   }
   const ops: SongTweakOp[] = [];
-  // tempo
-  if (/テンポ|速く|はやく|早く|遅く|おそく|ゆっくり|スピード/.test(said)) {
+  // tempo — R17: 「元の速さで」 back to the tempo it was sung at (a song is delivered SONG_DEFAULT_TEMPO faster)
+  if (/(元|もと|普通|ふつう|オリジナル|生成した時)の(速さ|はやさ|テンポ|スピード)|(速さ|テンポ|スピード)を?(元|もと)に|等速/.test(said)) ops.push({ op: 'tempo', factor: 1, to: 1 });
+  else if (/テンポ|速く|はやく|早く|遅く|おそく|ゆっくり|スピード/.test(said)) {
     const up = /速く|はやく|早く|上げ|あげ|アップ|速め|早め/.test(said);
     const down = /遅く|おそく|ゆっくり|下げ|さげ|ダウン|遅め/.test(said);
     if (up !== down) ops.push({ op: 'tempo', factor: up ? (MORE.test(said) ? 1.18 : LESS.test(said) ? 1.05 : 1.1) : MORE.test(said) ? 0.85 : LESS.test(said) ? 0.95 : 0.9 });
@@ -163,7 +164,7 @@ export function tweakWhat(ops: SongTweakOp[]): string {
     .map((o) => {
       switch (o.op) {
         case 'tempo':
-          return o.factor > 1 ? 'テンポを速く' : 'テンポをゆっくり';
+          return o.to !== undefined ? (Math.abs(o.to - 1) < 0.001 ? '元の速さに' : `テンポを${o.to}倍に`) : o.factor > 1 ? 'テンポを速く' : 'テンポをゆっくり';
         case 'key':
           return o.semitones > 0 ? `キーを${o.semitones}つ上げ` : `キーを${-o.semitones}つ下げ`;
         case 'cut':
@@ -202,10 +203,14 @@ export interface TweakPlan {
   room: number;
 }
 const samePart = (a: SongPart, b: SongPart) => JSON.stringify(a) === JSON.stringify(b);
-export function tweakPlan(ops: SongTweakOp[]): TweakPlan {
-  const p: TweakPlan = { tempo: 1, semitones: 0, cuts: [], repeats: [], maxSeconds: null, fadeIn: 0, fadeOut: 0, vocalDb: 0, bgmDb: 0, stem: 'both', room: 0 };
+/**
+ * R17 `base`: the tempo the song is delivered at over how it was sung (SONG_DEFAULT_TEMPO: 1.2) — every version is made
+ * from the original at base × the tempo ops (「もっと速く」 from 1.2, 「元の速さで」 back to 1)
+ */
+export function tweakPlan(ops: SongTweakOp[], base = 1): TweakPlan {
+  const p: TweakPlan = { tempo: base, semitones: 0, cuts: [], repeats: [], maxSeconds: null, fadeIn: 0, fadeOut: 0, vocalDb: 0, bgmDb: 0, stem: 'both', room: 0 };
   for (const o of ops) {
-    if (o.op === 'tempo') p.tempo = Math.max(0.7, Math.min(1.35, p.tempo * o.factor));
+    if (o.op === 'tempo') p.tempo = Math.max(0.7, Math.min(1.5, o.to ?? p.tempo * o.factor));
     else if (o.op === 'key') p.semitones = Math.max(-6, Math.min(6, p.semitones + o.semitones));
     else if (o.op === 'cut') {
       if (!p.cuts.some((c) => samePart(c, o.part))) p.cuts.push(o.part);

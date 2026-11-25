@@ -54,19 +54,22 @@ const body: FullSongBody = {
   lyrics,
 };
 
-function songs(cfg: Record<string, unknown>, runware: (t: RunwareAudioTask) => Promise<RunwareSong>) {
+function songs(cfg: Record<string, unknown>, runware: (t: RunwareAudioTask) => Promise<RunwareSong>, stretch?: (d: Buffer, tempo: number) => Promise<{ data: Buffer; seconds: number }>) {
   const inserted: Record<string, unknown>[] = [];
   const db = { write: { insert: () => ({ values: (v: Record<string, unknown>) => ({ returning: async () => (inserted.push(v), [{ id: 'song-1', savedAt: null, ...v }]) }) }) } };
   const media = { storeAudio: async (_u: string, mime: string) => ({ url: `https://cdn/${mime === 'audio/mpeg' ? 'song.mp3' : 'x.m4a'}` }) };
   const s = new SongService({ name: 'mock' } as never, cfg as never, db as never, media as never, {} as never);
   const tasks: RunwareAudioTask[] = [];
   let gpu = 0;
+  const stretches: number[] = [];
   Object.assign(s, {
     runware: (t: RunwareAudioTask) => (tasks.push(t), runware(t)),
-    audioSeconds: async () => 98.5,
+    // the take is as long as asked; made faster it is that ÷ tempo
+    audioSeconds: async () => tasks[tasks.length - 1]?.duration ?? 98.5,
+    stretch: stretch ?? (async (_d: Buffer, tempo: number) => (stretches.push(tempo), { data: Buffer.from('fast'), seconds: Math.round(((tasks[tasks.length - 1]?.duration ?? 98.5) / tempo) * 10) / 10 })),
     createGpu: async () => (gpu++, { id: 'gpu-song' }),
   });
-  return { s, tasks, inserted, gpuCalls: () => gpu };
+  return { s, tasks, inserted, stretches, gpuCalls: () => gpu };
 }
 const ok = async (t: RunwareAudioTask): Promise<RunwareSong> => ({ data: Buffer.from('mp3'), audioUrl: 'u', costUsd: t.model === SONG_MODEL_PREMIUM ? 0.15 : 0.009, taskUUID: t.taskUUID, model: t.model, ms: 13_000 });
 const down = async (): Promise<RunwareSong> => {
@@ -80,12 +83,13 @@ describe('R17: which engine sings (MUSIC_PROVIDER, the fallback, the secret spel
     expect(gpuCalls()).toBe(0);
     expect(tasks[0]).toMatchObject({ model: SONG_MODEL_NORMAL, includeCost: true, settings: { vocalLanguage: 'ja', bpm: 120, keyScale: 'C major' } });
     expect(tasks[0].settings.lyrics).toMatch(/^\[Intro\]/);
-    expect(tasks[0].duration).toBeGreaterThanOrEqual(90);
+    // R17: a minute delivered, sung 1.2× longer
+    expect(tasks[0].duration).toBe(72);
     expect(tasks[0].positivePrompt).not.toMatch(/no vocals/);
     const d = inserted[0].designJson as Record<string, unknown>;
     expect(d).toMatchObject({ engine: 'runware', cost: { usd: 0.009, model: SONG_MODEL_NORMAL }, sourceUrl: 'https://cdn/song.mp3' });
     expect(d.vocalsUrl).toBeUndefined();
-    expect(inserted[0]).toMatchObject({ mixUrl: 'https://cdn/song.mp3', seconds: 98.5 });
+    expect(inserted[0]).toMatchObject({ mixUrl: 'https://cdn/x.m4a', seconds: 60 });
   });
   it('Runware failing → our GPU sings it (when there is one); without the GPU the error stands', async () => {
     const a = songs({ MUSIC_RUNWARE_KEY: 'k', MUSIC_PROVIDER: 'runware', MUSIC_URL: 'https://gpu' }, down);
@@ -172,5 +176,99 @@ describe('R17: our GPU is woken only for a change that needs the stems / the tim
     expect(await s.tweak('u1', 's1', { said: '自分の声で歌って' }, 'http://x')).toMatchObject({ status: 'done' });
     Object.assign(row, { designJson: { ...(row.designJson as TweakDesign), voiced: false } });
     expect(await s.tweak('u1', 's1', { said: '自分の声で歌って' }, 'http://x')).toMatchObject({ status: 'paid', paid: 'voice' });
+  });
+});
+
+// --- R17: 60 s by default, sung 1.2× longer and delivered 1.2× faster -----------------------------------------------------
+
+describe('R17: the song length and the 1.2× signature tempo', () => {
+  it('default: 60 s delivered — sung 72 s, made 1.2× faster; the take kept as the original, the line times ÷ 1.2', async () => {
+    const { s, tasks, inserted, stretches } = songs({ MUSIC_RUNWARE_KEY: 'k' }, ok);
+    await s.createFull('u1', body, 'http://x');
+    expect(tasks[0].duration).toBe(72);
+    expect(stretches).toEqual([1.2]);
+    const d = inserted[0].designJson as TweakDesign;
+    expect(inserted[0]).toMatchObject({ mixUrl: 'https://cdn/x.m4a', seconds: 60, instrumentalUrl: 'https://cdn/song.mp3' });
+    expect(d.tempo).toBe(1.2);
+    expect(d.original).toMatchObject({ mixUrl: 'https://cdn/song.mp3', seconds: 72 });
+    expect(d.first).toMatchObject({ mixUrl: 'https://cdn/x.m4a', seconds: 60 });
+    const take = d.original!.phrases;
+    const shown = inserted[0].phrasesJson as SongPhrase[];
+    expect(shown).toHaveLength(take.length);
+    shown.forEach((p, i) => {
+      expect(p.startBeat).toBeCloseTo(take[i].startBeat / 1.2, 2);
+      expect(p.seconds).toBeCloseTo(take[i].seconds / 1.2, 1);
+      expect(p.url).toBe('https://cdn/x.m4a');
+    });
+  });
+  it('lyrics that do not fit in a minute (a full song) make it longer; a length the member asked for is honoured', async () => {
+    const full = songs({ MUSIC_RUNWARE_KEY: 'k' }, ok);
+    await full.s.createFull('u1', { ...body, lyrics: lyricsFallback(spellFrom('song', '夏の海の明るい曲'), 'フルで') }, 'http://x');
+    expect(full.tasks[0].duration).toBeGreaterThan(120);
+    const two = songs({ MUSIC_RUNWARE_KEY: 'k' }, ok);
+    await two.s.createFull('u1', { ...body, spell: spellFrom('song', '夏の海の明るい曲を2分で') }, 'http://x');
+    expect(two.tasks[0].duration).toBe(144);
+    expect(two.inserted[0].seconds).toBe(120);
+  });
+  it('SONG_DEFAULT_TEMPO 1 turns it off; a stretch that fails delivers the take as sung', async () => {
+    const off = songs({ MUSIC_RUNWARE_KEY: 'k', SONG_DEFAULT_TEMPO: 1 }, ok);
+    await off.s.createFull('u1', body, 'http://x');
+    expect(off.tasks[0].duration).toBe(60);
+    expect(off.stretches).toEqual([]);
+    expect(off.inserted[0]).toMatchObject({ mixUrl: 'https://cdn/song.mp3', seconds: 60 });
+    expect((off.inserted[0].designJson as TweakDesign).tempo).toBeUndefined();
+    const bad = songs({ MUSIC_RUNWARE_KEY: 'k' }, ok, async () => {
+      throw new Error('no ffmpeg');
+    });
+    await bad.s.createFull('u1', body, 'http://x');
+    expect(bad.inserted[0]).toMatchObject({ mixUrl: 'https://cdn/song.mp3', seconds: 72 });
+    expect((bad.inserted[0].designJson as TweakDesign).tempo).toBeUndefined();
+  });
+  it('the secret spell is delivered 1.2× faster too', async () => {
+    const a = songs({ MUSIC_RUNWARE_KEY: 'k' }, ok);
+    await a.s.createFull('u1', { ...body, premium: '7d1f6a3e-2b4c-4d5e-8f90-1a2b3c4d5e6f' }, 'http://x');
+    expect(a.stretches).toEqual([1.2]);
+    expect((a.inserted[0].designJson as TweakDesign).tempo).toBe(1.2);
+  });
+});
+
+describe('R17: free changes are made from the take as sung, the 1.2× folded in', () => {
+  const fast = () => {
+    const t = tweaks();
+    const d = t.row.designJson as TweakDesign;
+    const take = t.row.phrasesJson as SongPhrase[];
+    Object.assign(t.row, {
+      mixUrl: 'https://cdn/fast.m4a',
+      seconds: 83.3,
+      phrasesJson: take.map((p) => ({ ...p, startBeat: p.startBeat / 1.2, beats: p.beats / 1.2, seconds: p.seconds / 1.2 })),
+      designJson: { ...d, tempo: 1.2, original: { mixUrl: 'https://cdn/song.mp3', seconds: 100, phrases: take }, first: { mixUrl: 'https://cdn/fast.m4a', seconds: 83.3, phrases: [] } },
+    });
+    return t;
+  };
+  it('a change renders from the original take at 1.2 × its tempo (never from the faster song)', async () => {
+    const { s, renders } = fast();
+    const r = await s.tweak('u1', 's1', { said: 'テンポ速くして' }, 'http://x');
+    expect(r.status).toBe('done');
+    const o = renders[0] as unknown as { instrumentalUrl: string; plan: { tempo: number }; seconds: number; total: number };
+    expect(o.instrumentalUrl).toBe('https://cdn/song.mp3');
+    expect(o.plan.tempo).toBeCloseTo(1.32);
+    expect(o.seconds).toBe(100);
+    expect(o.total).toBeCloseTo(100 / 1.32, 0);
+  });
+  it('a change that is not about tempo keeps the 1.2×; 「元の速さで」 goes back to 1 (the take as sung)', async () => {
+    const a = fast();
+    await a.s.tweak('u1', 's1', { said: 'キーを上げて' }, 'http://x');
+    expect((a.renders[0] as unknown as { plan: { tempo: number; semitones: number } }).plan).toMatchObject({ tempo: 1.2, semitones: 2 });
+    const b = fast();
+    const r = await b.s.tweak('u1', 's1', { said: '元の速さで' }, 'http://x');
+    expect(r).toMatchObject({ status: 'done', what: '元の速さに' });
+    expect((b.renders[0] as unknown as { plan: { tempo: number }; total: number }).plan.tempo).toBe(1);
+    expect(r.song?.seconds).toBe(100);
+  });
+  it('「元に戻して」 after one change: back to the song as delivered (1.2×), not the take', async () => {
+    const { s } = fast();
+    await s.tweak('u1', 's1', { said: 'テンポ速くして' }, 'http://x');
+    const r = await s.tweak('u1', 's1', { undo: true }, 'http://x');
+    expect(r).toMatchObject({ status: 'undone', song: { url: 'https://cdn/fast.m4a', seconds: 83.3 } });
   });
 });

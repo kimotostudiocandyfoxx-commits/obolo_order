@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { lyricBlockKeys, lyricsFallback, lyricsSecondVerse, spellFrom, tweakPlan, type SongPhrase, type SongTweakResult } from '@obolo/shared';
 import { describe, expect, it } from 'vitest';
 import { SongTweakService, type TweakDesign } from './song-tweak.service';
-import { renderTweak, tweakGraph } from './tweak';
+import { renderTweak, RUBBERBAND_HQ, stretchSong, tempoFilters, tweakGraph } from './tweak';
 
 /** a 2番 song at 120 bpm: 4-beat lines back to back in each block */
 function songRow() {
@@ -119,3 +119,18 @@ describe.skipIf(!ffmpeg)('R13: the ffmpeg render (two stems → the changed song
   }, 60_000);
 });
 void (null as unknown as SongTweakResult);
+
+describe.skipIf(!ffmpeg)('R17: the song delivered 1.2× faster (ffmpeg, pitch kept)', () => {
+  it('a 24 s take becomes ≈ 20 s; rubberband in high quality, atempo without it', async () => {
+    const d = mkdtempSync(join(tmpdir(), 'st-'));
+    execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'lavfi', '-i', 'sine=f=440:d=24', '-ac', '2', '-c:a', 'libmp3lame', join(d, 't.mp3')]);
+    const out = await stretchSong(readFileSync(join(d, 't.mp3')), 1.2);
+    expect(out.seconds).toBeGreaterThan(19.5);
+    expect(out.seconds).toBeLessThan(20.5);
+    expect(tempoFilters(1.2, 0, true)).toEqual([`rubberband=tempo=1.2000:pitch=1.00000:${RUBBERBAND_HQ}`]);
+    expect(RUBBERBAND_HQ).toMatch(/formant=preserved/);
+    expect(RUBBERBAND_HQ).toMatch(/pitchq=quality/);
+    expect(tempoFilters(1.2, 0, false)).toEqual(['atempo=1.2000']);
+    expect(tempoFilters(1, 0, true)).toEqual([]);
+  }, 60_000);
+});

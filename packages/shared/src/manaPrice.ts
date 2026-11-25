@@ -146,6 +146,18 @@ export const RUNWARE_PRICES: Record<string, number> = {
   'minimax:music@2.6': 0.15, // MiniMax Music 2.6, one clip (Music lab: $0.15)
 };
 
+/**
+ * R17 (client 2026-11-25): a normal song is quoted as Runware ACE-Step 1.5 XL SFT for the seconds it is sung — a song is
+ * 60 s delivered (SONG_QUOTE_SECONDS) and sung 1.2× longer (SONG_QUOTE_TEMPO: delivered 1.2× faster, the pitch kept);
+ * its price scales with the length (RUNWARE_PRICES is for ≈ 60 s)
+ */
+export const SONG_QUOTE_SECONDS = 60;
+export const SONG_QUOTE_TEMPO = 1.2;
+/** ACE-Step 1.5 XL SFT on Runware for `seconds` of song (USD) */
+export const aceStepUsd = (seconds: number) => (RUNWARE_PRICES['runware:ace-step@v1.5-xl-sft'] * Math.max(30, seconds)) / 60;
+/** our CPU for the song: the request and storing it, plus the 1.2× time-stretch (rubberband on ~60 s of audio, p90) */
+export const SONG_QUOTE_CPU_SECONDS = 20 + 15;
+
 /** the pricing knobs that are not provider list prices (all set from the API's env) */
 export interface CostRates {
   usdJpy: number;
@@ -233,8 +245,8 @@ export const MAKE_COST_ESTIMATE: Record<MakeKind, CostEstimate> = {
   look: { usd: 4 * RUNWARE_PRICES['bytedance:seedream@5.0-pro'] + 0.002, note: 'Seedream 5.0 Pro ×4 枚（1枚 p90 約7円）＋文章 Gemini' },
   kororinDesign: { usd: 4 * RUNWARE_PRICES['bytedance:seedream@5.0-pro'], cpuSeconds: 10, note: 'Seedream 5.0 Pro ×4 枚＋切り抜き CPU' },
   jacketArt: { usd: 0.039 + 0.002, note: 'Gemini 2.5 Flash Image ×1 枚（約 $0.039）＋文章' },
-  song: { usd: 0.004, gpuSeconds: 240, cpuSeconds: 20, note: '自社 GPU（ACE-Step＋分離＋声）p90 240秒＋曲の設計・歌詞 Gemini' },
-  songPremium: { usd: RUNWARE_PRICES['minimax:music@2.6'] + 0.004, cpuSeconds: 20, note: 'MiniMax Music 2.6 ×1 曲（$0.15）＋設計・歌詞' },
+  song: { usd: aceStepUsd(SONG_QUOTE_SECONDS * SONG_QUOTE_TEMPO) + 0.004, cpuSeconds: SONG_QUOTE_CPU_SECONDS, note: 'Runware ACE-Step 1.5 XL SFT（60秒の曲を1.2倍の72秒ぶん歌う、長さに比例）＋1.2倍速の処理 CPU＋曲の設計・歌詞 Gemini' },
+  songPremium: { usd: RUNWARE_PRICES['minimax:music@2.6'] + 0.004, cpuSeconds: SONG_QUOTE_CPU_SECONDS, note: 'MiniMax Music 2.6 ×1 曲（$0.15）＋1.2倍速の処理 CPU＋設計・歌詞' },
   mv: { usd: 12 * RUNWARE_PRICES['runware:400@4'] + 0.006, cpuSeconds: 240, note: 'FLUX.2 klein 4B ×12 場面＋演出 Gemini＋描画 CPU p90 240秒' },
   story: { usd: 0.01, note: 'お話 Gemini Flash（数千トークン）' },
   game: { usd: 0.35, note: 'Gemini 2.5 Pro（入力 約1.5万・出力＋思考 約3万トークン）' },

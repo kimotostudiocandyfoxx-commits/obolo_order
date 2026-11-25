@@ -24,6 +24,39 @@ export function rubberbandReady(): Promise<boolean> {
   return hasRubberband;
 }
 
+/**
+ * R17: rubberband at its cleanest for a sung mix — the formants kept (the voice does not go chipmunk), the high-quality
+ * pitch path, smooth transients and laminar phase (no phasey / metallic vocals), both channels together (the image kept)
+ */
+export const RUBBERBAND_HQ = 'formant=preserved:pitchq=quality:transients=smooth:phase=laminar:channels=together';
+
+/** the tempo (and key) change as ffmpeg filters: rubberband in high quality, else asetrate + atempo; [] when none */
+export function tempoFilters(tempo: number, semitones: number, rubberband: boolean): string[] {
+  if (semitones === 0 && Math.abs(tempo - 1) <= 0.001) return [];
+  const ratio = 2 ** (semitones / 12);
+  if (rubberband) return [`rubberband=tempo=${tempo.toFixed(4)}:pitch=${ratio.toFixed(5)}:${RUBBERBAND_HQ}`];
+  if (semitones !== 0) return [`asetrate=${Math.round(44100 * ratio)}`, 'aresample=44100', `atempo=${(tempo / ratio).toFixed(4)}`];
+  return [`atempo=${tempo.toFixed(4)}`];
+}
+
+/**
+ * R17: the song as delivered — the take sung at 1.0× made `tempo` faster, the pitch kept (SONG_DEFAULT_TEMPO); AAC in
+ * MP4, and its length. The take itself is kept as the original (the free changes are made from it, never from this).
+ */
+export async function stretchSong(audio: Buffer, tempo: number): Promise<{ data: Buffer; seconds: number }> {
+  const dir = await mkdtemp(join(tmpdir(), 'tempo-'));
+  try {
+    const src = join(dir, 'take');
+    const out = join(dir, 'song.m4a');
+    await writeFile(src, audio);
+    const filters = ['aresample=44100', 'aformat=channel_layouts=stereo', ...tempoFilters(tempo, 0, await rubberbandReady())].join(',');
+    await run('ffmpeg', ['-y', '-hide_banner', '-loglevel', 'error', '-i', src, '-af', filters, '-ar', '44100', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', out], TWEAK_FFMPEG_MS);
+    return { data: await readFile(out), seconds: Math.round((await probe(out)).seconds * 10) / 10 };
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+}
+
 /** the filter graph (exported for the tests): inputs 0 = instrumental, 1 = vocals; output [o] */
 export function tweakGraph(o: { segments: Segment[]; plan: TweakPlan; seconds: number; total: number; rubberband: boolean }): string {
   const { plan } = o;
@@ -54,13 +87,8 @@ export function tweakGraph(o: { segments: Segment[]; plan: TweakPlan; seconds: n
   }
   const mixed = useInst && useVoc ? '[ib][vb]amix=inputs=2:duration=longest:normalize=0' : useInst ? '[ib]anull' : '[vb]anull';
   // key and tempo
-  const ratio = 2 ** (plan.semitones / 12);
-  const kt: string[] = [];
-  if (plan.semitones !== 0 || Math.abs(plan.tempo - 1) > 0.001) {
-    if (o.rubberband) kt.push(`rubberband=tempo=${plan.tempo.toFixed(4)}:pitch=${ratio.toFixed(5)}:formant=preserved`);
-    else if (plan.semitones !== 0) kt.push(`asetrate=${Math.round(44100 * ratio)}`, 'aresample=44100', `atempo=${(plan.tempo / ratio).toFixed(4)}`);
-    else kt.push(`atempo=${plan.tempo.toFixed(4)}`);
-  }
+  // (R17: plan.tempo has the delivered tempo folded in — the stems are the 1.0× take)
+  const kt = tempoFilters(plan.tempo, plan.semitones, o.rubberband);
   // length and fades (on the new timeline)
   const tail: string[] = [];
   const total = o.total;

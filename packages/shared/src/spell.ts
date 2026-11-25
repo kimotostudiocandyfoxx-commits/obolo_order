@@ -165,6 +165,14 @@ export const SPELL_DICTIONARY: Entry[] = [
   e('力強い歌声', 'powerful vocals', 'voice', /力強い歌声|力強く歌|シャウト/, SONG),
   e('女の子の声', 'female vocals', 'voice', /女の子の声|女性(の)?(声|ボーカル)/, SONG),
   e('男の子の声', 'male vocals', 'voice', /男の子の声|男性(の)?(声|ボーカル)/, SONG),
+  // R17 (client 2026-11-25): a song is a minute unless asked — how long, when the words say it (songEngine.songSeconds)
+  e('30秒の曲', 'a short song of about 30 seconds', 'length', /30秒|３０秒|短めの曲|短い曲|みじかい曲/, SONG),
+  e('1分半の曲', 'a song of about 90 seconds', 'length', /[1１]分半|90秒|９０秒/, SONG),
+  e('1分の曲', 'a song of about 60 seconds', 'length', /[1１]分(?!半)|60秒|６０秒/, SONG),
+  e('2分の曲', 'a song of about 2 minutes', 'length', /[2２]分(?!半)|120秒|１２０秒/, SONG),
+  e('3分の曲', 'a song of about 3 minutes', 'length', /[3３]分(?!半)|180秒|１８０秒/, SONG),
+  e('長めの曲', 'a longer song of about 2 minutes', 'length', /長め|長い曲|ながい曲|ロング/, SONG),
+  e('フルコーラス', 'the full song: two verses, a bridge and a last chorus, about 3 minutes', 'length', /フルで|フルコーラス|フルサイズ|フルバージョン|フルの曲/, SONG),
   // a picture's touch, colour, light, composition; an MV's camera; a look's clothes
   e('水彩', 'watercolor', 'style', /水彩/, PIC),
   e('油絵', 'oil painting', 'style', /油絵/, PIC),

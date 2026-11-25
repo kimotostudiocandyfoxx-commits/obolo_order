@@ -48,6 +48,13 @@ export type TweakDesign = {
   lyrics?: SongLyrics;
   /** the song as the studio made it (every version is made from its stems) */
   original?: { mixUrl: string; seconds: number; phrases: SongPhrase[] };
+  /**
+   * R17: the tempo the song is delivered at over `original` (SONG_DEFAULT_TEMPO, 1.2; absent = 1) — folded into every
+   * version's chain, so a change is always made from the take as sung (never a stretch of a stretch)
+   */
+  tempo?: number;
+  /** R17: the song as first delivered (at `tempo`): what 「元に戻して」 goes back to before any change */
+  first?: { mixUrl: string; seconds: number; phrases: SongPhrase[] };
   tweaks?: TweakVersion[];
 };
 
@@ -97,7 +104,8 @@ export class SongTweakService {
       if (!history.length) return { status: 'first', ...base };
       history.pop();
       const back = history[history.length - 1];
-      const now = back ?? { ops: [], mixUrl: original.mixUrl, seconds: original.seconds, phrases: original.phrases };
+      const first = d.first ?? original;
+      const now = back ?? { ops: [], mixUrl: first.mixUrl, seconds: first.seconds, phrases: first.phrases };
       await this.save(userId, id, { mixUrl: now.mixUrl, seconds: now.seconds, phrases: now.phrases, design: { ...d, original, tweaks: history } });
       return { status: 'undone', song: { url: now.mixUrl, seconds: now.seconds, phrases: now.phrases }, ...(d.lyrics ? { lyrics: tweakLyrics(d.lyrics, null, tweakPlan(now.ops)) } : {}), ops: now.ops, versions: history.length + 1 };
     }
@@ -107,7 +115,8 @@ export class SongTweakService {
     });
     if (!ops.length) return { status: 'none', ...base };
     const all = [...nowOps, ...ops];
-    const plan = tweakPlan(all);
+    // R17: from the take as sung, at the song's own tempo × the tempo ops (「元の速さで」: 1)
+    const plan = tweakPlan(all, d.tempo ?? 1);
     // R17: a song from Runware is one mix — tempo, key, length and fades are made from it; the voice / the music apart or
     // a part cut / again need our GPU's split first (once: a job; {bati} says 「ちょっと待ってね」, then the same words again)
     const runware = d.engine === 'runware';

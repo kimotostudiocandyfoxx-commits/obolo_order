@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { SongLyrics } from './lyrics';
+import { lyricsFallback, type SongLyrics } from './lyrics';
+import { spellFrom } from './spell';
 import {
   minimaxLyrics,
   normalSongTask,
@@ -11,6 +12,12 @@ import {
   saidPremiumWords,
   SONG_MODEL_NORMAL,
   SONG_MODEL_PREMIUM,
+  phrasesAtTempo,
+  SONG_DEFAULT_TEMPO,
+  SONG_SECONDS_DEFAULT,
+  SONG_SECONDS_MAX,
+  songGenSeconds,
+  songLyricsSeconds,
   songSeconds,
   spellSeconds,
   tweakNeedsSplit,
@@ -46,14 +53,48 @@ describe('R17: a normal song on Runware (ACE-Step 1.5 XL SFT)', () => {
     expect(s.length).toBeLessThanOrEqual(RUNWARE_LYRICS_MAX);
     expect(s.endsWith('あ')).toBe(true);
   });
-  it('the length: the spell’s length talisman, else from the lyrics, ~90–120 s when nothing says', () => {
+  it('R17 the length: 60 s by default; longer only when the lyrics do not fit or the member asks', () => {
+    expect(SONG_SECONDS_DEFAULT).toBe(60);
+    expect(songSeconds({})).toBe(60);
+    // {bati}'s one verse fits in a minute (pop, a ballad's slow tempo aside)
+    expect(songSeconds({ lyrics, bpm: 118 })).toBe(60);
+    expect(songSeconds({ lyrics: lyricsFallback(spellFrom('song', '夏の海の明るい曲')), bpm: 120 })).toBe(60);
+    expect(songSeconds({ lyrics: lyricsFallback(spellFrom('song', 'サイケデリックトランスの曲')), bpm: 145 })).toBe(60);
+    // a full song (2番, Cメロ, 大サビ) does not fit: longer, as long as it takes to sing
+    const full = lyricsFallback(spellFrom('song', '夏の海の明るい曲'), 'フルで');
+    const long = songSeconds({ lyrics: full, bpm: 120 });
+    expect(long).toBeGreaterThan(100);
+    expect(long).toBeLessThanOrEqual(SONG_SECONDS_MAX);
+    expect(songLyricsSeconds(full, 120)).toBeGreaterThan(songLyricsSeconds(lyrics, 120) * 1.8);
+    // the same lyrics take longer slower
+    expect(songLyricsSeconds(full, 80)).toBeGreaterThan(songLyricsSeconds(full, 140));
+    // a resung song keeps its length (atLeast)
+    expect(songSeconds({ lyrics, bpm: 118, atLeast: 75 })).toBe(75);
+  });
+  it('R17 the length the member asked for is honoured (a length talisman: exact, or at least for 長め / フル)', () => {
     expect(spellSeconds([{ ja: '1分', en: 'about 60 seconds', group: 'length' }])).toBe(60);
     expect(spellSeconds([{ ja: 'サビだけ', en: 'about 30 seconds: the chorus', group: 'length' }])).toBe(30);
     expect(songSeconds({ tags: [{ ja: '2分', en: 'two minutes', group: 'length' }] })).toBe(120);
-    expect(songSeconds({})).toBe(105);
-    const s = songSeconds({ lyrics, bpm: 118, seconds: 45 });
-    expect(s).toBeGreaterThanOrEqual(90);
-    expect(s).toBeLessThanOrEqual(120);
+    const len = (said: string) => spellFrom('song', said).filter((t) => t.group === 'length');
+    expect(songSeconds({ tags: len('夏の曲を2分で作って'), lyrics })).toBe(120);
+    expect(songSeconds({ tags: len('30秒の曲にして'), lyrics })).toBe(30);
+    expect(songSeconds({ tags: len('1分半くらいの曲'), lyrics })).toBe(90);
+    expect(songSeconds({ tags: len('長めの曲を作って'), lyrics })).toBe(120);
+    expect(songSeconds({ tags: len('フルで作って'), lyrics })).toBe(180);
+    // nothing about length in the words: no talisman, a minute
+    expect(len('夏の海の明るい曲')).toEqual([]);
+    expect(len('十二分に楽しい曲')).toEqual([]);
+    expect(len('フルーツの歌')).toEqual([]);
+  });
+  it('R17 sung 1.2× longer, delivered 1.2× faster: the generated length and the line times', () => {
+    expect(SONG_DEFAULT_TEMPO).toBe(1.2);
+    expect(songGenSeconds(60)).toBe(72);
+    expect(songGenSeconds(150)).toBe(180);
+    expect(songGenSeconds(60, 1)).toBe(60);
+    expect(songGenSeconds(280)).toBe(SONG_SECONDS_MAX);
+    const p = [{ startBeat: 12, beats: 6, seconds: 3 }];
+    expect(phrasesAtTempo(p, 1.2)).toEqual([{ startBeat: 10, beats: 5, seconds: 2.5 }]);
+    expect(phrasesAtTempo(p, 1)).toBe(p);
   });
   it('a part again / longer: audio to audio with the song and the seconds to repaint', () => {
     const t = repaintSongTask({ taskUUID: 'u', prompt: 'p', lyrics, audio: 'https://cdn/x.mp3', start: 60, end: 100, seconds: 100 });

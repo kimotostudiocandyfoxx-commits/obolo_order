@@ -1046,7 +1046,7 @@ export class DemoApi implements Api {
     await sleep(body.lyrics ? 700 : 1200);
     const own = ownLyricsOf(body.said);
     if (own) return { lyrics: lyricsStructure(own) ?? lyricsFallback(body.tags), how: 'own' };
-    if (!body.lyrics) return { lyrics: lyricsFallback(body.tags), how: 'new' };
+    if (!body.lyrics) return { lyrics: lyricsFallback(body.tags, body.said), how: 'new' };
     const e = lyricsEdit(body.lyrics, body.said);
     if (e) return { lyrics: e.lyrics, how: 'edit' };
     const d = lyricsDemoEdit(body.lyrics, body.said);

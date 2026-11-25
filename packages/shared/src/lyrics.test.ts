@@ -7,7 +7,9 @@ import {
   lyricsDemoEdit,
   lyricsDiff,
   lyricsEdit,
+  lyricsAsked,
   lyricsFallback,
+  lyricsWithBridge,
   lyricsKey,
   lyricsLines,
   lyricsNormalize,
@@ -25,7 +27,8 @@ import {
 import { FullSongBody } from './schemas';
 
 const tags = spellFrom('song', '夏の海の明るい曲');
-const base = lyricsFallback(tags);
+// (with a Cメロ and a 大サビ, as asked: 「Cメロも」 — the default is one verse, R17)
+const base = lyricsFallback(tags, 'Cメロも');
 
 describe('R13: lyrics with metatags — structure, sheet and engine', () => {
   it('the fallback is valid, original and has the engine tags', () => {
@@ -202,9 +205,43 @@ describe('R13: 3番 by rule', () => {
   it('a third verse goes after the second chorus', async () => {
     const { lyricsFallback: f, lyricsSecondVerse: more, lyricBlockLabels: labels, lyricsDemoEdit: demo } = await import('./lyrics');
     const { spellFrom: sf } = await import('./spell');
-    const two = more(f(sf('song', '夏の海')));
+    const two = more(f(sf('song', '夏の海'), 'Cメロも'));
     const three = more(two);
     expect(labels(three)).toEqual(['はじまり', 'Aメロ', 'サビ前', 'サビ', '2番Aメロ', '2番サビ前', '2番サビ', '3番Aメロ', '3番サビ前', '3番サビ', 'Cメロ', '大サビ', 'おわり']);
     expect(demo(two, '3番を足して')?.blocks.filter((b) => b.section === 'verse')).toHaveLength(3);
+  });
+});
+
+describe('R17: {bati} writes one verse; more only when asked', () => {
+  const one = lyricsFallback(tags);
+  it('by default: one verse (1番) — intro, verse, pre-chorus, chorus, outro; no 2番 / Cメロ / 大サビ', () => {
+    expect(SongLyrics.safeParse(one).success).toBe(true);
+    expect(one.blocks.map((b) => b.section)).toEqual(['intro', 'verse', 'pre-chorus', 'chorus', 'outro']);
+    expect(lyricBlockLabels(one)).toEqual(['はじまり', 'Aメロ', 'サビ前', 'サビ', 'おわり']);
+    expect(lyricsAsked('夏の海の明るい曲を作って', tags)).toEqual({ second: false, bridge: false });
+  });
+  it('a sparse genre keeps its own build / drop shape', () => {
+    const psy = lyricsFallback(spellFrom('song', 'サイケデリックトランスの曲'));
+    expect(psy.blocks.map((b) => b.section)).toContain('drop');
+    expect(psy.blocks.map((b) => b.section)).not.toContain('verse');
+  });
+  it('「2番も作って」 adds a 2番; 「Cメロも」 a bridge and a last chorus; 「フルで」 / a long length all of it', () => {
+    const two = lyricsFallback(tags, '夏の曲、2番も作って');
+    expect(lyricBlockLabels(two)).toEqual(['はじまり', 'Aメロ', 'サビ前', 'サビ', '2番Aメロ', '2番サビ前', '2番サビ', 'おわり']);
+    expect(two.blocks[4].lines).not.toEqual(two.blocks[1].lines);
+    expect(lyricsFallback(tags, 'Cメロも入れて').blocks.map((b) => b.section)).toEqual(['intro', 'verse', 'pre-chorus', 'chorus', 'bridge', 'final-chorus', 'outro']);
+    const full = lyricsFallback(tags, 'フルで作って');
+    expect(full.blocks.filter((b) => b.section === 'verse')).toHaveLength(2);
+    expect(full.blocks.map((b) => b.section)).toContain('final-chorus');
+    expect(lyricsAsked('', spellFrom('song', '3分の夏の曲'))).toEqual({ second: true, bridge: true });
+    expect(lyricsAsked('', spellFrom('song', '2分の夏の曲'))).toEqual({ second: true, bridge: false });
+  });
+  it('「2番を足して」 on one verse adds a 2番 (the song then grows: a paid re-sing); 「Cメロも足して」 a bridge', () => {
+    const two = lyricsDemoEdit(one, '2番を足して')!;
+    expect(lyricBlockLabels(two)).toEqual(['はじまり', 'Aメロ', 'サビ前', 'サビ', '2番Aメロ', '2番サビ前', '2番サビ', 'おわり']);
+    expect(lyricsSecondVerse(one).blocks).toHaveLength(8);
+    const br = lyricsDemoEdit(two, 'Cメロも足して')!;
+    expect(br.blocks.map((b) => b.section).slice(-3)).toEqual(['bridge', 'final-chorus', 'outro']);
+    expect(lyricsWithBridge(br)).toBe(br);
   });
 });

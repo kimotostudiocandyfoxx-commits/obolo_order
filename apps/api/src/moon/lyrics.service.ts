@@ -1,11 +1,12 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { lyricsRequest, lyricsSystem, moderateText, parseLyricsAnswer, type LlmProvider, type LyricsAsk } from '@obolo/ai';
-import { lyricsEdit, lyricsFallback, lyricsSecondVerse, lyricsStructure, ownLyricsOf, withEnds, type LyricsBody, type LyricsView, type SongLyrics } from '@obolo/shared';
+import { lyricsEdit, lyricsFallback, lyricsSecondVerse, lyricsStructure, lyricsWithBridge, ownLyricsOf, withEnds, type LyricsBody, type LyricsView, type SongLyrics } from '@obolo/shared';
 import { LLM, LYRICS_LLM } from '../infra/tokens';
 
 const sung = (l: SongLyrics) => l.blocks.flatMap((b) => b.lines).join('\n');
 const SECOND = /([2-4２-４二三四]番|二番目|セカンド)/;
 const MORE = /足|たし|追加|入れ|いれ|ほしい|欲しい|作|つく|書いて|かいて/;
+const BRIDGE = /Cメロ|Ｃメロ|ブリッジ|大サビ|ラスサビ/;
 
 /**
  * R13 (client 2026-11-25): POST /moon/lyrics — {bati}'s スペル入りの歌詞 for a song's style spell: Japanese lyrics in blocks,
@@ -29,7 +30,7 @@ export class LyricsService {
   async lyrics(b: LyricsBody): Promise<LyricsView> {
     const own = ownLyricsOf(b.said);
     const words = await moderateText(b.said, own ? this.llm : undefined);
-    if (words.flagged) return b.lyrics ? { lyrics: b.lyrics, how: 'kept', declined: 'flagged' } : { lyrics: lyricsFallback(b.tags), how: 'new', declined: 'flagged' };
+    if (words.flagged) return b.lyrics ? { lyrics: b.lyrics, how: 'kept', declined: 'flagged' } : { lyrics: lyricsFallback(b.tags, b.said), how: 'new', declined: 'flagged' };
     if (b.lyrics && !own) return this.edit(b.lyrics, b);
     if (own) {
       const r = await this.write({ mode: 'own', said: own, tags: b.tags });
@@ -37,7 +38,8 @@ export class LyricsService {
       return { lyrics: r?.lyrics ? withEnds(r.lyrics) : (lyricsStructure(own) ?? lyricsFallback(b.tags)), how: 'own' };
     }
     const r = await this.write({ mode: 'new', said: b.said, tags: b.tags });
-    return { lyrics: r?.lyrics && !r.copy ? r.lyrics : lyricsFallback(b.tags), how: 'new' };
+    // R17: one verse unless the words ask for a 2番 / Cメロ / a longer song (the rule's lyrics too)
+    return { lyrics: r?.lyrics && !r.copy ? r.lyrics : lyricsFallback(b.tags, b.said), how: 'new' };
   }
 
   private async edit(now: SongLyrics, b: LyricsBody): Promise<LyricsView> {
@@ -48,7 +50,12 @@ export class LyricsService {
     // 2番 by rule when the writer could not (the verse and chorus again)
     if (SECOND.test(b.said) && MORE.test(b.said)) {
       const two = lyricsSecondVerse(now);
-      if (two !== now) return { lyrics: two, how: 'edit' };
+      if (two !== now) return { lyrics: BRIDGE.test(b.said) ? lyricsWithBridge(two) : two, how: 'edit' };
+    }
+    // R17: a Cメロ / 大サビ by rule (「Cメロも足して」)
+    if (BRIDGE.test(b.said) && MORE.test(b.said)) {
+      const more = lyricsWithBridge(now);
+      if (more !== now) return { lyrics: more, how: 'edit' };
     }
     return { lyrics: now, how: 'kept' };
   }

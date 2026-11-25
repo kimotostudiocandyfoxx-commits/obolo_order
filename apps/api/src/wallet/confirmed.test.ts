@@ -115,7 +115,7 @@ describe('R11: a paid making from the Moon atelier is charged only with the yes'
     const l = new MemLedger();
     const f = fakes();
     const tags = spellFrom('song', '夏の海の明るい曲');
-    const lyrics = lyricsFallback(tags);
+    const lyrics = lyricsFallback(tags, 'Cメロも');
     const ok = { ...yes(), spell: songSpellKey(tags, lyrics)! };
     const other = lyricsEdit(lyrics, 'ささやきを外して')!.lyrics;
     expect(await code(startConfirmed({ ledger: l, db, ...f, userId: 'u1', kind: 'song', confirm: ok, spell: songSpellKey(tags, other), required: true }))).toBe('409 SPELL_CHANGED');

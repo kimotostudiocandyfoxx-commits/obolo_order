@@ -203,6 +203,11 @@ const Env = z.object({
    * (stems, line times) and sings it in the member's voice, lazily (song-split jobs).
    */
   MUSIC_PROVIDER: z.preprocess((v) => (v === '' ? undefined : v), z.enum(['runware', 'gpu']).default('runware')),
+  /**
+   * R17 (client 2026-11-25): the tempo every song is delivered at over how it was sung (the app's signature: 1.2× faster,
+   * the pitch kept; the engine sings 1.2× longer so the length asked is what is delivered). 1 turns it off.
+   */
+  SONG_DEFAULT_TEMPO: z.preprocess((v) => (v === '' ? undefined : v), z.coerce.number().min(1).max(1.5).default(1.2)),
   /** R17: the Runware key for songs (the secret obolo-seedream-api-key, like the looks and the MVs) */
   MUSIC_RUNWARE_KEY: secret(),
   /** R17: the secret spell ('off' turns it off for everyone) and its passphrases (comma-separated; default 「上級魔法で」) */

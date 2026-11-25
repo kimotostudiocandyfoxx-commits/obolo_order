@@ -22,23 +22,26 @@ export const RUNWARE_LYRICS_MAX = 3000;
 /** ACE-Step on Runware: 30–300 s */
 export const SONG_SECONDS_MIN = 30;
 export const SONG_SECONDS_MAX = 300;
-/** when nothing says how long: a song of about a minute and a half */
-export const SONG_SECONDS_DEFAULT = 105;
+/**
+ * R17 (client 2026-11-25: 「曲はふつう60秒。歌詞が60秒に入らない時か、長くしてと言われた時だけ長く」): a song is a minute
+ * unless its lyrics do not fit in one (estimated from the sheet: songLyricsSeconds) or the member asked for a length
+ */
+export const SONG_SECONDS_DEFAULT = 60;
 
 /** where a song is made: Runware (default), or our own GPU (the old path, kept as the fallback) */
 export type MusicProvider = 'runware' | 'gpu';
 
-/** a length the spell says (a 'length' talisman: 「30秒」「1分」「2分」「フル」…), in seconds; null when it says none */
+/** a length the spell says (a 'length' talisman: 「30秒」「1分」「2分」「長め」「フルで」…), in seconds; null when it says none */
 export function spellSeconds(tags: SpellTag[] | undefined | null): number | null {
   const t = tags?.find((x) => x.group === 'length');
   if (!t) return null;
   const s = `${t.ja} ${t.en}`;
   const n = (x: string) => Number(x.replace(/[０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0)));
-  // the talisman's own word first (「1分30秒」), then its English
+  // the talisman's own word first (「1分30秒」「1分半」), then its English
   for (const part of [t.ja, t.en]) {
     const min = part.match(/([0-9０-９]+(?:\.[0-9]+)?)\s*(?:分|min)/i);
     const sec = part.match(/([0-9０-９]+)\s*(?:秒|s(?:ec)?\b|seconds?)/i);
-    if (min) return n(min[1]) * 60 + (sec ? n(sec[1]) : 0);
+    if (min) return n(min[1]) * 60 + (sec ? n(sec[1]) : /分半/.test(part) ? 30 : 0);
     if (sec) return n(sec[1]);
   }
   if (/two minutes|2 minutes/i.test(s)) return 120;
@@ -47,22 +50,65 @@ export function spellSeconds(tags: SpellTag[] | undefined | null): number | null
   return null;
 }
 
+/** whether the spell's length is a rough one (「長め」「フルで」: at least that long) rather than an exact one (「2分」) */
+const roughLength = (tags: SpellTag[] | undefined | null) => {
+  const t = tags?.find((x) => x.group === 'length');
+  return !!t && !/[0-9０-９]/.test(t.ja);
+};
+
+/** the sung syllables of a line, about (a kanji is read as one and a half; small kana join the one before) */
+const syllables = (line: string) => {
+  let n = 0;
+  for (const c of line.replace(/[\s　、。,.!?！？「」『』…・〜~-]/g, '')) n += /[一-鿿々]/.test(c) ? 1.5 : /[ゃゅょャュョぁぃぅぇぉァィゥェォ]/.test(c) ? 0 : 1;
+  return n;
+};
+
 /**
- * how long the song is asked to be: the spell's length talisman, else what the design asked for when the lyrics fit in
- * it, else about four seconds a sung line (+ the instrumental parts); always 30–300 s, ~90–120 s when nothing says
+ * how long the lyric sheet takes to sing at this tempo, in seconds: each sung line at about two syllables a beat (plus a
+ * breath), in whole bars and never under two; an instrumental block (solo, build, drop …) four bars, the intro / outro two
  */
-export function songSeconds(o: { tags?: SpellTag[] | null; lyrics?: Pick<SongLyrics, 'blocks'> | null; seconds?: number | null; bpm?: number }): number {
+export function songLyricsSeconds(lyrics: Pick<SongLyrics, 'blocks'>, bpm = 110): number {
+  const bar = (4 * 60) / Math.max(60, Math.min(200, bpm));
+  let bars = 0;
+  for (const b of lyrics.blocks) {
+    if (b.lines.length) for (const l of b.lines) bars += Math.max(2, Math.ceil((syllables(l) / 2 + 1) / 4));
+    else bars += b.section === 'intro' || b.section === 'outro' ? 2 : 4;
+  }
+  return bars ? Math.round(bars * bar + 2) : 0;
+}
+
+/**
+ * how long the song is asked to be (always 30–300 s):
+ *  - the spell's length talisman (「2分」 exactly; 「長め」「フルで」 at least that, longer when the lyrics need it)
+ *  - else a minute (SONG_SECONDS_DEFAULT), longer only when the lyrics do not fit in one (songLyricsSeconds)
+ * `atLeast`: never shorter than this (a song sung again with its lines changed, or made longer, keeps that length)
+ */
+export function songSeconds(o: { tags?: SpellTag[] | null; lyrics?: Pick<SongLyrics, 'blocks'> | null; atLeast?: number | null; bpm?: number }): number {
   const clamp = (x: number) => Math.round(Math.max(SONG_SECONDS_MIN, Math.min(SONG_SECONDS_MAX, x)));
+  const need = o.lyrics ? songLyricsSeconds(o.lyrics, o.bpm) : 0;
   const said = spellSeconds(o.tags);
-  if (said) return clamp(said);
-  const lines = o.lyrics ? o.lyrics.blocks.reduce((a, b) => a + b.lines.length, 0) : 0;
-  const breaks = o.lyrics ? o.lyrics.blocks.filter((b) => !b.lines.length).length : 0;
-  // two bars a line at the song's tempo (ACE-Step sings ~6–10 syllables a line), a little less when it is fast
-  const bar = (4 * 60) / Math.max(60, Math.min(200, o.bpm ?? 110));
-  const need = lines ? lines * 2 * bar + breaks * 2 * bar + 8 : 0;
-  const asked = o.seconds ?? 0;
-  if (!need) return clamp(asked >= SONG_SECONDS_MIN ? Math.max(asked, 90) : SONG_SECONDS_DEFAULT);
-  return clamp(Math.max(need, asked, 90));
+  if (said) return clamp(roughLength(o.tags) ? Math.max(said, need) : said);
+  return clamp(Math.max(SONG_SECONDS_DEFAULT, need, o.atLeast ?? 0));
+}
+
+/**
+ * R17 (client 2026-11-25: the app's signature sound): every song is delivered 1.2× faster, the pitch kept (young
+ * listeners like them faster; an AI ballad drags). The engine sings `songSeconds × tempo` so the song delivered is the
+ * length asked; the 1.0× take is kept as the original every free change is made from (the factor folded into its chain).
+ * The API's SONG_DEFAULT_TEMPO sets it (1 = off).
+ */
+export const SONG_DEFAULT_TEMPO = 1.2;
+
+/** the seconds the engine is asked to sing for a song delivered `seconds` long at `tempo` (30–300 s) */
+export function songGenSeconds(seconds: number, tempo = SONG_DEFAULT_TEMPO): number {
+  return Math.round(Math.max(SONG_SECONDS_MIN, Math.min(SONG_SECONDS_MAX, seconds * Math.max(0.5, tempo))));
+}
+
+/** the lyric line times of the take sung at 1.0× on the song delivered at `tempo` (each time and length ÷ tempo) */
+export function phrasesAtTempo<P extends { startBeat: number; beats: number; seconds: number }>(phrases: P[], tempo: number): P[] {
+  if (Math.abs(tempo - 1) < 0.001) return phrases;
+  const r = (x: number, d: number) => Math.round(x * d) / d;
+  return phrases.map((p) => ({ ...p, startBeat: r(p.startBeat / tempo, 1000), beats: r(p.beats / tempo, 1000), seconds: r(p.seconds / tempo, 100) }));
 }
 
 const KEY_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];

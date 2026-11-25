@@ -54,7 +54,7 @@ describe('R13: free changes of a finished song — the words → ops', () => {
 /** a 2番 song at 120 bpm (0.5 s a beat): each sung line 4 beats (2 s), each block's lines back to back, gaps between blocks */
 function song() {
   const tags = spellFrom('song', '夏の海の明るい曲');
-  const lyrics = lyricsSecondVerse(lyricsFallback(tags));
+  const lyrics = lyricsSecondVerse(lyricsFallback(tags, 'Cメロも'));
   const keys = lyricBlockKeys(lyrics);
   const phrases: SongPhrase[] = [];
   let beat = 8; // 4 s intro
@@ -138,5 +138,18 @@ describe('R13: free changes — where the parts are and the cut timing math', ()
     expect(cut.blocks.map((b) => b.section)).toEqual(['intro', 'verse', 'pre-chorus', 'chorus', 'bridge', 'final-chorus', 'outro']);
     const rep = tweakLyrics(s.lyrics, null, tweakPlan([{ op: 'repeat', part: { section: 'chorus' } }]));
     expect(rep.blocks.slice(-2).map((b) => b.section)).toEqual(['chorus', 'outro']);
+  });
+});
+
+describe('R17: a song delivered 1.2× faster — the free changes fold the tempo in', () => {
+  it('「元の速さで」 sets the tempo back to as sung (1); 「もっと速く」 goes up from 1.2; 「ゆっくり」 down from it', () => {
+    for (const s of ['元の速さで', 'もとの速さに戻して', 'テンポを元にして', 'ふつうの速さにして']) expect(parseTweak(s).ops, s).toEqual([{ op: 'tempo', factor: 1, to: 1 }]);
+    expect(tweakPlan([], 1.2).tempo).toBe(1.2);
+    expect(tweakPlan([{ op: 'tempo', factor: 1, to: 1 }], 1.2).tempo).toBe(1);
+    expect(tweakPlan([{ op: 'tempo', factor: 1.1 }], 1.2).tempo).toBeCloseTo(1.32);
+    expect(tweakPlan([{ op: 'tempo', factor: 0.9 }], 1.2).tempo).toBeCloseTo(1.08);
+    expect(tweakPlan([{ op: 'tempo', factor: 1, to: 1 }, { op: 'tempo', factor: 1.1 }], 1.2).tempo).toBeCloseTo(1.1);
+    expect(tweakPlan([{ op: 'tempo', factor: 1.3 }, { op: 'tempo', factor: 1.3 }], 1.2).tempo).toBe(1.5);
+    expect(tweakWhat([{ op: 'tempo', factor: 1, to: 1 }])).toBe('元の速さに');
   });
 });

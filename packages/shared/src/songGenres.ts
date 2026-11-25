@@ -160,7 +160,7 @@ export const SONG_GENRES: SongGenre[] = [
   g({ ja: 'アイドルポップ', en: 'idol pop', re: /アイドル(ソング|ポップ|系|っぽ|の曲|曲)?|idol/i, family: 'pop', bpm: [140, 170], tempo: 'アップテンポ', mood: 'かわいい', instruments: ['シンセ', 'ドラム', 'ストリングス'], voice: 'みんなで歌う', lyrics: 'full', guide: 'idol pop: bright and cute, energetic group unison vocals, call-and-response chant spots, sparkly synths', avoid: ['暗い', 'ゆっくり'] }),
   g({ ja: 'K-POP', en: 'k-pop', re: /K-?POP|Ｋ-?ＰＯＰ|ケーポップ|韓国の?(曲|歌|ポップ)/i, family: 'pop', bpm: [100, 130], mood: 'かっこいい', instruments: ['シンセ', '808ベース'], voice: 'みんなで歌う', lyrics: 'full', guide: 'k-pop: polished dance-pop, punchy 808s and synths, switches between sung and rapped parts, a hook-driven chorus', avoid: ['ギター', 'ゆっくり'] }),
   g({ ja: 'ポップ', en: 'pop', re: /ポップ|J-?POP|pop/i, family: 'pop', bpm: [100, 130], mood: '明るい', instruments: ['ピアノ', 'ドラム'], voice: 'やさしい歌声', lyrics: 'full', guide: 'pop: catchy melody, verse / pre-chorus / chorus, clear sung vocals' }),
-  g({ ja: 'バラード', en: 'ballad', re: /バラード|ballad/i, family: 'acoustic', bpm: [60, 80], tempo: 'ゆっくり', mood: 'しっとり', instruments: ['ピアノ', 'ストリングス'], voice: 'やさしい歌声', lyrics: 'full', guide: 'ballad: slow, piano and strings, emotional full verses that build to a big final chorus', avoid: ['アップテンポ', '四つ打ち', '攻撃的'] }),
+  g({ ja: 'バラード', en: 'ballad', re: /バラード|ballad/i, family: 'acoustic', bpm: [60, 80], tempo: 'ゆっくり', mood: 'しっとり', instruments: ['ピアノ', 'ストリングス'], voice: 'やさしい歌声', lyrics: 'full', guide: 'ballad: slow, piano and strings, emotional full verses that build to a big chorus', avoid: ['アップテンポ', '四つ打ち', '攻撃的'] }),
   // urban
   g({ ja: 'R&B', en: 'r&b, soul', re: /R&B|Ｒ＆Ｂ|R＆B|アールアンドビー|リズムアンドブルース|ソウル(?!フル)/i, family: 'urban', bpm: [70, 100], tempo: 'ゆっくり', mood: 'おしゃれ', instruments: ['ベース', 'ローズピアノ', 'ドラム'], voice: 'ソウルフルな声', lyrics: 'full', guide: 'r&b: smooth groove, warm keys and bass, soulful melismatic vocals' }),
   g({ ja: 'ゴスペル', en: 'gospel', re: /ゴスペル|gospel/i, family: 'urban', bpm: [70, 110], mood: '神々しい', instruments: ['オルガン', 'ピアノ', '手拍子'], voice: 'ゴスペル合唱', lyrics: 'full', guide: 'gospel: organ and piano, hand claps, a big uplifting choir answering the lead singer', avoid: ['シンセ', '四つ打ち'] }),
@@ -218,7 +218,7 @@ export function genreLyricsGuide(tags: SpellTag[]): string {
   const none = voice?.ja === '歌なし';
   const how: GenreLyrics = none ? 'instrumental' : (genre?.lyrics ?? 'full');
   const rules: Record<GenreLyrics, string> = {
-    full: 'Sung all through: full verses, a pre-chorus and a chorus with a hook (a usual song).',
+    full: 'Sung all through: full verses, a pre-chorus and a chorus with a hook (a usual song: one verse of about a minute unless more is asked).',
     sparse:
       'This genre is mostly instrumental: write SPARSE lyrics — only a few short, repeated, mantra-like or hypnotic phrases (about 4–10 sung lines in all, 3–8 characters each, the same phrase coming back), with many non-sung blocks: Intro, Build, Drop, Instrumental between them, and an Outro. No long story verses.',
     instrumental:

@@ -43,3 +43,23 @@ describe('R13: free song changes by the model (when the rules did not understand
     expect(parseSongTweak('nope')).toEqual({ ops: [] });
   });
 });
+
+describe('R17: the writer writes one verse (about 60 s) unless more is asked', () => {
+  it('asks for ONE verse by default, in English and Japanese; 2番 / Cメロ / 大サビ only when asked', () => {
+    const s = lyricsSystem();
+    expect(s).toMatch(/about 60 seconds/);
+    expect(s).toMatch(/ONLY ONE VERSE \(1番\): Intro, Verse, Pre-Chorus, Chorus, Outro/);
+    expect(s).toMatch(/「1番」だけ/);
+    expect(s).toMatch(/Do NOT write a second verse \(2番\), a Bridge \(Cメロ\) or a Final Chorus \(大サビ\) unless the user asks/);
+    expect(s).toMatch(/2番も作って/);
+    expect(s).toMatch(/sparse Build \/ Drop shape/);
+    expect(s).not.toMatch(/A usual song: Intro, Verse, Pre-Chorus, Chorus, Bridge, Final Chorus/);
+  });
+  it('the request carries the words that ask for more (「2番も作って」) and a length talisman', () => {
+    const t = spellFrom('song', '夏の曲をフルで作って');
+    expect(t.some((x) => x.group === 'length' && x.ja === 'フルコーラス')).toBe(true);
+    const r = lyricsRequest({ mode: 'new', said: '夏の曲、2番も作って', tags: t });
+    expect(r).toMatch(/2番も作って/);
+    expect(r).toMatch(/length=the full song/);
+  });
+});
