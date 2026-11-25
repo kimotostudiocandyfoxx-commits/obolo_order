@@ -359,7 +359,10 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .pdisc.on .dk{animation:vspin 2.6s linear infinite}
 .prof .phead{top:auto!important;bottom:0;justify-content:center;padding:0 14px 18px!important;background:linear-gradient(transparent,rgba(30,10,50,.5))}
 .prof .phead .pback{display:none}
-.prof .pwho{padding:6px 16px 6px 8px}.prof .pwho img{width:40px;height:40px}.prof .pwho span{font-size:15px}
+.prof .phead{padding:0 14px 0!important;justify-content:flex-start!important}
+.prof .pwho{background:none!important;border:0!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;padding:0!important;align-items:flex-end;gap:6px;margin-bottom:-22px}
+.prof .pwho img{width:96px!important;height:96px!important;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}
+.prof .pwho span{font-size:18px!important;margin-bottom:30px;text-shadow:0 2px 6px rgba(0,0,0,.7)!important}
 .prof .pdachi{top:0;bottom:auto!important;padding:12px 12px 10px 60px!important;background:linear-gradient(rgba(30,10,50,.55),transparent)!important;align-items:flex-start}
 .prof .pdachi .lab{display:none}
 .prof .pdachi button{width:54px}.prof .pdachi img{width:44px;height:44px}
@@ -411,11 +414,12 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .vw.on{opacity:1;transform:translate(-50%,0) scale(1)}
 .vw .ttl2{margin-top:10px;text-align:center;font:900 clamp(22px,7vw,30px)/1.1 var(--f-body);color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.35),0 0 18px rgba(0,0,0,.5)}
 .vw .ttl2 .kj{font-size:1.14em}.vw .ttl2 .hr{font-size:.8em}
-.mvv .scr{position:relative;width:min(94vw,360px);aspect-ratio:16/9;overflow:hidden;border-radius:6px;box-shadow:0 20px 50px rgba(0,0,0,.6),0 0 0 2px rgba(255,255,255,.15)}
+.mvv .scr{position:relative;width:min(86vw,330px);aspect-ratio:1;overflow:hidden;border-radius:6px;box-shadow:0 20px 50px rgba(0,0,0,.6),0 0 0 2px rgba(255,255,255,.15)}
 .mvv .scr i{position:absolute;inset:-12%;background-size:cover;background-position:center;animation:kb 9s ease-in-out infinite alternate}
 @keyframes kb{from{transform:scale(1) translate(0,0)}to{transform:scale(1.18) translate(-4%,3%)}}
 .mvv .scr::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0 2px,transparent 2px 4px);mix-blend-mode:overlay}
-.rdv .disc2{width:min(70vw,250px);aspect-ratio:1;margin:0 auto;border-radius:50%;background-size:cover;background-position:center;box-shadow:0 18px 40px rgba(0,0,0,.5),0 0 0 6px rgba(255,255,255,.85),0 0 40px rgba(255,180,120,.5);animation:vspin 14s linear infinite}
+.rdv .disc2{position:relative;width:min(76vw,280px);aspect-ratio:1;margin:0 auto;border-radius:18px;background-size:cover;background-position:center;box-shadow:0 18px 40px rgba(0,0,0,.5),0 0 0 3px rgba(255,255,255,.9),0 0 40px rgba(255,180,120,.45)}
+.rdv .disc2::after{content:"";position:absolute;inset:0;border-radius:18px;background:linear-gradient(transparent 55%,rgba(0,0,0,.45))}
 .rdv .air{display:block;width:max-content;margin:12px auto 0;font:900 11px var(--f-body);letter-spacing:.3em;color:#fff;background:#ff3b5c;border-radius:6px;padding:4px 10px;box-shadow:0 0 14px #ff3b5c;animation:kdot 1s ease-in-out infinite alternate}
 .rdv .wave{display:flex;gap:4px;justify-content:center;height:40px;align-items:center;margin-top:10px}
 .rdv .wave b{width:5px;border-radius:3px;background:#fff;animation:eq .45s ease-in-out infinite alternate}
@@ -757,7 +761,7 @@ function makeG5(o,i,slot){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight
   e.addEventListener('click',()=>popG5(b));return b}
 function viewer(into,pl,o){const c=G5[pl],title=c.titles[o.ai-1],st=TSTYLE[title]||{f:"'Dela Gothic One'"},tt=`<div class="ttl2" style="font-family:${st.f},var(--f-body)">${[...title].map(ch=>`<span class="${chk(ch)}">${ch}</span>`).join('')}</div>`,art=A['jart-'+o.ai]||'';
   const v=document.createElement('div');let stop=()=>{};
-  if(c.t==='mv'){v.className='vw mvv';v.style.top='24%';v.innerHTML=`<div class="scr"><i style="background-image:url(${art})"></i></div>${tt}`;playSong('song-'+o.ai);stop=()=>stopSong()}
+  if(c.t==='mv'){v.className='vw mvv';v.style.top='12%';v.innerHTML=`<div class="scr"><i style="background-image:url(${art})"></i></div>${tt}`;playSong('song-'+o.ai);stop=()=>stopSong()}
   if(c.t==='radio'){v.className='vw rdv';v.style.top='14%';v.innerHTML=`<div class="disc2" style="background-image:url(${art})"></div><span class="air">ON AIR</span><div class="wave">${Array.from({length:15},(_,i)=>`<b style="height:${10+((i*7)%5)*6}px;animation-delay:${(i%5)*.08}s"></b>`).join('')}</div>${tt}`;const vk='voice-'+String(o.ai).padStart(2,'0');setTimeout(()=>{if(A[vk])playVoice(vk)},500)}
   if(c.t==='goods'){v.className='vw gdv';v.style.top='16%';v.innerHTML=`<div class="bag"><i style="background-image:url(${art})"></i></div>${tt}`}
   if(c.t==='book'){v.className='vw bkv';v.style.top='22%';v.innerHTML=`<div class="book"><div class="pg l" style="background-image:url(${art})"></div><div class="pg r"><h4>${title}</h4><p>むかしむかし、${o.n}が見つけたのは、だれも知らない小さな光だった。</p><p>その光は、夜になるとそっと歌いだす。</p></div></div>`}
