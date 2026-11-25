@@ -5,7 +5,7 @@ import { Database } from '../db/db';
 import { createEmailSender } from './email';
 import { createKv, KvStore } from './kv';
 import { BullQueue, CloudTasksQueue, InlineQueue, JobQueue } from './queue';
-import { BATI_IMAGES, BUDDY_LLM, EMAIL, GAME_CHEAP_LLM, GAME_LLM, GAME_TRIAL_LLM, IMAGES, KORORIN_IMAGES, KV, LLM, LOOK_IMAGES, LYRICS_LLM, NOVEL_LLM, QUEUE, SPELL_LLM } from './tokens';
+import { BATI_IMAGES, BUDDY_LLM, EMAIL, GAME_CHEAP_LLM, GAME_LLM, GAME_TRIAL_LLM, IMAGES, KORORIN_IMAGES, KV, LLM, LOOK_IMAGES, LYRICS_LLM, NOVEL_LLM, PLANET_CHIBI_IMAGES, QUEUE, SATURN_BALL_IMAGES, SATURN_CHIBI_IMAGES, SPELL_LLM } from './tokens';
 
 /** R17: one picture use's painter, logged with its model */
 function picture(use: string, model: string, c: AppConfig) {
@@ -51,6 +51,9 @@ function gameChain(what: string, spec: string, c: AppConfig): LlmProvider {
     { provide: LOOK_IMAGES, inject: [CONFIG], useFactory: (c: AppConfig) => picture('look', makeSetupOf(c).lookModel, c) },
     { provide: BATI_IMAGES, inject: [CONFIG], useFactory: (c: AppConfig) => picture('bati', makeSetupOf(c).batiModel, c) },
     { provide: KORORIN_IMAGES, inject: [CONFIG], useFactory: (c: AppConfig) => picture('kororin', makeSetupOf(c).kororinModel, c) },
+    { provide: SATURN_CHIBI_IMAGES, inject: [CONFIG], useFactory: (c: AppConfig) => picture('saturn chibi', makeSetupOf(c).saturnChibiModel, c) },
+    { provide: SATURN_BALL_IMAGES, inject: [CONFIG], useFactory: (c: AppConfig) => picture('saturn ball', makeSetupOf(c).saturnBallModel, c) },
+    { provide: PLANET_CHIBI_IMAGES, inject: [CONFIG], useFactory: (c: AppConfig) => picture('planet chibi', makeSetupOf(c).planetChibiModel, c) },
     {
       provide: LLM,
       inject: [CONFIG],
@@ -123,7 +126,7 @@ function gameChain(what: string, spec: string, c: AppConfig): LlmProvider {
     { provide: GAME_CHEAP_LLM, inject: [CONFIG], useFactory: (c: AppConfig) => gameChain('game (cheap)', makeSetupOf(c).gameCheapModel, c) },
     { provide: GAME_TRIAL_LLM, inject: [CONFIG], useFactory: (c: AppConfig) => gameChain('game (trial)', makeSetupOf(c).gameTrialModel, c) },
   ],
-  exports: [CONFIG, Database, KV, QUEUE, EMAIL, LLM, BUDDY_LLM, NOVEL_LLM, GAME_LLM, GAME_CHEAP_LLM, GAME_TRIAL_LLM, LYRICS_LLM, SPELL_LLM, IMAGES, LOOK_IMAGES, BATI_IMAGES, KORORIN_IMAGES],
+  exports: [CONFIG, Database, KV, QUEUE, EMAIL, LLM, BUDDY_LLM, NOVEL_LLM, GAME_LLM, GAME_CHEAP_LLM, GAME_TRIAL_LLM, LYRICS_LLM, SPELL_LLM, IMAGES, LOOK_IMAGES, BATI_IMAGES, KORORIN_IMAGES, SATURN_CHIBI_IMAGES, SATURN_BALL_IMAGES, PLANET_CHIBI_IMAGES],
 })
 export class InfraModule implements OnApplicationShutdown {
   constructor(

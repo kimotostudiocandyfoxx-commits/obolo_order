@@ -187,7 +187,9 @@ export function PatapataWorld({ events, overlay, topInset = 0, live = false }: {
 
   const neo = neoForm(me?.neoForm);
   const myHandle = me?.displayName || 'neo';
-  const myLook = { src: me?.butterfly ?? null, img: me?.butterfly ? null : (me?.puniPic ?? me?.avatarUrl), emoji: neo?.emoji ?? '🦋', wing: neo?.color ?? '#f0b27a' };
+  // client 2026-11-25: your Jupiter figure (the butterfly chibi of your look) until you have a butterfly painted
+  const myButterfly = me?.butterfly ?? me?.planetFigures?.jupiter ?? null;
+  const myLook = { src: myButterfly, img: myButterfly ? null : (me?.puniPic ?? me?.avatarUrl), emoji: neo?.emoji ?? '🦋', wing: neo?.color ?? '#f0b27a' };
   const myFlying: ViewPost[] = live ? (sky?.find((f) => f.author.id === me?.id)?.posts.map(liveView) ?? []) : local.posts.filter((p) => isFlying(p.createdAt)).map(localView);
 
   const flyers = useMemo(() => {

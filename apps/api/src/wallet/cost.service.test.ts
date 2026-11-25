@@ -148,6 +148,24 @@ describe('small costs of the free features', () => {
     expect(r.lines.some((l) => l.includes('ダチの原価') && l.includes('¥1.44'))).toBe(true);
     s.onModuleDestroy();
   });
+  it('client 2026-11-25: the planet figures nobody paid for (the first look, the backfill) are recorded, never taken', async () => {
+    const { s, store } = service();
+    store.balance.set('u3', 50);
+    // nine figures of a first look (¥2.26 each on Qwen)
+    for (let i = 0; i < 9; i++) await s.recordNow({ provider: 'runware', model: 'alibaba:qwen-image@2.1-turbo', usd: 0.01413, exact: true }, { userId: 'u3', feature: 'figures' });
+    expect(store.rows).toHaveLength(9);
+    expect(store.rows[0]).toMatchObject({ userId: 'u3', kind: 'figures', paid: false });
+    expect(store.usage).toHaveLength(0);
+    expect(store.balance.get('u3')).toBe(50);
+    // a paid profile look change's figures are that making's
+    await s.recordNow({ provider: 'runware', model: 'alibaba:qwen-image@2.1-turbo', usd: 0.01413, exact: true }, { userId: 'u3', feature: 'figures', kind: 'profileLook', job: 'k', paid: true });
+    expect(store.rows[9]).toMatchObject({ kind: 'profileLook', paid: true, job: 'k' });
+    store.data = { charged: [], costs: [{ kind: 'figures', paid: false, costJpy: 20.35 }, { kind: 'chat', paid: false, costJpy: 2 }], jobs: [], usageMana: 2, absorbed: { mana: 0, jpy: 0 } };
+    const r = await s.report(1);
+    expect(r.usage.features).toEqual([{ kind: 'chat', costJpy: 2 }]);
+    expect(r.lines.some((l) => l.includes('星の姿の原価') && l.includes('¥20.35'))).toBe(true);
+    s.onModuleDestroy();
+  });
   it('a cost with no member (story assets, admin) is recorded, not accrued', async () => {
     const { s, store } = service();
     await s.recordNow({ provider: 'gemini', model: 'gemini-2.5-flash', usd: 0.01, exact: true }, undefined);

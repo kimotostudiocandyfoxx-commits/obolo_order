@@ -22,7 +22,8 @@ export interface HomeWork {
   kind: PlanetWorkKind;
   /** pic: the puni face; chibi: the 2-heads mini figure that jumps out of the popped ball (M-R262; a round face until made) */
   /** M-R275: the maker's chosen kororin picture (1–24; none: not chosen yet) */
-  author: { id: string; name: string; pic?: string | null; chibi?: string | null; kororin?: KororinChoice | null };
+  /** client 2026-11-25: figure = the maker's own figure on this planet (Saturn: the chibi out of the ball); ball = their Saturn kororin ball in their own pattern */
+  author: { id: string; name: string; pic?: string | null; chibi?: string | null; kororin?: KororinChoice | null; figure?: string | null; ball?: string | null };
   rel: HomeRel;
   /** the words (Saturn: what was blown in, shown while it sings) */
   text: string;

@@ -79,6 +79,7 @@ import { SaturnService } from './saturn/saturn.service';
 import { LookController } from './look/look.controller';
 import { ChibiBackfillController } from './look/chibi-backfill.controller';
 import { LookService } from './look/look.service';
+import { PlanetFiguresService } from './look/figures.service';
 import { BatiMemoryService } from './look/memory.service';
 import { UsersController } from './users/users.controller';
 import { TesterController } from './users/tester.controller';
@@ -179,6 +180,7 @@ import { StorageWorksService } from './storage/storage-works.service';
     RadioService,
     InvitesService,
     LookService,
+    PlanetFiguresService,
     BatiMemoryService,
     BillingService,
     ComposeService,

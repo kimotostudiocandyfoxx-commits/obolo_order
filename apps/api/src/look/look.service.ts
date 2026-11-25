@@ -22,6 +22,9 @@ import { MediaService } from '../media/media.service';
 import { findPart, storedTalk, talkBlinkPrompt, talkMouthPrompt, TALK_PART_FACES, talkFacePrompt, type TalkWho } from './talk';
 import { day9At, toMe } from '../users/users.service';
 import { canUseMedia } from '../voice/media-consent';
+import { costScope } from '../wallet/cost-scope';
+import { PlanetFiguresService } from './figures.service';
+import type { FigureStore } from './figures';
 
 /**
  * Generations per OBOLO NEO. The story (2026-10-14) lets the visitor redraw "何度でも", so the screen
@@ -80,17 +83,8 @@ const CHIBI_PROMPT = (key: KeyName) =>
   'around it, on ' +
   keyedBackground(KEY_WORDS[key]) +
   '. Safe for children. No text, no letters.';
-// M-R262: the member's mini figure jumping out of a popped ball on Saturn — the same request as the story cast's chibi-*
-// (design/mv-art-queue.json on the story branch), on the key colour farthest from the look's own colours
-const KORORIN_CHIBI_PROMPT = (key: KeyName) =>
-  "A super-deformed 2-heads-tall chibi version of the character in the reference picture: a huge round head and a tiny body, keeping the character's " +
-  'face, hairstyle, outfit, colours and signature items exactly recognisable, drawn as a glossy cute 3D vinyl mini figure with soft studio lighting ' +
-  'and a sparkly highlight, matching cute pastel kawaii style. Jumping out joyfully with both arms up, a big happy smile, waving one hand. Centered, ' +
-  'the whole character inside the frame with a margin, on ' +
-  keyedBackground(KEY_WORDS[key]) +
-  ', no shadow, no ground. Safe for children. No text, no letters.';
-/** M-R262: one mini figure per member, at most this many paintings in all (one + one retry) */
-export const CHIBI_TRIES = 2;
+// M-R262 / M-R275 (client 2026-11-25): the Saturn mini figure is the 2D anime chibi2 now, one of the planet figures
+// (PlanetFiguresService, @obolo/ai saturnChibiPrompt) — the glossy 3D vinyl figure of before is gone
 const FACE_WORDS: Record<BatiFace, string> = {
   smile: 'a big happy smile, eyes curved with joy',
   sparkle: 'wide open eyes with big star-shaped highlights, cheeks glowing, excited and curious, leaning forward a little',
@@ -142,13 +136,14 @@ export class LookService {
     @Optional() @Inject(KORORIN_IMAGES) private readonly kororinPainter?: ImageProvider,
     /** R17: how many pictures a round paints (LOOK_CANDIDATES, PAID_LOOK_CANDIDATES, KORORIN_CANDIDATES) */
     @Optional() @Inject(CONFIG) private readonly cfg?: Partial<AppConfig>,
+    /** client 2026-11-25: the member's figures on every home planet, made after each look */
+    @Optional() private readonly figures?: PlanetFiguresService,
   ) {
     this.queue.register('bati.lines', ({ userId, batiId }) => this.writeLines(userId, batiId));
     this.queue.register('bati.paint', ({ userId, origin }) => this.paintBati(userId, origin).then(() => undefined));
     this.queue.register('bati.repaint', ({ userId, origin }) => this.repaintBati(userId, origin));
     this.queue.register('bati.faces', ({ userId, origin }) => this.batiFaces(userId, origin).then(() => undefined));
     this.queue.register('talk.look', ({ userId, origin, who }) => this.talkLook(userId, who, origin));
-    this.queue.register('look.chibi', ({ userId, origin }) => this.kororinChibi(userId, origin));
   }
 
   /** R17: {bati}'s painter (BATI_MODEL) */
@@ -172,9 +167,24 @@ export class LookService {
     return fee;
   }
 
-  /** the look's mana — none on day 2 (M-R223, D03-S004 「2日目はマナを使わない」) */
+  /**
+   * the look's mana — none on day 2 (M-R223, D03-S004 「2日目はマナを使わない」). Client 2026-11-25: a change of the
+   * profile look is 'profileLook' (its pictures + the planet figures of the look chosen)
+   */
   private async lookFee(userId: string, journeyDay: number, unlimited: boolean) {
-    return journeyDay <= 2 ? { refund: async () => undefined } : this.fee(userId, 'look', unlimited);
+    return journeyDay <= 2 ? { refund: async () => undefined } : this.fee(userId, 'profileLook', unlimited);
+  }
+
+  /** how long a paid round's pictures remember the yes that paid for them (the figures of the one chosen are part of it) */
+  private static readonly PAID_TTL = 60 * 60 * 24 * 30;
+  /**
+   * client 2026-11-25: the candidates of a paid profile look round — the figures of the one chosen are made as that
+   * making (its costs compared with its mana); a free round's are absorbed
+   */
+  private async rememberPaid(urls: string[]) {
+    const s = costScope.get();
+    if (!s?.paid || s.kind !== 'profileLook' || !s.job) return;
+    for (const url of urls) await this.kv.set(`look:paid:${url}`, s.job, LookService.PAID_TTL).catch(() => undefined);
   }
 
   private async user(userId: string) {
@@ -241,6 +251,7 @@ export class LookService {
         candidates.push({ id: m.id, url: m.url });
       } else this.log.warn(`look generation failed: ${String(r.reason)}`);
     }
+    await this.rememberPaid(candidates.map((c) => c.url));
     return { candidates, triesLeft: limited ? Math.max(0, NEO_LOOK_TRIES - tries) : 99, refinesLeft: await this.refinesLeft(userId, limited) };
   }
 
@@ -268,6 +279,7 @@ export class LookService {
         candidates.push({ id: m.id, url: m.url });
       } else this.log.warn(`look refine failed: ${String(r.reason)}`);
     }
+    await this.rememberPaid(candidates.map((c) => c.url));
     const tries = Number((await this.kv.get(`look:tries:${userId}`)) ?? 0);
     return { candidates, triesLeft: limited ? Math.max(0, NEO_LOOK_TRIES - tries) : 99, refinesLeft: await this.refinesLeft(userId, limited) };
   }
@@ -290,7 +302,7 @@ export class LookService {
     if (!unlimited && used >= BATI_MAGIC_PER_DAY) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'LOOK_REFINES', '今日はもう描き直せません');
     const src = body.mediaId ? await this.media.imageData(userId, body.mediaId, 'avatar') : await this.current(userId, u.avatarUrl);
     if (!src) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Image not found');
-    const fee = u.journeyDay < JOURNEY_DONE ? { refund: async () => undefined } : await this.fee(userId, 'look', unlimited, { ...body, spell: body.spell ? spellKey('look', body.spell) : null });
+    const fee = u.journeyDay < JOURNEY_DONE ? { refund: async () => undefined } : await this.fee(userId, 'profileLook', unlimited, { ...body, spell: body.spell ? spellKey('look', body.spell) : null });
     const n = await this.kv.incr(key, 60 * 60 * 26);
     // R11: made from exactly the spell said yes to
     const asked = body.spell ? spellPrompt('look', body.spell) : body.instruction;
@@ -303,6 +315,7 @@ export class LookService {
       } else this.log.warn(`look magic failed: ${String(r.reason)}`);
     }
     if (!candidates.length) await fee.refund();
+    else await this.rememberPaid(candidates.map((c) => c.url));
     const left = unlimited ? 99 : Math.max(0, BATI_MAGIC_PER_DAY - n);
     return { candidates, triesLeft: left, refinesLeft: left };
   }
@@ -479,15 +492,32 @@ export class LookService {
     const kept = hist.find((h) => h.url === url);
     const icon = kept?.icon ?? (origin ? await this.roundIcon(userId, url, origin).catch(() => null) : null);
     if (icon) hist = hist.map((h) => (h.url === url ? { ...h, icon } : h));
-    const j = { ...((await this.user(userId)).onboardingJson ?? {}) } as Record<string, string>;
+    const now = await this.user(userId);
+    const j = { ...(now.onboardingJson ?? {}) } as Record<string, string>;
     j['look.history'] = JSON.stringify(hist);
     if (icon) j['look.icon'] = icon;
     else delete j['look.icon'];
-    const [nu] = await this.db.write.update(users).set({ avatarUrl: url, onboardingJson: j, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
+    // client 2026-11-25: the planet figures of the looks kept (a look worn again paints nothing); a look that left the
+    // history takes its figures with it
+    const keep = new Set(hist.map((h) => h.url));
+    const store: FigureStore = {};
+    const dropped: string[] = [];
+    for (const [look, e] of Object.entries((now.planetFigures ?? {}) as FigureStore)) {
+      if (keep.has(look)) store[look] = e;
+      else dropped.push(...Object.entries(e).filter(([k]) => !k.includes('#')).map(([, v]) => v));
+    }
+    const chibi = store[url]?.saturnChibi;
+    const [nu] = await this.db.write
+      .update(users)
+      .set({ avatarUrl: url, onboardingJson: j, ...(dropped.length ? { planetFigures: store } : {}), ...(chibi ? { chibiPicUrl: chibi } : {}), updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    for (const d of dropped) await this.media.removeByUrl(userId, d).catch(() => undefined);
     // M-R234: the decided look's expressions, blink / mouth parts and コロリン, in the background
     if (origin) await this.enqueueTalk(userId, 'me', url, origin);
-    // M-R262: the Saturn mini figure, once per member (from the first look decided)
-    if (origin && !nu.chibiPicUrl) await this.enqueueChibi(userId, origin);
+    // client 2026-11-25 (M-R262): the look's figures on every home planet — the first look's free (absorbed), a paid
+    // profile look change's as that making
+    if (origin) await this.enqueueFigures(userId, origin, url, isNew);
     return toMe(nu);
   }
 
@@ -508,7 +538,10 @@ export class LookService {
       /* an unreadable talk look: just dropped */
     }
     for (const k of Object.keys(j)) if (k.startsWith('look.') || k === 'talk.me' || /^d\d+\.look$/.test(k)) delete j[k];
-    const [nu] = await this.db.write.update(users).set({ avatarUrl: null, onboardingJson: j, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
+    // client 2026-11-25: the planet figures (and the Saturn mini figure) were made from the look: they go too
+    if (u.chibiPicUrl) urls.add(u.chibiPicUrl);
+    for (const e of Object.values((u.planetFigures ?? {}) as FigureStore)) for (const [k, v] of Object.entries(e)) if (!k.includes('#') && v) urls.add(v);
+    const [nu] = await this.db.write.update(users).set({ avatarUrl: null, onboardingJson: j, chibiPicUrl: null, planetFigures: null, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
     for (const url of urls) await this.media.removeByUrl(userId, url).catch(() => undefined);
     return toMe(nu);
   }
@@ -983,40 +1016,14 @@ export class LookService {
     return toMe(nu);
   }
 
-  async enqueueChibi(userId: string, origin: string) {
-    await this.queue.enqueue('look.chibi', { userId, origin }, { dedupeKey: `chibi-${userId}` }).catch(() => undefined);
-  }
-
   /**
-   * M-R262: the member's 2-heads glossy mini figure (users.chibi_pic_url), painted from the decided look by the look
-   * painter and cut from its key colour. A paid call: one per member, at most CHIBI_TRIES paintings in all, counted in
-   * onboardingJson 'chibi.tries' before each one (a job retried by the queue never paints more). No mana (part of the look).
+   * client 2026-11-25: the figures of a look on every home planet (PlanetFiguresService). A new look chosen from a paid
+   * profile look round goes as that making; otherwise (the first journey's free looks, a look worn again) absorbed.
    */
-  async kororinChibi(userId: string, origin: string): Promise<void> {
-    for (;;) {
-      const u = await this.user(userId);
-      if (!u.avatarUrl || u.chibiPicUrl) return;
-      const j = (u.onboardingJson ?? {}) as Record<string, string>;
-      const tries = Number(j['chibi.tries'] ?? 0);
-      if (tries >= CHIBI_TRIES) return;
-      await this.db.write
-        .update(users)
-        .set({ onboardingJson: { ...j, 'chibi.tries': String(tries + 1) }, updatedAt: new Date() })
-        .where(eq(users.id, userId));
-      try {
-        const src = await this.current(userId, u.avatarUrl);
-        if (!src) return;
-        const key = await chooseKey(src.data);
-        const img = await this.looks.generate(KORORIN_CHIBI_PROMPT(key), 0, [src]);
-        const cut = await this.cut(img, 768, key);
-        if (!cut) throw new Error('chibi cut failed');
-        const m = await this.media.storeImage(userId, 'avatar', 'image/png', cut, origin);
-        await this.db.write.update(users).set({ chibiPicUrl: m.url, updatedAt: new Date() }).where(eq(users.id, userId));
-        return;
-      } catch (e) {
-        this.log.warn(`chibi failed (${tries + 1}/${CHIBI_TRIES}): ${String(e)}`);
-      }
-    }
+  async enqueueFigures(userId: string, origin: string, look: string, isNew = true, again = false) {
+    if (!this.figures) return;
+    const job = isNew ? await this.kv.get(`look:paid:${look}`).catch(() => null) : null;
+    await this.figures.enqueue(userId, origin, look, job ? { kind: 'profileLook', job } : undefined, again);
   }
 
   private async enqueueTalk(userId: string, who: TalkWho, url: string, origin: string) {

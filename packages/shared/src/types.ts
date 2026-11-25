@@ -4,6 +4,7 @@ import type { PuniLook } from './puni';
 import type { BatiCustomStyle, BatiEggKind, BatiPersonality } from './batiPersona';
 import type { BatiMemory, BatiRole } from './batiMemory';
 import type { TalkBeat, TalkFace, TalkLook, TalkMotion } from './talk';
+import type { PlanetFigures } from './planetFigures';
 
 /** API response shapes. Kept framework-free so web, api and future native shells share them. */
 
@@ -69,6 +70,11 @@ export interface Me {
   puniPic: string | null;
   /** M-R262: the 2-heads glossy mini figure painted once from the look (null until it is made) */
   chibiPic?: string | null;
+  /**
+   * client 2026-11-25: the figures of the look worn now on every home planet (the Saturn chibi and ball, the seven
+   * planets' chibis), made in the background after each look; a missing one is still being made
+   */
+  planetFigures?: PlanetFigures;
   /** M-R275: the chosen kororin picture (1–24); unset = not chosen yet */
   kororin?: { pic: number } | null;
   /** Jupiter: your painted butterfly (🦋 蝶を描いてもらう) */

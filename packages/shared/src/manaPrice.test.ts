@@ -25,6 +25,8 @@ import {
   MAKE_COST_ESTIMATE,
   RUNWARE_REF_PRICES,
   pictureUsd,
+  estimateJpy,
+  DEFAULT_COST_RATES,
 } from './manaPrice';
 
 describe('manaFor: ceil(cost / (1 − Stripe fee) × 1.08)', () => {
@@ -142,6 +144,25 @@ describe('the quoted mana', () => {
     expect(pictureUsd('gemini-2.5-flash-image')).toBe(0.039);
     expect(pictureUsd('civitai:123@456')).toBeLessThan(0.01);
     expect(pictureUsd('someone:new@1')).toBeGreaterThanOrEqual(0.05);
+  });
+  it('client 2026-11-25: a profile look change covers its 2 klein pictures + the Saturn chibi (klein) + the Saturn ball and 7 planet chibis (Qwen) ≈ 21 mana', () => {
+    const e = MAKE_COST_ESTIMATE.profileLook;
+    // 3 × FLUX.2 klein 4B with a reference + 8 × Qwen-Image 2.1 Turbo (costs.json: $0.01413) + the words check
+    expect(pictureUsd('alibaba:qwen-image@2.1-turbo', true)).toBe(0.01413);
+    expect(e.usd).toBeCloseTo(3 * pictureUsd('runware:400@4', true) + 8 * 0.01413 + 0.0005, 6);
+    // the 2 look pictures and the 9 figures, kept 12 months
+    expect(e.storedBytes).toBe(11 * 1.5 * 1024 ** 2);
+    const yen = estimateJpy(e, DEFAULT_COST_RATES);
+    expect(yen).toBeGreaterThan(18.7);
+    expect(yen).toBeLessThan(20);
+    expect(MAKE_COST.profileLook).toBe(manaFor10(yen));
+    expect(MAKE_COST.profileLook).toBeGreaterThanOrEqual(21);
+    expect(MAKE_COST.profileLook).toBeLessThan(22);
+    // {bati}'s dress-up keeps its own price
+    expect(MAKE_COST.look).toBeLessThan(MAKE_COST.profileLook);
+    // the figures follow their models (SATURN_CHIBI_MODEL / SATURN_BALL_MODEL / PLANET_CHIBI_MODEL)
+    const cheap = makeCostEstimates({ ...DEFAULT_MAKE_SETUP, saturnBallModel: 'runware:400@4', planetChibiModel: 'runware:400@4' });
+    expect(cheap.profileLook.usd).toBeLessThan(e.usd / 5);
   });
   it('R17: a song on Runware is about 2–3 mana', () => {
     expect(MAKE_COST.song).toBeLessThanOrEqual(3);

@@ -74,7 +74,8 @@ export const GAME_BUILDS_PER_DAY = 20;
 export const GAME_REFUNDS_PER_DAY = 3;
 /**
  * Bati's room (the Moon, P-BATI-ROOM): rounds a day per member of dressing up the Bati, and of Bati's magic on the
- * member's own look. Free during the first journey; after it each round takes the look's mana (MAKE_COST.look).
+ * member's own look. Free during the first journey; after it each round takes the dress-up's mana (MAKE_COST.look) /
+ * the profile look's (MAKE_COST.profileLook: its pictures + the planet figures of the look chosen, client 2026-11-25).
  * PLACEHOLDER (P-BATI-ROOM): ~3 pictures (restyle) / 4 pictures (look) per round, ~¥6 each.
  */
 export const BATI_RESTYLE_PER_DAY = 30; // M-R207: Bati's magic is free and "as often as you like" on day 2 — 30 is only a cost safety cap

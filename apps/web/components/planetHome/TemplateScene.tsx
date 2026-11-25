@@ -37,11 +37,15 @@ const nudge = (y: number, on: boolean) => (on && y + 6 > CAPTION.top && y - 6 < 
 
 /**
  * each work's own picture: on Saturn the kororin is its maker's own kororin (author.pic) in place of the sample sprite;
- * elsewhere the planet's sprite carries the maker's face, and a picture work (art / film) shows its own picture on it
+ * elsewhere the planet's sprite carries the maker's face, and a picture work (art / film) shows its own picture on it.
+ * Client 2026-11-25: once the maker's own figure on this planet is made (author.figure: the butterfly, the music-note boat,
+ * the UFO, the radio DJ …), it floats in place of the sprite and the face
  */
 export function pictureOf(w: StageItem, planet: string, open: string): { body: string | null; face: string | null; art: string | null } {
   if (planet === 'saturn') return { body: w.author.pic ?? null, face: null, art: null };
-  return { body: null, face: w.author.pic ?? null, art: w.thumbUrl || (open === 'view' ? w.url : null) || null };
+  const art = w.thumbUrl || (open === 'view' ? w.url : null) || null;
+  if (w.author.figure) return { body: w.author.figure, face: null, art };
+  return { body: null, face: w.author.pic ?? null, art };
 }
 
 const colourOf = (w: StageItem) => (w.rel === 'oshi' ? 'var(--oshi)' : w.rel === 'own' ? 'var(--mine)' : 'var(--dachi)');

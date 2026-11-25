@@ -19,3 +19,4 @@ export * from './talkBeats';
 export * from './kimorin';
 export * from './task';
 export * from './meter';
+export * from './prompts/planetFigures';

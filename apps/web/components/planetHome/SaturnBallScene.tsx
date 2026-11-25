@@ -189,7 +189,8 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, 
       shown.map((w) => {
         return {
           id: w.id,
-          pic: kororinBall(ballPic(w, hue(w.id))),
+          // client 2026-11-25: the maker's own ball in their pattern (author.ball) until they choose a kororin picture
+          pic: !w.author.kororin?.pic && w.author.ball ? w.author.ball : kororinBall(ballPic(w, hue(w.id))),
           turn: hue(w.id),
           name: w.rel === 'own' ? null : w.author.name,
           R: (22 + (hue(w.id) % 3) * 4) * scale,

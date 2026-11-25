@@ -115,7 +115,7 @@ export const DAY8: Step[] = [
   { t: 'sprite', image: null }, // ローブの裾をひるがえして、門の外へ。扇の尾が、ぴん、と立っている
   { t: 'notice', text: '月額88円（毎月88マナの代金）。値上げはしません。いつでもやめられます。やめ方は、支払いの画面に書いてあります' },
   // client 2026-11-25: the numbers are the price rule's (MAKE_COST), never fixed ones
-  { t: 'notice', text: `旅で使ったマナのめやす｜姿を変える ${formatMana(MAKE_COST.look)}マナ／アートの絵（{bati}が描く時） ${formatMana(MAKE_COST.jacketArt)}マナ／曲 ${formatMana(MAKE_COST.song)}マナ／MV ${formatMana(MAKE_COST.mv)}マナ。声のコロリン、月で{bati}に聞くこと（ふだんの分）、写真や字だけのアート、届けること、DJで回すことは、マナを使いません` },
+  { t: 'notice', text: `旅で使ったマナのめやす｜姿を変える ${formatMana(MAKE_COST.profileLook)}マナ／アートの絵（{bati}が描く時） ${formatMana(MAKE_COST.jacketArt)}マナ／曲 ${formatMana(MAKE_COST.song)}マナ／MV ${formatMana(MAKE_COST.mv)}マナ。声のコロリン、月で{bati}に聞くこと（ふだんの分）、写真や字だけのアート、届けること、DJで回すことは、マナを使いません` },
   { t: 'notice', text: 'Obolo Orderの旅｜毎月88マナで、{bati}と作り続けられます。切符の裏の天王星・海王星・冥王星へも行けます（旅の続き）。いつでもやめられて、やめても作ったものは残ります' },
   { t: 'notice', text: 'エクリプスを受けなくても、住人のまま、星に戻って、作ったものを見て、届けて、回せます。マナジェムのマナを使い切ったあと、新しく作る時は、エクリプスが必要です' },
 

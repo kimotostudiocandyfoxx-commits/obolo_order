@@ -84,6 +84,10 @@ const Env = z.object({
   LOOK_MODEL: z.string().default('runware:400@4'),
   BATI_MODEL: z.string().default('bytedance:seedream@5.0-flash'),
   KORORIN_MODEL: z.string().default('runware:400@4'),
+  /** client 2026-11-25 (art/lab/runware-planet-avatar): the member's planet figures — the Saturn chibi on FLUX.2 klein 4B, the Saturn ball and the seven planets' chibis on Qwen-Image 2.1 Turbo */
+  SATURN_CHIBI_MODEL: z.string().default('runware:400@4'),
+  SATURN_BALL_MODEL: z.string().default('alibaba:qwen-image@2.1-turbo'),
+  PLANET_CHIBI_MODEL: z.string().default('alibaba:qwen-image@2.1-turbo'),
   /** the look rounds of the first journey (free): four to pick from (M-R173, four touches) */
   LOOK_CANDIDATES: z.coerce.number().int().min(1).max(4).default(4),
   /** R17: a paid look / dress-up round (after the journey, the atelier's row of pictures): two to pick from, not four */
@@ -341,6 +345,9 @@ export function makeSetupOf(c: AppConfig): MakeSetup {
     lookModel: c.LOOK_MODEL || DEFAULT_MAKE_SETUP.lookModel,
     batiModel: c.BATI_MODEL || DEFAULT_MAKE_SETUP.batiModel,
     kororinModel: c.KORORIN_MODEL || DEFAULT_MAKE_SETUP.kororinModel,
+    saturnChibiModel: c.SATURN_CHIBI_MODEL || DEFAULT_MAKE_SETUP.saturnChibiModel,
+    saturnBallModel: c.SATURN_BALL_MODEL || DEFAULT_MAKE_SETUP.saturnBallModel,
+    planetChibiModel: c.PLANET_CHIBI_MODEL || DEFAULT_MAKE_SETUP.planetChibiModel,
     paidLookCandidates: c.PAID_LOOK_CANDIDATES || DEFAULT_MAKE_SETUP.paidLookCandidates,
     kororinCandidates: c.KORORIN_CANDIDATES || DEFAULT_MAKE_SETUP.kororinCandidates,
     gameTrialModel: c.GAME_MODEL_TRIAL || DEFAULT_MAKE_SETUP.gameTrialModel,

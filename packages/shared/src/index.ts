@@ -51,3 +51,4 @@ export * from './gameTemplates';
 export * from './access';
 export * from './storage';
 export * from './storageVariants';
+export * from './planetFigures';

@@ -2,6 +2,7 @@ import { BATI_MAGIC_PER_DAY, BATI_RESTYLE_PER_DAY, JOURNEY_DONE } from '@obolo/s
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { MemoryKv } from '../infra/kv';
+import { costScope } from '../wallet/cost-scope';
 import { LookService } from './look.service';
 
 // Bati's room (P-BATI-ROOM): the dress-up rounds, their limit and mana, and choosing one
@@ -32,11 +33,14 @@ function make(journeyDay: number) {
   const prompts: string[] = [];
   const looks = { generate: async (p: string) => (prompts.push(p), { data: await grey(), mime: 'image/png' }) };
   const charged: string[] = [];
-  const ledger = { charge: async (_db: unknown, _u: string, kind: string) => (charged.push(kind), { refund: async () => undefined }) };
+  // a charge marks the request's scope as that paid making (LedgerService.charge)
+  const ledger = { charge: async (_db: unknown, _u: string, kind: string) => (charged.push(kind), costScope.tag({ kind: kind as never, job: `make:${kind}:u:1`, paid: true }), { refund: async () => undefined }) };
   const jobs: string[] = [];
   const queue = { register: () => undefined, enqueue: async (name: string) => void jobs.push(name) };
-  const s = new LookService(db as never, media as never, looks as never, looks as never, { name: 'mock' } as never, new MemoryKv(), ledger as never, queue as never);
-  return { s, user, prompts, charged, jobs };
+  const figures: { look: string; paid?: unknown }[] = [];
+  const fig = { enqueue: async (_u: string, _o: string, look: string, paid?: unknown) => void figures.push({ look, paid }) };
+  const s = new LookService(db as never, media as never, looks as never, looks as never, { name: 'mock' } as never, new MemoryKv(), ledger as never, queue as never, undefined, undefined, undefined, undefined, fig as never);
+  return { s, user, prompts, charged, jobs, figures };
 }
 
 describe("Bati's room: dress up the Bati", () => {
@@ -152,6 +156,23 @@ describe("Bati's room: dress up the Bati", () => {
     expect(me.bati?.faces).toBeUndefined();
     expect(jobs).toEqual(['bati.faces']);
     await expect(s.chooseRestyle('u', '00000000-0000-4000-8000-0000000000ff', 'https://x')).rejects.toThrow();
+  });
+
+  it("client 2026-11-25: Bati's magic on your own look takes the profile look's mana; the look chosen gets its planet figures as that making", async () => {
+    const { s, charged, figures } = make(JOURNEY_DONE);
+    const r = await costScope.run({ feature: 'look', userId: 'u' }, () => s.refine('u', { instruction: '髪を長く', magic: true }, 'https://x'));
+    expect(charged).toEqual(['profileLook']);
+    await s.choose('u', r.candidates[0].id, 'https://x');
+    expect(figures).toEqual([{ look: r.candidates[0].url, paid: { kind: 'profileLook', job: 'make:profileLook:u:1' } }]);
+    // {bati}'s dress-up stays 'look'
+    await s.restyle('u', 'リボン', 'https://x');
+    expect(charged).toEqual(['profileLook', 'look']);
+    // the first journey's look: free, its figures absorbed (no paid making)
+    const free = make(2);
+    const f = await free.s.refine('u', { instruction: '髪を長く', magic: true }, 'https://x');
+    await free.s.choose('u', f.candidates[0].id, 'https://x');
+    expect(free.charged).toEqual([]);
+    expect(free.figures).toEqual([{ look: f.candidates[0].url, paid: undefined }]);
   });
 
   it("Bati's magic on the look is counted per day, not by the story's small total", async () => {

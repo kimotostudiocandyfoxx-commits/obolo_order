@@ -261,6 +261,9 @@ jobs:
             LOOK_MODEL=${{ vars.LOOK_MODEL || 'runware:400@4' }}
             BATI_MODEL=${{ vars.BATI_MODEL || 'bytedance:seedream@5.0-flash' }}
             KORORIN_MODEL=${{ vars.KORORIN_MODEL || 'runware:400@4' }}
+            SATURN_CHIBI_MODEL=${{ vars.SATURN_CHIBI_MODEL || 'runware:400@4' }}
+            SATURN_BALL_MODEL=${{ vars.SATURN_BALL_MODEL || 'alibaba:qwen-image@2.1-turbo' }}
+            PLANET_CHIBI_MODEL=${{ vars.PLANET_CHIBI_MODEL || 'alibaba:qwen-image@2.1-turbo' }}
             LOOK_CANDIDATES=${{ vars.LOOK_CANDIDATES || '4' }}
             PAID_LOOK_CANDIDATES=${{ vars.PAID_LOOK_CANDIDATES || '2' }}
             KORORIN_CANDIDATES=${{ vars.KORORIN_CANDIDATES || '4' }}

@@ -63,7 +63,10 @@ export function featureOfPath(path: string): UsageFeature {
 export function featureOfJob(name: string): UsageFeature {
   if (name === 'buddy.summarize') return 'memory';
   if (name === 'voice.line' || name === 'voice.bati') return 'voice';
-  if (name.startsWith('bati.') || name === 'talk.look' || name === 'look.chibi') return 'look';
+  // client 2026-11-25: the planet figures nobody paid for (the first look, the backfill) are absorbed (ABSORBED_FEATURES);
+  // a paid profile look change tags its job as that making (PlanetFiguresService.make)
+  if (name === 'look.figures' || name === 'look.chibi') return 'figures';
+  if (name.startsWith('bati.') || name === 'talk.look') return 'look';
   return 'other';
 }
 

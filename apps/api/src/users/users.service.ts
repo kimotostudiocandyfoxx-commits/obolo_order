@@ -31,6 +31,7 @@ import { users, wallets } from '../db/schema';
 import { LedgerService } from '../wallet/ledger.service';
 import { activeBati, batiSummaries, batiViewExtra, lookHistory } from '../look/batis';
 import { talkLookOf } from '../look/talk';
+import { figuresOf } from '../look/figures';
 import { activeMember, isTester } from './tester';
 
 /** Bati's expression pictures, kept in onboardingJson['bati.faces'] (JSON) */
@@ -109,6 +110,8 @@ export function toMe(u: typeof users.$inferSelect): Me {
     look: u.lookJson ?? null,
     puniPic: u.puniPicUrl ?? null,
     chibiPic: u.chibiPicUrl ?? null,
+    // client 2026-11-25: the look's figures on every home planet
+    planetFigures: figuresOf(u.planetFigures, u.avatarUrl),
     kororin: kororinOf({ pic: u.kororinPic }),
     butterfly: u.butterflyUrl ?? null,
     story: Object.fromEntries(Object.entries(u.onboardingJson ?? {}).filter(([k]) => /^(d\d+|l2|sys)\./.test(k))),

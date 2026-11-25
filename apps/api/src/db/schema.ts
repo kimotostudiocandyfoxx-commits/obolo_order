@@ -50,6 +50,11 @@ export const users = pgTable(
     puniPicUrl: text('puni_pic_url'),
     /** M-R262: the member's 2-heads glossy mini figure, jumping out of a popped ball on Saturn (painted once from the look) */
     chibiPicUrl: text('chibi_pic_url'),
+    /**
+     * client 2026-11-25: the member's figures on every home planet, per look (look URL → { figure → picture URL,
+     * 'figure#tries' → paintings tried }); the looks of the history only (@obolo/shared PLANET_FIGURES)
+     */
+    planetFigures: jsonb('planet_figures').$type<Record<string, Record<string, string>>>(),
     /** M-R266 (replaced by kororinPic, M-R275): the old choice, a colour and a face — kept, no longer read */
     kororinColour: text('kororin_colour'),
     kororinFace: text('kororin_face'),

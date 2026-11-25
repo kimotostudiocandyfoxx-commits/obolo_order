@@ -1,6 +1,7 @@
 import { Inject, Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { setCostSink, type CostEvent } from '@obolo/ai';
 import {
+  ABSORBED_FEATURES,
   accrueUsage,
   effectiveFeeRate,
   fxFor,
@@ -258,8 +259,9 @@ export class CostService implements OnModuleInit, OnModuleDestroy {
       units: e.units ?? null,
     });
     // R18: the ダチ talk is free for everyone — its cost is recorded (kind 'dachi') and absorbed as marketing, never taken
-    if (!paid && kind === MARKETING_FEATURE) {
-      this.log.debug(`unrecovered marketing cost (dachi): ${ctx?.userId ?? '-'} ${e.provider} ¥${costJpy.toFixed(4)}`);
+    // client 2026-11-25: so are the planet figures nobody paid for ('figures': the first look, the backfill)
+    if (!paid && ABSORBED_FEATURES.includes(kind)) {
+      this.log.debug(`unrecovered ${kind === MARKETING_FEATURE ? 'marketing ' : ''}cost (${kind}): ${ctx?.userId ?? '-'} ${e.provider} ¥${costJpy.toFixed(4)}`);
       return;
     }
     // a free feature's cost: added up and taken a whole mana at a time
@@ -313,7 +315,8 @@ export class CostService implements OnModuleInit, OnModuleDestroy {
       const jobs = d.jobs.filter((j) => j.kind === kind).map((j) => j.costJpy);
       makings.push(marginRow({ kind, count: ch?.count ?? jobs.length, chargedMana: ch?.mana ?? 0, costJpy, perJobCostsJpy: jobs, currentMana: isMakeKind(kind) ? prices[kind] : null }, rule));
     }
-    const free = d.costs.filter((c) => !c.paid && c.kind !== MARKETING_FEATURE);
+    const free = d.costs.filter((c) => !c.paid && !ABSORBED_FEATURES.includes(c.kind));
+    const figuresJpy = Math.round(d.costs.filter((c) => !c.paid && c.kind === 'figures').reduce((a, c) => a + c.costJpy, 0) * 100) / 100;
     const marketingJpy = Math.round(d.costs.filter((c) => !c.paid && c.kind === MARKETING_FEATURE).reduce((a, c) => a + c.costJpy, 0) * 100) / 100;
     const usageRow = marginRow({ kind: 'usage', count: free.length, chargedMana: d.usageMana, costJpy: free.reduce((a, c) => a + c.costJpy, 0) }, rule);
     const features = Object.entries(free.reduce<Record<string, number>>((m, c) => ({ ...m, [c.kind]: (m[c.kind] ?? 0) + c.costJpy }), {}))
@@ -327,6 +330,7 @@ export class CostService implements OnModuleInit, OnModuleDestroy {
       `つかったマナ（小さな原価）: ${usageRow.chargedMana}マナ／原価 ¥${usageRow.costJpy} → 取り分 ${pct(usageRow.margin)}${usageRow.low ? ' ⚠ 8%未満（0マナで吸収した分・まだ1マナにならない分を含む）' : ''}`,
       `吸収した小さな原価（これまで）: ${d.absorbed.mana}マナ（¥${d.absorbed.jpy.toFixed(2)}）`,
       `ダチの原価（宣伝費として吸収・引かない）: ¥${marketingJpy.toFixed(2)}`,
+      `星の姿の原価（最初の姿・作り直し。吸収・引かない）: ¥${figuresJpy.toFixed(2)}`,
     ];
     return {
       at: now.toISOString(),

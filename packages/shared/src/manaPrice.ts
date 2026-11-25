@@ -142,7 +142,7 @@ export const RUNWARE_PRICES: Record<string, number> = {
   'runware:400@2': 0.003, // FLUX.2 [klein] 9B
   'bfl:flux@3-image-klein': 0.0024, // FLUX 3 Image Klein (16 steps)
   'runware:z-image@turbo': 0.0023, // Z-Image Turbo (words only, no reference pictures)
-  'alibaba:qwen-image@2.1-turbo': 0.0141,
+  'alibaba:qwen-image@2.1-turbo': 0.01413, // Qwen-Image 2.1 Turbo with the member's look as reference (art/lab/runware-planet-avatar/costs.json: 27 pictures, $0.01413 each)
   'bytedance:seedream@5.0-flash': 0.0193,
   'prunaai:2@1': 0.0088, // P-Image Edit
   'google:nano-banana@2-lite': 0.0336,
@@ -294,8 +294,11 @@ export function fishCostUsd(text: string): number {
  * R17 (client 2026-11-25, cheaper games): gameTrial = the first game, one of the prepared templates filled in by a
  * Flash-class model; game / gameTweak = the member's own request on the cheap chain (GAME_MODEL_CHEAP); gamePro /
  * gameTweakPro = the full chain (GAME_MODEL_FULL) — a request that needs it, or a tweak the cheap chain could not make.
+ * Client 2026-11-25 (planet figures): profileLook = a change of the member's own profile look (a paid round of its
+ * pictures, and the figures of the look chosen: the Saturn chibi and ball and the seven planets' chibis); 'look' is
+ * {bati}'s dress-up.
  */
-export const MAKE_KINDS = ['look', 'kororinDesign', 'jacketArt', 'song', 'songPremium', 'songVoice', 'mv', 'story', 'game', 'gameTweak', 'mvPictures', 'mvRedraw', 'gameTrial', 'gamePro', 'gameTweakPro'] as const;
+export const MAKE_KINDS = ['look', 'kororinDesign', 'jacketArt', 'song', 'songPremium', 'songVoice', 'mv', 'story', 'game', 'gameTweak', 'mvPictures', 'mvRedraw', 'gameTrial', 'gamePro', 'gameTweakPro', 'profileLook'] as const;
 export type MakeKind = (typeof MAKE_KINDS)[number];
 export const isMakeKind = (k: string): k is MakeKind => (MAKE_KINDS as readonly string[]).includes(k);
 /** the game makings (each keeps its version on the game; each is refunded the same way) */
@@ -337,6 +340,12 @@ export interface MakeSetup {
   lookModel: string;
   /** {bati}'s dress-up (charged as 'look') */
   batiModel: string;
+  /** client 2026-11-25: the member's Saturn 2-heads chibi of each look (SATURN_CHIBI_MODEL; FLUX.2 klein 4B) */
+  saturnChibiModel: string;
+  /** the member's Saturn kororin ball in their own pattern (SATURN_BALL_MODEL; Qwen-Image 2.1 Turbo) */
+  saturnBallModel: string;
+  /** the other seven home planets' chibis of the member (PLANET_CHIBI_MODEL; Qwen-Image 2.1 Turbo) */
+  planetChibiModel: string;
   /** the Saturn kororin design */
   kororinModel: string;
   /** pictures in a paid look / dress-up round (the atelier card shows them as a row to pick from) */
@@ -353,6 +362,10 @@ export const DEFAULT_MAKE_SETUP: MakeSetup = {
   artModel: 'runware:400@2',
   lookModel: 'runware:400@4',
   batiModel: 'bytedance:seedream@5.0-flash',
+  // client 2026-11-25 (art/lab/runware-planet-avatar): the planet figures
+  saturnChibiModel: 'runware:400@4',
+  saturnBallModel: 'alibaba:qwen-image@2.1-turbo',
+  planetChibiModel: 'alibaba:qwen-image@2.1-turbo',
   kororinModel: 'runware:400@4',
   paidLookCandidates: 2,
   kororinCandidates: 4,
@@ -384,8 +397,15 @@ export function makeCostEstimates(s: MakeSetup = DEFAULT_MAKE_SETUP): Record<Mak
   const n = (x: number) => Math.max(1, Math.round(x));
   const pics = (model: string, count: number, refs: boolean) => n(count) * pictureUsd(model, refs);
   const lookUsd = Math.max(pics(s.lookModel, s.paidLookCandidates, true), pics(s.batiModel, s.paidLookCandidates, true));
+  const figures = planetFiguresUsd(s);
   return {
-    look: { usd: lookUsd + WORDS_USD, note: `姿 ${s.lookModel}・着せ替え ${s.batiModel} ×${n(s.paidLookCandidates)} 枚（参照画像つき）＋言葉の確認＋保存12か月`, storedBytes: n(s.paidLookCandidates) * PICTURE_STORED_BYTES },
+    look: { usd: lookUsd + WORDS_USD, note: `着せ替え ${s.batiModel} ×${n(s.paidLookCandidates)} 枚（参照画像つき）＋言葉の確認＋保存12か月`, storedBytes: n(s.paidLookCandidates) * PICTURE_STORED_BYTES },
+    // client 2026-11-25: the profile look's change — its pictures and the figures of the look chosen on every home planet
+    profileLook: {
+      usd: pics(s.lookModel, s.paidLookCandidates, true) + figures + WORDS_USD,
+      note: `姿 ${s.lookModel} ×${n(s.paidLookCandidates)} 枚＋土星のちびキャラ ${s.saturnChibiModel} ×1＋土星のボール ${s.saturnBallModel} ×1＋7つの星のちびキャラ ${s.planetChibiModel} ×7（どれも姿を参照）＋言葉の確認＋保存12か月`,
+      storedBytes: (n(s.paidLookCandidates) + PLANET_FIGURE_COUNT) * PICTURE_STORED_BYTES,
+    },
     kororinDesign: { usd: pics(s.kororinModel, s.kororinCandidates, true) + WORDS_USD, cpuSeconds: 10, note: `${s.kororinModel} ×${n(s.kororinCandidates)} 枚（見本の絵つき）＋切り抜き CPU＋保存12か月`, storedBytes: n(s.kororinCandidates) * PICTURE_STORED_BYTES },
     jacketArt: { usd: pics(s.artModel, 1, false) + WORDS_USD, note: `${s.artModel} ×1 枚＋言葉の確認＋保存12か月`, storedBytes: PICTURE_STORED_BYTES },
     // R17: sung on Runware (aceStepUsd for the seconds it is sung: 60 s delivered, 1.2× longer sung) + the 1.2× stretch
@@ -404,6 +424,13 @@ export function makeCostEstimates(s: MakeSetup = DEFAULT_MAKE_SETUP): Record<Mak
     mvPictures: { usd: 0.002, cpuSeconds: 180, note: '動き選び Gemini＋描画 CPU p90 180秒＋保存12か月（MP4 約11MB）', storedBytes: VIDEO_STORED_BYTES },
     mvRedraw: { usd: 4 * RUNWARE_PRICES['runware:400@4'] + 0.002, cpuSeconds: 180, note: 'FLUX.2 klein 4B ×最大4 場面＋描画 CPU＋保存12か月（新しい MP4・場面）', storedBytes: VIDEO_STORED_BYTES + 4 * 0.125 * MIB },
   };
+}
+
+/** client 2026-11-25: the figures of one look — the Saturn chibi, the Saturn ball and the seven other planets' chibis */
+export const PLANET_FIGURE_COUNT = 9;
+/** what the figures of one look cost (USD), each painted with the look as reference */
+export function planetFiguresUsd(s: Pick<MakeSetup, 'saturnChibiModel' | 'saturnBallModel' | 'planetChibiModel'> = DEFAULT_MAKE_SETUP): number {
+  return pictureUsd(s.saturnChibiModel, true) + pictureUsd(s.saturnBallModel, true) + (PLANET_FIGURE_COUNT - 2) * pictureUsd(s.planetChibiModel, true);
 }
 
 /** the seed table at the default setup */
@@ -455,6 +482,7 @@ export type UsageLine = (typeof USAGE_LINES)[number];
 export function usageLineOf(refType: string | null | undefined): UsageLine {
   switch (refType) {
     case 'look':
+    case 'profileLook':
     case 'kororinDesign':
     case 'jacketArt':
       return 'usage:art';
@@ -510,10 +538,14 @@ export const MAKE_COST: Readonly<ManaPrices> = Object.freeze(manaPrices());
 /**
  * What the free features are recorded as (gen_costs.kind / the usage row's ref_type). Their cost is added up per member
  * and taken a whole mana at a time (R18: a non-member past the first journey is stopped at 0 mana — access.ts). 'dachi'
- * (the ダチ talk) is never taken: an unrecovered marketing cost.
+ * (the ダチ talk) is never taken: an unrecovered marketing cost. 'figures' (client 2026-11-25: the planet figures of a
+ * look no one paid for — the first look of the journey, a look worn again whose figures were never made, the admin
+ * backfill) is never taken either: absorbed like 'dachi' (ABSORBED_FEATURES).
  */
-export const USAGE_FEATURES = ['chat', 'search', 'draw', 'voice', 'spell', 'lyrics', 'compass', 'songEdit', 'videoEdit', 'novel', 'unfurl', 'listen', 'memory', 'look', 'story', 'dachi', 'other'] as const;
+export const USAGE_FEATURES = ['chat', 'search', 'draw', 'voice', 'spell', 'lyrics', 'compass', 'songEdit', 'videoEdit', 'novel', 'unfurl', 'listen', 'memory', 'look', 'story', 'dachi', 'figures', 'other'] as const;
 export type UsageFeature = (typeof USAGE_FEATURES)[number];
+/** the free costs the operator absorbs (recorded, never taken from the member) */
+export const ABSORBED_FEATURES: readonly string[] = ['dachi', 'figures'];
 
 export interface AccrualStep {
   /** mana to take now (a ledger row of this many, reason 'usage') */

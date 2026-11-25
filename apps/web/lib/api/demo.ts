@@ -1811,7 +1811,7 @@ export class DemoApi implements Api {
     const used = Number(localStorage.getItem(key) ?? 0);
     if (u.journeyDay < JOURNEY_DONE && used >= 8) throw new ApiError(429, 'LOOK_TRIES', 'もう作り直せません');
     // M-R223: no mana on day 2
-    if (u.journeyDay > 2) this.charge('look');
+    if (u.journeyDay > 2) this.charge('profileLook');
     localStorage.setItem(key, String(used + 1));
     await new Promise((r) => setTimeout(r, 1800));
     let urls: string[];
@@ -1841,7 +1841,7 @@ export class DemoApi implements Api {
     const src = mediaId ? this.lookCache.find((c) => c.id === mediaId) : { url: u.avatarUrl ?? demoNeoLooks({ animal: 'おまかせ', color: 'おまかせ', mood: 'おまかせ' }, 0)[0] };
     if (!src) throw new ApiError(404, 'NOT_FOUND', 'not found');
     const n = 30 - this.refinesLeft();
-    if (u.journeyDay > 2) this.charge('look');
+    if (u.journeyDay > 2) this.charge('profileLook');
     localStorage.setItem(`obolo.look.refines.${u.id}`, String(n + 1));
     await new Promise((r) => setTimeout(r, 1500));
     // the one refine: four looks with the wish (client 2026-10-25)
@@ -1864,7 +1864,7 @@ export class DemoApi implements Api {
     if (used >= BATI_MAGIC_PER_DAY) throw new ApiError(429, 'LOOK_REFINES', '今日はもう描き直せません');
     const src = mediaId ? this.lookCache.find((c) => c.id === mediaId) : { url: u.avatarUrl ?? demoNeoLooks({ animal: 'おまかせ', color: 'おまかせ', mood: 'おまかせ' }, 0)[0] };
     if (!src) throw new ApiError(404, 'NOT_FOUND', 'not found');
-    if (u.journeyDay >= JOURNEY_DONE) this.charge('look', paid, false, 'look');
+    if (u.journeyDay >= JOURNEY_DONE) this.charge('profileLook', paid, false, 'look');
     localStorage.setItem(key, String(used + 1));
     await sleep(1500);
     const c = await Promise.all([0, 1, 2, 3].map(async (k) => ({ id: uid(), url: await demoRefine(src.url, instruction, used * 4 + k) })));
