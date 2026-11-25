@@ -10065,6 +10065,20 @@
       ],
       "always": false,
       "prompt": "Drawn as a dreamy, cute, trendy illustration that teenage girls and young women love: soft pastel colours (lilac, baby pink, mint, sky blue, cream), pearly iridescent sheen, soft airbrushed gradients, gentle glow, tiny sparkles and little stars floating around, clean smooth shapes, kawaii lifestyle-gadget design like a premium Japanese/Korean character-goods brand, not photo-realistic. An egg-shaped gadget standing upright on a soft pastel background, with one round screen set into its front framed by a thin rose-gold bezel. The top is smooth with no camera lens. Centered, the whole egg in frame, soft shadow, no text, no logo. The egg's body is split by a graceful S-shaped yin-yang curve: one side a cute stylised pastel Earth (blue ocean, mint continents, white clouds), the other side a cute stylised pastel Moon (lavender-cream with soft craters); along the curve a glowing pearly pink-gold ribbon of light where they softly blend, with a few stars. The round screen sits in the centre on the curve, filled completely edge to edge by a cute pastel Earth and Moon hugging each other with a tiny heart-shaped sparkle between them. "
+    },
+    {
+      "id": "home2-bg-saturn-top",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-close2.jpg"
+      ],
+      "prompt": "A NEW view in exactly the same soft kawaii pastel anime style and colours as the reference picture. Vertical phone wallpaper 9:16. Looking STRAIGHT DOWN from directly above onto one big glossy black vinyl record lying on soft pastel clouds: the record is a PERFECT CIRCLE seen flat (no perspective), centred, its diameter filling about 96% of the picture width, shining concentric grooves with soft pastel sparkles, a pastel rainbow-swirl label in the exact centre with a tiny spindle. Above and below the record: dreamy pastel clouds and a few stars. The groove area is empty. No tonearm, no characters, no text."
     }
   ],
   "redo": []
