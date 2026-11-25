@@ -843,7 +843,6 @@ const ASET=5;
 function eplayIcon(on){const b=$('eplay');b.classList.toggle('on',on);b.setAttribute('aria-label',on?'止める':'流す');b.innerHTML='<span class="rec"></span><span class="lbl"></span><svg viewBox="0 0 24 24" aria-hidden="true">'+(on?'<rect class="pl" x="6" y="6" width="12" height="12" rx="3"/>':'<path class="pl" d="M8.5 5.6c0-1.1 1.2-1.8 2.2-1.2l8.6 5.5c.9.6.9 1.9 0 2.5l-8.6 5.5c-1 .6-2.2-.1-2.2-1.2z"/>')+'</svg>'}
 function autoStart(){if(!EX||!EX.region)return;if(EX.open)EX.open.close();const order=[...EX.boats].sort(()=>Math.random()-.5);EX.auto={order,n:0,tm:0};$('trav').querySelector('img').src=A['udance-1']||A['chibi-user']||'';$('exp').classList.add('auto');eplayIcon(true);autoNext()}
 function autoNext(){const a=EX&&EX.auto;if(!a)return;if(EX.open)EX.open.close();
-  if(a.n>0&&a.n%ASET===0&&a.asked!==a.n){a.asked=a.n;autoAsk();return}
   const b=a.order.filter(x=>!x.hidden)[a.n%Math.max(1,a.order.filter(x=>!x.hidden).length)];if(!b){autoStop();return}a.n++;
   const d=expShow(b,{auto:true,song:((EX.region.song-1+a.n-1)%5)+1});a.tm=setTimeout(autoNext,(d||60)*1000+400)}
 function autoAsk(){const st=$('estage'),c=EXP[EX.pl],rs=c.regions,i=rs.indexOf(EX.region),nb=rs[(i+1)%rs.length];st.style.pointerEvents='auto';
