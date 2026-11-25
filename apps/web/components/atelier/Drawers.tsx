@@ -15,7 +15,7 @@ import { batiTalkDays } from '@/lib/finds/talks';
 import { BATI_COLOR, colorOf, SELF_COLOR } from '@/lib/talk/looks';
 import { discard, fly, type Ctx } from './makers';
 import { shelf, talks, type Talk } from './shelf';
-import type { ThreadInfo } from './threads';
+import { threadsInDrawer } from './threads';
 import { KindMark, usePlay } from './WorkCard';
 import { FLIES, type Work } from './work';
 
@@ -199,16 +199,13 @@ function Item({ w, onFly, onDiscard, onRing, markRef, tries, onOrigin, onDragOut
 }
 
 /**
- * The conversations on the left (M-R212 → M-R237): while there are few, the threads ({bati} first, the ダチ, the group,
- * the order's news …) are a ring of faces to turn through (choosing = round); more than eight, a list. The chosen
- * thread's past talk is the spiral and the list (one dot / row = one day, the dot in the colour of who spoke the most;
- * the row: the date, the day's first words, ★, mark), with the strip and the search box. A row opens that day in the
- * side-by-side talk; 〔話す〕 opens the thread itself.
+ * {bati}'s ≡ (M-R212 → M-R237 → R15): {bati}'s own past talk only — no ダチ (they are the ダチ tab's ≡, DachiHistory;
+ * threads.ts threadsInDrawer). One row a day, newest first (the date, the day's first words, ★, mark), with the strip and
+ * the search box; a row opens that day in the side-by-side talk (in the temple, like the talk now), 〔話す〕 the talk
+ * now, ＋ a new talk.
  */
 export function ThreadsDrawer({
   bati,
-  threads,
-  current,
   onThread,
   onNew,
   onDay,
@@ -216,40 +213,26 @@ export function ThreadsDrawer({
   extra,
 }: {
   bati: { name: string; face: string };
-  threads: ThreadInfo[];
-  current: string;
+  current?: string;
   talkId?: string;
   onThread: (id: string) => void;
   onTalk?: (t: Talk) => void;
   onNew: () => void;
-  /** open one day of a thread's past talk */
+  /** open one day of {bati}'s past talk */
   onDay: (thread: string, day: string) => void;
   onClose: () => void;
-  /** above the threads (a talk's settings, the looks …) */
+  /** above the list (a talk's settings, the looks …) */
   extra?: React.ReactNode;
 }) {
-  // R9 (client): KIMORIN⭐︎ lives in the ダチ tab, not in this drawer
-  const all = [{ id: 'bati', name: bati.name, avatar: bati.face }, ...threads.filter((t) => t.id !== 'bati' && t.id !== 'kimorin')];
-  const [sel, setSel] = useState(current || 'bati');
+  const [pick] = threadsInDrawer('bati', { name: bati.name, avatar: bati.face }, []);
   const [filter, setFilter] = useState<FindFilter>({});
   const [days, setDays] = useState<TalkDayView[] | null>(null);
-  const ring = all.length <= 8;
   useMarks();
   const key = JSON.stringify(filter);
   useEffect(() => {
-    let live = true;
-    setDays(null);
-    const f = { star: filter.star, mark: filter.mark, q: filter.q };
-    if (sel === 'bati') setDays(batiTalkDays(talks(), f));
-    else
-      void getApi()
-        .findTalkDays({ thread: sel, ...f })
-        .then((d) => live && setDays(d))
-        .catch(() => live && setDays([]));
-    return () => {
-      live = false;
-    };
-  }, [sel, key]);
+    setDays(batiTalkDays(talks(), { star: filter.star, mark: filter.mark, q: filter.q }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
   const colorFor = (who: string) => (who === 'me' ? SELF_COLOR : who === 'bati' ? BATI_COLOR : colorOf(who));
   const rows: SpiralRow[] | null =
     days?.map((d) => ({
@@ -261,35 +244,20 @@ export function ThreadsDrawer({
       stars: d.stars,
       markId: d.mark,
     })) ?? null;
-  const pick = all.find((t) => t.id === sel) ?? all[0];
   return (
-    <Drawer side="left" onClose={onClose} label="会話">
+    <Drawer side="left" onClose={onClose} label={`${pick.name}との会話`}>
       {extra}
-      {ring ? (
-        <ThreadRing all={all} sel={sel} onPick={(id) => (id === sel ? onThread(id) : setSel(id))} />
-      ) : (
-        <div className="no-scrollbar max-h-[34%] shrink-0 space-y-1 overflow-y-auto">
-          {all.map((t) => (
-            <button key={t.id} onClick={() => setSel(t.id)} className={`flex w-full items-center gap-2.5 rounded-xl px-2 py-1.5 text-left ${t.id === sel ? 'bg-amber-200/15' : ''}`}>
-              <Face src={t.avatar} name={t.name} size={34} />
-              <span className="min-w-0 flex-1 truncate text-[13px]">{t.name}</span>
-              {!!(t as ThreadInfo).unread && <span className="h-2 w-2 shrink-0 rounded-full bg-sky-300" aria-label="新しいメッセージ" />}
-            </button>
-          ))}
-        </div>
-      )}
-      <div className="flex shrink-0 items-center gap-2 py-2">
-        <p className="min-w-0 flex-1 truncate text-[13px] tracking-[0.12em] text-amber-100/90">{pick.name}</p>
-        {sel === 'bati' && (
-          <button onClick={onNew} aria-label="新しく話す" className="rounded-full border border-amber-200/30 px-2.5 py-1 text-[11.5px] text-amber-100/85">
-            ＋
-          </button>
-        )}
-        <button onClick={() => onThread(sel)} className="rounded-full bg-amber-200/90 px-3 py-1 text-[11.5px] font-bold text-[#1b1208]">
+      <div className="flex shrink-0 items-center gap-2.5 py-2" data-testid="bati-history">
+        <Face src={pick.avatar} name={pick.name} size={34} glow />
+        <p className="min-w-0 flex-1 truncate text-[13px] tracking-[0.12em] text-amber-100/90">{pick.name}との会話</p>
+        <button onClick={onNew} aria-label="新しく話す" className="rounded-full border border-amber-200/30 px-2.5 py-1 text-[11.5px] text-amber-100/85">
+          ＋
+        </button>
+        <button onClick={() => onThread(pick.id)} className="rounded-full bg-amber-200/90 px-3 py-1 text-[11.5px] font-bold text-[#1b1208]">
           話す
         </button>
       </div>
-      <SpiralList rows={rows} filter={filter} onFilter={setFilter} onRow={(r) => onDay(sel, r.id)} empty={filter.star || filter.mark || filter.q ? '見つからなかった' : 'まだ、話していない'} search="さがす" noSpiral />
+      <SpiralList rows={rows} filter={filter} onFilter={setFilter} onRow={(r) => onDay(pick.id, r.id)} empty={filter.star || filter.mark || filter.q ? '見つからなかった' : 'まだ、話していない'} search="さがす" noSpiral />
     </Drawer>
   );
 }

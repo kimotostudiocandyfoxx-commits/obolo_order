@@ -7,7 +7,9 @@ import { TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/Tal
 import { useAuth } from '@/lib/auth';
 import { batiDayMsgs } from '@/lib/finds/talks';
 import { usePartner } from '@/lib/partner';
-import { BATI_COLOR, batiLook, characterLook, PLACE_BG, SELF_COLOR, selfLook, selfTone } from '@/lib/talk/looks';
+import { BATI_COLOR, batiLook, characterLook, SELF_COLOR, selfLook, selfTone } from '@/lib/talk/looks';
+import { BowlFx } from './BowlFx';
+import { batiTalkPlace } from './temple';
 import { talks } from './shelf';
 import { KindMark } from './WorkCard';
 import type { Work } from './work';
@@ -16,7 +18,7 @@ const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Ser
 
 /**
  * M-R237 §3: one day of your talk with {bati}, opened from the past talks' list — the same side-by-side talk, read only
- * (no message bar). ★ and marks can still be put on its lines.
+ * (no message bar). ★ and marks can still be put on its lines. R15: in the temple before the bowl, like the talk now.
  */
 export function BatiDay({ day, at, onBack }: { day: string; /** M-R253 §5: opened at this message (a work from Bluena): the talk up to it, then 〔つづき〕 */ at?: string; onBack: () => void }) {
   const { me } = useAuth();
@@ -47,7 +49,9 @@ export function BatiDay({ day, at, onBack }: { day: string; /** M-R253 §5: open
       <TalkScene
         people={people}
         items={items}
-        place={PLACE_BG.moon}
+        framing="ots"
+        {...batiTalkPlace()}
+        placeFx={(m) => <BowlFx state="idle" at={m.at} scale={m.scale} reduced />}
         top={4}
         fixedSelfFace={me?.story?.[TALK_FIXED_FACE_KEY] === '1'}
         onRing={(it, at) => it.mark && ring.open(it.mark.kind, it.mark.id, at)}

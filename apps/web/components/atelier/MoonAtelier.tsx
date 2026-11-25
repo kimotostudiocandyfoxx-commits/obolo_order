@@ -8,7 +8,7 @@ import { usePartner } from '@/lib/partner';
 import { BluenaDevice, DachiTab, MoonTabs, tabOf, type MoonTab } from './MoonTabs';
 import type { Work } from './work';
 import { hasBluena, Shell } from './Shell';
-import type { RenderThread, ThreadInfo } from './threads';
+import { dachiLinkOf, threadsInDrawer, type RenderThread, type ThreadInfo } from './threads';
 
 /** the old atelier kinds a link may still carry (?kind=…) → what the chat asks for */
 const OLD: Record<string, AtelierKind> = { voice: 'voice', art: 'art', song: 'song', video: 'video', radio: 'radio' };
@@ -37,6 +37,13 @@ export function MoonAtelier({ threads, renderThread }: { threads?: ThreadInfo[];
   const tab: MoonTab = asked === 'bluena' ? 'bati' : asked;
   const dachi = tab === 'dachi' ? params.get('dachi') : null;
   const [device, setDevice] = useState(false);
+  // R15: {bati}'s chat holds {bati}'s talks only — a ?thread=<a ダチ> link (an old drawer's, the tester bar's) opens it in
+  // the ダチ tab
+  const dachiLink = dachiLinkOf(params.get('thread'));
+  useEffect(() => {
+    if (dachiLink) router.replace(`${path}?tab=dachi&dachi=${encodeURIComponent(dachiLink)}`, { scroll: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dachiLink]);
   useEffect(() => {
     if (params.get('tab') !== 'bluena') return;
     if (bluena) setDevice(true);
@@ -82,9 +89,9 @@ export function MoonAtelier({ threads, renderThread }: { threads?: ThreadInfo[];
     <main className="pt-safe relative mx-auto flex h-svh max-w-xl flex-col overflow-hidden bg-[radial-gradient(130%_70%_at_50%_0%,#1d2a52_0%,#0b1027_55%,#05060f_100%)] text-amber-50">
       {/* one bar: the talk's own (← back, the conversations, {bati}, Bluena) with the tabs under it — no page header above */}
       <div className={tab === 'dachi' ? 'hidden' : 'relative flex min-h-0 flex-1 flex-col'} data-testid="bati-place">
-        <Shell first={kindOf(params.get('kind'))} threads={threads} renderThread={renderThread} onBack={back} banner={banner} onDevice={openDevice} open={params.get('thread') || params.get('job') ? { thread: params.get('thread') || 'bati', day: params.get('day') ?? undefined, at: params.get('at') ?? undefined, job: params.get('job') ?? undefined } : undefined} />
+        <Shell first={kindOf(params.get('kind'))} onBack={back} banner={banner} onDevice={openDevice} open={(params.get('thread') && !dachiLink) || params.get('job') ? { thread: 'bati', day: params.get('day') ?? undefined, at: params.get('at') ?? undefined, job: params.get('job') ?? undefined } : undefined} />
       </div>
-      {tab === 'dachi' && <DachiTab threads={(threads ?? []).filter((t) => t.id !== 'bati')} open={dachi} onOpen={openDachi} onBack={back} banner={banner} renderThread={renderThread} onDevice={openDevice} />}
+      {tab === 'dachi' && <DachiTab threads={threadsInDrawer('dachi', { name: partner.name }, threads ?? [])} open={dachi} onOpen={openDachi} onBack={back} banner={banner} renderThread={renderThread} onDevice={openDevice} />}
       {/* R10: the Bluena device, over whatever is open (the place behind blurs); from a talk each work can be sent */}
       {device && <BluenaDevice onClose={() => setDevice(false)} onSend={sendTo} sendTo={tab === 'dachi' ? 'dachi' : 'bati'} />}
       {gate && <Gate onSkip={() => setGate(false)} />}

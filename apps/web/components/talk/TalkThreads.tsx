@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import { useState, type ReactNode } from 'react';
 import { Drawer, ThreadRing, ThreadsDrawer, Face } from '@/components/atelier/Drawers';
 import { SpiralList, type FindFilter, type SpiralRow } from '@/components/finds/SpiralList';
-import { useDachiThreads } from '@/lib/dachi/useDachiThreads';
 import { usePartner } from '@/lib/partner';
 
 /** one conversation in a talk's left drawer ({bati}, a ダチ, a group, the society's notices) */
@@ -14,18 +13,16 @@ export type TalkThread = { id: string; name: string; avatar?: string; unread?: n
  * The left drawer of a talk outside the atelier (M-R237, the same parts as the atelier's): the conversations at the
  * top (a ring while few), the chosen one's past as the spiral and the list below.
  *
- * AppThreads — the signed-in app ({bati}'s talk on the moon): the real threads; choosing one goes to the atelier,
- * which opens it (or that day of it).
+ * AppThreads — the signed-in app ({bati}'s talk on the moon): {bati}'s past talks only (R15: the ダチ are the Moon chat's
+ * ダチ tab's); 〔話す〕 / a day goes to the atelier, which opens it (or that day of it).
  */
 export function AppThreads({ current = 'bati', extra, onClose }: { current?: string; extra?: ReactNode; onClose: () => void }) {
   const router = useRouter();
   const partner = usePartner();
-  const { threads } = useDachiThreads();
   const go = (q: string) => router.push(`/moon/atelier${q}`);
   return (
     <ThreadsDrawer
       bati={{ name: partner.name, face: partner.face }}
-      threads={threads}
       current={current}
       extra={
         <>

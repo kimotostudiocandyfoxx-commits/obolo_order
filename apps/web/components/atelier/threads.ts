@@ -41,3 +41,18 @@ export type ThreadCtx = {
 export type RenderThread = (id: string, ctx: ThreadCtx) => ReactNode;
 
 export const BATI_THREAD = 'bati';
+
+/**
+ * R15 (client, iPad): which conversations a Moon tab's ≡ lists. {bati}'s tab: {bati}'s own talks only — never a ダチ
+ * (from D04-S005c, day 3, every user has the inviter's thread, or MIKIE⭐︎DRILL's welcome when nobody invited them, and
+ * it used to be listed here beside {bati}); the ダチ tab: every ダチ (KIMORIN⭐︎, the inviter / MIKIE⭐︎DRILL, the others),
+ * never {bati}.
+ */
+export function threadsInDrawer(tab: 'bati' | 'dachi', bati: Omit<ThreadInfo, 'id'>, threads: ThreadInfo[]): ThreadInfo[] {
+  return tab === 'bati' ? [{ ...bati, id: BATI_THREAD }] : threads.filter((t) => t.id !== BATI_THREAD);
+}
+
+/** R15: a link into the Moon chat with ?thread=<a ダチ> (an old drawer's, the tester bar's) opens that talk in the ダチ tab */
+export function dachiLinkOf(thread: string | null | undefined): string | null {
+  return thread && thread !== BATI_THREAD ? thread : null;
+}
