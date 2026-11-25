@@ -5,7 +5,8 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, typ
 import { templateConfig, type PlanetTemplateConfig } from '@/lib/planetTemplate/config';
 import { clamp, isDrag, replace, seat, type Crowd } from '@/lib/planetTemplate/layout';
 import type { Body } from '@/lib/planetTemplate/motion';
-import { peopleOf, type HomePerson } from '@/lib/planetTemplate/people';
+import { dancerOf, peopleOf, type HomePerson } from '@/lib/planetTemplate/people';
+import { SAMPLE_OWN_FIGURE } from '@/lib/planetTemplate/sample';
 import { pinchOf } from '@/lib/planetTemplate/sky';
 import { PlayView } from './PlayView';
 import { Profile, type ProfileMiddleSlot, type ProfilePerson } from './Profile';
@@ -343,7 +344,7 @@ export function PlanetTemplateHome({
           cfg={cfg}
           people={playing}
           back={me.back}
-          dancer={(cfg.play.danceAs === 'figure' ? me.figure : me.dance) ?? null}
+          dancer={dancerOf(cfg.play.danceAs, me, SAMPLE_OWN_FIGURE(planet))}
           opener={opener}
           figure={hooks.figure}
           onEnd={(finished) => {

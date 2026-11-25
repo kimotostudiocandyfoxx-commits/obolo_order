@@ -24,6 +24,7 @@ import {
   wingCutOf,
   wingParts,
 } from './jupiter';
+import { dancerOf } from './people';
 import { templateSample } from './sample';
 
 const insetOf = (clip: string) => clip.match(/[\d.]+/g)!.map(Number); // top right bottom left
@@ -132,6 +133,16 @@ describe('03 §3 ▶ from the porch', () => {
     expect(cycle).toBeGreaterThan(4300);
     expect(cycle).toBeLessThan(5000);
     expect(templateConfig('mercury').play.danceAs).toBe('dance');
+  });
+});
+
+describe('▶: somebody always comes out of your place', () => {
+  it("takes the planet's choice, else the other picture, else the stand-in", () => {
+    expect(dancerOf('dance', { figure: 'ship', dance: 'chibi' }, 'x')).toBe('chibi');
+    expect(dancerOf('dance', { figure: 'ship', dance: null }, 'x')).toBe('ship');
+    expect(dancerOf('figure', { figure: 'bf', dance: 'chibi' }, 'x')).toBe('bf');
+    expect(dancerOf('figure', { figure: null, dance: 'chibi' }, 'x')).toBe('chibi');
+    expect(dancerOf('dance', { figure: null }, 'x')).toBe('x');
   });
 });
 

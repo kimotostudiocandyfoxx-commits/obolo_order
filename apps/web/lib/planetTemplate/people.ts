@@ -24,6 +24,16 @@ export function ownFigure(figures: PlanetFigures | null | undefined, planet: Hom
   return (planet === 'saturn' ? (f.ball ?? f.url) : f.url) ?? null;
 }
 
+/**
+ * Who comes out of your place when ▶ is pressed (Mercury: you dancing; Jupiter: your butterfly). Nobody coming out is to be
+ * avoided: without the planet's first choice, the other one (your figure on this planet), else the template's own stand-in.
+ */
+export function dancerOf(danceAs: 'dance' | 'figure', me: { figure: string | null; dance?: string | null }, standIn: string): string {
+  const first = danceAs === 'figure' ? me.figure : me.dance;
+  const second = danceAs === 'figure' ? me.dance : me.figure;
+  return first || second || standIn;
+}
+
 /** the people of a home: everyone with a work around you (dachi and 推し), the newest arrival first; one figure each */
 export function peopleOf(view: PlanetHomeView | null | undefined): HomePerson[] {
   if (!view) return [];

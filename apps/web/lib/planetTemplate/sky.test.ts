@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { HomeWork } from '@obolo/shared';
-import { pinchOf, SAMPLE_CONTINENTS, sampleDrift, sampleSky, sampleSkyWorks, sampleSong, SKY_SLOTS, songOf, TRIP_SLOTS } from './sky';
+import { countLine, pinchOf, SAMPLE_CONTINENTS, sampleDrift, sampleSky, sampleSkyWorks, sampleSong, SEARCH_PLACEHOLDER, SKY_COUNT_UNIT, SKY_SLOTS, songOf, TRIP_SLOTS } from './sky';
 
 const seq = () => {
   let i = 0;
@@ -73,5 +73,15 @@ describe('a work’s song', () => {
     expect((await songOf(api, w({})))?.lyrics).toHaveLength(1);
     const broken = { planetSong: vi.fn(async () => Promise.reject(new Error('x'))) };
     expect(await songOf(broken, w({}))).toMatchObject({ url: 'https://x/s.m4a', lyrics: [] });
+  });
+});
+
+describe('the search shows no tags (M-R310)', () => {
+  it("counts the drifted works the planet's way, and asks for a name or genre only", () => {
+    expect(countLine('mercury', 8)).toBe('🌊 8曲');
+    expect(countLine('jupiter', 3)).toBe('🌊 3作品');
+    expect(countLine('saturn', null)).toBe('🌊 0人');
+    expect(Object.keys(SKY_COUNT_UNIT)).toHaveLength(8);
+    expect(SEARCH_PLACEHOLDER).toBe('大陸の名前・ジャンル');
   });
 });

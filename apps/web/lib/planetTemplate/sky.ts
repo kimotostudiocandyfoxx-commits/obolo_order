@@ -25,6 +25,14 @@ import { SAMPLE_LYRICS, SAMPLE_SONGS, sampleSongOf, sampleSongUrl, shipStandIn }
  * the prototype's continents and songs kept in the browser.
  */
 
+/**
+ * 〔🔍 大陸をさがす〕's words. No tags are ever shown (M-R310: the classification stays hidden): the genre chips are the
+ * words alone (no 「#」), and under each continent only how many works drifted there, counted the planet's way.
+ */
+export const SEARCH_PLACEHOLDER = '大陸の名前・ジャンル';
+export const SKY_COUNT_UNIT: Record<HomePlanet, string> = { mercury: '曲', jupiter: '作品', saturn: '人', mars: '作品', venus: '作品', uranus: '作品', pluto: '作品', neptune: '作品' };
+export const countLine = (planet: HomePlanet, n: number | null | undefined) => `🌊 ${n ?? 0}${SKY_COUNT_UNIT[planet]}`;
+
 /** じぶんの空: the five islands' places (x, y, width — fractions) and your own island's (ESLOT / EME) */
 export const SKY_SLOTS: readonly (readonly [number, number, number])[] = [
   [0.25, 0.2, 0.37],

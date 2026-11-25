@@ -6,7 +6,7 @@ import { templateConfig } from '@/lib/planetTemplate/config';
 import { clamp, isDrag } from '@/lib/planetTemplate/layout';
 import { LAND_SEA, MSLOT_X, sailMotion, shipStandIn } from '@/lib/planetTemplate/mercury';
 import type { Body } from '@/lib/planetTemplate/motion';
-import { pinchOf, SKY_ME, SKY_SLOTS, TRIP_SLOTS, type LandWork, type SkySource } from '@/lib/planetTemplate/sky';
+import { countLine, pinchOf, SEARCH_PLACEHOLDER, SKY_ME, SKY_SLOTS, TRIP_SLOTS, type LandWork, type SkySource } from '@/lib/planetTemplate/sky';
 import { SongStage } from '../mercury/SongStage';
 import x from './Sky.module.css';
 
@@ -243,19 +243,21 @@ export function SkyExplore({
           </button>
         </div>
       )}
-      {search && <SearchSheet source={source} favs={favs} onClose={() => setSearch(false)} onLand={(c) => land(c, 'map', { x: 0.5, y: 0.45 })} onFavourite={favourite} />}
+      {search && <SearchSheet planet={planet} source={source} favs={favs} onClose={() => setSearch(false)} onLand={(c) => land(c, 'map', { x: 0.5, y: 0.45 })} onFavourite={favourite} />}
     </div>
   );
 }
 
-/** 〔🔍 大陸をさがす〕: by name, genre, #tag or maker; best first, the same at random (never by popularity, M-R298) */
+/** 〔🔍 大陸をさがす〕: by name, genre (the chips: words only, no 「#」, M-R310) or maker; best first, the same at random (never by popularity, M-R298) */
 function SearchSheet({
+  planet,
   source,
   favs,
   onClose,
   onLand,
   onFavourite,
 }: {
+  planet: HomePlanet;
   source: SkySource;
   favs: FavouriteSlots;
   onClose: () => void;
@@ -291,7 +293,7 @@ function SearchSheet({
   return (
     <div className={x.esheet} data-testid="sky-sheet">
       <div className={x.eshead}>
-        <input value={q} onChange={(e) => setQ(e.target.value)} type="search" placeholder="大陸の名前・ジャンル・#タグ" autoComplete="off" aria-label="大陸をさがす" />
+        <input value={q} onChange={(e) => setQ(e.target.value)} type="search" placeholder={SEARCH_PLACEHOLDER} autoComplete="off" aria-label="大陸をさがす" />
         <button type="button" onClick={onClose} aria-label="とじる">
           ✕
         </button>
@@ -299,7 +301,7 @@ function SearchSheet({
       <div className={x.estags}>
         {tags.map((g) => (
           <button key={g} type="button" className={g === tag ? x.on : ''} onClick={() => setTag((t) => (t === g ? '' : g))}>
-            #{g}
+            {g}
           </button>
         ))}
       </div>
@@ -313,9 +315,7 @@ function SearchSheet({
               <div className={x.th} style={c.pictures.sky ? { backgroundImage: `url(${c.pictures.sky})` } : undefined} />
               <div className={x.t}>
                 <b>{c.name}</b>
-                <small>
-                  🌊 {c.count ?? 0}曲 · {c.tags.map((g) => `#${g}`).join(' ')} · {c.creator ? `by ${c.creator.name}` : '公式'}
-                </small>
+                <small>{countLine(planet, c.count)}</small>
               </div>
               <button type="button" className={`${x.st} ${fav ? x.on : ''}`} aria-label="お気に入り" onClick={() => onFavourite(c, !fav)}>
                 {fav ? '★' : '☆'}
