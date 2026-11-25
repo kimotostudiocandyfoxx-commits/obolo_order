@@ -230,3 +230,15 @@ export const shipStandIn = (seed: string) => {
   for (const ch of seed) h = (h * 31 + ch.codePointAt(0)!) >>> 0;
   return `/planets/ships/ship-${(h % 4) + 1}.webp`;
 };
+
+/**
+ * Story chat 2026-11-25: while the title is read in its maker's voice the song dips a little — down to 60% over 0.2 s,
+ * back to full over 0.4 s once the reading ends — so the maker's voice is heard clearly.
+ */
+export const DUCK = { level: 0.6, downMs: 200, upMs: 400 } as const;
+/** the volume `t` ms into a ramp from `from` to `to` lasting `ms` (linear, clamped) */
+export function rampAt(from: number, to: number, ms: number, t: number): number {
+  if (ms <= 0 || t >= ms) return to;
+  if (t <= 0) return from;
+  return from + (to - from) * (t / ms);
+}

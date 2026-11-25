@@ -2,7 +2,7 @@
 
 import type { HomeWork, PlanetSongView, SongLyricLine, WorkTags } from '@obolo/shared';
 import { useEffect, useRef, useState } from 'react';
-import { LETTER_GAP, letterKind, lyricAt, SONG_START_MS, STAGE, TITLE_MS, titleStyle, titleVoiceInTime, type StagePlace } from '@/lib/planetTemplate/mercury';
+import { DUCK, LETTER_GAP, letterKind, lyricAt, rampAt, SONG_START_MS, STAGE, TITLE_MS, titleStyle, titleVoiceInTime, type StagePlace } from '@/lib/planetTemplate/mercury';
 import m from './Mercury.module.css';
 
 /** load a title's font, only the letters it uses (Google Fonts `text=`), once */
@@ -179,11 +179,38 @@ export function SongStage({
       voice.current = null;
     };
   }, [song]);
-  // …and read with the title's entrance (2.2 s), over the song as it is; one that comes much later is left out
+  // …and read with the title's entrance (2.2 s); the song dips while it is read (DUCK); one that comes much later is left out
   useEffect(() => {
     const v = voice.current;
     if (!titled || !v || !titleVoiceInTime(Date.now() - opened.current, titleMs)) return;
-    v.play().catch(() => undefined);
+    let raf = 0;
+    const ramp = (to: number, ms: number) => {
+      cancelAnimationFrame(raf);
+      const a = audio.current;
+      if (!a) return;
+      const from = a.volume;
+      const t0 = performance.now();
+      const step = () => {
+        const cur = audio.current;
+        if (!cur) return;
+        const t = performance.now() - t0;
+        cur.volume = rampAt(from, to, ms, t);
+        if (t < ms) raf = requestAnimationFrame(step);
+      };
+      raf = requestAnimationFrame(step);
+    };
+    const back = () => ramp(1, DUCK.upMs);
+    v.addEventListener('ended', back);
+    v.addEventListener('error', back);
+    v.play()
+      .then(() => ramp(DUCK.level, DUCK.downMs))
+      .catch(() => undefined);
+    return () => {
+      v.removeEventListener('ended', back);
+      v.removeEventListener('error', back);
+      cancelAnimationFrame(raf);
+      if (audio.current) audio.current.volume = 1;
+    };
   }, [titled, song, titleMs]);
 
   const title = song?.title || work.title || '';

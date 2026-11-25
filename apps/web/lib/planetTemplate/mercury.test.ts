@@ -212,3 +212,15 @@ describe('02 §2 the title read in its maker\'s voice', () => {
     expect(titleVoiceInTime(1600, 0)).toBe(false);
   });
 });
+
+import { DUCK, rampAt } from './mercury';
+describe('the song dips while the title is read (story chat 2026-11-25)', () => {
+  it('down to 60% over 0.2 s, back over 0.4 s', () => {
+    expect(DUCK).toEqual({ level: 0.6, downMs: 200, upMs: 400 });
+    expect(rampAt(1, DUCK.level, DUCK.downMs, 0)).toBe(1);
+    expect(rampAt(1, DUCK.level, DUCK.downMs, 100)).toBeCloseTo(0.8, 6);
+    expect(rampAt(1, DUCK.level, DUCK.downMs, 200)).toBe(0.6);
+    expect(rampAt(0.6, 1, DUCK.upMs, 200)).toBeCloseTo(0.8, 6);
+    expect(rampAt(0.6, 1, DUCK.upMs, 999)).toBe(1);
+  });
+});
