@@ -10118,6 +10118,681 @@
       ],
       "always": false,
       "prompt": "A single cute retro speaker tower drawn in bright summer Japanese anime style, front view: a rounded cream-and-coral cabinet with soft glossy highlights, two round woofers stacked, and a large perfectly SQUARE flat empty panel on the upper front (plain light grey, nothing printed) where an album cover will be placed, little brass feet. Clean lines, cel shading. Centered, whole speaker in frame. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "home5-mars-main",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "prompt": "Cool Japanese cyberpunk anime background art: a neon night city on Mars, rust-red sky with two small moons, glowing pink-cyan-violet neon signs, wet reflective streets, holographic billboards, cinematic. Vertical phone wallpaper 9:16. At the back right, ONE small retro movie theater building with a glowing marquee of light bulbs and a red carpet entrance — clearly someone's own theater. The lower two-thirds are open and empty for many small flying things in front. Do not show the planet Mars itself in the sky. No characters, no people, no text, no letters."
+    },
+    {
+      "id": "home5-mars-hv",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "prompt": "Cool Japanese cyberpunk anime background art: a neon night city on Mars, rust-red sky with two small moons, glowing pink-cyan-violet neon signs, wet reflective streets, holographic billboards, cinematic. Vertical phone wallpaper 9:16. The view from a seat inside your own small cosy movie theater: rows of red velvet seats in the foreground at the bottom, a huge empty glowing cinema screen filling the middle, warm neon side lights. Do not show the planet Mars itself in the sky. No characters, no people, no text, no letters."
+    },
+    {
+      "id": "home5-mars-prof",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "prompt": "Cool Japanese cyberpunk anime background art: a neon night city on Mars, rust-red sky with two small moons, glowing pink-cyan-violet neon signs, wet reflective streets, holographic billboards, cinematic. Vertical phone wallpaper 9:16. Inside the lobby of your small retro movie theater: a long wall with empty poster frames lit by bulbs, red carpet, popcorn stand at a corner. Do not show the planet Mars itself in the sky. No characters, no people, no text, no letters."
+    },
+    {
+      "id": "home5-venus-main",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "prompt": "Dreamy lo-fi Japanese anime background art: a golden-pink sunset sky high above an endless sea of fluffy clouds on Venus, soft warm gradients, sparkles, calm and nostalgic. Vertical phone wallpaper 9:16. At the back right, ONE cute little round glass radio booth sitting on a big fluffy cloud, with an ON AIR lamp and an antenna — clearly someone's own broadcast booth. The lower two-thirds are open and empty for many small flying things in front. Do not show the planet Venus itself in the sky. No characters, no people, no text, no letters."
+    },
+    {
+      "id": "home5-venus-hv",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "prompt": "Dreamy lo-fi Japanese anime background art: a golden-pink sunset sky high above an endless sea of fluffy clouds on Venus, soft warm gradients, sparkles, calm and nostalgic. Vertical phone wallpaper 9:16. The view from inside your cosy little radio booth: a desk with a microphone and soft lamp at the bottom, a big round window showing the sunset sea of clouds in the middle. Do not show the planet Venus itself in the sky. No characters, no people, no text, no letters."
+    },
+    {
+      "id": "home5-venus-prof",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "prompt": "Dreamy lo-fi Japanese anime background art: a golden-pink sunset sky high above an endless sea of fluffy clouds on Venus, soft warm gradients, sparkles, calm and nostalgic. Vertical phone wallpaper 9:16. Inside your cosy radio booth: a wooden wall of shelves for cassette tapes (empty slots), a microphone stand, warm fairy lights, a round window with sunset clouds. Do not show the planet Venus itself in the sky. No characters, no people, no text, no letters."
+    },
+    {
+      "id": "home5-uranus-main",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "prompt": "Bright Y2K pop-art Japanese anime background art: a candy-coloured toy-like town on Uranus with an aqua sky and cute rings, bold clean outlines, glossy bubbles, stars and hearts, super cheerful. Vertical phone wallpaper 9:16. At the back right, ONE cute little pop shop with a striped awning, a big glass window and a heart-shaped sign — clearly someone's own shop. The lower two-thirds are open and empty for many small flying things in front. Do not show the planet Uranus itself in the sky. No characters, no people, no text, no letters."
+    },
+    {
+      "id": "home5-uranus-hv",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "prompt": "Bright Y2K pop-art Japanese anime background art: a candy-coloured toy-like town on Uranus with an aqua sky and cute rings, bold clean outlines, glossy bubbles, stars and hearts, super cheerful. Vertical phone wallpaper 9:16. The view from behind the counter of your own cute pop shop: the counter and a cash register at the bottom, the big shop window in the middle showing the candy town and sky. Do not show the planet Uranus itself in the sky. No characters, no people, no text, no letters."
+    },
+    {
+      "id": "home5-uranus-prof",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "prompt": "Bright Y2K pop-art Japanese anime background art: a candy-coloured toy-like town on Uranus with an aqua sky and cute rings, bold clean outlines, glossy bubbles, stars and hearts, super cheerful. Vertical phone wallpaper 9:16. Inside your cute pop shop: bright pastel walls with many empty display shelves and hooks for goods, a striped awning edge at the top, a little counter. Do not show the planet Uranus itself in the sky. No characters, no people, no text, no letters."
+    },
+    {
+      "id": "home5-pluto-main",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "prompt": "Moonlit gothic dark-fantasy Japanese anime background art: a starry violet night on Pluto with a huge pale moon, frozen silver hills, floating lanterns, elegant and mysterious. Vertical phone wallpaper 9:16. At the back right, ONE tall slender library tower with glowing arched windows and a little spire — clearly someone's own library. The lower two-thirds are open and empty for many small flying things in front. Do not show the planet Pluto itself in the sky. No characters, no people, no text, no letters."
+    },
+    {
+      "id": "home5-pluto-hv",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "prompt": "Moonlit gothic dark-fantasy Japanese anime background art: a starry violet night on Pluto with a huge pale moon, frozen silver hills, floating lanterns, elegant and mysterious. Vertical phone wallpaper 9:16. The view from the reading nook at the top of your library tower: a window seat with cushions and a candle at the bottom, a tall arched window in the middle showing the moonlit sky. Do not show the planet Pluto itself in the sky. No characters, no people, no text, no letters."
+    },
+    {
+      "id": "home5-pluto-prof",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "prompt": "Moonlit gothic dark-fantasy Japanese anime background art: a starry violet night on Pluto with a huge pale moon, frozen silver hills, floating lanterns, elegant and mysterious. Vertical phone wallpaper 9:16. Inside your library tower: tall curved wooden bookshelves with empty spaces for books, a spiral staircase, candle light, moonlight from an arched window. Do not show the planet Pluto itself in the sky. No characters, no people, no text, no letters."
+    },
+    {
+      "id": "home5-neptune-main",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "prompt": "Retro 90s cel-anime meets vaporwave background art: a glowing neon sea on Neptune at night, deep blue and magenta, grid horizon, palm silhouettes, floating bubbles, chill and stylish. Vertical phone wallpaper 9:16. At the back right, ONE small wooden game hut on stilts over the water with a glowing arcade sign — clearly someone's own game hut. The lower two-thirds are open and empty for many small flying things in front. Do not show the planet Neptune itself in the sky. No characters, no people, no text, no letters."
+    },
+    {
+      "id": "home5-neptune-hv",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "prompt": "Retro 90s cel-anime meets vaporwave background art: a glowing neon sea on Neptune at night, deep blue and magenta, grid horizon, palm silhouettes, floating bubbles, chill and stylish. Vertical phone wallpaper 9:16. The view from inside your game hut: a retro TV and game console on a low table at the bottom, a big window in the middle showing the neon sea and bubbles. Do not show the planet Neptune itself in the sky. No characters, no people, no text, no letters."
+    },
+    {
+      "id": "home5-neptune-prof",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "prompt": "Retro 90s cel-anime meets vaporwave background art: a glowing neon sea on Neptune at night, deep blue and magenta, grid horizon, palm silhouettes, floating bubbles, chill and stylish. Vertical phone wallpaper 9:16. Inside your game hut: walls with rows of empty display slots for game cartridges, an old arcade cabinet in the corner, neon strip lights. Do not show the planet Neptune itself in the sky. No characters, no people, no text, no letters."
+    },
+    {
+      "id": "p5-mars-user",
+      "refs": [
+        "design/home/chibi-ref/user.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding a small cute round flying saucer UFO whose colours and patterns are designed from the character's outfit, a soft projector beam glowing under it. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-mars-kimorin",
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding a small cute round flying saucer UFO whose colours and patterns are designed from the character's outfit, a soft projector beam glowing under it. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-mars-monban",
+      "refs": [
+        "design/home/chibi-ref/monban.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding a small cute round flying saucer UFO whose colours and patterns are designed from the character's outfit, a soft projector beam glowing under it. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-mars-mikie",
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding a small cute round flying saucer UFO whose colours and patterns are designed from the character's outfit, a soft projector beam glowing under it. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-mars-brother",
+      "refs": [
+        "design/home/chibi-ref/brother.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding a small cute round flying saucer UFO whose colours and patterns are designed from the character's outfit, a soft projector beam glowing under it. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-mars-sister",
+      "refs": [
+        "design/home/chibi-ref/sister.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding a small cute round flying saucer UFO whose colours and patterns are designed from the character's outfit, a soft projector beam glowing under it. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-venus-user",
+      "refs": [
+        "design/home/chibi-ref/user.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), sitting on a small fluffy cloud, holding a retro radio whose colours and patterns are designed from the character's outfit, little sound waves around. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-venus-kimorin",
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), sitting on a small fluffy cloud, holding a retro radio whose colours and patterns are designed from the character's outfit, little sound waves around. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-venus-monban",
+      "refs": [
+        "design/home/chibi-ref/monban.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), sitting on a small fluffy cloud, holding a retro radio whose colours and patterns are designed from the character's outfit, little sound waves around. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-venus-mikie",
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), sitting on a small fluffy cloud, holding a retro radio whose colours and patterns are designed from the character's outfit, little sound waves around. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-venus-brother",
+      "refs": [
+        "design/home/chibi-ref/brother.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), sitting on a small fluffy cloud, holding a retro radio whose colours and patterns are designed from the character's outfit, little sound waves around. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-venus-sister",
+      "refs": [
+        "design/home/chibi-ref/sister.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), sitting on a small fluffy cloud, holding a retro radio whose colours and patterns are designed from the character's outfit, little sound waves around. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-uranus-user",
+      "refs": [
+        "design/home/chibi-ref/user.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), hanging from a bunch of balloons with a gift box whose colours and patterns are designed from the character's outfit. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-uranus-kimorin",
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), hanging from a bunch of balloons with a gift box whose colours and patterns are designed from the character's outfit. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-uranus-monban",
+      "refs": [
+        "design/home/chibi-ref/monban.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), hanging from a bunch of balloons with a gift box whose colours and patterns are designed from the character's outfit. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-uranus-mikie",
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), hanging from a bunch of balloons with a gift box whose colours and patterns are designed from the character's outfit. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-uranus-brother",
+      "refs": [
+        "design/home/chibi-ref/brother.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), hanging from a bunch of balloons with a gift box whose colours and patterns are designed from the character's outfit. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-uranus-sister",
+      "refs": [
+        "design/home/chibi-ref/sister.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), hanging from a bunch of balloons with a gift box whose colours and patterns are designed from the character's outfit. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-pluto-user",
+      "refs": [
+        "design/home/chibi-ref/user.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding on a big open flying book whose cover colours and patterns are designed from the character's outfit, little glowing letters floating. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-pluto-kimorin",
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding on a big open flying book whose cover colours and patterns are designed from the character's outfit, little glowing letters floating. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-pluto-monban",
+      "refs": [
+        "design/home/chibi-ref/monban.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding on a big open flying book whose cover colours and patterns are designed from the character's outfit, little glowing letters floating. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-pluto-mikie",
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding on a big open flying book whose cover colours and patterns are designed from the character's outfit, little glowing letters floating. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-pluto-brother",
+      "refs": [
+        "design/home/chibi-ref/brother.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding on a big open flying book whose cover colours and patterns are designed from the character's outfit, little glowing letters floating. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-pluto-sister",
+      "refs": [
+        "design/home/chibi-ref/sister.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding on a big open flying book whose cover colours and patterns are designed from the character's outfit, little glowing letters floating. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-neptune-user",
+      "refs": [
+        "design/home/chibi-ref/user.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), floating inside a big transparent bubble holding a game controller whose colours and patterns are designed from the character's outfit. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-neptune-kimorin",
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), floating inside a big transparent bubble holding a game controller whose colours and patterns are designed from the character's outfit. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-neptune-monban",
+      "refs": [
+        "design/home/chibi-ref/monban.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), floating inside a big transparent bubble holding a game controller whose colours and patterns are designed from the character's outfit. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-neptune-mikie",
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), floating inside a big transparent bubble holding a game controller whose colours and patterns are designed from the character's outfit. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-neptune-brother",
+      "refs": [
+        "design/home/chibi-ref/brother.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), floating inside a big transparent bubble holding a game controller whose colours and patterns are designed from the character's outfit. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "p5-neptune-sister",
+      "refs": [
+        "design/home/chibi-ref/sister.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), floating inside a big transparent bubble holding a game controller whose colours and patterns are designed from the character's outfit. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
     }
   ],
   "redo": []
