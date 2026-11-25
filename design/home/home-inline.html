@@ -379,6 +379,16 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .recdoor::before{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid rgba(255,255,255,.85);box-shadow:0 0 14px rgba(255,255,255,.7);animation:ring 2.4s ease-out infinite}
 .bub .by2,.bubo .by2{pointer-events:auto;cursor:pointer;text-decoration:underline;text-decoration-color:rgba(138,106,154,.4)}
 .bub,.bubo{pointer-events:auto}
+.wg{position:relative;width:100%;height:100%}
+.wg{filter:drop-shadow(0 0 6px rgba(255,250,210,.55)) drop-shadow(0 8px 10px rgba(0,0,0,.3))}
+.wg img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;animation:none!important;filter:none!important}
+.wg .wl{clip-path:inset(0 59% 0 0);transform-origin:41% 52%;animation:wflap var(--fl,.3s) ease-in-out infinite alternate!important}
+.wg .wr{clip-path:inset(0 0 0 59%);transform-origin:59% 52%;animation:wflap var(--fl,.3s) ease-in-out infinite alternate!important}
+.wg .bd{clip-path:inset(0 36.5% 0 36.5%)}
+@keyframes wflap{from{transform:scaleX(1)}to{transform:scaleX(.42)}}
+.bf.ch .w{animation:none!important}
+.bf.ch .w.wg2{animation:bodybob .6s ease-in-out infinite alternate!important}
+@keyframes bodybob{from{transform:translateY(0)}to{transform:translateY(-3px)}}
 .puni{position:absolute;left:0;top:0;z-index:6;cursor:grab;touch-action:none;will-change:transform}
 .puni img{width:100%;height:100%;object-fit:contain;pointer-events:none;border-radius:50%}
 .puni.talk{z-index:7}
@@ -725,6 +735,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('#bstyle button')
 const TSTYLE={'夏のはじまり':{f:"'Mochiy Pop One'",a:'pop'},'チルな午後':{f:"'Zen Kurenaido'",a:'float'},'パーティー':{f:"'Rampart One'",a:'glitch'},'夜のバラード':{f:"'Shippori Mincho B1'",a:'float'},'走れ':{f:"'Reggae One'",a:'slam'},
   '夕焼けの町':{f:"'Kaisei Decol'",a:'brush'},'屋根の上のねこ':{f:"'Hachi Maru Pop'",a:'pop'},'ラーメン':{f:"'Dela Gothic One'",a:'slam'},'さくら通り':{f:"'Yuji Syuku'",a:'brush'},'月と海':{f:"'Shippori Mincho B1'",a:'float'}};
 const chk=ch=>/[一-鿿々]/.test(ch)?'kj':/[぀-ゟ]/.test(ch)?'hr':/[゠-ヿー]/.test(ch)?'kt':'lt';
+const WG=src=>`<div class="wg"><img class="wl" alt="" src="${src}"><img class="wr" alt="" src="${src}"><img class="bd" alt="" src="${src}"></div>`;
 const KKS=()=>['kakejiku','kakejiku2','kakejiku3','kakejiku4'].filter(k=>A[k]);
 function openArt(into,o){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,ks=KKS(),kk=ks[Math.floor(Math.random()*ks.length)]||'kakejiku',bx=JSON.parse(A['box-'+kk]||'[.242,.196,.516,.469]');
   const sw=.95/bx[2],ar=+(A['ar-'+kk]||1.25),sh=sw*W*ar,aw=.95*W,artTop=.09*H,ph_=bx[3]*sh,top=artTop-(bx[1]*sh+(ph_-aw)/2);
@@ -844,7 +855,7 @@ function setupJup(){
 }
 function makeBf(o,i,slot){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,e=document.createElement('div');e.className='bf';e.tabIndex=0;e.setAttribute('role','button');e.setAttribute('aria-label',o.n+'のアート');
   const wi=(i*3+o.n.length)%4+1,ai=(i*2+o.n.length)%5+1;e.style.setProperty('--fl',(.26+((i*7)%5)*.03)+'s');
-  const ck=((window.BST||'4')==='4'&&A['chibi4-'+CHB(o.n)]?'chibi4-':'chibi3-')+CHB(o.n);if(A[ck]){e.classList.add('ch');e.innerHTML=`<div class="w"><img alt="" src="${A[ck]}"></div><span class="nm">${o.n}</span>`}
+  const ck=((window.BST||'4')==='4'&&A['chibi4-'+CHB(o.n)]?'chibi4-':'chibi3-')+CHB(o.n);if(A[ck]){e.classList.add('ch');e.innerHTML=`<div class="w wg2">${WG(A[ck])}</div><span class="nm">${o.n}</span>`}
   else e.innerHTML=`<div class="w"><img alt="" src="${A['bfly3-'+wi]||''}"></div><div class="art" style="background-image:url(${A['jart-'+ai]||''})"></div><span class="nm">${o.n}</span>`;$('sky').appendChild(e);
   const S=JSLOT[slot%8];e.classList.add('l'+S[5]);
   const b={o,e,i,ai,slot,sc:S[2],cx:S[0],cy:S[1],ax:S[3],ay:S[4],w1:.5+((i*17)%7)*.07,w2:.7+((i*11)%5)*.09,w3:.3,p1:i*1.7,p2:i*2.3,t:0,x:W*(i%2?1.1:-.1),y:H*.6,tl:0,gone:false};
@@ -855,7 +866,7 @@ let JBUSY=false,JOPEN=null;
 function popBf(b){if(b.gone||JBUSY||JV)return;b.gone=true;JBUSY=true;const sky=$('sky'),ph=$('phone'),pw=ph.clientWidth,phh=ph.clientHeight,x=b.x,y=b.y;chime();
   const ck=((window.BST||'4')==='4'&&A['chibi4-'+CHB(b.o.n)]?'chibi4-':'chibi3-')+CHB(b.o.n),img=A[ck]||A['bfly3-1']||'';b.e.classList.add('held');
   ph.classList.add('zoomart');document.querySelector('.dock').classList.add('busy');
-  const f=document.createElement('div');f.className='flyc';f.style.zIndex='15';f.style.transition='left .35s cubic-bezier(.3,.9,.3,1),top .35s cubic-bezier(.3,.9,.3,1),transform .35s,opacity .3s';f.innerHTML=`<img alt="" src="${img}">`;f.style.left=x+'px';f.style.top=y+'px';sky.appendChild(f);
+  const f=document.createElement('div');f.className='flyc';f.style.zIndex='15';f.style.transition='left .35s cubic-bezier(.3,.9,.3,1),top .35s cubic-bezier(.3,.9,.3,1),transform .35s,opacity .3s';f.innerHTML=WG(img);f.style.left=x+'px';f.style.top=y+'px';sky.appendChild(f);
   const tag=document.createElement('div');tag.className='whotag';tag.textContent=b.o.n;
   requestAnimationFrame(()=>requestAnimationFrame(()=>{f.style.left=(pw*.15)+'px';f.style.top=(phh*.93)+'px';f.style.transform='scale(.9)'}));
   setTimeout(()=>{tag.style.left=(pw*.15)+'px';tag.style.top=(phh*.955)+'px';sky.appendChild(tag)},360);
@@ -885,7 +896,7 @@ function playJ(){if(JOPEN)JOPEN.close();setCta(true);festStart();const order=[..
   popOut(JTREE[0],JTREE[1],A['chibi4-user']||A['chibi-user']);
   T(()=>{hvOn('bg3-jupiter-porch',true);const fx=$('hvfx');for(let n=0;n<18;n++){const i=document.createElement('i');i.className='ff2';i.style.left=(Math.random()*100)+'%';i.style.top=(10+Math.random()*80)+'%';i.style.setProperty('--d',(4+Math.random()*4)+'s');i.style.setProperty('--b',(1+Math.random()*1.4)+'s');i.style.setProperty('--fx',(Math.random()*60-30)+'px');i.style.setProperty('--fy',(Math.random()*-60)+'px');fx.appendChild(i)}},900);
   const one=()=>{if(!JV)return;if(k>=order.length){stopJ();toast('🌳 今日のアート、全部見たね！');return}const o=order[k],i=k++,ai=(i*2+o.n.length)%5+1;
-    const img=A['chibi4-'+CHB(o.n)]||A['chibi3-'+CHB(o.n)]||'';const v=document.createElement('div');v.className='vis flap';v.style.width='120px';v.style.height='120px';v.innerHTML=`<img alt="" src="${img}"><span class="nm2">${o.n}</span>`;$('hvstage').appendChild(v);
+    const img=A['chibi4-'+CHB(o.n)]||A['chibi3-'+CHB(o.n)]||'';const v=document.createElement('div');v.className='vis';v.style.width='120px';v.style.height='120px';v.innerHTML=`${WG(img)}<span class="nm2">${o.n}</span>`;$('hvstage').appendChild(v);
     v.style.transition='none';hvPos(v,.15+Math.random()*.3,.18,.3);requestAnimationFrame(()=>requestAnimationFrame(()=>{v.style.transition='transform .85s cubic-bezier(.25,.8,.3,1),opacity .4s';hvPos(v,.3,.76,1.35)}));chime();
     let art=null;const tg=document.createElement('div');tg.className='whotag';tg.textContent=o.n;
     T(()=>{$('hv').classList.add('zoomart');v.style.transition='transform .35s';hvPos(v,.15,.92,.75);tg.style.left='15%';tg.style.top='95.5%';$('hvstage').appendChild(tg);art=openArt($('hvstage'),{img:A['jart-'+ai]||'',title:JART[ai-1]});popSound();const tk='vtitle-'+ai;if(A[tk])playVoice(tk)},850);
