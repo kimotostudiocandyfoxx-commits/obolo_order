@@ -728,6 +728,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
         setBusy(false);
       }
     })();
+    return true;
+  };
   /** R13: a video starts with {bati}'s few questions (what it is for, which of your songs, how the pictures move) */
   const videoStart = async (content: string) => {
     setBusy(true);
