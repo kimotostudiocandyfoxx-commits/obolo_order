@@ -13,7 +13,7 @@ export const STORAGE_LINES = {
   /** 100%: a making / an upload stopped */
   full: 'ブルーナの袋がいっぱいだよ。いらないものを消すか、ふくろの魔法で袋をふやしてね。',
   /** 「ふくろの魔法」「袋をふやして」(old: 「保存の魔法」「ブルーナを広げて」): the tiers and their prices in one sentence (no buttons) */
-  explain: 'ブルーナの袋をふやすふくろの魔法は、ひと月10袋が{p10}マナ、30袋が{p30}マナ、100袋が{p100}マナだよ。どれにする？',
+  explain: 'ブルーナの袋をふやす、ふくろの魔法。ひと月10袋が{p10}マナ、30袋が{p30}マナ、100袋が{p100}マナだよ。どれにする？',
   /** the size was not heard */
   which: 'いくつふやす？　10袋、30袋、100袋から選んでね。',
   /** the price, before the yes */

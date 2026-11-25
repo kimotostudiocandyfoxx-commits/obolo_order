@@ -200,7 +200,7 @@ describe('R18: words', () => {
   it('the lines in every style, the same placeholders and sentences; ていねい writes デス／マス', () => {
     expect(STORAGE_LINES.near).toBe('ブルーナの袋がいっぱいになってきたよ。いらないものを消すか、ふくろの魔法で袋をふやせるよ。');
     expect(STORAGE_LINES.full).toBe('ブルーナの袋がいっぱいだよ。いらないものを消すか、ふくろの魔法で袋をふやしてね。');
-    expect(STORAGE_LINES.explain).toBe('ブルーナの袋をふやすふくろの魔法は、ひと月10袋が{p10}マナ、30袋が{p30}マナ、100袋が{p100}マナだよ。どれにする？');
+    expect(STORAGE_LINES.explain).toBe('ブルーナの袋をふやす、ふくろの魔法。ひと月10袋が{p10}マナ、30袋が{p30}マナ、100袋が{p100}マナだよ。どれにする？');
     expect(STORAGE_LINES.confirm).toBe('{bags}袋を、ひと月{price}マナだね。唱える？');
     const holes = (x: string) => [...x.matchAll(/\{[a-z0-9]+\}/g)].map((m) => m[0]).sort();
     const split = (x: string) => x.match(/[^！？。!?]+[！？。!?]*/g) ?? [x];
