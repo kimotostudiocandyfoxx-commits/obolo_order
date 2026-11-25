@@ -5,6 +5,7 @@ import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { BatiLook } from '@/components/bati/BatiLook';
 import { LOOK_LOCKED_LINE } from '@obolo/shared';
+import { batiLine, batiLineVoiceOf } from '@/lib/onboarding/batiLine';
 
 /**
  * Bati's room (the Moon; client 2026-11-22: "24時間の間はバティと喋らせまくる時間にしたい"): next to the chat,
@@ -90,6 +91,8 @@ function MeSheet({ onClose, onDone, name: given }: { onClose: () => void; onDone
   const { me, setMe } = useAuth();
   const api = getApi();
   const name = me?.displayName || given || 'あなた';
+  // the lock line in {bati}'s own style ({self} = its 一人称)
+  const lockedLine = (n: string) => batiLine(LOOK_LOCKED_LINE, batiLineVoiceOf(me?.bati)).replaceAll('{neo}', n);
   const current = mode === 'bati' ? (me?.bati?.imageUrl ?? null) : (me?.avatarUrl ?? null);
   const [wish, setWish] = useState('');
   const [busy, setBusy] = useState(false);
@@ -98,7 +101,7 @@ function MeSheet({ onClose, onDone, name: given }: { onClose: () => void; onDone
   // client 2026-11-25: a resident's look stays as it is once confirmed (day 2's night) until they join — {bati} says so
   // (PLACEHOLDER line, LOOK_LOCKED_LINE) and offers no magic
   const locked = mode === 'me' && !!me?.lookLocked;
-  const [line, setLine] = useState<string>(locked ? LOOK_LOCKED_LINE.replace('{neo}', name) : LINES[mode].open.replace('{name}', name));
+  const [line, setLine] = useState<string>(locked ? lockedLine(name) : LINES[mode].open.replace('{name}', name));
   const [ended, setEnded] = useState(locked);
 
   const shown = candidates.find((c) => c.id === pick)?.url ?? current;
@@ -128,7 +131,7 @@ function MeSheet({ onClose, onDone, name: given }: { onClose: () => void; onDone
         setLine(LINES.limit);
       } else if (code === 'LOOK_LOCKED') {
         setEnded(true);
-        setLine(LOOK_LOCKED_LINE.replace('{neo}', name));
+        setLine(lockedLine(name));
       } else if (code === 'MODERATION') setLine(LINES.words);
       else if (code === 'NO_MANA' && e instanceof ApiError) setLine(e.message);
       else setLine(LINES.failed);

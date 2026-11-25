@@ -497,7 +497,7 @@ export const DAY2: Step[] = [
   { t: 'face', who: '@bati', expr: 'smile' },
   { t: 'se', sound: 'sparkle' },
   { t: 'say', who: 'バティ', text: 'やったー！　ボク、この姿、気に入った！' },
-  { t: 'notice', text: '{neo}と{bati}の見た目は、あとでも変えられます。チャットの上の、{neo}か{bati}の顔を押してください' },
+  { t: 'notice', text: '{neo}の姿は、今夜まで変えられます。チャットの上の、{neo}の顔を押してください。今夜決まったあとは、Obolo Orderに入ると、また変えられます。{bati}の見た目は、いつでも変えられます' },
   { t: 'sprite', image: ['obolon', '@bati'] },
   { t: 'say', who: 'OBOLON', text: '、、、{neo}。もう一つ、教えておく。' },
   { t: 'say', who: 'OBOLON', text: '{bati}は、、、マナの力で、調べるのが、得意だ。' },
@@ -548,8 +548,12 @@ export const DAY2: Step[] = [
   // provisional; a look of the preset forms (no own look) takes nothing and is told nothing
   { t: 'branch', key: 'look', cases: { '': 'look-kept' }, otherwise: 'look-paid' },
   { t: 'label', id: 'look-paid' },
-  { t: 'notice', text: `{neo}の姿は、これで決まり。8つの星で会う{neo}、話す時の顔、後ろ姿も、この姿から描きます（マナジェムから ${formatMana(MAKE_COST.profileLook)}マナ）。姿は、Obolo Orderに入ると、また変えられます` },
+  { t: 'notice', text: `{neo}の姿は、これで決まり。8つの星で会う{neo}も、話す時の顔も、後ろ姿も、この姿から描きます（マナジェムから ${formatMana(MAKE_COST.profileLook)}マナ）。姿は、Obolo Orderに入ると、また変えられます` },
+  { t: 'goto', id: 'look-told' },
+  // a preset form takes nothing: the same notice without the mana (story chat 2026-11-25)
   { t: 'label', id: 'look-kept' },
+  { t: 'notice', text: '{neo}の姿は、これで決まり。8つの星で会う{neo}も、話す時の顔も、後ろ姿も、この姿から描きます。姿は、Obolo Orderに入ると、また変えられます' },
+  { t: 'label', id: 'look-told' },
   { t: 'sprite', image: null },
   { t: 'black', fade: 0.8 }, // 暗くフェード
   // 〔完了画面：3日目まで24時間のカウントダウン。その下に、{bati}とのチャット〕〔0になったら、3日目が始まる〕（M-R269: no

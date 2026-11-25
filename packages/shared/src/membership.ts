@@ -53,4 +53,4 @@ export function profileLookLocked(s: LookLockLike): boolean {
  * PLACEHOLDER (story chat, client 2026-11-25): {bati}'s words when a resident asks to change their own look after it
  * was confirmed — provisional until the story chat writes them ({neo}: the member's name)
  */
-export const LOOK_LOCKED_LINE = '{neo}の姿は、もう決まったよ。Obolo Orderに入ったら、また変えられるからね';
+export const LOOK_LOCKED_LINE = '{neo}の姿は、もう決まったよ。Obolo Orderに入ったら、また変えられるからね。{self}の着せかえなら、いつでもできるよ！';

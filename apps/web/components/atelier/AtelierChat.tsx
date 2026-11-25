@@ -938,7 +938,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     if (!isOpen(kind, day)) return setMsgs((m) => [...m, { id: uid(), who: 'bati', text: lockLine(kind, day, batiVoice?.personality ?? 'genki') }]);
     // client 2026-11-25: a resident's own look stays as it is once confirmed (day 2's night) until they join the Order —
     // {bati} says so instead of offering a spell (PLACEHOLDER line, LOOK_LOCKED_LINE); {bati}'s own dress-up stays open
-    if (kind === 'look' && me?.lookLocked) return setMsgs((m) => [...m, { id: uid(), who: 'bati', text: LOOK_LOCKED_LINE.replace('{neo}', me.displayName || 'きみ') }]);
+    if (kind === 'look' && me?.lookLocked) return setMsgs((m) => [...m, { id: uid(), who: 'bati', text: tline(LOOK_LOCKED_LINE) }]);
     // R12: only the kind named (「画像を作りたい」) → what was asked for a few turns ago (「空飛ぶクジラが…」)
     if (isBare(content)) {
       const r = recentRequest(msgsRef.current);

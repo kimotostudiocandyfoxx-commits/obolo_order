@@ -2862,7 +2862,7 @@ function demoLookLocked(u: Me): boolean {
   return profileLookLocked({ journeyDay: u.journeyDay, journeyCompletedAt: u.journeyCompletedAt, confirmed: !!u.story?.['look.confirmed'], hasLook: !!u.avatarUrl, member: isActiveMember(u) });
 }
 function demoUnlocked(u: Me) {
-  if (demoLookLocked(u)) throw new ApiError(403, 'LOOK_LOCKED', LOOK_LOCKED_LINE.replace('{neo}', u.displayName || 'きみ'));
+  if (demoLookLocked(u)) throw new ApiError(403, 'LOOK_LOCKED', LOOK_LOCKED_LINE.replace('{neo}', u.displayName || 'きみ').replace('{self}', 'ボク'));
 }
 
 /** the demo's face for a reply: surprised at a question, a hop at something nice, else a smile */
