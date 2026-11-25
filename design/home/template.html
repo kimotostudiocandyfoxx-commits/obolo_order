@@ -737,11 +737,11 @@ function pop(r){
 }
 function stopRoll(){cancelAnimationFrame(raf);rolls=[]}
 /* ---- Mars / Venus / Uranus / Pluto / Neptune: one template ---- */
-const G5={mars:{t:'mv',place:'シアター',home:[.8,.47],titles:['ネオンの夜','走れ','パーティー','夜のバラード','はじまりの歌'],c:'#ff5fd2'},
-  venus:{t:'radio',place:'ブース',home:[.8,.42],titles:['深夜のひとりごと','ラーメン報告','ねこラジオ','夏の作戦会議','月夜の雑談'],c:'#ffb36b'},
+const G5={mars:{t:'mv',place:'シアター',home:[.79,.54],titles:['ネオンの夜','走れ','パーティー','夜のバラード','はじまりの歌'],c:'#ff5fd2'},
+  venus:{t:'radio',place:'ブース',home:[.72,.38],titles:['深夜のひとりごと','ラーメン報告','ねこラジオ','夏の作戦会議','月夜の雑談'],c:'#ffb36b'},
   uranus:{t:'goods',place:'お店',home:[.8,.48],titles:['夕焼けトート','ねこトート','ラーメントート','さくらトート','月夜トート'],c:'#4fe0ff'},
-  pluto:{t:'book',place:'図書館',home:[.82,.42],titles:['夕焼けの町の約束','屋根の上のねこ','ラーメンと魔法','さくら通りの手紙','月と海の物語'],c:'#b48cff'},
-  neptune:{t:'game',place:'ゲーム小屋',home:[.8,.48],titles:['ネオンランナー','ねこジャンプ','ラーメンパズル','さくらレース','ムーンダイブ'],c:'#ff4fd8'}};
+  pluto:{t:'book',place:'図書館',home:[.68,.36],titles:['夕焼けの町の約束','屋根の上のねこ','ラーメンと魔法','さくら通りの手紙','月と海の物語'],c:'#b48cff'},
+  neptune:{t:'game',place:'ゲーム小屋',home:[.84,.44],titles:['ネオンランナー','ねこジャンプ','ラーメンパズル','さくらレース','ムーンダイブ'],c:'#ff4fd8'}};
 const isG5=()=>!!(G5[cur]&&mode==='anime'&&A['bg5-'+cur]);
 const G5IMG=(pl,n)=>A['p5-'+pl+'-'+CHB(n)]||A['chibi-'+CHB(n)]||'';
 let GF=[],GQ=[],Graf=0,GOPEN=null,GV=null,GNB=0;
@@ -768,7 +768,7 @@ function chip(){const c=getAC();if(!c)return;const t0=c.currentTime+.02;[523,659
 function popG5(b){if(b.gone||GOPEN||GV)return;b.gone=true;const sky=$('sky'),ph=$('phone'),pw=ph.clientWidth,phh=ph.clientHeight;chime();b.e.classList.add('held');ph.classList.add('zoomart');document.querySelector('.dock').classList.add('busy');
   const f=document.createElement('div');f.className='flyc';f.style.zIndex='15';f.style.transition='left .35s,top .35s,transform .35s,opacity .3s';f.innerHTML=`<img alt="" src="${G5IMG(cur,b.o.n)}">`;f.style.left=b.x+'px';f.style.top=b.y+'px';sky.appendChild(f);
   const tag=document.createElement('div');tag.className='whotag';tag.textContent=b.o.n;requestAnimationFrame(()=>requestAnimationFrame(()=>{f.style.left=(pw*.15)+'px';f.style.top=(phh*.92)+'px';f.style.transform='scale(.85)'}));setTimeout(()=>{tag.style.left=(pw*.15)+'px';tag.style.top=(phh*.955)+'px';sky.appendChild(tag)},360);
-  const vw=viewer(sky,cur,b);const t0=performance.now();
+  const vw=viewer(sky,cur,{ai:b.ai,n:b.o.n});const t0=performance.now();
   GOPEN={t0,close(){vw.close();tag.remove();GOPEN=null;setTimeout(()=>{ph.classList.remove('zoomart');document.querySelector('.dock').classList.remove('busy');const c=G5[cur]||{home:[.8,.47]};f.style.transition='left .5s ease-in,top .5s ease-in,transform .5s,opacity .5s';f.style.left=(c.home[0]*pw)+'px';f.style.top=(c.home[1]*phh)+'px';f.style.transform='scale(.25)';f.style.opacity='0';b.e.remove()},200);setTimeout(()=>f.remove(),800);
     setTimeout(()=>{if(GQ.length){const o=GQ.shift();GF.push(makeG5(o,100+(GNB++),b.slot))}},600)}}}
 function playG5(){if(GOPEN)GOPEN.close();setCta(true);const pl=cur,order=[...GF.filter(b=>!b.gone).map(b=>b.o),...GQ];let k=0;GV={t:[]};const T=(f,ms)=>GV.t.push(setTimeout(f,ms));
