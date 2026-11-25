@@ -461,6 +461,26 @@ export function spellWords(tags: SpellTag[]): string {
   return tags.map((t) => t.ja).join('、');
 }
 
+/** R12: the labels a kind's spell gets when the words did not say them (a spell book match leaves them out) */
+export function spellDefaultLabels(kind: SpellKind): string[] {
+  return Object.values(DEFAULTS[kind]).filter((x): x is string => !!x);
+}
+
+/**
+ * R12 (コンパス): a spell read from a picture / a song, completed with the kind's own defaults for the groups it did not
+ * read (a song always has a genre, a tempo and a voice), in the usual order, at most SPELL_MAX_TAGS
+ */
+export function spellComplete(kind: SpellKind, tags: SpellTag[]): SpellTag[] {
+  const out = [...tags];
+  for (const [g, ja] of Object.entries(DEFAULTS[kind]) as [SpellGroup, string][]) if (!out.some((t) => t.group === g)) out.push(tagOf(byJa(ja)));
+  if (kind === 'song') {
+    const mood = out.find((t) => t.group === 'mood')?.en;
+    if (!out.some((t) => t.group === 'tempo')) out.push(tagOf(byJa(mood === 'mellow' || mood === 'bittersweet' || mood === 'calm' ? 'ゆっくり' : mood === 'energetic' || mood === 'joyful' ? 'アップテンポ' : 'ふつうの速さ')));
+    if (!out.some((t) => t.group === 'instrument')) for (const ja of INSTRUMENTS[out.find((t) => t.group === 'genre')!.en] ?? ['ピアノ']) out.push(tagOf(byJa(ja)));
+  }
+  return sortTags(out).slice(0, SPELL_MAX_TAGS[kind]);
+}
+
 /** the spell's fingerprint: the yes is tied to exactly this tag set (MakeConfirm.spell) */
 export function spellKey(kind: SpellKind, tags: SpellTag[]): string {
   const s = `${kind}|${tags.map((t) => `${t.group}:${t.en}:${t.ja}`).join('|')}`;

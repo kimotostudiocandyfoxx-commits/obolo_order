@@ -35,3 +35,5 @@ export * from './spell';
 export * from './craft';
 export * from './craftDemo';
 export * from './links';
+export * from './spellTools';
+export * from './toolVariants';

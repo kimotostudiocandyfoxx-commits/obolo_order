@@ -11,12 +11,15 @@
  */
 import type { BatiOrdinaryPersonality } from './batiPersona';
 import { CRAFT_VARIANTS } from './craftVariants';
+import { TOOL_VARIANTS } from './toolVariants';
 
 export type BatiVariantSet = Record<Exclude<BatiOrdinaryPersonality, 'genki'>, string>;
 
 export const BATI_VARIANTS: Record<string, BatiVariantSet> = {
   // client 2026-11-25: the book and game lines (craftVariants.ts)
   ...CRAFT_VARIANTS,
+  // R12: the compass and the spell book (toolVariants.ts)
+  ...TOOL_VARIANTS,
   "……やぁ！": {
     teinei: "……こんにちは！",
     kansai: "……まいど！",
