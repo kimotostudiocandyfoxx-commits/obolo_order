@@ -377,7 +377,7 @@ export function ClipRows({ mode, onSent }: { mode: ClipMode; onSent?: () => void
 }
 
 /** open / save a document (a PDF opens in the browser's viewer; others download) */
-async function openDoc(f: ClipFile) {
+export async function openDoc(f: ClipFile) {
   const url = await clipUrl(f.id);
   if (!url) return;
   const a = document.createElement('a');

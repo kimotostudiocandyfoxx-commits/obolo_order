@@ -38,6 +38,8 @@ import { CraftController } from './craft/craft.controller';
 import { GameService } from './craft/game.service';
 import { NovelService } from './craft/novel.service';
 import { InfraModule } from './infra/infra.module';
+import { LinksController } from './links/links.controller';
+import { LinksService } from './links/links.service';
 import { InvitesController } from './invites/invites.controller';
 import { InvitesService } from './invites/invites.service';
 import { MediaController } from './media/media.controller';
@@ -121,6 +123,7 @@ import { WalletController } from './wallet/wallet.controller';
     MoonWorksController,
     SpellController,
     CraftController,
+    LinksController,
   ],
   providers: [
     AuthGuard,
@@ -165,6 +168,7 @@ import { WalletController } from './wallet/wallet.controller';
     SpellService,
     NovelService,
     GameService,
+    LinksService,
   ],
 })
 export class AppModule {}

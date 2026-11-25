@@ -34,3 +34,4 @@ export * from './makeConfirm';
 export * from './spell';
 export * from './craft';
 export * from './craftDemo';
+export * from './links';
