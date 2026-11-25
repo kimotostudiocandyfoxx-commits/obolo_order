@@ -15,7 +15,8 @@ import type { MvEffect, MvMotion, MvPlan, MvSegment, MvTextEffect } from './plan
 export type StoryScene = { dur: number; tags: string; hero: boolean; motion: MvMotion; effect: MvEffect };
 export type StoryPlan = { note: string; style: string; scenes: StoryScene[]; lyrics: MvTextEffect[] };
 export type StoryLyric = { t: number; text: string; chorus: boolean };
-export type StoryInput = { title: string; seconds: number; bpm: number; mood: string; music: string; lyrics: StoryLyric[]; hero: string; maxScenes: number };
+/** `scenes` (R13): exactly this many pictures (the spell's 4 / 8 / 12場面), else by the song's length */
+export type StoryInput = { title: string; seconds: number; bpm: number; mood: string; music: string; lyrics: StoryLyric[]; hero: string; maxScenes: number; scenes?: number };
 
 const MOTIONS: MvMotion[] = ['zoom-in', 'pan-left', 'zoom-out', 'pan-right'];
 const EFFECTS: MvEffect[] = ['POSTERIZE', 'GLITCH', 'SPEED_LINES', 'NONE'];
@@ -78,7 +79,8 @@ function clean(tags: string) {
 }
 
 /** How many scenes: one per ~1.5 bars (MV lab m03: 6-second scenes dragged), between 8 and maxScenes. */
-export function sceneCount(i: Pick<StoryInput, 'seconds' | 'bpm' | 'maxScenes'>) {
+export function sceneCount(i: Pick<StoryInput, 'seconds' | 'bpm' | 'maxScenes' | 'scenes'>) {
+  if (i.scenes) return Math.max(2, Math.min(i.maxScenes, i.scenes));
   const bar = (60 / (i.bpm || 100)) * 4;
   return Math.max(8, Math.min(i.maxScenes, Math.round(i.seconds / Math.max(2.4, bar * 1.5))));
 }

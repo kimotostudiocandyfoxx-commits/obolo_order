@@ -1,5 +1,5 @@
-import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
-import { MV_MAX_MATERIALS, MV_MAX_SECONDS, type AddMvMaterialBody, type MvMaterial, type MvProjectView, type SongMix, type SongPhrase } from '@obolo/shared';
+import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
+import { MV_MAX_MATERIALS, MV_MAX_SECONDS, spellPrompt, VIDEO_DEFAULTS, videoParams, videoWindow, type AddMvMaterialBody, type MvEditBody, type MvMaterial, type MvProjectView, type SongMix, type SongPhrase, type SpellTag, type VideoCut, type VideoParams } from '@obolo/shared';
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -9,17 +9,18 @@ import { apiError } from '../common/errors';
 import { phraseStarts } from '../compose/mix';
 import { AppConfig, CONFIG } from '../config';
 import { Database } from '../db/db';
-import { marsBackstage, mvProjects, songs, users } from '../db/schema';
+import { jupiterRoots, marsBackstage, mvProjects, songs, users } from '../db/schema';
 import { probe, run } from '../media/transcode';
 import { MediaService } from '../media/media.service';
 import { idToken } from '../compose/music.client';
 import { DepthModel } from './depth';
 import { KeyArtist } from './keyart';
-import { addParallax } from './parallax';
+import { addParallax, type Parallax } from './parallax';
+import { cutPlan, FLY_MOVES, usesDepth, windowLyrics } from './cut';
 import { paintScenes, PAINTERS, seedreamSheets, StyledPainter } from './styled';
 import { planMv, type MvPlan } from './plan';
 import { burnLyrics, renderMv } from './render';
-import { describeHero, isHuman, planStory, storyToPlan, type StoryPlan } from './storyboard';
+import { describeHero, isHuman, planStory, type StoryPlan } from './storyboard';
 import { Stylizer } from './stylize';
 
 type Row = typeof mvProjects.$inferSelect;
@@ -110,6 +111,7 @@ export class MvService {
       note: p.note,
       backstageId: p.backstageId,
       seconds: p.seconds,
+      cut: ((p.planJson ?? null) as { cut?: MvProjectView['cut'] } | null)?.cut ?? null,
     };
   }
 
@@ -244,54 +246,44 @@ export class MvService {
   }
 
   /**
-   * Story MV (client decision 2026-10-08): no materials — Bati reads the song and the profile picture
-   * (the hero), writes a storyboard and every scene is painted as an anime picture (Novita), then
-   * edited on the beat. `mood` = what the creator said they want (may be empty: Bati decides).
+   * Story MV (client decision 2026-10-08; R13 from its spell): no materials — Bati reads the song and the profile picture
+   * (the hero), writes a storyboard and every scene is painted as one picture (FLUX.2 klein on Runware / our GPU), then
+   * the pictures move (renderCut). `mood` = what the creator said they want (may be empty: Bati decides); `tags` = the
+   * video's spell (what it is for, the scenes, the camera, the length …), none = the older call: the whole song.
+   * No video-generation model is used: the pictures are moved and joined by ffmpeg.
    */
-  async story(userId: string, id: string, origin: string, mood: string): Promise<MvProjectView> {
-    const p = await this.row(userId, id);
-    if (p.status === 'rendering' && p.updatedAt > new Date(Date.now() - 10 * 60_000)) throw apiError(HttpStatus.CONFLICT, 'BUSY', 'Already making it');
-    await this.db.write.update(mvProjects).set({ status: 'rendering', error: null, updatedAt: new Date() }).where(eq(mvProjects.id, id));
+  async story(userId: string, id: string, origin: string, mood: string, tags?: SpellTag[]): Promise<MvProjectView> {
+    const p = await this.begin(userId, id);
     const s = await this.song(userId, p.songId);
+    const params = tags ? videoParams(tags) : this.legacyParams();
     const dir = await mkdtemp(join(tmpdir(), 'obolo-mvs-'));
     try {
       const t0 = Date.now();
-      const seconds = Math.min(MV_MAX_SECONDS, s.seconds);
-      const audioBytes = await this.media.bytesByUrl(userId, s.mixUrl);
-      if (!audioBytes) throw new Error('song audio unavailable');
-      const audio = join(dir, 'song.m4a');
-      await writeFile(audio, audioBytes);
       // the hero: the painted ぷにぷに picture, else the NEO look
-      const [u] = await this.db.read.select({ pic: users.puniPicUrl, avatar: users.avatarUrl }).from(users).where(eq(users.id, userId));
-      const picUrl = u?.pic ?? u?.avatar ?? null;
-      const picture = picUrl ? await this.pictureBytes(userId, picUrl) : null;
+      const picture = await this.heroPicture(userId);
       const hero = await describeHero(picture, this.cfg.GEMINI_API_KEY, this.cfg.MV_PLAN_MODEL);
       const design = s.designJson as { bpm?: number; instrumentalPrompt?: string };
       const bpm = Number(design.bpm) || 100;
+      const all = this.lyricLines(s);
+      const win = videoWindow(params, s.seconds, all);
+      const lyr = windowLyrics(all, win.start, win.seconds);
+      const cap = this.sheets ? this.cfg.MV_SHEET_SCENES : this.keyArtist.sceneBudget(this.cfg.MV_SCENES, this.cfg.MV_QWEN_SCENES);
       const story: StoryPlan = await planStory(
         {
           title: s.title,
-          seconds,
+          seconds: win.seconds,
           bpm,
-          mood: mood.trim().slice(0, 200),
+          mood: [mood.trim(), params.purpose === 'slideshow' ? 'a story told in pictures, like a picture book read aloud' : ''].filter(Boolean).join('; ').slice(0, 260),
           music: String(design.instrumentalPrompt ?? '').slice(0, 300),
-          lyrics: this.lyricLines(s).map((l) => ({ t: l.t, text: l.text, chorus: l.chorus })),
+          lyrics: lyr.map((l) => ({ t: l.t, text: l.text, chorus: l.chorus })),
           hero,
-          maxScenes: this.sheets ? this.cfg.MV_SHEET_SCENES : this.keyArtist.sceneBudget(this.cfg.MV_SCENES, this.cfg.MV_QWEN_SCENES),
+          maxScenes: cap,
+          scenes: tags ? params.scenes : undefined,
         },
         this.cfg.GEMINI_API_KEY,
         this.cfg.MV_PLAN_MODEL,
       );
-      // paint every scene; one seed per MV keeps the look together
-      const seed = Math.floor(Math.random() * 2 ** 31);
-      // plan A: one picture per scene on Runware (FLUX.2 klein 4B by default; Seedream = four per sheet); plan B / unset: our GPU (else Qwen) via the key artist
-      if (this.sheets) this.sheets.lastCostUsd = 0;
-      const drawn = this.sheets
-        ? this.cfg.MV_PAINTER === 'seedream'
-          ? await seedreamSheets(this.sheets, story.scenes.map((sc) => ({ caption: sc.tags })), picture)
-          : await paintScenes(this.sheets, story.scenes.map((sc) => ({ caption: sc.tags })), picture, PAINTERS[this.cfg.MV_PAINTER], hero)
-        : await this.keyArtist.paintAll(story.scenes, seed, this.cfg.MV_PAINT_PARALLEL, { reference: picture, refScale: this.cfg.MV_HERO_REF, heroIsHuman: isHuman(hero) });
-      if (this.sheets) this.log.log(`MV ${id}: plan A paint cost ${Math.round(this.sheets.lastCostUsd * 150)} yen`);
+      const drawn = await this.paint(story.scenes.map((sc) => sc.tags), picture, hero, id);
       const pics: (string | null)[] = await Promise.all(
         drawn.map(async (img, k) => {
           if (!img) return null;
@@ -304,54 +296,286 @@ export class MvService {
       this.log.log(`MV ${id}: storyboard ${story.scenes.length} scenes, painted ${painted} in ${Math.round((Date.now() - t0) / 1000)}s`);
       // a scene that could not be painted shows its neighbour (or, with nothing painted, a plain card)
       const fallback = pics.find(Boolean) ?? (await this.plainCard(dir, s.title));
-      // 2.5D: each still's depth and camera move (a still without them keeps the plain zoom / pan)
-      const moves = this.cfg.MV_PARALLAX
-        ? await addParallax(pics, story.scenes.map((sc) => sc.tags), this.depth, { key: this.cfg.GEMINI_API_KEY, model: this.cfg.MV_PLAN_MODEL }).catch((e) => {
-            this.log.warn(`MV ${id}: parallax skipped: ${String(e).slice(0, 200)}`);
-            return pics.map(() => null);
-          })
-        : pics.map(() => null);
-      const materials = pics.map((f, k) => {
-        const own = f ? k : pics.slice(0, k).reduce((a, x, j) => (x ? j : a), -1);
-        const mv = own >= 0 ? moves[own] : null;
-        return { kind: 'photo' as const, file: f ?? pics.slice(0, k).reverse().find(Boolean) ?? fallback, depth: mv?.depth ?? null, parallax: mv ?? null };
-      });
-      const plan = storyToPlan(story, bpm, this.lyricLines(s).map((l) => ({ t: l.t, text: l.text, chorus: l.chorus })));
-      const out = await renderMv({ dir, materials, plan, audio, seconds, bpm, keyArtist: this.keyArtist, painted: true });
-      const v = await this.media.storeGenerated(userId, 'video', 'video/mp4', await readFile(out.video), origin);
-      const poster = await this.media.storeGenerated(userId, 'poster', 'image/webp', await readFile(out.poster), origin);
-      const info = await probe(out.video);
-      const [b] = await this.db.write
-        .insert(marsBackstage)
-        .values({ userId, mediaId: v.id, url: v.url, posterUrl: poster.url, seconds: info.seconds, title: `${s.title}（MV）`.slice(0, 40) })
-        .returning();
-      const [up] = await this.db.write
-        .update(mvProjects)
-        .set({
-          status: 'done',
-          planJson: { ...plan, mode: 'story', hero, style: story.style, scenes: story.scenes, painted } as never,
-          videoUrl: v.url,
-          lyricsVideoUrl: null,
-          posterUrl: poster.url,
-          seconds: info.seconds,
-          note: plan.note,
-          backstageId: b.id,
-          updatedAt: new Date(),
-        })
-        .where(eq(mvProjects.id, id))
-        .returning();
+      const files = pics.map((f, k) => f ?? pics.slice(0, k).reverse().find(Boolean) ?? fallback);
+      // every picture is kept with the video: a change of how it moves is made again from them, never painted again
+      const urls = await this.keepPictures(userId, files, origin);
+      const cut: VideoCut = { params, order: story.scenes.map((_, k) => k), scenes: story.scenes.map((sc, k) => ({ url: urls[k], tags: sc.tags, dur: sc.dur })) };
+      const out = await this.renderCut(userId, p, s, cut, origin, dir, { files, note: story.note, extra: { mode: 'story', hero, style: story.style, painted, window: win }, replace: false });
       this.log.log(`MV ${id}: done in ${Math.round((Date.now() - t0) / 1000)}s`);
-      return this.view(up);
+      return out;
     } catch (e) {
-      this.log.warn(`story MV failed: ${String(e).slice(0, 300)}`);
-      await this.db.write
-        .update(mvProjects)
-        .set({ status: 'failed', error: String(e).slice(0, 300), updatedAt: new Date() })
-        .where(eq(mvProjects.id, id));
-      throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'MV_FAILED', 'Could not make the MV');
+      return this.failed(id, e);
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
+  }
+
+  /** R13: the settings of a video made without a spell (the Mars studio's older call): the whole song, as before */
+  private legacyParams(): VideoParams {
+    return { ...VIDEO_DEFAULTS, length: 'full', captions: false, camera: this.cfg.MV_PARALLAX ? 'parallax' : 'zoom' };
+  }
+
+  /** the video is being made (a second one at the same time is refused) */
+  private async begin(userId: string, id: string): Promise<Row> {
+    const p = await this.row(userId, id);
+    if (p.status === 'rendering' && p.updatedAt > new Date(Date.now() - 10 * 60_000)) throw apiError(HttpStatus.CONFLICT, 'BUSY', 'Already making it');
+    await this.db.write.update(mvProjects).set({ status: 'rendering', error: null, updatedAt: new Date() }).where(eq(mvProjects.id, id));
+    return p;
+  }
+
+  private async failed(id: string, e: unknown): Promise<never> {
+    this.log.warn(`MV failed: ${String(e).slice(0, 300)}`);
+    await this.db.write
+      .update(mvProjects)
+      .set({ status: 'failed', error: String(e).slice(0, 300), updatedAt: new Date() })
+      .where(eq(mvProjects.id, id));
+    if (e instanceof HttpException && e.getStatus() < 500 && e.getStatus() !== HttpStatus.UNPROCESSABLE_ENTITY) throw e;
+    throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'MV_FAILED', 'Could not make the MV');
+  }
+
+  /** the hero's picture (the painted ぷにぷに picture, else the NEO look), or null */
+  private async heroPicture(userId: string): Promise<Buffer | null> {
+    const [u] = await this.db.read.select({ pic: users.puniPicUrl, avatar: users.avatarUrl }).from(users).where(eq(users.id, userId));
+    const picUrl = u?.pic ?? u?.avatar ?? null;
+    return picUrl ? this.pictureBytes(userId, picUrl) : null;
+  }
+
+  /**
+   * One picture per scene (still pictures — never a video model): plan A, one picture per scene on Runware (FLUX.2
+   * klein 4B by default; Seedream = four per sheet); plan B / unset: our GPU (else Qwen) via the key artist. One seed
+   * per video keeps the look together.
+   */
+  private async paint(captions: string[], picture: Buffer | null, hero: string, id: string): Promise<(Buffer | null)[]> {
+    const seed = Math.floor(Math.random() * 2 ** 31);
+    if (this.sheets) this.sheets.lastCostUsd = 0;
+    const drawn = this.sheets
+      ? this.cfg.MV_PAINTER === 'seedream'
+        ? await seedreamSheets(this.sheets, captions.map((caption) => ({ caption })), picture)
+        : await paintScenes(this.sheets, captions.map((caption) => ({ caption })), picture, PAINTERS[this.cfg.MV_PAINTER], hero)
+      : await this.keyArtist.paintAll(
+          captions.map((tags) => ({ tags, hero: true })),
+          seed,
+          this.cfg.MV_PAINT_PARALLEL,
+          { reference: picture, refScale: this.cfg.MV_HERO_REF, heroIsHuman: isHuman(hero) },
+        );
+    if (this.sheets) this.log.log(`MV ${id}: plan A paint cost ${Math.round(this.sheets.lastCostUsd * 150)} yen`);
+    return drawn;
+  }
+
+  /** the pictures kept as the member's own images (one each, a picture shown twice kept once) */
+  private async keepPictures(userId: string, files: string[], origin: string): Promise<string[]> {
+    const seen = new Map<string, string>();
+    const out: string[] = [];
+    for (const f of files) {
+      if (!seen.has(f)) {
+        const webp = await sharp(await readFile(f)).resize(1024, 1024, { fit: 'inside' }).webp({ quality: 88 }).toBuffer();
+        seen.set(f, (await this.media.storeGenerated(userId, 'image', 'image/webp', webp, origin)).url);
+      }
+      out.push(seen.get(f)!);
+    }
+    return out;
+  }
+
+  /** the member's own pictures for a video: the project's photos, else the newest pictures in Bluena (Jupiter) */
+  async ownPictures(userId: string, id: string, n: number): Promise<string[]> {
+    const p = await this.row(userId, id);
+    const mats = (p.materialsJson as unknown as MvMaterial[]).filter((m) => m.kind === 'photo').map((m) => m.url);
+    if (mats.length) return mats.slice(0, 16);
+    const rows = await this.db.read
+      .select({ url: jupiterRoots.url })
+      .from(jupiterRoots)
+      .where(and(eq(jupiterRoots.userId, userId), eq(jupiterRoots.kind, 'photo'), isNull(jupiterRoots.deletedAt)))
+      .orderBy(desc(jupiterRoots.createdAt))
+      .limit(Math.max(2, Math.min(16, n)));
+    return rows.map((r) => r.url).reverse();
+  }
+
+  /**
+   * R13: a video of the member's own pictures (their art in Bluena, their photos): nothing painted, the pictures only
+   * move — CPU only, so it costs little (MAKE_COST.mvPictures).
+   */
+  async pictures(userId: string, id: string, origin: string, tags: SpellTag[]): Promise<MvProjectView> {
+    const params = videoParams(tags);
+    const urls = await this.ownPictures(userId, id, params.scenes);
+    if (!urls.length) throw apiError(HttpStatus.BAD_REQUEST, 'NO_PICTURES', 'No pictures to move yet');
+    const p = await this.begin(userId, id);
+    const s = await this.song(userId, p.songId);
+    const dir = await mkdtemp(join(tmpdir(), 'obolo-mvp-'));
+    try {
+      const cut: VideoCut = { params, order: urls.map((_, k) => k), scenes: urls.map((url) => ({ url, dur: 1 })) };
+      return await this.renderCut(userId, p, s, cut, origin, dir, { note: 'きみの絵を、そのまま動かしたよ。', extra: { mode: 'pictures' }, replace: false });
+    } catch (e) {
+      return this.failed(id, e);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  }
+
+  private cutOf(p: Row): VideoCut {
+    const cut = (p.planJson as { cut?: VideoCut } | null)?.cut;
+    if (!cut?.scenes?.length) throw apiError(HttpStatus.BAD_REQUEST, 'NO_CUT', 'This video cannot be changed by words');
+    return cut;
+  }
+
+  /**
+   * R13: a free change after it is made — how the pictures move (camera, pace, fades, lyrics, order, a scene cut out,
+   * the length, the part of the song, the colours). Re-rendered on the CPU from the kept pictures: no new picture, no mana.
+   */
+  async edit(userId: string, id: string, origin: string, body: MvEditBody): Promise<MvProjectView> {
+    const p0 = await this.row(userId, id);
+    const cut = this.cutOf(p0);
+    const order = [...new Set(body.order.filter((k) => k >= 0 && k < cut.scenes.length))];
+    if (!order.length) throw apiError(HttpStatus.BAD_REQUEST, 'NO_SCENES', 'Keep at least one scene');
+    // what it is for, its song and its pictures stay (those are a new video)
+    const params: VideoParams = { ...body.params, purpose: cut.params.purpose, songId: cut.params.songId, scenes: cut.params.scenes };
+    const p = await this.begin(userId, id);
+    const s = await this.song(userId, p.songId);
+    const dir = await mkdtemp(join(tmpdir(), 'obolo-mve-'));
+    try {
+      return await this.renderCut(userId, p, s, { ...cut, params, order }, origin, dir, { note: p.note ?? undefined, replace: true });
+    } catch (e) {
+      return this.failed(id, e);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  }
+
+  /** R13: some scenes painted again from a small spell (MAKE_COST.mvRedraw), then the video re-rendered */
+  async redraw(userId: string, id: string, origin: string, body: { scenes: number[]; spell: SpellTag[] }): Promise<MvProjectView> {
+    const p0 = await this.row(userId, id);
+    const cut = this.cutOf(p0);
+    const ks = [...new Set(body.scenes.filter((k) => k >= 0 && k < cut.scenes.length))];
+    if (!ks.length) throw apiError(HttpStatus.BAD_REQUEST, 'NO_SCENES', 'Which scene?');
+    const p = await this.begin(userId, id);
+    const s = await this.song(userId, p.songId);
+    const dir = await mkdtemp(join(tmpdir(), 'obolo-mvr-'));
+    try {
+      const picture = await this.heroPicture(userId);
+      const hero = ((p.planJson ?? {}) as { hero?: string }).hero ?? (await describeHero(picture, this.cfg.GEMINI_API_KEY, this.cfg.MV_PLAN_MODEL));
+      const look = spellPrompt('video', body.spell);
+      const drawn = await this.paint(ks.map((k) => [cut.scenes[k].tags || `solo, ${hero}`, look].join(', ').slice(0, 900)), picture, hero, id);
+      if (!drawn.some(Boolean)) throw new Error('nothing painted');
+      const scenes = [...cut.scenes];
+      for (const [j, k] of ks.entries()) {
+        const img = drawn[j];
+        if (!img) continue;
+        const f = join(dir, `redraw-${k}.jpg`);
+        await sharp(img).jpeg({ quality: 92 }).toFile(f);
+        const [url] = await this.keepPictures(userId, [f], origin);
+        scenes[k] = { ...scenes[k], url, parallax: null };
+      }
+      return await this.renderCut(userId, p, s, { ...cut, scenes }, origin, dir, { note: p.note ?? undefined, replace: true });
+    } catch (e) {
+      return this.failed(id, e);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  }
+
+  /** a kept picture's bytes (the member's own file, else fetched) */
+  private async sceneBytes(userId: string, url: string): Promise<Buffer | null> {
+    const own = await this.media.bytesByUrl(userId, url).catch(() => null);
+    if (own) return own;
+    const r = await fetch(url, { signal: AbortSignal.timeout(60_000) }).catch(() => null);
+    return r?.ok ? Buffer.from(await r.arrayBuffer()) : null;
+  }
+
+  /**
+   * R13: the video from what it is made of — the window of the song, the pictures in their order, each picture's depth and
+   * 2.5D move (kept once chosen), the camera, the fades, the lyric lines, the colour grade — rendered at 720p (ffmpeg,
+   * render.ts). The first render and every change use this; `replace` = a change of the same video (its 裏スタジオ entry
+   * is updated, not added).
+   */
+  private async renderCut(
+    userId: string,
+    p: Row,
+    s: SongRow,
+    cut0: VideoCut,
+    origin: string,
+    dir: string,
+    o: { files?: (string | null)[]; note?: string; extra?: Record<string, unknown>; replace: boolean },
+  ): Promise<MvProjectView> {
+    const cut: VideoCut = { ...cut0, scenes: cut0.scenes.map((x) => ({ ...x })) };
+    const all = this.lyricLines(s);
+    const win = videoWindow(cut.params, s.seconds, all);
+    const lyr = windowLyrics(all, win.start, win.seconds);
+    const bpm = Number((s.designJson as { bpm?: number }).bpm) || 100;
+    const audioBytes = await this.media.bytesByUrl(userId, s.mixUrl);
+    if (!audioBytes) throw new Error('song audio unavailable');
+    const audio = join(dir, 'song.m4a');
+    await writeFile(audio, audioBytes);
+    // the pictures as files (painted just now, else the kept ones)
+    const files: (string | null)[] = await Promise.all(
+      cut.scenes.map(async (sc, k) => {
+        if (o.files?.[k]) return o.files[k];
+        const bytes = await this.sceneBytes(userId, sc.url);
+        if (!bytes) return null;
+        const f = join(dir, `kept-${k}.jpg`);
+        await sharp(bytes).rotate().flatten({ background: '#000000' }).resize(1024, 1024, { fit: 'inside' }).jpeg({ quality: 92 }).toFile(f);
+        return f;
+      }),
+    );
+    const usable = cut.order.filter((k) => files[k]);
+    if (!usable.length) throw new Error('pictures unavailable');
+    const { plan, shown } = cutPlan({ ...cut, order: usable }, { seconds: win.seconds, bpm, lyrics: lyr.map((l) => ({ t: l.t, text: l.text, chorus: l.chorus })), note: o.note });
+    // 2.5D: the depth of each picture shown (CPU) and its move (chosen once, then kept); without them: Ken Burns
+    let moves: ((Parallax & { focus: number; depth: string }) | null)[] = shown.map(() => null);
+    if (usesDepth(cut.params) && this.cfg.MV_PARALLAX) {
+      const known = shown.map((k, j) => {
+        const pr = cut.scenes[k].parallax;
+        const fly = cut.params.camera === 'fly' ? FLY_MOVES[j % FLY_MOVES.length] : null;
+        return pr ? { ...(pr as Parallax), ...(fly ? { move: fly } : {}) } : null;
+      });
+      moves = await addParallax(
+        shown.map((k) => files[k]),
+        shown.map((k) => cut.scenes[k].tags ?? ''),
+        this.depth,
+        { key: this.cfg.GEMINI_API_KEY, model: this.cfg.MV_PLAN_MODEL },
+        known,
+      ).catch((e) => {
+        this.log.warn(`MV ${p.id}: parallax skipped: ${String(e).slice(0, 200)}`);
+        return shown.map(() => null);
+      });
+      shown.forEach((k, j) => {
+        const mv = moves[j];
+        if (!mv) return;
+        if (cut.params.camera === 'fly') mv.move = FLY_MOVES[j % FLY_MOVES.length];
+        cut.scenes[k].parallax = { move: mv.move, fx: mv.fx, fy: mv.fy, strength: mv.strength };
+      });
+    }
+    const materials = shown.map((k, j) => ({ kind: 'photo' as const, file: files[k]!, depth: moves[j]?.depth ?? null, parallax: moves[j] ?? null }));
+    const out = await renderMv({ dir, materials, plan, audio, seconds: win.seconds, bpm, keyArtist: this.keyArtist, painted: true, audioStart: win.start, grade: cut.params.grade });
+    // the lyric lines on screen (their effects from the plan: calm verses, big chorus — or as asked)
+    const final = cut.params.captions && lyr.length ? await burnLyrics(dir, out.video, lyr.map((l, i) => ({ t: l.t, end: l.end, text: l.text, effect: plan.lyrics[i] ?? 'MINIMAL_CHILL' }))) : out.video;
+    const v = await this.media.storeGenerated(userId, 'video', 'video/mp4', await readFile(final), origin);
+    const poster = await this.media.storeGenerated(userId, 'poster', 'image/webp', await readFile(out.poster), origin);
+    const info = await probe(final);
+    const title = `${s.title}（MV）`.slice(0, 40);
+    let backstageId = p.backstageId;
+    if (o.replace && backstageId) {
+      // a change of the same video: its 裏スタジオ entry shows the new one
+      await this.db.write.update(marsBackstage).set({ mediaId: v.id, url: v.url, posterUrl: poster.url, seconds: info.seconds, updatedAt: new Date() }).where(and(eq(marsBackstage.id, backstageId), eq(marsBackstage.userId, userId)));
+    } else {
+      const [b] = await this.db.write.insert(marsBackstage).values({ userId, mediaId: v.id, url: v.url, posterUrl: poster.url, seconds: info.seconds, title }).returning();
+      backstageId = b.id;
+    }
+    const before = (p.planJson ?? {}) as Record<string, unknown>;
+    const [up] = await this.db.write
+      .update(mvProjects)
+      .set({
+        status: 'done',
+        planJson: { ...before, ...o.extra, segments: plan.segments, lyrics: plan.lyrics, cut } as never,
+        videoUrl: v.url,
+        lyricsVideoUrl: cut.params.captions && lyr.length ? v.url : null,
+        posterUrl: poster.url,
+        seconds: info.seconds,
+        note: plan.note || p.note,
+        backstageId,
+        updatedAt: new Date(),
+      })
+      .where(eq(mvProjects.id, p.id))
+      .returning();
+    return this.view(up);
   }
 
   /** The profile picture as PNG (on a white card if it is see-through), or null. */

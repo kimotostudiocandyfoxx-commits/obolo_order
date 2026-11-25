@@ -12,10 +12,14 @@ import { Logger } from '@nestjs/common';
  * the loud effects on the chorus.
  */
 /** pulse = a zoom that beats with the song (chorus shots, MV lab m03: "static, slideshow-like") */
-export type MvMotion = 'zoom-in' | 'zoom-out' | 'pan-left' | 'pan-right' | 'still' | 'pulse' | 'face' | 'tilt-up';
+export type MvMotion = 'zoom-in' | 'zoom-out' | 'pan-left' | 'pan-right' | 'still' | 'pulse' | 'face' | 'tilt-up' | 'hold';
 export type MvEffect = 'POSTERIZE' | 'GLITCH' | 'SPEED_LINES' | 'NONE';
 export type MvTextEffect = 'SHAKE_HARD' | 'STROBO_FLASH' | 'ZOOM_BURST' | 'MINIMAL_CHILL';
-export type MvSegment = { m: number; dur: number; from: number; motion: MvMotion; effect: MvEffect; key: boolean; chorus?: boolean };
+/**
+ * `enter` (R13): how this shot comes in when a new picture starts — a soft fade through dark or a white flash (none = a
+ * hard cut); `pace`: how far the camera moves (1 = as before, 0.5 = slow, 1.5 = fast); `hold` = the picture stays still
+ */
+export type MvSegment = { m: number; dur: number; from: number; motion: MvMotion; effect: MvEffect; key: boolean; chorus?: boolean; enter?: 'fade' | 'flash'; pace?: number };
 export type MvPlan = { note: string; segments: MvSegment[]; lyrics: MvTextEffect[] };
 
 export type PlanMaterial = { kind: 'photo' | 'video'; seconds: number | null; preview: Buffer | null };

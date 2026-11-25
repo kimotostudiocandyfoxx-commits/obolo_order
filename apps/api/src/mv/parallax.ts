@@ -152,17 +152,22 @@ export async function addParallax(
   notes: string[],
   depthModel: DepthModel,
   gemini: { key?: string; model: string },
+  /** R13: the moves chosen before (a re-render keeps them: no new question to Gemini) */
+  known: (Parallax | null | undefined)[] = [],
 ): Promise<((Parallax & { focus: number; depth: string }) | null)[]> {
   const pics: (Buffer | null)[] = await Promise.all(files.map((f) => (f ? readFile(f).catch(() => null) : null)));
   const shown: { p: Buffer; k: number }[] = [];
   pics.forEach((p, k) => p && shown.push({ p, k }));
+  const all = shown.every((x) => known[x.k]);
   const [moves, depths] = await Promise.all([
-    directParallax(
-      shown.map((x) => x.p),
-      shown.map((x) => notes[x.k] ?? ''),
-      gemini.key,
-      gemini.model,
-    ),
+    all
+      ? Promise.resolve(shown.map((x) => known[x.k]!))
+      : directParallax(
+          shown.map((x) => x.p),
+          shown.map((x) => notes[x.k] ?? ''),
+          gemini.key,
+          gemini.model,
+        ),
     // one at a time: the model is CPU-bound and the API has two CPUs
     (async () => {
       const out: (Buffer | null)[] = [];

@@ -155,7 +155,8 @@ const Env = z.object({
    *  B: our own GPU kept running (MUSIC_MIN_INSTANCES=1) with open models — once there are many
    */
   /** Story MV stills move in 2.5D (depth picture on the API's CPU + Gemini's camera moves); the depth model's ONNX (default Depth Anything V2 Small) */
-  MV_PARALLAX: bool(false),
+  // R13: on by default — the 2.5D camera is the spell's default (パララックス); depth on the CPU, no cost per video
+  MV_PARALLAX: bool(true),
   MV_DEPTH_ONNX_URL: secret(),
   MV_PLAN: z.preprocess((v) => (v === '' ? undefined : v), z.enum(['A', 'B']).optional()),
   /** plan A: the Runware key (secret obolo-seedream-api-key) and how many scenes an MV gets (4 per picture) */

@@ -109,7 +109,7 @@ describe('M-R253 §4: how long it takes', () => {
     const db = { row: { ...row } as JobRow, pushes: [] as string[], queued: 0 };
     const queue = { register: () => undefined, enqueue: async () => void db.queued++ };
     const push = { notify: async (_u: string, p: { title: string; body: string }) => void db.pushes.push(`${p.title}|${p.body}`) };
-    const s = new JobsService({} as never, queue as never, {} as never, {} as never, push as never, {} as never);
+    const s = new JobsService({} as never, queue as never, {} as never, {} as never, push as never, {} as never, {} as never);
     Object.assign(s, {
       load: async () => ({ ...db.row }),
       patch: async (_id: string, set: object) => void Object.assign(db.row, set),

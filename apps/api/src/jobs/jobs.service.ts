@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { batiSay, estimateEtaMs, fillLine, lateEta, MOON_LINES, shouldRetry, type DemoJobBody, type EtaKind, type FullSongBody, type JobKind, type JobView } from '@obolo/shared';
+import { batiSay, estimateEtaMs, fillLine, lateEta, MOON_LINES, shouldRetry, type DemoJobBody, type EtaKind, type FullSongBody, type JobKind, type JobView, type MakeConfirm, type MakeKind, type MvEditBody, type SpellTag } from '@obolo/shared';
 import { and, count, desc, eq, inArray, isNotNull } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { SongService } from '../compose/song.service';
@@ -11,11 +11,15 @@ import { QUEUE } from '../infra/tokens';
 import { MvService } from '../mv/mv.service';
 import { GameService, type GameJobInput } from '../craft/game.service';
 import { PushService } from '../push/push.service';
+import { LedgerService } from '../wallet/ledger.service';
 
 type Row = typeof jobs.$inferSelect;
 type Inputs = {
   song: { body: FullSongBody; origin: string };
-  'mv-story': { mvId: string; mood: string; origin: string; from?: 'atelier' };
+  /** R13: `tags` = the video's spell; `confirm` + `pay` = the yes it was charged with (the mana goes back when it fails for good) */
+  'mv-story': { mvId: string; mood: string; origin: string; from?: 'atelier'; tags?: SpellTag[]; confirm?: MakeConfirm; pay?: MakeKind };
+  /** R13: a video of the member's own pictures, a free re-render (edit), or scenes painted again (redraw) */
+  'mv-edit': { mvId: string; origin: string; from?: 'atelier'; mode: 'pictures' | 'edit' | 'redraw'; tags?: SpellTag[]; edit?: MvEditBody; scenes?: number[]; confirm?: MakeConfirm; pay?: MakeKind };
   'mv-lyrics': { mvId: string; origin: string };
   /** M-R253: the review page's stand-in (it only waits) */
   demo: DemoJobBody;
@@ -24,7 +28,7 @@ type Inputs = {
 };
 
 /** what each job is timed as (M-R253 §4) */
-export const ETA_OF: Record<JobKind, EtaKind> = { song: 'song', 'mv-story': 'mv', 'mv-lyrics': 'mv', demo: 'demo', game: 'game' };
+export const ETA_OF: Record<JobKind, EtaKind> = { song: 'song', 'mv-story': 'mv', 'mv-lyrics': 'mv', demo: 'demo', game: 'game', 'mv-edit': 'mvEdit' };
 type Patch = Partial<typeof jobs.$inferInsert>;
 
 /** A job running longer than this was lost (its instance went away): the member may try again. */
@@ -56,6 +60,7 @@ export class JobsService implements OnModuleInit {
     private readonly mv: MvService,
     private readonly push: PushService,
     private readonly games: GameService,
+    private readonly ledger: LedgerService,
   ) {}
 
   onModuleInit() {
@@ -179,6 +184,8 @@ export class JobsService implements OnModuleInit {
       await this.finish(jobId, 'failed', null, err);
       // a game that could not be made gives its mana back (once per yes)
       if (row.kind === 'game') await this.games.refundJob(row.userId, row.inputJson as unknown as GameJobInput);
+      // R13: so does a video (painted or moved) and a scene painted again
+      if (row.kind === 'mv-story' || row.kind === 'mv-edit') await this.refundVideo(row.userId, row.inputJson as unknown as Inputs['mv-edit']);
       await this.notify(row, false);
     }
   }
@@ -203,7 +210,14 @@ export class JobsService implements OnModuleInit {
       case 'mv-story': {
         const input = row.inputJson as unknown as Inputs['mv-story'];
         await this.stage(row.id, 'painting');
-        return { mv: await this.mv.story(row.userId, input.mvId, input.origin, input.mood) };
+        return { mv: await this.mv.story(row.userId, input.mvId, input.origin, input.mood, input.tags) };
+      }
+      case 'mv-edit': {
+        const input = row.inputJson as unknown as Inputs['mv-edit'];
+        await this.stage(row.id, input.mode === 'redraw' ? 'painting' : 'moving');
+        if (input.mode === 'pictures') return { mv: await this.mv.pictures(row.userId, input.mvId, input.origin, input.tags ?? []) };
+        if (input.mode === 'redraw') return { mv: await this.mv.redraw(row.userId, input.mvId, input.origin, { scenes: input.scenes ?? [], spell: input.tags ?? [] }) };
+        return { mv: await this.mv.edit(row.userId, input.mvId, input.origin, input.edit!) };
       }
       case 'mv-lyrics': {
         const input = row.inputJson as unknown as Inputs['mv-lyrics'];
@@ -225,6 +239,15 @@ export class JobsService implements OnModuleInit {
       default:
         throw new Error(`unknown job kind ${row.kind}`);
     }
+  }
+
+  /** a paid video job that could not be made gives its mana back (once per yes) */
+  protected async refundVideo(userId: string, input: { confirm?: MakeConfirm; pay?: MakeKind; mvId: string }): Promise<number> {
+    if (!input.confirm || !input.pay) return 0;
+    return this.ledger.refundYes(this.db, userId, input.pay, input.confirm, input.mvId).catch((e) => {
+      this.log.error(`video refund failed for ${userId}: ${String(e)}`);
+      return 0;
+    });
   }
 
   private async stage(id: string, stage: string) {

@@ -21,9 +21,13 @@ export const ANIME_FILTER = 'hqdn3d=3:3:4:4,eq=saturation=1.45:contrast=1.12:bri
 /** `depth` (a grey picture, white = near) and `parallax` (its camera move, `focus` = the depth kept still) make a still move in 2.5D */
 export type RenderMaterial = { kind: 'photo' | 'video'; file: string; depth?: string | null; parallax?: (Parallax & { focus: number }) | null };
 
-function motion(m: MvSegment['motion'], frames: number, beat = 0.5) {
-  const z = 1.18;
+function motion(m: MvSegment['motion'], frames: number, beat = 0.5, pace = 1) {
+  // R13: how far the camera goes (「カメラをもっとゆっくり」 = half as far in the same time)
+  const amt = 0.18 * Math.max(0.2, Math.min(2, pace));
+  const z = +(1 + amt).toFixed(3);
   switch (m) {
+    case 'hold':
+      return `z='1':x='0':y='0'`;
     case 'face':
       // a quick push towards the upper middle, where the character's face usually is
       return `z='min(1.15+${(0.25 / frames).toFixed(5)}*on,1.4)':x='iw/2-(iw/zoom/2)':y='ih*0.3-(ih/zoom/2)+ih/zoom/2*0.4'`;
@@ -36,9 +40,9 @@ function motion(m: MvSegment['motion'], frames: number, beat = 0.5) {
       return `z='1.06+0.06*pow(1-mod(on,${per})/${per},3)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'`;
     }
     case 'zoom-in':
-      return `z='min(1+${(0.18 / frames).toFixed(5)}*on,${z})':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'`;
+      return `z='min(1+${(amt / frames).toFixed(5)}*on,${z})':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'`;
     case 'zoom-out':
-      return `z='max(${z}-${(0.18 / frames).toFixed(5)}*on,1)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'`;
+      return `z='max(${z}-${(amt / frames).toFixed(5)}*on,1)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'`;
     case 'pan-left':
       return `z='${z}':x='(iw-iw/zoom)*(1-on/${frames})':y='ih/2-(ih/zoom/2)'`;
     case 'pan-right':
@@ -84,6 +88,16 @@ async function speedLines(file: string) {
     .toFile(file);
 }
 
+/** R13: a colour grade over the whole video (free to change: 「もっと明るく」「モノクロにして」) */
+export const GRADES = {
+  none: '',
+  bright: 'eq=brightness=0.06:saturation=1.1',
+  dark: 'eq=brightness=-0.07:contrast=1.05',
+  vivid: 'eq=saturation=1.4:contrast=1.06',
+  soft: 'eq=saturation=0.8:brightness=0.03',
+  mono: 'hue=s=0',
+} as const;
+
 const ff = (args: string[], timeout = 240_000) => run('ffmpeg', ['-y', '-hide_banner', '-loglevel', 'error', ...args], timeout);
 const enc = ['-c:v', 'libx264', '-preset', 'veryfast', '-crf', '23', '-pix_fmt', 'yuv420p', '-r', String(FPS), '-an'];
 
@@ -97,6 +111,10 @@ export async function renderMv(o: {
   keyArtist: KeyArtist;
   /** the materials are anime pictures already (story MV): no painted look on top */
   painted?: boolean;
+  /** R13: where in the song the video starts (seconds) */
+  audioStart?: number;
+  /** R13: a colour grade over the whole video (GRADES) */
+  grade?: keyof typeof GRADES;
 }): Promise<{ video: string; poster: string; keyCuts: number }> {
   const { dir } = o;
   const beat = 60 / (o.bpm || 100);
@@ -140,11 +158,13 @@ export async function renderMv(o: {
       if (nth % 2 === 1) p.move = ({ 'orbit-left': 'orbit-right', 'orbit-right': 'orbit-left', 'crane-up': 'crane-down', 'crane-down': 'crane-up', 'dolly-in': 'dolly-out', 'dolly-out': 'dolly-in' } as const)[p.move];
       // the chorus moves bolder and every cut punches on the beat (m15: "the drop lacks kinetic motion")
       if (s.chorus) p.strength = Math.min(1.6, p.strength * 1.35);
-      pre = parallaxGraph(p, mat.parallax.focus, s.dur, SIDE, s.motion === 'pulse' || s.chorus ? beat : undefined).replace(/\[v\]$/, '[pv]');
+      // R13: 「カメラをもっとゆっくり」
+      if (s.pace) p.strength = Math.max(0.2, Math.min(2, p.strength * s.pace));
+      pre = parallaxGraph(p, mat.parallax.focus, s.dur, SIDE, (s.motion === 'pulse' || s.chorus) && (s.pace ?? 1) >= 1 ? beat : undefined).replace(/\[v\]$/, '[pv]');
       base = '[pv]null';
     } else if (key || mat.kind === 'photo') {
       inputs.push('-loop', '1', '-i', key ?? mat.file);
-      base = `[0:v]${big},zoompan=${motion(s.motion === 'still' ? 'zoom-in' : s.motion, frames, beat)}:d=${frames}:s=${SIDE}x${SIDE}:fps=${FPS},setsar=1`;
+      base = `[0:v]${big},zoompan=${motion(s.motion === 'still' ? 'zoom-in' : s.motion, frames, beat, s.pace)}:d=${frames}:s=${SIDE}x${SIDE}:fps=${FPS},setsar=1`;
     } else {
       inputs.push('-ss', s.from.toFixed(2), '-t', s.dur.toFixed(2), '-i', mat.file);
       base = `[0:v]crop='min(iw,ih)':'min(iw,ih)',scale=${SIDE}:${SIDE},fps=${FPS},setsar=1`;
@@ -153,7 +173,10 @@ export async function renderMv(o: {
     // 2.5D stills drop the manga speed lines (m13/m14: "disconnected", "overused"); the moving depth does that work.
     const effect = pre && s.effect === 'SPEED_LINES' ? 'NONE' : s.effect;
     // (a white flash on chorus cuts was tried in m16–m18 and read as "a blank frame interrupting": off)
-    const flash = '';
+    // R13: how a new picture comes in (a soft fade through dark, a white flash) and the soft fade out before one
+    const next = o.plan.segments[k + 1];
+    const out = next?.enter === 'fade' && s.dur > 0.8 ? `,fade=t=out:st=${(s.dur - 0.3).toFixed(2)}:d=0.3` : '';
+    const flash = (s.enter === 'fade' ? ',fade=t=in:st=0:d=0.35' : s.enter === 'flash' ? ',fade=t=in:st=0:d=0.3:color=white' : '') + out;
     const look = key ? `fade=t=in:st=0:d=0.25:color=white` : `${effectFilter(effect, beat, o.painted)}${flash}`;
     let graph = `${base},${look}[v]`;
     if (effect === 'SPEED_LINES') {
@@ -173,10 +196,13 @@ export async function renderMv(o: {
   await ff(['-f', 'concat', '-safe', '0', '-i', list, '-c', 'copy', joined]);
   const video = join(dir, 'mv.mp4');
   const end = Math.max(0.5, o.seconds - 1);
+  const start = Math.max(0, o.audioStart ?? 0);
+  const grade = o.grade && GRADES[o.grade] ? `,${GRADES[o.grade]}` : '';
   await ff(
     [
       '-i',
       joined,
+      ...(start > 0 ? ['-ss', start.toFixed(2)] : []),
       '-i',
       o.audio,
       '-map',
@@ -186,9 +212,9 @@ export async function renderMv(o: {
       '-t',
       o.seconds.toFixed(2),
       '-vf',
-      `fade=t=in:st=0:d=0.6,fade=t=out:st=${end.toFixed(2)}:d=1`,
+      `fade=t=in:st=0:d=0.6,fade=t=out:st=${end.toFixed(2)}:d=1${grade}`,
       '-af',
-      `afade=t=out:st=${end.toFixed(2)}:d=1`,
+      `${start > 0 ? 'afade=t=in:st=0:d=0.8,' : ''}afade=t=out:st=${end.toFixed(2)}:d=1`,
       '-c:v',
       'libx264',
       '-preset',
