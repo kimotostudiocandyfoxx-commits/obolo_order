@@ -168,9 +168,14 @@ for pl in ['mars','venus','uranus','pluto','neptune']:
 for k in ['saturn','jupiter','mercury','mars','venus','uranus','pluto','neptune']:
     f=f'{O}/picon-{k}.jpg'
     if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((140,140),Image.LANCZOS); A['picon-'+k]=uri(o,86)
-for nm in ['me','edm','hiphop','ballad','rock','chill','citypop','anison','jazz','matsuri','rain']:
-    f=f'{O}/isl-mercury-{nm}.jpg'
-    if os.path.exists(f): o=unwhite(Image.open(f)); bb=o.getbbox(); o=o.crop(bb) if bb else o; o.thumbnail((380,380),Image.LANCZOS); A[f'isl-mercury-{nm}']=uri(o,84)
+# sky pieces for every planet (isl-<planet>-<key>) and their backgrounds (exp-<planet>-...)
+import glob as _g
+for f in sorted(_g.glob(f'{O}/isl-*.jpg')):
+    k=os.path.basename(f)[:-4]; o=unwhite(Image.open(f)); bb=o.getbbox(); o=o.crop(bb) if bb else o; o.thumbnail((380,380),Image.LANCZOS); A[k]=uri(o,84)
+for f in sorted(_g.glob(f'{O}/exp-*.jpg')):
+    k=os.path.basename(f)[:-4]
+    if k.startswith('exp-mercury'): continue
+    im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A[k]=uri(im,76)
 for nm in ['map','sea','edm','hiphop','ballad','rock','chill','citypop','anison','jazz','matsuri','rain']+[k+'-pier' for k in ['edm','hiphop','ballad','rock','chill','citypop','anison','jazz','matsuri','rain']]:
     f=f'{O}/exp-mercury-{nm}.jpg'
     if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A[f'exp-mercury-{nm}']=uri(im,76)

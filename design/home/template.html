@@ -592,6 +592,9 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .exp:not(.land) .rname{transition:opacity .12s}
 .exp.land.show .rname,.exp.land.auto .rname{opacity:0;transition:opacity .2s}
 .exp .eb{position:absolute;left:0;top:0;width:100px;height:116px;margin:-58px 0 0 -50px;cursor:pointer;z-index:2;will-change:transform}
+.exp .eb .eart{position:absolute;left:50%;top:60px;width:34px;height:34px;margin-left:-17px;border:3px solid #fff8e8;border-radius:4px;box-shadow:0 4px 10px rgba(20,30,10,.45);background-size:cover;background-position:center}
+.exp .eb.fl img{animation:flap .3s ease-in-out infinite alternate;transform-origin:50% 60%}
+.exp .pb .eart{position:absolute;left:50%;top:58%;width:40%;height:40%;margin-left:-20%;border:3px solid #fff8e8;border-radius:4px;background-size:cover;background-position:center}
 .exp .eb img{width:100px;height:100px;object-fit:contain;filter:drop-shadow(0 6px 6px rgba(0,30,60,.35))}
 .exp .eb span{position:absolute;left:50%;top:100px;transform:translateX(-50%);font:900 9px var(--f-body);color:#fff;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.85)}
 .exp .eb.held{visibility:hidden}
@@ -758,7 +761,7 @@ function render(){
     $('s6spk').querySelectorAll('img').forEach(i=>{i.src=A['sat6-spk']||''})}
   const isS=cur==='saturn'&&mode==='anime'&&!s6&&!s7;$('tint').hidden=!isS;$('fg').hidden=!(isS&&A['sat-fg']);if(isS&&A['sat-fg'])$('fg').style.backgroundImage=`url(${A['sat-fg']})`;$('swatch').hidden=true;
   if(isS&&A['rec-mask']){$('tint').style.webkitMaskImage=$('tint').style.maskImage=`url(${A['rec-mask']})`}
-  $('skybtn').hidden=true;if(EXP[cur]&&A['exp-'+cur+'-map']&&!window.__pinchHint){window.__pinchHint=1;setTimeout(()=>toast('✌️ 2本の指でつまむと、空から探せるよ'),900)}$('home').classList.remove('ghost');$('home').style.left='';$('home').style.top='';stopRoll();stopJup();stopMer();stopG5();if(isG5()){$('bg').style.backgroundImage=`url(${A['bg5-'+cur]})`;$('plate').hidden=true;rw.innerHTML='';$('home').classList.add('ghost');$('home').style.left=(G5[cur].home[0]*100)+'%';$('home').style.top=(G5[cur].home[1]*100)+'%';setupG5();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));setCta(false);return}
+  $('skybtn').hidden=true;if(hasSky(cur)&&!window.__pinchHint){window.__pinchHint=1;setTimeout(()=>toast('✌️ 2本の指でつまむと、空から探せるよ'),900)}$('home').classList.remove('ghost');$('home').style.left='';$('home').style.top='';stopRoll();stopJup();stopMer();stopG5();if(isG5()){$('bg').style.backgroundImage=`url(${A['bg5-'+cur]})`;$('plate').hidden=true;rw.innerHTML='';$('home').classList.add('ghost');$('home').style.left=(G5[cur].home[0]*100)+'%';$('home').style.top=(G5[cur].home[1]*100)+'%';setupG5();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));setCta(false);return}
   if(cur==='mercury'&&mode==='anime'&&A['bg3-mercury']){$('bg').style.backgroundImage=`url(${A['bg3-mercury']})`;$('plate').hidden=true;rw.innerHTML='';$('home').classList.add('ghost');$('home').style.left=(MHOUSE[0]*100)+'%';$('home').style.top=(MHOUSE[1]*100)+'%';setupMer();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));return}
   if(cur==='jupiter'&&mode==='anime'&&A['bg3-jupiter']){$('bg').style.backgroundImage=`url(${A['bg3-jupiter']})`;$('plate').hidden=true;rw.innerHTML='';$('home').classList.add('ghost');$('home').style.left=(JTREE[0]*100)+'%';$('home').style.top=(JTREE[1]*100)+'%';setupJup();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));return}
   if(cur==='saturn'&&(S6()||S7())){const RG=S7()?S7G.rec:S6G.rec;const d=document.createElement('button');d.type='button';d.className='recdoor';d.setAttribute('aria-label','自分のレコードを開く');d.style.left=(RG[0]*100)+'%';d.style.top=(RG[1]*100)+'%';d.onclick=()=>openProf(ME);$('sky').appendChild(d)}
@@ -955,10 +958,36 @@ const WORKS={mercury:[
 ].map(([title,by,genre,bpm,mood])=>({title,by,genre,bpm,mood,song:GSONG[genre]||1}))};
 // your own songs drift too (same rule, nothing to do by hand)
 WORKS.mercury.push(...[['夏のはじまり','J-POP',120,['夏','青春']],['チルな午後','ローファイ',80,['チル','作業用']],['パーティー','EDM',128,['アゲ','ダンス']],['夜のバラード','バラード',70,['しっとり','夜']],['走れ','ロック',176,['熱い','青春']]].map(([title,genre,bpm,mood],i)=>({title,by:ME,genre,bpm,mood,song:i+1,mine:1})));
-const RULE={edm:{g:['EDM'],m:['ダンス','フェス'],bpm:[118,999]},hiphop:{g:['ヒップホップ'],m:['ストリート']},ballad:{g:['バラード'],m:['しっとり'],bpm:[0,90]},rock:{g:['ロック'],m:['熱い']},chill:{g:['ローファイ'],m:['チル','作業用'],bpm:[0,100]},
+const RULE={};RULE.mercury={edm:{g:['EDM'],m:['ダンス','フェス'],bpm:[118,999]},hiphop:{g:['ヒップホップ'],m:['ストリート']},ballad:{g:['バラード'],m:['しっとり'],bpm:[0,90]},rock:{g:['ロック'],m:['熱い']},chill:{g:['ローファイ'],m:['チル','作業用'],bpm:[0,100]},
   citypop:{g:['シティポップ'],m:['夜ドライブ','80s']},anison:{g:['アニソン'],m:['アニメ']},jazz:{g:['ジャズ'],m:['おしゃれ']},matsuri:{g:[],m:['祭り','和風','夏']},rain:{g:[],m:['雨']}};
-function workScore(w,k){const R=RULE[k];if(!R)return 0;let s=0;if(R.g.includes(w.genre))s+=3;s+=w.mood.filter(x=>R.m.includes(x)).length*2;if(R.bpm&&s>0&&(w.bpm<R.bpm[0]||w.bpm>R.bpm[1]))s-=2;return s}
-function drift(pl,k){return (WORKS[pl]||[]).map(w=>({w,s:workScore(w,k)})).filter(x=>x.s>=2&&!(x.w.mine&&false)).sort((a,b)=>b.s-a.s||Math.random()-.5).map(x=>x.w)}
+function workScore(w,k,pl){const R=(RULE[pl||'mercury']||{})[k];if(!R)return 0;let s=0;if(R.g.includes(w.genre))s+=3;s+=w.mood.filter(x=>R.m.includes(x)).length*2;if(R.bpm&&s>0&&(w.bpm<R.bpm[0]||w.bpm>R.bpm[1]))s-=2;return s}
+function drift(pl,k){return (WORKS[pl]||[]).map(w=>({w,s:workScore(w,k,pl)})).filter(x=>x.s>=2&&!(x.w.mine&&false)).sort((a,b)=>b.s-a.s||Math.random()-.5).map(x=>x.w)}
+CONT.jupiter=[
+  {k:'watercolor',n:'水彩の森',tags:['水彩','やさしい','パステル']},
+  {k:'anime',n:'アニメ塗りの丘',tags:['アニメ塗り','キラキラ','人物']},
+  {k:'pixel',n:'ドット絵の村',tags:['ドット絵','レトロ','ゲーム']},
+  {k:'oil',n:'油絵の金の森',tags:['油絵','あたたか','風景']},
+  {k:'yumekawa',n:'ゆめかわの花畑',tags:['ゆめかわ','パステル','かわいい']},
+  {k:'cats',n:'ねこの森',tags:['ねこ','どうぶつ','かわいい'],by:'みお'},
+  {k:'nightview',n:'夜景の丘',tags:['夜','夜景','つめたい'],by:'REN'},
+  {k:'wamodern',n:'和モダンの庭',tags:['和風','和モダン','花'],by:'ことね'},
+  {k:'retropop',n:'レトロポップ広場',tags:['レトロ','ポップ','あざやか'],by:'YUZU'},
+  {k:'mono',n:'モノクロの森',tags:['モノクロ','白黒','かっこいい'],by:'kei'}];
+const JTAG=(t,b,s,m)=>({title:t,by:b,genre:s,mood:m});
+WORKS.jupiter=[JTAG('雨上がりの町','みお','水彩',['やさしい','風景']),JTAG('花びらの午後','はるか','水彩',['パステル','花']),JTAG('にじむ夕焼け','そら','水彩',['あたたか','風景']),JTAG('窓辺のねこ','みお','水彩',['ねこ','やさしい']),
+ JTAG('放課後の屋上','ショウ','アニメ塗り',['人物','青春']),JTAG('星の魔法少女','ぽんず','アニメ塗り',['キラキラ','人物']),JTAG('夏の約束','YUZU','アニメ塗り',['人物','夏']),JTAG('桜の帰り道','ことね','アニメ塗り',['花','人物']),
+ JTAG('8bitの勇者','タク','ドット絵',['ゲーム','レトロ']),JTAG('ピクセル商店街','kei','ドット絵',['レトロ','夜']),JTAG('ドットのねこ','ぽんず','ドット絵',['ねこ','かわいい']),
+ JTAG('金色の森','REN','油絵',['あたたか','風景']),JTAG('ひまわりの丘','そら','油絵',['花','夏']),JTAG('港の朝','Nagi','油絵',['風景','あたたか']),
+ JTAG('ゆめかわユニコーン','ぽんず','ゆめかわ',['パステル','かわいい']),JTAG('わたあめの空','はるか','ゆめかわ',['パステル','空']),JTAG('ハートの雲','YUZU','ゆめかわ',['かわいい','空']),
+ JTAG('こたつねこ','みお','アニメ塗り',['ねこ','どうぶつ']),JTAG('ねこの昼寝','はるか','水彩',['ねこ','どうぶつ']),
+ JTAG('ネオンの夜','REN','アニメ塗り',['夜景','夜']),JTAG('屋上から見た街','Nagi','油絵',['夜景','つめたい']),JTAG('真夜中の駅','kei','モノクロ',['夜','つめたい']),
+ JTAG('鳥居と月','ことね','和モダン',['和風','夜']),JTAG('金魚と風鈴','はるか','水彩',['和風','夏']),JTAG('椿の庭','ことね','和モダン',['花','和風']),
+ JTAG('レコード少女','YUZU','レトロ',['ポップ','あざやか']),JTAG('70sドライブ','Rio','レトロ',['ポップ','夏']),JTAG('ソーダ水','そら','ポップ',['あざやか','夏']),
+ JTAG('影のダンス','kei','モノクロ',['白黒','かっこいい']),JTAG('墨の龍','タク','モノクロ',['和風','かっこいい']),JTAG('白い朝','REN','モノクロ',['白黒','風景'])
+].map((w,i)=>({...w,ai:(i%5)+1}));
+WORKS.jupiter.push(...['夕焼けの町','屋根の上のねこ','ラーメン','さくら通り','月と海'].map((title,i)=>({title,by:ME,genre:['水彩','アニメ塗り','油絵','アニメ塗り','水彩'][i],mood:[['風景','あたたか'],['ねこ','かわいい'],['あたたか','食べもの'],['花','人物'],['夜','風景']][i],ai:i+1,mine:1})));
+RULE.jupiter={watercolor:{g:['水彩'],m:['やさしい','パステル']},anime:{g:['アニメ塗り'],m:['キラキラ','人物']},pixel:{g:['ドット絵'],m:['ゲーム','レトロ']},oil:{g:['油絵'],m:['あたたか']},yumekawa:{g:['ゆめかわ'],m:['パステル','かわいい']},
+  cats:{g:[],m:['ねこ','どうぶつ']},nightview:{g:[],m:['夜景','夜']},wamodern:{g:['和モダン'],m:['和風']},retropop:{g:['レトロ','ポップ'],m:['ポップ','あざやか']},mono:{g:['モノクロ'],m:['白黒']}};
 const ESLOT=[[.25,.2,.37],[.76,.23,.37],[.5,.37,.32],[.21,.55,.42],[.8,.57,.42]],EME=[.5,.85,.56];
 const FAVN=5;let FAV={};
 function favGet(pl){if(FAV[pl])return FAV[pl];let v=null;try{v=JSON.parse(localStorage.getItem('obolo-sky-'+pl)||'null')}catch(e){}
@@ -1012,7 +1041,8 @@ document.addEventListener('click',ev=>{if(!EX)return;
 const STRANGERS=['Rio','はるか','ショウ','ぽんず','kei','みお','YUZU','タク','Nagi','ことね','そら','REN'];
 let EX=null;
 const DEC=[];function predecode(keys){keys.forEach(k=>{if(!A[k]||DEC.some(x=>x.k===k))return;const im=new Image();im.src=A[k];DEC.push({k,im});if(im.decode)im.decode().catch(()=>{})})}
-function expOpen(){const c=EXP[cur];if(!c)return;if(typeof MV!=='undefined'&&MV)stopM();if(MBUSY)MBUSY.close();const ex=$('exp'),ph=$('phone');whoosh();
+const hasSky=pl=>!!(CONT[pl]&&A['exp-'+pl+'-sea']);
+function expOpen(){if(!hasSky(cur))return;if(typeof MV!=='undefined'&&MV)stopM();if(MBUSY)MBUSY.close();const ex=$('exp'),ph=$('phone');whoosh();
   $('bg').style.transition='transform .8s cubic-bezier(.5,0,.2,1)';$('bg').style.transform='scale(1.12)';
   $('emap').style.backgroundImage=`url(${A['exp-'+cur+'-sea']||A['exp-'+cur+'-map']||''})`;$('emap').classList.remove('dive');$('emap').style.transform='';$('emap').style.opacity='';ex.querySelectorAll('.rg').forEach(e=>e.remove());
   $('etitle').textContent=P[cur].name+'の海を空から';ex.className='exp on';EX={pl:cur,boats:[],raf:0};drawSky();requestAnimationFrame(()=>requestAnimationFrame(()=>ex.classList.add('map')))}
@@ -1020,22 +1050,42 @@ function expOpen(){const c=EXP[cur];if(!c)return;if(typeof MV!=='undefined'&&MV)
   const dist=()=>{const a=[...pts.values()];return Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)};
   document.addEventListener('pointerdown',ev=>{if(!ev.target.closest('#phone'))return;pts.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});window.PINCH=pts.size;if(pts.size===2){d0=dist();fired=false}},true);
   document.addEventListener('pointermove',ev=>{if(!pts.has(ev.pointerId))return;pts.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});if(pts.size!==2||fired||!d0)return;const r=dist()/d0;
-    if(r<.72&&!EX&&EXP[cur]&&A['exp-'+cur+'-map']&&!PROF){fired=true;expOpen()}
+    if(r<.72&&!EX&&hasSky(cur)&&!PROF){fired=true;expOpen()}
     else if(r<.72&&EX&&EX.region&&!EX.open){fired=true;expToMap()}
     else if(r>1.35&&EX&&!EX.region){fired=true;expClose()}},true);
   const up=ev=>{pts.delete(ev.pointerId);window.PINCH=pts.size;if(pts.size<2)d0=0};document.addEventListener('pointerup',up,true);document.addEventListener('pointercancel',up,true);
   // trackpad pinch on a computer arrives as ctrl+wheel
-  document.addEventListener('wheel',ev=>{if(!ev.ctrlKey||!ev.target.closest('#phone'))return;ev.preventDefault();if(ev.deltaY>4&&EX&&EX.region)expToMap();else if(ev.deltaY>4&&!EX&&EXP[cur]&&A['exp-'+cur+'-map']&&!PROF)expOpen();else if(ev.deltaY<-4&&EX&&!EX.region)expClose()},{passive:false});
+  document.addEventListener('wheel',ev=>{if(!ev.ctrlKey||!ev.target.closest('#phone'))return;ev.preventDefault();if(ev.deltaY>4&&EX&&EX.region)expToMap();else if(ev.deltaY>4&&!EX&&hasSky(cur)&&!PROF)expOpen();else if(ev.deltaY<-4&&EX&&!EX.region)expClose()},{passive:false});
 })();
 function expClose(){const ex=$('exp');expLeave();closeSearch();endSwap();ex.className='exp';$('bg').style.transform='';setTimeout(()=>{$('bg').style.transition=''},900);EX=null}
 function expLeave(){if(!EX)return;autoStop();cancelAnimationFrame(EX.raf);EX.boats.forEach(b=>b.e.remove());EX.boats=[];$('estage').innerHTML='';if(EX.open)EX.open.close();stopSong()}
 function expLand(r){const ex=$('exp'),c=EXP[EX.pl],em=$('emap');closeSearch();endSwap();if(EX.region){expLeave();EX.region=null;ex.className='exp on map'}whoosh();em.style.transformOrigin=`${r.x*100}% ${r.y*100}%`;em.style.transform='scale(3.2)';em.classList.add('dive');
   setTimeout(()=>{$('eland').style.backgroundImage=`url(${A['exp-'+EX.pl+'-'+r.k]||''})`;$('rname').textContent=r.n;$('rname').style.fontSize=r.n.length>5?Math.max(22,Math.floor(232/r.n.length))+'px':'';$('etitle').textContent='';ex.className='exp on land';EX.region=r;eplayIcon(false);efavPaint();spawnStrangers(r)},700)}
-function spawnStrangers(r){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,ex=$('exp');const pool=drift(EX.pl,r.k);const ws=pool.slice(0,7).sort(()=>Math.random()-.5);
-  EX.boats=ws.map((w,i)=>{const n=w.by;const S=MSLOT[i%7],e=document.createElement('div');e.className='eb';e.innerHTML=`<img alt="" src="${A['ship3-'+((i%4)+1)]||''}"><span>${w.mine?'★ じぶん':n}</span>`;ex.appendChild(e);
+const SKYV={
+  mercury:{motion:'sail',hint:'の海',rider:(w,i)=>`<img alt="" src="${A['ship3-'+((i%4)+1)]||''}">`,
+    tag:w=>`#${w.genre} ${w.bpm}BPM ${w.mood.slice(0,2).map(x=>'#'+x).join(' ')}`,
+    pierFrom:[-.2,.5,.35],pierTo:[.5,.8,1.45],pierOut:[1.25,.55,.45],
+    show(b,st,o){const r=EX.region,sk='song-'+((b.w&&b.w.song)||o.song||r.song||1),vn=vinyl(st,A['jart-'+((b.i%5)+1)]||'','50%','36%','74%');if(vn&&vn.el)vn.el.style.zIndex='1';const dur=playSong(sk);lyricsStart(st,sk,'63%');
+      const kt=kinTitle(st,{top:'7%',label:'',noby:1,title:b.title,by:b.n,c:'#38c8ff',c2:'#bdf0ff',g:'rgba(56,200,255,.6)'});return{dur,whoTop:'60%',close(){lyricsStop();vn.out();kt.out();stopSong()}}}},
+  jupiter:{motion:'flutter',hint:'の森',rider:(w,i)=>`<img alt="" src="${A['bfly3-'+((i%4)+1)]||''}"><i class="eart" style="background-image:url(${A['jart-'+(w.ai||1)]||''})"></i>`,
+    tag:w=>`#${w.genre} ${w.mood.slice(0,2).map(x=>'#'+x).join(' ')}`,
+    pierFrom:[.5,.08,.3],pierTo:[.5,.8,1.3],pierOut:[.5,-.2,.3],
+    show(b,st,o){const art=openArt(st,{img:A['jart-'+(b.w.ai||1)]||'',title:b.title});chime();return{dur:7,whoTop:'86%',close(){art.close()}}}}};
+const GLADE=[[.22,.5,.55],[.55,.46,.55],[.82,.55,.6],[.14,.66,.8],[.42,.64,.8],[.72,.7,.82],[.3,.82,1.05]];
+function spawnStrangers(r){if(SKYV[EX.pl].motion==='flutter')return spawnFlutter(r);const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,ex=$('exp');const pool=drift(EX.pl,r.k);const ws=pool.slice(0,7).sort(()=>Math.random()-.5);
+  EX.boats=ws.map((w,i)=>{const n=w.by;const S=MSLOT[i%7],e=document.createElement('div');e.className='eb';e.innerHTML=`${SKYV[EX.pl].rider(w,i)}<span>${w.mine?'★ じぶん':n}</span>`;ex.appendChild(e);
     const b={n,i,e,sc:S[1],lane:S[0],x:[.2,.62,.12,.48,.84,.3,.7][i]*W,v:(10+(i%4)*4)*(i%2?-1:1)*(.6+S[1]*.5),title:w.title,w};const tap=()=>{if(EX.auto){clearTimeout(EX.auto.tm);if(EX.open)EX.open.close();EX.auto.n++;EX.auto.tm=setTimeout(autoNext,(expShow(b,{auto:true})||60)*1000+400)}else expShow(b)};
     dragify(b,e,tap,()=>{const H=ph.clientHeight;b.lane=clamp(b.y/H,.42,.9);b.sc=lerpPts(b.lane,[[.5,.5],[.69,.78],[.83,1.08]]);b.x=clamp(b.x,-40,W+40)});return b});
   let last=performance.now();const step=now=>{const dt=Math.min(.05,(now-last)/1000);last=now;const ts=now/1000;for(const b of EX.boats){if(b.e.classList.contains('held')||b.drag)continue;b.x+=b.v*dt;if(b.x>W+60)b.x=-60;if(b.x<-60)b.x=W+60;const y=b.lane*H+Math.sin(ts*1.6+b.i)*4;b.y=y;b.e.style.transform=`translate3d(${b.x}px,${y}px,0) scale(${b.sc})`;b.e.querySelector('img').style.transform=b.v<0?'scaleX(-1)':''}EX.raf=requestAnimationFrame(step)};EX.raf=requestAnimationFrame(step)}
+function spawnFlutter(r){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,ex=$('exp');const ws=drift(EX.pl,r.k).slice(0,7).sort(()=>Math.random()-.5);
+  EX.boats=ws.map((w,i)=>{const n=w.by,S=GLADE[i%7],e=document.createElement('div');e.className='eb fl';e.innerHTML=`${SKYV[EX.pl].rider(w,i)}<span>${w.mine?'★ じぶん':n}</span>`;ex.appendChild(e);
+    const b={n,i,e,sc:S[2],cx:S[0],cy:S[1],ax:.05,ay:.02,w1:.5+((i*17)%7)*.07,w2:.7+((i*11)%5)*.09,p1:i*1.7,p2:i*2.3,t:0,x:W*(i%2?1.1:-.1),y:H*.55,title:w.title,w};
+    const tap=()=>{if(EX.auto){clearTimeout(EX.auto.tm);if(EX.open)EX.open.close();EX.auto.n++;EX.auto.tm=setTimeout(autoNext,(expShow(b,{auto:true})||60)*1000+400)}else expShow(b)};
+    dragify(b,e,tap,()=>dropFloat(b,[[.45,.55],[.65,.8],[.82,1.05]],[2,2],[.06,.94,.34,.88]));return b});
+  let last=performance.now();const step=now=>{const dt=Math.min(.05,(now-last)/1000);last=now;const ts=now/1000;
+    for(const b of EX.boats){if(b.e.classList.contains('held')||b.drag)continue;b.t+=dt;const tx=(b.cx+Math.sin(b.t*b.w1+b.p1)*b.ax)*W,ty=(b.cy+Math.sin(b.t*b.w2+b.p2)*b.ay)*H+Math.sin(ts*6+b.i)*3;
+      const dx=tx-b.x;b.x+=dx*Math.min(1,dt*3);b.y+=(ty-b.y)*Math.min(1,dt*3);b.e.style.transform=`translate3d(${b.x}px,${b.y}px,0) rotate(${clamp(dx*.6,-14,14)}deg) scale(${b.sc})`}
+    EX.raf=requestAnimationFrame(step)};EX.raf=requestAnimationFrame(step)}
 const ASET=5;
 function eplayIcon(on){const b=$('eplay');b.classList.toggle('on',on);b.setAttribute('aria-label',on?'止める':'流す');b.innerHTML='<span class="rec"></span><span class="lbl"></span><svg viewBox="0 0 24 24" aria-hidden="true">'+(on?'<rect class="pl" x="6" y="6" width="12" height="12" rx="3"/>':'<path class="pl" d="M8.5 5.6c0-1.1 1.2-1.8 2.2-1.2l8.6 5.5c.9.6.9 1.9 0 2.5l-8.6 5.5c-1 .6-2.2-.1-2.2-1.2z"/>')+'</svg>'}
 function pierPos(e,x,y,s){const ph=$('phone');e.style.transform=`translate3d(${x*ph.clientWidth}px,${y*ph.clientHeight}px,0) translate(-50%,-50%) scale(${s})`}
@@ -1045,10 +1095,10 @@ function autoStart(){if(!EX||!EX.region)return;if(EX.open)EX.open.close();const 
 function autoNext(){const a=EX&&EX.auto;if(!a)return;if(EX.open)EX.open.close();
   const b=a.order.filter(x=>!x.hidden)[a.n%Math.max(1,a.order.filter(x=>!x.hidden).length)];if(!b){autoStop();return}a.n++;
   if(!$('exp').classList.contains('pier')){const d=expShow(b,{auto:true});a.tm=setTimeout(autoNext,(d||60)*1000+400);return}
-  const v=document.createElement('div');v.className='pb';v.innerHTML=b.e.querySelector('img').outerHTML;v.style.zIndex='3';$('estage').appendChild(v);a.v=v;v.style.transition='none';pierPos(v,-.2,.5,.35);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{v.style.transition='transform 1.8s cubic-bezier(.3,.7,.3,1)';pierPos(v,.5,.8,1.45)}));
+  const v=document.createElement('div');v.className='pb';const V=SKYV[EX.pl];v.innerHTML=V.rider(b.w,b.i);v.style.zIndex='3';$('estage').appendChild(v);a.v=v;v.style.transition='none';pierPos(v,...V.pierFrom);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{v.style.transition='transform 1.8s cubic-bezier(.3,.7,.3,1)';pierPos(v,...V.pierTo)}));
   a.tm=setTimeout(()=>{if(!EX||EX.auto!==a)return;v.classList.add('bob');splash();const d=expShow(b,{auto:true});
-    a.tm=setTimeout(()=>{if(!EX||EX.auto!==a)return;if(EX.open)EX.open.close();v.classList.remove('bob');v.style.transition='transform 1.4s ease-in,opacity 1s';pierPos(v,1.25,.55,.45);v.style.opacity='0';a.tm=setTimeout(()=>{v.remove();autoNext()},1100)},(d||60)*1000)},1800)}
+    a.tm=setTimeout(()=>{if(!EX||EX.auto!==a)return;if(EX.open)EX.open.close();v.classList.remove('bob');v.style.transition='transform 1.4s ease-in,opacity 1s';pierPos(v,...V.pierOut);v.style.opacity='0';a.tm=setTimeout(()=>{v.remove();autoNext()},1100)},(d||60)*1000)},1800)}
 function autoAsk(){const st=$('estage'),c=EXP[EX.pl],rs=c.regions,i=rs.indexOf(EX.region),nb=rs[(i+1)%rs.length];st.style.pointerEvents='auto';
   const w=document.createElement('div');w.className='aend';w.innerHTML=`<p>${ASET}曲きいたよ</p><small>ここで少しひと休み。このあとどうする？</small><button class="m" data-a="more">▶ もっと聴く</button><button data-a="next">🧭 となりの${nb.n}へ</button><button data-a="dice">🎲 どこかに降りる</button>`;st.appendChild(w);requestAnimationFrame(()=>w.classList.add('on'));chime();
   EX.auto.panel=w;w.onclick=ev=>{const k=ev.target.closest('button');if(!k)return;ev.stopPropagation();w.remove();EX.auto.panel=null;st.style.pointerEvents='none';
@@ -1059,14 +1109,14 @@ function repMenu(b,st,anchor){const old=st.querySelector('.repmenu');if(old){old
   m.onclick=ev=>{const k=ev.target.closest('button');if(!k)return;ev.stopPropagation();m.remove();b.hidden=true;b.e.style.display='none';toast(k.dataset.a==='rep'?'⚑ 通報したよ。もう表示されないよ':'🙈 '+b.n+' は表示しないよ');
     if(EX.auto){clearTimeout(EX.auto.tm);if(EX.auto.v){EX.auto.v.remove();EX.auto.v=null}autoNext()}else if(EX.open){EX.open.close();st.style.pointerEvents='none'}}}
 function expShow(b,o){o=o||{};if(EX.open)return;const ex=$('exp'),st=$('estage');b.e.classList.add('held');ex.classList.add('show');splash();const r=EX.region;
-  const sk='song-'+((b.w&&b.w.song)||o.song||r.song),vn=vinyl(st,A['jart-'+((b.i%5)+1)]||'','50%','36%','74%');if(vn&&vn.el)vn.el.style.zIndex='1';const dur=playSong(sk);lyricsStart(st,sk,'63%');const kt=kinTitle(st,{top:'7%',label:'',noby:1,title:b.title,by:b.n,c:'#38c8ff',c2:'#bdf0ff',g:'rgba(56,200,255,.6)'});
-  const who=document.createElement('div');who.className='whotag';who.style.left='50%';who.style.top='60%';who.style.fontSize='13px';who.textContent='by '+(b.w&&b.w.mine?'じぶん':b.n)+(b.w?`  ·  #${b.w.genre} ${b.w.bpm}BPM ${b.w.mood.slice(0,2).map(x=>'#'+x).join(' ')}`:'');st.appendChild(who);
+  const V=SKYV[EX.pl],sv=V.show(b,st,o),dur=sv.dur;
+  const who=document.createElement('div');who.className='whotag';who.style.left='50%';who.style.top=sv.whoTop||'60%';who.style.fontSize='13px';who.style.zIndex='60';who.textContent='by '+(b.w&&b.w.mine?'じぶん':b.n)+(b.w?'  ·  '+V.tag(b.w):'');st.appendChild(who);
   const ob=document.createElement('button');ob.type='button';if(b.w&&b.w.mine)ob.style.display='none';ob.className='oshib'+(oshi.has(b.n)?' done':'');ob.textContent=oshi.has(b.n)?'♡ 推してる':'♡ 推す';st.appendChild(ob);requestAnimationFrame(()=>ob.classList.add('on'));
   ob.onclick=ev=>{ev.stopPropagation();if(oshi.has(b.n))return;oshi.add(b.n);ob.classList.add('done');ob.textContent='♡ 推してる';chime();
     for(let k=0;k<12;k++){const h=document.createElement('i');h.className='heartp';h.textContent='💗';h.style.left='50%';h.style.top='88%';h.style.setProperty('--dx',(Math.random()*160-80)+'px');h.style.setProperty('--dy',(-60-Math.random()*120)+'px');st.appendChild(h);setTimeout(()=>h.remove(),1000)}
     toast('💗 '+b.n+' を推しにしたよ')};
   const rb=document.createElement('button');rb.type='button';rb.className='repb';rb.setAttribute('aria-label','通報・非表示');rb.textContent='⋯';st.appendChild(rb);rb.onclick=ev=>{ev.stopPropagation();repMenu(b,st)};
-  const t0=performance.now();EX.open={close(){st.style.pointerEvents='none';lyricsStop();vn.out();kt.out();who.remove();ob.remove();rb.remove();const m=st.querySelector('.repmenu');if(m)m.remove();stopSong();ex.classList.remove('show');b.e.classList.remove('held');EX.open=null}};
+  const t0=performance.now();EX.open={close(){st.style.pointerEvents='none';sv.close();who.remove();ob.remove();rb.remove();const m=st.querySelector('.repmenu');if(m)m.remove();ex.classList.remove('show');b.e.classList.remove('held');EX.open=null}};
   st.style.pointerEvents='auto';st.onclick=ev=>{if(ev.target.closest('.oshib,.repb,.repmenu,.aend'))return;if(performance.now()-t0>300){if(EX.auto){autoStop();return}EX.open&&EX.open.close();st.style.pointerEvents='none'}};return dur}
 document.addEventListener('click',ev=>{if(ev.target.closest('#skybtn'))expOpen();if(ev.target.closest('#eback')){if(EX&&EX.region)expToMap();else if(EX&&EX.swap)endSwap();else expClose()}
   if(ev.target.closest('#eplay')&&EX){if(EX.auto)autoStop();else autoStart()}
@@ -1325,7 +1375,7 @@ let BF=[],BFQ=[],BFraf=0,JPLAY=null,JNB=0;const JMAX=8,JTREE=[.74,.62];
 const JSLOT=[[.22,.47,.52,.05,.015,0],[.5,.44,.5,.05,.015,0],[.13,.6,.82,.05,.022,1],[.38,.63,.82,.05,.022,1],[.6,.58,.82,.045,.022,1],[.84,.66,.82,.04,.022,1],[.27,.81,1.22,.06,.02,2],[.72,.83,1.22,.06,.02,2]];
 const JART=['夕焼けの町','屋根の上のねこ','ラーメン','さくら通り','月と海'];
 function stopJup(){cancelAnimationFrame(BFraf);BF=[];BFQ=[];if(JV)stopJ();if(JOPEN)JOPEN.close()}
-function setupJup(){
+function setupJup(){setTimeout(()=>{if(cur!=='jupiter')return;predecode(['exp-jupiter-sea',...CONT.jupiter.flatMap(c=>['isl-jupiter-'+c.k,'exp-jupiter-'+c.k]),'isl-jupiter-me'])},1200);
   const base=[...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'れい',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'},{n:'みお',k:'oshi'}];
   BF=[];BFQ=base.slice(JMAX);base.slice(0,JMAX).forEach((o,i)=>BF.push(makeBf(o,i,i)));
   let last=performance.now();const ph=$('phone');
