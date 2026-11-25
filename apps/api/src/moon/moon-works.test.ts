@@ -148,6 +148,24 @@ describe('M-R253 §4: how long it takes', () => {
     expect(db.pushes[0]).toContain('少ししてから、もう一回、頼んでくれる？');
   });
 
+  it('R16: a Moon atelier song that fails for good gives its yes back (once), a song without a yes gives nothing', async () => {
+    const refunds: string[] = [];
+    const ledger = { refundYes: async (_db: unknown, u: string, kind: string, c: { id: string }) => (refunds.push(`${u}:${kind}:${c.id}`), 2) };
+    const song = { ...base, kind: 'song', inputJson: { body: { title: 'よるのステップ' }, origin: 'x', confirm: { id: 'yes-1', price: 2 } } };
+    const { s } = jobsHarness(song, async () => {
+      throw new Error('studio down');
+    });
+    Object.assign(s, { ledger });
+    for (let i = 0; i < JOB_MAX_ATTEMPTS; i++) await s.run('j1');
+    expect(refunds).toEqual(['u:song:yes-1']);
+    const plain = jobsHarness({ ...song, inputJson: { body: { title: 'x' }, origin: 'x' } }, async () => {
+      throw new Error('studio down');
+    });
+    Object.assign(plain.s, { ledger });
+    for (let i = 0; i < JOB_MAX_ATTEMPTS; i++) await plain.s.run('j1');
+    expect(refunds).toHaveLength(1);
+  });
+
   it('the review stand-in takes the seconds asked; a real one is estimated', async () => {
     const { s } = jobsHarness(base, async () => ({}));
     expect(await s.estimate('demo', { seconds: 120, failTimes: 0 })).toBe(120_000);

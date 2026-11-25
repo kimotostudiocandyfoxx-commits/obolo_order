@@ -87,7 +87,8 @@ export class ComposeController {
       confirm,
       spell: songSpellKey(spell, b.lyrics),
       required: b.from === 'atelier',
-      create: () => this.jobs.create(userId, 'song', { body: song, origin: `${req.protocol}://${req.get('host')}` }),
+      // R16: the yes goes with the job (a song that fails for good gives its mana back)
+      create: () => this.jobs.create(userId, 'song', { body: song, origin: `${req.protocol}://${req.get('host')}`, ...(confirm ? { confirm } : {}) }),
     });
   }
 

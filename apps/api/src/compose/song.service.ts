@@ -255,6 +255,8 @@ export class SongService {
         directionJson: PLAIN_DIRECTION as unknown as Record<string, unknown>,
         mixUrl: mixM.url,
         seconds: made.seconds,
+        // R16: a song asked for in the Moon atelier is in Bluena once it is made, even before the app finishes its card
+        ...(body.from === 'atelier' ? { savedAt: new Date() } : {}),
       })
       .returning();
     this.log.log(

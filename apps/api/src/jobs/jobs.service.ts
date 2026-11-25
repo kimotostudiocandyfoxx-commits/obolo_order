@@ -15,7 +15,8 @@ import { LedgerService } from '../wallet/ledger.service';
 
 type Row = typeof jobs.$inferSelect;
 type Inputs = {
-  song: { body: FullSongBody; origin: string };
+  /** R16: `confirm` = the yes a Moon atelier song was charged with (its mana goes back when it fails for good) */
+  song: { body: FullSongBody; origin: string; confirm?: MakeConfirm };
   /** R13: `tags` = the video's spell; `confirm` + `pay` = the yes it was charged with (the mana goes back when it fails for good) */
   'mv-story': { mvId: string; mood: string; origin: string; from?: 'atelier'; tags?: SpellTag[]; confirm?: MakeConfirm; pay?: MakeKind };
   /** R13: a video of the member's own pictures, a free re-render (edit), or scenes painted again (redraw) */
@@ -184,6 +185,8 @@ export class JobsService implements OnModuleInit {
       await this.finish(jobId, 'failed', null, err);
       // a game that could not be made gives its mana back (once per yes)
       if (row.kind === 'game') await this.games.refundJob(row.userId, row.inputJson as unknown as GameJobInput);
+      // R16: so does a song from the Moon atelier (its card says the mana is back)
+      if (row.kind === 'song') await this.refundSong(row.userId, row.inputJson as unknown as Inputs['song']);
       // R13: so does a video (painted or moved) and a scene painted again
       if (row.kind === 'mv-story' || row.kind === 'mv-edit') await this.refundVideo(row.userId, row.inputJson as unknown as Inputs['mv-edit']);
       await this.notify(row, false);
@@ -239,6 +242,15 @@ export class JobsService implements OnModuleInit {
       default:
         throw new Error(`unknown job kind ${row.kind}`);
     }
+  }
+
+  /** R16: a paid song that could not be made gives its mana back (once per yes) */
+  protected async refundSong(userId: string, input: { confirm?: MakeConfirm }): Promise<number> {
+    if (!input.confirm) return 0;
+    return this.ledger.refundYes(this.db, userId, 'song', input.confirm).catch((e) => {
+      this.log.error(`song refund failed for ${userId}: ${String(e)}`);
+      return 0;
+    });
   }
 
   /** a paid video job that could not be made gives its mana back (once per yes) */

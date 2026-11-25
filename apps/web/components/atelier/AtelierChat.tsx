@@ -26,14 +26,15 @@ import { dropTry, fly, failLine, keep, keepFace, keepShow, make, wear, type Make
 import { asMaterial, fromMaterial, PROPOSAL_ASK, proposalFor, usesOf } from './material';
 import { dragLine } from './proposal';
 import { saveTalk, talks, type Talk } from './shelf';
-import { countdown, jobView, msLeft, onJobs, watchJob } from '@/lib/atelier/jobs';
+import { jobSaid, markJobSaid, msLeft, onJobs, watchJob } from '@/lib/atelier/jobs';
+import { failedCard, freshMsgs, refreshWork, stale } from './refresh';
 import { dayOf } from '@/lib/finds/spiral';
 import { nextLine } from '@/lib/atelier/lineTurn';
 import { cues, withWords, type StoryMode } from './story';
 import { contentOf } from './intent';
 import { toggleAudio } from '@/lib/audio';
 import { Teach } from './Teach';
-import { KindMark, WorkCard } from './WorkCard';
+import { KindMark, WorkCard, WorkThumb } from './WorkCard';
 import { ChangePreview } from './ChangePreview';
 import { DeviceButton } from './DeviceButton';
 import { ClipRelic } from '@/components/relic/ClipRelics';
@@ -68,6 +69,8 @@ const PLANET_OF = KIND_HOME_PLANET as Record<string, string>;
 const PLANET_WORD = Object.fromEntries(Object.entries(KIND_HOME_PLANET).map(([k, p]) => [k, PLANET_NAME[p]])) as Record<string, string>;
 const LESSON_OF: Partial<Record<AtelierKind, Lesson>> = { voice: 'voice', art: 'art', song: 'song', video: 'video', radio: 'radio' };
 // PLACEHOLDER (P-ATELIER-5): {bati}'s line when the words were not understood (iPad feedback: no longer the opening)
+/** R16: {bati}'s word when a job could not be made (a game's / a video's mana is back) */
+const failedLine = (kind: AtelierKind) => (kind === 'video' ? VIDEO_LINES.failed : isCraftKind(kind) ? CRAFT_LINES.gameBroken : MOON_LINES.stop);
 const HELLO = 'なにをする？ ことばで頼んでね';
 /** this visit has greeted already (the first new talk of a visit, after earlier talks, is 「おかえり！」) */
 const VISIT_KEY = 'obolo.atelier.visit';
@@ -151,7 +154,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   const partner = story ? { ...own, name: story.speaker('バティ').name, face: story.speaker('バティ').avatar ?? own.face } : own;
   const day = me?.journeyDay;
   const talkId = talk.id;
-  const [msgs, setMsgs] = useState<Msg[]>(() => (story ? (story.works ?? []).map((work) => ({ id: uid(), who: 'work' as const, work })) : talk.msgs));
+  // R16: the saved copy where a card in it is further along (a slow one finished while this talk was not open)
+  const [msgs, setMsgs] = useState<Msg[]>(() => (story ? (story.works ?? []).map((work) => ({ id: uid(), who: 'work' as const, work })) : freshMsgs(talk.id, talk.msgs)));
   const lines = cues(story?.lines);
   const [busy, setBusy] = useState(false);
   /** 〔星へ飛ばす〕: the work flying up for a moment (its kind) */
@@ -599,23 +603,55 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
           sayT(k >= 2 ? MOON_LINES.late2 : nextLine('late', MOON_LINES.late), { n });
         } else if (e.kind === 'retrying') sayT(e.w.toast ? nextLine('retry', MOON_LINES.retry) : MOON_LINES.retryQuick, { n });
         else if (e.kind === 'done' && e.work) {
+          const said = jobSaid(e.job.id);
+          markJobSaid(e.job.id);
           if (e.work.ref?.songId) lastSong.current = e.work.ref.songId;
-          putLast(e.work);
+          putLast({ ...e.work, id: e.w.card.id });
+          // R16: already said (a card looked at again): the card only
+          if (said) return;
           // ⑤ a slow one: {bati}'s word for coming back to it; a quick one: as any card
           if (e.w.toast && !story) sayT(nextLine('welcome', MOON_LINES.welcome));
           if (!(e.w.toast && !story) || isCraftKind(e.work.kind) || (e.work.kind === 'song' && !story)) afterRef.current(e.work, e.w.words);
         } else if (e.kind === 'failed') {
-          const before = e.w.card.versions?.length ? faceTo({ ...e.w.card, status: 'ready', job: undefined }, e.w.card.versions.length - 1) : { ...e.w.card, status: 'failed' as const, job: undefined, note: undefined };
-          // a game that could not be made: the one before stays (its mana is back: the server gave it)
-          const game = isCraftKind(e.w.card.kind) && e.w.card.kind !== 'video';
-          put(game ? { ...e.w.card, status: e.w.card.game ? 'ready' : 'failed', job: undefined } : before);
+          const said = jobSaid(e.job.id);
+          markJobSaid(e.job.id);
+          // a redo: the try before stays; a game: the one before (its mana is back: the server gave it); R16: the failed card says so
+          put({ ...(e.work ?? failedCard(e.w.card, e.job)), id: e.w.card.id });
+          if (said) return;
           // ④ two failures in a row: the re-try stops (R13: a video's mana is back)
-          sayT(game ? CRAFT_LINES.gameBroken : e.w.card.kind === 'video' ? VIDEO_LINES.failed : MOON_LINES.stop);
+          sayT(failedLine(e.w.card.kind));
         }
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
+
+  // R16: the talk opened again — a slow card finished (or failed) while it was not open is said once now (as if it had
+  // been watched here), and a card still waiting for its job is looked at on the server at once (the job host's events
+  // above say it when it is over)
+  useEffect(() => {
+    if (story) return;
+    for (const m of msgsRef.current) {
+      if (m.who !== 'work') continue;
+      const w = m.work;
+      if (stale(w)) {
+        void refreshWork(w, talkId);
+        continue;
+      }
+      if (!w.settled || jobSaid(w.settled.job)) continue;
+      markJobSaid(w.settled.job);
+      if (w.settled.failed) {
+        sayTRef.current(failedLine(w.kind));
+        continue;
+      }
+      if (w.status !== 'ready') continue;
+      if (w.ref?.songId) lastSong.current = w.ref.songId;
+      putLast(w);
+      if (!welcome) sayTRef.current(nextLine('welcome', MOON_LINES.welcome));
+      if (isCraftKind(w.kind) || w.kind === 'song') afterRef.current(w, w.prompt);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // client 2026-11-25: the maker's game did not run in its sandbox → {bati} says so, and its mana goes back
   useGameBroken((d) => {
@@ -1945,42 +1981,6 @@ function StoryButton({ story, msgs, busy }: { story: StoryMode; msgs: Msg[]; bus
       {fly ? '今は飛ばさない' : '次へ'}
     </button>
   );
-}
-
-/** a work small in {bati}'s bubble (M-R232 §2): its picture, or its mark and name; a tap opens the whole card */
-function WorkThumb({ w }: { w: Work }) {
-  const pic = w.image ?? w.poster ?? w.candidates?.[0]?.url;
-  return (
-    <span className="flex items-center gap-2 bg-[rgba(16,11,26,0.7)] p-1.5">
-      {pic ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={pic} alt="" className="h-14 w-14 shrink-0 rounded-lg object-cover" />
-      ) : (
-        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-white/5 text-amber-100/80">
-          <KindMark kind={w.kind} className="h-6 w-6" />
-        </span>
-      )}
-      <span className="min-w-0 flex-1">
-        <span className="block truncate text-[13px] text-amber-50">{w.title || w.text || w.prompt}</span>
-        <span className="block text-[10.5px] text-amber-200/70">{w.status === 'making' ? <ThumbLeft w={w} /> : w.status === 'failed' ? 'うまくできなかった' : w.status === 'record' ? '押して、録る' : '押して、ひらく'}</span>
-      </span>
-    </span>
-  );
-}
-
-/** M-R253 §4: a slow card's count in the bubble too (「作っているよ・あと3分」) */
-function ThumbLeft({ w }: { w: Work }) {
-  const [, tick] = useState(0);
-  useEffect(() => {
-    const t = setInterval(() => tick((n) => n + 1), 1000);
-    const off = onJobs(() => tick((n) => n + 1));
-    return () => {
-      clearInterval(t);
-      off();
-    };
-  }, []);
-  const c = countdown(jobView(w.job?.id), Date.now(), !!w.job?.long);
-  return <>{c.left ? `作っているよ・${c.left}` : '作っているよ…'}</>;
 }
 
 /** the works {bati} found, small in its bubble: a row of their pictures / marks (a tap opens them all) */

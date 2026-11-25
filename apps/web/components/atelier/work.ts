@@ -43,6 +43,8 @@ export type Work = {
   origin?: WorkOrigin;
   /** §4: the slow job it is waiting for (the card counts down) */
   job?: { id: string; long: boolean };
+  /** R16: the job this card was waiting for, once it was over (done, or failed: the try before is the face again): an older copy still waiting for it gives way */
+  settled?: { job: string; failed?: boolean };
   /** §2: the part the try being made changes */
   target?: RefineTarget;
   /** client 2026-11-25 (本): the book as it is now (its chapters, read in the reader) */

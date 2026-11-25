@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { finishJob } from '@/components/atelier/makers';
+import { failJob, finishJob } from '@/components/atelier/makers';
 import { onJobs, startJobPolling } from '@/lib/atelier/jobs';
 import { useAuth } from '@/lib/auth';
 import { fillLine, MOON_LINES } from '@obolo/shared';
@@ -25,7 +25,7 @@ export function JobToasts() {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const voice = partner.isBati ? batiLineVoiceOf(me?.bati) : undefined;
 
-  useEffect(() => startJobPolling((w, job) => finishJob(w, job)), []);
+  useEffect(() => startJobPolling((w, job) => finishJob(w, job), failJob), []);
   useEffect(
     () =>
       onJobs((e) => {

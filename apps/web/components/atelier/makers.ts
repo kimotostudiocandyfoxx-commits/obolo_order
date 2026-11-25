@@ -7,6 +7,7 @@ import { workMarkRef } from '@/lib/finds/works';
 import { makeSong, pickGenre, songFromDesign, type MadeSong } from '@/lib/mercury/compose';
 import { dropShelf, LOCAL_KINDS, patchTalkWork, putShelf } from './shelf';
 import { stack, uid, type Version, type Work } from './work';
+import { failedCard } from './refresh';
 import { bookCoverUrl, bookSub } from './BookRead';
 import { spellKindOf, type Plan } from './plan';
 import { demoEdited, demoRedrawn, demoReel, type VideoReel } from './video';
@@ -266,7 +267,14 @@ export async function finishJob(w: Watched, job: JobView, live = getApi().mode =
     if (!g) throw new Error('no game');
     made = { ...base, title: g.title, game: g, ref: { gameId: g.id }, spell: g.tags, home: KIND_HOME_PLANET.game };
   } else made = base;
-  const out = await keep(c.versions?.length ? c : undefined, { ...made, saved: true }, c.target);
+  const out: Work = { ...(await keep(c.versions?.length ? c : undefined, { ...made, saved: true }, c.target)), settled: { job: job.id } };
+  patchTalkWork(w.talkId, out);
+  return out;
+}
+
+/** R16: a job that could not be made (or is gone): its failed card, written into the saved talk as a finished one is */
+export function failJob(w: Watched, job: JobView | null): Work {
+  const out = failedCard(w.card, job, w.jobId);
   patchTalkWork(w.talkId, out);
   return out;
 }

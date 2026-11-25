@@ -106,7 +106,8 @@ export function WorkCard({
   onAgain?: () => void;
   /** M-R236: a long press on the ★ opens the mark ring */
   onRing?: (at: { x: number; y: number }) => void;
-  onFly: () => void;
+  /** none: no 〔星へ飛ばす〕 (a past day's talk is read only) */
+  onFly?: () => void;
   onWear: () => void;
   onPick: (id: string) => void;
   onRecorded: (blob: Blob, seconds: number) => void;
@@ -194,6 +195,7 @@ export function WorkCard({
         onPointerCancel={() => (swipe.current = null)}
       >
         {showMaking && <Making w={w} />}
+        {!showMaking && w.status === 'failed' && <Failed w={shown} />}
 
         {w.status === 'record' && <RadioRecorder onDone={onRecorded} song={songUrl} />}
 
@@ -256,7 +258,7 @@ export function WorkCard({
       )}
 
       {w.kind === 'lookup' && w.status === 'ready' && <p className="mt-1 text-[10px] text-amber-50/45">答えが、まちがっていることもあります。大事なことは、自分でも確かめてね</p>}
-      {!showMaking && shown.note && <p className="mt-1 text-[12px] text-amber-100/70">{shown.note}</p>}
+      {!showMaking && w.status !== 'failed' && shown.note && <p className="mt-1 text-[12px] text-amber-100/70">{shown.note}</p>}
 
       {/* §3: the works it was made from */}
       {!!w.materials?.length && (
@@ -313,7 +315,7 @@ export function WorkCard({
               {w.worn ? 'これになった' : 'これにする'}
             </button>
           )}
-          {planet && w.status === 'ready' && w.saved && (
+          {planet && onFly && w.status === 'ready' && w.saved && (
             <button onClick={onFly} disabled={busy || w.flown} className={`${btn} bg-sky-300 font-bold text-slate-950`}>
               <PlanetMark id={planet} size={14} />
               {w.flown ? '飛んでいった' : '星へ飛ばす'}
@@ -560,6 +562,57 @@ function CardLyrics({ lyrics, note }: { lyrics: SongLyrics; note?: string }) {
           ))}
         </div>
       ))}
+    </div>
+  );
+}
+
+/** a work small in a bubble (M-R232 §2): its picture, or its mark and name, and how it is; a tap opens the whole card */
+export function WorkThumb({ w }: { w: Work }) {
+  const pic = w.image ?? w.poster ?? w.candidates?.[0]?.url;
+  return (
+    <span className="flex items-center gap-2 bg-[rgba(16,11,26,0.7)] p-1.5" data-testid="work-thumb">
+      {pic && !pic.startsWith('idb:') ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={pic} alt="" className="h-14 w-14 shrink-0 rounded-lg object-cover" />
+      ) : (
+        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-white/5 text-amber-100/80">
+          <KindMark kind={w.kind} className="h-6 w-6" />
+        </span>
+      )}
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-[13px] text-amber-50">{w.title || w.text || w.prompt}</span>
+        <span className="block text-[10.5px] text-amber-200/70">{w.status === 'making' ? <ThumbLeft w={w} /> : w.status === 'failed' ? 'うまくできなかった' : w.status === 'record' ? '押して、録る' : '押して、ひらく'}</span>
+      </span>
+    </span>
+  );
+}
+
+/** M-R253 §4: a slow card's count in the bubble too (「作っているよ・あと3分」) */
+function ThumbLeft({ w }: { w: Work }) {
+  const [, tick] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => tick((n) => n + 1), 1000);
+    const off = onJobs(() => tick((n) => n + 1));
+    return () => {
+      clearInterval(t);
+      off();
+    };
+  }, []);
+  const c = countdown(jobView(w.job?.id), Date.now(), !!w.job?.long);
+  return <>{c.left ? `作っているよ・${c.left}` : '作っているよ…'}</>;
+}
+
+/** R16: a card that could not be made — said plainly on the card (never a title row alone) */
+function Failed({ w }: { w: Work }) {
+  const [head, ...rest] = (w.note || 'うまく、できなかった……').split('。');
+  return (
+    <div className="flex flex-col items-center justify-center gap-1.5 py-4 text-center" data-testid="work-failed">
+      <span className="flex h-12 w-12 items-center justify-center rounded-full border border-rose-200/40 bg-rose-300/10 text-rose-100/80" aria-hidden>
+        <KindMark kind={w.kind} className="h-5 w-5" />
+      </span>
+      <p className="text-[13px] font-bold tracking-[0.08em] text-amber-50">{head}</p>
+      {!!rest.join('').trim() && <p className="text-[12px] text-amber-100/80">{rest.join('。')}</p>}
+      <p className="text-[11px] text-amber-100/55">もう一回、頼んでみてね</p>
     </div>
   );
 }
