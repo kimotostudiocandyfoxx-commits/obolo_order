@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { PLANET_FLY_MS, type PlanetWorkKind } from './flying';
 import { seesOnlyDachi } from './schemas';
 import type { HomePlanet } from './planetHomeConfig';
+import type { WorkTags, WorkVisibility } from './planetWorks';
 
 /**
  * 星のホーム (M-R258, docs/story-rewrite/星のホーム_共通の作り.md; Saturn M-R257 土星_自分のレコード.md): every planet is one
@@ -36,6 +37,12 @@ export interface HomeWork {
   flownAt: string;
   /** a scripted / demo item (the story's resident place, seeded works): no 〔推す〕〔外す〕〔通報〕 */
   demo?: boolean;
+  /** 2-1 (planets rebuild): the hidden tags — for the planet's own logic only, never shown (M-R310) */
+  tags?: WorkTags;
+  /** 2-2: the visibility in effect (own works: what the 〔⋯〕 toggle shows) */
+  visibility?: WorkVisibility;
+  /** 2-3: own works only — why the automatic check keeps it dachi */
+  heldReason?: string | null;
 }
 
 export interface HomeOshi {

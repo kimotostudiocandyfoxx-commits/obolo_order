@@ -1,0 +1,396 @@
+import { z } from 'zod';
+import type { PlanetWorkKind } from './flying';
+import type { HomePlanet } from './planetHomeConfig';
+import { PLANET_FIGURE_OF, type PlanetFigure, type PlanetFigures } from './planetFigures';
+import type { SpellTag } from './spell';
+import { songGenreOf } from './songGenres';
+
+/**
+ * 惑星の作り直し 01・2章「データの土台」(docs/handoff/planets-01-foundation.md, M-R297〜M-R312; docs/planets.md).
+ *  - 2-1 every planet work carries hidden tags from the moment it is made (from the spell / the settings, never typed
+ *    by hand): one main class (a song's genre, an art's style …) and a few moods (+ a song's BPM)
+ *  - 2-2 every work is `dachi` (its maker's dachi / 推し homes only) or `public` (also drifts to strangers' continents)
+ *  - 2-4 continents are data (a rule each); a public work drifts to every continent its tags score ≥ 2 on (workScore)
+ *  - 2-5 per member: 5 favourite continents per planet, the continents seen (〔旅〕 picks unseen ones)
+ *  - 2-6 the member's riding figure on each planet (figureFor)
+ * Pure: the API (apps/api/src/planets/continents.service.ts, planet-works.service.ts) and the web use the same rules.
+ */
+
+// --- 2-1 tags ---------------------------------------------------------------------------------------------------
+
+/** the hidden tags of one planet work (users never see them, M-R310) */
+export interface WorkTags {
+  /** the main class: a song's genre (EDM, ローファイ …), an art's style (水彩, アニメ塗り …); null = not known yet */
+  main: string | null;
+  /** the moods (アゲ, 夜, ねこ …), at most WORK_MOODS_MAX */
+  moods: string[];
+  /** a song's tempo (other kinds: null) */
+  bpm?: number | null;
+}
+export const WORK_MOODS_MAX = 10;
+export const EMPTY_TAGS: WorkTags = { main: null, moods: [], bpm: null };
+
+/** the song genres the continents speak of (prototype design/home/template.html GSONG / M-R299) */
+export const PLANET_SONG_GENRES = ['EDM', 'ヒップホップ', 'バラード', 'ロック', 'ローファイ', 'シティポップ', 'アニソン', 'ジャズ', 'J-POP'] as const;
+/** the art styles the continents speak of (handoff 2-1, prototype CONT.jupiter) */
+export const PLANET_ART_STYLES = ['水彩', 'アニメ塗り', 'ドット絵', '油絵', 'ゆめかわ', '和モダン', 'レトロ', 'ポップ', 'モノクロ'] as const;
+
+/** the studio's genre (songGenres.ts label) → the continents' genre; a genre not listed keeps its own label */
+const SONG_GENRE_TO_PLANET: Record<string, string> = {
+  サイケデリックトランス: 'EDM',
+  ゴアトランス: 'EDM',
+  プログレッシブトランス: 'EDM',
+  ミニマルテクノ: 'EDM',
+  ハードスタイル: 'EDM',
+  ビッグルームEDM: 'EDM',
+  フューチャーベース: 'EDM',
+  ドラムンベース: 'EDM',
+  ディープハウス: 'EDM',
+  ユーロビート: 'EDM',
+  ダブステップ: 'EDM',
+  ハウス: 'EDM',
+  テクノ: 'EDM',
+  トランス: 'EDM',
+  EDM: 'EDM',
+  ダンス: 'EDM',
+  ローファイヒップホップ: 'ローファイ',
+  ローファイ: 'ローファイ',
+  トラップ: 'ヒップホップ',
+  ヒップホップ: 'ヒップホップ',
+  シューゲイザー: 'ロック',
+  エモ: 'ロック',
+  'J-ROCK': 'ロック',
+  メタル: 'ロック',
+  パンク: 'ロック',
+  ロック: 'ロック',
+  シティポップ: 'シティポップ',
+  アニソン: 'アニソン',
+  ボカロ: 'アニソン',
+  アイドルポップ: 'J-POP',
+  'K-POP': 'J-POP',
+  ポップ: 'J-POP',
+  バラード: 'バラード',
+  ジャズ: 'ジャズ',
+  ボサノバ: 'ジャズ',
+};
+/** moods a genre brings by itself (the anison continent gathers 'アニメ', M-R299) */
+const GENRE_MOODS: Record<string, string[]> = { アニソン: ['アニメ'], シティポップ: ['80s'], ダンス: ['ダンス'], ハウス: ['ダンス'], ディスコ: ['ダンス'], ビッグルームEDM: ['フェス'], ボカロ: ['アニメ'] };
+
+/** the spell's art style (spell.ts) → the continents' style */
+const ART_STYLE_TO_PLANET: Record<string, string> = { アニメ風: 'アニメ塗り', 水彩: '水彩', 油絵: '油絵', ドット絵: 'ドット絵', モノクロ: 'モノクロ', ゆめかわ: 'ゆめかわ', 和モダン: '和モダン', レトロ: 'レトロ', ポップ: 'ポップ' };
+
+/** a word of the spell / settings → the continents' moods (a word may bring several: ねこ → ねこ, どうぶつ) */
+const MOOD_RULES: [RegExp, string[]][] = [
+  [/高揚|ノリノリ|元気|楽し|わくわく|ワクワク|疾走|アゲ|盛り上が|アップテンポ/, ['アゲ']],
+  [/切な|せつな|泣|エモ|さみし|寂し/, ['泣ける']],
+  [/チル|リラックス|ゆったり|静か|落ち着/, ['チル']],
+  [/しっとり|おだやか|穏やか|メロウ/, ['しっとり']],
+  [/夜景|ネオン/, ['夜景', '夜']],
+  [/夜|暗い|月明かり|星明かり|深夜|真夜中|ミッドナイト/, ['夜']],
+  [/熱い|攻撃|情熱|力強/, ['熱い']],
+  [/おしゃれ|オシャレ|お洒落/, ['おしゃれ']],
+  [/ダンス|踊/, ['ダンス']],
+  [/フェス/, ['フェス']],
+  [/ストリート|路地/, ['ストリート']],
+  [/青春|放課後/, ['青春']],
+  [/ドライブ/, ['夜ドライブ']],
+  [/80s|80年代/, ['80s']],
+  [/アニメ/, ['アニメ']],
+  [/作業|勉強|集中/, ['作業用']],
+  [/夏|なつ|花火|かき氷/, ['夏']],
+  [/祭|まつり|盆おどり|盆踊/, ['祭り']],
+  [/和風|和モダン|着物|神社|鳥居|和楽器|風鈴/, ['和風']],
+  [/雨|しずく|梅雨/, ['雨']],
+  [/やさし|優し|ほっこり/, ['やさしい']],
+  [/やわらかい色|パステル|淡い/, ['パステル']],
+  [/あざやか|鮮やか|カラフル|虹色/, ['あざやか']],
+  [/キラキラ|きらきら/, ['キラキラ']],
+  [/モノクロ|白黒/, ['白黒']],
+  [/あたたか|あったか|温か|金色|夕焼け/, ['あたたか']],
+  [/つめたい|冷た|青い色/, ['つめたい']],
+  [/かっこ|カッコ|クール/, ['かっこいい']],
+  [/かわい|可愛|カワイイ/, ['かわいい']],
+  [/ねこ|猫|ネコ/, ['ねこ', 'どうぶつ']],
+  [/どうぶつ|動物|いぬ|犬|うさぎ|くま|とり|鳥(?!居)/, ['どうぶつ']],
+  [/花|桜|さくら|ひまわり|椿|バラ/, ['花']],
+  [/風景|景色|港|丘|山|森/, ['風景']],
+  [/人物|女の子|男の子|少女|少年/, ['人物']],
+  [/レトロ|昭和/, ['レトロ']],
+  [/ゲーム|8bit|8ビット|ピクセル/, ['ゲーム']],
+  [/ポップ/, ['ポップ']],
+  [/空|雲/, ['空']],
+];
+
+const clean = (s: string) => s.replace(/^#/, '').trim();
+const splitWords = (s: string | null | undefined): string[] => (s ?? '').split(/[、,，・/／\s]+/).map(clean).filter((w) => w.length > 0 && w.length <= 16);
+
+/** the moods the words bring (the continents' vocabulary first, then the words themselves for user-made continents) */
+export function planetMoodsOf(words: readonly string[]): string[] {
+  const out: string[] = [];
+  const add = (m: string) => {
+    if (!out.includes(m)) out.push(m);
+  };
+  for (const w of words) for (const [re, ms] of MOOD_RULES) if (re.test(w)) ms.forEach(add);
+  for (const w of words) add(clean(w));
+  return out.filter(Boolean).slice(0, WORK_MOODS_MAX);
+}
+
+/** a song's genre as the continents call it (unknown genres keep their own label; none: null) */
+export function planetGenreOf(genre: string | null | undefined): string | null {
+  const g = clean(genre ?? '');
+  if (!g) return null;
+  const found = songGenreOf({ ja: g, en: g });
+  if (found) return SONG_GENRE_TO_PLANET[found.ja] ?? found.ja;
+  return SONG_GENRE_TO_PLANET[g] ?? g.slice(0, 20);
+}
+
+/** the groups of a spell whose words are moods (the colour, light and theme of a picture; a song's mood and theme) */
+const MOOD_GROUPS = new Set(['mood', 'theme', 'color', 'light', 'event', 'world']);
+
+/** 2-1 a song's tags: from songs.designJson (genre / mood / bpm, and the spell it was made with when kept) */
+export function songTags(design: { genre?: unknown; mood?: unknown; bpm?: unknown; spell?: unknown } | null | undefined): WorkTags {
+  const d = design ?? {};
+  const spell = Array.isArray(d.spell) ? (d.spell as SpellTag[]) : [];
+  const genreTag = spell.find((t) => t?.group === 'genre');
+  const rawGenre = typeof d.genre === 'string' && d.genre ? d.genre : (genreTag?.ja ?? null);
+  const main = planetGenreOf(rawGenre);
+  const found = rawGenre ? songGenreOf({ ja: rawGenre, en: rawGenre }) : null;
+  const words = [...splitWords(typeof d.mood === 'string' ? d.mood : ''), ...spell.filter((t) => t && MOOD_GROUPS.has(t.group)).map((t) => t.ja)];
+  const implied = (found && GENRE_MOODS[found.ja]) || (main && GENRE_MOODS[main]) || [];
+  const bpm = Number(d.bpm);
+  return { main, moods: planetMoodsOf([...implied, ...words]), bpm: Number.isFinite(bpm) && bpm > 0 ? Math.round(bpm) : null };
+}
+
+/** 2-1 an art's tags: the spell's style is the main class, its colour / light / mood / theme the moods (`style`: the touch said in words) */
+export function artTags(spell: readonly SpellTag[] | null | undefined, style?: string | null): WorkTags {
+  const tags = spell ?? [];
+  const words = [...tags.filter((t) => MOOD_GROUPS.has(t.group)).map((t) => t.ja), ...splitWords(style)];
+  const styleWords = [...tags.filter((t) => t.group === 'style').map((t) => t.ja), ...splitWords(style)];
+  const mainWord = styleWords.find((w) => ART_STYLE_TO_PLANET[w]) ?? styleWords.find((w) => (PLANET_ART_STYLES as readonly string[]).includes(w)) ?? tags.find((t) => t.group === 'style')?.ja ?? null;
+  const main = mainWord ? (ART_STYLE_TO_PLANET[mainWord] ?? mainWord) : null;
+  return { main, moods: planetMoodsOf(words.filter((w) => w !== mainWord)), bpm: null };
+}
+
+/**
+ * 2-1 the other kinds (MV, radio, goods, story, game, a Saturn voice): the same shape — one main class and moods. Their
+ * values come with the later handoff documents (02〜); until then a work carries what is known (often nothing).
+ */
+export function genericTags(main: string | null | undefined, words: readonly string[] = []): WorkTags {
+  return { main: main ? clean(main) || null : null, moods: planetMoodsOf(words), bpm: null };
+}
+
+/** stored tags read back safely */
+export function readTags(main: unknown, moods: unknown, bpm: unknown): WorkTags {
+  const n = Number(bpm);
+  return { main: typeof main === 'string' && main ? main : null, moods: Array.isArray(moods) ? moods.filter((m): m is string => typeof m === 'string').slice(0, WORK_MOODS_MAX) : [], bpm: bpm == null || !Number.isFinite(n) ? null : n };
+}
+
+// --- 2-2 visibility -----------------------------------------------------------------------------------------------
+
+export const WORK_VISIBILITIES = ['dachi', 'public'] as const;
+export type WorkVisibility = (typeof WORK_VISIBILITIES)[number];
+/**
+ * 2-2 the visibility of a work whose maker never chose (pending the client's answer; the story's proposal: dachi).
+ * ONE constant: flipping it changes every work not chosen by hand (a stored null follows it), old works included.
+ */
+export const PLANET_WORK_DEFAULT_VISIBILITY: WorkVisibility = 'dachi';
+export const WorkVisibilityBody = z.object({ visibility: z.enum(WORK_VISIBILITIES) });
+export type WorkVisibilityBody = z.infer<typeof WorkVisibilityBody>;
+
+/** 2-3 the automatic check before a work goes public: not yet / passed / held (stays dachi, with the reason) */
+export const WORK_CHECK_STATES = ['unchecked', 'ok', 'held'] as const;
+export type WorkCheckState = (typeof WORK_CHECK_STATES)[number];
+
+/** what a work's visibility is in effect: a held work (or one never checked) is dachi whatever was chosen */
+export function effectiveVisibility(chosen: WorkVisibility | null | undefined, check: WorkCheckState | null | undefined, def: WorkVisibility = PLANET_WORK_DEFAULT_VISIBILITY): WorkVisibility {
+  const v = chosen ?? def;
+  return v === 'public' && check === 'ok' ? 'public' : 'dachi';
+}
+
+export interface WorkVisibilityView {
+  kind: PlanetWorkKind;
+  id: string;
+  /** what the maker chose (null = the default) */
+  chosen: WorkVisibility | null;
+  /** in effect now */
+  visibility: WorkVisibility;
+  check: WorkCheckState;
+  /** why a held work stays dachi (the check's categories) */
+  reason: string | null;
+}
+
+// --- 2-4 continents -----------------------------------------------------------------------------------------------
+
+/** a continent's rule: main classes, moods, a BPM range (songs) */
+export const ContinentRule = z.object({
+  g: z.array(z.string().trim().min(1).max(20)).max(20).default([]),
+  m: z.array(z.string().trim().min(1).max(20)).max(20).default([]),
+  bpm: z.tuple([z.number().int().min(0).max(999), z.number().int().min(0).max(999)]).optional(),
+});
+export type ContinentRule = z.infer<typeof ContinentRule>;
+
+/** a work drifts to a continent at this score or more (prototype drift(): s >= 2) */
+export const DRIFT_MIN_SCORE = 2;
+
+/**
+ * 2-4 the prototype's workScore (design/home/template.html): +3 when the main class matches, +2 for every mood that
+ * matches, −2 when the rule has a BPM range, something matched and the BPM is outside it.
+ */
+export function workScore(tags: WorkTags, rule: ContinentRule): number {
+  let s = 0;
+  if (tags.main && rule.g.includes(tags.main)) s += 3;
+  s += tags.moods.filter((m) => rule.m.includes(m)).length * 2;
+  if (rule.bpm && s > 0 && tags.bpm != null && (tags.bpm < rule.bpm[0] || tags.bpm > rule.bpm[1])) s -= 2;
+  return s;
+}
+export const driftsTo = (tags: WorkTags, rule: ContinentRule): boolean => workScore(tags, rule) >= DRIFT_MIN_SCORE;
+/** every continent a work reaches (one work may reach several) */
+export function continentsOf<C extends { key: string; rule: ContinentRule }>(tags: WorkTags, continents: readonly C[]): string[] {
+  return continents.filter((c) => driftsTo(tags, c.rule)).map((c) => c.key);
+}
+
+export interface ContinentView {
+  key: string;
+  planet: HomePlanet;
+  name: string;
+  /** null = the operator's (公式); a member's continent (M-R297, later) carries its maker */
+  creator: { id: string; name: string } | null;
+  rule: ContinentRule;
+  /** the words it is found by in 〔🔍 大陸をさがす〕 (#tags) */
+  tags: string[];
+  /** the three pictures: the sky island, the landed scene, the shore view (null = not painted yet) */
+  pictures: { sky: string | null; land: string | null; shore: string | null };
+  /** search: how many public works drifted there (never used for ordering, M-R299) */
+  count?: number;
+}
+
+/** 〔🔍 大陸をさがす〕 score (prototype searchList's sc): name +3, a tag +2, the creator +1; a #tag chip must be on it; −1 = out */
+export function continentSearchScore(c: Pick<ContinentView, 'name' | 'tags' | 'creator'>, q: string, tag?: string | null): number {
+  const s0 = q.trim().replace(/^#/, '').toLowerCase();
+  let s = 0;
+  if (s0) {
+    if (c.name.toLowerCase().includes(s0)) s += 3;
+    if (c.tags.some((g) => g.toLowerCase().includes(s0))) s += 2;
+    if (c.creator?.name.toLowerCase().includes(s0)) s += 1;
+    if (!s) return -1;
+  }
+  if (tag) {
+    if (!c.tags.includes(tag)) return -1;
+    s += 1;
+  }
+  return s;
+}
+
+/** ranked by the score, the same score at random (never by popularity, M-R298) */
+export function rankContinents<C extends Pick<ContinentView, 'name' | 'tags' | 'creator'>>(cs: readonly C[], q: string, tag?: string | null, rand: () => number = Math.random): C[] {
+  return cs
+    .map((c) => ({ c, s: continentSearchScore(c, q, tag), r: rand() }))
+    .filter((x) => x.s >= 0)
+    .sort((a, b) => b.s - a.s || a.r - b.r)
+    .map((x) => x.c);
+}
+
+// --- 2-5 favourites and the continents seen ----------------------------------------------------------------------
+
+/** じぶんの空: five slots per planet (M-R298), an empty slot allowed */
+export const FAVOURITE_SLOTS = 5;
+export type FavouriteSlots = (string | null)[];
+export const FavouritesBody = z.object({ slots: z.array(z.string().trim().min(1).max(40).nullable()).length(FAVOURITE_SLOTS) });
+export type FavouritesBody = z.infer<typeof FavouritesBody>;
+export const FavouriteBody = z.object({ on: z.boolean(), slot: z.number().int().min(0).max(FAVOURITE_SLOTS - 1).optional() });
+export type FavouriteBody = z.infer<typeof FavouriteBody>;
+
+/**
+ * the member's five: what they kept (a continent gone since → an empty slot), or — never chosen — the operator's
+ * first five (their order)
+ */
+export function favouritesOf(saved: readonly (string | null)[] | null | undefined, continents: readonly { key: string; creatorId?: string | null }[]): FavouriteSlots {
+  const keys = new Set(continents.map((c) => c.key));
+  if (Array.isArray(saved) && saved.length === FAVOURITE_SLOTS) {
+    const seen = new Set<string>();
+    return saved.map((k) => (k && keys.has(k) && !seen.has(k) ? (seen.add(k), k) : null));
+  }
+  const ops = continents.filter((c) => !c.creatorId).slice(0, FAVOURITE_SLOTS).map((c) => c.key);
+  return [...ops, ...Array(FAVOURITE_SLOTS - ops.length).fill(null)];
+}
+
+/** the whole five set at once (the swap): every key a continent of the planet, none twice */
+export function checkFavourites(slots: readonly (string | null)[], keys: ReadonlySet<string>): FavouriteSlots | 'BAD_SLOTS' | 'UNKNOWN' | 'TWICE' {
+  if (slots.length !== FAVOURITE_SLOTS) return 'BAD_SLOTS';
+  const seen = new Set<string>();
+  for (const k of slots) {
+    if (k == null) continue;
+    if (!keys.has(k)) return 'UNKNOWN';
+    if (seen.has(k)) return 'TWICE';
+    seen.add(k);
+  }
+  return [...slots];
+}
+
+/**
+ * ☆ on a continent (M-R298): on → into `slot` (replacing what is there: 「どの島と入れかえる？」) or the first empty
+ * slot; 'FULL' when all five are taken and no slot was said. Already in → unchanged. off → its slot becomes empty.
+ */
+export function toggleFavourite(slots: readonly (string | null)[], key: string, on: boolean, slot?: number): FavouriteSlots | 'FULL' {
+  const out = [...slots];
+  const at = out.indexOf(key);
+  if (!on) {
+    if (at >= 0) out[at] = null;
+    return out;
+  }
+  if (slot != null) {
+    if (at >= 0) out[at] = null;
+    out[slot] = key;
+    return out;
+  }
+  if (at >= 0) return out;
+  const free = out.indexOf(null);
+  if (free < 0) return 'FULL';
+  out[free] = key;
+  return out;
+}
+
+/** 〔✈ 旅〕 shows this many continents (prototype TSLOT) */
+export const TRAVEL_COUNT = 6;
+/**
+ * 〔✈ 旅〕 (M-R312): continents never shown first (at random), then the ones shown longest ago — so every press brings
+ * others; never by popularity. `seen`: key → when it was last shown / landed on (ms).
+ */
+export function pickTravel(keys: readonly string[], seen: ReadonlyMap<string, number>, n = TRAVEL_COUNT, rand: () => number = Math.random): string[] {
+  const unseen = keys.filter((k) => !seen.has(k)).map((k) => ({ k, r: rand() }));
+  unseen.sort((a, b) => a.r - b.r);
+  const old = keys.filter((k) => seen.has(k)).sort((a, b) => seen.get(a)! - seen.get(b)!);
+  return [...unseen.map((x) => x.k), ...old].slice(0, n);
+}
+
+// --- 2-6 the member's own riding figure --------------------------------------------------------------------------
+
+/** what each planet's own figure rides / is (handoff 2-6: Saturn kororin, Jupiter butterfly, Mercury ship …) */
+export const PLANET_RIDE: Record<HomePlanet, string> = {
+  saturn: 'kororin',
+  jupiter: 'butterfly',
+  mercury: 'ship',
+  mars: 'ufo',
+  venus: 'dj',
+  uranus: 'balloons',
+  pluto: 'book',
+  neptune: 'bubble',
+};
+
+export interface RidingFigure {
+  planet: HomePlanet;
+  ride: string;
+  /** which of the nine pictures (PLANET_FIGURES) */
+  figure: PlanetFigure;
+  /** its picture (null = still being made, or failed: the planet draws its stand-in) */
+  url: string | null;
+  /** Saturn: the member's own kororin ball the chibi jumps out of */
+  ball?: string | null;
+}
+
+/** 2-6 the member's figure on a planet, from GET /me `planetFigures` (read-only; the look code makes them) */
+export function figureFor(figures: PlanetFigures | null | undefined, planet: HomePlanet): RidingFigure {
+  const figure = PLANET_FIGURE_OF[planet];
+  const f = figures ?? {};
+  return { planet, ride: PLANET_RIDE[planet], figure, url: f[figure] ?? null, ...(planet === 'saturn' ? { ball: f.saturnBall ?? null } : {}) };
+}

@@ -533,7 +533,11 @@ export type CreatePlazaBody = z.input<typeof CreatePlazaBody>;
 
 /** Put an uploaded photo / video (POST /media/photo, /media/video?max=8) into your 根っこ. */
 // Jupiter keeps photos only; videos all live in Mars's 裏スタジオ (client decision 2026-10-07)
-export const JupiterRootBody = z.object({ mediaId: z.string().uuid() });
+export const JupiterRootBody = z.object({
+  mediaId: z.string().uuid(),
+  /** planets 2-1: the spell a picture painted in the Moon atelier was made with (its style / colour / mood tags go with the post) */
+  spell: SpellTags.optional(),
+});
 export type JupiterRootBody = z.infer<typeof JupiterRootBody>;
 
 export const JUPITER_FILTERS = ['none', 'warm', 'sepia', 'mono', 'soft'] as const;
