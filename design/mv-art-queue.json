@@ -10881,6 +10881,90 @@
       ],
       "always": false,
       "prompt": "A single cute stylised planet icon in a glossy Japanese anime illustration style: Neptune, deep blue with glowing aqua swirls, soft gradients, a bright highlight and a tiny sparkle, clean outline. Centered, the whole planet in frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "exp-mercury-map",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/home3-bg-mercury.jpg"
+      ],
+      "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. Vertical phone wallpaper 9:16. A high aerial drone view looking down on a vast sparkling turquoise ocean with five distinct themed islands, clearly separated with open sea between them, no text: top-left: an EDM continent with glowing neon speaker towers, lasers and a festival stage; top-right: a hip-hop kingdom, a compact city island with graffiti walls, boomboxes and basketball courts; middle-left: a gentle ballad island with moonlit soft hills, a lighthouse and a piano-shaped lake; middle-right: a rock volcano island with a smoking volcano shaped like a guitar headstock and amps; bottom-center: a chill lo-fi lagoon atoll with palm trees, hammocks and a calm round lagoon. Little white boat wakes between the islands, soft clouds drifting below the camera."
+    },
+    {
+      "id": "exp-mercury-edm",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/home3-bg-mercury.jpg"
+      ],
+      "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. Vertical phone wallpaper 9:16. Ground-level view of a neon EDM festival beach at night: glowing speaker towers, laser beams over the water, a lit festival stage on the sand, colourful light reflections. The lower two-thirds are open water, empty, for many small boats floating in front. No characters, no people, no boats, no text."
+    },
+    {
+      "id": "exp-mercury-hiphop",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/home3-bg-mercury.jpg"
+      ],
+      "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. Vertical phone wallpaper 9:16. Ground-level view of a hip-hop harbour city at golden hour: graffiti walls on the pier, boomboxes, a basketball court by the water, cool street vibe. The lower two-thirds are open water, empty, for many small boats floating in front. No characters, no people, no boats, no text."
+    },
+    {
+      "id": "exp-mercury-ballad",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/home3-bg-mercury.jpg"
+      ],
+      "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. Vertical phone wallpaper 9:16. Ground-level view of a gentle moonlit ballad beach: a lighthouse, soft hills, a calm sea under a huge moon and stars, romantic and quiet. The lower two-thirds are open water, empty, for many small boats floating in front. No characters, no people, no boats, no text."
+    },
+    {
+      "id": "exp-mercury-rock",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/home3-bg-mercury.jpg"
+      ],
+      "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. Vertical phone wallpaper 9:16. Ground-level view of a rock volcano coast: a dramatic volcano glowing with lava, black sand, amps and stage lights by the shore, fiery sky. The lower two-thirds are open water, empty, for many small boats floating in front. No characters, no people, no boats, no text."
+    },
+    {
+      "id": "exp-mercury-chill",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/home3-bg-mercury.jpg"
+      ],
+      "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. Vertical phone wallpaper 9:16. Ground-level view of a chill lo-fi lagoon in the afternoon: palm trees, hammocks, a calm round turquoise lagoon, soft pastel clouds. The lower two-thirds are open water, empty, for many small boats floating in front. No characters, no people, no boats, no text."
     }
   ],
   "redo": []
