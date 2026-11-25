@@ -8,7 +8,7 @@ import { FLY_READY_KINDS, KIND_HOME_PLANET } from './finds';
  * place, the floating things) is plugged in by the web app by `art` key, so the look can be swapped without touching
  * the rules (apps/web/components/planetHome).
  *
- * `store: null` = the planet has no store of works yet (Uranus goods, Pluto stories, Neptune games): its home opens with
+ * `store: null` = the planet has no store of works yet (Uranus goods: nothing makes them yet): its home opens with
  * your place and an empty sky, and the feed API answers with nothing until a store is wired in.
  */
 export const HOME_PLANETS = ['saturn', 'jupiter', 'mercury', 'mars', 'venus', 'uranus', 'pluto', 'neptune'] as const;
@@ -216,7 +216,8 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
     residents: residentsOf('venus'),
     releaseOrder: 4,
   },
-  // Uranus / Pluto / Neptune: words from the story team's template (design/home); no store of works yet
+  // Uranus / Pluto / Neptune: words from the story team's template (design/home); Pluto's books and Neptune's games are
+  // the Moon's (books / games, flown by POST /moon/books|games/:id/fly, handoff 05); Uranus has no store of goods yet
   uranus: {
     planet: 'uranus',
     en: 'URANUS',
@@ -246,7 +247,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
     cta: '中に入る',
     verb: '読む',
     name: '冥王星',
-    store: null,
+    store: 'book',
     work: '物語',
     place: '図書館',
     inside: '図書館',
@@ -268,7 +269,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
     cta: '中に入る',
     verb: '遊ぶ',
     name: '海王星',
-    store: null,
+    store: 'game',
     work: 'ゲーム',
     place: 'ゲーム小屋',
     inside: 'ゲーム小屋',

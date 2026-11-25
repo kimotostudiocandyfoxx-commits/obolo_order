@@ -109,7 +109,7 @@ describe('PlanetHomeService', () => {
   });
   it('feed: a planet with no store yet answers with your place only', async () => {
     const db = fakeDb([[{ id: 'me', name: 'ネオ', onboarding: {} }], []]);
-    const v = await new PlanetHomeService(db as never).feed('me', 'pluto', now);
+    const v = await new PlanetHomeService(db as never).feed('me', 'uranus', now);
     expect(v).toMatchObject({ live: false, own: [], around: [], far: [], young: true });
   });
   it('〔推す〕: a young viewer cannot push a stranger, nor anyone a young stranger; a dachi stays in the list', async () => {

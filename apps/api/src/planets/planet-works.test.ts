@@ -1,7 +1,7 @@
 import { PgDialect } from 'drizzle-orm/pg-core';
 import { describe, expect, it } from 'vitest';
 import { flyingSince, type ContinentRule, type WorkTags } from '@obolo/shared';
-import { continents, continentSeen, jupiterPosts, jupiterRoots, personHides, radioShows, planetHomes, planetPosts, planetWorkMeta, saturnPosts, songs, userBlocks, userReports, users, workHides } from '../db/schema';
+import { books, continents, games, continentSeen, jupiterPosts, jupiterRoots, personHides, radioShows, planetHomes, planetPosts, planetWorkMeta, saturnPosts, songs, userBlocks, userReports, users, workHides } from '../db/schema';
 import { aroundWhere } from './planet-home.service';
 import { planetWorkScope } from '../common/child';
 import { readFileSync } from 'node:fs';
@@ -112,7 +112,7 @@ describe('2-1 a work is tagged the moment it is made', () => {
   });
 
   it('Saturn: when the model fails the kororin is still kept (checked, no topic) — the backfill asks again and counts only what it now tags', async () => {
-    const { db, writes } = memDb(q([planetWorkMeta, [[{ id: 'k1' }, { id: 'k2' }]]], [planetPosts, [[]]], [jupiterPosts, [[]]], [saturnPosts, [[]]], [radioShows, [[]]]));
+    const { db, writes } = memDb(q([planetWorkMeta, [[{ id: 'k1' }, { id: 'k2' }], [], []]], [planetPosts, [[]]], [jupiterPosts, [[]]], [saturnPosts, [[]]], [radioShows, [[]]], [books, [[]]], [games, [[]]]));
     let up = false;
     const llm = { name: 'gemini', chat: async (r: { system: string }) => (r.system.includes('topic') ? (up ? '{"topic":"朝","moods":["おはよう"]}' : Promise.reject(new Error('quota'))) : 'OK') };
     const svc = new PlanetWorksService(db as never, llm as never);
@@ -139,7 +139,7 @@ describe('2-2 a dachi work never reaches continents, search, travel or the far s
     expect(r.sql).toContain('NOT EXISTS (SELECT 1 FROM work_hides h');
     expect(r.sql).toContain('user_blocks b');
     expect(r.sql).toContain('SELECT 1 FROM users a WHERE a.id = "planet_posts"."user_id"');
-    expect(continentWhere('me', 'pluto')).toBeNull();
+    expect(continentWhere('me', 'uranus')).toBeNull();
   });
   it('the far scenery of a home asks the same (a work with no row is never public)', () => {
     const r = render(farWhere(storeOf('jupiter')!, 'me', 'jupiter_post', flyingSince()));

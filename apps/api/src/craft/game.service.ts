@@ -9,7 +9,9 @@ import { games, type GameVersionRow } from '../db/schema';
 import type { KvStore } from '../infra/kv';
 import { GAME_CHEAP_LLM, GAME_LLM, GAME_TRIAL_LLM, KV, LLM } from '../infra/tokens';
 import { LedgerService } from '../wallet/ledger.service';
-import { gameView, notFound, sentTo, type GameRow } from './craft.store';
+import { PlanetWorksService } from '../planets/planet-works.service';
+import { seesWork } from '../planets/planet-songs.service';
+import { gameFacts, gameView, notFound, sentTo, type GameRow } from './craft.store';
 
 /** what a game job carries (the yes too: its mana goes back when the build fails for good) */
 export type GameJobInput = { gameId?: string; tags: SpellTag[]; said?: string; confirm: MakeConfirm; kind: GameMakeKind; from: 'atelier'; /** R17: the trial's template */ template?: GameTemplateId };
@@ -55,6 +57,8 @@ export class GameService {
     /** R17: the cheap chain (a member's own game, every tweak first) and the trial's (the template values) */
     @Optional() @Inject(GAME_CHEAP_LLM) private readonly cheapLlm?: LlmProvider,
     @Optional() @Inject(GAME_TRIAL_LLM) private readonly trialLlm?: LlmProvider,
+    /** planets 2-1 (05): the game's hidden tags, kept from its first build on */
+    @Optional() private readonly works?: PlanetWorksService,
   ) {}
 
   /** the chain a game making is written by (its tier) */
@@ -92,14 +96,23 @@ export class GameService {
     return rows.map(gameView);
   }
 
-  /** the game for its maker, or for a ダチ it was sent to */
+  /** the game for its maker, for a ダチ it was sent to, or (05) for whoever its Neptune home reaches once it has flown */
   async play(viewerId: string, id: string): Promise<GameView> {
     const [row] = await this.db.read
       .select()
       .from(games)
       .where(and(eq(games.id, id), isNull(games.deletedAt)));
-    if (!row || (row.userId !== viewerId && !(await sentTo(this.db, row.userId, viewerId, id)))) throw notFound('Game');
+    if (!row || (row.userId !== viewerId && !(await sentTo(this.db, row.userId, viewerId, id)) && !(row.flownAt && (await seesWork(this.db, viewerId, 'neptune', id))))) throw notFound('Game');
     return gameView(row);
+  }
+
+  /** 05: the game flies to Neptune (its 88 hours start now); `on: false` brings it back to the Moon */
+  async fly(userId: string, id: string, on = true): Promise<{ id: string; flownAt: string | null }> {
+    const row = await this.own(userId, id);
+    const flownAt = on ? new Date() : null;
+    await this.db.write.update(games).set({ flownAt, updatedAt: new Date() }).where(eq(games.id, row.id));
+    if (on) await this.works?.tag('game', row.id, gameFacts(row));
+    return { id: row.id, flownAt: flownAt?.toISOString() ?? null };
   }
 
   /** before the charge: the words are checked and a tweak's game is the member's own */
@@ -120,6 +133,8 @@ export class GameService {
     const v: GameVersionRow = { ...made, tags: input.tags, at: new Date().toISOString(), confirmId: input.confirm.id, kind: input.kind, price: input.confirm.price };
     if (!row) {
       const [r] = await this.db.write.insert(games).values({ userId, title: made.title, versionsJson: [v], active: 0, homePlanet: KIND_HOME_PLANET.game }).returning();
+      // planets 2-1 (05): tagged the moment it is made (genre, how it is played), again with every new version
+      await this.works?.tag('game', r.id, gameFacts(r));
       return gameView(r);
     }
     const versions = [...row.versionsJson, v].slice(-MAX_VERSIONS);
@@ -128,6 +143,7 @@ export class GameService {
       .set({ versionsJson: versions, active: versions.length - 1, title: made.title || row.title, updatedAt: new Date() })
       .where(eq(games.id, row.id))
       .returning();
+    await this.works?.tag('game', r.id, gameFacts(r));
     return gameView(r);
   }
 

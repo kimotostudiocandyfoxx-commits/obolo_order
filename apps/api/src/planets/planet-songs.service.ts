@@ -1,5 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import type { PlanetSongView, SongMix, SongPhrase } from '@obolo/shared';
+import { PLANET_HOMES, type HomePlanet, type PlanetSongView, type SongMix, type SongPhrase } from '@obolo/shared';
 import { and, eq, or, sql, type SQL } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { timedLyrics } from '../compose/lyrics';
@@ -9,10 +9,31 @@ import { planetPosts, planetWorkMeta, songs, users } from '../db/schema';
 import { continentWhere } from './continents.service';
 import { aroundWhere, ownWhere, storeOf } from './planet-home.service';
 
-/** whoever may see a Mercury song post: its maker; their dachi / 推し (any time, not only its 88 hours); anyone it drifts to */
-export function songSeenWhere(viewerId: string): SQL {
-  const s = storeOf('mercury')!;
-  return or(ownWhere(s, viewerId), aroundWhere(s, viewerId, 'planet_post', new Date(0)), continentWhere(viewerId, 'mercury') ?? sql`FALSE`)!;
+/** whoever may see a planet's work: its maker; their dachi / 推し (any time, not only its 88 hours); anyone it drifts to */
+export function workSeenWhere(viewerId: string, planet: HomePlanet): SQL {
+  const s = storeOf(planet);
+  const kind = PLANET_HOMES[planet].store;
+  if (!s || !kind) return sql`FALSE`;
+  return or(ownWhere(s, viewerId), aroundWhere(s, viewerId, kind, new Date(0)), continentWhere(viewerId, planet) ?? sql`FALSE`)!;
+}
+/** whoever may see a Mercury song post (02 §2) */
+export const songSeenWhere = (viewerId: string): SQL => workSeenWhere(viewerId, 'mercury');
+
+/**
+ * 05: the viewer may open this work of the planet the way its home does (Neptune: play the game, Pluto: read the book)
+ * — the same people as above (a work flown there, not hidden, the maker not blocked)
+ */
+export async function seesWork(db: Database, viewerId: string, planet: HomePlanet, id: string): Promise<boolean> {
+  const s = storeOf(planet);
+  if (!s) return false;
+  const [hit] = (await db.read
+    .select({ id: s.id })
+    .from(s.t as never)
+    .innerJoin(users, sql`${users.id} = ${s.userId}`)
+    .leftJoin(planetWorkMeta, sql`${planetWorkMeta.kind} = ${PLANET_HOMES[planet].store} AND ${planetWorkMeta.workId} = ${s.id}`)
+    .where(and(sql`${s.id} = ${id}`, sql`${users.deletedAt} IS NULL`, workSeenWhere(viewerId, planet)))
+    .limit(1)) as { id: string }[];
+  return !!hit;
 }
 
 /**

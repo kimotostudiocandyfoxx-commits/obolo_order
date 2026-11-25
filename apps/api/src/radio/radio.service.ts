@@ -3,7 +3,7 @@ import { LlmProvider, moderateText } from '@obolo/ai';
 import {
   CHILD_AGE,
   flyingSince,
-  genericTags,
+  radioTags,
   RADIO_LIVE_STALE_SECONDS,
   type BluenaKeptView,
   type CommsPerson,
@@ -226,8 +226,8 @@ export class RadioService {
         liveId: body.liveId ?? null,
       })
       .returning();
-    // planets 2-1: a show carries the same tag shape (its values come with Venus's handoff)
-    await this.works?.tag('radio_show', r.id, { userId, planet: 'venus', tags: genericTags(null), words: r.title });
+    // planets 2-1 (05 Venus): the topic from its title, how it is spoken from its settings (loop, hour, songs on air)
+    await this.works?.tag('radio_show', r.id, { userId, planet: 'venus', tags: radioTags({ title: r.title, loop: r.loop, cues: cues.length, at: r.createdAt }), words: r.title });
     return (await this.showView([r], userId))[0];
   }
 

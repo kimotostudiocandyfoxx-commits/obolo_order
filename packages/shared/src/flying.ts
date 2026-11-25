@@ -48,8 +48,8 @@ export function splitFlying<T>(items: readonly T[], flownAt: (x: T) => When | nu
 
 // --- M-R213: strangers' works on a planet's wide place: 〔通報〕 and 〔見えなくする〕 -----------------------------------
 
-/** which kind of planet work: Saturn kororin, Jupiter butterfly, Mercury / Mars post, Venus show */
-export const PLANET_WORK_KINDS = ['saturn_post', 'jupiter_post', 'planet_post', 'radio_show'] as const;
+/** which kind of planet work: Saturn kororin, Jupiter butterfly, Mercury / Mars post, Venus show, Pluto book, Neptune game (05) */
+export const PLANET_WORK_KINDS = ['saturn_post', 'jupiter_post', 'planet_post', 'radio_show', 'book', 'game'] as const;
 export type PlanetWorkKind = (typeof PLANET_WORK_KINDS)[number];
 export const PlanetWorkHideBody = z.object({ on: z.boolean() });
 export type PlanetWorkHideBody = z.infer<typeof PlanetWorkHideBody>;

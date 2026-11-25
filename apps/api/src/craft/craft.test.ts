@@ -236,3 +236,38 @@ describe('ゲーム: code checked, one repair round, mana back when it fails', (
     expect(await s.broken('u1', g.id, { version: 0, reason: 'x' })).toEqual({ refunded: 0 });
   });
 });
+
+describe('05: a book flies to Pluto, a game to Neptune (tagged at making, again when flown)', () => {
+  const recorder = () => {
+    const tagged: [string, string, { planet: string; tags: { main: string | null; moods: string[] } }][] = [];
+    return { tagged, works: { tag: async (k: string, id: string, f: never) => void tagged.push([k, id, f]) } as never };
+  };
+  it('a book: tagged with its first chapter and every next one; flying starts its 88 hours, on: false brings it back', async () => {
+    const { db, tables } = fakeDb();
+    const { tagged, works } = recorder();
+    const s = new NovelService(mock as never, mock as never, db, kv(), works);
+    const b = await s.chapter('u1', { tags: spellOfAnswers('novel', [{ group: 'genre', said: 'ミステリー' }]) });
+    expect(tagged.at(-1)).toMatchObject(['book', b.id, { planet: 'pluto', tags: { main: 'ミステリー' } }]);
+    await s.chapter('u1', { bookId: b.id, tags: spellFrom('chapter', '新しい仲間') });
+    expect(tagged).toHaveLength(2);
+    const f = await s.fly('u1', b.id);
+    expect(f.flownAt).not.toBeNull();
+    expect((tables.get(books)![0] as { flownAt: Date | null }).flownAt).toBeInstanceOf(Date);
+    expect(tagged).toHaveLength(3);
+    expect((await s.fly('u1', b.id, false)).flownAt).toBeNull();
+    expect((tables.get(books)![0] as { flownAt: Date | null }).flownAt).toBeNull();
+  });
+  it('a game: tagged when built and with every version; flown to Neptune', async () => {
+    const { db, tables } = fakeDb();
+    const { tagged, works } = recorder();
+    const s = new GameService(mock as never, mock as never, db, new MemLedger(), kv(), undefined, undefined, works);
+    const confirm = { id: 'c1', price: 30 } as MakeConfirm;
+    const g = await s.make('u1', { tags: spellFrom('game', 'パズルでハイスコア'), confirm, kind: 'game', from: 'atelier' });
+    expect(tagged.at(-1)).toMatchObject(['game', g.id, { planet: 'neptune', tags: { main: 'パズル', moods: ['ひとりで', 'じっくり'] } }]);
+    await s.make('u1', { gameId: g.id, tags: spellFrom('game', '60秒'), confirm: { id: 'c2', price: 10 } as MakeConfirm, kind: 'game', from: 'atelier' });
+    expect(tagged).toHaveLength(2);
+    await s.fly('u1', g.id);
+    expect((tables.get(games)![0] as { flownAt: Date | null }).flownAt).toBeInstanceOf(Date);
+    expect(tagged).toHaveLength(3);
+  });
+});

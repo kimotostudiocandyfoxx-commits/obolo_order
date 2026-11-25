@@ -4,6 +4,7 @@ import {
   MARS_VIDEO_SECONDS,
   flyingSince,
   genericTags,
+  mvTags,
   songTags,
   splitFlying,
   type CreatePlanetPostBody,
@@ -54,7 +55,7 @@ export class PlanetPostsService {
       if (mod.flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'MODERATION', 'This post breaks the community rules');
     }
     let values: typeof planetPosts.$inferInsert;
-    // planets 2-1: the hidden tags, from the song's settings (Mars: the generic shape until its handoff says)
+    // planets 2-1: the hidden tags, from the song's settings (05 Mars: an MV inherits its song's genre and moods)
     let tags = genericTags(null);
     let song: typeof songs.$inferSelect | undefined;
     if (planet === 'mercury') {
@@ -74,10 +75,12 @@ export class PlanetPostsService {
       if (!v) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Pick a video from your 裏スタジオ');
       // an MV Bati made is already square and may fly for the whole song (MV_MAX_SECONDS)
       const [mv] = await this.db.write
-        .select({ id: mvProjects.id })
+        .select({ id: mvProjects.id, design: songs.designJson })
         .from(mvProjects)
+        .leftJoin(songs, eq(songs.id, mvProjects.songId))
         .where(and(eq(mvProjects.userId, userId), or(eq(mvProjects.videoUrl, v.url), eq(mvProjects.lyricsVideoUrl, v.url))))
         .limit(1);
+      if (mv) tags = mvTags(mv.design);
       // other Mars posts are square: a centre-cropped copy; the original stays in the 裏スタジオ
       const sq = mv ? { url: v.url, posterUrl: v.posterUrl, seconds: v.seconds } : await this.media.squareCopy(userId, v.url, MARS_VIDEO_SECONDS, origin);
       values = { planet, userId, kind: 'video', sourceId: v.id, title: body.title || v.title || '', text: body.text, url: sq.url, posterUrl: sq.posterUrl, seconds: sq.seconds };

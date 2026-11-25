@@ -24,7 +24,7 @@ import { and, eq, inArray, isNull, or, sql, type SQL } from 'drizzle-orm';
 import { dachiOf, notHidden, notPersonHidden, viewerIsYoung } from '../common/child';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
-import { follows, jupiterPosts, planetHomes, planetPosts, planetWorkMeta, radioShows, saturnPosts, userBlocks, users } from '../db/schema';
+import { books, follows, games, jupiterPosts, planetHomes, planetPosts, planetWorkMeta, radioShows, saturnPosts, userBlocks, users } from '../db/schema';
 import { decodeWings, WINGS_KEY } from '../look/figures';
 import { isPublicWork, metaView } from './planet-works.service';
 
@@ -39,7 +39,7 @@ import { isPublicWork, metaView } from './planet-works.service';
 
 /** one planet store, seen the same way: who made it, when it was flown, what plays */
 type Store = {
-  t: typeof saturnPosts | typeof jupiterPosts | typeof planetPosts | typeof radioShows;
+  t: typeof saturnPosts | typeof jupiterPosts | typeof planetPosts | typeof radioShows | typeof books | typeof games;
   id: SQL;
   userId: SQL;
   flownAt: SQL;
@@ -51,6 +51,9 @@ type Store = {
   /** what counts as "on the planet" at all (flown, not removed) */
   live: SQL;
 };
+
+/** 05 Pluto: how much of a book's first chapter the home carries (the open book's right page shows its start) */
+export const BOOK_OPENING_CHARS = 160;
 
 export function storeOf(planet: HomePlanet): Store | null {
   const cfg = PLANET_HOMES[planet];
@@ -107,6 +110,36 @@ export function storeOf(planet: HomePlanet): Store | null {
         thumb: sql`${radioShows.thumbUrl}`,
         seconds: sql`${radioShows.seconds}`,
         live: sql`(${radioShows.deletedAt} IS NULL AND ${radioShows.removedAt} IS NULL AND ${radioShows.status} = 'public' AND ${radioShows.publishedAt} IS NOT NULL)`,
+      };
+    // 05 Pluto: a book made on the Moon, once flown (POST /moon/books/:id/fly). Its words are the opening of its first
+    // chapter (the open book's right page), its picture the painted cover (none: the page is plain paper)
+    case 'book':
+      return {
+        t: books,
+        id: sql`${books.id}`,
+        userId: sql`${books.userId}`,
+        flownAt: sql`${books.flownAt}`,
+        text: sql`LEFT(COALESCE(${books.chaptersJson} -> 0 ->> 'text', ''), ${BOOK_OPENING_CHARS})`,
+        title: sql`${books.title}`,
+        url: sql`NULL::text`,
+        thumb: sql`${books.coverUrl}`,
+        seconds: sql`NULL::real`,
+        live: sql`(${books.deletedAt} IS NULL AND ${books.flownAt} IS NOT NULL)`,
+      };
+    // 05 Neptune: a game made on the Moon, once flown; its words are how to play the version on its face (the code is
+    // fetched when PRESS START is pressed: GET /moon/games/:id)
+    case 'game':
+      return {
+        t: games,
+        id: sql`${games.id}`,
+        userId: sql`${games.userId}`,
+        flownAt: sql`${games.flownAt}`,
+        text: sql`COALESCE(${games.versionsJson} -> ${games.active} ->> 'howTo', '')`,
+        title: sql`COALESCE(NULLIF(${games.versionsJson} -> ${games.active} ->> 'title', ''), ${games.title})`,
+        url: sql`NULL::text`,
+        thumb: sql`NULL::text`,
+        seconds: sql`NULL::real`,
+        live: sql`(${games.deletedAt} IS NULL AND ${games.flownAt} IS NOT NULL)`,
       };
     default:
       return null;
@@ -303,6 +336,11 @@ export class PlanetHomeService {
       n = (await this.db.write.update(planetPosts).set({ deletedAt: new Date() }).where(and(eq(planetPosts.id, id), eq(planetPosts.userId, userId), eq(planetPosts.planet, cfg.storePlanet!), isNull(planetPosts.deletedAt))).returning({ id: planetPosts.id })).length;
     else if (cfg.store === 'radio_show')
       n = (await this.db.write.update(radioShows).set({ status: 'private', publishedAt: null, updatedAt: new Date() }).where(and(eq(radioShows.id, id), eq(radioShows.userId, userId))).returning({ id: radioShows.id })).length;
+    // 05: a book / a game goes back to the Moon only (not flown; the work itself stays)
+    else if (cfg.store === 'book')
+      n = (await this.db.write.update(books).set({ flownAt: null, updatedAt: new Date() }).where(and(eq(books.id, id), eq(books.userId, userId), isNull(books.deletedAt))).returning({ id: books.id })).length;
+    else if (cfg.store === 'game')
+      n = (await this.db.write.update(games).set({ flownAt: null, updatedAt: new Date() }).where(and(eq(games.id, id), eq(games.userId, userId), isNull(games.deletedAt))).returning({ id: games.id })).length;
     if (!n) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Work not found');
   }
 

@@ -173,8 +173,8 @@ export function artTags(spell: readonly SpellTag[] | null | undefined, style?: s
 }
 
 /**
- * 2-1 the other kinds (MV, radio, goods, story, game, a Saturn voice): the same shape — one main class and moods. Their
- * values come with the later handoff documents (02〜); until then a work carries what is known (often nothing).
+ * 2-1 the shape every kind shares — one main class and moods. The kinds of handoff 05 (MV, radio, goods, story, game)
+ * fill it through their own functions below (mvTags, radioTags, goodsTags, bookTags, gameTags).
  */
 export function genericTags(main: string | null | undefined, words: readonly string[] = []): WorkTags {
   return { main: main ? clean(main) || null : null, moods: planetMoodsOf(words), bpm: null };
@@ -242,6 +242,144 @@ export function voiceTagsOfWords(words: string): WorkTags {
     topic,
     VOICE_MOOD_RULES.filter(([re]) => re.test(w)).map(([, m]) => m),
   );
+}
+
+// --- 2-1 the five planets of handoff 05 (planets-05-five.md 「作品のタグ」) ------------------------------------------
+
+/** 05 火星 MV: the main class is the song's genre and the moods the song's (inherited from the song it was made for) */
+export function mvTags(songDesign: Parameters<typeof songTags>[0]): WorkTags {
+  const t = songTags(songDesign);
+  return { main: t.main, moods: t.moods, bpm: null };
+}
+
+/** 05 金星 ラジオ: the topic (the same vocabulary as Saturn's kororins) and how it is spoken */
+export const PLANET_RADIO_MOODS = ['にぎやか', 'しっとり', 'ゆったり', '深夜', '朝', '夜', '音楽たっぷり', 'トーク'] as const;
+/** the show's loop (radio.ts RADIO_LOOPS) → how it sounds */
+const RADIO_LOOP_MOODS: Record<string, string> = { pulse: 'にぎやか', ripple: 'しっとり', drift: 'ゆったり', stars: '夜', still: 'しっとり' };
+const RADIO_WORD_MOODS: [RegExp, string][] = [
+  [/にぎやか|ワイワイ|わいわい|元気|テンション|パーティー|祭/, 'にぎやか'],
+  [/しっとり|しずか|静か|ひとりごと|ひとり言|つぶやき/, 'しっとり'],
+  [/ゆったり|まったり|のんびり|ゆる/, 'ゆったり'],
+  [/深夜|夜ふかし|真夜中|ミッドナイト|眠れない/, '深夜'],
+  [/朝|おはよう|モーニング/, '朝'],
+  [/夜|月夜|星/, '夜'],
+];
+/** the hour in Japan (0–23) of a time */
+const jstHour = (at: Date | string | null | undefined): number | null => {
+  if (!at) return null;
+  const d = at instanceof Date ? at : new Date(at);
+  return Number.isNaN(d.getTime()) ? null : (d.getUTCHours() + 9) % 24;
+};
+/**
+ * 2-1 Venus: a show's topic from its title (the Saturn word rules: 雑談 when nothing is said), and how it is spoken from
+ * its settings — the title's words, the loop it was made with, the hour it was made (22–4 時 深夜, 5–9 時 朝) and the
+ * songs on air (3 or more: 音楽たっぷり, none: トーク). At most four.
+ */
+export function radioTags(show: { title?: string | null; loop?: string | null; cues?: number | null; at?: Date | string | null }): WorkTags {
+  const title = show.title ?? '';
+  const out: string[] = [];
+  const add = (m: string | undefined) => {
+    if (m && !out.includes(m)) out.push(m);
+  };
+  RADIO_WORD_MOODS.filter(([re]) => re.test(title)).forEach(([, m]) => add(m));
+  add(RADIO_LOOP_MOODS[show.loop ?? '']);
+  const h = jstHour(show.at);
+  if (h != null && (h >= 22 || h < 5)) add('深夜');
+  if (h != null && h >= 5 && h < 10) add('朝');
+  if (show.cues != null) add(show.cues >= 3 ? '音楽たっぷり' : show.cues === 0 ? 'トーク' : undefined);
+  return { main: voiceTagsOfWords(title).main, moods: out.slice(0, VOICE_MOODS_MAX), bpm: null };
+}
+
+/** 05 天王星 グッズ: what it is (the main class); the moods are the printed art's, in Jupiter's vocabulary */
+export const PLANET_GOODS_KINDS = ['トート', 'Tシャツ', 'ステッカー', 'アクスタ', 'マグカップ', '缶バッジ'] as const;
+const GOODS_KIND_OF: [RegExp, string][] = [
+  [/トート|tote|バッグ/i, 'トート'],
+  [/Tシャツ|ティーシャツ|t-?shirt|シャツ/i, 'Tシャツ'],
+  [/ステッカー|シール|sticker/i, 'ステッカー'],
+  [/アクスタ|アクリルスタンド|acrylic/i, 'アクスタ'],
+  [/マグ|mug|カップ/i, 'マグカップ'],
+  [/缶バッジ|缶バッチ|バッジ|badge/i, '缶バッジ'],
+];
+/** 2-1 Uranus: the goods' kind, and the printed art's style first, then its moods (artTags of its spell) */
+export function goodsTags(kind: string | null | undefined, artSpell?: readonly SpellTag[] | null, style?: string | null): WorkTags {
+  const k = (kind ?? '').trim();
+  const main = GOODS_KIND_OF.find(([re]) => re.test(k))?.[1] ?? (k ? clean(k).slice(0, 20) || null : null);
+  const art = artTags(artSpell, style);
+  return { main, moods: [...(art.main ? [art.main] : []), ...art.moods].slice(0, WORK_MOODS_MAX), bpm: null };
+}
+
+/** 05 冥王星 物語: the genre, then the length and the feeling */
+export const PLANET_STORY_GENRES = ['ファンタジー', '恋愛', 'ホラー', '日常', 'SF', 'ミステリー'] as const;
+export const PLANET_STORY_LENGTHS = ['短い', '中くらい', '長い'] as const;
+export const PLANET_STORY_FEELINGS = ['泣ける', '笑える', 'こわい', 'やさしい', 'わくわく'] as const;
+/** the book spell's genre (spell.ts BOOK genres) → the planet's */
+const STORY_GENRE_OF: Record<string, string> = { ファンタジー: 'ファンタジー', 冒険: 'ファンタジー', ミステリー: 'ミステリー', SF: 'SF', 学園もの: '日常', 日常: '日常', ちょっと怖い: 'ホラー' };
+const STORY_WORD_GENRES: [RegExp, string][] = [
+  [/恋|好きな人|片思い|告白|デート|ラブ/, '恋愛'],
+  [/怖|こわ|ホラー|おばけ|幽霊/, 'ホラー'],
+  [/ミステリー|謎|なぞ|探偵|事件/, 'ミステリー'],
+  [/SF|ＳＦ|宇宙|未来|ロボット/i, 'SF'],
+  [/魔法|まほう|ドラゴン|魔女|冒険|森/, 'ファンタジー'],
+  [/日常|学校|学園|町|まち|ほのぼの/, '日常'],
+];
+const STORY_FEELING_OF: [RegExp, string][] = [
+  [/切な|せつな|泣|涙|さみし|寂し/, '泣ける'],
+  [/おもしろ|面白|笑|ギャグ|コメディ/, '笑える'],
+  [/怖|こわ|ホラー|おばけ/, 'こわい'],
+  [/やさし|優し|ほっこり|あったか|温か|しっとり/, 'やさしい'],
+  [/わくわく|ワクワク|ドキドキ|どきどき|冒険/, 'わくわく'],
+];
+/**
+ * a book's length by the characters of its chapters (a chapter is ~1500–2500): up to 5000 短い, up to 12000 中くらい,
+ * more 長い; nothing written yet: the spell's length talisman (短め / 長め; else 中くらい)
+ */
+export function storyLength(chars: number, spellLength?: string | null): (typeof PLANET_STORY_LENGTHS)[number] {
+  if (chars > 0) return chars <= 5000 ? '短い' : chars <= 12000 ? '中くらい' : '長い';
+  return /短/.test(spellLength ?? '') ? '短い' : /長/.test(spellLength ?? '') ? '長い' : '中くらい';
+}
+/**
+ * 2-1 Pluto: a book's genre from its spell (its genre talisman; else the words of its world / hero / mood; else 日常),
+ * its length from the chapters written (`chars`) and its feelings from the spell's words. At most four moods.
+ */
+export function bookTags(spell: readonly SpellTag[] | null | undefined, chars = 0): WorkTags {
+  const tags = spell ?? [];
+  const words = tags.map((t) => t.ja);
+  const genreTag = tags.find((t) => t.group === 'genre' && STORY_GENRE_OF[t.ja]);
+  const main = genreTag ? STORY_GENRE_OF[genreTag.ja] : (STORY_WORD_GENRES.find(([re]) => words.some((w) => re.test(w)))?.[1] ?? '日常');
+  const moods: string[] = [storyLength(chars, tags.find((t) => t.group === 'length')?.ja)];
+  for (const [re, m] of STORY_FEELING_OF) if (!moods.includes(m) && words.some((w) => re.test(w))) moods.push(m);
+  return { main, moods: moods.slice(0, 4), bpm: null };
+}
+
+/** 05 海王星 ゲーム: the genre, then how it is played */
+export const PLANET_GAME_GENRES = ['アクション', 'パズル', 'レース', 'リズム', 'シューティング', 'クイズ'] as const;
+export const PLANET_GAME_STYLES = ['ひとりで', 'みんなで', 'すぐ終わる', 'じっくり'] as const;
+/** the game spell's genre (spell.ts GAME genres) → the planet's */
+const GAME_GENRE_OF: Record<string, string> = { 集める: 'アクション', よける: 'アクション', ジャンプ: 'アクション', タップ: 'アクション', ブロックくずし: 'アクション', シューティング: 'シューティング', パズル: 'パズル', クイズ: 'クイズ' };
+/** words that name a genre the spell has no talisman for (a race, a rhythm game) */
+const GAME_NAMED_GENRES: [RegExp, string][] = [
+  [/レース|車|カー|ドライブ|バイク/, 'レース'],
+  [/リズム|音ゲー|ダンス|ビート/, 'リズム'],
+];
+/**
+ * 2-1 Neptune: a game's genre — words naming a race or a rhythm game first (the spell has no talisman for them), then
+ * its genre talisman, else アクション — and how it is played: alone (every game made today is one player; words of
+ * playing together: みんなで), over quickly (a time limit, an easy level, a small goal) or slowly (a puzzle or a quiz, a
+ * hard level, lives, a high score).
+ */
+export function gameTags(spell: readonly SpellTag[] | null | undefined, title = ''): WorkTags {
+  const tags = spell ?? [];
+  const words = [...tags.map((t) => t.ja), title].filter(Boolean);
+  const has = (re: RegExp) => words.some((w) => re.test(w));
+  const named = GAME_NAMED_GENRES.find(([re]) => has(re))?.[1];
+  const genreTag = tags.find((t) => t.group === 'genre' && GAME_GENRE_OF[t.ja]);
+  const main = named ?? (genreTag ? GAME_GENRE_OF[genreTag.ja] : 'アクション');
+  const moods: string[] = [has(/対戦|みんな|ふたり|2人|二人|協力/) ? 'みんなで' : 'ひとりで'];
+  const quick = has(/秒|かんたん|30こ集めたら勝ち/);
+  const slow = main === 'パズル' || main === 'クイズ' || has(/むずかしい|ライフ3つ|ハイスコア/);
+  if (quick) moods.push('すぐ終わる');
+  else if (slow) moods.push('じっくり');
+  return { main, moods, bpm: null };
 }
 
 /** stored tags read back safely */

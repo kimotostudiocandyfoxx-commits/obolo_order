@@ -139,6 +139,9 @@ export type GameBuildBody = z.infer<typeof GameBuildBody>;
 /** POST /moon/game/:id/broken: the version did not run in the sandbox (the mana given back, a few times a day) */
 export const GameBrokenBody = z.object({ version: z.number().int().min(0).max(99), reason: z.string().trim().max(200).default('') });
 export type GameBrokenBody = z.infer<typeof GameBrokenBody>;
+/** 05: POST /moon/books/:id/fly · /moon/games/:id/fly — to its home planet (Pluto / Neptune), or back (`on: false`) */
+export const CraftFlyBody = z.object({ on: z.boolean().default(true) });
+export type CraftFlyBody = z.infer<typeof CraftFlyBody>;
 
 export interface GameView {
   id: string;

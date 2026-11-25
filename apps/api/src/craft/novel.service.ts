@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, Logger, Optional } from '@nestjs/common';
 import { type LlmProvider, moderateText } from '@obolo/ai';
 import { demoChapter, KIND_HOME_PLANET, isFinalChapter, jstDay, NOVEL_CHAPTERS_PER_DAY, NOVEL_MAX_CHAPTERS, novelSystem, novelUser, type BookView, type NovelChapterBody, type SpellTag } from '@obolo/shared';
 import { and, desc, eq, isNull } from 'drizzle-orm';
@@ -7,7 +7,9 @@ import { Database } from '../db/db';
 import { books } from '../db/schema';
 import type { KvStore } from '../infra/kv';
 import { KV, LLM, NOVEL_LLM } from '../infra/tokens';
-import { bookView, notFound, sentTo, type BookRow } from './craft.store';
+import { PlanetWorksService } from '../planets/planet-works.service';
+import { seesWork } from '../planets/planet-songs.service';
+import { bookFacts, bookView, notFound, sentTo, type BookRow } from './craft.store';
 
 const json = (raw: string) => JSON.parse(raw.match(/\{[\s\S]*\}/)?.[0] ?? '{}') as Record<string, unknown>;
 const clip = (v: unknown, n: number) => String(v ?? '').trim().slice(0, n);
@@ -28,6 +30,8 @@ export class NovelService {
     @Inject(LLM) private readonly modLlm: LlmProvider,
     private readonly db: Database,
     @Inject(KV) private readonly kv: KvStore,
+    /** planets 2-1 (05): the book's hidden tags, kept from its first chapter on */
+    @Optional() private readonly works?: PlanetWorksService,
   ) {}
 
   private async clean(text: string) {
@@ -59,14 +63,26 @@ export class NovelService {
     return rows.map(bookView);
   }
 
-  /** the book for its maker, or for a ダチ it was sent to */
+  /** the book for its maker, for a ダチ it was sent to, or (05) for whoever its Pluto home reaches once it has flown */
   async read(viewerId: string, id: string): Promise<BookView> {
     const [row] = await this.db.read
       .select()
       .from(books)
       .where(and(eq(books.id, id), isNull(books.deletedAt)));
-    if (!row || (row.userId !== viewerId && !(await sentTo(this.db, row.userId, viewerId, id)))) throw notFound('Book');
+    if (!row || (row.userId !== viewerId && !(await sentTo(this.db, row.userId, viewerId, id)) && !(row.flownAt && (await seesWork(this.db, viewerId, 'pluto', id))))) throw notFound('Book');
     return bookView(row);
+  }
+
+  /**
+   * 05: the book flies to Pluto (its home, KIND_HOME_PLANET.novel) — its 88 hours start now (again, when flown again);
+   * its tags and the check are brought up to date. `on: false` brings it back to the Moon.
+   */
+  async fly(userId: string, id: string, on = true): Promise<{ id: string; flownAt: string | null }> {
+    const row = await this.own(userId, id);
+    const flownAt = on ? new Date() : null;
+    await this.db.write.update(books).set({ flownAt, updatedAt: new Date() }).where(eq(books.id, row.id));
+    if (on) await this.works?.tag('book', row.id, bookFacts(row));
+    return { id: row.id, flownAt: flownAt?.toISOString() ?? null };
   }
 
   /** a new book and its first chapter (no bookId: `tags` is the book's spell), or the next chapter (`tags`: its spell) */
@@ -88,6 +104,8 @@ export class NovelService {
         .insert(books)
         .values({ userId, title: written.bookTitle || 'わたしの本', spellJson: book, chaptersJson: [ch], homePlanet: KIND_HOME_PLANET.novel })
         .returning();
+      // planets 2-1 (05): tagged the moment it is made (genre, length, feeling), again as it grows
+      await this.works?.tag('book', made.id, bookFacts(made));
       return bookView(made);
     }
     const [saved] = await this.db.write
@@ -95,6 +113,7 @@ export class NovelService {
       .set({ chaptersJson: [...row.chaptersJson, ch], done: final, updatedAt: at })
       .where(eq(books.id, row.id))
       .returning();
+    await this.works?.tag('book', saved.id, bookFacts(saved));
     return bookView(saved);
   }
 

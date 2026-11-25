@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, Inject, Param, ParseUUIDPipe, Post, UseGuards } from '@nestjs/common';
 import { HttpStatus } from '@nestjs/common';
-import { GAME_BUILDS_PER_DAY, GameBrokenBody, GameBuildBody, gameMakeKind, NovelChapterBody, spellKey } from '@obolo/shared';
+import { CraftFlyBody, GAME_BUILDS_PER_DAY, GameBrokenBody, GameBuildBody, gameMakeKind, NovelChapterBody, spellKey } from '@obolo/shared';
 import { apiError } from '../common/errors';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
@@ -49,6 +49,13 @@ export class CraftController {
     return this.novels.read(userId, id);
   }
 
+  /** 05: the book flies to Pluto ({on: false}: back to the Moon) */
+  @Post('books/:id/fly')
+  @HttpCode(200)
+  flyBook(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string, @Body() body: unknown) {
+    return this.novels.fly(userId, id, parseBody(CraftFlyBody, body ?? {}).on);
+  }
+
   @Post('game')
   @HttpCode(202)
   async build(@UserId() userId: string, @Body() body: unknown) {
@@ -84,6 +91,13 @@ export class CraftController {
   @Get('games/:id')
   game(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string) {
     return this.games.play(userId, id);
+  }
+
+  /** 05: the game flies to Neptune ({on: false}: back to the Moon) */
+  @Post('games/:id/fly')
+  @HttpCode(200)
+  flyGame(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string, @Body() body: unknown) {
+    return this.games.fly(userId, id, parseBody(CraftFlyBody, body ?? {}).on);
   }
 
   /** the sandbox said the version does not run: its mana back (see GameService.broken) */

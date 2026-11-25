@@ -4,7 +4,9 @@ import {
   artTags,
   effectiveVisibility,
   genericTags,
+  mvTags,
   PLANET_WORK_DEFAULT_VISIBILITY,
+  radioTags,
   readTags,
   songTags,
   type HomePlanet,
@@ -17,7 +19,8 @@ import {
 import { and, desc, eq, inArray, isNull, sql, type SQL } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
-import { bluenaSaves, jupiterPosts, jupiterRoots, personHides, planetPosts, planetWorkMeta, radioShows, saturnPosts, songs, userBlocks } from '../db/schema';
+import { bluenaSaves, books, games, jupiterPosts, jupiterRoots, marsBackstage, mvProjects, personHides, planetPosts, planetWorkMeta, radioShows, saturnPosts, songs, userBlocks } from '../db/schema';
+import { bookFacts, gameFacts } from '../craft/craft.store';
 import { LLM } from '../infra/tokens';
 
 type Meta = typeof planetWorkMeta.$inferSelect;
@@ -109,8 +112,16 @@ export class PlanetWorksService {
         .leftJoin(songs, eq(songs.id, planetPosts.sourceId))
         .where(and(eq(planetPosts.id, id), isNull(planetPosts.deletedAt)));
       if (!r) return null;
-      const tags = r.kind === 'song' ? songTags(r.design) : genericTags(null);
+      const tags = r.kind === 'song' ? songTags(r.design) : await this.mvTagsOf(id);
       return { userId: r.userId, planet: r.planet === 'mars' ? 'mars' : 'mercury', tags, words: `${r.title} ${r.text}` };
+    }
+    if (kind === 'book') {
+      const [r] = await this.db.read.select().from(books).where(and(eq(books.id, id), isNull(books.deletedAt)));
+      return r ? bookFacts(r) : null;
+    }
+    if (kind === 'game') {
+      const [r] = await this.db.read.select().from(games).where(and(eq(games.id, id), isNull(games.deletedAt)));
+      return r ? gameFacts(r) : null;
     }
     if (kind === 'jupiter_post') {
       const [r] = await this.db.read
@@ -124,8 +135,24 @@ export class PlanetWorksService {
       const [r] = await this.db.read.select({ userId: saturnPosts.userId, text: saturnPosts.text }).from(saturnPosts).where(and(eq(saturnPosts.id, id), isNull(saturnPosts.deletedAt)));
       return r ? { userId: r.userId, planet: 'saturn', tags: genericTags(null), words: r.text } : null;
     }
-    const [r] = await this.db.read.select({ userId: radioShows.userId, title: radioShows.title }).from(radioShows).where(and(eq(radioShows.id, id), isNull(radioShows.deletedAt)));
-    return r ? { userId: r.userId, planet: 'venus', tags: genericTags(null), words: r.title } : null;
+    const [r] = await this.db.read
+      .select({ userId: radioShows.userId, title: radioShows.title, loop: radioShows.loop, cues: radioShows.cuesJson, at: radioShows.createdAt })
+      .from(radioShows)
+      .where(and(eq(radioShows.id, id), isNull(radioShows.deletedAt)));
+    return r ? { userId: r.userId, planet: 'venus', tags: radioTags({ title: r.title, loop: r.loop, cues: Array.isArray(r.cues) ? r.cues.length : null, at: r.at }), words: r.title } : null;
+  }
+
+  /** 05 Mars: a video post that is an MV takes its song's genre and moods (its 裏スタジオ video → the MV → the song) */
+  protected async mvTagsOf(postId: string): Promise<WorkTags> {
+    const [r] = await this.db.read
+      .select({ design: songs.designJson })
+      .from(planetPosts)
+      .innerJoin(marsBackstage, eq(marsBackstage.id, planetPosts.sourceId))
+      .innerJoin(mvProjects, sql`${mvProjects.userId} = ${planetPosts.userId} AND (${mvProjects.videoUrl} = ${marsBackstage.url} OR ${mvProjects.lyricsVideoUrl} = ${marsBackstage.url})`)
+      .innerJoin(songs, eq(songs.id, mvProjects.songId))
+      .where(eq(planetPosts.id, postId))
+      .limit(1);
+    return r ? mvTags(r.design) : genericTags(null);
   }
 
   async meta(kind: PlanetWorkKind, id: string): Promise<Meta | null> {
@@ -220,7 +247,7 @@ export class PlanetWorksService {
    */
   async backfill(limit = 200): Promise<Record<PlanetWorkKind, number>> {
     const missing = (kind: PlanetWorkKind, id: SQL) => sql`NOT EXISTS (SELECT 1 FROM planet_work_meta pm WHERE pm.kind = ${kind} AND pm.work_id = ${id})`;
-    const pick = async (kind: PlanetWorkKind, t: typeof planetPosts | typeof jupiterPosts | typeof saturnPosts | typeof radioShows, extra?: SQL) =>
+    const pick = async (kind: PlanetWorkKind, t: typeof planetPosts | typeof jupiterPosts | typeof saturnPosts | typeof radioShows | typeof books | typeof games, extra?: SQL) =>
       (
         await this.db.read
           .select({ id: t.id })
@@ -229,12 +256,14 @@ export class PlanetWorksService {
           .orderBy(t.createdAt)
           .limit(limit)
       ).map((r) => r.id);
-    const done = { saturn_post: 0, jupiter_post: 0, planet_post: 0, radio_show: 0 } as Record<PlanetWorkKind, number>;
+    const done = { saturn_post: 0, jupiter_post: 0, planet_post: 0, radio_show: 0, book: 0, game: 0 } as Record<PlanetWorkKind, number>;
     const lists: [PlanetWorkKind, string[]][] = [
       ['planet_post', await pick('planet_post', planetPosts)],
       ['jupiter_post', await pick('jupiter_post', jupiterPosts)],
       ['saturn_post', await pick('saturn_post', saturnPosts, isNull(saturnPosts.replyToId))],
       ['radio_show', await pick('radio_show', radioShows)],
+      ['book', await pick('book', books)],
+      ['game', await pick('game', games)],
     ];
     for (const [kind, ids] of lists)
       for (const id of ids) {
@@ -260,6 +289,27 @@ export class PlanetWorksService {
       await this.tag('saturn_post', id, { ...f, tags });
       done.saturn_post++;
     }
+    // 05: Mars videos and Venus shows tagged before their values existed (no main class) — again where it can be had now
+    // (an MV's song, a show's title); counted only when one is found, so the repeat ends at 0
+    const untagged = async (kind: PlanetWorkKind, planet: HomePlanet) =>
+      (
+        await this.db.read
+          .select({ id: planetWorkMeta.workId })
+          .from(planetWorkMeta)
+          .where(and(eq(planetWorkMeta.kind, kind), eq(planetWorkMeta.planet, planet), isNull(planetWorkMeta.main), sql`${planetWorkMeta.moodsJson} = '[]'::jsonb`))
+          .orderBy(planetWorkMeta.createdAt)
+          .limit(limit)
+      ).map((r) => r.id);
+    for (const [kind, planet] of [
+      ['planet_post', 'mars'],
+      ['radio_show', 'venus'],
+    ] as const)
+      for (const id of await untagged(kind, planet)) {
+        const f = await this.facts(kind, id);
+        if (!f || (!f.tags.main && !f.tags.moods.length)) continue;
+        await this.tag(kind, id, f);
+        done[kind]++;
+      }
     return done;
   }
 }
