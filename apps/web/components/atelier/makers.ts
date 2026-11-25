@@ -1,4 +1,4 @@
-import { CRAFT_LINES, KIND_HOME_PLANET, spellFrom, KORORIN_VOICE_STYLE, neoVoiceUrl, withTarget, type JobView, type MakeConfirm, type Me, type RefineTarget, type WorkVersion } from '@obolo/shared';
+import { CRAFT_LINES, KIND_HOME_PLANET, spellFrom, KORORIN_VOICE_STYLE, neoVoiceUrl, withTarget, lyricsLines, lyricsSections, type JobView, type MakeConfirm, type Me, type RefineTarget, type WorkVersion } from '@obolo/shared';
 import { demoStickerArt } from '@/lib/look';
 import { ApiError, getApi } from '@/lib/api';
 import type { AtelierKind } from '@/lib/atelier/unlock';
@@ -69,7 +69,8 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
   const spell = opts.confirm ? opts.plan?.tags : undefined;
   const sk = spellKindOf(kind);
   const paid = { confirm: opts.confirm, spell };
-  const pay = (m: 'song' | 'jacketArt' | 'mv') => (opts.confirm ? { kind: m, confirm: opts.confirm, spell: spell && sk ? { kind: sk, tags: spell } : undefined } : undefined);
+  const lyrics = kind === 'song' && opts.confirm ? opts.plan?.lyrics : undefined;
+  const pay = (m: 'song' | 'jacketArt' | 'mv') => (opts.confirm ? { kind: m, confirm: opts.confirm, spell: spell && sk ? { kind: sk, tags: spell, ...(lyrics ? { lyrics } : {}) } : undefined } : undefined);
   const base: Work = { id: uid(), kind, prompt, status: 'ready' };
   const done = (w: Work): Work => {
     const out = { ...w, saved: true };
@@ -127,25 +128,29 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
       if (!ctx.live) {
         // the review page: a 2-minute stand-in job, then the offline sketch (finishJob)
         const job = await api.demoJob({ seconds: DEMO_SECONDS.song!, failTimes: 0, pay: pay('song') });
-        return { ...base, prompt: words, status: 'making', started: { job, what: 'song', words, extra: opts.plan?.genre ? { genre: opts.plan.genre } : undefined } };
+        return { ...base, prompt: words, status: 'making', ...(lyrics ? { lyrics, title: lyrics.title } : {}), started: { job, what: 'song', words, extra: { ...(opts.plan?.genre ? { genre: opts.plan.genre } : {}), ...(lyrics?.title ? { songTitle: lyrics.title } : {}) } } };
       }
-      const d = await api.composeDesign({ partner: ctx.partner.name, isBati: ctx.partner.isBati, genre: opts.plan?.genre ?? 'auto', history: [{ role: 'user', text: words.slice(0, 400) }] });
+      // R13: the design (tempo, key, chords) goes with the lyrics said yes to; the song is sung from exactly those
+      const sung = lyrics ? `\n歌詞：\n${lyricsLines(lyrics).map((l) => l.text).join('\n')}` : '';
+      const d = await api.composeDesign({ partner: ctx.partner.name, isBati: ctx.partner.isBati, genre: opts.plan?.genre ?? 'auto', history: [{ role: 'user', text: `${words.slice(0, 300)}${sung}`.slice(0, 1400) }] });
       const sketch = songFromDesign(d, ctx.me?.displayName ?? '');
       const job = await api.composeFullSong({
-        title: d.title.slice(0, 40),
+        title: (lyrics?.title || d.title).slice(0, 40),
         genre: d.genre,
         mood: d.mood.slice(0, 30),
         bpm: d.bpm,
         keyRoot: d.keyRoot,
         scale: d.scale,
-        sections: d.sections.map((s) => ({ name: s.name, lines: s.lines.map((l) => ({ text: l.text.slice(0, 40), beats: l.notes.reduce((a, n) => a + n.beats, 0) })) })),
+        sections: lyrics ? lyricsSections(lyrics) : d.sections.map((s) => ({ name: s.name, lines: s.lines.map((l) => ({ text: l.text.slice(0, 40), beats: l.notes.reduce((a, n) => a + n.beats, 0) })) })),
+        ...(lyrics ? { lyrics } : {}),
         instrumentalPrompt: d.instrumentalPrompt,
         progression: d.progression,
         seconds: Math.max(10, Math.min(180, d.seconds)),
         from: 'atelier',
         ...(opts.confirm ? { confirm: opts.confirm, ...(spell ? { spell } : {}) } : {}),
       });
-      return { ...base, prompt: words, status: 'making', title: sketch.title, started: { job, what: 'song', words, extra: { comment: d.comment, songTitle: sketch.title } } };
+      const title = lyrics?.title || sketch.title;
+      return { ...base, prompt: words, status: 'making', title, ...(lyrics ? { lyrics } : {}), started: { job, what: 'song', words, extra: { comment: d.comment, songTitle: title } } };
     }
     case 'video': {
       const words = prev?.kind === 'video' ? `${prev.prompt}。${said}` : said;
@@ -199,7 +204,7 @@ export async function finishJob(w: Watched, job: JobView, live = getApi().mode =
     } else {
       const s = makeSong(w.words, (w.extra?.genre as ReturnType<typeof pickGenre> | undefined) ?? pickGenre(w.words), '');
       buryDemo(s);
-      made = { ...base, title: s.title, audio: 'synth:', ref: { demoSong: s } };
+      made = { ...base, title: w.extra?.songTitle || s.title, audio: 'synth:', ref: { demoSong: s } };
     }
   } else if (w.what === 'video') {
     const p = job.result?.mv;

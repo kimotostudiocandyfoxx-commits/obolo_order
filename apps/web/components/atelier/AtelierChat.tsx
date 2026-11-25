@@ -37,7 +37,7 @@ import { DeviceButton } from './DeviceButton';
 import { ClipRelic } from '@/components/relic/ClipRelics';
 import { PortalRelic } from '@/components/relic/PortalRelic';
 import { CLUSTER_MAX } from '@/lib/relic/layout';
-import { linkDomain, wordsAndLinks, type ClipFile } from '@obolo/shared';
+import { linkDomain, wordsAndLinks, type ClipFile, isLyricsTalk, lyricsDiff, lyricsFallback, ownLyricsOf, songSpellKey, SONG_LINES, type LyricsView, type SongLyrics } from '@obolo/shared';
 
 /** R12: your line in the Bati chat — a file handed over floats as its relic; a URL in your words becomes a portal */
 function meItem(m: { id: string; text: string; file?: ClipFile | null }): TalkItem {
@@ -50,6 +50,7 @@ import { BowlFx, TEMPLE_PLATE, type BowlState } from './BowlFx';
 import { faceTo, FLIES, uid, versionsOf, type Msg, type Work } from './work';
 import { isYes, planOf, spellKindOf, type Plan } from './plan';
 import { FloatingSpell, floatLayout, MANA_H, SpellRecord, type FloatSpell } from './FloatingSpell';
+import { LyricSheet, LyricsRecord } from './LyricSheet';
 import { spellLookFor } from './spellLooks';
 import { useGameBroken } from './GamePlay';
 import { BatiCompass, SpellBookFloat, BOOK_PER_PAGE, type BookMode, type BookSaving, type CompassPhase } from './BatiTools';
@@ -255,7 +256,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
           // §4: slow → {bati} says when to come back; the card counts down; the app's host finishes it
           const ms = msLeft(started.job);
           const long = ms > 30_000;
-          const card: Work = { ...shell, ...(prev ? {} : { prompt: res.prompt, title: res.title }), ref: res.ref ?? shell.ref, job: { id: started.job.id, long } };
+          const card: Work = { ...shell, ...(prev ? {} : { prompt: res.prompt, title: res.title }), ref: res.ref ?? shell.ref, ...(res.lyrics ? { lyrics: res.lyrics } : {}), job: { id: started.job.id, long } };
           watchJob({ jobId: started.job.id, what: started.what, card, talkId, toast: long, words: started.words, extra: started.extra, since: Date.now() }, started.job);
           put(card);
           if (long) backLine(kind, ms);
@@ -308,35 +309,91 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
    * float in the sky over the bowl (FloatingSpell, the scene's `stage`); the talk keeps 「じゃあ、こういうスペルになるね。」
    * with a small record of it, and {bati}'s question 「このスペルで作る？　それとも、どこか変える？」
    */
-  const propose = async (kind: AtelierKind, said: string, prev: Work | undefined, opts: MakeOpts, before?: PlanAsk, view?: SpellView, extra?: { lead?: [string, Record<string, string>?]; from?: 'compass' | 'book' }) => {
+  const propose = async (kind: AtelierKind, said: string, prev: Work | undefined, opts: MakeOpts, before?: PlanAsk, view?: SpellView, extra?: { lead?: [string, Record<string, string>?]; from?: 'compass' | 'book'; lyrics?: SongLyrics }) => {
     // client 2026-11-25: a book's spell is free (no mana words), a game's tweak costs its own; a chapter has its own spell
     const craft = isCraftKind(kind);
     const cost = atelierMakeCost(kind, day, kind === 'game' && !!prev) ?? (craft ? { kind: 'game' as const, mana: 0 } : null);
     const sk = craftSpellKind(kind, prev) ?? spellKindOf(kind);
     if (!cost || !sk) return start(kind, said, prev, opts);
+    // R13: a song's spell has two parts — the style talismans, then the lyrics with metatags (not in a story day's script)
+    const twoPart = kind === 'song' && !story;
+    if (twoPart && before && isLyricsTalk(said)) return reLyric(before, said);
     if (before) setMsgs((m) => m.map((x) => (x.id === before.id && x.who === 'bati' && x.plan ? { ...x, plan: { ...x.plan, done: 'changed' as const } } : x)));
     setBusy(true);
-    const asked = before || craft ? said : prev ? `${prev.prompt}。${said}` : said;
+    // R13: 「歌詞はこれで：…」 — the style spell is from the words before the lyrics
+    const own = twoPart && !before ? ownLyricsOf(said) : null;
+    const styleSaid = own ? said.slice(0, Math.max(0, said.indexOf(own))).replace(/(歌詞は(これ|こう|こちら)で|この歌詞で|歌詞)[\s:：、。]*$/, '').trim() : said;
+    const asked = before || craft ? styleSaid : prev ? `${prev.prompt}。${styleSaid}` : styleSaid;
     // a game's change edits the spell it was cast with (「もっと難しく」); a chapter's spell is fresh from the words
     const was = before ? before.plan.tags : kind === 'game' && prev?.spell?.length ? prev.spell : undefined;
     const v =
       view ??
       (await getApi()
         .moonSpell({ kind: sk, said: asked.slice(0, 200) || 'おまかせ', ...(was ? { tags: was } : {}) })
-        .catch((): SpellView => (before ? { tags: before.plan.tags, added: [], removed: [] } : { tags: spellFrom(sk, asked), added: [], removed: [] })));
+        .catch((): SpellView => (before ? { tags: before.plan.tags, added: [], removed: [] } : { tags: spellFrom(sk, asked || 'おまかせ'), added: [], removed: [] })));
     const [have] = await Promise.all([manaNow()]);
     setBusy(false);
-    const plan = planOf(kind, v);
+    const plan0 = planOf(kind, v);
+    // R13: the lyrics carry over a change of the style talismans; a fresh song gets them written for its style
+    const plan: Plan = twoPart && before?.plan.lyrics ? { ...plan0, lyrics: before.plan.lyrics } : plan0;
     const id = uid();
-    const text = extra?.lead ? tline(extra.lead[0], extra.lead[1]) : tline(before ? MOON_LINES.replan : MOON_LINES.plan);
-    setMsgs((m) => [...m, { id, who: 'bati', text, plan: { kind, tags: plan.tags, price: cost.mana, have } }, { id: uid(), who: 'bati', text: tline(craft ? craftConfirmLine(kind, prev) : MOON_LINES.confirm) }]);
-    setFloating((f) => ({ id: before && f ? f.id : id, kind, look: spellLookFor(kind), tags: plan.tags, removed: before ? plan.removed : [], price: cost.mana, have, from: extra?.from }));
+    const text = extra?.lead ? tline(extra.lead[0], extra.lead[1]) : tline(before ? MOON_LINES.replan : twoPart ? SONG_LINES.songPlan : MOON_LINES.plan);
+    const fid = before && floatingRef.current ? floatingRef.current.id : id;
+    setMsgs((m) => [...m, { id, who: 'bati', text, plan: { kind, tags: plan.tags, price: cost.mana, have } }]);
+    setFloating((f) => ({ id: fid, kind, look: spellLookFor(kind), tags: plan.tags, removed: before ? plan.removed : [], price: cost.mana, have, from: extra?.from, lyrics: twoPart && before && f?.lyrics ? f.lyrics : undefined }));
     hinted.current.clear();
     // a redo is asked with the change's own words (the card's words carry over); a new one with the spell's
-    setPending({ plan: { id, plan, prompt: craft ? (before ? `${before.prompt}、${said}` : said) : prev ? (before ? `${before.prompt}、${said}` : said) : plan.words, prev, opts, price: cost.mana } });
+    const ask: PlanAsk = { id, plan, prompt: craft ? (before ? `${before.prompt}、${said}` : said) : prev ? (before ? `${before.prompt}、${styleSaid}` : styleSaid) : plan.words, prev, opts, price: cost.mana };
+    if (twoPart && !plan.lyrics) {
+      // the style talismans come out first (「曲調のスペルはこんなんだね。」); meanwhile {bati} writes the lyrics
+      const t0 = Date.now();
+      setBusy(true);
+      const base = extra?.lyrics ?? prev?.lyrics;
+      const got: LyricsView = base
+        ? { lyrics: base, how: 'new' }
+        : await getApi()
+            .moonLyrics({ tags: plan.tags, said: (own ? `歌詞はこれで：${own}` : asked || plan.words || 'おまかせ').slice(0, 1200) })
+            .catch((): LyricsView => ({ lyrics: lyricsFallback(plan.tags), how: 'new' }));
+      // the talismans finish coming in before the sheet (each 230 ms, then a breath)
+      const wait = 1400 + plan.tags.length * 230 - (Date.now() - t0);
+      if (wait > 0) await new Promise((r) => setTimeout(r, wait));
+      setBusy(false);
+      if (floatingRef.current?.id !== fid) return;
+      showLyrics(fid, got, null);
+      const lead = got.declined === 'copy' ? SONG_LINES.lyricsCopy : got.declined === 'flagged' ? SONG_LINES.lyricsFlagged : got.how === 'own' ? SONG_LINES.lyricsOwn : SONG_LINES.songLyrics;
+      setMsgs((m) => [...m, ...(got.declined === 'flagged' ? [{ id: uid(), who: 'bati' as const, text: tline(lead) }] : []), { id: uid(), who: 'bati', text: tline(got.declined === 'flagged' ? SONG_LINES.songLyrics : lead), lyricsRec: got.lyrics }, { id: uid(), who: 'bati', text: tline(MOON_LINES.confirm) }]);
+      return setPending({ plan: { ...ask, plan: { ...plan, lyrics: got.lyrics } } });
+    }
+    setMsgs((m) => [...m, { id: uid(), who: 'bati', text: tline(craft ? craftConfirmLine(kind, prev) : MOON_LINES.confirm) }]);
+    setPending({ plan: ask });
+  };
+  /** R13: the lyric sheet shown (or changed: `before` the lyrics it was) under the style talismans, now compact */
+  const showLyrics = (fid: string, got: LyricsView, before: SongLyrics | null) =>
+    setFloating((f) => (f && f.id === fid ? { ...f, removed: [], lyrics: { lyrics: got.lyrics, change: before ? lyricsDiff(before, got.lyrics) : undefined, v: (f.lyrics?.v ?? 0) + 1 } } : f));
+  /**
+   * R13: words about the lyrics while the song's spell waits (「サビをもっと明るく」「2番を足して」「ささやきを外して」
+   * 「歌詞の〇〇を△△に」「歌詞はこれで：…」) — {bati} changes the lyrics (changed lines glow, tags fall / drop in) and asks again
+   */
+  const reLyric = async (before: PlanAsk, said: string) => {
+    const now = before.plan.lyrics ?? lyricsFallback(before.plan.tags);
+    setBusy(true);
+    const got = await getApi()
+      .moonLyrics({ tags: before.plan.tags, said: said.slice(0, 1200), lyrics: now })
+      .catch((): LyricsView => ({ lyrics: now, how: 'kept' }));
+    setBusy(false);
+    const fid = floatingRef.current?.id;
+    const changed = got.how !== 'kept' && !got.declined;
+    if (fid && changed) showLyrics(fid, got, got.how === 'own' ? null : now);
+    const lead = got.declined === 'copy' ? SONG_LINES.lyricsCopy : got.declined === 'flagged' ? SONG_LINES.lyricsFlagged : got.how === 'kept' ? SONG_LINES.lyricsFail : got.how === 'own' ? SONG_LINES.lyricsOwn : SONG_LINES.lyricsChanged;
+    if (got.declined === 'copy' && fid) showLyrics(fid, got, null);
+    const id = uid();
+    setMsgs((m) => [...m.map((x) => (x.id === before.id && x.who === 'bati' && x.plan ? { ...x, plan: { ...x.plan, done: 'changed' as const } } : x)), { id, who: 'bati', text: tline(lead), ...(changed || got.declined === 'copy' ? { lyricsRec: got.lyrics } : {}) }, { id: uid(), who: 'bati', text: tline(MOON_LINES.confirm) }]);
+    setPending({ plan: { ...before, id, plan: { ...before.plan, added: [], removed: [], lyrics: changed || got.declined === 'copy' ? got.lyrics : now } } });
   };
   /** the spell floating over the bowl (from its first showing through its changes, until it is cast) */
   const [floating, setFloating] = useState<FloatSpell | null>(null);
+  const floatingRef = useRef(floating);
+  floatingRef.current = floating;
   /** a talisman tapped: it wobbles; {bati} says, once a talisman, how to take it off (no ✕, no buttons) */
   const hinted = useRef(new Set<string>());
   const tapTag = (t: SpellTag) => {
@@ -372,8 +429,10 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     const sk = craftSpellKind(pa.plan.kind, pa.prev) ?? spellKindOf(pa.plan.kind);
     // R12: the spell just cast (「しまっておいて」 keeps it; a happy word once its work is done may bring the offer)
     const bk = bookKindOf(sk);
-    lastCast.current = bk ? { kind: bk, tags: pa.plan.tags, done: false } : lastCast.current;
-    void start(pa.plan.kind, pa.prompt, pa.prev, { ...pa.opts, plan: pa.plan, confirm: { id: yesId(), price: pa.price, ...(sk ? { spell: spellKey(sk, pa.plan.tags) } : {}) } });
+    lastCast.current = bk ? { kind: bk, tags: pa.plan.tags, ...(pa.plan.lyrics ? { lyrics: pa.plan.lyrics } : {}), done: false } : lastCast.current;
+    // R13: a song's yes covers its style talismans and its lyrics with metatags
+    const key = sk === 'song' && pa.plan.lyrics ? songSpellKey(pa.plan.tags, pa.plan.lyrics) : sk ? spellKey(sk, pa.plan.tags) : null;
+    void start(pa.plan.kind, pa.prompt, pa.prev, { ...pa.opts, plan: pa.plan, confirm: { id: yesId(), price: pa.price, ...(key ? { spell: key } : {}) } });
   };
 
   /** what is said once a card is made */
@@ -623,7 +682,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     toolTimer.current = setTimeout(f, ms);
   };
   /** the spell just cast in this talk (its work done or not), and whether it is in the book */
-  const lastCast = useRef<{ kind: SpellBookKind; tags: SpellTag[]; done: boolean; kept?: SavedSpell } | null>(null);
+  const lastCast = useRef<{ kind: SpellBookKind; tags: SpellTag[]; lyrics?: SongLyrics; done: boolean; kept?: SavedSpell } | null>(null);
   const lastKept = useRef<SavedSpell | null>(null);
   const bookList = useRef<SavedSpell[] | null>(null);
   const loadBook = async (fresh = false) => {
@@ -681,7 +740,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     if (c.kept && !name) return sayT(SPELL_TOOL_LINES.bookAlready, { spell: c.kept.name });
     setBusy(true);
     try {
-      const r = await getApi().saveSpell({ kind: c.kind, tags: c.tags, ...(name ? { name } : {}) });
+      const r = await getApi().saveSpell({ kind: c.kind, tags: c.tags, ...(c.lyrics && c.kind === 'song' ? { lyrics: c.lyrics } : {}), ...(name ? { name } : {}) });
       lastCast.current = { ...c, kept: r };
       lastKept.current = r;
       if (r.already) return sayT(SPELL_TOOL_LINES.bookAlready, { spell: r.name });
@@ -722,7 +781,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     later(wasOpen ? 2000 : 2200, bookAway);
     void getApi().usedSpell(sp.id).catch(() => undefined);
     lastKept.current = sp;
-    void propose(kind, sp.name, undefined, {}, undefined, { tags: sp.tags, added: [], removed: [] }, { lead: [SPELL_TOOL_LINES.bookUse, { spell: sp.name }], from: 'book' });
+    // R13: a song spell kept with its lyrics brings both parts back
+    void propose(kind, sp.name, undefined, {}, undefined, { tags: sp.tags, added: [], removed: [] }, { lead: [SPELL_TOOL_LINES.bookUse, { spell: sp.name }], from: 'book', ...(sp.lyrics ? { lyrics: sp.lyrics } : {}) });
   };
   /** R12: a kind asked for, and a kept spell of that kind fits the words — {bati} asks (now and then) */
   const suggestFromBook = (kind: AtelierKind, content: string): boolean => {
@@ -1355,7 +1415,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
             name: m.speaker && story ? story.speaker(m.speaker).name : undefined,
             // client 2026-11-24: a picture right in the talk (where it came from, small under it); R11: the plan's card
             // client 2026-11-25: the spell itself floats over the bowl; the talk keeps a small record of it
-            extra: m.pic ? <PicBubble pic={m.pic} /> : m.plan ? <SpellRecord tags={m.plan.tags} /> : undefined,
+            extra: m.pic ? <PicBubble pic={m.pic} /> : m.plan ? <SpellRecord tags={m.plan.tags} /> : m.lyricsRec ? <LyricsRecord lyrics={m.lyricsRec} /> : undefined,
             chips: m.changed
               ? [{ label: m.changed.undone ? '元に戻した' : '元に戻す', onPick: () => undoChange(m.id), disabled: busy || !!m.changed.undone }]
               : m.plan
@@ -1473,6 +1533,30 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
                 if (!floating) return { top: tool?.kind === 'book' ? bk.top : cp.y - cp.size / 2, node: toolNode };
                 const b = m.at(TEMPLE_PLATE.bowl.u, TEMPLE_PLATE.bowl.v);
                 const bottom = b.y - TEMPLE_PLATE.bowl.w * m.scale * 0.13;
+                const from0 = floating.from === 'compass' ? { x: cp.x, y: cp.y } : floating.from === 'book' ? { x: bb.x, y: bk.top + bk.h / 2 } : undefined;
+                if (floating.lyrics) {
+                  // R13: the style talismans compact upward, the lyric sheet under them, the mana under the sheet
+                  const sc = m.w >= 700 ? 0.74 : 0.62;
+                  const sheetW = Math.min(m.w - 28, 540);
+                  const layout = floatLayout(floating.look, floating.tags, m.w, (sheetW + 10) / sc);
+                  const manaTop = floating.price > 0 ? bottom - 22 : bottom;
+                  const roof = m.top + (m.w >= 700 ? 150 : 104);
+                  const styleH = layout.height * sc;
+                  const sheetBottom = manaTop - 8;
+                  const sheetH = Math.max(170, Math.min(m.w >= 700 ? 520 : 420, sheetBottom - roof - styleH - 10));
+                  const sheetTop = sheetBottom - sheetH;
+                  const styleBottom = sheetTop - 6;
+                  return {
+                    top: Math.min(styleBottom - styleH, tool?.kind === 'book' ? bk.top : bottom),
+                    node: (
+                      <>
+                        {toolNode}
+                        <FloatingSpell key={floating.id} spell={floating} layout={layout} cx={b.x} bottom={styleBottom} bowl={b} scale={sc} onTap={tapTag} from={from0} manaTop={manaTop} />
+                        <LyricSheet key={`${floating.id}-sheet`} sheet={floating.lyrics} cx={b.x} top={sheetTop} width={sheetW} height={sheetH} casting={floating.casting} />
+                      </>
+                    ),
+                  };
+                }
                 const layout = floatLayout(floating.look, floating.tags, m.w);
                 const need = layout.height + (floating.price > 0 ? MANA_H : 0);
                 // room for at least a short line of the talk above them

@@ -1,4 +1,4 @@
-import { spellWords, type SpellKind, type SpellTag, type SpellView } from '@obolo/shared';
+import { spellWords, type SongLyrics, type SpellKind, type SpellTag, type SpellView } from '@obolo/shared';
 import type { AtelierKind } from '@/lib/atelier/unlock';
 
 /**
@@ -18,6 +18,8 @@ export type Plan = {
   genre?: Genre;
   /** the Japanese words the making is asked with (what it is about; else the whole spell) */
   words: string;
+  /** R13: a song's second part — the lyrics with metatags (the yes covers them; the song is sung from them) */
+  lyrics?: SongLyrics;
 };
 
 const GENRE: Record<string, Genre> = { pop: 'pop', rock: 'rock', ballad: 'ballad', 'hip hop': 'hiphop', 'dance, EDM': 'edm' };

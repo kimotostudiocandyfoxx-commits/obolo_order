@@ -3,6 +3,7 @@
 import { useRef, useState, type CSSProperties } from 'react';
 import type { SpellTag } from '@obolo/shared';
 import { face, LOOK_CSS, Talisman, useSpellFont, type TalismanLook } from './spellLooks';
+import type { FloatLyrics } from './LyricSheet';
 
 /**
  * Client 2026-11-25: the spell is not in a bubble. While {bati} says 「じゃあ、こういうスペルになるね。」 its talismans come
@@ -13,7 +14,7 @@ import { face, LOOK_CSS, Talisman, useSpellFont, type TalismanLook } from './spe
  * `stage`), so it stays while the talk scrolls; the talk keeps a small record line of it (SpellRecord).
  */
 /** `id`: the spell from its first showing through its changes (a new making is a new one) */
-export type FloatSpell = { id: string; kind: string; look: TalismanLook; tags: SpellTag[]; removed: SpellTag[]; price: number; have: number | null; casting?: boolean; /** R12: where its talismans come out of at first ({bati}'s compass, the spell book) */ from?: 'compass' | 'book' };
+export type FloatSpell = { id: string; kind: string; look: TalismanLook; tags: SpellTag[]; removed: SpellTag[]; price: number; have: number | null; casting?: boolean; /** R12: where its talismans come out of at first ({bati}'s compass, the spell book) */ from?: 'compass' | 'book'; /** R13: a song's lyrics with metatags (the sheet under the compact style talismans) */ lyrics?: FloatLyrics };
 
 const seedOf = (s: string) => [...s].reduce((x, c) => (x * 31 + c.charCodeAt(0)) >>> 0, 7);
 /** a small steady tilt per tag (the same tag always hangs the same way) */
@@ -50,8 +51,8 @@ export type FloatLayout = { at: Map<string, { x: number; y: number; w: number; h
  * where each talisman floats: rows (centred, every other row a little to the side), a small steady jitter each; strips
  * (A) in rows of tall papers, a staggered height each
  */
-export function floatLayout(look: TalismanLook, tags: SpellTag[], width: number): FloatLayout {
-  const maxW = Math.min(width - 36, look === 'reifu' ? 330 : 370);
+export function floatLayout(look: TalismanLook, tags: SpellTag[], width: number, /** R13: a wider row (the compact talismans over a song's lyric sheet) */ rowW?: number): FloatLayout {
+  const maxW = rowW ?? Math.min(width - 36, look === 'reifu' ? 330 : 370);
   const gx = look === 'reifu' ? 9 : 14;
   const gy = look === 'reifu' ? 14 : 12;
   const rows: { tags: { t: SpellTag; w: number; h: number }[]; w: number; h: number }[] = [];
@@ -97,12 +98,12 @@ const CSS = `
  * the spell in the air: `cx` = the bowl's centre line, `bottom` = just over the bowl's rim (the mana sits there, the
  * talismans above it), `bowl` = where they fly when it is cast, `scale` = shrunk to fit the room over the bowl
  */
-export function FloatingSpell({ spell, layout, cx, bottom, bowl, scale, onTap, from }: { spell: FloatSpell; layout: FloatLayout; cx: number; bottom: number; bowl: { x: number; y: number }; scale: number; onTap?: (t: SpellTag) => void; /** R12: the point (stage px) its first talismans come out of */ from?: { x: number; y: number } }) {
+export function FloatingSpell({ spell, layout, cx, bottom, bowl, scale, onTap, from, manaTop }: { spell: FloatSpell; layout: FloatLayout; cx: number; bottom: number; bowl: { x: number; y: number }; scale: number; onTap?: (t: SpellTag) => void; /** R12: the point (stage px) its first talismans come out of */ from?: { x: number; y: number }; /** R13: the mana words at their own place (under a song's lyric sheet); the talismans end at `bottom` */ manaTop?: number }) {
   const { look } = spell;
   useSpellFont(look);
   const g = GLOW[look];
   const manaH = spell.price > 0 ? MANA_H : 0;
-  const top = bottom - (layout.height + manaH) * scale;
+  const top = bottom - (layout.height + (manaTop != null ? 0 : manaH)) * scale;
   // each talisman keeps the motion it came with (a change does not replay the others): its order of coming in
   const born = useRef(new Map<string, { delay: number; spell: string; first?: boolean }>());
   const last = useRef(new Map<string, { x: number; y: number; w: number; h: number }>());
@@ -135,7 +136,7 @@ export function FloatingSpell({ spell, layout, cx, bottom, bowl, scale, onTap, f
           filter: casting ? 'brightness(2.6) blur(1px)' : undefined,
           transition: casting
             ? `left .95s cubic-bezier(.55,0,.75,.6) ${i * 85}ms, top .95s cubic-bezier(.4,0,.9,.5) ${i * 85}ms, transform .95s ease-in ${i * 85}ms, opacity .35s ease-in ${600 + i * 85}ms, filter .6s ease-in ${i * 85}ms`
-            : 'left .8s cubic-bezier(.3,.7,.3,1), top .8s cubic-bezier(.3,.7,.3,1)',
+            : 'left .8s cubic-bezier(.3,.7,.3,1), top .8s cubic-bezier(.3,.7,.3,1), transform .8s cubic-bezier(.3,.7,.3,1)',
           zIndex: gone ? 0 : 1,
         }}
         data-float-tag={t.ja}
@@ -189,7 +190,7 @@ export function FloatingSpell({ spell, layout, cx, bottom, bowl, scale, onTap, f
       {manaH > 0 && (
         <div
           className="absolute flex -translate-x-1/2 items-baseline gap-4 whitespace-nowrap"
-          style={{ left: cx, top: bottom - manaH * scale + 2, fontSize: 13.5 * Math.max(scale, 0.85), color: g.ink, textShadow: `0 0 2px rgba(4,8,30,.95), 0 1px 3px rgba(4,8,30,.9), ${g.shadow}`, fontFamily: face(look), letterSpacing: '.08em', animation: spell.casting ? 'none' : `fs-mana 1.2s ease-out ${300 + spell.tags.length * 230}ms both`, opacity: spell.casting ? 0 : 1, transition: 'opacity .35s ease-in' } as CSSProperties}
+          style={{ left: cx, top: manaTop ?? bottom - manaH * scale + 2, fontSize: 13.5 * (manaTop != null ? 0.92 : Math.max(scale, 0.85)), color: g.ink, textShadow: `0 0 2px rgba(4,8,30,.95), 0 1px 3px rgba(4,8,30,.9), ${g.shadow}`, fontFamily: face(look), letterSpacing: '.08em', animation: spell.casting ? 'none' : `fs-mana 1.2s ease-out ${300 + spell.tags.length * 230}ms both`, opacity: spell.casting ? 0 : 1, transition: 'opacity .35s ease-in' } as CSSProperties}
           data-testid="spell-mana"
         >
           <span>

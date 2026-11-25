@@ -70,6 +70,13 @@ import {
   spellFrom,
   spellKey,
   spellOfAnswers,
+  songSpellKey,
+  ownLyricsOf,
+  lyricsStructure,
+  lyricsFallback,
+  lyricsEdit,
+  lyricsDemoEdit,
+  type LyricsView,
   demoChapter,
   demoGame,
   isFinalChapter,
@@ -961,6 +968,18 @@ export class DemoApi implements Api {
     await sleep(250);
     return body.tags?.length ? spellEdit(body.kind, body.tags, body.said) : { tags: body.answers?.length ? spellOfAnswers(body.kind, body.answers) : spellFrom(body.kind, body.said), added: [], removed: [] };
   }
+  // R13: the review demo's lyrics — canned ones by the shared rules (the API's writer is a model); a change by rule, or the
+  // demo's stand-in for new words (「サビをもっと明るく」「2番を足して」)
+  async moonLyrics(body: Parameters<Api['moonLyrics']>[0]): Promise<LyricsView> {
+    await sleep(body.lyrics ? 700 : 1200);
+    const own = ownLyricsOf(body.said);
+    if (own) return { lyrics: lyricsStructure(own) ?? lyricsFallback(body.tags), how: 'own' };
+    if (!body.lyrics) return { lyrics: lyricsFallback(body.tags), how: 'new' };
+    const e = lyricsEdit(body.lyrics, body.said);
+    if (e) return { lyrics: e.lyrics, how: 'edit' };
+    const d = lyricsDemoEdit(body.lyrics, body.said);
+    return d ? { lyrics: d, how: 'edit' } : { lyrics: body.lyrics, how: 'kept' };
+  }
 
   // R12: the compass's canned reads in the demo (a photo / an image: a watercolour seaside at dusk; a link: a night-drive
   // city pop) — the review shots; the real ones are the API's model
@@ -1006,13 +1025,13 @@ export class DemoApi implements Api {
   }
   async saveSpell(body: Parameters<Api['saveSpell']>[0]) {
     await sleep(200);
-    const key = spellKeyOf(body.kind, body.tags);
+    const key = body.lyrics && body.kind === 'song' ? songSpellKey(body.tags, body.lyrics)! : spellKeyOf(body.kind, body.tags);
     const mine = this.myBook();
     const same = mine.find((x) => x.key === key);
     if (same) return { ...this.bookView(same), already: true };
     if (mine.length >= SPELL_BOOK_MAX) throw new ApiError(409, 'SPELL_BOOK_FULL', 'The spell book is full');
     const name = spellNameUnique(body.name ? spellNameClean(body.name) : spellBookName(body.kind, body.tags), mine.map((x) => x.name));
-    const row = { id: uid(), owner: this.uid(), key, kind: body.kind, name, tags: body.tags, createdAt: new Date().toISOString(), usedAt: null };
+    const row = { id: uid(), owner: this.uid(), key, kind: body.kind, name, tags: body.tags, ...(body.lyrics && body.kind === 'song' ? { lyrics: body.lyrics } : {}), createdAt: new Date().toISOString(), usedAt: null };
     this.s.spellBook = [row, ...(this.s.spellBook ?? [])];
     this.save();
     return this.bookView(row);
@@ -1043,7 +1062,7 @@ export class DemoApi implements Api {
 
   async demoJob(body: Parameters<Api['demoJob']>[0] & { lateBy?: number }): Promise<JobView> {
     // R11: a paid stand-in is charged with the yes; the same yes again hands back the job it started
-    const key = body.pay ? this.charge(body.pay.kind, { confirm: body.pay.confirm, spell: body.pay.spell?.tags }, true, body.pay.spell?.kind) : null;
+    const key = body.pay ? this.charge(body.pay.kind, { confirm: body.pay.confirm, spell: body.pay.spell?.tags, lyrics: body.pay.spell?.lyrics }, true, body.pay.spell?.kind) : null;
     if (key && this.s.paidYes?.[key]) return this.getJob(this.s.paidYes[key]);
     const id = uid();
     if (key) this.s.paidYes = { ...(this.s.paidYes ?? {}), [key]: id };
@@ -1533,7 +1552,7 @@ export class DemoApi implements Api {
   private charge(kind: MakeKind, paid?: Paid, repeatOk = false, spellKind: SpellKind = 'art'): string | null {
     const w = this.s.wallets[this.uid()];
     const key = paid?.confirm ? confirmKey(this.uid(), kind, paid.confirm) : null;
-    const d = decideCharge({ kind, confirm: paid?.confirm, required: false, spell: paid?.spell ? spellKey(spellKind, paid.spell) : null, balance: w?.mana ?? 0, applied: !!key && key in (this.s.paidYes ?? {}) });
+    const d = decideCharge({ kind, confirm: paid?.confirm, required: false, spell: paid?.spell ? (spellKind === 'song' && paid.lyrics ? songSpellKey(paid.spell, paid.lyrics) : spellKey(spellKind, paid.spell)) : null, balance: w?.mana ?? 0, applied: !!key && key in (this.s.paidYes ?? {}) });
     if ('error' in d) {
       if (d.error === 'NO_MANA') window.dispatchEvent(new Event('obolo:nomana'));
       throw new ApiError(d.error === 'NO_MANA' ? 402 : 409, d.error, CHARGE_ERROR_WORDS[d.error]);

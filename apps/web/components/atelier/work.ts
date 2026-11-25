@@ -1,5 +1,5 @@
 import type { AtelierKind } from '@/lib/atelier/unlock';
-import { FLY_READY_KINDS, KIND_HOME_PLANET, type BluenaPlanet, type BookView, type GameView, type SpellTag } from '@obolo/shared';
+import { FLY_READY_KINDS, KIND_HOME_PLANET, type BluenaPlanet, type BookView, type GameView, type SpellTag, type SongLyrics } from '@obolo/shared';
 import type { ClipFile, RefineTarget, WorkMaterial, WorkOrigin } from '@obolo/shared';
 import type { MadeSong } from '@/lib/mercury/compose';
 
@@ -50,6 +50,8 @@ export type Work = {
   game?: GameView;
   /** the spell it was last cast with (a book's / a game's change edits it) */
   spell?: SpellTag[];
+  /** R13: a song's lyrics with metatags (sung from them; its lyric sheet keeps the section labels) */
+  lyrics?: SongLyrics;
   /** the planet it belongs to (KIND_HOME_PLANET), kept for the later 〔星へ飛ばす〕 of planets without a screen yet */
   home?: BluenaPlanet;
 };
@@ -92,7 +94,7 @@ export function swipeTo(i: number, dir: -1 | 1, n: number): number {
   return Math.max(0, Math.min(n - 1, i + dir));
 }
 
-export type Msg = { id: string; who: 'me'; text: string; /** Bluena's 📎: a file from the device handed over */ file?: ClipFile } | { id: string; who: 'bati'; text: string; chips?: string[]; /** a story line: the script's speaker (KIMORIN, OBOLON, コロリン …) */ speaker?: string; /** M-R236: the works {bati} found (「★がついた曲、見せて」), shown as cards */ found?: Work[]; /** M-R263: a change {bati} made (the preview card and 〔元に戻す〕) */ changed?: { id: string; from: string; to: string; undone?: boolean }; /** client 2026-11-24: a picture in the talk (a lookup's, 「〇〇の絵を見せて」) */ pic?: { url: string; title?: string; source?: string; pageUrl?: string }; /** R11: {bati}'s spell before a paid making (its talismans float over the bowl; the talk keeps a record line) and what came of it */ plan?: { kind: AtelierKind; /** the spell's tags (Japanese shown; English never) */ tags: SpellTag[]; added?: SpellTag[]; removed?: SpellTag[]; price: number; have: number | null; done?: 'yes' | 'changed' | 'short' } } | { id: string; who: 'work'; work: Work };
+export type Msg = { id: string; who: 'me'; text: string; /** Bluena's 📎: a file from the device handed over */ file?: ClipFile } | { id: string; who: 'bati'; text: string; chips?: string[]; /** a story line: the script's speaker (KIMORIN, OBOLON, コロリン …) */ speaker?: string; /** M-R236: the works {bati} found (「★がついた曲、見せて」), shown as cards */ found?: Work[]; /** M-R263: a change {bati} made (the preview card and 〔元に戻す〕) */ changed?: { id: string; from: string; to: string; undone?: boolean }; /** client 2026-11-24: a picture in the talk (a lookup's, 「〇〇の絵を見せて」) */ pic?: { url: string; title?: string; source?: string; pageUrl?: string }; /** R11: {bati}'s spell before a paid making (its talismans float over the bowl; the talk keeps a record line) and what came of it */ plan?: { kind: AtelierKind; /** the spell's tags (Japanese shown; English never) */ tags: SpellTag[]; added?: SpellTag[]; removed?: SpellTag[]; price: number; have: number | null; done?: 'yes' | 'changed' | 'short' }; /** R13: the lyrics with metatags shown (the talk keeps a record line: 「歌詞：Aメロ・サビ…」) */ lyricsRec?: SongLyrics } | { id: string; who: 'work'; work: Work };
 
 /** the kinds that fly to a planet (〔星へ飛ばす〕) */
 // client 2026-11-25: from the one shared map (KIND_HOME_PLANET); a planet without its screen yet (Pluto's books,
