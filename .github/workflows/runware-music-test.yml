@@ -1,0 +1,39 @@
+name: Runware music test
+
+# One-off listening test (client 2026-11-25): the same Japanese lyrics on Runware's ACE-Step 1.5 XL SFT and
+# MiniMax Music 2.6. Uses the Runware key already in Secret Manager (obolo-seedream-api-key); nothing is deployed.
+# The two mp3s, the lyrics and Runware's cost per song are saved to art/lab/runware-music on this branch.
+on:
+  workflow_dispatch:
+
+env:
+  WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER || format('projects/{0}/locations/global/workloadIdentityPools/github/providers/github', vars.GCP_PROJECT_NUMBER) }}
+  DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA || format('obolo-deployer@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+
+jobs:
+  sing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Sing the same lyrics on both models
+        run: |
+          export RUNWARE_API_KEY="$(gcloud secrets versions access latest --secret=obolo-seedream-api-key)"
+          python3 scripts/music-lab/runware_compare.py
+      - name: Save the songs to the branch
+        if: always()
+        run: |
+          git config user.name "music-lab"
+          git config user.email "music-lab@users.noreply.github.com"
+          git add -f art/lab/runware-music || exit 0
+          git diff --cached --quiet && exit 0
+          git commit -m "Music lab: Runware listening test (ACE-Step 1.5 XL SFT vs MiniMax Music 2.6) [skip ci]"
+          for i in 1 2 3; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 5; done
