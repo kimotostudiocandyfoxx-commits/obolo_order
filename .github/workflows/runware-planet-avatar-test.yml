@@ -1,0 +1,71 @@
+name: Runware planet avatar test
+
+# One-off comparison (client 2026-11-25): each planet's deformed member figure (Saturn chibi and kororin ball, Jupiter
+# butterfly, Mercury boat, Mars UFO, Venus radio DJ, Uranus balloons, Pluto book, Neptune bubble) painted from 2-3 real
+# member looks on the candidate Runware models, with the look as the first reference picture like the app sends it.
+# Prompts: scripts/art-lab/planet_avatar_prompts.json (from the story branch's design/mv-art-queue.json). Uses the key
+# already in Secret Manager (obolo-seedream-api-key); nothing is deployed. Estimated ~$2.6 for the full run, stopped
+# by the script at budget_usd. Pictures, per-case contact sheets, costs.json and README.md are saved to
+# art/lab/runware-planet-avatar on this branch.
+on:
+  workflow_dispatch:
+    inputs:
+      models:
+        description: 'only these model slugs (comma-separated, e.g. flux2-klein-4b,seedream-5-flash); empty = all six'
+        required: false
+        default: ''
+      styles:
+        description: 'only these styles (e.g. saturn-chibi,jupiter-butterfly); empty = all nine'
+        required: false
+        default: ''
+      looks:
+        description: 'only these looks (A-fox, B-rabbit, C-user); empty = all three'
+        required: false
+        default: ''
+      budget_usd:
+        description: 'stop painting once Runware reports this much spent (USD)'
+        required: false
+        default: '3.0'
+
+env:
+  WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER || format('projects/{0}/locations/global/workloadIdentityPools/github/providers/github', vars.GCP_PROJECT_NUMBER) }}
+  DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA || format('obolo-deployer@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+
+jobs:
+  paint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Pillow for the contact sheets
+        run: python3 -m pip install --quiet pillow
+      - name: Paint every planet's figure on every model
+        env:
+          MODELS: ${{ inputs.models }}
+          STYLES: ${{ inputs.styles }}
+          LOOKS: ${{ inputs.looks }}
+          BUDGET_USD: ${{ inputs.budget_usd }}
+        run: |
+          export RUNWARE_API_KEY="$(gcloud secrets versions access latest --secret=obolo-seedream-api-key)"
+          python3 scripts/art-lab/runware_planet_avatar.py --dry-run
+          python3 scripts/art-lab/runware_planet_avatar.py
+      - name: Costs in the summary
+        if: always()
+        run: cat art/lab/runware-planet-avatar/README.md >> "$GITHUB_STEP_SUMMARY" || true
+      - name: Save the pictures to the branch
+        if: always()
+        run: |
+          git config user.name "art-lab"
+          git config user.email "art-lab@users.noreply.github.com"
+          git add -f art/lab/runware-planet-avatar || exit 0
+          git diff --cached --quiet && exit 0
+          git commit -m "Art lab: planet-home member figures on the candidate models [skip ci]"
+          for i in 1 2 3; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 5; done

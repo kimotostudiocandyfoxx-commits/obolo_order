@@ -1,0 +1,114 @@
+{
+  "about": "Planet-home deformed member figures (M-R262/M-R275/M-R278/M-R279/M-R280/M-R293, story branch design/mv-art-queue.json items chibi2-*, kor4-*, chibi4-*, ship4-*, p5-<planet>-*). Each style is the queue prompt with the story cast's own outfit words replaced by a {pattern}/{accessory}/{top} slot (the member's pattern card, M-R279), filled per look below. The look goes FIRST, the style references after it, at 1024x1024, as the app sends references (packages/ai/src/images.ts runwareImageTask).",
+  "looks": [
+    {
+      "id": "A-fox",
+      "ref": "art/review/saturn/gen-tests/look-photo1-1.jpg",
+      "about": "a real member look made by the app from photo p1 (hooded portrait, round sunglasses, fox ears)",
+      "pattern": "olive gold and teal with black accents, taken from her olive-gold hooded cloak, teal fox ears and long black hair",
+      "accessory": "her round black sunglasses",
+      "top": "two pointed teal fox ears with a bit of her black hair",
+      "all_models": true
+    },
+    {
+      "id": "B-rabbit",
+      "ref": "art/review/saturn/gen-tests/look-photo2-1.jpg",
+      "about": "a real member look made by the app from photo p2 (navy hood with gold trim, round sunglasses, rabbit ears)",
+      "pattern": "deep navy and gold with a little cream, taken from his navy hooded cloak with gold trim and gold lining",
+      "accessory": "his round black sunglasses",
+      "top": "two long rabbit ears from his hood",
+      "all_models": false
+    },
+    {
+      "id": "C-user",
+      "ref": "art/lab/runware-planet-avatar/refs/look-user.jpg",
+      "about": "the story's {neo} (design/home/chibi-ref/user.jpg on the story branch): the reference all story chibi/p5 art was drawn from",
+      "pattern": "black, white and silver taken from his black jacket and white shirt (a neat jacket-collar pattern)",
+      "accessory": "his round glasses",
+      "top": "a small tuft of his black hair",
+      "all_models": true
+    }
+  ],
+  "style_refs": {
+    "bstyle": [
+      "crop:apps/api/assets/butterfly-style.jpg:600,0,300,300",
+      "crop:apps/api/assets/butterfly-style.jpg:0,300,300,300",
+      "crop:apps/api/assets/butterfly-style.jpg:600,300,300,300"
+    ],
+    "kstyle": ["art/lab/runware-planet-avatar/refs/kororin-style-dot.jpg"]
+  },
+  "styles": [
+    {
+      "id": "saturn-chibi",
+      "planet": "Saturn",
+      "what": "2-heads chibi that jumps out of the popped ball (M-R262, 2D anime per M-R275)",
+      "source": "story design/mv-art-queue.json chibi2-user",
+      "style_refs": [],
+      "prompt": "A super-deformed 2-heads-tall chibi of the character in the reference picture, drawn as a flat 2D Japanese anime illustration (like official chibi art in a popular TV anime or its character goods): a big round head and a tiny body, keeping the character's face, hairstyle, outfit, colours and signature items exactly recognisable. Clean confident lineart, anime cel shading with soft gradient shadows, big expressive anime eyes with sparkling highlights, soft blush, bright clear colours. Not 3D, not a figure, not a render. Jumping out joyfully with both arms up, a big happy smile, waving one hand. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text."
+    },
+    {
+      "id": "saturn-ball",
+      "planet": "Saturn",
+      "what": "the member's kororin ball in their own pattern (M-R279 proposal)",
+      "source": "story design/mv-art-queue.json kor4-user",
+      "style_refs": ["kstyle"],
+      "prompt": "A round ball-shaped mascot (a perfect glossy sphere with no arms and no legs) in exactly the same style as the SECOND reference picture: soft cute anime mascot, glossy highlight top-left, and the same simple face — two tiny shiny black dot eyes, a small ω-shaped cat mouth and soft round pink blush. Its colour and surface pattern are designed from the character in the FIRST reference picture: {pattern}. Accessory: {accessory} on the face. On top: {top}. It must still read as a round ball first. Front view, centered, filling about 80% of the frame. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "jupiter-butterfly",
+      "planet": "Jupiter",
+      "what": "kigurumi butterfly chibi hugging a scroll (M-R278/M-R279)",
+      "source": "story design/mv-art-queue.json chibi4-user",
+      "style_refs": ["bstyle"],
+      "prompt": "Draw the character from the FIRST reference picture as a cute super-deformed chibi, in exactly the same art style as the other reference pictures (soft hand-drawn kawaii chibi illustration, gentle muted watercolour-like colouring, clean brown-black outlines, sticker-like): the character is dressed up as a butterfly — keep the character's face and identity recognisable, give it curly butterfly antennae on the head or hood, and butterfly wings growing from its back whose colours and patterns are designed from the character's outfit: {pattern} (no green). The chibi is flying gently and hugging a rolled-up old paper scroll with a red cord in both arms. Front view, centered, the whole character and both wings inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+    },
+    {
+      "id": "mercury-ship",
+      "planet": "Mercury",
+      "what": "chibi riding their own music-note sailboat with a boombox (M-R280)",
+      "source": "story design/mv-art-queue.json ship4-user",
+      "style_refs": ["bstyle"],
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a small cute sailboat seen from the side with a sail shaped like a music note. The boat's hull and sail colours and patterns are designed from the character: {pattern}. Riding in the boat is a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), happily carrying a big boombox speaker on its shoulder. No water, no sea. Centered, the whole boat and character inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "mars-ufo",
+      "planet": "Mars",
+      "what": "chibi riding a UFO in their colours (M-R293)",
+      "source": "story design/mv-art-queue.json p5-mars-user",
+      "style_refs": ["bstyle"],
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding a small cute round flying saucer UFO whose colours and patterns are designed from the character's outfit, a soft projector beam glowing under it. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "venus-dj",
+      "planet": "Venus",
+      "what": "chibi radio DJ at a tiny booth on a cloud (M-R293 addendum)",
+      "source": "story design/mv-art-queue.json p5-venus-user",
+      "style_refs": ["bstyle"],
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), working as a radio DJ: sitting at a tiny cute radio DJ booth desk (with a little mixer and an ON AIR lamp) whose colours and patterns are designed from the character's outfit, wearing headphones and talking happily into a microphone on a desk arm that pops up in front, the whole little booth floating on a small fluffy cloud. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "uranus-balloons",
+      "planet": "Uranus",
+      "what": "chibi hanging from balloons with a gift box (M-R293)",
+      "source": "story design/mv-art-queue.json p5-uranus-user",
+      "style_refs": ["bstyle"],
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), hanging from a bunch of balloons with a gift box whose colours and patterns are designed from the character's outfit. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "pluto-book",
+      "planet": "Pluto",
+      "what": "chibi riding a flying book (M-R293)",
+      "source": "story design/mv-art-queue.json p5-pluto-user",
+      "style_refs": ["bstyle"],
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding on a big open flying book whose cover colours and patterns are designed from the character's outfit, little glowing letters floating. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "neptune-bubble",
+      "planet": "Neptune",
+      "what": "chibi in a bubble holding a game controller (M-R293)",
+      "source": "story design/mv-art-queue.json p5-neptune-user",
+      "style_refs": ["bstyle"],
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), floating inside a big transparent bubble holding a game controller whose colours and patterns are designed from the character's outfit. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    }
+  ]
+}
