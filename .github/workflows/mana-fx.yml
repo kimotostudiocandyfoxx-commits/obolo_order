@@ -1,0 +1,61 @@
+name: Mana FX and margins
+
+# docs/マナの値段.md: the monthly USD→JPY review and the mana margin report, from the Actions tab.
+#  - usd_jpy set: PUT /admin/mana/fx (the month, default next month) — the prices of that month follow it
+#  - every run (and every day at 10:17 JST): GET /admin/mana/margins for the day and the week — a making under 8% fails
+#    the run (an alert mail from GitHub) and the log shows the suggested price (the small costs are shown, not failed:
+#    their yen below one mana wait, so a day can read low)
+# A one-off Cloud Run job with the API's own service account, so the admin token stays in Google Cloud (as Issue invite).
+on:
+  workflow_dispatch:
+    inputs:
+      usd_jpy:
+        description: 'USD→JPY（空なら設定しない。控えめ＝円安ぎみの数字。例 160）'
+        default: ''
+      month:
+        description: '月（YYYY-MM。空なら来月）'
+        default: ''
+  schedule:
+    - cron: '17 1 * * *'
+
+env:
+  REGION: asia-northeast1
+  WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER || format('projects/{0}/locations/global/workloadIdentityPools/github/providers/github', vars.GCP_PROJECT_NUMBER) }}
+  DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA || format('obolo-deployer@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+  RUNTIME_SA: ${{ vars.GCP_RUNTIME_SA || format('obolo-api-runtime@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+
+jobs:
+  fx:
+    if: ${{ vars.GCP_PROJECT_ID != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Set the rate and read the margins
+        env:
+          IN_RATE: ${{ inputs.usd_jpy }}
+          IN_MONTH: ${{ inputs.month }}
+        run: |
+          API="https://obolo-api-${{ vars.GCP_PROJECT_NUMBER }}.${REGION}.run.app"
+          IMAGE=$(gcloud run services describe obolo-api --region "$REGION" --format='value(spec.template.spec.containers[0].image)')
+          BODY=$(python3 -c 'import json,os; r=os.environ.get("IN_RATE","").strip(); m=os.environ.get("IN_MONTH","").strip(); b={"usdJpy":float(r)} if r else {}; b.update({"month":m} if (r and m) else {}); print(json.dumps(b))' | base64 -w0)
+          SCRIPT=$(printf '%s' "const h={'content-type':'application/json','x-admin-token':process.env.ADMIN_TOKEN};const b=JSON.parse(Buffer.from(process.env.BODY_B64,'base64').toString());if(b.usdJpy){const r=await fetch(process.env.API+'/admin/mana/fx',{method:'PUT',headers:h,body:JSON.stringify(b)});console.log('FX '+r.status+' '+JSON.stringify(await r.json().catch(()=>null)));}let low=0;for(const d of [1,7]){const r=await fetch(process.env.API+'/admin/mana/margins?days='+d,{headers:h});const j=await r.json().catch(()=>null);console.log('MARGINS '+d+' '+r.status);for(const l of (j&&j.lines)||[])console.log('LINE '+l);const lo=((j&&j.low)||[]).filter((x)=>x.kind!=='usage');if(lo.length){low++;console.log('LOW '+JSON.stringify(lo));}}console.log(low?'MARGIN_LOW':'MARGIN_OK');" | base64 -w0)
+          gcloud run jobs deploy obolo-mana-fx --region "$REGION" --image "$IMAGE" --service-account "$RUNTIME_SA" \
+            --set-secrets ADMIN_TOKEN=obolo-admin-token:latest \
+            --set-env-vars "^##^API=$API##BODY_B64=$BODY##SCRIPT_B64=$SCRIPT" \
+            --command node --args "^##^--input-type=module##-e##await import('data:text/javascript;base64,' + process.env.SCRIPT_B64)" \
+            --memory 512Mi --task-timeout 120 --max-retries 0 --quiet
+          gcloud run jobs execute obolo-mana-fx --region "$REGION" --wait || true
+          EXEC=$(gcloud run jobs executions list --job obolo-mana-fx --region "$REGION" --limit 1 --format='value(metadata.name)')
+          sleep 20
+          gcloud logging read "resource.type=cloud_run_job AND resource.labels.job_name=obolo-mana-fx AND labels.\"run.googleapis.com/execution_name\"=\"$EXEC\"" \
+            --order=asc --limit=80 --format='value(textPayload)' | tee log.txt
+          grep '^LINE ' log.txt | sed 's/^LINE //' >> "$GITHUB_STEP_SUMMARY" || true
+          if grep -q MARGIN_LOW log.txt; then echo "::error::マナの取り分が 8% を下回った種類があります（上のログの LOW と提案の値段）"; exit 1; fi

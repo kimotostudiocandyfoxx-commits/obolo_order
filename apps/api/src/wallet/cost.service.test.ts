@@ -7,7 +7,7 @@ import type { AppConfig } from '../config';
 import type { Database } from '../db/db';
 import type { KvStore } from '../infra/kv';
 import { costScope } from './cost-scope';
-import { CostService, type CostRow, type CostStore, type ReportData } from './cost.service';
+import { CostService, parseFxRates, type CostRow, type CostStore, type ReportData } from './cost.service';
 import type { LedgerService } from './ledger.service';
 import { livePrices } from './price-book';
 
@@ -150,6 +150,16 @@ describe('FX and the quoted prices', () => {
     expect(warn).toHaveBeenCalledTimes(1);
     await s.setFx(fxMonth(), 170);
     expect(await s.fx()).toEqual({ usdJpy: 170, month: fxMonth(), stale: false });
+    s.onModuleDestroy();
+  });
+  it('the GitHub variable FX_RATES gives month rates; the table wins for the same month', async () => {
+    expect(parseFxRates('2026-12=158; 2027-01=160,bad=1,2027-02=9999')).toEqual({ '2026-12': 158, '2027-01': 160 });
+    const store = new MemStore();
+    const m = fxMonth();
+    const { s } = service(store, { FX_RATES: `${m}=150` } as Partial<AppConfig>);
+    expect(await s.fx()).toEqual({ usdJpy: 150, month: m, stale: false });
+    await s.setFx(m, 158);
+    expect((await s.fx()).usdJpy).toBe(158);
     s.onModuleDestroy();
   });
   it('quote = manaFor(estimated cost); the live list is what the ledger reads', async () => {

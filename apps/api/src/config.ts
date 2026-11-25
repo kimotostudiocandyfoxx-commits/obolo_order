@@ -209,6 +209,8 @@ const Env = z.object({
   MANA_MARGIN: z.coerce.number().min(0).max(1).default(0.08),
   /** the USD→JPY rate when no month is set in fx_rates (GitHub variable FX_USD_JPY; conservative = a weak yen) */
   FX_USD_JPY: z.coerce.number().min(50).max(500).default(160),
+  /** month rates from the GitHub variable FX_RATES, e.g. "2026-12=158;2027-01=160" (the fx_rates table wins for a month) */
+  FX_RATES: z.string().default(''),
   /** our Cloud Run GPU (L4 + its CPU / memory) and CPU (the API, renders) per second, in yen */
   GPU_SECOND_JPY: z.coerce.number().min(0).default(0.05),
   CPU_SECOND_JPY: z.coerce.number().min(0).default(0.01),

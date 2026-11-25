@@ -148,10 +148,13 @@ export class CostService implements OnModuleInit, OnModuleDestroy {
   async fx(now = new Date()): Promise<ReturnType<typeof fxFor>> {
     if (this.fxCache && Date.now() - this.fxCache.at < 10 * 60_000) return this.fxCache.pick;
     const month = fxMonth(now);
-    const rates = await this.store.fxRates().catch((e) => {
-      this.log.warn(`fx rates unreadable: ${String(e)}`);
-      return {};
-    });
+    const rates = {
+      ...parseFxRates(this.cfg.FX_RATES ?? ''),
+      ...(await this.store.fxRates().catch((e) => {
+        this.log.warn(`fx rates unreadable: ${String(e)}`);
+        return {};
+      })),
+    };
     const pick = fxFor(rates, month, this.cfg.FX_USD_JPY);
     if (pick.stale && this.warnedMonth !== month) {
       this.warnedMonth = month;
@@ -302,6 +305,16 @@ export class CostService implements OnModuleInit, OnModuleDestroy {
       this.log.error(`mana cost check failed: ${String(e)}`);
     }
   }
+}
+
+/** FX_RATES ("2026-12=158;2027-01=160", commas / spaces too) → month → rate */
+export function parseFxRates(spec: string): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const part of spec.split(/[;,\s]+/)) {
+    const m = part.match(/^(\d{4}-(?:0[1-9]|1[0-2]))[=:](\d+(?:\.\d+)?)$/);
+    if (m && Number(m[2]) >= 50 && Number(m[2]) <= 500) out[m[1]] = Number(m[2]);
+  }
+  return out;
 }
 
 /** CostStore on Postgres */
