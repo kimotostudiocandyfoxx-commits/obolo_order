@@ -1,6 +1,6 @@
 import { applyDelta, LedgerError } from '@obolo/ledger';
 import { meterGemini, meterRunware } from '@obolo/ai';
-import { accrueUsage, costCoveredBy, fxMonth, geminiCostUsd, MAKE_COST, manaFor, type AccrualStep, type MakeKind, type PriceRule } from '@obolo/shared';
+import { accrueUsage, costCoveredBy, fxMonth, geminiCostUsd, MAKE_COST, manaFor, manaFor10, type AccrualStep, type MakeKind, type PriceRule } from '@obolo/shared';
 import { Logger } from '@nestjs/common';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { AppConfig } from '../config';
@@ -179,8 +179,31 @@ describe('FX and the quoted prices', () => {
     const r = await s.refine();
     expect(r.song).toBe(30);
     expect(store.saved).toEqual([{ kind: 'song', costJpy: 30, samples: 4 }]);
-    expect((await s.prices()).song).toBe(manaFor(30));
+    expect((await s.prices()).song).toBe(manaFor10(30));
     s.onModuleDestroy();
+  });
+});
+
+describe('R17: the price follows the configured models', () => {
+  it('a cheap anime model for every picture use quotes the pictures below a mana or so; the game tiers by their chains', async () => {
+    const store = new MemStore();
+    store.fx = { [fxMonth()]: 160 };
+    const now = await service(store).s.prices();
+    const cheap = await service(store, { ART_MODEL: 'runware:400@4', LOOK_MODEL: 'runware:400@4', BATI_MODEL: 'runware:400@4', KORORIN_MODEL: 'runware:400@4' }).s.prices();
+    expect(cheap.jacketArt).toBeLessThan(now.jacketArt);
+    expect(cheap.jacketArt).toBeLessThanOrEqual(0.5);
+    expect(cheap.look).toBeLessThanOrEqual(1);
+    expect(cheap.kororinDesign).toBeLessThanOrEqual(2);
+    expect(now.gameTrial).toBeLessThan(now.game);
+    expect(now.game).toBeLessThan(now.gamePro);
+    // four pictures in a paid round cost twice the two of the default
+    const four = await service(store, { PAID_LOOK_CANDIDATES: 4 }).s.prices();
+    expect(four.look).toBeGreaterThan(now.look * 1.8);
+  });
+  it('COST_REFINE_SINCE: costs recorded before a model switch do not refine the price', async () => {
+    const { s } = service(new MemStore(), { COST_REFINE_SINCE: new Date(Date.now() - 86400_000).toISOString() });
+    expect(s.refineSince().getTime()).toBeGreaterThan(Date.now() - 2 * 86400_000);
+    expect(service(new MemStore()).s.refineSince().getTime()).toBeLessThan(Date.now() - 29 * 86400_000);
   });
 });
 
@@ -208,7 +231,7 @@ describe('the daily margin report', () => {
     const game = r.makings.find((m) => m.kind === 'game')!;
     expect(song.low).toBe(false);
     expect(game.low).toBe(true);
-    expect(game.suggestedMana).toBe(manaFor(95));
+    expect(game.suggestedMana).toBe(manaFor10(95));
     expect(r.low.map((l) => l.kind)).toEqual(['game']);
     expect(r.usage.chargedMana).toBe(4);
     expect(r.usage.features).toEqual([{ kind: 'chat', costJpy: 3 }]);

@@ -29,9 +29,20 @@ export class GeminiProvider implements LlmProvider {
   private readonly client: GoogleGenAI;
   /** first model that answers is kept; the rest are fallbacks when a model name is unknown / retired */
   private readonly models: string[];
-  constructor(apiKey: string, model: string | string[]) {
+  constructor(
+    apiKey: string,
+    model: string | string[],
+    /** R17: a cap on the thinking tokens (billed as output) — 0 = none, for short JSON / prose tasks (`?think=N` in a task chain) */
+    private readonly o: { thinkingBudget?: number } = {},
+  ) {
     this.client = new GoogleGenAI({ apiKey });
     this.models = Array.isArray(model) ? model : [model];
+  }
+  /** the thinking cap for a model (Pro models cannot turn it off: at least 128) */
+  private thinking(model: string) {
+    const b = this.o.thinkingBudget;
+    if (b == null || !/2\.5|flash|pro/i.test(model)) return {};
+    return { thinkingConfig: { thinkingBudget: /pro/i.test(model) ? Math.max(128, b) : b } };
   }
   async chat(req: ChatRequest): Promise<string> {
     const { system, contents } = geminiContents(req);
@@ -46,6 +57,7 @@ export class GeminiProvider implements LlmProvider {
             temperature: req.temperature ?? 0.9,
             maxOutputTokens: req.maxOutputTokens ?? 800,
             ...(req.json ? { responseMimeType: 'application/json' } : {}),
+            ...this.thinking(model),
           },
         });
         meterGemini(model, res.usageMetadata);

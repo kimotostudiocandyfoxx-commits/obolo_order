@@ -8,10 +8,31 @@ import type { LlmProvider, ModerationResult } from './types';
  */
 const BLOCKLIST = [/死ね/, /殺す/, /\bkill yourself\b/i];
 
+/**
+ * R17 (cheaper): the same words are checked once — a spell's words are checked at the spell, at the yes and again in the
+ * job; a refine is asked with the same instruction twice. The model's answers are kept a while (per process).
+ */
+const SEEN = new Map<string, { at: number; r: ModerationResult }>();
+const SEEN_MS = 30 * 60_000;
+const SEEN_MAX = 2000;
+export const moderationCacheSize = () => SEEN.size;
+
 export async function moderateText(text: string, llm?: LlmProvider): Promise<ModerationResult> {
   const hits = BLOCKLIST.filter((re) => re.test(text)).map((re) => re.source);
   if (hits.length) return { flagged: true, categories: ['harassment'] };
   if (!llm || llm.name === 'mock') return { flagged: false, categories: [] };
+  const key = `${llm.name}\u0000${text.trim()}`;
+  const seen = SEEN.get(key);
+  if (seen && Date.now() - seen.at < SEEN_MS) return seen.r;
+  const r = await askModerator(text, llm);
+  // an error is not an answer: not kept (fail open this once, ask again next time)
+  if (!r) return { flagged: false, categories: [] };
+  if (SEEN.size >= SEEN_MAX) SEEN.delete(SEEN.keys().next().value!);
+  SEEN.set(key, { at: Date.now(), r });
+  return r;
+}
+
+async function askModerator(text: string, llm: LlmProvider): Promise<ModerationResult | null> {
   try {
     const out = await llm.chat({
       system:
@@ -21,10 +42,11 @@ export async function moderateText(text: string, llm?: LlmProvider): Promise<Mod
       maxOutputTokens: 20,
     });
     if (out.startsWith('FLAG')) return { flagged: true, categories: [out.split(':')[1]?.trim() || 'other'] };
+    return { flagged: false, categories: [] };
   } catch {
     // Fail open in the demo; production should queue for human review instead (P-MOD-1).
+    return null;
   }
-  return { flagged: false, categories: [] };
 }
 
 /**

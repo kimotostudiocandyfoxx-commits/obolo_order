@@ -12,17 +12,28 @@ import type { ChatRequest, LlmProvider } from './types';
  */
 export const TASK_MODEL_DEFAULTS = {
   /** a book's chapters: Flash-class (long Japanese prose, cheap) */
-  novel: 'gemini:gemini-2.5-flash,gemini:gemini-flash-latest',
+  novel: 'gemini:gemini-2.5-flash?think=0,gemini:gemini-flash-latest?think=0',
   /** a game's code: Pro-class, Flash behind it for a timeout / the quota */
   game: 'gemini:gemini-2.5-pro,gemini:gemini-2.5-flash',
+  /** R17: the first game's template values (a tiny JSON) */
+  gameTrial: 'gemini:gemini-2.5-flash-lite?think=0,gemini:gemini-2.5-flash?think=0',
+  /** R17: a member's own game and every tweak, first */
+  gameCheap: 'gemini:gemini-2.5-flash?think=4096,gemini:gemini-flash-latest?think=4096',
   /** R13: a song's lyrics with metatags (Japanese, short, JSON): Flash-class; Claude later by LYRICS_MODEL only */
-  lyrics: 'gemini:gemini-2.5-flash,gemini:gemini-flash-latest',
+  lyrics: 'gemini:gemini-2.5-flash?think=0,gemini:gemini-flash-latest?think=0',
   /** R14: every スペル is built by the model first (short JSON, must be quick): Flash-class; Claude by SPELL_MODEL */
-  spell: 'gemini:gemini-2.5-flash,gemini:gemini-flash-latest',
+  spell: 'gemini:gemini-2.5-flash?think=0,gemini:gemini-flash-latest?think=0',
 } as const;
 export type TaskName = keyof typeof TASK_MODEL_DEFAULTS;
 
-export type ModelStep = { provider: 'gemini' | 'claude' | 'openai'; model: string };
+export type ModelStep = { provider: 'gemini' | 'claude' | 'openai'; model: string; /** R17: `?think=N` — a Gemini step's thinking cap */ think?: number };
+/** `model?think=N` → the model and its thinking cap */
+function options(step: ModelStep): ModelStep {
+  const m = step.model.match(/^([^?]+)\?(.*)$/);
+  if (!m) return step;
+  const think = m[2].match(/(?:^|&)think=(\d+)/);
+  return { ...step, model: m[1].trim(), ...(think ? { think: Number(think[1]) } : {}) };
+}
 export function parseModelSpec(spec: string): ModelStep[] {
   return spec
     .split(',')
@@ -30,9 +41,9 @@ export function parseModelSpec(spec: string): ModelStep[] {
     .filter(Boolean)
     .flatMap((s): ModelStep[] => {
       const m = s.match(/^(gemini|claude|anthropic|openai):(.+)$/i);
-      if (!m) return /^gemini|^claude|^gpt/i.test(s) ? [{ provider: /^claude/i.test(s) ? 'claude' : /^gpt/i.test(s) ? 'openai' : 'gemini', model: s }] : [];
+      if (!m) return /^gemini|^claude|^gpt/i.test(s) ? [options({ provider: /^claude/i.test(s) ? 'claude' : /^gpt/i.test(s) ? 'openai' : 'gemini', model: s })] : [];
       const p = m[1].toLowerCase();
-      return [{ provider: p === 'anthropic' ? 'claude' : (p as ModelStep['provider']), model: m[2].trim() }];
+      return [options({ provider: p === 'anthropic' ? 'claude' : (p as ModelStep['provider']), model: m[2].trim() })];
     });
 }
 
@@ -55,7 +66,7 @@ export function createTaskLlm(spec: string, keys: { geminiApiKey?: string; anthr
   for (const s of parseModelSpec(spec)) {
     const p =
       s.provider === 'gemini' && keys.geminiApiKey
-        ? new GeminiProvider(keys.geminiApiKey, s.model)
+        ? new GeminiProvider(keys.geminiApiKey, s.model, s.think != null ? { thinkingBudget: s.think } : {})
         : s.provider === 'claude' && keys.anthropicApiKey
           ? new ClaudeProvider(keys.anthropicApiKey, s.model)
           : s.provider === 'openai' && keys.openaiApiKey

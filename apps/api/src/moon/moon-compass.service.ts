@@ -1,4 +1,5 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
+import { createHash } from 'node:crypto';
 import { compassSpellPrompt, compassTitlePrompt, moderateText, type LlmProvider } from '@obolo/ai';
 import { spellComplete, spellNormalize, youtubeLink, type CompassSpell, type MoonCompassBody, type SpellGroup, type SpellTag } from '@obolo/shared';
 import { apiError } from '../common/errors';
@@ -68,10 +69,35 @@ export class MoonCompassService {
     private readonly files: FilesService,
   ) {}
 
+  /**
+   * R17 (cheaper): a read is kept a while — the same YouTube link (a whole video watched by the model, the dearest read)
+   * or the same picture read again gives the same spell, from any member (nothing of theirs is in it: style tags only)
+   */
+  private readonly seen = new Map<string, { at: number; v: CompassSpell }>();
+  private remember(key: string, v: CompassSpell): CompassSpell {
+    if (this.seen.size >= 300) this.seen.delete(this.seen.keys().next().value!);
+    this.seen.set(key, { at: Date.now(), v });
+    return v;
+  }
+  private recall(key: string): CompassSpell | null {
+    const hit = this.seen.get(key);
+    return hit && Date.now() - hit.at < 24 * 3600_000 ? hit.v : null;
+  }
+
   async read(userId: string, b: MoonCompassBody): Promise<CompassSpell> {
-    if (b.url) return this.song(youtubeLink(b.url)!);
+    if (b.url) {
+      const url = youtubeLink(b.url)!;
+      return this.recall(`url:${url}`) ?? this.remember(`url:${url}`, await this.song(url));
+    }
     const img = b.fileId ? await this.files.photo(userId, b.fileId) : b.image ? { mime: b.image.mime, data: Buffer.from(b.image.data, 'base64') } : null;
     if (!img) throw apiError(HttpStatus.NOT_FOUND, 'FILE_NOT_FOUND', 'Photo not found');
+    const key = `img:${createHash('sha256').update(img.data).digest('hex')}`;
+    const kept = this.recall(key);
+    if (kept) return kept;
+    return this.remember(key, await this.picture(img));
+  }
+
+  private async picture(img: { mime: string; data: Buffer }): Promise<CompassSpell> {
     if (!this.llm.perceive) throw this.cannot();
     const raw = await this.within(this.llm.perceive(img, compassSpellPrompt('art')), 30_000).catch((e) => {
       this.log.warn(`compass (picture) failed: ${String(e)}`);

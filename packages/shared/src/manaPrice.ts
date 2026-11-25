@@ -135,12 +135,17 @@ export const FISH_USD_PER_MBYTE = 15;
 
 /**
  * Runware per-picture / per-task prices for when a response carries no `cost` (we always ask with includeCost: true,
- * so these are only the seed of the estimates). USD.
+ * so these are only the seed of the estimates). USD, one 1024×1024 picture (Runware's model pages, 2026-11-25).
  */
 export const RUNWARE_PRICES: Record<string, number> = {
   'runware:400@4': 0.0012, // FLUX.2 [klein] 4B, ≈ ¥0.19 a picture (Model scout s02)
   'runware:400@2': 0.003, // FLUX.2 [klein] 9B
-  'alibaba:qwen-image@2.1-turbo': 0.01,
+  'bfl:flux@3-image-klein': 0.0024, // FLUX 3 Image Klein (16 steps)
+  'runware:z-image@turbo': 0.0023, // Z-Image Turbo (words only, no reference pictures)
+  'alibaba:qwen-image@2.1-turbo': 0.0141,
+  'bytedance:seedream@5.0-flash': 0.0193,
+  'prunaai:2@1': 0.0088, // P-Image Edit
+  'google:nano-banana@2-lite': 0.0336,
   'bytedance:seedream@5.0-pro': 0.045, // ≈ ¥2–7 a picture at 1024 (p90 ≈ ¥7)
   'runware:ace-step@v1.5-xl-sft': 0.009, // ACE-Step 1.5 XL SFT, ≈ 60 s of song at 50 steps, scales with the length (Music lab: $0.009)
   'minimax:music@2.6': 0.15, // MiniMax Music 2.6, one clip (Music lab: $0.15)
@@ -157,6 +162,29 @@ export const SONG_QUOTE_TEMPO = 1.2;
 export const aceStepUsd = (seconds: number) => (RUNWARE_PRICES['runware:ace-step@v1.5-xl-sft'] * Math.max(30, seconds)) / 60;
 /** our CPU for the song: the request and storing it, plus the 1.2× time-stretch (rubberband on ~60 s of audio, p90) */
 export const SONG_QUOTE_CPU_SECONDS = 20 + 15;
+/** painted from reference pictures, some models cost a little more (Runware's measured runs, 1024) */
+export const RUNWARE_REF_PRICES: Record<string, number> = {
+  'runware:400@4': 0.0019,
+  'runware:400@2': 0.0035,
+  'bfl:flux@3-image-klein': 0.004,
+  'bytedance:seedream@5.0-pro': 0.048,
+};
+/** a community SDXL checkpoint (Animagine / Illustrious, civitai:…) with Runware's IP-Adapter: ≈ ¥0.3–0.5 a picture */
+export const SDXL_PICTURE_USD = 0.003;
+/** Gemini's own picture model: one picture is 1,290 output tokens */
+export const GEMINI_PICTURE_USD: Record<string, number> = { 'gemini-2.5-flash-image': 0.039 };
+/** a picture model with no price here: priced high, never under */
+const PICTURE_UNKNOWN_USD = 0.05;
+
+/** one picture on a model (a Runware AIR id, or a Gemini image model), painted with or without reference pictures */
+export function pictureUsd(model: string, withRefs = false): number {
+  const m = model.trim();
+  if (/^gemini/i.test(m)) return byPrefix(GEMINI_PICTURE_USD, m, PICTURE_UNKNOWN_USD);
+  if (withRefs && RUNWARE_REF_PRICES[m] != null) return RUNWARE_REF_PRICES[m];
+  if (RUNWARE_PRICES[m] != null) return RUNWARE_PRICES[m];
+  if (/^civitai:/i.test(m)) return SDXL_PICTURE_USD;
+  return PICTURE_UNKNOWN_USD;
+}
 
 /** the pricing knobs that are not provider list prices (all set from the API's env) */
 export interface CostRates {
@@ -213,6 +241,16 @@ export function claudeCostUsd(model: string, u: ClaudeUsage | null | undefined):
   return tokens / 1e6 + (u?.server_tool_use?.web_search_requests ?? 0) * CLAUDE_SEARCH_USD;
 }
 
+/**
+ * an estimate of one text call (USD): `tokens.out` includes the thinking. `model` is a model id or a task chain's
+ * first step (`gemini:gemini-2.5-flash?think=0` — the provider prefix and the options are dropped).
+ */
+export function textUsd(model: string, tokens: { in: number; out: number }): number {
+  const m = model.split(',')[0].trim().replace(/^(gemini|claude|anthropic|openai):/i, '').replace(/\?.*$/, '');
+  if (/^claude/i.test(m)) return claudeCostUsd(m, { input_tokens: tokens.in, output_tokens: tokens.out });
+  return geminiCostUsd(m, { promptTokenCount: tokens.in, candidatesTokenCount: tokens.out });
+}
+
 /** what one Fish TTS reading cost in USD (UTF-8 bytes of the text) */
 export function fishCostUsd(text: string): number {
   return (new TextEncoder().encode(text).length * FISH_USD_PER_MBYTE) / 1e6;
@@ -223,10 +261,17 @@ export function fishCostUsd(text: string): number {
 /**
  * The makings that spend mana with the member's yes (the confirm card shows the mana). songPremium = the premium spell
  * on MiniMax Music 2.6 (its price is ready; the flow comes with the Runware song engine).
+ * R17 (client 2026-11-25, cheaper games): gameTrial = the first game, one of the prepared templates filled in by a
+ * Flash-class model; game / gameTweak = the member's own request on the cheap chain (GAME_MODEL_CHEAP); gamePro /
+ * gameTweakPro = the full chain (GAME_MODEL_FULL) — a request that needs it, or a tweak the cheap chain could not make.
  */
-export const MAKE_KINDS = ['look', 'kororinDesign', 'jacketArt', 'song', 'songPremium', 'mv', 'story', 'game', 'gameTweak', 'mvPictures', 'mvRedraw'] as const;
+export const MAKE_KINDS = ['look', 'kororinDesign', 'jacketArt', 'song', 'songPremium', 'mv', 'story', 'game', 'gameTweak', 'mvPictures', 'mvRedraw', 'gameTrial', 'gamePro', 'gameTweakPro'] as const;
 export type MakeKind = (typeof MAKE_KINDS)[number];
 export const isMakeKind = (k: string): k is MakeKind => (MAKE_KINDS as readonly string[]).includes(k);
+/** the game makings (each keeps its version on the game; each is refunded the same way) */
+export const GAME_MAKE_KINDS = ['gameTrial', 'game', 'gamePro', 'gameTweak', 'gameTweakPro'] as const;
+export type GameMakeKind = (typeof GAME_MAKE_KINDS)[number];
+export const isGameMakeKind = (k: string): k is GameMakeKind => (GAME_MAKE_KINDS as readonly string[]).includes(k);
 
 /** an estimated cost of one making: provider money in USD plus our own GPU / CPU seconds (a high percentile, p90) */
 export interface CostEstimate {
@@ -238,39 +283,169 @@ export interface CostEstimate {
 }
 
 /**
- * The seed of the cost table (p90 of one making, from the provider prices above). The daily check replaces a kind's
- * estimate with the p90 of its recorded actual costs once there are enough of them (CostService).
+ * R17 (client 2026-11-25: cheaper wherever the quality allows — the art is Japanese-anime-like): which model paints each
+ * picture use, how many pictures a paid round paints, and which models write a game — the API's config (ART_MODEL,
+ * LOOK_MODEL, BATI_MODEL, KORORIN_MODEL: a Runware AIR id or a Gemini image model; PAID_LOOK_CANDIDATES,
+ * KORORIN_CANDIDATES; GAME_MODEL_TRIAL / _CHEAP / _FULL). The picture defaults are R16's models until the client picks
+ * from the picture comparison (.github/workflows/runware-art-test.yml).
  */
-export const MAKE_COST_ESTIMATE: Record<MakeKind, CostEstimate> = {
-  look: { usd: 4 * RUNWARE_PRICES['bytedance:seedream@5.0-pro'] + 0.002, note: 'Seedream 5.0 Pro ×4 枚（1枚 p90 約7円）＋文章 Gemini' },
-  kororinDesign: { usd: 4 * RUNWARE_PRICES['bytedance:seedream@5.0-pro'], cpuSeconds: 10, note: 'Seedream 5.0 Pro ×4 枚＋切り抜き CPU' },
-  jacketArt: { usd: 0.039 + 0.002, note: 'Gemini 2.5 Flash Image ×1 枚（約 $0.039）＋文章' },
-  song: { usd: aceStepUsd(SONG_QUOTE_SECONDS * SONG_QUOTE_TEMPO) + 0.004, cpuSeconds: SONG_QUOTE_CPU_SECONDS, note: 'Runware ACE-Step 1.5 XL SFT（60秒の曲を1.2倍の72秒ぶん歌う、長さに比例）＋1.2倍速の処理 CPU＋曲の設計・歌詞 Gemini' },
-  songPremium: { usd: RUNWARE_PRICES['minimax:music@2.6'] + 0.004, cpuSeconds: SONG_QUOTE_CPU_SECONDS, note: 'MiniMax Music 2.6 ×1 曲（$0.15）＋1.2倍速の処理 CPU＋設計・歌詞' },
-  mv: { usd: 12 * RUNWARE_PRICES['runware:400@4'] + 0.006, cpuSeconds: 240, note: 'FLUX.2 klein 4B ×12 場面＋演出 Gemini＋描画 CPU p90 240秒' },
-  story: { usd: 0.01, note: 'お話 Gemini Flash（数千トークン）' },
-  game: { usd: 0.35, note: 'Gemini 2.5 Pro（入力 約1.5万・出力＋思考 約3万トークン）' },
-  gameTweak: { usd: 0.3, note: 'Gemini 2.5 Pro（今のコード＋直し、出力＋思考 約3万トークン）' },
-  mvPictures: { usd: 0.002, cpuSeconds: 180, note: '動き選び Gemini＋描画 CPU p90 180秒' },
-  mvRedraw: { usd: 4 * RUNWARE_PRICES['runware:400@4'] + 0.002, cpuSeconds: 180, note: 'FLUX.2 klein 4B ×最大4 場面＋描画 CPU' },
+export interface MakeSetup {
+  /** an art piece (jacketArt) and {bati}'s chat picture */
+  artModel: string;
+  /** the member's look (the moon look, its magic) */
+  lookModel: string;
+  /** {bati}'s dress-up (charged as 'look') */
+  batiModel: string;
+  /** the Saturn kororin design */
+  kororinModel: string;
+  /** pictures in a paid look / dress-up round (the atelier card shows them as a row to pick from) */
+  paidLookCandidates: number;
+  /** pictures in a kororin design (Saturn shows four to pick from, story D04-S005b) */
+  kororinCandidates: number;
+  gameTrialModel: string;
+  gameCheapModel: string;
+  gameFullModel: string;
+}
+
+export const DEFAULT_MAKE_SETUP: MakeSetup = {
+  artModel: 'gemini-2.5-flash-image',
+  lookModel: 'bytedance:seedream@5.0-pro',
+  batiModel: 'bytedance:seedream@5.0-pro',
+  kororinModel: 'bytedance:seedream@5.0-pro',
+  paidLookCandidates: 2,
+  kororinCandidates: 4,
+  gameTrialModel: 'gemini:gemini-2.5-flash-lite',
+  gameCheapModel: 'gemini:gemini-2.5-flash',
+  gameFullModel: 'gemini:gemini-2.5-pro',
 };
+
+/**
+ * The token sizes (p90) of each game making; `out` includes the thinking. The trial is a small JSON of template values;
+ * a build / tweak may need the repair round (its answer sent back once).
+ */
+export const GAME_TOKENS = {
+  trial: { in: 3_000, out: 1_500 },
+  cheap: { in: 12_000, out: 16_000 },
+  cheapTweak: { in: 16_000, out: 14_000 },
+  full: { in: 15_000, out: 30_000 },
+  fullTweak: { in: 18_000, out: 24_000 },
+} as const;
+/** the moderation of the words around a making (Flash-Lite, a few hundred tokens) */
+const WORDS_USD = 0.0005;
+const short = (model: string) => model.split(',')[0].trim().replace(/^(gemini|claude|anthropic|openai):/i, '').replace(/\?.*$/, '');
+
+/**
+ * The seed of the cost table (p90 of one making, from the provider prices above) for a setup. The daily check replaces
+ * a kind's estimate with the p90 of its recorded actual costs once there are enough of them (CostService).
+ */
+export function makeCostEstimates(s: MakeSetup = DEFAULT_MAKE_SETUP): Record<MakeKind, CostEstimate> {
+  const n = (x: number) => Math.max(1, Math.round(x));
+  const pics = (model: string, count: number, refs: boolean) => n(count) * pictureUsd(model, refs);
+  const lookUsd = Math.max(pics(s.lookModel, s.paidLookCandidates, true), pics(s.batiModel, s.paidLookCandidates, true));
+  return {
+    look: { usd: lookUsd + WORDS_USD, note: `姿 ${s.lookModel}・着せ替え ${s.batiModel} ×${n(s.paidLookCandidates)} 枚（参照画像つき）＋言葉の確認` },
+    kororinDesign: { usd: pics(s.kororinModel, s.kororinCandidates, true) + WORDS_USD, cpuSeconds: 10, note: `${s.kororinModel} ×${n(s.kororinCandidates)} 枚（見本の絵つき）＋切り抜き CPU` },
+    jacketArt: { usd: pics(s.artModel, 1, false) + WORDS_USD, note: `${s.artModel} ×1 枚＋言葉の確認` },
+    // R17: sung on Runware (aceStepUsd for the seconds it is sung: 60 s delivered, 1.2× longer sung) + the 1.2× stretch
+    // CPU + the song's design (Flash-Lite). The lyrics are written before the yes (their own small cost, 'lyrics'); our GPU
+    // splits only for a change that needs it — that change's own small cost (songEdit), not the song's
+    song: { usd: aceStepUsd(SONG_QUOTE_SECONDS * SONG_QUOTE_TEMPO) + textUsd('gemini-flash-lite-latest', { in: 3_000, out: 1_500 }) + WORDS_USD, cpuSeconds: SONG_QUOTE_CPU_SECONDS, note: 'Runware ACE-Step 1.5 XL SFT（60秒の曲を1.2倍の72秒ぶん歌う、長さに比例）＋1.2倍速の処理 CPU＋曲の設計 Gemini Flash-Lite' },
+    songPremium: { usd: RUNWARE_PRICES['minimax:music@2.6'] + 0.004, cpuSeconds: SONG_QUOTE_CPU_SECONDS, note: 'MiniMax Music 2.6 ×1 曲（$0.15）＋1.2倍速の処理 CPU＋設計・歌詞' },
+    mv: { usd: 12 * RUNWARE_PRICES['runware:400@4'] + 0.006, cpuSeconds: 240, note: 'FLUX.2 klein 4B ×12 場面＋演出 Gemini＋描画 CPU p90 240秒' },
+    story: { usd: textUsd('gemini-flash-lite-latest', { in: 2_500, out: 1_700 }) + WORDS_USD, note: 'お話 Gemini Flash-Lite（入力 約2,500・出力 約1,700トークン）＋言葉の確認' },
+    gameTrial: { usd: textUsd(s.gameTrialModel, GAME_TOKENS.trial) + WORDS_USD, note: `型のゲーム ${short(s.gameTrialModel)}（型の値だけ：入力 約3千・出力 約1,500トークン）` },
+    game: { usd: textUsd(s.gameCheapModel, GAME_TOKENS.cheap) + WORDS_USD, note: `ゲーム ${short(s.gameCheapModel)}（入力 約1.2万・出力＋思考 約1.6万トークン）` },
+    gamePro: { usd: textUsd(s.gameFullModel, GAME_TOKENS.full) + WORDS_USD, note: `大きなゲーム ${short(s.gameFullModel)}（入力 約1.5万・出力＋思考 約3万トークン）` },
+    gameTweak: { usd: textUsd(s.gameCheapModel, GAME_TOKENS.cheapTweak) + WORDS_USD, note: `ゲームの直し ${short(s.gameCheapModel)}（今のコード＋直し）` },
+    gameTweakPro: { usd: textUsd(s.gameFullModel, GAME_TOKENS.fullTweak) + WORDS_USD, note: `ゲームの直し・強い魔法 ${short(s.gameFullModel)}（ふつうの直しが2回とも通らなかった時）` },
+    mvPictures: { usd: 0.002, cpuSeconds: 180, note: '動き選び Gemini＋描画 CPU p90 180秒' },
+    mvRedraw: { usd: 4 * RUNWARE_PRICES['runware:400@4'] + 0.002, cpuSeconds: 180, note: 'FLUX.2 klein 4B ×最大4 場面＋描画 CPU' },
+  };
+}
+
+/** the seed table at the default setup */
+export const MAKE_COST_ESTIMATE: Record<MakeKind, CostEstimate> = makeCostEstimates();
 
 /** the yen an estimate comes to at these rates */
 export function estimateJpy(e: CostEstimate, rates: CostRates = DEFAULT_COST_RATES): number {
   return e.usd * rates.usdJpy + (e.gpuSeconds ?? 0) * rates.gpuSecondJpy + (e.cpuSeconds ?? 0) * rates.cpuSecondJpy;
 }
 
-/** a making's quoted mana: manaFor(its estimated cost), at least 1 */
-export function quoteMana(costJpy: number, rule: PriceRule = DEFAULT_PRICE_RULE): number {
-  return Math.max(1, manaFor(costJpy, rule));
+/**
+ * Client 2026-11-25 (R17): a cheap making shows its real price below 1 mana (「使うマナ 0.3」), never rounded up to 1.
+ * The rule to the tenth: ceil( cost / (1 − fee) × 1.08 × 10 ) / 10, 0 for no cost.
+ */
+export function manaFor10(costJpy: number, rule: PriceRule = DEFAULT_PRICE_RULE): number {
+  const exact = manaExact(costJpy, rule);
+  return exact > 0 ? Math.ceil(exact * 10 - EPS * 10) / 10 : 0;
 }
+
+/** a making's quoted mana: manaFor10(its estimated cost) — a tenth of a mana at least */
+export function quoteMana(costJpy: number, rule: PriceRule = DEFAULT_PRICE_RULE): number {
+  return Math.max(0.1, manaFor10(costJpy, rule));
+}
+
+/** a price in tenths of a mana (the ledger's exact unit for a quoted price: 0.3 → 3, 12.5 → 125) */
+export const manaTenths = (mana: number): number => Math.round(mana * 10);
+/** a price as it is taken: the whole mana now (a ledger row) and the tenths left over (waiting with the small costs) */
+export function splitMana(mana: number): { whole: number; tenths: number } {
+  const t = Math.max(0, manaTenths(mana));
+  return { whole: Math.floor(t / 10), tenths: t % 10 };
+}
+/** a mana number as it is shown: 「3」「0.3」「12.5」 */
+export function formatMana(mana: number): string {
+  const t = manaTenths(mana);
+  return t % 10 === 0 ? String(t / 10) : (t / 10).toFixed(1);
+}
+/**
+ * R17: the monthly line a 'usage' row is shown in (its ref_type): the tenths of paid makings by what was made
+ * (「つかったマナ（絵）」), the small costs of the free features as before (「つかったマナ（おしゃべり・声など）」)
+ */
+export const USAGE_LINES = ['usage', 'usage:art', 'usage:song', 'usage:video', 'usage:game', 'usage:story'] as const;
+export type UsageLine = (typeof USAGE_LINES)[number];
+export function usageLineOf(refType: string | null | undefined): UsageLine {
+  switch (refType) {
+    case 'look':
+    case 'kororinDesign':
+    case 'jacketArt':
+      return 'usage:art';
+    case 'song':
+    case 'songPremium':
+      return 'usage:song';
+    case 'mv':
+    case 'mvPictures':
+    case 'mvRedraw':
+      return 'usage:video';
+    case 'game':
+    case 'gameTrial':
+    case 'gamePro':
+    case 'gameTweak':
+    case 'gameTweakPro':
+      return 'usage:game';
+    case 'story':
+      return 'usage:story';
+    default:
+      return 'usage';
+  }
+}
+
+/** a quoted price has at most one decimal */
+export const isTenthMana = (n: number): boolean => Number.isFinite(n) && Math.abs(n * 10 - Math.round(n * 10)) < 1e-6;
 
 export type ManaPrices = Record<MakeKind, number>;
 
-/** every making's mana at these rates (`costJpy` overrides a kind's estimate in yen — the refined, recorded p90) */
-export function manaPrices(rates: CostRates = DEFAULT_COST_RATES, rule: PriceRule = DEFAULT_PRICE_RULE, costJpy: Partial<Record<MakeKind, number>> = {}): ManaPrices {
+/**
+ * every making's mana at these rates (`costJpy` overrides a kind's estimate in yen — the refined, recorded p90; `table`
+ * is the seed table of the API's setup, makeCostEstimates)
+ */
+export function manaPrices(
+  rates: CostRates = DEFAULT_COST_RATES,
+  rule: PriceRule = DEFAULT_PRICE_RULE,
+  costJpy: Partial<Record<MakeKind, number>> = {},
+  table: Record<MakeKind, CostEstimate> = MAKE_COST_ESTIMATE,
+): ManaPrices {
   const out = {} as ManaPrices;
-  for (const k of MAKE_KINDS) out[k] = quoteMana(costJpy[k] ?? estimateJpy(MAKE_COST_ESTIMATE[k], rates), rule);
+  for (const k of MAKE_KINDS) out[k] = quoteMana(costJpy[k] ?? estimateJpy(table[k], rates), rule);
   return out;
 }
 

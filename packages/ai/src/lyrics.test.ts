@@ -7,7 +7,7 @@ const tags = spellFrom('song', '夏の海の明るい曲');
 
 describe('R13: the lyrics writer (LYRICS_MODEL)', () => {
   it('a Flash-class chain by default', () => {
-    expect(parseModelSpec(TASK_MODEL_DEFAULTS.lyrics)[0]).toEqual({ provider: 'gemini', model: 'gemini-2.5-flash' });
+    expect(parseModelSpec(TASK_MODEL_DEFAULTS.lyrics)[0]).toEqual({ provider: 'gemini', model: 'gemini-2.5-flash', think: 0 });
   });
   it('offers only the engine’s tags, original lyrics only, JSON', () => {
     const s = lyricsSystem();

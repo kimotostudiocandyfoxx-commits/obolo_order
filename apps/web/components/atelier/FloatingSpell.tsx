@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, type CSSProperties } from 'react';
-import type { SpellTag } from '@obolo/shared';
+import { formatMana, type SpellTag } from '@obolo/shared';
 import { face, LOOK_CSS, Talisman, useSpellFont, type TalismanLook } from './spellLooks';
 import type { FloatLyrics } from './LyricSheet';
 
@@ -206,7 +206,7 @@ export function FloatingSpell({ spell, layout, cx, bottom, bowl, scale, onTap, f
           data-testid="spell-mana"
         >
           <span>
-            {spell.gold ? '上級魔法・' : ''}使うマナ <b style={{ fontSize: '1.45em', color: g.num, fontWeight: 400 }}>{spell.price}</b>
+            {spell.gold ? '上級魔法・' : ''}使うマナ <b style={{ fontSize: '1.45em', color: g.num, fontWeight: 400 }}>{formatMana(spell.price)}</b>
           </span>
           {spell.have != null && <span style={short ? { color: '#ffb4a0' } : { opacity: 0.8 }}>いま {spell.have}マナ</span>}
         </div>

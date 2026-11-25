@@ -20,7 +20,7 @@ import { markNames } from '@/lib/finds/marks';
 import { findAll, PLANET_NAME, workMarkRef, type Found } from '@/lib/finds/works';
 import { choiceOf, detectOpen, pickOpen, type OpenAsk } from '@/lib/bluena/find';
 import { EDIT_EVENT, openInBluena, takeEdit } from '@/lib/bluena/edit';
-import { BLUENA_LINES } from '@obolo/shared';
+import { BLUENA_LINES, formatMana, gameTierFor, gameMakeKind, matchGameTemplate, type GameTemplateId, type GameTier } from '@obolo/shared';
 import { daysUntil, isOpen, KINDS, lockLine, openKinds, openLessons, type AtelierKind, type Lesson } from '@/lib/atelier/unlock';
 import { historyOf, recentRequest } from './carry';
 import { usePartner } from '@/lib/partner';
@@ -124,7 +124,7 @@ type PlanAsk = {
   writing?: boolean;
 };
 /** client 2026-11-25: {bati}'s questions for a book / a game (`craft`), and a book / a game just made (its next words change it: `after`) */
-type Pending = { kind: AtelierKind } | { radioName: string } | { tweak: Work } | { voiceAgain: true } | { use: AtelierKind; materials: Work[] } | { plan: PlanAsk } | { craft: CraftAsk } | { after: Work } | { tool: ToolAsk; spell?: SavedSpell; forKind?: AtelierKind; content?: string } | null;
+type Pending = { kind: AtelierKind } | { gameTrial: { said: string } } | { radioName: string } | { tweak: Work } | { voiceAgain: true } | { use: AtelierKind; materials: Work[] } | { plan: PlanAsk } | { craft: CraftAsk } | { after: Work } | { tool: ToolAsk; spell?: SavedSpell; forKind?: AtelierKind; content?: string } | null;
 /** R12: {bati}'s tool out in the sky (the compass while it reads; the spell book open, or taking a spell in) */
 type ToolShow = { kind: 'compass'; phase: CompassPhase; leaving?: boolean; key: number } | { kind: 'book'; mode: BookMode; page: number; spells: SavedSpell[]; saving?: BookSaving; key: number } | null;
 
@@ -339,6 +339,17 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   const spellGen = useRef(0);
   /** R14: a yes said while the lyrics were still being written (cast as soon as they come) */
   const yesWaiting = useRef<string | null>(null);
+  /** R17: the template the first game is made from (set by the answer to {bati}'s offer) */
+  const trialTemplate = useRef<GameTemplateId | null>(null);
+  /** R17: the member has no game yet (the review page's story steps never offer the trial) */
+  const firstGameNow = async () => {
+    if (story) return false;
+    if (msgsRef.current.some((m) => m.who === 'work' && m.work.kind === 'game')) return false;
+    return getApi()
+      .games()
+      .then((g) => g.length === 0)
+      .catch(() => false);
+  };
   const manaNow = () =>
     getApi()
       .wallet()
@@ -394,7 +405,14 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     // R13: a video's spell has exactly one song talisman (picked by its name); its price follows what it is for
     const vv = kind === 'video' ? fixVideoSpell(v, said) : v;
     const plan0 = planOf(kind, vv);
-    const price = prem ? prem.price : kind === 'video' ? videoPrice(vv.tags, opts.redraw, manaPricesNow()) : cost.mana;
+    // R17: a game's price is its tier's — the first game from a template (the trial), a small request (cheap), a big one
+    // or a tweak the cheap magic could not make (full); the tier goes with the yes
+    if (kind === 'game') {
+      const template = opts.game?.template ?? before?.opts.game?.template;
+      const tier: GameTier = opts.game?.tier === 'full' || before?.opts.game?.tier === 'full' ? 'full' : gameTierFor({ recast: !!prev, firstGame: !!template && !prev, template, said: plan0.words || said, tags: vv.tags, escalate: false });
+      opts = { ...opts, game: { tier, ...(template ? { template } : {}) } };
+    }
+    const price = prem ? prem.price : kind === 'video' ? videoPrice(vv.tags, opts.redraw, manaPricesNow()) : kind === 'game' ? (manaPricesNow()[gameMakeKind(!!prev, opts.game!.tier)] ?? cost.mana) : cost.mana;
     // R13: the lyrics carry over a change of the style talismans; a fresh song gets them written for its style
     const plan: Plan = twoPart && before?.plan.lyrics ? { ...plan0, lyrics: before.plan.lyrics } : plan0;
     const id = uid();
@@ -555,7 +573,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     if (have != null && have < pa.price) {
       markPlan(pa.id, 'short');
       setFloating(null);
-      sayT(MOON_LINES.noMana, { short: pa.price - have });
+      sayT(MOON_LINES.noMana, { short: formatMana(pa.price - have) });
       // no story here: only a member is offered the mana gems (NoManaNotice)
       window.dispatchEvent(new CustomEvent('obolo:nomana', { detail: { plain: true } }));
       return;
@@ -641,6 +659,12 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
             sayT(PREMIUM_LINES.failed);
             return void proposeRef.current('song', e.w.card.prompt, undefined, {}, undefined, e.w.card.spell?.length ? { tags: e.w.card.spell, added: [], removed: [] } : undefined, { lead: [MOON_LINES.plan], ...(e.w.card.lyrics ? { lyrics: e.w.card.lyrics } : {}) });
           }
+          // R17: a cheap tweak the checks refused twice — its mana is back; the strong magic is offered at its own price
+          if (e.w.card.kind === 'game' && e.job.errorCode === 'VALIDATION' && e.w.card.ref?.gameId && e.w.card.ref.gameTier !== 'full') {
+            sayT(CRAFT_LINES.gameStrongOffer);
+            const prevCard: Work = { ...e.w.card, status: 'ready' };
+            return void proposeRef.current('game', e.w.card.prompt, prevCard, { game: { tier: 'full' } }, undefined, e.w.card.spell?.length ? { tags: e.w.card.spell, added: [], removed: [] } : undefined, { lead: [MOON_LINES.plan] });
+          }
           // ④ two failures in a row: the re-try stops (R13: a video's mana is back)
           sayT(failedLine(e.w.card.kind));
         }
@@ -704,6 +728,16 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     }
     // client 2026-11-25: a book / a game starts with {bati}'s 2–4 short questions
     if (kind === 'video' && !story) return void videoStart(content);
+    // R17: a member's first game starts from one of our templates (cheap): {bati} names them in a sentence, words answer
+    if (kind === 'game' && !story) {
+      const words = content;
+      return void firstGameNow().then((first) => {
+        if (!first) return craftAsk(craftBegin('game', words, isBare(words)));
+        setPending({ gameTrial: { said: isBare(words) ? '' : words } });
+        sayT(CRAFT_LINES.gameTrialOffer);
+        sayT(CRAFT_LINES.gameTrialList);
+      });
+    }
     if (isCraftKind(kind)) return craftAsk(craftBegin(kind, content, isBare(content)));
     // R12: a kept spell that fits the words — {bati} offers it now and then (「スペルブックの『…』をもとにする？」)
     if (suggestFromBook(kind, content)) return;
@@ -838,7 +872,10 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       .moonSpell({ kind: a.kind, said, answers: a.answers })
       .catch(() => null);
     setBusy(false);
-    void propose(a.kind, said, undefined, {}, undefined, view ?? undefined);
+    // R17: the first game's template goes with its spell (the trial's price)
+    const template = a.kind === 'game' ? (a.template ?? trialTemplate.current ?? undefined) : undefined;
+    trialTemplate.current = null;
+    void propose(a.kind, said, undefined, template ? { game: { tier: 'trial', template } } : {}, undefined, view ?? undefined);
   };
   /**
    * R13 (client 2026-11-25): a finished song changed in words, for free — 「テンポ速くして2番カット」「サビをもう一回」
@@ -1349,6 +1386,20 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       const h = held.current.get(p.radioName);
       const w = msgs.find((m): m is Extract<Msg, { who: 'work' }> => m.who === 'work' && m.work.id === p.radioName)?.work;
       if (h && w) return void recorded({ ...w, title: text.slice(0, 40) }, h.blob, h.seconds);
+    }
+    // R17: the answer to the first game's offer — a template by its words; none named → asked once more
+    if (p && 'gameTrial' in p) {
+      const it = detect(text, false, markNames());
+      if (!(it.kind === 'make' && it.what !== 'game' && it.what !== 'lookup') && it.kind !== 'find') {
+        const t = matchGameTemplate(text);
+        if (!t) {
+          setPending(p);
+          return sayT(CRAFT_LINES.gameTrialAgain);
+        }
+        trialTemplate.current = t;
+        const said = [p.gameTrial.said, text].filter(Boolean).join('。');
+        return void craftAsk({ ...craftBegin('game', said, false), template: t });
+      }
     }
     // client 2026-11-25: an answer to {bati}'s question for a book / a game (unless another kind is asked for)
     if (p && 'craft' in p) {

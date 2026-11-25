@@ -24,7 +24,25 @@ export class SpellService {
   private readonly log = new Logger('Spell');
   constructor(@Inject(SPELL_LLM) private readonly llm: LlmProvider) {}
 
+  /**
+   * R17 (cheaper): the same ask gives the same spell — a double send, the spell asked again after a back-and-forth, the
+   * same words in another tab — kept a while instead of asking the model again (per process; only the model's answers)
+   */
+  private readonly seen = new Map<string, { at: number; v: SpellView }>();
+
   async spell(b: SpellBody): Promise<SpellView> {
+    const key = JSON.stringify([b.kind, b.said, b.tags ?? null, b.answers ?? null, b.history ?? null]);
+    const hit = this.seen.get(key);
+    if (hit && Date.now() - hit.at < 10 * 60_000) return hit.v;
+    const v = await this.make(b);
+    if (v.how === 'model') {
+      if (this.seen.size >= 500) this.seen.delete(this.seen.keys().next().value!);
+      this.seen.set(key, { at: Date.now(), v });
+    }
+    return v;
+  }
+
+  private async make(b: SpellBody): Promise<SpellView> {
     const fresh = !b.tags?.length;
     const correction = !fresh && spellCorrection(b.said);
     const rules: SpellView = fresh ? { tags: b.answers?.length ? spellOfAnswers(b.kind, b.answers) : spellFrom(b.kind, b.said), added: [], removed: [] } : spellEdit(b.kind, b.tags!, b.said);

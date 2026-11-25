@@ -1,3 +1,4 @@
+import type { GameTier } from '@obolo/shared';
 import type { AtelierKind } from '@/lib/atelier/unlock';
 import { FLY_READY_KINDS, KIND_HOME_PLANET, type BluenaPlanet, type BookView, type GameView, type SpellTag, type SongLyrics } from '@obolo/shared';
 import type { ClipFile, RefineTarget, WorkMaterial, WorkOrigin } from '@obolo/shared';
@@ -27,7 +28,7 @@ export type Work = {
   poster?: string | null;
   source?: { title: string; source: string; pageUrl: string };
   note?: string;
-  ref?: { /** client 2026-11-25: a book's / a game's id on the server */ bookId?: string; gameId?: string; postId?: string; rootId?: string; /** the root's photo (an MV's still, M-R253 §3) */ mediaId?: string; songId?: string; backstageId?: string; /** R13: the video's project on the server (its free changes go there) */ mvId?: string; showId?: string; demoSong?: MadeSong; style?: string; /** a stand-in made on the review page (makers.ts makeTest) */ test?: boolean };
+  ref?: { /** client 2026-11-25: a book's / a game's id on the server */ bookId?: string; gameId?: string; postId?: string; rootId?: string; /** the root's photo (an MV's still, M-R253 §3) */ mediaId?: string; songId?: string; backstageId?: string; /** R13: the video's project on the server (its free changes go there) */ mvId?: string; showId?: string; demoSong?: MadeSong; style?: string; /** R17: the game tier this card was asked at (a cheap tweak that failed is offered at full) */ gameTier?: GameTier; /** a stand-in made on the review page (makers.ts makeTest) */ test?: boolean };
   flown?: boolean;
   worn?: boolean;
   /** put into Bluena (the card's edge flashes once) */

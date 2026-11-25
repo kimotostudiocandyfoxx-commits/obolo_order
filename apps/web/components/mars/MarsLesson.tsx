@@ -1,6 +1,6 @@
 'use client';
 
-import { MAKE_COST } from '@obolo/shared';
+import { formatMana, MAKE_COST } from '@obolo/shared';
 import { useEffect, useRef, useState } from 'react';
 import { Sticker, saveSpell } from '@/components/jupiter/JupiterLesson';
 import { Record } from '@/components/mercury/MercuryLesson';
@@ -316,7 +316,7 @@ export function MarsLesson({
     actions = (
       <NextButton
         onClick={() => {
-          if (ms === 0) setCue({ who: 'guide', text: `−${MAKE_COST.mv}マナ` });
+          if (ms === 0) setCue({ who: 'guide', text: `−${formatMana(MAKE_COST.mv)}マナ` });
           else if (!remade) said({ who: 'bati', text: 'Bluenaに、しまったよ！' });
           else setCue(null);
           setMs(ms === 0 ? 1 : remade ? 3 : 2);

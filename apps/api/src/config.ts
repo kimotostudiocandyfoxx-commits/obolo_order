@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { DEFAULT_MAKE_SETUP, type MakeSetup } from '@obolo/shared';
 
 /**
  * All runtime configuration comes from environment variables (spec §8: secrets never committed).
@@ -71,8 +72,24 @@ const Env = z.object({
   /** the looks and the Bati painted by Seedream on Runware (client decision 2026-10-25; secret obolo-seedream-api-key) */
   LOOK_RUNWARE_KEY: secret(),
   GEMINI_MODEL: z.string().optional(),
-  /** PLACEHOLDER (P-AI-3): image model for the NEO look / Bati. */
+  /** PLACEHOLDER (P-AI-3): image model for the NEO look / Bati. Now only the old name of ART_MODEL (a Gemini image model). */
   GEMINI_IMAGE_MODEL: z.string().optional(),
+  /**
+   * R17 (client 2026-11-25: cheaper pictures; the art is Japanese-anime-like): the model of each picture use — a Runware
+   * AIR id (runware:400@4 = FLUX.2 [klein] 4B, bfl:flux@3-image-klein, alibaba:qwen-image@2.1-turbo, a civitai:… SDXL
+   * anime checkpoint …) or a Gemini image model (gemini-2.5-flash-image). Defaults: R16's models, until the client picks
+   * from the comparison (.github/workflows/runware-art-test.yml). Set them as GitHub Variables of the same name.
+   */
+  ART_MODEL: z.string().optional(),
+  LOOK_MODEL: z.string().default('bytedance:seedream@5.0-pro'),
+  BATI_MODEL: z.string().default('bytedance:seedream@5.0-pro'),
+  KORORIN_MODEL: z.string().default('bytedance:seedream@5.0-pro'),
+  /** the look rounds of the first journey (free): four to pick from (M-R173, four touches) */
+  LOOK_CANDIDATES: z.coerce.number().int().min(1).max(4).default(4),
+  /** R17: a paid look / dress-up round (after the journey, the atelier's row of pictures): two to pick from, not four */
+  PAID_LOOK_CANDIDATES: z.coerce.number().int().min(1).max(4).default(2),
+  /** the Saturn kororin design shows four to pick from (story D04-S005b; DECISIONS 2026-10-27) */
+  KORORIN_CANDIDATES: z.coerce.number().int().min(1).max(4).default(4),
   OPENAI_API_KEY: secret(),
   OPENAI_MODEL: z.string().optional(),
   /** Bati's conversation on Claude Haiku 5.5 (client decision 2026-11-21; secret obolo-anthropic-api-key).
@@ -84,20 +101,29 @@ const Env = z.object({
    * client 2026-11-25: the models a book's chapters and a game's code are written with — a chain of provider:model
    * (packages/ai task.ts; gemini / claude / openai), the next tried on a timeout or quota. Claude later = change these.
    */
-  NOVEL_MODEL: z.string().default('gemini:gemini-2.5-flash,gemini:gemini-flash-latest'),
-  GAME_MODEL: z.string().default('gemini:gemini-2.5-pro,gemini:gemini-2.5-flash'),
+  NOVEL_MODEL: z.string().default('gemini:gemini-2.5-flash?think=0,gemini:gemini-flash-latest?think=0'),
+  /** the old name of GAME_MODEL_FULL (kept: a set GitHub Variable still works) */
+  GAME_MODEL: z.string().optional(),
+  /**
+   * R17 (client 2026-11-25: games cheaper): the chain of each game tier — the first game's template values (TRIAL), a
+   * member's own request and every tweak (CHEAP), a request that needs it / a tweak the cheap chain failed twice (FULL).
+   * `?think=N` caps a Gemini step's thinking tokens (0 = none).
+   */
+  GAME_MODEL_TRIAL: z.string().default('gemini:gemini-2.5-flash-lite?think=0,gemini:gemini-2.5-flash?think=0'),
+  GAME_MODEL_CHEAP: z.string().default('gemini:gemini-2.5-flash?think=4096,gemini:gemini-flash-latest?think=4096'),
+  GAME_MODEL_FULL: z.string().optional(),
   /** a step of GAME_MODEL that takes longer than this gives way to the next (ms) */
   GAME_MODEL_TIMEOUT_MS: z.coerce.number().min(10_000).max(600_000).default(150_000),
   NOVEL_MODEL_TIMEOUT_MS: z.coerce.number().min(5_000).max(300_000).default(60_000),
   /** R13: the model a song's lyrics with metatags are written with (a chain like NOVEL_MODEL; Claude later = change this) */
-  LYRICS_MODEL: z.string().default('gemini:gemini-2.5-flash,gemini:gemini-flash-latest'),
+  LYRICS_MODEL: z.string().default('gemini:gemini-2.5-flash?think=0,gemini:gemini-flash-latest?think=0'),
   LYRICS_MODEL_TIMEOUT_MS: z.coerce.number().min(5_000).max(120_000).default(30_000),
   /**
    * R14 (client 2026-11-25: 「サイケデリックトランスの曲」 came back as a pop spell): the model that builds every スペル first
    * (POST /moon/spell; a chain like LYRICS_MODEL — Claude = e.g. claude:claude-haiku-4-5,gemini:gemini-2.5-flash); the
    * rules only fill what it left empty, or stand alone when it fails
    */
-  SPELL_MODEL: z.string().default('gemini:gemini-2.5-flash,gemini:gemini-flash-latest'),
+  SPELL_MODEL: z.string().default('gemini:gemini-2.5-flash?think=0,gemini:gemini-flash-latest?think=0'),
   SPELL_MODEL_TIMEOUT_MS: z.coerce.number().min(2_000).max(60_000).default(9_000),
   /**
    * R14 (client 2026-11-25, iPad: 「バティの話すスピードが少し遅い」): how fast {bati} speaks in the Moon chat (Fish
@@ -232,6 +258,11 @@ const Env = z.object({
   CPU_SECOND_JPY: z.coerce.number().min(0).default(0.01),
   /** a making's price follows its recorded costs (p90) once this many makings were recorded in the last 30 days */
   COST_REFINE_MIN_SAMPLES: z.coerce.number().min(3).default(20),
+  /**
+   * R17: recorded costs before this moment (ISO date) are not used to refine the prices — set it when a model is switched
+   * (ART_MODEL …), so the old model's costs do not hold the price up (or down) for 30 days
+   */
+  COST_REFINE_SINCE: z.string().optional(),
   /** cost recording on (false: provider calls are not recorded and no small costs are taken) */
   COST_RECORDING: bool(true),
 
@@ -264,3 +295,23 @@ export function loadConfig(): AppConfig {
 }
 
 export const CONFIG = Symbol('CONFIG');
+
+/** R17: the art model (ART_MODEL; GEMINI_IMAGE_MODEL is its old name; default Gemini 2.5 Flash Image as in R16) */
+export const artModelOf = (c: Pick<AppConfig, 'ART_MODEL' | 'GEMINI_IMAGE_MODEL'>) => c.ART_MODEL || c.GEMINI_IMAGE_MODEL || DEFAULT_MAKE_SETUP.artModel;
+/** R17: the full game chain (GAME_MODEL_FULL; GAME_MODEL is its old name) */
+export const gameFullOf = (c: Pick<AppConfig, 'GAME_MODEL_FULL' | 'GAME_MODEL'>) => c.GAME_MODEL_FULL || c.GAME_MODEL || 'gemini:gemini-2.5-pro,gemini:gemini-2.5-flash';
+
+/** R17: what the pictures and the games are made with — the seed of the price table follows it (makeCostEstimates) */
+export function makeSetupOf(c: AppConfig): MakeSetup {
+  return {
+    artModel: artModelOf(c),
+    lookModel: c.LOOK_MODEL || DEFAULT_MAKE_SETUP.lookModel,
+    batiModel: c.BATI_MODEL || DEFAULT_MAKE_SETUP.batiModel,
+    kororinModel: c.KORORIN_MODEL || DEFAULT_MAKE_SETUP.kororinModel,
+    paidLookCandidates: c.PAID_LOOK_CANDIDATES || DEFAULT_MAKE_SETUP.paidLookCandidates,
+    kororinCandidates: c.KORORIN_CANDIDATES || DEFAULT_MAKE_SETUP.kororinCandidates,
+    gameTrialModel: c.GAME_MODEL_TRIAL || DEFAULT_MAKE_SETUP.gameTrialModel,
+    gameCheapModel: c.GAME_MODEL_CHEAP || DEFAULT_MAKE_SETUP.gameCheapModel,
+    gameFullModel: gameFullOf(c),
+  };
+}

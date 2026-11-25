@@ -65,6 +65,13 @@ const code = async (p: Promise<unknown>) => {
 class MemLedger extends LedgerService {
   balance = 200;
   rows: ManaEntryInput[] = [];
+  tenths = { pendingTenths: 0, rows: 0, takenMana: 0 };
+  protected override async tenthsRow() {
+    return { ...this.tenths };
+  }
+  protected override async saveTenths(_tx: Tx, _u: string, v: { pendingTenths: number; rows: number; takenMana: number }) {
+    this.tenths = v;
+  }
   protected override async lockedBalance() {
     return this.balance;
   }
@@ -156,6 +163,27 @@ describe('ゲーム: code checked, one repair round, mana back when it fails', (
     const bad = new GameService({ name: 'gemini', chat: async () => JSON.stringify({ code: 'alert(1)' }) } as never, mock as never, fakeDb().db, new MemLedger(), kv());
     expect(await code(bad.make('u1', input))).toBe('VALIDATION');
   });
+  it('R17: each tier on its own chain — the trial fills a template (our code), cheap and full write it', async () => {
+    const { db } = fakeDb();
+    const used: string[] = [];
+    const writer = (name: string) => ({ name, chat: async () => (used.push(name), JSON.stringify({ title: 't', howTo: 'h', code: good })) });
+    const trial = { name: 'trial', chat: async () => (used.push('trial'), JSON.stringify({ title: 'ねこクイズ', howTo: 'こたえてね', quiz: [1, 2, 3].map((i) => ({ q: `ねこの問題${i}`, a: ['あ', 'い', 'う'], ok: 1 })) })) };
+    const s = new GameService(writer('full') as never, mock as never, db, new MemLedger(), kv(), writer('cheap') as never, trial as never);
+    expect(await s.firstGame('u1')).toBe(true);
+    const t = await s.make('u1', { ...input, kind: 'gameTrial', template: 'quiz' });
+    expect(t.title).toBe('ねこクイズ');
+    expect(t.code).toContain('ねこの問題3');
+    expect(checkGameCode(t.code).ok).toBe(true);
+    expect(await s.firstGame('u1')).toBe(false);
+    await s.make('u1', { ...input, kind: 'game' });
+    await s.make('u1', { ...input, kind: 'gamePro' });
+    await s.make('u1', { ...input, gameId: t.id, kind: 'gameTweak' });
+    await s.make('u1', { ...input, gameId: t.id, kind: 'gameTweakPro' });
+    expect(used).toEqual(['trial', 'cheap', 'full', 'cheap', 'full']);
+    // the trial's model failing: the template's own values, still a game
+    const quiet = new GameService(writer('full') as never, mock as never, fakeDb().db, new MemLedger(), kv(), undefined, { name: 'trial', chat: async () => Promise.reject(new Error('down')) } as never);
+    expect(checkGameCode((await quiet.make('u1', { ...input, kind: 'gameTrial', template: 'maze' })).code).ok).toBe(true);
+  });
   it('a tweak is a new version made from the previous code; the face is the newest', async () => {
     const { db } = fakeDb();
     let prompt = '';
@@ -178,7 +206,7 @@ describe('ゲーム: code checked, one repair round, mana back when it fails', (
     await startConfirmed({ ledger: l, db, ...f, userId: 'u1', kind: 'game', confirm: yes, spell: yes.spell, required: true });
     // the same yes again (a double tap): no second charge
     expect(await code(startConfirmed({ ledger: l, db, ...f, userId: 'u1', kind: 'game', confirm: yes, spell: yes.spell, required: true }))).toBe('ALREADY_STARTED');
-    expect(l.balance).toBe(200 - MAKE_COST.game);
+    expect(200 - l.balance + l.tenths.pendingTenths / 10).toBeCloseTo(MAKE_COST.game, 6);
     const s = new GameService(mock as never, mock as never, db, l, kv());
     expect(await s.refundJob('u1', input)).toBe(MAKE_COST.game);
     expect(await s.refundJob('u1', input)).toBe(0);
@@ -197,7 +225,8 @@ describe('ゲーム: code checked, one repair round, mana back when it fails', (
     const tweak = { id: '11111111-2b4c-4d5e-8f90-1a2b3c4d5e6f', price: MAKE_COST.gameTweak };
     await startConfirmed({ ledger: l, db, ...f, userId: 'u1', kind: 'gameTweak', confirm: tweak, spell: null, required: false });
     await s.make('u1', { ...input, gameId: g.id, kind: 'gameTweak', confirm: tweak });
-    expect(l.balance).toBe(200 - MAKE_COST.game - MAKE_COST.gameTweak);
+    // R17: the tenths of the prices wait with the small costs (the quoted prices are what is accounted)
+    expect(200 - l.balance + l.tenths.pendingTenths / 10).toBeCloseTo(MAKE_COST.game + MAKE_COST.gameTweak, 6);
     expect(await s.broken('u1', g.id, { version: 1, reason: 'TypeError' })).toEqual({ refunded: MAKE_COST.gameTweak });
     expect(await s.broken('u1', g.id, { version: 1, reason: 'TypeError' })).toEqual({ refunded: 0 });
     expect((tables.get(games)![0] as { active: number }).active).toBe(0);

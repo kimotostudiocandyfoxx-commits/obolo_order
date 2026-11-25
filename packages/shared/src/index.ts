@@ -46,3 +46,4 @@ export * from './bluenaVariants';
 export * from './video';
 export * from './videoVariants';
 export * from './songEngine';
+export * from './gameTemplates';

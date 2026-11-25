@@ -6,7 +6,7 @@ import { parseModelSpec, TASK_MODEL_DEFAULTS } from './task';
 
 describe('R14: the spell model (SPELL_MODEL)', () => {
   it('a Flash-class chain by default', () => {
-    expect(parseModelSpec(TASK_MODEL_DEFAULTS.spell)[0]).toEqual({ provider: 'gemini', model: 'gemini-2.5-flash' });
+    expect(parseModelSpec(TASK_MODEL_DEFAULTS.spell)[0]).toEqual({ provider: 'gemini', model: 'gemini-2.5-flash', think: 0 });
   });
   it('knows the genres, keeps defaults from contradicting them, keeps the request words out, remakes on a correction', () => {
     const s = spellSystem('song');

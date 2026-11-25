@@ -1,6 +1,6 @@
 'use client';
 
-import { MAKE_COST } from '@obolo/shared';
+import { formatMana, MAKE_COST } from '@obolo/shared';
 import { useEffect, useRef, useState } from 'react';
 import { Big, LessonShell, NextButton, Panel, Soft, type CoachLine } from '@/components/onboarding/LessonShell';
 import { VoiceField } from '@/components/onboarding/StoryExtras';
@@ -352,7 +352,7 @@ export function JupiterLesson({
                         : make === 'ready' && art === 'skip'
                           ? { who: 'kaiser', text: '字だけのアートも、あるダ。' }
                           : make === 'ready' && art === 'mana'
-                            ? { who: 'guide', text: `−${MAKE_COST.jacketArt}マナ` }
+                            ? { who: 'guide', text: `−${formatMana(MAKE_COST.jacketArt)}マナ` }
                             : null;
   const pickLine: Line | null =
     beat?.k !== 'pick'

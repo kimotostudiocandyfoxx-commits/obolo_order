@@ -1,0 +1,32 @@
+[
+  {
+    "id": "1-art",
+    "use": "ART_MODEL (jacketArt: an art piece from a spell)",
+    "prompt": "One square artwork that fills the whole square frame edge to edge (no border, no frame, no sticker outline). Style and touch: illustration, of 夜空, 泳ぐクジラ, stars, watercolor, gentle, soft pastel colors, sparkling light, square composition. It shows this feeling or moment: \"夜空を泳ぐクジラ\". No text, no letters, no numbers, no logo, no watermark. Do not draw real people or their faces.",
+    "refs": []
+  },
+  {
+    "id": "2-look",
+    "use": "LOOK_MODEL (a member look from their photo, photo → anime)",
+    "prompt": "Paint, do not photograph: turn the person in the attached photo into a painted illustration (brush strokes, painted skin and hair), never a retouched photo. Japanese anime-style semi-realistic illustration, modern Japanese anime key-visual look, clean fine line art, soft cel shading with gentle painterly light, Japanese character design, painted skin and hair — NOT a photograph, no photographic skin texture, no camera depth of field. Chest-up, centered, facing the viewer, a young person in their late teens or early twenties with a friendly, attractive face. A member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow, fine gold embroidery along the hood's edge. Round sunglasses with thin gold frames and pitch-black lenses with a faint golden reflection are always worn: the eyes are never visible. The mouth and the lower face are visible (no face mask, no scarf over the mouth). Modest clothes under the cloak with a high closed neckline, nothing revealing. Background: a dark night with soft golden glints and faint stars, softly blurred. Square image that works as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. Base the character on the person in the attached photo: draw THEM as a semi-real painted portrait, keeping a clear likeness of their face shape, hairstyle and their own hair colour (painted and flattering). They wear round sunglasses with thin gold frames and pitch-black lenses, so their eyes are not visible. The ears of a cat come out through openings in the hood, the hood pulled up deep. Colours: the hood and cloak are blue, the lining is blue; the hair keeps the photo's own colour. Mood: calm; a gentle smile. They love music: show it as one small charm or accent they wear. Only this one person, never anyone else from the photo. Avoid: western cartoon, american comic style, 3D render, pixar style, photorealistic. Age: as they are, in their late teens or early twenties.",
+    "refs": [
+      "art/review/saturn/gen-tests/photos/p1.jpg"
+    ]
+  },
+  {
+    "id": "3-bati",
+    "use": "BATI_MODEL ({bati} dress-up, keeps the creature from its picture)",
+    "prompt": "Edit the first picture: it is the same small magical partner creature called Bati — its look now, the reference to follow — and it must stay clearly the same creature: the same face, eyes, body shape, main colours, the tiny mark on its forehead and the framing, on a perfectly flat, solid pure chroma-key green (#00FF00) background — one single even colour everywhere around it, also in the gaps — with no floor, no shadow, no light spill and no other objects; nothing on the character is that colour. Dress it up or change it following this wish: \"魔法使いの帽子とマントを着せて\" — new clothes, accessories, a hat, a small costume, a different art touch (watercolour, crayon, pixel art …) or a cute transformation (colours of a part, little wings, a tail tip, ears), never a different animal or a different character. Variation 1 of 4 (each of the four a clearly different take on the wish): a happy pose. No text, no letters. Rules for the look: it must not resemble any real, existing person; it must not resemble or copy any character, mascot, costume, logo or brand from an existing anime, game, film, book or company; nothing sexual or revealing; nothing violent (no weapons, blood or injuries). Cute and kids-friendly, never scary. IMPORTANT: it was born from the food \"いちご\", and a little of that food must stay visible somewhere on it in every look: a small hair ornament, a pattern or an item it holds that is clearly \"いちご\" (a red body with tiny yellow seeds, a green strawberry calyx worn as a hat) — small, not the main subject. If that would look unnatural, a small tattoo of \"いちご\" somewhere on its body.",
+    "refs": [
+      "apps/api/assets/bati/moon-1.jpg"
+    ]
+  },
+  {
+    "id": "4-kororin",
+    "use": "KORORIN_MODEL (a kororin design in the style of the reference characters)",
+    "prompt": "Draw ONE kororin character in exactly the style of the FIRST attached image (the base kororin): a small squishy takoyaki ball (round octopus dumpling) with a golden-brown baked body, brown takoyaki sauce on top, a white mayonnaise zigzag, green aonori flakes and dancing katsuobushi flakes, small black dot eyes, a tiny \"ω\" mouth, short stubby arms and feet, a soft soft-lit deformed 3D look. Round gold-rimmed sunglasses are pushed UP on its forehead, resting on the sauce, so the eyes stay visible. The body is ALWAYS this takoyaki ball. Make it the member's own from their words: \"星のかけらでできた、ねむそうなたこ焼き\" — show it only as the colour of the band around its lower body, small patterns, and one small charm or accessory it wears or holds. Mood: happy and smiling. Composition: full body, front view, centered, about 75% of a square frame, nothing cut off. Background: plain flat pure white (#FFFFFF), no ground, no shadow, no other objects. No text, no letters, no logo, no watermark. IMPORTANT: the result must be a completely NEW, ORIGINAL character. Do NOT reproduce, trace or imitate any existing character, mascot, costume, logo or trademark from anime, games, films or brands; change the face, outfit design, silhouette and details so it is clearly a different character.",
+    "refs": [
+      "apps/api/assets/kororin-style.jpg"
+    ]
+  }
+]

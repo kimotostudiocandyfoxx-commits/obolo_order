@@ -61,8 +61,50 @@ export class MockImageProvider implements ImageProvider {
  */
 const SEEDREAM_MODEL = 'bytedance:seedream@5.0-pro';
 
-export class SeedreamImageProvider implements ImageProvider {
-  readonly name = 'seedream';
+/**
+ * R17: how a Runware model takes the reference pictures — `referenceImages` (Seedream, FLUX.2 / FLUX 3 klein, Qwen-Image,
+ * Nano Banana, P-Image Edit …), Runware's IP-Adapter on a community SDXL checkpoint (civitai:…: Animagine, Illustrious),
+ * or none (a words-only model: the references are left out)
+ */
+export function runwareRefMode(model: string): { mode: 'refs' | 'ip' | 'none'; max: number } {
+  if (/^civitai:/i.test(model)) return { mode: 'ip', max: 1 };
+  if (/z-image|^prunaai:1@|twinflow/i.test(model)) return { mode: 'none', max: 0 };
+  if (/^runware:400@|^bfl:flux@3|^prunaai:2@/i.test(model)) return { mode: 'refs', max: 4 };
+  if (/qwen-image/i.test(model)) return { mode: 'refs', max: 3 };
+  return { mode: 'refs', max: 10 };
+}
+/** Runware's IP-Adapter for SDXL (the MV chibi cuts use the same) */
+const IP_ADAPTER = 'runware:55@1';
+const SDXL_NEGATIVE = 'lowres, bad anatomy, bad hands, text, watermark, signature, worst quality, low quality, photo, realistic, 3d, nsfw, nude';
+
+/** the Runware task of one picture on `model` (R17: any AIR id; includeCost always) */
+export function runwareImageTask(model: string, taskUUID: string, prompt: string, side: number, refs: GeneratedImage[]): Record<string, unknown> {
+  const uri = (r: GeneratedImage) => `data:${r.mime};base64,${r.data.toString('base64')}`;
+  const how = runwareRefMode(model);
+  const sdxl = how.mode === 'ip';
+  return {
+    taskType: 'imageInference',
+    taskUUID,
+    model,
+    positivePrompt: prompt.slice(0, sdxl ? 1900 : 3000),
+    width: side,
+    height: side,
+    numberResults: 1,
+    outputType: 'URL',
+    outputFormat: 'JPG',
+    includeCost: true,
+    ...(sdxl ? { negativePrompt: SDXL_NEGATIVE, steps: 28, CFGScale: 5 } : {}),
+    ...(refs.length && how.mode === 'refs' ? { referenceImages: refs.slice(0, how.max).map(uri) } : {}),
+    ...(refs.length && how.mode === 'ip' ? { ipAdapters: [{ model: IP_ADAPTER, guideImage: uri(refs[0]), weight: 0.6 }] } : {}),
+  };
+}
+
+/**
+ * A picture on Runware by any AIR id (R17: ART_MODEL / LOOK_MODEL / BATI_MODEL / KORORIN_MODEL). Seedream 5.0 Pro was the
+ * only one before; the waiting line, the retries and the polling are the same for every model.
+ */
+export class RunwareImageProvider implements ImageProvider {
+  readonly name: string;
   // 1024, not 1536 (generation test 1, I: 54–179 s a look; the screen shows them at 720 at most), and at most twelve at
   // once from one server (four made a line longer than five minutes in test 2), the rest waiting in line: a burst of twelve made Runware give up at about 120 s (half the
   // Bati births came back with no picture)
@@ -74,7 +116,10 @@ export class SeedreamImageProvider implements ImageProvider {
     private readonly maxAtOnce = 12,
     /** one picture's whole wait (2026-10-29: a look waited minutes and the screen sat on 「水盤が描いている」) */
     private readonly timeoutMs = 115_000,
-  ) {}
+    readonly model: string = SEEDREAM_MODEL,
+  ) {
+    this.name = model === SEEDREAM_MODEL ? 'seedream' : `runware:${model}`;
+  }
   async generate(prompt: string, seed?: number, refs: GeneratedImage[] = []): Promise<GeneratedImage> {
     if (this.running >= this.maxAtOnce) await new Promise<void>((go) => this.waiting.push(go));
     this.running++;
@@ -105,15 +150,15 @@ export class SeedreamImageProvider implements ImageProvider {
         signal: AbortSignal.timeout(20_000),
       });
       const j = (await res.json().catch(() => ({}))) as { data?: { taskUUID?: string; imageURL?: string; status?: string; cost?: number }[]; errors?: unknown[] };
-      if (j.errors?.length) throw new Error(`Seedream ${res.status} ${JSON.stringify(j.errors).slice(0, 200)}`);
+      if (j.errors?.length) throw new Error(`${this.name} ${res.status} ${JSON.stringify(j.errors).slice(0, 200)}`);
       const d = (j.data ?? []).find((x) => x.taskUUID === taskUUID);
-      if (d?.status === 'error') throw new Error(`Seedream ${JSON.stringify(d).slice(0, 200)}`);
+      if (d?.status === 'error') throw new Error(`${this.name} ${JSON.stringify(d).slice(0, 200)}`);
       if (d?.imageURL) {
-        meterRunware(SEEDREAM_MODEL, [d]);
+        meterRunware(this.model, [d]);
         return d.imageURL;
       }
     }
-    throw new Error('Seedream: the picture did not come back in time');
+    throw new Error(`${this.name}: the picture did not come back in time`);
   }
   private async paint(prompt: string, _seed?: number, refs: GeneratedImage[] = []): Promise<GeneratedImage> {
     const taskUUID = crypto.randomUUID();
@@ -121,37 +166,40 @@ export class SeedreamImageProvider implements ImageProvider {
     const res = await fetch('https://api.runware.ai/v1', {
       method: 'POST',
       headers: { 'content-type': 'application/json', authorization: `Bearer ${this.apiKey}` },
-      body: JSON.stringify([
-        {
-          taskType: 'imageInference',
-          taskUUID,
-          model: SEEDREAM_MODEL,
-          positivePrompt: prompt.slice(0, 3000),
-          width: this.side,
-          height: this.side,
-          numberResults: 1,
-          outputType: 'URL',
-          outputFormat: 'JPG',
-          includeCost: true,
-          ...(refs.length ? { referenceImages: refs.map((r) => `data:${r.mime};base64,${r.data.toString('base64')}`) } : {}),
-        },
-      ]),
+      body: JSON.stringify([runwareImageTask(this.model, taskUUID, prompt, this.side, refs)]),
       signal: AbortSignal.timeout(this.timeoutMs),
     });
     const j = (await res.json().catch(() => ({}))) as { data?: { imageURL?: string; status?: string; cost?: number }[]; errors?: unknown[] };
-    if (j.data?.[0]?.imageURL) meterRunware(SEEDREAM_MODEL, [j.data[0]]);
+    if (j.data?.[0]?.imageURL) meterRunware(this.model, [j.data[0]]);
     const processing = !j.errors?.length && j.data?.[0] && !j.data[0].imageURL;
     const url = j.data?.[0]?.imageURL ?? (processing ? await this.waitFor(taskUUID, until) : undefined);
-    if ((!res.ok && !url) || j.errors?.length || !url) throw new Error(`Seedream ${res.status} ${JSON.stringify(j.errors ?? j).slice(0, 200)}`);
+    if ((!res.ok && !url) || j.errors?.length || !url) throw new Error(`${this.name} ${res.status} ${JSON.stringify(j.errors ?? j).slice(0, 200)}`);
     const img = await fetch(url, { signal: AbortSignal.timeout(60_000) });
-    if (!img.ok) throw new Error(`Seedream image ${img.status}`);
+    if (!img.ok) throw new Error(`${this.name} image ${img.status}`);
     return { data: Buffer.from(await img.arrayBuffer()), mime: 'image/jpeg' };
+  }
+}
+
+/** Seedream 5.0 Pro on Runware (the R16 painter of the looks and the Bati) */
+export class SeedreamImageProvider extends RunwareImageProvider {
+  constructor(apiKey: string, side = 1024, maxAtOnce = 12, timeoutMs = 115_000) {
+    super(apiKey, side, maxAtOnce, timeoutMs, SEEDREAM_MODEL);
   }
 }
 
 /** The looks and the Bati: Seedream when its key is set, else the general image provider. */
 export function createLookImageProvider(cfg: { runwareKey?: string; geminiApiKey?: string; imageModel?: string }): ImageProvider {
   return cfg.runwareKey ? new SeedreamImageProvider(cfg.runwareKey) : createImageProvider(cfg);
+}
+
+/**
+ * R17: the painter of one picture use from its config — a Gemini image model (gemini-…) on the Gemini key, anything else
+ * a Runware AIR id on the Runware key. A Runware model without the Runware key falls back to Gemini (then the mock).
+ */
+export function createPictureProvider(model: string, keys: { runwareKey?: string; geminiApiKey?: string }): ImageProvider {
+  const m = model.trim();
+  if (!/^gemini/i.test(m) && keys.runwareKey) return new RunwareImageProvider(keys.runwareKey, 1024, 12, 115_000, m);
+  return createImageProvider({ geminiApiKey: keys.geminiApiKey, imageModel: /^gemini/i.test(m) ? m : undefined });
 }
 
 export function createImageProvider(cfg: { geminiApiKey?: string; imageModel?: string }): ImageProvider {

@@ -87,6 +87,11 @@ import {
   type SongTweakResult,
   demoChapter,
   demoGame,
+  gameFromTemplate,
+  gameMakeKind,
+  splitMana,
+  usageLineOf,
+  type GameTemplateId,
   isFinalChapter,
   NOVEL_CHAPTERS_PER_DAY,
   NOVEL_MAX_CHAPTERS,
@@ -223,7 +228,7 @@ interface DemoWalletEntry {
 interface DemoState {
   users: Record<string, Me>; // by id
   sessions: Record<string, string>; // token -> userId
-  wallets: Record<string, { mana: number; entries: DemoWalletEntry[]; lastActivity: string }>;
+  wallets: Record<string, { mana: number; entries: DemoWalletEntry[]; lastActivity: string; /** R17: tenths of a mana waiting (a price below 1) */ tenths?: number }>;
   buddy: Record<string, { name: string; persona: BuddyPersona; memory: string[]; messages: BuddyMessageView[] }>;
   posts: (Omit<SaturnPostView, 'starredByMe'> & { starredBy: string[]; plazaId?: string | null })[];
   quota: Record<string, number>;
@@ -270,10 +275,10 @@ interface DemoState {
   /** M-R253 §4: the review's stand-in jobs (they only take their time; `lateBy` s more than said, the first `failTimes` fail) */
   /** R11: the yeses already charged (MakeConfirm's ledger key → the stand-in job it started, '' for none) */
   paidYes?: Record<string, string>;
-  djobs?: Record<string, { owner: string; seconds: number; lateBy: number; failTimes: number; start: number; attempts: number; eta: number; late: boolean; retrying: boolean; createdAt: string; done?: boolean; /** a game being built (its result is the game) */ game?: { gameId?: string; tags: SpellTag[]; madeId?: string } }>;
+  djobs?: Record<string, { owner: string; seconds: number; lateBy: number; failTimes: number; start: number; attempts: number; eta: number; late: boolean; retrying: boolean; createdAt: string; done?: boolean; /** a game being built (its result is the game) */ game?: { gameId?: string; tags: SpellTag[]; madeId?: string; kind?: MakeKind; price?: number; template?: GameTemplateId } }>;
   /** client 2026-11-25: the demo's books and games (canned chapters / the canned game, no model) */
   books?: (BookView & { owner: string })[];
-  games?: (GameView & { owner: string; versions: { tags: SpellTag[]; code: string; title: string; howTo: string }[] })[];
+  games?: (GameView & { owner: string; versions: { tags: SpellTag[]; code: string; title: string; howTo: string }[]; /** R17: each version's making and price */ kinds?: MakeKind[]; prices?: number[] })[];
   /** chapters written per member and day */
   chapterDays?: Record<string, number>;
   /** M-R253: the Moon atelier's works (tries inside one work) */
@@ -890,7 +895,7 @@ export class DemoApi implements Api {
       return view('running');
     }
     j.done = true;
-    if (j.game && !j.game.madeId) j.game.madeId = this.buildDemoGame(j.owner, j.game.tags, j.game.gameId);
+    if (j.game && !j.game.madeId) j.game.madeId = this.buildDemoGame(j.owner, j.game.tags, j.game.gameId, j.game);
     this.save();
     return view('done');
   }
@@ -902,18 +907,21 @@ export class DemoApi implements Api {
     const { owner: _o, versions: _v, ...view } = g;
     return view;
   }
-  private buildDemoGame(owner: string, tags: SpellTag[], gameId?: string): string {
-    const made = demoGame(tags);
+  private buildDemoGame(owner: string, tags: SpellTag[], gameId?: string, how: { kind?: MakeKind; price?: number; template?: GameTemplateId } = {}): string {
+    // R17: the first game from a template — the template's own code (its values without a model)
+    const made = how.template && !gameId ? gameFromTemplate(how.template, null) : demoGame(tags);
     const at = now();
     const list = (this.s.games ??= []);
     const old = gameId ? list.find((x) => x.id === gameId && x.owner === owner) : undefined;
     if (old) {
       old.versions = [...old.versions, { ...made, tags }].slice(-8);
       Object.assign(old, { ...made, tags, version: old.versions.length - 1, updatedAt: at });
+      old.kinds = [...(old.kinds ?? []), how.kind ?? 'gameTweak'].slice(-8);
+      old.prices = [...(old.prices ?? []), how.price ?? MAKE_COST.gameTweak].slice(-8);
       return old.id;
     }
     const id = uid();
-    list.unshift({ id, owner, ...made, tags, version: 0, home: KIND_HOME_PLANET.game, createdAt: at, updatedAt: at, versions: [{ ...made, tags }] });
+    list.unshift({ id, owner, ...made, tags, version: 0, home: KIND_HOME_PLANET.game, createdAt: at, updatedAt: at, versions: [{ ...made, tags }], kinds: [how.kind ?? 'game'], prices: [how.price ?? MAKE_COST.game] });
     return id;
   }
   async novelChapter(body: Parameters<Api['novelChapter']>[0]): Promise<BookView> {
@@ -956,8 +964,15 @@ export class DemoApi implements Api {
     const { owner: _o, ...view } = b;
     return view;
   }
+  async games(): Promise<GameView[]> {
+    const me = this.uid();
+    return (this.s.games ?? []).filter((g) => g.owner === me).map((g) => this.gameOf(g.id));
+  }
   async gameBuild(body: Parameters<Api['gameBuild']>[0]): Promise<JobView> {
-    const kind = body.gameId ? 'gameTweak' : 'game';
+    // R17: the tier the quote was for (the trial only for the first game, from a template)
+    const tier = body.tier ?? 'cheap';
+    if (tier === 'trial' && (body.gameId || !body.template || (this.s.games ?? []).some((g) => g.owner === this.uid()))) throw new ApiError(409, 'TRIAL_USED', 'かんたんなゲームは、最初の1回だけだよ');
+    const kind = gameMakeKind(!!body.gameId, tier);
     const key = this.charge(kind, { confirm: body.confirm, spell: body.tags }, true, 'game');
     if (key && this.s.paidYes?.[key]) return this.getJob(this.s.paidYes[key]);
     const id = uid();
@@ -965,7 +980,7 @@ export class DemoApi implements Api {
     const t = Date.now();
     // a stand-in for the model's time: long enough for {bati}'s 「このトークに戻ってきてね」
     const seconds = body.gameId ? 34 : 40;
-    this.s.djobs = { ...(this.s.djobs ?? {}), [id]: { owner: this.uid(), seconds, lateBy: 0, failTimes: 0, start: t, attempts: 1, eta: t + seconds * 1000, late: false, retrying: false, createdAt: new Date(t).toISOString(), game: { gameId: body.gameId, tags: body.tags } } };
+    this.s.djobs = { ...(this.s.djobs ?? {}), [id]: { owner: this.uid(), seconds, lateBy: 0, failTimes: 0, start: t, attempts: 1, eta: t + seconds * 1000, late: false, retrying: false, createdAt: new Date(t).toISOString(), game: { gameId: body.gameId, tags: body.tags, kind, price: body.confirm.price, ...(tier === 'trial' && body.template ? { template: body.template } : {}) } } };
     this.save();
     return this.getJob(id);
   }
@@ -975,10 +990,9 @@ export class DemoApi implements Api {
   async gameBroken(id: string, body: Parameters<Api['gameBroken']>[1]): Promise<{ refunded: number }> {
     const g = (this.s.games ?? []).find((x) => x.id === id && x.owner === this.uid());
     if (!g || body.version !== g.version) return { refunded: 0 };
-    const amount = MAKE_COST[g.version ? 'gameTweak' : 'game'];
-    const w = this.s.wallets[this.uid()];
-    w.mana += amount;
-    w.entries.push({ id: uid(), delta: amount, reason: 'refund', createdAt: now() });
+    const kind = g.kinds?.[g.version] ?? (g.version ? 'gameTweak' : 'game');
+    const amount = g.prices?.[g.version] ?? MAKE_COST[kind];
+    this.giveBack(kind, amount);
     this.save();
     return { refunded: amount };
   }
@@ -1634,12 +1648,36 @@ export class DemoApi implements Api {
       throw new ApiError(409, 'ALREADY_STARTED', 'もう作り始めているよ');
     }
     const amount = d.amount;
-    w.mana -= amount;
+    // R17: like the API — the whole mana now, the tenths wait and are taken a whole mana at a time
+    const part = splitMana(amount);
+    w.mana -= part.whole;
     w.lastActivity = now();
-    w.entries.push({ id: uid(), delta: -amount, reason: 'generation', createdAt: now() });
+    if (part.whole) w.entries.push({ id: uid(), delta: -part.whole, reason: 'generation', createdAt: now() });
+    this.addTenths(w, kind, part.tenths);
     if (key) this.s.paidYes = { ...(this.s.paidYes ?? {}), [key]: '' };
     this.save();
     return key;
+  }
+
+  /** R17: tenths into the wallet's waiting ones; whole mana taken as they reach 10 (a 'usage' line for the kind) */
+  private addTenths(w: { mana: number; entries: DemoWalletEntry[]; tenths?: number }, kind: MakeKind, tenths: number) {
+    if (!tenths) return;
+    let t = (w.tenths ?? 0) + tenths;
+    const take = t >= 10 ? Math.min(Math.floor(t / 10), w.mana) : 0;
+    if (take > 0) {
+      w.mana -= take;
+      t -= take * 10;
+      w.entries.push({ id: uid(), delta: -take, reason: usageLineOf(kind), createdAt: now() });
+    }
+    w.tenths = t;
+  }
+  /** R17: a price given back (the whole mana, the tenths to the waiting ones) */
+  private giveBack(kind: MakeKind, amount: number) {
+    const w = this.s.wallets[this.uid()];
+    const part = splitMana(amount);
+    w.mana += part.whole;
+    if (part.whole) w.entries.push({ id: uid(), delta: part.whole, reason: 'refund', createdAt: now() });
+    this.addTenths(w, kind, -part.tenths);
   }
 
   async lookCandidates(body: Parameters<Api['lookCandidates']>[0]) {

@@ -133,6 +133,17 @@ describe("Bati's room: dress up the Bati", () => {
     expect(charged).toEqual(['look']);
   });
 
+  it('R17: a paid round paints two (still a row to pick from); the free rounds of the journey four', async () => {
+    const paid = make(JOURNEY_DONE);
+    expect((await paid.s.restyle('u', 'リボン', 'https://x')).candidates).toHaveLength(2);
+    expect(paid.prompts).toHaveLength(2);
+    expect((await paid.s.refine('u', { instruction: '髪を長く', magic: true }, 'https://x')).candidates).toHaveLength(2);
+    expect(paid.s.lookCount(false)).toBe(4);
+    expect(paid.s.lookCount(true)).toBe(2);
+    const free = make(2);
+    expect((await free.s.restyle('u', 'リボン', 'https://x')).candidates).toHaveLength(4);
+  });
+
   it('a chosen picture becomes the Bati and its faces are drawn again', async () => {
     const { s, user, jobs } = make(2);
     const r = await s.restyle('u', 'リボン', 'https://x');

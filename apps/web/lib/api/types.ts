@@ -180,6 +180,8 @@ export interface Api {
   book(id: string): Promise<BookView>;
   /** client 2026-11-25 (ゲーム): a game built / tweaked with the yes (a background job; its result is the game) */
   gameBuild(body: GameBuildBody): Promise<JobView>;
+  /** R17: your own games (none yet → the first game is the cheap trial from a template) */
+  games(): Promise<GameView[]>;
   /** your own game, or one a ダチ sent you (played in the sandbox) */
   game(id: string): Promise<GameView>;
   /** the version did not run in the sandbox: its mana back (soon after it was built, a few a day) */

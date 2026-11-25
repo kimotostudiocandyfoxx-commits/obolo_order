@@ -1,4 +1,5 @@
 import type { BatiVariantSet } from './batiVariants';
+import { gameTemplateList } from './gameTemplates';
 
 /**
  * Client 2026-11-25 (本・ゲーム): {bati}'s book and game lines (CRAFT_LINES, CRAFT_QUESTIONS) in the other styles, by the
@@ -198,4 +199,59 @@ export const CRAFT_VARIANTS: Record<string, BatiVariantSet> = {
     galcool: '見た目は、どんな感じ？　夜空っぽくとか、ネオンでピカピカとか。',
     galkansai: '見た目は、どんな感じにする？　夜空っぽくとか、ネオンでピカピカとかな。',
   },
+  // R17 (PLACEHOLDER wording for the story chat): the first game, our templates, the strong magic for a tweak
+  'まずは、かんたんなゲームから作ってみよう！': {
+    teinei: 'まずは、かんたんなゲームから作ってみよう！',
+    kansai: 'まずは、かんたんなゲームから作ってみよう！',
+    cool: 'まずは、かんたんなゲームから作ってみよう。',
+    mellow: 'まずは、かんたんなゲームから作ってみよっか〜。',
+    amae: 'まずは、かんたんなゲームから作ってみよ！',
+    gal: 'まずは、かんたんなゲームから作ってみよ！',
+    galfuwa: 'まずは〜、かんたんなゲームから作ってみよ〜！',
+    galane: 'まずは、かんたんなゲームから作ってみな！',
+    galcool: 'まずは、かんたんなゲームから作ってみよ。',
+    galkansai: 'まずは、かんたんなゲームから作ってみよか！',
+  },
+  [gameTemplateList()]: listIn({
+    teinei: 'どれにする？',
+    kansai: 'どれにする？',
+    cool: 'どれにする？',
+    mellow: 'どれにしよっか〜？',
+    amae: 'どれがいい？',
+    gal: 'どれにする？',
+    galfuwa: 'どれにする〜？',
+    galane: 'どれにする？',
+    galcool: 'どれにする？',
+    galkansai: 'どれにする？',
+  }),
+  'どれがいいかな？　たとえば「クイズ」とか「迷路」みたいに言ってね。': {
+    teinei: 'どれがいいかな？　たとえば「クイズ」とか「迷路」みたいに言ってね。',
+    kansai: 'どれがいいかな？　たとえば「クイズ」とか「迷路」みたいに言うてな。',
+    cool: 'どれがいい？　たとえば「クイズ」とか「迷路」みたいに言ってくれ。',
+    mellow: 'どれがいいかな〜？　たとえば「クイズ」とか「迷路」みたいに言ってね〜。',
+    amae: 'どれがいいかな？　たとえば「クイズ」とか「迷路」みたいに言ってね。',
+    gal: 'どれがいいかな？　たとえば「クイズ」とか「迷路」みたいに言ってね。',
+    galfuwa: 'どれがいいかな〜？　たとえば「クイズ」とか「迷路」みたいに言ってね〜。',
+    galane: 'どれがいい？　たとえば「クイズ」とか「迷路」みたいに言いな。',
+    galcool: 'どれがいい？　たとえば「クイズ」とか「迷路」みたいに言って。',
+    galkansai: 'どれがええかな？　たとえば「クイズ」とか「迷路」みたいに言うてな。',
+  },
+  'ふつうの魔法だと、うまく直せなかった。マナは返したよ。もっと強い魔法なら、直せそう。': {
+    teinei: 'ふつうの魔法だと、うまく直せなかった。マナは返したよ。もっと強い魔法なら、直せそうデス。',
+    kansai: 'ふつうの魔法だと、うまく直せなかった。マナは返したで。もっと強い魔法なら、直せそう。',
+    cool: 'ふつうの魔法だと、うまく直せなかった。マナは返した。もっと強い魔法なら、直せそうだ。',
+    mellow: 'ふつうの魔法だと、うまく直せなかったよ〜。マナは返したよ〜。もっと強い魔法なら、直せそう〜。',
+    amae: 'ふつうの魔法だと、うまく直せなかったの。マナは返したよ。もっと強い魔法なら、直せそう。',
+    gal: 'ふつうの魔法だと、うまく直せなかった。マナは返したよ。もっと強い魔法なら、直せそう。',
+    galfuwa: 'ふつうの魔法だと、うまく直せなかった〜。マナは返したよ〜。もっと強い魔法なら、直せそう〜。',
+    galane: 'ふつうの魔法だと、うまく直せなかった。マナは返しといた。もっと強い魔法なら、直せそうだよ。',
+    galcool: 'ふつうの魔法だと、うまく直せなかった。マナは返した。もっと強い魔法なら、直せそう。',
+    galkansai: 'ふつうの魔法やと、うまく直せへんかった。マナは返したで。もっと強い魔法なら、直せそうや。',
+  },
 };
+
+/** the template list in a style: the same names, only its question in that style */
+function listIn(asks: BatiVariantSet): BatiVariantSet {
+  const list = gameTemplateList().replace(/どれにする？$/, '');
+  return Object.fromEntries(Object.entries(asks).map(([k, a]) => [k, list + a])) as BatiVariantSet;
+}

@@ -197,6 +197,9 @@ export class HttpApi implements Api {
   gameBuild(body: Parameters<Api['gameBuild']>[0]) {
     return this.req<Awaited<ReturnType<Api['gameBuild']>>>('POST', '/moon/game', body);
   }
+  games() {
+    return this.req<Awaited<ReturnType<Api['games']>>>('GET', '/moon/games');
+  }
   game(id: string) {
     return this.req<Awaited<ReturnType<Api['game']>>>('GET', `/moon/games/${id}`);
   }

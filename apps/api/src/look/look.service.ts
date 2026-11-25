@@ -15,7 +15,8 @@ import { alreadyStarted } from '../wallet/confirmed';
 import { buddyProfiles, users } from '../db/schema';
 import type { KvStore } from '../infra/kv';
 import type { JobQueue } from '../infra/queue';
-import { BUDDY_LLM, IMAGES, KV, LLM, LOOK_IMAGES, QUEUE } from '../infra/tokens';
+import { BATI_IMAGES, BUDDY_LLM, IMAGES, KORORIN_IMAGES, KV, LLM, LOOK_IMAGES, QUEUE } from '../infra/tokens';
+import { CONFIG, type AppConfig } from '../config';
 import { activeBati, batiList, columnsOf, keepLook, lookHistory, type BatiRecord } from './batis';
 import { MediaService } from '../media/media.service';
 import { findPart, storedTalk, talkBlinkPrompt, talkMouthPrompt, TALK_PART_FACES, talkFacePrompt, type TalkWho } from './talk';
@@ -136,6 +137,11 @@ export class LookService {
     @Inject(QUEUE) private readonly queue: JobQueue,
     /** the Bati chat model (Haiku 5.5): decides a newborn {bati}'s personality (M-R217) */
     @Optional() @Inject(BUDDY_LLM) private readonly buddyLlm?: LlmProvider,
+    /** R17: {bati}'s pictures (BATI_MODEL) and the kororin's (KORORIN_MODEL); the look's painter without them */
+    @Optional() @Inject(BATI_IMAGES) private readonly batiPainter?: ImageProvider,
+    @Optional() @Inject(KORORIN_IMAGES) private readonly kororinPainter?: ImageProvider,
+    /** R17: how many pictures a round paints (LOOK_CANDIDATES, PAID_LOOK_CANDIDATES, KORORIN_CANDIDATES) */
+    @Optional() @Inject(CONFIG) private readonly cfg?: Partial<AppConfig>,
   ) {
     this.queue.register('bati.lines', ({ userId, batiId }) => this.writeLines(userId, batiId));
     this.queue.register('bati.paint', ({ userId, origin }) => this.paintBati(userId, origin).then(() => undefined));
@@ -143,6 +149,18 @@ export class LookService {
     this.queue.register('bati.faces', ({ userId, origin }) => this.batiFaces(userId, origin).then(() => undefined));
     this.queue.register('talk.look', ({ userId, origin, who }) => this.talkLook(userId, who, origin));
     this.queue.register('look.chibi', ({ userId, origin }) => this.kororinChibi(userId, origin));
+  }
+
+  /** R17: {bati}'s painter (BATI_MODEL) */
+  private get bati(): ImageProvider {
+    return this.batiPainter ?? this.looks;
+  }
+  /**
+   * R17 (client 2026-11-25: generate fewer where fewer are enough): a free round of the first journey paints four (four
+   * touches to pick from, M-R173); a paid round after it paints PAID_LOOK_CANDIDATES (2 — still a row to pick from).
+   */
+  lookCount(paid: boolean): number {
+    return paid ? (this.cfg?.PAID_LOOK_CANDIDATES ?? 2) : (this.cfg?.LOOK_CANDIDATES ?? CANDIDATES);
   }
 
   /** mana for a making (M-R132); admins (unlimited) make for free. Returns the refund for a failed making. */
@@ -214,7 +232,7 @@ export class LookService {
     // the look for their age band (M-R172; the birth year itself never reaches the painter), in the touch of each of the
     // four (M-R173: two Japanese anime semi-real, two character anime)
     const band = ageBand(Number((u.onboardingJson as Record<string, string> | null)?.birthYear) || null);
-    const made = await settleWithRetry(CANDIDATES, (i) => this.looks.generate(withAgeBand(withTouch(prompt(i), i), band), i, refs));
+    const made = await settleWithRetry(this.lookCount(u.journeyDay > 2 && !unlimited), (i) => this.looks.generate(withAgeBand(withTouch(prompt(i), i), band), i, refs));
     if (!made.some((r) => r.status === 'fulfilled')) await fee.refund();
     const candidates = [];
     for (const r of made) {
@@ -241,7 +259,7 @@ export class LookService {
     if (!src) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Image not found');
     const fee = await this.lookFee(userId, u.journeyDay, unlimited);
     await this.kv.incr(`look:refine:${userId}`, TRY_TTL);
-    const made = await settleWithRetry(CANDIDATES, (i) => this.looks.generate(refineLookPrompt(body.instruction, i), i, [src]));
+    const made = await settleWithRetry(this.lookCount(u.journeyDay > 2 && !unlimited), (i) => this.looks.generate(refineLookPrompt(body.instruction, i), i, [src]));
     if (!made.some((r) => r.status === 'fulfilled')) await fee.refund();
     const candidates = [];
     for (const r of made) {
@@ -276,7 +294,7 @@ export class LookService {
     const n = await this.kv.incr(key, 60 * 60 * 26);
     // R11: made from exactly the spell said yes to
     const asked = body.spell ? spellPrompt('look', body.spell) : body.instruction;
-    const made = await settleWithRetry(CANDIDATES, (i) => this.looks.generate(refineLookPrompt(asked, i), i, [src]));
+    const made = await settleWithRetry(this.lookCount(u.journeyDay >= JOURNEY_DONE && !unlimited), (i) => this.looks.generate(refineLookPrompt(asked, i), i, [src]));
     const candidates = [];
     for (const r of made) {
       if (r.status === 'fulfilled') {
@@ -322,7 +340,8 @@ export class LookService {
     // M-R223: the seed it was born from (food / sound / word) stays somewhere small in every look
     const r0 = activeBati(u);
     const seed = { seed: r0?.seed || u.batiFood || '', kind: paintKind(r0?.seedKind) };
-    const made = await settleWithRetry(RESTYLE_CANDIDATES, (i) => this.looks.generate(batiRestylePrompt(spell ? spellPrompt('bati', spell) : wish, i, !!born, seed, KEY_WORDS[bg]), i, refs));
+    const count = u.journeyDay >= JOURNEY_DONE && !unlimited ? this.lookCount(true) : RESTYLE_CANDIDATES;
+    const made = await settleWithRetry(count, (i) => this.bati.generate(batiRestylePrompt(spell ? spellPrompt('bati', spell) : wish, i, !!born, seed, KEY_WORDS[bg]), i, refs));
     const candidates = [];
     for (const r of made) {
       if (r.status !== 'fulfilled') {
@@ -555,8 +574,8 @@ export class LookService {
     // the kororin design costs mana (3, M-R132)
     const fee = kind === 'puni' ? await this.fee(userId, 'kororinDesign', unlimited) : { refund: async () => undefined };
     const prompt = kind === 'butterfly' ? butterflyPrompt : kororinPicPrompt;
-    const painter = kind === 'butterfly' ? this.images : this.looks;
-    const made = await settleWithRetry(kind === 'butterfly' ? 2 : PUNI_PIC_CANDIDATES, (i) => painter.generate(prompt(body.description, !!reference, i), i, refs));
+    const painter = kind === 'butterfly' ? this.images : (this.kororinPainter ?? this.looks);
+    const made = await settleWithRetry(kind === 'butterfly' ? 2 : (this.cfg?.KORORIN_CANDIDATES ?? PUNI_PIC_CANDIDATES), (i) => painter.generate(prompt(body.description, !!reference, i), i, refs));
     const candidates = [];
     for (const r of made) {
       if (r.status !== 'fulfilled') {
@@ -846,7 +865,7 @@ export class LookService {
     let url: string | null = null;
     for (let k = 0; k < 2 && !url; k++) {
       try {
-        const img = await this.looks.generate(batiPrompt(u.batiFood, !!body, paintKind(activeBati(u)?.seedKind), body ? KEY_WORDS[body.key] : undefined), k, body ? [body] : []);
+        const img = await this.bati.generate(batiPrompt(u.batiFood, !!body, paintKind(activeBati(u)?.seedKind), body ? KEY_WORDS[body.key] : undefined), k, body ? [body] : []);
         // painted on the body's flat key colour: cut out, so the Bati stands on the stage like the others
         const png = body ? await this.cut(img, 768, body.key) : null;
         url = (png ? await this.media.storeImage(userId, 'bati', 'image/png', png, origin) : await this.media.storeImage(userId, 'bati', img.mime, img.data, origin)).url;
@@ -886,7 +905,7 @@ export class LookService {
       if (!u.batiFood || !(u.onboardingJson as Record<string, string> | null)?.['bati.stand']) return;
       const body = await this.batiBody(activeBati(u)?.egg ?? (await this.kv.get(`bati:egg:${userId}`)) ?? 'sun');
       try {
-        const img = await this.looks.generate(batiPrompt(u.batiFood, !!body, paintKind(activeBati(u)?.seedKind), body ? KEY_WORDS[body.key] : undefined), 7 + k, body ? [body] : []);
+        const img = await this.bati.generate(batiPrompt(u.batiFood, !!body, paintKind(activeBati(u)?.seedKind), body ? KEY_WORDS[body.key] : undefined), 7 + k, body ? [body] : []);
         const png = body ? await this.cut(img, 768, body.key) : null;
         const url = (png ? await this.media.storeImage(userId, 'bati', 'image/png', png, origin) : await this.media.storeImage(userId, 'bati', img.mime, img.data, origin)).url;
         const cur = await this.user(userId);
@@ -943,7 +962,7 @@ export class LookService {
     // M-R223: the seed's small mark (food / sound / word) stays on every face too
     const r0 = activeBati(u);
     const keep = batiSeedRule({ seed: r0?.seed || u.batiFood || '', kind: paintKind(r0?.seedKind) });
-    const made = await settleWithRetry(todo.length, (i) => this.looks.generate(`${BATI_FACE_PROMPT(todo[i], key)} Keep the small mark of what it was born from exactly where it is. ${keep}`, i, [ref]));
+    const made = await settleWithRetry(todo.length, (i) => this.bati.generate(`${BATI_FACE_PROMPT(todo[i], key)} Keep the small mark of what it was born from exactly where it is. ${keep}`, i, [ref]));
     const faces = { ...have };
     for (const [i, r] of made.entries()) {
       if (r.status !== 'fulfilled') {

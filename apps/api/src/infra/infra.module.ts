@@ -1,11 +1,26 @@
 import { Global, Inject, Logger, Module, OnApplicationShutdown } from '@nestjs/common';
-import { createBuddyLlm, createImageProvider, createLookImageProvider, createLlm, createTaskLlm, LlmProvider } from '@obolo/ai';
-import { AppConfig, CONFIG, loadConfig } from '../config';
+import { createBuddyLlm, createPictureProvider, createLlm, createTaskLlm, LlmProvider } from '@obolo/ai';
+import { AppConfig, artModelOf, CONFIG, gameFullOf, loadConfig, makeSetupOf } from '../config';
 import { Database } from '../db/db';
 import { createEmailSender } from './email';
 import { createKv, KvStore } from './kv';
 import { BullQueue, CloudTasksQueue, InlineQueue, JobQueue } from './queue';
-import { BUDDY_LLM, EMAIL, GAME_LLM, IMAGES, KV, LLM, LOOK_IMAGES, LYRICS_LLM, NOVEL_LLM, QUEUE, SPELL_LLM } from './tokens';
+import { BATI_IMAGES, BUDDY_LLM, EMAIL, GAME_CHEAP_LLM, GAME_LLM, GAME_TRIAL_LLM, IMAGES, KORORIN_IMAGES, KV, LLM, LOOK_IMAGES, LYRICS_LLM, NOVEL_LLM, QUEUE, SPELL_LLM } from './tokens';
+
+/** R17: one picture use's painter, logged with its model */
+function picture(use: string, model: string, c: AppConfig) {
+  const p = createPictureProvider(model, { runwareKey: c.LOOK_RUNWARE_KEY, geminiApiKey: c.GEMINI_API_KEY });
+  new Logger('Images').log(`${use}: ${p.name} (${model})`);
+  return p;
+}
+
+/** R17: one game tier's chain */
+function gameChain(what: string, spec: string, c: AppConfig): LlmProvider {
+  const log = new Logger('LLM');
+  const llm = createTaskLlm(spec, { geminiApiKey: c.GEMINI_API_KEY, anthropicApiKey: c.ANTHROPIC_API_KEY, openaiApiKey: c.OPENAI_API_KEY }, { timeoutMs: c.GAME_MODEL_TIMEOUT_MS, onError: (p, e) => log.warn(`${what}: ${p} failed, next: ${String(e)}`) });
+  log.log(`${what} chain: ${llm.name}`);
+  return llm;
+}
 
 @Global()
 @Module({
@@ -30,17 +45,12 @@ import { BUDDY_LLM, EMAIL, GAME_LLM, IMAGES, KV, LLM, LOOK_IMAGES, LYRICS_LLM, N
       },
     },
     { provide: EMAIL, inject: [CONFIG], useFactory: createEmailSender },
-    {
-      provide: IMAGES,
-      inject: [CONFIG],
-      useFactory: (c: AppConfig) => createImageProvider({ geminiApiKey: c.GEMINI_API_KEY, imageModel: c.GEMINI_IMAGE_MODEL }),
-    },
-    {
-      // the looks and the Bati (client decision 2026-10-25): Seedream on Runware once its key is set
-      provide: LOOK_IMAGES,
-      inject: [CONFIG],
-      useFactory: (c: AppConfig) => createLookImageProvider({ runwareKey: c.LOOK_RUNWARE_KEY, geminiApiKey: c.GEMINI_API_KEY, imageModel: c.GEMINI_IMAGE_MODEL }),
-    },
+    // R17 (client 2026-11-25: cheaper pictures): each picture use on its own model (a Runware AIR id or a Gemini image
+    // model), the defaults R16's until the client picks from the comparison (runware-art-test.yml)
+    { provide: IMAGES, inject: [CONFIG], useFactory: (c: AppConfig) => picture('art', artModelOf(c), c) },
+    { provide: LOOK_IMAGES, inject: [CONFIG], useFactory: (c: AppConfig) => picture('look', makeSetupOf(c).lookModel, c) },
+    { provide: BATI_IMAGES, inject: [CONFIG], useFactory: (c: AppConfig) => picture('bati', makeSetupOf(c).batiModel, c) },
+    { provide: KORORIN_IMAGES, inject: [CONFIG], useFactory: (c: AppConfig) => picture('kororin', makeSetupOf(c).kororinModel, c) },
     {
       provide: LLM,
       inject: [CONFIG],
@@ -108,18 +118,12 @@ import { BUDDY_LLM, EMAIL, GAME_LLM, IMAGES, KV, LLM, LOOK_IMAGES, LYRICS_LLM, N
         return llm;
       },
     },
-    {
-      provide: GAME_LLM,
-      inject: [CONFIG],
-      useFactory: (c: AppConfig): LlmProvider => {
-        const log = new Logger('LLM');
-        const llm = createTaskLlm(c.GAME_MODEL, { geminiApiKey: c.GEMINI_API_KEY, anthropicApiKey: c.ANTHROPIC_API_KEY, openaiApiKey: c.OPENAI_API_KEY }, { timeoutMs: c.GAME_MODEL_TIMEOUT_MS, onError: (p, e) => log.warn(`game: ${p} failed, next: ${String(e)}`) });
-        log.log(`game chain: ${llm.name}`);
-        return llm;
-      },
-    },
+    // R17: the game tiers (GAME_MODEL_FULL / _CHEAP / _TRIAL)
+    { provide: GAME_LLM, inject: [CONFIG], useFactory: (c: AppConfig) => gameChain('game (full)', gameFullOf(c), c) },
+    { provide: GAME_CHEAP_LLM, inject: [CONFIG], useFactory: (c: AppConfig) => gameChain('game (cheap)', makeSetupOf(c).gameCheapModel, c) },
+    { provide: GAME_TRIAL_LLM, inject: [CONFIG], useFactory: (c: AppConfig) => gameChain('game (trial)', makeSetupOf(c).gameTrialModel, c) },
   ],
-  exports: [CONFIG, Database, KV, QUEUE, EMAIL, LLM, BUDDY_LLM, NOVEL_LLM, GAME_LLM, LYRICS_LLM, SPELL_LLM, IMAGES, LOOK_IMAGES],
+  exports: [CONFIG, Database, KV, QUEUE, EMAIL, LLM, BUDDY_LLM, NOVEL_LLM, GAME_LLM, GAME_CHEAP_LLM, GAME_TRIAL_LLM, LYRICS_LLM, SPELL_LLM, IMAGES, LOOK_IMAGES, BATI_IMAGES, KORORIN_IMAGES],
 })
 export class InfraModule implements OnApplicationShutdown {
   constructor(

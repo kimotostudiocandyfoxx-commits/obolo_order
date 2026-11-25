@@ -16,6 +16,15 @@ import {
   marginRow,
   percentile,
   quoteMana,
+  manaFor10,
+  isTenthMana,
+  splitMana,
+  formatMana,
+  makeCostEstimates,
+  DEFAULT_MAKE_SETUP,
+  MAKE_COST_ESTIMATE,
+  RUNWARE_REF_PRICES,
+  pictureUsd,
 } from './manaPrice';
 
 describe('manaFor: ceil(cost / (1 − Stripe fee) × 1.08)', () => {
@@ -95,9 +104,46 @@ describe('provider costs', () => {
 });
 
 describe('the quoted mana', () => {
-  it('every making has a price of at least 1, from the cost table', () => {
-    for (const k of MAKE_KINDS) expect(MAKE_COST[k]).toBeGreaterThanOrEqual(1);
-    expect(quoteMana(0)).toBe(1);
+  it('every making has a price of at least a tenth of a mana, from the cost table, to the tenth', () => {
+    for (const k of MAKE_KINDS) {
+      expect(MAKE_COST[k]).toBeGreaterThanOrEqual(0.1);
+      expect(isTenthMana(MAKE_COST[k])).toBe(true);
+    }
+    expect(quoteMana(0)).toBe(0.1);
+  });
+  it('R17: a cheap making shows its real price below 1 mana, rounded UP to the tenth', () => {
+    // ¥0.2 of picture: 0.2 / 0.964 × 1.08 = 0.224… → 0.3
+    expect(manaFor10(0.2)).toBe(0.3);
+    expect(quoteMana(0.2)).toBe(0.3);
+    // ¥10: 11.203… → 11.3 (manaFor rounds the same to 12)
+    expect(manaFor10(10)).toBe(11.3);
+    expect(manaFor10(costCoveredBy(0.7))).toBe(0.7);
+    expect(manaFor10(0)).toBe(0);
+    for (const c of [0.05, 0.3, 2.4, 13.7, 99.99]) {
+      const m = manaFor10(c);
+      expect(m * (1 - DEFAULT_PRICE_RULE.feeRate)).toBeGreaterThanOrEqual(c * 1.08 - 1e-9);
+      expect((m - 0.1) * (1 - DEFAULT_PRICE_RULE.feeRate)).toBeLessThan(c * 1.08);
+    }
+    expect(splitMana(0.3)).toEqual({ whole: 0, tenths: 3 });
+    expect(splitMana(12.5)).toEqual({ whole: 12, tenths: 5 });
+    expect(formatMana(0.3)).toBe('0.3');
+    expect(formatMana(3)).toBe('3');
+    expect(formatMana(12.5)).toBe('12.5');
+  });
+  it('R17: the pictures follow the model of each use (cheap anime models make the art cost a tenth of a mana or so)', () => {
+    const klein = makeCostEstimates({ ...DEFAULT_MAKE_SETUP, artModel: 'runware:400@4', lookModel: 'runware:400@4', batiModel: 'runware:400@4', kororinModel: 'runware:400@4' });
+    const p = manaPrices(undefined, undefined, {}, klein);
+    expect(p.jacketArt).toBeLessThanOrEqual(0.5);
+    expect(p.look).toBeLessThanOrEqual(1);
+    expect(p.kororinDesign).toBeLessThan(MAKE_COST.kororinDesign);
+    // the paid look round paints 2 (a row to pick from), not 4
+    expect(MAKE_COST_ESTIMATE.look.usd).toBeCloseTo(2 * RUNWARE_REF_PRICES['bytedance:seedream@5.0-pro'] + 0.0005, 6);
+    expect(pictureUsd('gemini-2.5-flash-image')).toBe(0.039);
+    expect(pictureUsd('civitai:123@456')).toBeLessThan(0.01);
+    expect(pictureUsd('someone:new@1')).toBeGreaterThanOrEqual(0.05);
+  });
+  it('R17: a song on Runware is about 2–3 mana', () => {
+    expect(MAKE_COST.song).toBeLessThanOrEqual(3);
   });
   it('the default price list at 160 JPY/USD', () => {
     expect(MAKE_COST).toEqual(manaPrices());
@@ -107,7 +153,7 @@ describe('the quoted mana', () => {
     expect(MAKE_COST.songPremium).toBeGreaterThan(MAKE_COST.song);
   });
   it('a refined cost (recorded p90) and the FX move the price', () => {
-    expect(manaPrices(undefined, undefined, { song: 10 }).song).toBe(manaFor(10));
+    expect(manaPrices(undefined, undefined, { song: 10 }).song).toBe(manaFor10(10));
     const cheapYen = manaPrices({ usdJpy: 200, gpuSecondJpy: 0.05, cpuSecondJpy: 0.01 });
     expect(cheapYen.game).toBeGreaterThan(MAKE_COST.game);
   });
@@ -155,7 +201,7 @@ describe('the daily margin check', () => {
     const low = marginRow({ kind: 'game', count: 2, chargedMana: 2 * 50, costJpy: 2 * 60, perJobCostsJpy: [55, 65], currentMana: 50 });
     expect(low.low).toBe(true);
     expect(low.margin!).toBeLessThan(0);
-    expect(low.suggestedMana).toBe(manaFor(65));
+    expect(low.suggestedMana).toBe(manaFor10(65));
     expect(low.costWithFeeJpy).toBeCloseTo(120 / 0.964, 2);
     expect(marginRow({ kind: 'x', count: 0, chargedMana: 0, costJpy: 0 }).margin).toBeNull();
   });

@@ -1,11 +1,11 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { applyDelta, assertInteger, LedgerError, ManaReason } from '@obolo/ledger';
-import { CHARGE_ERROR_WORDS, confirmKey, decideCharge, type ChargeError, type MakeConfirm, type MakeKind } from '@obolo/shared';
+import { CHARGE_ERROR_WORDS, confirmKey, decideCharge, splitMana, type ChargeError, type MakeConfirm, type MakeKind } from '@obolo/shared';
 import { randomUUID } from 'node:crypto';
 import { apiError } from '../common/errors';
 import { and, asc, eq, isNull, sql } from 'drizzle-orm';
 import type { Database, Db } from '../db/db';
-import { manaLedger, users, wallets } from '../db/schema';
+import { manaLedger, usageAccruals, users, wallets } from '../db/schema';
 import { costScope } from './cost-scope';
 import { GENESIS, manaRowHash } from './mana-chain';
 import { livePrice } from './price-book';
@@ -103,11 +103,51 @@ export class LedgerService {
     const key = confirmKey(userId, kind, confirm);
     return db.write.transaction(async (tx) => {
       const charged = await this.deltaOf(tx, key);
-      if (charged == null || charged >= 0) return 0;
+      if (charged == null || charged > 0) return 0;
       if ((await this.deltaOf(tx, `${key}:refund`)) != null) return 0;
+      // R17: the whole mana as a row (a 0 row for a price below 1, so it is given back once), the tenths to the waiting ones
+      const { whole, tenths } = splitMana(confirm.price);
+      const back = whole === -charged ? tenths : 0;
       await this.applyMana(tx, { userId, delta: -charged, reason: 'refund', idempotencyKey: `${key}:refund`, refType: kind, refId });
-      return -charged;
+      await this.addTenths(tx, userId, kind, -back);
+      return -charged + back / 10;
     });
+  }
+
+  /**
+   * R17 (client 2026-11-25: a price below 1 mana is shown as it is, 「使うマナ 0.3」): the tenths of a paid making wait
+   * with the member's small costs and are taken a whole mana at a time as they reach 10 (a 'usage' row labelled with the
+   * kind, at most the balance; the rest keeps waiting). Negative tenths (a refund) are given back the same way: the next
+   * tenths use them up first. Call inside the transaction.
+   */
+  async addTenths(tx: Tx, userId: string, kind: string, tenths: number): Promise<{ taken: number; pending: number }> {
+    if (!tenths) return { taken: 0, pending: 0 };
+    const a = await this.tenthsRow(tx, userId);
+    let pending = a.pendingTenths + tenths;
+    let rows = a.rows;
+    let taken = 0;
+    if (pending >= 10) {
+      const balance = await this.lockedBalance(tx, userId);
+      taken = Math.min(Math.floor(pending / 10), balance);
+      if (taken > 0) {
+        rows++;
+        await this.applyMana(tx, { userId, delta: -taken, reason: 'usage', idempotencyKey: `usage:${userId}:${rows}`, refType: kind.slice(0, 40) });
+        pending -= taken * 10;
+      }
+    }
+    await this.saveTenths(tx, userId, { pendingTenths: pending, rows, takenMana: a.takenMana + taken });
+    return { taken, pending };
+  }
+
+  /** the member's waiting tenths (and the small costs' row counter), the row locked */
+  protected async tenthsRow(tx: Tx, userId: string): Promise<{ pendingTenths: number; rows: number; takenMana: number }> {
+    await tx.insert(usageAccruals).values({ userId }).onConflictDoNothing();
+    const [a] = await tx.select().from(usageAccruals).where(eq(usageAccruals.userId, userId)).for('update');
+    return a;
+  }
+
+  protected async saveTenths(tx: Tx, userId: string, v: { pendingTenths: number; rows: number; takenMana: number }): Promise<void> {
+    await tx.update(usageAccruals).set({ ...v, updatedAt: new Date() }).where(eq(usageAccruals.userId, userId));
   }
 
   /** the member's balance, the wallet row locked for this transaction (serialises a double tap) */
@@ -153,7 +193,10 @@ export class LedgerService {
           return;
         }
         amount = d.amount;
-        await this.applyMana(tx, { userId, delta: -d.amount, reason: 'generation', idempotencyKey: key, refType: kind, refId });
+        // R17: the whole mana now (a 0 row for a price below 1: it marks the yes), the tenths with the waiting ones
+        const { whole, tenths } = splitMana(d.amount);
+        await this.applyMana(tx, { userId, delta: -whole, reason: 'generation', idempotencyKey: key, refType: kind, refId });
+        await this.addTenths(tx, userId, kind, tenths);
       });
     } catch (e) {
       if (e instanceof LedgerError) throw chargeRefused('NO_MANA');
@@ -165,7 +208,12 @@ export class LedgerService {
       repeat,
       refund: async () => {
         if (repeat || !amount) return;
-        await db.write.transaction((tx) => this.applyMana(tx, { userId, delta: amount, reason: 'refund', idempotencyKey: `${key}:refund`, refType: kind, refId }));
+        const { whole, tenths } = splitMana(amount);
+        await db.write.transaction(async (tx) => {
+          if ((await this.deltaOf(tx, `${key}:refund`)) != null) return;
+          await this.applyMana(tx, { userId, delta: whole, reason: 'refund', idempotencyKey: `${key}:refund`, refType: kind, refId });
+          await this.addTenths(tx, userId, kind, -tenths);
+        });
       },
     };
   }

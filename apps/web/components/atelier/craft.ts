@@ -1,4 +1,4 @@
-import { CRAFT_LINES, isCraftKind, MOON_LINES, questionsFor, spellNamedGroups, type CraftKind, type CraftQuestion, type SpellAnswer, type SpellKind } from '@obolo/shared';
+import { type GameTemplateId, CRAFT_LINES, isCraftKind, MOON_LINES, questionsFor, spellNamedGroups, type CraftKind, type CraftQuestion, type SpellAnswer, type SpellKind } from '@obolo/shared';
 import type { AtelierKind } from '@/lib/atelier/unlock';
 import type { Work } from './work';
 import { videoAnswered, videoDoneLine } from './video';
@@ -9,7 +9,7 @@ import { videoAnswered, videoDoneLine } from './video';
  * said once something is made.
  */
 export { isCraftKind };
-export type CraftAsk = { kind: CraftKind; answers: SpellAnswer[]; left: CraftQuestion[] };
+export type CraftAsk = { kind: CraftKind; answers: SpellAnswer[]; left: CraftQuestion[]; /** R17: the first game's template */ template?: GameTemplateId };
 
 /** the start: what the first words said already counts as an answer; the questions still to ask (2–4) */
 export function craftBegin(kind: CraftKind, content: string, bare: boolean): CraftAsk {

@@ -1,0 +1,1 @@
+ALTER TABLE "usage_accruals" ADD COLUMN "pending_tenths" integer DEFAULT 0 NOT NULL;

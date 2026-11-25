@@ -1,0 +1,54 @@
+name: Runware art test
+
+# One-off picture comparison (R17, client 2026-11-25: cheaper anime-capable picture models). The same four prompts the
+# app sends (scripts/art-lab/prompts.json: an art piece, a member look from a reference photo, a Bati dress-up, a kororin
+# design) on each candidate model on Runware and on the current ones (Seedream 5.0 Pro, Gemini 2.5 Flash Image). Uses
+# the keys already in Secret Manager (obolo-seedream-api-key, obolo-gemini-api-key); nothing is deployed. The pictures,
+# costs.json (Runware's own cost per picture) and README.md (the table) are saved to art/lab/runware-art on this branch.
+# Pick a model, then set the GitHub Variables ART_MODEL / LOOK_MODEL / BATI_MODEL / KORORIN_MODEL to its AIR id and
+# run Deploy API (docs/マナの値段.md).
+on:
+  workflow_dispatch:
+    inputs:
+      models:
+        description: 'only these (comma-separated slugs from the script, e.g. flux2-klein-4b,flux3-klein); empty = all'
+        required: false
+        default: ''
+
+env:
+  WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER || format('projects/{0}/locations/global/workloadIdentityPools/github/providers/github', vars.GCP_PROJECT_NUMBER) }}
+  DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA || format('obolo-deployer@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+
+jobs:
+  paint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Paint the same prompts on every model
+        env:
+          MODELS: ${{ inputs.models }}
+        run: |
+          export RUNWARE_API_KEY="$(gcloud secrets versions access latest --secret=obolo-seedream-api-key)"
+          export GEMINI_API_KEY="$(gcloud secrets versions access latest --secret=obolo-gemini-api-key || true)"
+          python3 scripts/art-lab/runware_art_compare.py
+      - name: Costs in the summary
+        if: always()
+        run: cat art/lab/runware-art/README.md >> "$GITHUB_STEP_SUMMARY" || true
+      - name: Save the pictures to the branch
+        if: always()
+        run: |
+          git config user.name "art-lab"
+          git config user.email "art-lab@users.noreply.github.com"
+          git add -f art/lab/runware-art || exit 0
+          git diff --cached --quiet && exit 0
+          git commit -m "Art lab: Runware picture comparison (four app prompts on the candidate models) [skip ci]"
+          for i in 1 2 3; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 5; done

@@ -1,4 +1,4 @@
-import { CRAFT_LINES, KIND_HOME_PLANET, spellFrom, KORORIN_VOICE_STYLE, neoVoiceUrl, withTarget, lyricsLines, lyricsSections, type JobView, type MakeConfirm, type Me, type RefineTarget, type VideoParams, type WorkVersion, VIDEO_LINES, videoParams } from '@obolo/shared';
+import { type GameTemplateId, type GameTier, CRAFT_LINES, KIND_HOME_PLANET, spellFrom, KORORIN_VOICE_STYLE, neoVoiceUrl, withTarget, lyricsLines, lyricsSections, type JobView, type MakeConfirm, type Me, type RefineTarget, type VideoParams, type WorkVersion, VIDEO_LINES, videoParams } from '@obolo/shared';
 import { demoStickerArt } from '@/lib/look';
 import { ApiError, getApi } from '@/lib/api';
 import type { AtelierKind } from '@/lib/atelier/unlock';
@@ -50,6 +50,8 @@ export type MakeOpts = {
   edit?: { params: VideoParams; order: number[] };
   /** R13: a video's scenes to paint again (in its own order), from the small spell said yes to */
   redraw?: number[];
+  /** R17: a game's tier (the trial from a template, the cheap chain, the full one) — what the price was quoted for */
+  game?: { tier: GameTier; template?: GameTemplateId };
   /** R17: the secret spell's grant (only after a member said its passphrase; the server checks it) and its price */
   premium?: { grant: string; price: number };
 };
@@ -224,8 +226,10 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
       // client 2026-11-25: built in the background with the yes (12, then 3 a tweak); the job host finishes the card
       const tags = opts.plan?.tags ?? spellFrom('game', said);
       if (!opts.confirm) throw new ApiError(428, 'CONFIRM_REQUIRED', 'まだ、OKをもらってないよ。');
-      const job = await api.gameBuild({ gameId: prev?.kind === 'game' ? prev.ref?.gameId : undefined, tags, said: said.slice(0, 200), confirm: opts.confirm });
-      return { ...base, prompt: said, status: 'making', ref: prev?.ref, spell: tags, home: KIND_HOME_PLANET.game, started: { job, what: 'game', words: said } };
+      const gameId = prev?.kind === 'game' ? prev.ref?.gameId : undefined;
+      const tier = opts.game?.tier ?? 'cheap';
+      const job = await api.gameBuild({ gameId, tags, said: said.slice(0, 200), confirm: opts.confirm, tier, ...(opts.game?.template && !gameId ? { template: opts.game.template } : {}) });
+      return { ...base, prompt: said, status: 'making', ref: { ...prev?.ref, gameTier: tier }, spell: tags, home: KIND_HOME_PLANET.game, started: { job, what: 'game', words: said } };
     }
   }
 }

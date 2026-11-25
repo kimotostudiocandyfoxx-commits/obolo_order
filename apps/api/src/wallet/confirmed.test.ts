@@ -12,8 +12,18 @@ import { LedgerService, type ManaEntryInput, type Tx } from './ledger.service';
 class MemLedger extends LedgerService {
   balance = 100;
   rows: ManaEntryInput[] = [];
+  tenths = { pendingTenths: 0, rows: 0, takenMana: 0 };
   protected override async lockedBalance() {
     return this.balance;
+  }
+  protected override async tenthsRow() {
+    return { ...this.tenths };
+  }
+  protected override async saveTenths(_tx: Tx, _u: string, v: { pendingTenths: number; rows: number; takenMana: number }) {
+    this.tenths = v;
+  }
+  protected override async deltaOf(_tx: Tx, key: string) {
+    return this.rows.find((r) => r.idempotencyKey === key)?.delta;
   }
   protected override async applied(_tx: Tx, key: string) {
     return this.rows.some((r) => r.idempotencyKey === key);
@@ -26,6 +36,8 @@ class MemLedger extends LedgerService {
     return {} as never;
   }
 }
+/** R17: what a member has spent, the waiting tenths counted (the quoted price is what is accounted) */
+const spent = (l: MemLedger) => 100 - l.balance + l.tenths.pendingTenths / 10;
 const db = { write: { transaction: <T,>(fn: (tx: Tx) => Promise<T>) => fn({} as Tx) } } as unknown as Database;
 const yes = (price: number = MAKE_COST.song): MakeConfirm => ({ id: '7d1f6a3e-2b4c-4d5e-8f90-1a2b3c4d5e6f', price });
 const code = async (p: Promise<unknown>) => {
@@ -54,6 +66,66 @@ function fakes() {
   };
 }
 
+describe('R17: a price below 1 mana (to the tenth) is charged exactly', () => {
+  it('0.3 three times, then 0.3 again: the whole mana is taken when the tenths reach 10, labelled with the kind', async () => {
+    const l = new MemLedger();
+    setPriceSource(async () => ({ ...MAKE_COST, jacketArt: 0.3 }));
+    try {
+      for (let k = 0; k < 4; k++) {
+        const f = fakes();
+        await startConfirmed({ ledger: l, db, ...f, userId: 'u1', kind: 'jacketArt', confirm: { id: `7d1f6a3e-2b4c-4d5e-8f90-1a2b3c4d5e6${k}`, price: 0.3 }, required: true });
+      }
+      // each yes is marked with a 0 row; the fourth 0.3 crosses 1.0 → one 'usage' row of 1 mana
+      expect(l.rows.filter((r) => r.reason === 'generation').map((r) => r.delta)).toEqual([-0, -0, -0, -0]);
+      expect(l.rows.filter((r) => r.reason === 'usage')).toMatchObject([{ delta: -1, refType: 'jacketArt' }]);
+      expect(l.balance).toBe(99);
+      expect(l.tenths.pendingTenths).toBe(2);
+      expect(spent(l)).toBeCloseTo(1.2, 9);
+    } finally {
+      setPriceSource(null);
+    }
+  });
+  it('12.5: 12 now, the .5 waits; a refund gives back exactly 12.5', async () => {
+    const l = new MemLedger();
+    setPriceSource(async () => ({ ...MAKE_COST, mv: 12.5 }));
+    try {
+      const fee = await l.charge(db, 'u1', 'mv', undefined, { confirm: { id: '7d1f6a3e-2b4c-4d5e-8f90-1a2b3c4d5e70', price: 12.5 }, required: true });
+      expect(l.balance).toBe(88);
+      expect(l.tenths.pendingTenths).toBe(5);
+      await fee.refund();
+      expect(l.balance).toBe(100);
+      expect(l.tenths.pendingTenths).toBe(0);
+      expect(spent(l)).toBeCloseTo(0, 9);
+      // a later refund of a yes (a job that failed for good) is given back once, tenths too
+      await l.charge(db, 'u1', 'mv', undefined, { confirm: { id: '7d1f6a3e-2b4c-4d5e-8f90-1a2b3c4d5e71', price: 12.5 }, required: true });
+      expect(await l.refundYes(db, 'u1', 'mv', { id: '7d1f6a3e-2b4c-4d5e-8f90-1a2b3c4d5e71', price: 12.5 })).toBe(12.5);
+      expect(await l.refundYes(db, 'u1', 'mv', { id: '7d1f6a3e-2b4c-4d5e-8f90-1a2b3c4d5e71', price: 12.5 })).toBe(0);
+      expect(spent(l)).toBeCloseTo(0, 9);
+    } finally {
+      setPriceSource(null);
+    }
+  });
+  it('a price below 1 needs at least one mana in the gem; refunded tenths below 0 are used up first', async () => {
+    const l = new MemLedger();
+    l.balance = 0;
+    setPriceSource(async () => ({ ...MAKE_COST, story: 0.3 }));
+    try {
+      expect(await code(l.charge(db, 'u1', 'story', undefined, { confirm: { id: '7d1f6a3e-2b4c-4d5e-8f90-1a2b3c4d5e72', price: 0.3 }, required: true }))).toBe('402 NO_MANA');
+      l.balance = 5;
+      const a = await l.charge(db, 'u1', 'story', undefined, { confirm: { id: '7d1f6a3e-2b4c-4d5e-8f90-1a2b3c4d5e73', price: 0.3 }, required: true });
+      await a.refund();
+      expect(l.tenths.pendingTenths).toBe(0);
+      await l.addTenths({} as Tx, 'u1', 'story', -3);
+      expect(l.tenths.pendingTenths).toBe(-3);
+      await l.addTenths({} as Tx, 'u1', 'story', 9);
+      expect(l.tenths.pendingTenths).toBe(6);
+      expect(l.balance).toBe(5);
+    } finally {
+      setPriceSource(null);
+    }
+  });
+});
+
 describe('R11: a paid making from the Moon atelier is charged only with the yes', () => {
   it('no confirm: 428, nothing charged, no job', async () => {
     const l = new MemLedger();
@@ -70,8 +142,8 @@ describe('R11: a paid making from the Moon atelier is charged only with the yes'
     expect(l.rows).toHaveLength(0);
     const job = await startConfirmed({ ledger: l, db, ...f, userId: 'u1', kind: 'song', confirm: yes(), required: true });
     expect(job.id).toBe('job1');
-    expect(l.rows.map((r) => r.delta)).toEqual([-MAKE_COST.song]);
-    expect(l.balance).toBe(100 - MAKE_COST.song);
+    expect(l.rows.map((r) => r.delta)).toEqual([-Math.floor(MAKE_COST.song)]);
+    expect(spent(l)).toBeCloseTo(MAKE_COST.song, 6);
   });
   it('the same yes twice (a double tap) is one charge and one job', async () => {
     const l = new MemLedger();
@@ -81,11 +153,11 @@ describe('R11: a paid making from the Moon atelier is charged only with the yes'
     expect(b.id).toBe(a.id);
     expect(f.made).toEqual(['job1']);
     expect(l.rows).toHaveLength(1);
-    expect(l.balance).toBe(100 - MAKE_COST.song);
+    expect(spent(l)).toBeCloseTo(MAKE_COST.song, 6);
   });
   it('not enough mana: 402, nothing charged, no job', async () => {
     const l = new MemLedger();
-    l.balance = MAKE_COST.song - 1;
+    l.balance = Math.ceil(MAKE_COST.song) - 1;
     const f = fakes();
     expect(await code(startConfirmed({ ledger: l, db, ...f, userId: 'u1', kind: 'song', confirm: yes(), required: true }))).toBe('402 NO_MANA');
     expect(l.rows).toHaveLength(0);
@@ -123,7 +195,7 @@ describe('R11: a paid making from the Moon atelier is charged only with the yes'
     expect(l.rows).toHaveLength(0);
     await startConfirmed({ ledger: l, db, ...f, userId: 'u1', kind: 'song', confirm: ok, spell: songSpellKey(tags, lyrics), required: true });
     expect(l.rows).toHaveLength(1);
-    expect(l.balance).toBe(100 - MAKE_COST.song);
+    expect(spent(l)).toBeCloseTo(MAKE_COST.song, 6);
   });
   it('client 2026-11-25: the live price (cost + fee + 8%) is what the yes must carry and what is charged', async () => {
     const l = new MemLedger();
@@ -155,6 +227,6 @@ describe('R11: a paid making from the Moon atelier is charged only with the yes'
     const l = new MemLedger();
     const fee = await l.charge(db, 'u1', 'song');
     expect(fee.repeat).toBe(false);
-    expect(l.balance).toBe(100 - MAKE_COST.song);
+    expect(spent(l)).toBeCloseTo(MAKE_COST.song, 6);
   });
 });

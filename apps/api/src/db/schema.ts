@@ -8,7 +8,7 @@
  * planet tables carry created_at / updated_at / deleted_at (soft delete).
  */
 import { sql } from 'drizzle-orm';
-import type { AtelierLayout, BuddySource, ChapterView, PuniLook, SongLyrics, SpellTag, TalkBeat, TalkFace, TalkMotion, WorkMaterial, WorkOrigin, WorkVersion } from '@obolo/shared';
+import type { AtelierLayout, BuddySource, ChapterView, GameMakeKind, PuniLook, SongLyrics, SpellTag, TalkBeat, TalkFace, TalkMotion, WorkMaterial, WorkOrigin, WorkVersion } from '@obolo/shared';
 import {
   bigint,
   boolean,
@@ -218,6 +218,11 @@ export const usageAccruals = pgTable('usage_accruals', {
     .primaryKey()
     .references(() => users.id),
   pendingJpy: doublePrecision('pending_jpy').notNull().default(0),
+  /**
+   * R17: the tenths of a mana of paid makings not taken yet (a price of 0.3, the .5 of 12.5): taken a whole mana at a
+   * time as they reach 10; below 0 = tenths given back (a refund) that the next ones use up first
+   */
+  pendingTenths: integer('pending_tenths').notNull().default(0),
   takenMana: integer('taken_mana').notNull().default(0),
   absorbedMana: integer('absorbed_mana').notNull().default(0),
   absorbedJpy: doublePrecision('absorbed_jpy').notNull().default(0),
@@ -1028,7 +1033,7 @@ export const books = pgTable(
  * Client 2026-11-25 (ゲーム): a small game made in the Moon atelier — its versions (the code of each build / tweak, the
  * spell it was cast with, the yes it was paid with), the face. Played in a sandbox in the app. Home: Neptune.
  */
-export type GameVersionRow = { code: string; title: string; howTo: string; tags: SpellTag[]; at: string; confirmId: string; kind: 'game' | 'gameTweak'; broken?: boolean };
+export type GameVersionRow = { code: string; title: string; howTo: string; tags: SpellTag[]; at: string; confirmId: string; kind: GameMakeKind; /** R17: the price said yes to (a tenth of a mana) */ price?: number; broken?: boolean };
 export const games = pgTable(
   'games',
   {

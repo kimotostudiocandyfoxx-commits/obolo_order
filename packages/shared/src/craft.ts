@@ -3,6 +3,7 @@ import type { BluenaPlanet } from './finds';
 import { MakeConfirm } from './makeConfirm';
 import { spellPrompt, SpellTags, type SpellGroup, type SpellTag } from './spell';
 import { VIDEO_QUESTIONS } from './video';
+import { GAME_TEMPLATE_IDS, GAME_TIERS, gameTemplateList } from './gameTemplates';
 
 /**
  * Client 2026-11-25 — 本 (novel) and ゲーム (game) on the Moon: 「会話で始めて、スペルで決めて、会話で直す」.
@@ -78,6 +79,14 @@ export const CRAFT_LINES = {
   gameBroken: 'ごめん、ゲームがうまく動かなかった。マナは返したよ。もう一回、頼んでくれる？',
   /** a chapter / a game that could not be made */
   failed: 'ごめん、うまく作れなかった。もう一回、頼んでくれる？',
+  /** R17: the first game (the client's own words) … */
+  gameTrialOffer: 'まずは、かんたんなゲームから作ってみよう！',
+  /** … and our prepared games named in one sentence (no buttons). PLACEHOLDER wording for the story chat. */
+  gameTrialList: gameTemplateList(),
+  /** R17: an answer that named none of them. PLACEHOLDER wording for the story chat. */
+  gameTrialAgain: 'どれがいいかな？　たとえば「クイズ」とか「迷路」みたいに言ってね。',
+  /** R17: the cheap magic could not make the change, twice: the strong one, at its own mana. PLACEHOLDER wording. */
+  gameStrongOffer: 'ふつうの魔法だと、うまく直せなかった。マナは返したよ。もっと強い魔法なら、直せそう。',
 } as const;
 export const CRAFT_LINE_TEXTS: string[] = [...Object.values(CRAFT_LINES), ...Object.values(CRAFT_QUESTIONS).flatMap((qs) => qs.map((q) => q.text))];
 
@@ -121,6 +130,10 @@ export const GameBuildBody = z.object({
   tags: SpellTags,
   said: z.string().trim().max(200).optional(),
   confirm: MakeConfirm,
+  /** R17: the first game, made from one of our templates (the trial) */
+  template: z.enum(GAME_TEMPLATE_IDS).optional(),
+  /** R17: the chain the quote was for (trial: a template; cheap: Flash-class; full: Pro-class). Default cheap. */
+  tier: z.enum(GAME_TIERS).optional(),
 });
 export type GameBuildBody = z.infer<typeof GameBuildBody>;
 /** POST /moon/game/:id/broken: the version did not run in the sandbox (the mana given back, a few times a day) */

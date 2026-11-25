@@ -1,18 +1,18 @@
-import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, Logger, Optional } from '@nestjs/common';
 import { type ChatTurn, type LlmProvider, moderateText } from '@obolo/ai';
-import { demoGame, KIND_HOME_PLANET, GAME_REFUNDS_PER_DAY, gameSystem, gameUser, jstDay, MAKE_COST, validateGameCode, type GameBrokenBody, type GameView, type MakeConfirm, type SpellTag } from '@obolo/shared';
+import { demoGame, gameFromTemplate, gameTemplateSystem, gameTemplateUser, gameTierOf, KIND_HOME_PLANET, GAME_REFUNDS_PER_DAY, gameSystem, gameUser, jstDay, MAKE_COST, validateGameCode, type GameBrokenBody, type GameMakeKind, type GameTemplateId, type GameView, type MakeConfirm, type SpellTag } from '@obolo/shared';
 import { Script } from 'node:vm';
 import { and, desc, eq, isNull } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
 import { games, type GameVersionRow } from '../db/schema';
 import type { KvStore } from '../infra/kv';
-import { GAME_LLM, KV, LLM } from '../infra/tokens';
+import { GAME_CHEAP_LLM, GAME_LLM, GAME_TRIAL_LLM, KV, LLM } from '../infra/tokens';
 import { LedgerService } from '../wallet/ledger.service';
 import { gameView, notFound, sentTo, type GameRow } from './craft.store';
 
 /** what a game job carries (the yes too: its mana goes back when the build fails for good) */
-export type GameJobInput = { gameId?: string; tags: SpellTag[]; said?: string; confirm: MakeConfirm; kind: 'game' | 'gameTweak'; from: 'atelier' };
+export type GameJobInput = { gameId?: string; tags: SpellTag[]; said?: string; confirm: MakeConfirm; kind: GameMakeKind; from: 'atelier'; /** R17: the trial's template */ template?: GameTemplateId };
 /** versions kept per game (the oldest go) */
 const MAX_VERSIONS = 8;
 /** a version reported as not running gives its mana back only this soon after it was built */
@@ -37,7 +37,8 @@ export function checkGameCode(raw: unknown): { ok: true; code: string } | { ok: 
 export const wordsInCode = (code: string) => [...code.matchAll(/(['"`])((?:(?!\1).){0,80}[\p{sc=Hiragana}\p{sc=Katakana}\p{sc=Han}](?:(?!\1).){0,80})\1/gu)].map((m) => m[2]).join('、').slice(0, 1500);
 
 /**
- * Client 2026-11-25 (ゲーム): a small canvas game written by GAME_LLM (GAME_MODEL: Gemini Pro, Flash behind it) inside the
+ * Client 2026-11-25 (ゲーム): a small canvas game written by its tier's chain (R17: the trial from a template on GAME_MODEL_TRIAL, the cheap
+ * chain GAME_MODEL_CHEAP, the full one GAME_MODEL_FULL) inside the
  * fixed harness. The model answers JSON {title, howTo, code}; the code is checked (validateGameCode + a parse) and, when
  * refused, sent back once with the reason (one repair round) before the build fails (the job then gives the mana back).
  * The sandbox in the app is the real guard. Without a key the canned demo game stands in.
@@ -51,7 +52,22 @@ export class GameService {
     private readonly db: Database,
     private readonly ledger: LedgerService,
     @Inject(KV) private readonly kv: KvStore,
+    /** R17: the cheap chain (a member's own game, every tweak first) and the trial's (the template values) */
+    @Optional() @Inject(GAME_CHEAP_LLM) private readonly cheapLlm?: LlmProvider,
+    @Optional() @Inject(GAME_TRIAL_LLM) private readonly trialLlm?: LlmProvider,
   ) {}
+
+  /** the chain a game making is written by (its tier) */
+  chainFor(kind: GameMakeKind): LlmProvider {
+    const tier = gameTierOf(kind);
+    return tier === 'trial' ? (this.trialLlm ?? this.cheapLlm ?? this.llm) : tier === 'cheap' ? (this.cheapLlm ?? this.llm) : this.llm;
+  }
+
+  /** the member has made no game yet (the trial is for the first one) */
+  async firstGame(userId: string): Promise<boolean> {
+    const [row] = await this.db.write.select({ id: games.id }).from(games).where(eq(games.userId, userId)).limit(1);
+    return !row;
+  }
 
   private async clean(text: string) {
     if (text.trim() && (await moderateText(text, this.modLlm)).flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'MODERATION', 'その言葉は使えません');
@@ -96,9 +112,12 @@ export class GameService {
   async make(userId: string, input: GameJobInput): Promise<GameView> {
     const row = input.gameId ? await this.own(userId, input.gameId) : null;
     const prev = row ? row.versionsJson[row.active] : null;
-    const made = await this.write(input.tags, prev ? { code: prev.code, tags: prev.tags } : null, input.said);
+    const made =
+      input.kind === 'gameTrial' && input.template && !row
+        ? await this.fromTemplate(input.template, input.tags, input.said)
+        : await this.write(input.tags, prev ? { code: prev.code, tags: prev.tags } : null, input.said, this.chainFor(input.kind));
     await this.clean(`${made.title}\n${made.howTo}\n${wordsInCode(made.code)}`);
-    const v: GameVersionRow = { ...made, tags: input.tags, at: new Date().toISOString(), confirmId: input.confirm.id, kind: input.kind };
+    const v: GameVersionRow = { ...made, tags: input.tags, at: new Date().toISOString(), confirmId: input.confirm.id, kind: input.kind, price: input.confirm.price };
     if (!row) {
       const [r] = await this.db.write.insert(games).values({ userId, title: made.title, versionsJson: [v], active: 0, homePlanet: KIND_HOME_PLANET.game }).returning();
       return gameView(r);
@@ -112,12 +131,29 @@ export class GameService {
     return gameView(r);
   }
 
-  protected async write(tags: SpellTag[], prev: { code: string; tags: SpellTag[] } | null, said?: string): Promise<{ title: string; howTo: string; code: string }> {
-    if (this.llm.name === 'mock') return demoGame(tags);
+  /**
+   * R17: the first game — the template's code, its values (title, how to play, speed, amount, goal, time, lives; a
+   * quiz's questions) from the trial chain as a small JSON; the template's own values when the model gives none
+   */
+  protected async fromTemplate(id: GameTemplateId, tags: SpellTag[], said?: string): Promise<{ title: string; howTo: string; code: string }> {
+    const llm = this.chainFor('gameTrial');
+    let raw: Record<string, unknown> | null = null;
+    if (llm.name !== 'mock') {
+      try {
+        raw = json(await llm.chat({ system: gameTemplateSystem(id), history: [{ role: 'user', text: gameTemplateUser({ tags, said }) }], json: true, temperature: 0.6, maxOutputTokens: 1500 }));
+      } catch (e) {
+        this.log.warn(`game template values failed (${id}), its defaults: ${String(e)}`);
+      }
+    }
+    return gameFromTemplate(id, raw, (code) => checkGameCode(code).ok);
+  }
+
+  protected async write(tags: SpellTag[], prev: { code: string; tags: SpellTag[] } | null, said?: string, llm: LlmProvider = this.llm): Promise<{ title: string; howTo: string; code: string }> {
+    if (llm.name === 'mock') return demoGame(tags);
     const history: ChatTurn[] = [{ role: 'user', text: gameUser({ tags, prev, said }) }];
     let reason = '';
     for (let round = 0; round < 2; round++) {
-      const raw = await this.llm.chat({ system: gameSystem(), history, json: true, temperature: 0.6, maxOutputTokens: 24_000 });
+      const raw = await llm.chat({ system: gameSystem(), history, json: true, temperature: 0.6, maxOutputTokens: 24_000 });
       let j: Record<string, unknown> = {};
       try {
         j = json(raw);
@@ -154,7 +190,7 @@ export class GameService {
     const n = await this.kv.incr(`game-broken:${userId}:${jstDay(new Date().toISOString())}`, 30 * 3600);
     if (n > GAME_REFUNDS_PER_DAY) return { refunded: 0 };
     this.log.warn(`game ${id} v${b.version} does not run: ${b.reason}`);
-    const refunded = await this.ledger.refundYes(this.db, userId, v.kind, { id: v.confirmId, price: MAKE_COST[v.kind] }, id);
+    const refunded = await this.ledger.refundYes(this.db, userId, v.kind, { id: v.confirmId, price: v.price ?? MAKE_COST[v.kind] }, id);
     const versions = row.versionsJson.map((x, i) => (i === b.version ? { ...x, broken: true } : x));
     // a broken tweak on the face: the face goes back to the last version that ran
     let active = row.active;

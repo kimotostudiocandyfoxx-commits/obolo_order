@@ -1,6 +1,7 @@
 import { z } from 'zod';
-import { MAKE_COST, type MakeKind, type ManaPrices } from './manaPrice';
+import { isTenthMana, MAKE_COST, manaTenths, type MakeKind, type ManaPrices } from './manaPrice';
 import { JOURNEY_DONE } from './journey';
+import { gameMakeKind, type GameTier } from './gameTemplates';
 
 /**
  * R11 (client 2026-11-24): nothing that spends mana is made on one vague line. {bati} first asks what it should be or
@@ -11,7 +12,8 @@ import { JOURNEY_DONE } from './journey';
  */
 export const MakeConfirm = z.object({
   id: z.string().uuid(),
-  price: z.number().int().min(0).max(100_000),
+  /** R17: the price shown, to the tenth of a mana (0.3 is a price) */
+  price: z.number().min(0).max(100_000).refine(isTenthMana, 'a tenth of a mana at most'),
   /** the spell said yes to (spellKey of its tags): the work is made from exactly those tags */
   spell: z.string().max(64).optional(),
 });
@@ -26,10 +28,11 @@ export function atelierMakeCost(
   journeyDay: number | null | undefined,
   /** a game recast / tweaked (not its first build) */ recast = false,
   /** the live prices (GET /mana/prices); the price rule's fallback until they arrive */ prices: Readonly<ManaPrices> = MAKE_COST,
+  /** R17: a game's tier (the trial from a template, the cheap chain, the full one) — cheap when not given */ gameTier: GameTier = 'cheap',
 ): { kind: MakeKind; mana: number } | null {
   const done = (journeyDay ?? JOURNEY_DONE) >= JOURNEY_DONE;
   // client 2026-11-25: a game spends mana (its first build, then each tweak); a book's chapters are free ('novel': null)
-  const k: MakeKind | null = kind === 'song' ? 'song' : kind === 'art' ? 'jacketArt' : kind === 'video' ? 'mv' : kind === 'game' ? (recast ? 'gameTweak' : 'game') : (kind === 'look' || kind === 'bati') && done ? 'look' : null;
+  const k: MakeKind | null = kind === 'song' ? 'song' : kind === 'art' ? 'jacketArt' : kind === 'video' ? 'mv' : kind === 'game' ? gameMakeKind(recast, gameTier) : (kind === 'look' || kind === 'bati') && done ? 'look' : null;
   return k ? { kind: k, mana: prices[k] ?? MAKE_COST[k] } : null;
 }
 
@@ -57,7 +60,7 @@ export function decideCharge(o: {
 }): ChargeDecision {
   const amount = o.price ?? MAKE_COST[o.kind];
   if (o.required && !o.confirm) return { error: 'CONFIRM_REQUIRED' };
-  if (o.confirm && o.confirm.price !== amount) return { error: 'PRICE_CHANGED' };
+  if (o.confirm && manaTenths(o.confirm.price) !== manaTenths(amount)) return { error: 'PRICE_CHANGED' };
   // the spell carried must be the one said yes to (and one said yes to must be carried)
   if (o.confirm && (o.confirm.spell ?? null) !== (o.spell ?? null)) return { error: 'SPELL_CHANGED' };
   if (o.confirm && o.applied) return { do: 'repeat' };

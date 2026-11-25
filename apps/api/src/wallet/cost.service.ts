@@ -8,6 +8,7 @@ import {
   isMakeKind,
   MAKE_KINDS,
   manaPrices,
+  makeCostEstimates as costTableOf,
   marginRow,
   percentile,
   type AccrualStep,
@@ -18,7 +19,7 @@ import {
   type PriceRule,
 } from '@obolo/shared';
 import { and, eq, gte, inArray, isNotNull, sql } from 'drizzle-orm';
-import { AppConfig, CONFIG } from '../config';
+import { AppConfig, CONFIG, makeSetupOf } from '../config';
 import { Database } from '../db/db';
 import { fxRates, genCosts, makeCostEstimates, manaLedger, usageAccruals, wallets } from '../db/schema';
 import type { KvStore } from '../infra/kv';
@@ -64,7 +65,8 @@ export interface CostStore {
   insert(row: CostRow): Promise<void>;
   fxRates(): Promise<Record<string, number>>;
   setFx(month: string, usdJpy: number, note: string | null): Promise<void>;
-  estimates(): Promise<Partial<Record<MakeKind, number>>>;
+  /** the refined estimates saved since `since` (older ones are a model switched since: not used) */
+  estimates(since?: Date): Promise<Partial<Record<MakeKind, number>>>;
   saveEstimate(kind: MakeKind, costJpy: number, samples: number): Promise<void>;
   /** the per-making costs of the last `days` days (yen, one number per making) */
   jobCosts(kind: MakeKind, since: Date): Promise<number[]>;
@@ -171,10 +173,23 @@ export class CostService implements OnModuleInit, OnModuleDestroy {
   /** the live mana of every making (what the confirm card shows and what is charged) */
   async prices(): Promise<ManaPrices> {
     if (this.priceCache && Date.now() - this.priceCache.at < 60_000) return this.priceCache.prices;
-    const est = await this.store.estimates().catch(() => ({}));
-    const prices = manaPrices(await this.rates(), this.rule(), est);
+    const est = await this.store.estimates(this.refineSince()).catch(() => ({}));
+    const prices = manaPrices(await this.rates(), this.rule(), est, this.table());
     this.priceCache = { at: Date.now(), prices };
     return prices;
+  }
+
+  /** R17: the seed table of this setup (the picture models and counts, the game chains from the config) */
+  table() {
+    return (this.seed ??= costTableOf(makeSetupOf(this.cfg)));
+  }
+  private seed: ReturnType<typeof costTableOf> | null = null;
+
+  /** R17: recorded costs from before COST_REFINE_SINCE (a model switched) do not refine the prices */
+  refineSince(now = new Date()): Date {
+    const month = new Date(now.getTime() - 30 * DAY);
+    const set = this.cfg.COST_REFINE_SINCE ? new Date(this.cfg.COST_REFINE_SINCE) : null;
+    return set && Number.isFinite(set.getTime()) && set > month ? set : month;
   }
 
   /** the yen of one reported cost */
@@ -236,7 +251,7 @@ export class CostService implements OnModuleInit, OnModuleDestroy {
 
   /** the daily refinement: a making with enough recorded makings is quoted from their p90 */
   async refine(now = new Date()): Promise<Partial<Record<MakeKind, number>>> {
-    const since = new Date(now.getTime() - 30 * DAY);
+    const since = this.refineSince(now);
     const out: Partial<Record<MakeKind, number>> = {};
     for (const k of MAKE_KINDS) {
       const costs = await this.store.jobCosts(k, since);
@@ -340,9 +355,9 @@ export class PgCostStore implements CostStore {
       .onConflictDoUpdate({ target: fxRates.month, set: { usdJpy, note, setAt: new Date() } });
   }
 
-  async estimates() {
+  async estimates(since?: Date) {
     const rows = await this.db.read.select().from(makeCostEstimates);
-    return Object.fromEntries(rows.filter((r) => isMakeKind(r.kind)).map((r) => [r.kind, r.costJpy])) as Partial<Record<MakeKind, number>>;
+    return Object.fromEntries(rows.filter((r) => isMakeKind(r.kind) && (!since || r.updatedAt >= since)).map((r) => [r.kind, r.costJpy])) as Partial<Record<MakeKind, number>>;
   }
 
   async saveEstimate(kind: MakeKind, costJpy: number, samples: number) {
@@ -389,7 +404,8 @@ export class PgCostStore implements CostStore {
         mana: sql<number>`coalesce(sum(-${manaLedger.delta}), 0)`,
       })
       .from(manaLedger)
-      .where(and(inArray(manaLedger.reason, ['generation', 'refund']), inArray(manaLedger.refType, kinds), gte(manaLedger.createdAt, since)))
+      // R17: the tenths of a price are taken later as 'usage' rows labelled with the making (counted with it here)
+      .where(and(inArray(manaLedger.reason, ['generation', 'refund', 'usage']), inArray(manaLedger.refType, kinds), gte(manaLedger.createdAt, since)))
       .groupBy(manaLedger.refType);
     const costs = await this.db.read
       .select({ kind: genCosts.kind, paid: genCosts.paid, costJpy: sql<number>`sum(${genCosts.costJpy})` })
@@ -404,7 +420,7 @@ export class PgCostStore implements CostStore {
     const [usage] = await this.db.read
       .select({ mana: sql<number>`coalesce(sum(-${manaLedger.delta}), 0)` })
       .from(manaLedger)
-      .where(and(eq(manaLedger.reason, 'usage'), gte(manaLedger.createdAt, since)));
+      .where(and(eq(manaLedger.reason, 'usage'), sql`${manaLedger.refType} is null or not (${inArray(manaLedger.refType, kinds)})`, gte(manaLedger.createdAt, since)));
     const [abs] = await this.db.read.select({ mana: sql<number>`coalesce(sum(${usageAccruals.absorbedMana}), 0)`, jpy: sql<number>`coalesce(sum(${usageAccruals.absorbedJpy}), 0)` }).from(usageAccruals);
     return {
       charged: charged.map((c) => ({ kind: c.kind ?? 'other', count: Number(c.count), mana: Number(c.mana) })),

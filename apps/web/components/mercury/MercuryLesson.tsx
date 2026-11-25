@@ -1,9 +1,9 @@
 'use client';
 
-import { MAKE_COST, type SongDesign } from '@obolo/shared';
+import { formatMana, MAKE_COST, type SongDesign } from '@obolo/shared';
 
 /** the song's mana telop (client 2026-11-25: the price rule's number, never a fixed 2) */
-const SONG_MANA = `−${MAKE_COST.song}マナ`;
+const SONG_MANA = `−${formatMana(MAKE_COST.song)}マナ`;
 import { useEffect, useRef, useState } from 'react';
 import { KIMORIN_JACKET, Sticker, saveSpell } from '@/components/jupiter/JupiterLesson';
 import { Big, LessonShell, NextButton, Panel, Soft, type CoachLine } from '@/components/onboarding/LessonShell';

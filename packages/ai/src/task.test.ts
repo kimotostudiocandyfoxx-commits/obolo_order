@@ -14,6 +14,16 @@ describe('per-task models (NOVEL_MODEL / GAME_MODEL)', () => {
     ]);
     expect(parseModelSpec('anthropic:x,junk')).toEqual([{ provider: 'claude', model: 'x' }]);
   });
+  it('R17: `?think=N` caps a step’s thinking; the per-tier game chains', () => {
+    expect(parseModelSpec('gemini:gemini-2.5-flash?think=0,gemini:gemini-flash-latest?think=4096')).toEqual([
+      { provider: 'gemini', model: 'gemini-2.5-flash', think: 0 },
+      { provider: 'gemini', model: 'gemini-flash-latest', think: 4096 },
+    ]);
+    expect(parseModelSpec(TASK_MODEL_DEFAULTS.gameTrial)[0]).toEqual({ provider: 'gemini', model: 'gemini-2.5-flash-lite', think: 0 });
+    expect(parseModelSpec(TASK_MODEL_DEFAULTS.gameCheap)[0].model).toBe('gemini-2.5-flash');
+    expect(parseModelSpec(TASK_MODEL_DEFAULTS.spell)[0].think).toBe(0);
+    expect(createTaskLlm(TASK_MODEL_DEFAULTS.gameCheap, { geminiApiKey: 'k' }).name).toBe('gemini:gemini-2.5-flash>gemini:gemini-flash-latest');
+  });
   it('steps without a key are skipped; nothing usable is the offline mock', () => {
     expect(createTaskLlm(TASK_MODEL_DEFAULTS.game, {}).name).toBe('mock');
     const g = createTaskLlm(TASK_MODEL_DEFAULTS.game, { geminiApiKey: 'k' }, { timeoutMs: 1000 });

@@ -1,5 +1,7 @@
 import { Body, Controller, Get, HttpCode, Inject, Param, ParseUUIDPipe, Post, UseGuards } from '@nestjs/common';
-import { GAME_BUILDS_PER_DAY, GameBrokenBody, GameBuildBody, NovelChapterBody, spellKey } from '@obolo/shared';
+import { HttpStatus } from '@nestjs/common';
+import { GAME_BUILDS_PER_DAY, GameBrokenBody, GameBuildBody, gameMakeKind, NovelChapterBody, spellKey } from '@obolo/shared';
+import { apiError } from '../common/errors';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
@@ -53,7 +55,10 @@ export class CraftController {
     await rateLimit(this.kv, `game-build:${userId}`, GAME_BUILDS_PER_DAY, 86_400);
     const b = parseBody(GameBuildBody, body);
     await this.games.precheck(userId, b);
-    const kind = b.gameId ? ('gameTweak' as const) : ('game' as const);
+    // R17: the tier the quote was for — the trial only for a member's first game, from one of the templates
+    const tier = b.tier ?? 'cheap';
+    if (tier === 'trial' && (b.gameId || !b.template || !(await this.games.firstGame(userId)))) throw apiError(HttpStatus.CONFLICT, 'TRIAL_USED', 'かんたんなゲームは、最初の1回だけだよ');
+    const kind = gameMakeKind(!!b.gameId, tier);
     return startConfirmed({
       ledger: this.ledger,
       db: this.db,
@@ -66,7 +71,7 @@ export class CraftController {
       // made from exactly the spell said yes to
       spell: spellKey('game', b.tags),
       required: true,
-      create: () => this.jobs.create(userId, 'game', { gameId: b.gameId, tags: b.tags, said: b.said, confirm: b.confirm, kind, from: 'atelier' }),
+      create: () => this.jobs.create(userId, 'game', { gameId: b.gameId, tags: b.tags, said: b.said, confirm: b.confirm, kind, from: 'atelier', ...(tier === 'trial' && b.template ? { template: b.template } : {}) }),
     });
   }
 
