@@ -168,6 +168,9 @@ for pl in ['mars','venus','uranus','pluto','neptune']:
 for k in ['saturn','jupiter','mercury','mars','venus','uranus','pluto','neptune']:
     f=f'{O}/picon-{k}.jpg'
     if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((140,140),Image.LANCZOS); A['picon-'+k]=uri(o,86)
+for nm in ['map','edm','hiphop','ballad','rock','chill']:
+    f=f'{O}/exp-mercury-{nm}.jpg'
+    if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A[f'exp-mercury-{nm}']=uri(im,76)
 VD=os.environ.get('VOICE_DIR')
 if VD:
     for n in range(1,6):
