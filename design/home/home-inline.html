@@ -583,6 +583,15 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .acts .oshib.done svg{fill:#ff5fa8;stroke:#ff5fa8}
 .acts button.pop svg{animation:actpop .45s cubic-bezier(.2,1.8,.4,1)}
 @keyframes actpop{0%{transform:scale(.6)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
+.exp .eomakase{font-size:14px!important;letter-spacing:.1em}
+.exp .emap.tripout .isl{transform:translate(-50%,-50%) scale(.55)!important;opacity:0!important;transition:transform .55s ease-in,opacity .45s!important}
+.exp .tcloud{position:absolute;inset:-20% -10%;z-index:7;pointer-events:none;opacity:0;background:radial-gradient(ellipse 40% 18% at 20% 30%,#fff 0 40%,transparent 70%),radial-gradient(ellipse 45% 20% at 75% 45%,#fff 0 40%,transparent 70%),radial-gradient(ellipse 50% 22% at 35% 65%,#fff 0 40%,transparent 70%),radial-gradient(ellipse 40% 18% at 80% 80%,#fff 0 40%,transparent 70%)}
+.exp .tcloud.go{animation:tsweep 1.15s cubic-bezier(.5,0,.4,1)}
+@keyframes tsweep{0%{opacity:0;transform:translateY(60%) scale(1.1)}35%{opacity:.95}65%{opacity:.95}100%{opacity:0;transform:translateY(-60%) scale(1.3)}}
+.exp .tlabel{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);z-index:6;padding:6px 14px;border-radius:999px;background:rgba(10,30,60,.4);color:#fff;font:900 12px var(--f-body);letter-spacing:.08em;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:none;pointer-events:none}
+.exp.map.trip .tlabel{display:block}
+.exp .isl.popin2{animation:islin .6s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes islin{from{opacity:0;transform:translate(-50%,-50%) scale(.4)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
 .exp{position:absolute;inset:0;z-index:42;overflow:hidden;pointer-events:none;opacity:0;transition:opacity .35s}
 .exp.on{opacity:1;pointer-events:auto}
 .exp{background:#0b3a66}
@@ -698,7 +707,7 @@ button:focus-visible,.item:focus-visible,.home:focus-visible{outline:3px solid v
   <div class="fest" id="fest" aria-hidden="true"><div class="dusk"></div><div class="glow"></div></div>
   <div class="camfx" id="camfx" aria-hidden="true"></div>
   <button class="skybtn" id="skybtn" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>空へ</button>
-  <div class="exp" id="exp" aria-hidden="true"><div class="emap" id="emap"></div><div class="eland" id="eland"></div><div class="rname" id="rname"></div><div class="estage" id="estage"></div><div class="etop"><button class="eback" id="eback" type="button" aria-label="もどる">←</button><span class="etitle" id="etitle"></span><button class="esearch" id="esearch" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M15.5 15.5l5 5" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg><span>大陸をさがす</span></button><button class="eomakase" id="eomakase" type="button" aria-label="おまかせで降りる"><svg viewBox="0 0 24 24" aria-hidden="true"><g transform="rotate(-14 12 13)"><rect x="4.5" y="5.5" width="14" height="14" rx="3.6" fill="#fff"/><g fill="#6a6cff"><circle cx="8.6" cy="9.6" r="1.5"/><circle cx="14.4" cy="15.4" r="1.5"/><circle cx="11.5" cy="12.5" r="1.5"/></g></g><path d="M20 2.5l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6-1.6-.7 1.6-.7z" fill="#fff6b0"/><path d="M3.2 18.6l.45 1 1 .45-1 .45-.45 1-.45-1-1-.45 1-.45z" fill="#fff6b0"/></svg>おまかせ</button><button class="efav" id="efav" type="button"></button></div><div class="eswap" id="eswap"><p>どの島と入れかえる？</p><img class="nw" id="eswapimg" alt=""><button type="button" id="eswapx">やめる</button></div><div class="esheet" id="esheet"><div class="eshead"><input id="eq" type="search" placeholder="大陸の名前・ジャンル・#タグ" autocomplete="off"><button type="button" id="esx" aria-label="とじる">✕</button></div><div class="estags" id="estags"></div><div class="eslist" id="eslist"></div></div><button class="dice" id="dice" type="button">🎲 どこかに降りる</button><button class="cta disc mer eplay" id="eplay" type="button" aria-label="流す"></button><img class="pback" id="pback" alt=""><div class="trav" id="trav"><span>おじゃまします</span><img alt=""></div></div>
+  <div class="exp" id="exp" aria-hidden="true"><div class="emap" id="emap"></div><div class="eland" id="eland"></div><div class="rname" id="rname"></div><div class="estage" id="estage"></div><div class="etop"><button class="eback" id="eback" type="button" aria-label="もどる">←</button><span class="etitle" id="etitle"></span><button class="esearch" id="esearch" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M15.5 15.5l5 5" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg><span>大陸をさがす</span></button><button class="eomakase" id="eomakase" type="button" aria-label="旅に出る（ランダムな6つ）"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.2l17.2-7.4c.6-.3 1.2.3.9.9L13.8 21c-.3.6-1.1.5-1.3-.1l-2-6.4-6.4-2c-.6-.2-.7-1-.1-1.3z" fill="#fff"/><path d="M10.5 14.5l4.8-4.8" stroke="#6a6cff" stroke-width="1.6" stroke-linecap="round"/></svg>旅</button><button class="efav" id="efav" type="button"></button></div><div class="eswap" id="eswap"><p>どの島と入れかえる？</p><img class="nw" id="eswapimg" alt=""><button type="button" id="eswapx">やめる</button></div><div class="tcloud" id="tcloud"></div><div class="tlabel" id="tlabel">✈ 旅の空</div><div class="esheet" id="esheet"><div class="eshead"><input id="eq" type="search" placeholder="大陸の名前・ジャンル・#タグ" autocomplete="off"><button type="button" id="esx" aria-label="とじる">✕</button></div><div class="estags" id="estags"></div><div class="eslist" id="eslist"></div></div><button class="dice" id="dice" type="button">🎲 どこかに降りる</button><button class="cta disc mer eplay" id="eplay" type="button" aria-label="流す"></button><img class="pback" id="pback" alt=""><div class="trav" id="trav"><span>おじゃまします</span><img alt=""></div></div>
   <div class="pstrip" id="pstrip" aria-label="星をえらぶ"><div class="sc" id="psc"></div><div class="hint">← スクロールして、行きたい星で止める →</div></div>
   <div class="prof" id="prof" aria-hidden="true"><div class="pbg" id="pbg"></div><div class="prec" id="prec"></div><div class="ppile" id="ppile"></div><div class="pgal" id="pgal" hidden></div><div class="pbeach" id="pbeach" hidden></div><div class="pstage" id="pstage"></div><div class="phead"><button class="pback" id="pback" type="button" aria-label="もどる">←</button><div class="pwho"><img id="pwimg" alt=""><span id="pwname"></span></div></div><div class="pdachi" id="pdachi"></div><button class="ptop-back" id="pback2" type="button" aria-label="もどる">←</button><div class="pswipe" id="pswipe" hidden>← スワイプで次のダチ →</div></div>
   <div class="hv" id="hv" aria-hidden="true"><div class="hvbg" id="hvbg"></div><div class="hvfx" id="hvfx"></div><div class="vig"></div><div class="glow2"></div><div class="hvstage" id="hvstage"></div><div class="hvback" id="hvback"><img alt=""></div><div class="lb t"></div><div class="lb b"></div><div class="flash"></div></div>
@@ -1051,13 +1060,20 @@ function favSave(pl){try{localStorage.setItem('obolo-sky-'+pl,JSON.stringify(FAV
 const contOf=(pl,k)=>CONT[pl].find(c=>c.k===k);
 function islImg(pl,k){return A['isl-'+pl+'-'+k]||''}
 function islInner(pl,c){const s=islImg(pl,c.k);return (s?`<img alt="" src="${s}">`:'<div class="ph"></div>')+`<b>${c.n}${c.by?`<small>by ${c.by}</small>`:''}</b>`}
-function drawSky(){const pl=EX.pl,em=$('emap'),f=favGet(pl);em.querySelectorAll('.isl').forEach(e=>e.remove());
+const TSLOT=[[.25,.2,.37],[.76,.23,.37],[.5,.39,.33],[.21,.57,.42],[.79,.6,.42],[.5,.8,.5]];
+function drawSky(){const pl=EX.pl,em=$('emap'),f=favGet(pl);em.querySelectorAll('.isl').forEach(e=>e.remove());$('exp').classList.toggle('trip',!!EX.trip);
+  if(EX.trip){EX.trip.forEach((k,i)=>{const S=TSLOT[i],c=contOf(pl,k),b=document.createElement('button');b.type='button';b.className='isl slot popin2';b.style.animationDelay=(i*.07)+'s';b.dataset.i=i;b.style.left=S[0]*100+'%';b.style.top=S[1]*100+'%';b.style.width=S[2]*100+'%';
+    b.innerHTML=islInner(pl,c);b.onclick=ev=>{ev.stopPropagation();expLand({...c,x:S[0],y:S[1]})};em.appendChild(b)});return}
   f.forEach((k,i)=>{const S=ESLOT[i],b=document.createElement('button');b.type='button';b.className='isl slot'+(k?'':' empty');b.dataset.i=i;b.style.left=S[0]*100+'%';b.style.top=S[1]*100+'%';b.style.width=S[2]*100+'%';
     const c=k&&contOf(pl,k);b.innerHTML=c?islInner(pl,c):'<div class="ph"></div><b>＋ さがす</b>';b.onclick=ev=>{ev.stopPropagation();if(EX.swap){doSwap(i);return}if(c)expLand({...c,x:S[0],y:S[1]});else openSearch()};em.appendChild(b)});
   const m=document.createElement('button');m.type='button';m.className='isl me';m.style.left=EME[0]*100+'%';m.style.top=EME[1]*100+'%';m.style.width=EME[2]*100+'%';
   const s=islImg(pl,'me');m.innerHTML=(s?`<img alt="" src="${s}">`:'<div class="ph"></div>')+'<b>じぶんの島</b>';
   m.onclick=ev=>{ev.stopPropagation();if(EX.swap)return;expClose()};em.appendChild(m)}
-function startSwap(c){const ex=$('exp');EX.swap=c;$('eswapimg').src=islImg(EX.pl,c.k)||A['isl-'+EX.pl+'-me']||'';$('eswap').querySelector('p').textContent=`「${c.n}」をどの島と入れかえる？`;ex.classList.add('swapping')}
+function tripGo(){if(!EX||EX.busy)return;EX.busy=1;endSwap();const em=$('emap'),cl=$('tcloud'),cs=CONT[EX.pl];let keys=[...cs].sort(()=>Math.random()-.5).map(c=>c.k);
+  if(EX.trip){const prev=new Set(EX.trip);keys=[...keys.filter(k=>!prev.has(k)),...keys.filter(k=>prev.has(k))]}keys=keys.slice(0,6);
+  whoosh();em.classList.add('tripout');cl.classList.remove('go');void cl.offsetWidth;cl.classList.add('go');
+  setTimeout(()=>{EX.trip=keys;drawSky();em.classList.remove('tripout');EX.busy=0;if(!window.__tripHint){window.__tripHint=1;toast('✈ ← でじぶんの空にもどれるよ')}},600)}
+function startSwap(c){const ex=$('exp');if(EX.trip){EX.trip=null;drawSky()}EX.swap=c;$('eswapimg').src=islImg(EX.pl,c.k)||A['isl-'+EX.pl+'-me']||'';$('eswap').querySelector('p').textContent=`「${c.n}」をどの島と入れかえる？`;ex.classList.add('swapping')}
 function endSwap(){if(!EX)return;EX.swap=null;$('exp').classList.remove('swapping')}
 function doSwap(i){const pl=EX.pl,c=EX.swap;if(!c)return;const f=favGet(pl),old=f[i]&&contOf(pl,f[i]);f[i]=c.k;favSave(pl);endSwap();drawSky();const e=$('emap').querySelector(`.isl[data-i="${i}"]`);if(e)e.classList.add('popin');chime();toast(old?`🔁 ${old.n} → ${c.n}`:`☆ ${c.n} をじぶんの空に追加`)}
 function addFav(c){const pl=EX.pl,f=favGet(pl);if(f.includes(c.k))return 'has';const i=f.indexOf(null);if(i>=0){f[i]=c.k;favSave(pl);return 'added'}return 'full'}
@@ -1091,7 +1107,7 @@ document.addEventListener('click',ev=>{if(!EX)return;
   if(ev.target.closest('#esearch'))openSearch();
   if(ev.target.closest('#esx'))closeSearch();
   if(ev.target.closest('#eswapx'))endSwap();
-  if(ev.target.closest('#eomakase')){const cs=CONT[EX.pl];const c=cs[Math.floor(Math.random()*cs.length)];expLand({...c,x:.5,y:.45})}
+  if(ev.target.closest('#eomakase'))tripGo();
   if(ev.target.closest('#efav')&&EX.region){const c=contOf(EX.pl,EX.region.k),f=favGet(EX.pl);if(f.includes(c.k))return;const res=addFav(c);if(res==='added'){chime();toast('☆ '+c.n+' をじぶんの空に追加');efavPaint()}else{expToMap();setTimeout(()=>startSwap(c),500)}}});
 const STRANGERS=['Rio','はるか','ショウ','ぽんず','kei','みお','YUZU','タク','Nagi','ことね','そら','REN'];
 let EX=null;
@@ -1177,7 +1193,7 @@ function expShow(b,o){o=o||{};if(EX.open)return;const ex=$('exp'),st=$('estage')
   const rb=document.createElement('button');rb.type='button';rb.className='repb';rb.setAttribute('aria-label','通報・非表示');rb.textContent='⋯';st.appendChild(rb);rb.onclick=ev=>{ev.stopPropagation();repMenu(b,st)};
   const t0=performance.now();EX.open={close(){st.style.pointerEvents='none';sv.close();who.remove();acts.remove();rb.remove();const m=st.querySelector('.repmenu');if(m)m.remove();ex.classList.remove('show');b.e.classList.remove('held');EX.open=null}};
   st.style.pointerEvents='auto';st.onclick=ev=>{if(ev.target.closest('.oshib,.favb,.repb,.repmenu,.aend'))return;if(performance.now()-t0>300){if(EX.auto){autoStop();return}EX.open&&EX.open.close();st.style.pointerEvents='none'}};return dur}
-document.addEventListener('click',ev=>{if(ev.target.closest('#skybtn'))expOpen();if(ev.target.closest('#eback')){if(EX&&EX.region)expToMap();else if(EX&&EX.swap)endSwap();else expClose()}
+document.addEventListener('click',ev=>{if(ev.target.closest('#skybtn'))expOpen();if(ev.target.closest('#eback')){if(EX&&EX.region)expToMap();else if(EX&&EX.swap)endSwap();else if(EX&&EX.trip){EX.trip=null;whoosh();drawSky()}else expClose()}
   if(ev.target.closest('#eplay')&&EX){if(EX.auto)autoStop();else autoStart()}
   if(ev.target.closest('#dice')&&EX){const rs=EXP[EX.pl].regions;expLand(rs[Math.floor(Math.random()*rs.length)])}});
 /* ---- planet picker: touch the planet icon, slide, stop on the one you want ---- */
