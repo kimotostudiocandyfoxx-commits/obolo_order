@@ -173,10 +173,10 @@ export function withTarget(prompt: string, t?: RefineTarget | null): string {
 // --- 4. how long it takes -----------------------------------------------------------------------------------------
 
 /** what is timed: the generations people wait for (demo = the review page's stand-in jobs) */
-export const ETA_KINDS = ['song', 'mv', 'radio', 'art', 'voice', 'look', 'demo', 'game'] as const;
+export const ETA_KINDS = ['song', 'mv', 'mvEdit', 'radio', 'art', 'voice', 'look', 'demo', 'game'] as const;
 export type EtaKind = (typeof ETA_KINDS)[number];
 /** the table the estimate starts from (ms); recent real times pull it toward what it takes now */
-export const ETA_BASE_MS: Record<EtaKind, number> = { song: 240_000, mv: 210_000, radio: 20_000, art: 18_000, voice: 6_000, look: 15_000, demo: 20_000, game: 60_000 };
+export const ETA_BASE_MS: Record<EtaKind, number> = { song: 240_000, mv: 210_000, mvEdit: 90_000, radio: 20_000, art: 18_000, voice: 6_000, look: 15_000, demo: 20_000, game: 60_000 };
 /** at or under this, {bati} says no time: you wait in place */
 export const QUICK_MS = 30_000;
 /** when it will be late, {bati} says so first and gives this much more */

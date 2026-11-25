@@ -2,6 +2,7 @@ import { z } from 'zod';
 import type { BluenaPlanet } from './finds';
 import { MakeConfirm } from './makeConfirm';
 import { spellPrompt, SpellTags, type SpellGroup, type SpellTag } from './spell';
+import { VIDEO_QUESTIONS } from './video';
 
 /**
  * Client 2026-11-25 — 本 (novel) and ゲーム (game) on the Moon: 「会話で始めて、スペルで決めて、会話で直す」.
@@ -15,7 +16,8 @@ import { spellPrompt, SpellTags, type SpellGroup, type SpellTag } from './spell'
  *  5. A book is free (no confirm card, its chapters are capped a day: NOVEL_CHAPTERS_PER_DAY); a game spends mana with the
  *     yes (MAKE_COST.game, then MAKE_COST.gameTweak per tweak; mana back when it could not be made or does not run).
  */
-export const CRAFT_KINDS = ['novel', 'game'] as const;
+/** R13: a video (pictures that move) is made the same way: questions → spell → talk (video.ts) */
+export const CRAFT_KINDS = ['novel', 'game', 'video'] as const;
 export type CraftKind = (typeof CRAFT_KINDS)[number];
 export const isCraftKind = (k: string): k is CraftKind => (CRAFT_KINDS as readonly string[]).includes(k);
 
@@ -34,7 +36,7 @@ export const CRAFT_QUESTIONS: Record<CraftKind, CraftQuestion[]> = {
     { group: 'genre', covers: ['genre'], text: 'いいね、ゲームを作ろう！　どんなゲームにする？　落ちてくる星を集めるのとか、よけるのとか、クイズとか。' },
     { group: 'hero', covers: ['hero', 'goal'], text: '主人公はだれ？　それと、どうなったら勝ち？　30こ集めたら勝ち、とか。' },
     { group: 'color', covers: ['color', 'style'], text: '見た目は、どんな感じ？　夜空っぽくとか、ネオンでピカピカとか。' },
-  ],
+  ],  video: VIDEO_QUESTIONS,
 };
 
 /**

@@ -13,6 +13,7 @@ import type { BatiOrdinaryPersonality } from './batiPersona';
 import { CRAFT_VARIANTS } from './craftVariants';
 import { TOOL_VARIANTS } from './toolVariants';
 import { SONG_VARIANTS } from './songVariants';
+import { VIDEO_VARIANTS } from './videoVariants';
 
 export type BatiVariantSet = Record<Exclude<BatiOrdinaryPersonality, 'genki'>, string>;
 
@@ -23,6 +24,8 @@ export const BATI_VARIANTS: Record<string, BatiVariantSet> = {
   ...TOOL_VARIANTS,
   // R13: a song's two-part spell, its lyric changes and the free changes of a finished song (songVariants.ts)
   ...SONG_VARIANTS,
+  // R13: videos as pictures that move (videoVariants.ts)
+  ...VIDEO_VARIANTS,
   "……やぁ！": {
     teinei: "……こんにちは！",
     kansai: "……まいど！",

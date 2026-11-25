@@ -51,7 +51,14 @@ export const STARTER_GEM_MANA = 40;
 /**
  * What making costs (the story's table, D08-S002). Voice kororins, photo / words-only jackets, delivering and DJ are free.
  */
-export const MAKE_COST = { look: 3, kororinDesign: 3, jacketArt: 3, song: 2, mv: 8, story: 1, game: 12, gameTweak: 3 } as const;
+export const MAKE_COST = { look: 3, kororinDesign: 3, jacketArt: 3, song: 2, mv: 8, story: 1, game: 12, gameTweak: 3, mvPictures: 2, mvRedraw: 2 } as const;
+/**
+ * R13 (client 2026-11-25, docs/動画の作り方.md): a video is pictures that move — no video-generation model. `mv` paints a
+ * new picture per scene (FLUX.2 klein, ~0.2 yen a picture) and moves them; `mvPictures` moves the member's own pictures
+ * (nothing painted: CPU only); `mvRedraw` paints one scene again. A change of how it moves (camera, fades, lyrics, order,
+ * length, the part of the song) is a re-render on the CPU: free, capped a day (VIDEO_EDITS_PER_DAY). PROPOSED numbers.
+ */
+export const VIDEO_EDITS_PER_DAY = 20;
 /**
  * client 2026-11-25 (本・ゲーム): the costs above — a game's first build (MAKE_COST.game) and each recast / tweak after
  * it (MAKE_COST.gameTweak) spend mana, with the member's yes; a book's chapters are free (no confirm card) and capped per

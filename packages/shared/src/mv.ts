@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { VideoCut } from './video';
 
 /**
  * Mars MV (client decision 2026-10-08): Bati turns one of your Mercury songs into a music video.
@@ -28,6 +29,8 @@ export type MvProjectView = {
   /** the MV kept in your 裏スタジオ (to publish it) */
   backstageId: string | null;
   seconds: number | null;
+  /** R13: what it is made of (its pictures, how they move): a change of how it moves is re-rendered from this alone */
+  cut?: VideoCut | null;
 };
 
 export const CreateMvBody = z.object({ songId: z.string().uuid() });

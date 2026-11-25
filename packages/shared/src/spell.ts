@@ -15,7 +15,7 @@ export type SpellKind = (typeof SPELL_KINDS)[number];
  * novel / chapter / game (client 2026-11-25, 「会話で始めて、スペルで決めて、会話で直す」): a book's world, hero and length;
  * a chapter's event; a game's rule, goal and level
  */
-export const SPELL_GROUPS = ['theme', 'genre', 'mood', 'tempo', 'instrument', 'voice', 'style', 'color', 'light', 'composition', 'camera', 'wear', 'world', 'hero', 'length', 'event', 'rule', 'goal', 'level'] as const;
+export const SPELL_GROUPS = ['theme', 'genre', 'mood', 'tempo', 'instrument', 'voice', 'style', 'color', 'light', 'composition', 'camera', 'wear', 'world', 'hero', 'length', 'event', 'rule', 'goal', 'level', 'purpose', 'source', 'scenes', 'transition', 'caption'] as const;
 export type SpellGroup = (typeof SPELL_GROUPS)[number];
 
 export const SpellTag = z.object({ ja: z.string().trim().min(1).max(16), en: z.string().trim().min(1).max(80), group: z.enum(SPELL_GROUPS) });
@@ -45,6 +45,7 @@ const BOOK: SpellKind[] = ['novel'];
 const CHAP: SpellKind[] = ['chapter'];
 const GAME: SpellKind[] = ['game'];
 const TALE: SpellKind[] = ['novel', 'game'];
+const VID: SpellKind[] = ['video'];
 const e = (ja: string, en: string, group: SpellGroup, re: RegExp | string, kinds?: SpellKind[]): Entry => ({ ja, en, group, re: typeof re === 'string' ? new RegExp(re) : re, for: kinds });
 
 /** the fixed tags (first match wins inside a group; the longer words come first) */
@@ -183,9 +184,26 @@ export const SPELL_DICTIONARY: Entry[] = [
   e('真ん中に大きく', 'centered subject', 'composition', /真ん中|まんなか/, PIC),
   e('遠くから', 'wide view', 'composition', /遠く|広く|ひろく/, PIC),
   e('アップ', 'close-up', 'composition', /アップで|大きく|近く/, PIC),
-  e('ゆっくりズーム', 'slow zoom', 'camera', /ズーム/, ['video']),
-  e('空を飛ぶカメラ', 'flying camera', 'camera', /飛ぶ|とぶ|空から/, ['video']),
-  e('横に流れる', 'panning shot', 'camera', /流れる|パン/, ['video']),
+  // R13 (client 2026-11-25): a video is pictures that move — what it is for, the song, how many scenes, how long, how the
+  // camera moves over each picture, how scenes change, the lyrics on screen (video.ts reads them as the pipeline's settings)
+  e('曲のMV', 'purpose: a music video for my song, a new picture painted for each scene', 'purpose', /MV|ＭＶ|ミュージックビデオ|曲に(映像|動画)|曲の(映像|動画)/i, VID),
+  e('絵をつなぐ', 'purpose: a short clip made of my own pictures, nothing new painted', 'purpose', /(持ってる|もってる|今ある|いまある|自分の|じぶんの|わたしの|私の|ぼくの|僕の|おれの|俺の)(絵|写真|しゃしん|アート|作品)|(絵|写真|しゃしん|アート|作品)を(つな|繋|並べ|ならべ|動か|うごか)/, VID),
+  e('お話スライド', 'purpose: a story slideshow told in pictures', 'purpose', /スライド|紙芝居|かみしばい|お話|物語|ストーリー/, VID),
+  e('4場面', '4 scenes', 'scenes', /[4４四](場面|シーン|枚)|少なめ/, VID),
+  e('8場面', '8 scenes', 'scenes', /[8８八](場面|シーン|枚)|ふつうの数/, VID),
+  e('12場面', '12 scenes', 'scenes', /(12|１２|十二)(場面|シーン|枚)|多め|たくさんの場面/, VID),
+  e('サビだけ', 'about 30 seconds: the chorus', 'length', /サビだけ|サビ|30秒|３０秒|ショート/, VID),
+  e('1分', 'about 60 seconds', 'length', /[1１一]分|60秒|６０秒/, VID),
+  e('まるごと', 'the whole song', 'length', /まるごと|丸ごと|ぜんぶ|全部|フル|最後まで/, VID),
+  e('パララックス', '2.5D parallax: near and far move apart', 'camera', /パララックス|奥行き|おくゆき/, VID),
+  e('ゆっくりズーム', 'slow zoom', 'camera', /ズーム/, VID),
+  e('空を飛ぶカメラ', 'flying camera', 'camera', /飛ぶ|とぶ|空から/, VID),
+  e('横に流れる', 'panning shot', 'camera', /流れる|パン/, VID),
+  e('ふわっと切りかえ', 'soft fade between scenes', 'transition', /ふわっと|フェード|じわっと/, VID),
+  e('パッと切りかえ', 'hard cut between scenes', 'transition', /パッと|ぱっと|スパッと/, VID),
+  e('ピカッと切りかえ', 'white flash between scenes', 'transition', /ピカッと|ぴかっと|フラッシュ/, VID),
+  e('歌詞なし', 'no lyric captions', 'caption', /(歌詞|字幕)(は|を)?(なし|無し|いらない|出さない|ださない|なくて)/, VID),
+  e('歌詞を出す', 'lyric captions on screen', 'caption', /歌詞|字幕/, VID),
   e('魔法使い', 'wizard robe', 'wear', /魔法使い|まほうつかい/, ['look', 'bati']),
   e('パジャマ', 'pajamas', 'wear', /パジャマ/, ['look', 'bati']),
   e('宇宙飛行士', 'astronaut suit', 'wear', /宇宙飛行士/, ['look', 'bati']),
@@ -233,16 +251,17 @@ const THEMES: [RegExp, string, string][] = [
 ];
 
 /** the groups that take one tag only (a new one replaces the old) */
-const ONE: SpellGroup[] = ['genre', 'tempo', 'voice', 'style', 'composition', 'camera', 'world', 'hero', 'length', 'level', 'goal'];
+const ONE: SpellGroup[] = ['genre', 'tempo', 'voice', 'style', 'composition', 'camera', 'world', 'hero', 'length', 'level', 'goal', 'purpose', 'source', 'scenes', 'transition', 'caption'];
 /** moods that do not go together */
 const OPPOSITE: Record<string, string[]> = { bright: ['dark', 'bittersweet'], dark: ['bright', 'joyful'], joyful: ['dark', 'bittersweet'], bittersweet: ['bright', 'joyful'], energetic: ['calm', 'mellow'], calm: ['energetic'], mellow: ['energetic'] };
-const ORDER: SpellGroup[] = ['world', 'hero', 'theme', 'wear', 'genre', 'event', 'style', 'mood', 'tempo', 'instrument', 'voice', 'rule', 'goal', 'level', 'color', 'light', 'composition', 'camera', 'length'];
+const ORDER: SpellGroup[] = ['purpose', 'source', 'world', 'hero', 'theme', 'wear', 'genre', 'event', 'style', 'mood', 'tempo', 'instrument', 'voice', 'rule', 'goal', 'level', 'color', 'light', 'composition', 'camera', 'transition', 'scenes', 'length', 'caption'];
 const INSTRUMENTS: Record<string, string[]> = { pop: ['ピアノ', 'ドラム'], rock: ['エレキギター', 'ドラム'], ballad: ['ピアノ', 'ストリングス'], 'hip hop': ['ドラム', 'ベース'], 'dance, EDM': ['シンセ', 'ドラム'], jazz: ['ピアノ', 'サックス'], 'acoustic folk': ['ギター'], 'lo-fi': ['ピアノ', 'ドラム'] };
 /** what a kind's spell always has (the dictionary's ja), when the words did not say it */
 const DEFAULTS: Record<SpellKind, Partial<Record<SpellGroup, string>>> = {
   song: { genre: 'ポップ', mood: '明るい', voice: 'やさしい歌声' },
   art: { style: '水彩', color: 'やわらかい色', composition: '正方形' },
-  video: { style: 'アニメ風', camera: 'ゆっくりズーム' },
+  // R13: pictures that move — Bati fills what was not said (an MV of the chorus, 8 pictures, 2.5D, soft fades, lyrics on)
+  video: { purpose: '曲のMV', style: 'アニメ風', camera: 'パララックス', transition: 'ふわっと切りかえ', scenes: '8場面', length: 'サビだけ', caption: '歌詞を出す' },
   look: { style: 'アニメ風' },
   bati: { style: 'アニメ風' },
   // client 2026-11-25: {bati} fills what was not said (the member never has to write anything)
@@ -467,7 +486,7 @@ export function spellNormalize(kind: SpellKind, pairs: { ja?: unknown; en?: unkn
   return sortTags(out).slice(0, 16);
 }
 
-const PREFIX: Record<SpellKind, string> = { song: 'song', art: 'illustration', video: 'music video', look: 'character look', bati: 'character outfit', novel: 'story', chapter: 'next chapter', game: 'small HTML5 canvas game' };
+const PREFIX: Record<SpellKind, string> = { song: 'song', art: 'illustration', video: 'music video made of still pictures that move', look: 'character look', bati: 'character outfit', novel: 'story', chapter: 'next chapter', game: 'small HTML5 canvas game' };
 /** the English prompt the generator is given (built from the tags as they are now) */
 export function spellPrompt(kind: SpellKind, tags: SpellTag[]): string {
   const g = (k: SpellGroup) => tags.filter((t) => t.group === k).map((t) => t.en);
@@ -486,6 +505,11 @@ export function spellPrompt(kind: SpellKind, tags: SpellTag[]): string {
     const look = [...g('color'), ...g('style'), ...g('mood')];
     const parts = [`${PREFIX.game}: ${g('genre').join(', ') || 'collect game'}`, g('hero').length && `the player is ${g('hero').join(', ')}`, about.length && `about ${about.join(', ')}`, g('rule').length && `rules: ${g('rule').join(', ')}`, g('goal').length && `goal: ${g('goal').join(', ')}`, g('level').length && `difficulty: ${g('level').join(', ')}`, look.length && `look: ${look.join(', ')}`];
     return parts.filter(Boolean).join('; ');
+  }
+  if (kind === 'video') {
+    // R13: only what the pictures look like (what it is for, the song, the scenes, the camera … are the pipeline's settings)
+    const look = tags.filter((t) => ['style', 'mood', 'color', 'light', 'composition', 'wear', 'hero', 'world'].includes(t.group)).map((t) => t.en);
+    return [PREFIX.video, about.length && `of ${about.join(', ')}`, ...look].filter(Boolean).join(', ');
   }
   return [PREFIX[kind], about.length && `of ${about.join(', ')}`, ...rest].filter(Boolean).join(', ');
 }

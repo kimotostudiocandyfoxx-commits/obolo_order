@@ -7,7 +7,7 @@ import type { GameView } from './craft';
  * Long work done in the background (2026-10-09: 受付 → 順番に処理 → できたら通知): the app starts
  * it, polls GET /jobs/:id, and gets a push when it is done.
  */
-export type JobKind = 'song' | 'mv-story' | 'mv-lyrics' | 'demo' | 'game';
+export type JobKind = 'song' | 'mv-story' | 'mv-lyrics' | 'demo' | 'game' | 'mv-edit';
 
 /** M-R253 §4: a review stand-in job (no AI): it takes `seconds`, the first `failTimes` tries fail (to show the re-try) */
 export const DemoJobBody = z.object({ seconds: z.number().int().min(3).max(240), failTimes: z.number().int().min(0).max(2).default(0) });

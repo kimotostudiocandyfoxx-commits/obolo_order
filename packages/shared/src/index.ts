@@ -39,3 +39,5 @@ export * from './links';
 export * from './spellTools';
 export * from './toolVariants';
 export * from './songVariants';
+export * from './video';
+export * from './videoVariants';
