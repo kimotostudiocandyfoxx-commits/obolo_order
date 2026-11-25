@@ -1,0 +1,343 @@
+{
+  "usd_jpy": 160,
+  "side": 1024,
+  "cases": [
+    {
+      "id": "1-art",
+      "use": "ART_MODEL (jacketArt: an art piece from a spell)",
+      "refs": []
+    },
+    {
+      "id": "2-look",
+      "use": "LOOK_MODEL (a member look from their photo, photo → anime)",
+      "refs": [
+        "art/review/saturn/gen-tests/photos/p1.jpg"
+      ]
+    },
+    {
+      "id": "3-bati",
+      "use": "BATI_MODEL ({bati} dress-up, keeps the creature from its picture)",
+      "refs": [
+        "apps/api/assets/bati/moon-1.jpg"
+      ]
+    },
+    {
+      "id": "4-kororin",
+      "use": "KORORIN_MODEL (a kororin design in the style of the reference characters)",
+      "refs": [
+        "apps/api/assets/kororin-style.jpg"
+      ]
+    }
+  ],
+  "models": {
+    "seedream-5-pro": {
+      "model": "bytedance:seedream@5.0-pro",
+      "about": "current: the looks, Bati, kororin (R16)",
+      "cases": {
+        "1-art": {
+          "file": "1-art__seedream-5-pro.jpg",
+          "cost_usd": 0.04815,
+          "seconds": 56.0
+        },
+        "2-look": {
+          "file": "2-look__seedream-5-pro.jpg",
+          "cost_usd": 0.04815,
+          "seconds": 45.6
+        },
+        "3-bati": {
+          "file": "3-bati__seedream-5-pro.jpg",
+          "cost_usd": 0.04815,
+          "seconds": 49.8
+        },
+        "4-kororin": {
+          "file": "4-kororin__seedream-5-pro.jpg",
+          "cost_usd": 0.04815,
+          "seconds": 49.2
+        }
+      },
+      "avg_usd": 0.04815,
+      "avg_jpy": 7.7
+    },
+    "gemini-2-5-flash-image": {
+      "model": "gemini-2.5-flash-image",
+      "about": "current: the art (R16), Gemini API",
+      "cases": {
+        "1-art": {
+          "file": "1-art__gemini-2-5-flash-image.jpg",
+          "cost_usd": 0.03873,
+          "seconds": 6.6
+        },
+        "2-look": {
+          "file": "2-look__gemini-2-5-flash-image.jpg",
+          "cost_usd": 0.03891,
+          "seconds": 7.6
+        },
+        "3-bati": {
+          "file": "3-bati__gemini-2-5-flash-image.jpg",
+          "cost_usd": 0.03889,
+          "seconds": 8.4
+        },
+        "4-kororin": {
+          "file": "4-kororin__gemini-2-5-flash-image.jpg",
+          "cost_usd": 0.03887,
+          "seconds": 8.2
+        }
+      },
+      "avg_usd": 0.03885,
+      "avg_jpy": 6.22
+    },
+    "flux2-klein-4b": {
+      "model": "runware:400@4",
+      "about": "FLUX.2 [klein] 4B (already the MV painter)",
+      "cases": {
+        "1-art": {
+          "file": "1-art__flux2-klein-4b.jpg",
+          "cost_usd": 0.0011,
+          "seconds": 2.0
+        },
+        "2-look": {
+          "file": "2-look__flux2-klein-4b.jpg",
+          "cost_usd": 0.0011,
+          "seconds": 3.0
+        },
+        "3-bati": {
+          "file": "3-bati__flux2-klein-4b.jpg",
+          "cost_usd": 0.0021,
+          "seconds": 3.2
+        },
+        "4-kororin": {
+          "file": "4-kororin__flux2-klein-4b.jpg",
+          "cost_usd": 0.0021,
+          "seconds": 4.2
+        }
+      },
+      "avg_usd": 0.0016,
+      "avg_jpy": 0.26
+    },
+    "flux2-klein-9b": {
+      "model": "runware:400@2",
+      "about": "FLUX.2 [klein] 9B",
+      "cases": {
+        "1-art": {
+          "file": "1-art__flux2-klein-9b.jpg",
+          "cost_usd": 0.0013,
+          "seconds": 3.0
+        },
+        "2-look": {
+          "file": "2-look__flux2-klein-9b.jpg",
+          "cost_usd": 0.00273,
+          "seconds": 4.2
+        },
+        "3-bati": {
+          "file": "3-bati__flux2-klein-9b.jpg",
+          "cost_usd": 0.00273,
+          "seconds": 4.7
+        },
+        "4-kororin": {
+          "file": "4-kororin__flux2-klein-9b.jpg",
+          "cost_usd": 0.00273,
+          "seconds": 4.6
+        }
+      },
+      "avg_usd": 0.00237,
+      "avg_jpy": 0.38
+    },
+    "flux3-klein": {
+      "model": "bfl:flux@3-image-klein",
+      "about": "FLUX 3 Image Klein",
+      "cases": {
+        "1-art": {
+          "error": "[{\"code\": \"inferenceError\", \"message\": \"Inference error occurred while processing the request. Please try again or contact support if the issue persists.\", \"documentation\": \"https://runware.ai/docs/image-inference/api-reference#errors\", \"taskUUID\": \"a7023910-6d42-438a-ad31-189fb18f56b8\"}]",
+          "seconds": 0.9
+        },
+        "2-look": {
+          "file": "2-look__flux3-klein.jpg",
+          "cost_usd": 0.0048,
+          "seconds": 6.7
+        },
+        "3-bati": {
+          "error": "[{\"code\": \"inferenceError\", \"message\": \"Inference error occurred while processing the request. Please try again or contact support if the issue persists.\", \"documentation\": \"https://runware.ai/docs/image-inference/api-reference#errors\", \"taskUUID\": \"4687ef1c-37b9-47be-9171-bf4a4fbce5f7\"}]",
+          "seconds": 2.5
+        },
+        "4-kororin": {
+          "file": "4-kororin__flux3-klein.jpg",
+          "cost_usd": 0.0059,
+          "seconds": 8.3
+        }
+      },
+      "avg_usd": 0.00535,
+      "avg_jpy": 0.86
+    },
+    "qwen-image-2-1-turbo": {
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "about": "Qwen-Image 2.1 Turbo",
+      "cases": {
+        "1-art": {
+          "file": "1-art__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "seconds": 13.7
+        },
+        "2-look": {
+          "file": "2-look__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "seconds": 22.3
+        },
+        "3-bati": {
+          "file": "3-bati__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "seconds": 17.0
+        },
+        "4-kororin": {
+          "file": "4-kororin__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "seconds": 13.6
+        }
+      },
+      "avg_usd": 0.01413,
+      "avg_jpy": 2.26
+    },
+    "seedream-5-flash": {
+      "model": "bytedance:seedream@5.0-flash",
+      "about": "Seedream 5.0 Flash",
+      "cases": {
+        "1-art": {
+          "file": "1-art__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "seconds": 21.2
+        },
+        "2-look": {
+          "file": "2-look__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "seconds": 17.1
+        },
+        "3-bati": {
+          "file": "3-bati__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "seconds": 14.0
+        },
+        "4-kororin": {
+          "file": "4-kororin__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "seconds": 16.7
+        }
+      },
+      "avg_usd": 0.01926,
+      "avg_jpy": 3.08
+    },
+    "nano-banana-2-lite": {
+      "model": "google:nano-banana@2-lite",
+      "about": "Nano Banana 2 Lite (on Runware)",
+      "cases": {
+        "1-art": {
+          "file": "1-art__nano-banana-2-lite.jpg",
+          "cost_usd": 0.0336318,
+          "seconds": 4.6
+        },
+        "2-look": {
+          "file": "2-look__nano-banana-2-lite.jpg",
+          "cost_usd": 0.0340734,
+          "seconds": 9.9
+        },
+        "3-bati": {
+          "file": "3-bati__nano-banana-2-lite.jpg",
+          "cost_usd": 0.0340524,
+          "seconds": 6.0
+        },
+        "4-kororin": {
+          "file": "4-kororin__nano-banana-2-lite.jpg",
+          "cost_usd": 0.0340299,
+          "seconds": 5.1
+        }
+      },
+      "avg_usd": 0.03395,
+      "avg_jpy": 5.43
+    },
+    "z-image-turbo": {
+      "model": "runware:z-image@turbo",
+      "about": "Z-Image Turbo (words only: the references are left out)",
+      "cases": {
+        "1-art": {
+          "file": "1-art__z-image-turbo.jpg",
+          "cost_usd": 0.0023,
+          "seconds": 4.1
+        },
+        "2-look": {
+          "file": "2-look__z-image-turbo.jpg",
+          "cost_usd": 0.0023,
+          "seconds": 3.6,
+          "note": "references left out"
+        },
+        "3-bati": {
+          "file": "3-bati__z-image-turbo.jpg",
+          "cost_usd": 0.0023,
+          "seconds": 2.6,
+          "note": "references left out"
+        },
+        "4-kororin": {
+          "file": "4-kororin__z-image-turbo.jpg",
+          "cost_usd": 0.0023,
+          "seconds": 2.4,
+          "note": "references left out"
+        }
+      },
+      "avg_usd": 0.0023,
+      "avg_jpy": 0.37
+    },
+    "animagine-xl-4": {
+      "model": "civitai:1188071@1408658",
+      "about": "Animagine XL 4.0 (SDXL anime) + IP-Adapter",
+      "cases": {
+        "1-art": {
+          "file": "1-art__animagine-xl-4.jpg",
+          "cost_usd": 0.003,
+          "seconds": 3.8
+        },
+        "2-look": {
+          "file": "2-look__animagine-xl-4.jpg",
+          "cost_usd": 0.0074,
+          "seconds": 8.5
+        },
+        "3-bati": {
+          "file": "3-bati__animagine-xl-4.jpg",
+          "cost_usd": 0.0074,
+          "seconds": 8.5
+        },
+        "4-kororin": {
+          "file": "4-kororin__animagine-xl-4.jpg",
+          "cost_usd": 0.003,
+          "seconds": 6.1
+        }
+      },
+      "avg_usd": 0.0052,
+      "avg_jpy": 0.83
+    },
+    "illustrious-xl": {
+      "model": "x:42@2125353",
+      "about": "an Illustrious-XL anime checkpoint + IP-Adapter",
+      "cases": {
+        "1-art": {
+          "file": "1-art__illustrious-xl.jpg",
+          "cost_usd": 0.003,
+          "seconds": 8.5
+        },
+        "2-look": {
+          "file": "2-look__illustrious-xl.jpg",
+          "cost_usd": 0.0089,
+          "seconds": 10.0
+        },
+        "3-bati": {
+          "file": "3-bati__illustrious-xl.jpg",
+          "cost_usd": 0.003,
+          "seconds": 5.4
+        },
+        "4-kororin": {
+          "file": "4-kororin__illustrious-xl.jpg",
+          "cost_usd": 0.003,
+          "seconds": 5.8
+        }
+      },
+      "avg_usd": 0.00447,
+      "avg_jpy": 0.72
+    }
+  }
+}
