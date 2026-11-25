@@ -230,6 +230,25 @@ export const usageAccruals = pgTable('usage_accruals', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
+/**
+ * R18 (docs/マナの値段.md 13.): a member's 保存の魔法 — the tier bought (+GB a month), the last month paid (YYYY-MM,
+ * Japan), 「やめて」 (ends at the month's end), the grace when the renewal found too little mana, when it last lapsed, and
+ * which of {bati}'s notices were said (80%, the grace, the lapse).
+ */
+export const storagePlans = pgTable('storage_plans', {
+  userId: uuid('user_id')
+    .primaryKey()
+    .references(() => users.id),
+  tierGb: integer('tier_gb'),
+  paidMonth: text('paid_month'),
+  cancelled: boolean('cancelled').notNull().default(false),
+  graceUntil: timestamp('grace_until', { withTimezone: true }),
+  lapsedAt: timestamp('lapsed_at', { withTimezone: true }),
+  toldJson: jsonb('told_json').$type<{ near?: boolean; grace?: string; lapsed?: string }>().notNull().default({}),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
 /** USD→JPY per month (YYYY-MM, Japan time), set by the operator for the next month (PUT /admin/mana/fx) */
 export const fxRates = pgTable('fx_rates', {
   month: text('month').primaryKey(),

@@ -20,6 +20,7 @@ import { markNames } from '@/lib/finds/marks';
 import { findAll, PLANET_NAME, workMarkRef, type Found } from '@/lib/finds/works';
 import { choiceOf, detectOpen, pickOpen, type OpenAsk } from '@/lib/bluena/find';
 import { EDIT_EVENT, openInBluena, takeEdit } from '@/lib/bluena/edit';
+import { isStorageAsk, isStorageCancel, storageTierOf, STORAGE_LINES, type StorageTierPrice, type StorageView } from '@obolo/shared';
 import { BATI_REST_HINT, type BatiRest, BLUENA_LINES, formatMana, gameTierFor, gameMakeKind, matchGameTemplate, type GameTemplateId, type GameTier } from '@obolo/shared';
 import { daysUntil, isOpen, KINDS, lockLine, openKinds, openLessons, type AtelierKind, type Lesson } from '@/lib/atelier/unlock';
 import { historyOf, recentRequest } from './carry';
@@ -127,7 +128,9 @@ type PlanAsk = {
 /** client 2026-11-25: {bati}'s questions for a book / a game (`craft`), and a book / a game just made (its next words change it: `after`) */
 /** R18: 君の声にする魔法 asked — {bati} said its mana and waits for the yes (the quote's price and spell key go with the yes) */
 type VoiceAsk = { card: Work; price: number; spell: string };
-type Pending = { kind: AtelierKind } | { gameTrial: { said: string } } | { radioName: string } | { tweak: Work } | { voiceSpell: VoiceAsk } | { voiceAgain: true } | { use: AtelierKind; materials: Work[] } | { plan: PlanAsk } | { craft: CraftAsk } | { after: Work } | { tool: ToolAsk; spell?: SavedSpell; forKind?: AtelierKind; content?: string } | null;
+/** R18: 保存の魔法 — which size (the tiers said), then the yes to its price */
+type StorageAsk = { tiers: StorageTierPrice[]; plan: StorageView['plan']; gb?: number; price?: number };
+type Pending = { storage: StorageAsk } | { kind: AtelierKind } | { gameTrial: { said: string } } | { radioName: string } | { tweak: Work } | { voiceSpell: VoiceAsk } | { voiceAgain: true } | { use: AtelierKind; materials: Work[] } | { plan: PlanAsk } | { craft: CraftAsk } | { after: Work } | { tool: ToolAsk; spell?: SavedSpell; forKind?: AtelierKind; content?: string } | null;
 /** R12: {bati}'s tool out in the sky (the compass while it reads; the spell book open, or taking a spell in) */
 type ToolShow = { kind: 'compass'; phase: CompassPhase; leaving?: boolean; key: number } | { kind: 'book'; mode: BookMode; page: number; spells: SavedSpell[]; saving?: BookSaving; key: number } | null;
 
@@ -612,6 +615,100 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     void start(pa.plan.kind, pa.prompt, pa.prev, { ...pa.opts, plan: pa.plan, confirm: { id: yesId(), price: pa.price, ...(key ? { spell: key } : {}) } });
   };
 
+  // ── R18 (client 2026-11-25): Bluena's room and 保存の魔法 — all in words, no buttons ──
+  /** {bati}'s notice said once: 80% (「ブルーナがいっぱいになってきたよ。」), the renewal's grace, the lapse */
+  const storageNotice = async () => {
+    if (story) return;
+    const v = await getApi()
+      .storage()
+      .catch(() => null);
+    if (!v?.say) return;
+    if (v.say === 'near') sayT(STORAGE_LINES.near);
+    else if (v.say === 'grace') sayT(STORAGE_LINES.grace, { days: v.plan?.graceUntil ? Math.max(1, Math.ceil((Date.parse(v.plan.graceUntil) - Date.now()) / 86400_000)) : 7 });
+    else sayT(STORAGE_LINES.lapsed);
+    void getApi()
+      .storageTold(v.say)
+      .catch(() => undefined);
+  };
+  /** 「保存の魔法」「ブルーナを広げて」: the tiers and their mana in one sentence; a size said with it goes to its price */
+  const storageExplain = async (text: string) => {
+    setBusy(true);
+    const v = await getApi()
+      .storage()
+      .catch(() => null);
+    setBusy(false);
+    if (!v) return sayT(STORAGE_LINES.failed);
+    const ask: StorageAsk = { tiers: v.tiers, plan: v.plan };
+    const gb = storageTierOf(text);
+    if (gb) return storagePrice(ask, gb);
+    const p = (n: number) => formatMana(v.tiers.find((t) => t.gb === n)?.mana ?? 0);
+    sayT(STORAGE_LINES.explain, { p10: p(10), p30: p(30), p100: p(100) });
+    setPending({ storage: ask });
+  };
+  /** the size heard: its mana a month, then the yes */
+  const storagePrice = (ask: StorageAsk, gb: number) => {
+    const price = ask.tiers.find((t) => t.gb === gb)?.mana;
+    if (price == null) return sayT(STORAGE_LINES.which);
+    if (ask.plan?.gb === gb && !ask.plan.cancelled && !ask.plan.graceUntil) return sayT(STORAGE_LINES.already, { gb });
+    sayT(STORAGE_LINES.confirm, { gb, price: formatMana(price) });
+    setPending({ storage: { ...ask, gb, price } });
+  };
+  /** the yes: a full month charged (once per yes), the room bigger at once */
+  const storageCast = async (gb: number, price: number) => {
+    const have = await manaNow();
+    if (have != null && have < price) {
+      sayT(MOON_LINES.noMana, { short: formatMana(price - have) });
+      window.dispatchEvent(new CustomEvent('obolo:nomana', { detail: { plain: true } }));
+      return;
+    }
+    setBusy(true);
+    try {
+      const r = await getApi().expandStorage(gb, { id: yesId(), price });
+      castNow(1800);
+      sayT(r.status === 'already' ? STORAGE_LINES.already : STORAGE_LINES.done, { gb });
+      window.dispatchEvent(new Event('obolo:storage'));
+    } catch (e) {
+      if (e instanceof ApiError && e.code === 'NO_MANA') sayT(CHARGE_ERROR_WORDS.NO_MANA);
+      else if (e instanceof ApiError && e.code === 'PRICE_CHANGED') sayT(CHARGE_ERROR_WORDS.PRICE_CHANGED);
+      else sayT(STORAGE_LINES.failed);
+    } finally {
+      setBusy(false);
+    }
+  };
+  /** 「保存の魔法をやめて」: it ends at the month's end */
+  const storageCancel = async () => {
+    const r = await getApi()
+      .cancelStorage()
+      .catch(() => null);
+    if (!r) return sayT(STORAGE_LINES.failed);
+    sayT(r.cancelled ? STORAGE_LINES.cancel : STORAGE_LINES.cancelNone);
+    window.dispatchEvent(new Event('obolo:storage'));
+  };
+  /** the words while 保存の魔法 waits (true: taken here) */
+  const storageAnswer = (text: string, a: StorageAsk): boolean => {
+    const gb = storageTierOf(text);
+    if (a.gb && a.price != null) {
+      const yn = voiceSpellAnswer(text, isYes);
+      if (yn === 'yes' && !(gb && gb !== a.gb)) return void storageCast(a.gb, a.price), true;
+      if (yn === 'no') return sayT(STORAGE_LINES.stop), true;
+      if (gb) return storagePrice(a, gb), true;
+      return false;
+    }
+    if (gb) return storagePrice(a, gb), true;
+    if (voiceSpellAnswer(text, isYes) === 'no') return sayT(STORAGE_LINES.stop), true;
+    // a short answer that is no size: asked again; anything longer is another matter
+    if (text.trim().length <= 12) {
+      sayT(STORAGE_LINES.which);
+      setPending({ storage: a });
+      return true;
+    }
+    return false;
+  };
+  useEffect(() => {
+    void storageNotice();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   /** what is said once a card is made */
   const afterMade = (w: Work, prompt: string) => {
     if (story) {
@@ -634,6 +731,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       setPending({ tweak: w });
     } else if (DONE[w.kind]) say(DONE[w.kind]);
     if (w.status === 'ready' && !story) void tipCheck();
+    // R18: the room after it (80%: said once)
+    if (w.status === 'ready' && !story) void storageNotice();
     // R12: a work of the spell just cast is done (a happy word about it may bring {bati}'s offer to keep the spell)
     if (w.status === 'ready' && !story && lastCast.current && !lastCast.current.done) {
       lastCast.current = { ...lastCast.current, done: true };
@@ -1471,6 +1570,10 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   const sendOn = (text: string, p: Pending) => {
     // R16: the answer to 「どれかな？」 (which of the works found to open)
     if (!story && openChoices.current && openChosen(text)) return;
+    // R18: 保存の魔法 — the size / the yes while it waits; 「保存の魔法をやめて」; 「保存の魔法」「ブルーナを広げて」
+    if (!story && p && 'storage' in p && storageAnswer(text, p.storage)) return;
+    if (!story && isStorageCancel(text)) return void storageCancel();
+    if (!story && isStorageAsk(text)) return void storageExplain(text);
     // R12: {bati}'s compass and spell book (a link, their names, the answers to its questions, the offer)
     if (!story && toolSend(text, p)) return;
     // R13 fix: a spell still coming out (its lyrics being written) can be called off too

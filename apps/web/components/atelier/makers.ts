@@ -1,4 +1,4 @@
-import { type GameTemplateId, type GameTier, CRAFT_LINES, KIND_HOME_PLANET, spellFrom, KORORIN_VOICE_STYLE, neoVoiceUrl, withTarget, lyricsLines, lyricsSections, type JobView, type MakeConfirm, type Me, type RefineTarget, type VideoParams, type WorkVersion, VIDEO_LINES, videoParams } from '@obolo/shared';
+import { STORAGE_LINES, type GameTemplateId, type GameTier, CRAFT_LINES, KIND_HOME_PLANET, spellFrom, KORORIN_VOICE_STYLE, neoVoiceUrl, withTarget, lyricsLines, lyricsSections, type JobView, type MakeConfirm, type Me, type RefineTarget, type VideoParams, type WorkVersion, VIDEO_LINES, videoParams } from '@obolo/shared';
 import { demoStickerArt } from '@/lib/look';
 import { ApiError, getApi } from '@/lib/api';
 import type { AtelierKind } from '@/lib/atelier/unlock';
@@ -412,12 +412,13 @@ export async function discard(w: Work): Promise<void> {
 }
 
 async function discardThing(w: Work): Promise<void> {
+  // R18: thrown away with its files (the room comes back): DELETE /storage/works/:kind/:id
   const api = getApi();
   const r = w.ref ?? {};
-  if (w.kind === 'voice' && r.postId) await api.deleteSaturnPost(r.postId);
-  else if (w.kind === 'art' && r.rootId) await api.removeJupiterRoot(r.rootId);
-  else if (w.kind === 'video' && r.backstageId) await api.removeMarsVideo(r.backstageId);
-  else if (w.kind === 'radio' && r.showId) await api.removeRadioShow(r.showId);
+  if (w.kind === 'voice' && r.postId) await api.removeWork('saturn_post', r.postId);
+  else if (w.kind === 'art' && r.rootId) await api.removeWork('jupiter_root', r.rootId);
+  else if (w.kind === 'video' && r.backstageId) await api.removeWork('mars_backstage', r.backstageId);
+  else if (w.kind === 'radio' && r.showId) await api.removeWork('radio_show', r.showId);
 }
 
 /** wear it: your look / {bati}'s dress-up */
@@ -432,7 +433,8 @@ export function failLine(e: unknown): string {
   if (code === 'MODERATION') return 'その言葉は使えないみたい。別の言い方にしてみて';
   if (code === 'RESTYLE_TRIES' || code === 'LOOK_REFINES' || code === 'STICKER_TRIES') return '今日の魔法は、ここまで。また明日、つづきをしよう';
   if (code === 'NO_MANA' && e instanceof ApiError) return e.message;
-  if (code === 'STORAGE_FULL') return 'ブルーナが、いっぱいみたい';
+  // R18: a full Bluena — {bati}'s line (every style: STORAGE_VARIANTS)
+  if (code === 'STORAGE_FULL' || code === 'STORAGE_QUOTA') return STORAGE_LINES.full;
   if (code === 'DEMO') return 'これは、ここ（おためし）では作れないんだ';
   if (code === 'CHAPTER_LIMIT') return CRAFT_LINES.chapterLimit;
   if (code === 'BOOK_FULL') return CRAFT_LINES.bookFull;

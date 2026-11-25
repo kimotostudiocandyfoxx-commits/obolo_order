@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { MakeConfirm } from './makeConfirm';
-import { DEFAULT_COST_RATES, DEFAULT_PRICE_RULE, quoteMana, SONG_VOICE_CPU_SECONDS, SONG_VOICE_GPU_SEED, type CostRates, type PriceRule } from './manaPrice';
+import { DEFAULT_COST_RATES, DEFAULT_PRICE_RULE, MAKE_COST_ESTIMATE, quoteMana, SONG_VOICE_CPU_SECONDS, SONG_VOICE_GPU_SEED, storageJpyOf, type CostRates, type PriceRule } from './manaPrice';
 
 /**
  * R18 (client 2026-11-25): 君の声にする魔法 — a finished song sung again in the member's OWN registered voice (Seed-VC on
@@ -34,7 +34,8 @@ export interface SongVoiceQuote {
 /** THE price of the voice spell: the price rule (manaFor) of its estimated GPU (and CPU) seconds */
 export function songVoiceQuote(o: { split: boolean }, rates: CostRates = DEFAULT_COST_RATES, rule: PriceRule = DEFAULT_PRICE_RULE, p90: Partial<SongVoiceSeconds> = {}): SongVoiceQuote {
   const gpuSeconds = songVoiceGpuSeconds(o, p90);
-  const costJpy = gpuSeconds * rates.gpuSecondJpy + SONG_VOICE_CPU_SECONDS * rates.cpuSecondJpy;
+  // R18: with the months of storing the member's voice version (the seed table's bytes)
+  const costJpy = gpuSeconds * rates.gpuSecondJpy + SONG_VOICE_CPU_SECONDS * rates.cpuSecondJpy + storageJpyOf(MAKE_COST_ESTIMATE.songVoice, rates);
   return { mana: quoteMana(costJpy, rule), split: o.split, gpuSeconds, costJpy };
 }
 

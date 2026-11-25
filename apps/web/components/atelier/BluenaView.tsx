@@ -1,6 +1,6 @@
 'use client';
 
-import { lyricBlockLabels, lyricHintLabel, type BookView, type GameView, type MarkedKind, type SongLyrics } from '@obolo/shared';
+import { isRemovableWorkKind, lyricBlockLabels, lyricHintLabel, type BookView, type GameView, type MarkedKind, type SongLyrics } from '@obolo/shared';
 import { useEffect, useRef, useState } from 'react';
 import { PlanetMark } from '@/components/bluena/PlanetMark';
 import { StarButton, useMarkRing } from '@/components/finds/MarkRing';
@@ -14,7 +14,8 @@ import { fullWork, songVersions, trackOf } from './bluenaWork';
 import { flownLine } from './Drawers';
 import { GameFrame, GameFull } from './GamePlay';
 import { KIND_WORD } from './intent';
-import { fly, type Ctx } from './makers';
+import { discard, fly, type Ctx } from './makers';
+import { STORAGE_EVENT } from '@/components/bluena/StorageBar';
 import { ReelPlayer } from './ReelPlayer';
 import { refreshWork, stale } from './refresh';
 import { face, LOOK_CSS, spellLookFor, Talisman, useSpellFont } from './spellLooks';
@@ -82,6 +83,23 @@ export function BluenaView({ item, ctx, onClose, onEdit, onSend, autoplay, autoO
       setLine('うまくいかなかった…');
     }
   };
+  // R18 (client 2026-11-25): 〔消す〕 — small, with a confirmation; the work, its tries, its stems / versions and their files
+  const removable = item.mark.kind === 'local' || isRemovableWorkKind(item.mark.kind);
+  const [removing, setRemoving] = useState(false);
+  const doRemove = async () => {
+    if (!confirm('ブルーナから消す？　別の版や分けた音も、いっしょに消えるよ。もとには戻せないよ。')) return;
+    setRemoving(true);
+    try {
+      if (item.mark.kind === 'local') await discard(w);
+      else await getApi().removeWork(item.mark.kind, item.mark.id);
+      window.dispatchEvent(new Event(STORAGE_EVENT));
+      onChanged?.();
+      onClose();
+    } catch {
+      setLine('うまく消せなかった…');
+      setRemoving(false);
+    }
+  };
   return (
     <div className="absolute inset-0 z-[55] flex flex-col overflow-hidden bg-[#070b24] text-[#f4f1ff]" role="dialog" aria-label={`${item.title || KIND_WORD[kind]}を見る`} data-testid="bluena-view" data-kind={kind}>
       <style>{`${LOOK_CSS}@keyframes bv-in{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}@keyframes bv-spin{to{transform:rotate(360deg)}}`}</style>
@@ -141,6 +159,11 @@ export function BluenaView({ item, ctx, onClose, onEdit, onSend, autoplay, autoO
           {onSend && (
             <button onClick={() => onSend(w)} className="h-9 rounded-full border border-[rgba(210,220,255,.3)] px-3 text-[12px] text-[#dfe4ff]/85" data-testid="bluena-view-send">
               送る
+            </button>
+          )}
+          {removable && (
+            <button onClick={() => void doRemove()} disabled={removing} className="h-9 rounded-full px-2.5 text-[11.5px] text-[#dfe4ff]/55 underline-offset-2 hover:underline disabled:opacity-40" data-testid="bluena-view-remove">
+              消す
             </button>
           )}
         </footer>

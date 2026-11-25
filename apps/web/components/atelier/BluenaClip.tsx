@@ -1,6 +1,6 @@
 'use client';
 
-import { CLIP_WORD, MEDIA_POLICY, type ClipFile, type ClipKind } from '@obolo/shared';
+import { CLIP_WORD, STORAGE_LINES, MEDIA_POLICY, type ClipFile, type ClipKind } from '@obolo/shared';
 import { useEffect, useRef, useState } from 'react';
 import { getApi } from '@/lib/api';
 import { usePartner } from '@/lib/partner';
@@ -201,7 +201,7 @@ export function BluenaClip({ mode, onSent, onLine }: { mode: ClipMode; onSent?: 
           state: 'bad',
           note:
             e?.code === 'STORAGE_QUOTA'
-              ? 'ブルーナが、いっぱいみたい'
+              ? STORAGE_LINES.full
               : e?.code === 'RATE_LIMITED'
                 ? 'すこし、まってからね'
                 : e?.code === 'TOO_LARGE'

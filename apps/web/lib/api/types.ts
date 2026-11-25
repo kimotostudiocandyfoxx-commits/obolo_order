@@ -453,6 +453,16 @@ export interface Api {
   setMarkNames(body: MarkNamesBody): Promise<MarkNames>;
   /** M-R237: Bluena's works across the planets (newest first), filtered by planet / ★ / mark / words */
   findWorks(f: FindWorksQuery): Promise<FoundWork[]>;
+  /** R18: Bluena's room (the calm bar), 保存の魔法's tiers and plan, a notice for {bati} to say once */
+  storage(): Promise<import('@obolo/shared').StorageView>;
+  /** R18: the yes to a 保存の魔法 tier at the price {bati} said (a full month now) */
+  expandStorage(gb: number, confirm: { id: string; price: number }): Promise<import('@obolo/shared').StorageExpandResult>;
+  /** R18: 「保存の魔法をやめて」 (ends at the month's end) */
+  cancelStorage(): Promise<{ cancelled: boolean; view: import('@obolo/shared').StorageView }>;
+  /** R18: {bati} said the notice */
+  storageTold(what: import('@obolo/shared').StorageSay): Promise<void>;
+  /** R18: Bluena's 〔消す〕 — the work, its tries and its files */
+  removeWork(kind: string, id: string): Promise<import('@obolo/shared').RemoveWorkResult>;
   /** M-R237: a thread's past talk as days (newest first), filtered by ★ / mark / words */
   findTalkDays(f: FindTalksQuery): Promise<TalkDayView[]>;
   /** M-R213: 〔見えなくする〕 a stranger's planet work, for you only (kept on the server) */

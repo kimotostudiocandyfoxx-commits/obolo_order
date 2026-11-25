@@ -31,6 +31,8 @@ export const MANA_REASONS = [
   'refund',
   // client 2026-11-25: the small costs of the free features (chat, voice, spells…), taken a whole mana at a time
   'usage',
+  // R18: 保存の魔法 — a month of Bluena's extra room (bought, then at the start of each month)
+  'storage',
 ] as const;
 export type ManaReason = (typeof MANA_REASONS)[number];
 

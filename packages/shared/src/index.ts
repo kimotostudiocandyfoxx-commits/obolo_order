@@ -49,3 +49,5 @@ export * from './videoVariants';
 export * from './songEngine';
 export * from './gameTemplates';
 export * from './access';
+export * from './storage';
+export * from './storageVariants';

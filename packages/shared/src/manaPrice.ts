@@ -193,8 +193,38 @@ export interface CostRates {
   gpuSecondJpy: number;
   /** our Cloud Run CPU (the API / renders) per second in yen (CPU_SECOND_JPY) */
   cpuSecondJpy: number;
+  /** R18: storage per GB-month in USD (STORAGE_GB_MONTH_USD; Cloudflare R2 $0.015) — the default when not given */
+  storageGbMonthUsd?: number;
+  /** R18: the months of storage a making's price includes (STORAGE_PRICE_MONTHS; 12) — the default when not given */
+  storageMonths?: number;
 }
 export const DEFAULT_COST_RATES: CostRates = { usdJpy: DEFAULT_USD_JPY, gpuSecondJpy: 0.05, cpuSecondJpy: 0.01 };
+
+// ───────────────────────────── R18: storage (Cloudflare R2) ─────────────────────────────
+
+/** one GB as the quota counts it (GiB) */
+export const GIB = 1024 ** 3;
+/** one MB (MiB) */
+export const MIB = 1024 ** 2;
+/** Cloudflare R2 Standard storage per GB-month (R2's pricing page; egress free) — STORAGE_GB_MONTH_USD overrides it */
+export const DEFAULT_STORAGE_GB_MONTH_USD = 0.015;
+/** R18: a making's price includes this many months of storing what it made (STORAGE_PRICE_MONTHS) */
+export const DEFAULT_STORAGE_PRICE_MONTHS = 12;
+
+/** what storing `bytes` for `months` months costs (USD) at `gbMonthUsd` per GB-month */
+export function storedUsd(bytes: number, months: number = DEFAULT_STORAGE_PRICE_MONTHS, gbMonthUsd: number = DEFAULT_STORAGE_GB_MONTH_USD): number {
+  if (!(bytes > 0) || !(months > 0)) return 0;
+  return (bytes / GIB) * months * Math.max(0, gbMonthUsd);
+}
+
+/**
+ * R18 (client 2026-11-25): the bytes one making leaves in the member's Bluena (p90): pictures as stored (PNG cut-outs ≈
+ * 1.5 MB), a song's delivered mix + the original + the stems a change splits (≈ 1 MB a minute each), a video's MP4
+ * (720p ≈ 1.5 Mbps × 60 s ≈ 11 MB) + its poster and scenes; text (a book's chapter, a game's code) is small.
+ */
+export const PICTURE_STORED_BYTES = 1.5 * MIB;
+export const SONG_STORED_BYTES = 6 * MIB;
+export const VIDEO_STORED_BYTES = 11.5 * MIB;
 
 const byPrefix = <T>(table: Record<string, T>, model: string, unknown: T): T => {
   const m = model.replace(/^models\//, '').toLowerCase();
@@ -280,6 +310,8 @@ export interface CostEstimate {
   cpuSeconds?: number;
   /** where the number comes from (docs/マナの値段.md) */
   note: string;
+  /** R18: the bytes it stores for the member (its price includes STORAGE_PRICE_MONTHS of storing them) */
+  storedBytes?: number;
 }
 
 /**
@@ -353,24 +385,24 @@ export function makeCostEstimates(s: MakeSetup = DEFAULT_MAKE_SETUP): Record<Mak
   const pics = (model: string, count: number, refs: boolean) => n(count) * pictureUsd(model, refs);
   const lookUsd = Math.max(pics(s.lookModel, s.paidLookCandidates, true), pics(s.batiModel, s.paidLookCandidates, true));
   return {
-    look: { usd: lookUsd + WORDS_USD, note: `姿 ${s.lookModel}・着せ替え ${s.batiModel} ×${n(s.paidLookCandidates)} 枚（参照画像つき）＋言葉の確認` },
-    kororinDesign: { usd: pics(s.kororinModel, s.kororinCandidates, true) + WORDS_USD, cpuSeconds: 10, note: `${s.kororinModel} ×${n(s.kororinCandidates)} 枚（見本の絵つき）＋切り抜き CPU` },
-    jacketArt: { usd: pics(s.artModel, 1, false) + WORDS_USD, note: `${s.artModel} ×1 枚＋言葉の確認` },
+    look: { usd: lookUsd + WORDS_USD, note: `姿 ${s.lookModel}・着せ替え ${s.batiModel} ×${n(s.paidLookCandidates)} 枚（参照画像つき）＋言葉の確認＋保存12か月`, storedBytes: n(s.paidLookCandidates) * PICTURE_STORED_BYTES },
+    kororinDesign: { usd: pics(s.kororinModel, s.kororinCandidates, true) + WORDS_USD, cpuSeconds: 10, note: `${s.kororinModel} ×${n(s.kororinCandidates)} 枚（見本の絵つき）＋切り抜き CPU＋保存12か月`, storedBytes: n(s.kororinCandidates) * PICTURE_STORED_BYTES },
+    jacketArt: { usd: pics(s.artModel, 1, false) + WORDS_USD, note: `${s.artModel} ×1 枚＋言葉の確認＋保存12か月`, storedBytes: PICTURE_STORED_BYTES },
     // R17: sung on Runware (aceStepUsd for the seconds it is sung: 60 s delivered, 1.2× longer sung) + the 1.2× stretch
     // CPU + the song's design (Flash-Lite). The lyrics are written before the yes (their own small cost, 'lyrics'); our GPU
     // splits only for a change that needs it — that change's own small cost (songEdit), not the song's
-    song: { usd: aceStepUsd(SONG_QUOTE_SECONDS * SONG_QUOTE_TEMPO) + textUsd('gemini-flash-lite-latest', { in: 3_000, out: 1_500 }) + WORDS_USD, cpuSeconds: SONG_QUOTE_CPU_SECONDS, note: 'Runware ACE-Step 1.5 XL SFT（60秒の曲を1.2倍の72秒ぶん歌う、長さに比例）＋1.2倍速の処理 CPU＋曲の設計 Gemini Flash-Lite' },
-    songPremium: { usd: RUNWARE_PRICES['minimax:music@2.6'] + 0.004, cpuSeconds: SONG_QUOTE_CPU_SECONDS, note: 'MiniMax Music 2.6 ×1 曲（$0.15）＋1.2倍速の処理 CPU＋設計・歌詞' },
-    songVoice: { usd: 0, gpuSeconds: SONG_VOICE_GPU_SEED.cold + SONG_VOICE_GPU_SEED.split + SONG_VOICE_GPU_SEED.convert, cpuSeconds: SONG_VOICE_CPU_SECONDS, note: '君の声にする魔法：自社 GPU（起動＋分離＋Seed-VC）p90 160秒。分離ずみの曲は変換だけ（songVoiceQuote）' },
-    mv: { usd: 12 * RUNWARE_PRICES['runware:400@4'] + 0.006, cpuSeconds: 240, note: 'FLUX.2 klein 4B ×12 場面＋演出 Gemini＋描画 CPU p90 240秒' },
-    story: { usd: textUsd('gemini-flash-lite-latest', { in: 2_500, out: 1_700 }) + WORDS_USD, note: 'お話 Gemini Flash-Lite（入力 約2,500・出力 約1,700トークン）＋言葉の確認' },
-    gameTrial: { usd: textUsd(s.gameTrialModel, GAME_TOKENS.trial) + WORDS_USD, note: `型のゲーム ${short(s.gameTrialModel)}（型の値だけ：入力 約3千・出力 約1,500トークン）` },
-    game: { usd: textUsd(s.gameCheapModel, GAME_TOKENS.cheap) + WORDS_USD, note: `ゲーム ${short(s.gameCheapModel)}（入力 約1.2万・出力＋思考 約1.6万トークン）` },
-    gamePro: { usd: textUsd(s.gameFullModel, GAME_TOKENS.full) + WORDS_USD, note: `大きなゲーム ${short(s.gameFullModel)}（入力 約1.5万・出力＋思考 約3万トークン）` },
-    gameTweak: { usd: textUsd(s.gameCheapModel, GAME_TOKENS.cheapTweak) + WORDS_USD, note: `ゲームの直し ${short(s.gameCheapModel)}（今のコード＋直し）` },
-    gameTweakPro: { usd: textUsd(s.gameFullModel, GAME_TOKENS.fullTweak) + WORDS_USD, note: `ゲームの直し・強い魔法 ${short(s.gameFullModel)}（ふつうの直しが2回とも通らなかった時）` },
-    mvPictures: { usd: 0.002, cpuSeconds: 180, note: '動き選び Gemini＋描画 CPU p90 180秒' },
-    mvRedraw: { usd: 4 * RUNWARE_PRICES['runware:400@4'] + 0.002, cpuSeconds: 180, note: 'FLUX.2 klein 4B ×最大4 場面＋描画 CPU' },
+    song: { usd: aceStepUsd(SONG_QUOTE_SECONDS * SONG_QUOTE_TEMPO) + textUsd('gemini-flash-lite-latest', { in: 3_000, out: 1_500 }) + WORDS_USD, cpuSeconds: SONG_QUOTE_CPU_SECONDS, note: 'Runware ACE-Step 1.5 XL SFT（60秒の曲を1.2倍の72秒ぶん歌う、長さに比例）＋1.2倍速の処理 CPU＋曲の設計 Gemini Flash-Lite＋保存12か月（mp3・元の曲・分けた音 約6MB）', storedBytes: SONG_STORED_BYTES },
+    songPremium: { usd: RUNWARE_PRICES['minimax:music@2.6'] + 0.004, cpuSeconds: SONG_QUOTE_CPU_SECONDS, note: 'MiniMax Music 2.6 ×1 曲（$0.15）＋1.2倍速の処理 CPU＋設計・歌詞＋保存12か月', storedBytes: SONG_STORED_BYTES },
+    songVoice: { usd: 0, gpuSeconds: SONG_VOICE_GPU_SEED.cold + SONG_VOICE_GPU_SEED.split + SONG_VOICE_GPU_SEED.convert, cpuSeconds: SONG_VOICE_CPU_SECONDS, note: '君の声にする魔法：自社 GPU（起動＋分離＋Seed-VC）p90 160秒。分離ずみの曲は変換だけ（songVoiceQuote）＋保存12か月（君の声の歌と曲 約4MB）', storedBytes: 4 * MIB },
+    mv: { usd: 12 * RUNWARE_PRICES['runware:400@4'] + 0.006, cpuSeconds: 240, note: 'FLUX.2 klein 4B ×12 場面＋演出 Gemini＋描画 CPU p90 240秒＋保存12か月（MP4・場面の絵 約13MB）', storedBytes: VIDEO_STORED_BYTES + 12 * 0.125 * MIB },
+    story: { usd: textUsd('gemini-flash-lite-latest', { in: 2_500, out: 1_700 }) + WORDS_USD, note: 'お話 Gemini Flash-Lite（入力 約2,500・出力 約1,700トークン）＋言葉の確認', storedBytes: 16 * 1024 },
+    gameTrial: { usd: textUsd(s.gameTrialModel, GAME_TOKENS.trial) + WORDS_USD, note: `型のゲーム ${short(s.gameTrialModel)}（型の値だけ：入力 約3千・出力 約1,500トークン）`, storedBytes: 64 * 1024 },
+    game: { usd: textUsd(s.gameCheapModel, GAME_TOKENS.cheap) + WORDS_USD, note: `ゲーム ${short(s.gameCheapModel)}（入力 約1.2万・出力＋思考 約1.6万トークン）`, storedBytes: 128 * 1024 },
+    gamePro: { usd: textUsd(s.gameFullModel, GAME_TOKENS.full) + WORDS_USD, note: `大きなゲーム ${short(s.gameFullModel)}（入力 約1.5万・出力＋思考 約3万トークン）`, storedBytes: 256 * 1024 },
+    gameTweak: { usd: textUsd(s.gameCheapModel, GAME_TOKENS.cheapTweak) + WORDS_USD, note: `ゲームの直し ${short(s.gameCheapModel)}（今のコード＋直し）`, storedBytes: 128 * 1024 },
+    gameTweakPro: { usd: textUsd(s.gameFullModel, GAME_TOKENS.fullTweak) + WORDS_USD, note: `ゲームの直し・強い魔法 ${short(s.gameFullModel)}（ふつうの直しが2回とも通らなかった時）`, storedBytes: 256 * 1024 },
+    mvPictures: { usd: 0.002, cpuSeconds: 180, note: '動き選び Gemini＋描画 CPU p90 180秒＋保存12か月（MP4 約11MB）', storedBytes: VIDEO_STORED_BYTES },
+    mvRedraw: { usd: 4 * RUNWARE_PRICES['runware:400@4'] + 0.002, cpuSeconds: 180, note: 'FLUX.2 klein 4B ×最大4 場面＋描画 CPU＋保存12か月（新しい MP4・場面）', storedBytes: VIDEO_STORED_BYTES + 4 * 0.125 * MIB },
   };
 }
 
@@ -379,7 +411,13 @@ export const MAKE_COST_ESTIMATE: Record<MakeKind, CostEstimate> = makeCostEstima
 
 /** the yen an estimate comes to at these rates */
 export function estimateJpy(e: CostEstimate, rates: CostRates = DEFAULT_COST_RATES): number {
-  return e.usd * rates.usdJpy + (e.gpuSeconds ?? 0) * rates.gpuSecondJpy + (e.cpuSeconds ?? 0) * rates.cpuSecondJpy;
+  const stored = storedUsd(e.storedBytes ?? 0, rates.storageMonths ?? DEFAULT_STORAGE_PRICE_MONTHS, rates.storageGbMonthUsd ?? DEFAULT_STORAGE_GB_MONTH_USD);
+  return (e.usd + stored) * rates.usdJpy + (e.gpuSeconds ?? 0) * rates.gpuSecondJpy + (e.cpuSeconds ?? 0) * rates.cpuSecondJpy;
+}
+
+/** R18: the yen of an estimate that is storage (bytes × months × the GB-month price) */
+export function storageJpyOf(e: CostEstimate, rates: CostRates = DEFAULT_COST_RATES): number {
+  return storedUsd(e.storedBytes ?? 0, rates.storageMonths ?? DEFAULT_STORAGE_PRICE_MONTHS, rates.storageGbMonthUsd ?? DEFAULT_STORAGE_GB_MONTH_USD) * rates.usdJpy;
 }
 
 /**

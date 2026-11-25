@@ -90,6 +90,10 @@ import { AccessService, SpendGate } from './wallet/access.service';
 import { ManaPricesController } from './wallet/mana-prices.controller';
 import { WalletController } from './wallet/wallet.controller';
 
+import { StorageController } from './storage/storage.controller';
+import { StorageGate, StorageService } from './storage/storage.service';
+import { StorageWorksService } from './storage/storage-works.service';
+
 /** One module for the demo; split per planet (spec §4.3) as the surface grows. */
 @Module({
   imports: [InfraModule],
@@ -137,6 +141,7 @@ import { WalletController } from './wallet/wallet.controller';
     CraftController,
     LinksController,
     ManaPricesController,
+    StorageController,
   ],
   providers: [
     AuthGuard,
@@ -149,6 +154,10 @@ import { WalletController } from './wallet/wallet.controller';
     AccessService,
     // R18: the making-side requests of a non-member at 0 mana stop (after the guards: the member is known)
     { provide: APP_INTERCEPTOR, useClass: SpendGate },
+    // R18: Bluena's room (保存の魔法); a full Bluena stops the making-side writes
+    StorageService,
+    StorageWorksService,
+    { provide: APP_INTERCEPTOR, useClass: StorageGate },
     BuddyService,
     PictureService,
     CompassService,

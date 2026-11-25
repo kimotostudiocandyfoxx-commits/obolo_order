@@ -810,6 +810,21 @@ export class HttpApi implements Api {
   findWorks(f: Parameters<Api['findWorks']>[0]) {
     return this.req<Awaited<ReturnType<Api['findWorks']>>>('GET', `/finds/works${findQs(f)}`);
   }
+  storage() {
+    return this.req<Awaited<ReturnType<Api['storage']>>>('GET', '/storage');
+  }
+  expandStorage(gb: number, confirm: { id: string; price: number }) {
+    return this.req<Awaited<ReturnType<Api['expandStorage']>>>('POST', '/storage/expand', { gb, confirm });
+  }
+  cancelStorage() {
+    return this.req<Awaited<ReturnType<Api['cancelStorage']>>>('POST', '/storage/cancel', {});
+  }
+  async storageTold(what: Parameters<Api['storageTold']>[0]) {
+    await this.req('POST', '/storage/told', { what });
+  }
+  removeWork(kind: string, id: string) {
+    return this.req<Awaited<ReturnType<Api['removeWork']>>>('DELETE', `/storage/works/${encodeURIComponent(kind)}/${encodeURIComponent(id)}`);
+  }
   findTalkDays(f: Parameters<Api['findTalkDays']>[0]) {
     return this.req<Awaited<ReturnType<Api['findTalkDays']>>>('GET', `/finds/talks${findQs(f)}`);
   }

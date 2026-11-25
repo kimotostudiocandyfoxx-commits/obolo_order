@@ -387,7 +387,7 @@ function MarsFolder({ empty }: { empty: string }) {
               公開する
             </button>
           )}
-          <Remove onRemove={() => getApi().removeMarsVideo(v.id).then(reload)} />
+          <Remove onRemove={() => getApi().removeWork('mars_backstage', v.id).then(reload)} />
         </Row>
       ))}
       {toast.node}
@@ -412,7 +412,7 @@ function JupiterFolder({ empty }: { empty: string }) {
             <Link href="/jupiter" className="rounded-full bg-emerald-300 px-2 py-0.5 text-[10px] font-bold text-slate-950">
               公開する
             </Link>
-            <Remove small onRemove={() => getApi().removeJupiterRoot(r.id).then(reload)} />
+            <Remove small onRemove={() => getApi().removeWork('jupiter_root', r.id).then(reload)} />
           </div>
         </div>
       ))}
@@ -457,7 +457,7 @@ function VenusFolder({ empty }: { empty: string }) {
           >
             {s.status === 'public' ? 'もどす' : '公開する'}
           </button>
-          <Remove onRemove={() => getApi().removeRadioShow(s.id).then(reload)} />
+          <Remove onRemove={() => getApi().removeWork('radio_show', s.id).then(reload)} />
         </Row>
       ))}
       {toast.node}
@@ -504,7 +504,7 @@ function SaturnFolder({ empty }: { empty: string }) {
               公開する
             </button>
           )}
-          <Remove onRemove={() => getApi().deleteSaturnPost(p.id).then(reload)} />
+          <Remove onRemove={() => getApi().removeWork('saturn_post', p.id).then(reload)} />
         </Row>
       ))}
       {toast.node}

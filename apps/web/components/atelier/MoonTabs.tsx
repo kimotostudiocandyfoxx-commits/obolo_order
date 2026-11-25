@@ -17,6 +17,7 @@ import { markOf } from '@/lib/finds/marks';
 import { useClips } from '@/lib/clip/useClip';
 import { DeviceButton } from './DeviceButton';
 import { BluenaClip, ClipRows } from './BluenaClip';
+import { StorageBar, STORAGE_EVENT } from '@/components/bluena/StorageBar';
 import { DachiHistory } from './DachiHistory';
 import type { Work } from './work';
 import { KindMark } from './WorkCard';
@@ -226,11 +227,16 @@ export function BluenaDevice({ onClose, onSend, sendTo, onView }: { onClose: () 
   const marks = useMarks();
   useEffect(() => {
     let live = true;
-    void findAll({})
-      .then((x) => live && setFound(x))
-      .catch(() => live && setFound([]));
+    const load = () =>
+      void findAll({})
+        .then((x) => live && setFound(x))
+        .catch(() => live && setFound([]));
+    load();
+    // R18: a work thrown away from its viewer (〔消す〕) leaves the list
+    window.addEventListener(STORAGE_EVENT, load);
     return () => {
       live = false;
+      window.removeEventListener(STORAGE_EVENT, load);
     };
   }, []);
   // the ★ shown now (a star given here counts at once)
@@ -263,6 +269,8 @@ export function BluenaDevice({ onClose, onSend, sendTo, onView }: { onClose: () 
             ✕
           </button>
         </header>
+        {/* R18: the room, calm and small (「ブルーナ：2.1GB / 5GB」) */}
+        <StorageBar className="-mt-1.5 mb-1.5 px-4" />
         {/* the search box, ★, 〔姿とバティ〕 */}
         <div className="pointer-events-auto flex items-center gap-1.5 px-4">
           <label className="flex h-9 min-w-0 flex-1 items-center gap-1.5 rounded-full border border-[rgba(210,220,255,.3)] bg-[rgba(16,22,64,.6)] px-3 backdrop-blur">

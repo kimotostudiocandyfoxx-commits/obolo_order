@@ -1,4 +1,4 @@
-import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
+import { forwardRef, HttpStatus, Inject, Injectable, Logger, Optional } from '@nestjs/common';
 import { deleteObject, mediaKey, MediaKind, putObject } from '@obolo/media';
 import { MEDIA_POLICY, VOICE_MAX_BYTES, VOICE_MIME_TYPES } from '@obolo/shared';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
@@ -13,8 +13,12 @@ import { clipView } from './clip-view';
 import type { ClipFile } from '@obolo/shared';
 import { probe, squareVideo, transcodePhoto, transcodeVideo, videoPoster } from './transcode';
 import { writeFile } from 'node:fs/promises';
+import { StorageService } from '../storage/storage.service';
 
-/** Spec §5: default per-user storage quota 1 GB across all planets. */
+/**
+ * Spec §5: the quota without the storage service (scripts, tests): 1 GB. R18: the real room is StorageService's —
+ * STORAGE_MEMBER_GB (5) for a member, STORAGE_FREE_GB (1) for everyone else, + 保存の魔法; every stored file counts.
+ */
 export const STORAGE_QUOTA_BYTES = 1024 * 1024 * 1024;
 
 @Injectable()
@@ -23,6 +27,7 @@ export class MediaService {
   constructor(
     @Inject(CONFIG) private readonly cfg: AppConfig,
     private readonly db: Database,
+    @Optional() @Inject(forwardRef(() => StorageService)) private readonly storage?: StorageService,
   ) {}
 
   private get bunny() {
@@ -109,10 +114,12 @@ export class MediaService {
   }
 
   private async store(userId: string, kind: MediaKind, mime: string, data: Buffer, requestOrigin: string, opts: { meta?: Record<string, unknown>; id?: string } = {}) {
-    const [u] = await this.db.write.select({ used: users.storageUsageBytes }).from(users).where(eq(users.id, userId));
-    if ((u?.used ?? 0) + data.length > STORAGE_QUOTA_BYTES) {
-      // Spec §5: reject with a storage add-on offer (add-on purchase = phase 1 billing, P-BILL-1).
-      throw apiError(HttpStatus.PAYLOAD_TOO_LARGE, 'STORAGE_QUOTA', 'Storage quota exceeded');
+    if (this.storage) {
+      // R18: every file the member owns counts (uploads, works, versions, stems …); over the room nothing new is stored
+      await this.storage.assertRoom(userId, data.length);
+    } else {
+      const [u] = await this.db.write.select({ used: users.storageUsageBytes }).from(users).where(eq(users.id, userId));
+      if ((u?.used ?? 0) + data.length > STORAGE_QUOTA_BYTES) throw apiError(HttpStatus.PAYLOAD_TOO_LARGE, 'STORAGE_QUOTA', 'Storage quota exceeded');
     }
     const id = opts.id ?? crypto.randomUUID();
     const key = mediaKey(kind, userId, mime, id);

@@ -157,6 +157,7 @@ const en: Messages = {
       'usage:video': 'Mana used (videos)',
       'usage:game': 'Mana used (games)',
       'usage:story': 'Mana used (stories)',
+      storage: 'Storage spell',
       refund: 'Refund',
     },
   },

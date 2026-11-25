@@ -9,6 +9,7 @@ import { manaLedger, usageAccruals, users, wallets } from '../db/schema';
 import { costScope } from './cost-scope';
 import { GENESIS, manaRowHash } from './mana-chain';
 import { livePrice } from './price-book';
+import { checkRoom } from '../storage/storage-gate';
 
 export type Tx = Parameters<Parameters<Db['transaction']>[0]>[0];
 
@@ -179,6 +180,8 @@ export class LedgerService {
   async charge(db: Database, userId: string, kind: MakeKind, refId?: string, opts: { confirm?: MakeConfirm; required?: boolean; /** spellKey of the spell the request carries */ spell?: string | null; /** R18: a making quoted per work (the voice spell: its GPU seconds) — the server's own quote, never the client's */ price?: number } = {}): Promise<{ refund: () => Promise<void>; repeat: boolean }> {
     // client 2026-11-25: the live price (manaFor of the making's estimated cost at this month's FX) — the same list the
     // confirm card showed; a yes to another price is refused (PRICE_CHANGED), never charged at a new one
+    // R18: a full Bluena stops the making before anything is charged (STORAGE_QUOTA; the room is checked again per file)
+    await checkRoom(userId);
     const price = opts.price ?? (await this.priceOf(kind));
     const key = opts.confirm ? confirmKey(userId, kind, opts.confirm) : `make:${kind}:${userId}:${randomUUID()}`;
     let repeat = false;

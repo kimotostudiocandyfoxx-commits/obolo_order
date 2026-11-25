@@ -101,6 +101,20 @@ import {
   type SpellTag,
   type SpellKind,
   decideCharge,
+  baseQuotaBytes,
+  fxMonth,
+  GIB,
+  MIB,
+  manaTenths,
+  PICTURE_STORED_BYTES,
+  quotaBytes,
+  SONG_STORED_BYTES,
+  storageBuyKey,
+  storageLevel,
+  tierPrices,
+  VIDEO_STORED_BYTES,
+  type StorageSay,
+  type StorageView,
   type MakeConfirm,
   BATI_FACES,
   BATI_MAGIC_PER_DAY,
@@ -280,6 +294,8 @@ interface DemoState {
   songVoices?: Record<string, { using: SongVoiceVersion }>;
   /** client 2026-11-25: the demo's books and games (canned chapters / the canned game, no model) */
   books?: (BookView & { owner: string })[];
+  /** R18: the demo's 保存の魔法 (a tier, the month paid, 「やめて」) and the notices said */
+  storagePlans?: Record<string, { gb: number | null; paidMonth: string | null; cancelled: boolean; told?: { near?: boolean } }>;
   games?: (GameView & { owner: string; versions: { tags: SpellTag[]; code: string; title: string; howTo: string }[]; /** R17: each version's making and price */ kinds?: MakeKind[]; prices?: number[] })[];
   /** chapters written per member and day */
   chapterDays?: Record<string, number>;
@@ -460,6 +476,72 @@ export class DemoApi implements Api {
         return m ? { ...x, atelierId: m.id, versionCount: m.versions.length, origin: m.origin } : x;
       })
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  }
+  /** R18: the demo's room — the works it keeps, sized as the price table sizes them (the review has no real files) */
+  async storage(): Promise<StorageView> {
+    const me = this.uid();
+    const works = await this.findWorks({});
+    const size: Record<string, number> = { song: SONG_STORED_BYTES, saturn_post: 0.3 * MIB, jupiter_root: PICTURE_STORED_BYTES, mars_backstage: VIDEO_STORED_BYTES, radio_show: 8 * MIB, book: 32 * 1024, game: 128 * 1024 };
+    const used = works.reduce((n, w) => n + (size[w.kind] ?? 0), 0);
+    const member = isActiveMember(this.s.users[me]);
+    const p = this.s.storagePlans?.[me];
+    const month = fxMonth();
+    const extra = p?.gb && p.paidMonth && p.paidMonth >= month ? p.gb : 0;
+    const quota = quotaBytes(member, extra);
+    const level = storageLevel(used, quota);
+    return { usedBytes: used, quotaBytes: quota, baseGb: baseQuotaBytes(member) / GIB, extraGb: extra, member, level, plan: p?.gb ? { gb: p.gb, cancelled: p.cancelled, paidMonth: p.paidMonth, graceUntil: null } : null, tiers: tierPrices(), say: level === 'near' && !p?.told?.near ? 'near' : null };
+  }
+  async expandStorage(gb: number, confirm: { id: string; price: number }) {
+    const me = this.uid();
+    const price = tierPrices().find((t) => t.gb === gb)?.mana;
+    if (price == null) throw new ApiError(400, 'VALIDATION', 'No such tier');
+    if (manaTenths(confirm.price) !== manaTenths(price)) throw new ApiError(409, 'PRICE_CHANGED', CHARGE_ERROR_WORDS.PRICE_CHANGED);
+    const plans = (this.s.storagePlans ??= {});
+    const p = plans[me];
+    const month = fxMonth();
+    if (p?.gb === gb && p.paidMonth === month) {
+      p.cancelled = false;
+      this.save();
+      return { status: 'already' as const, view: await this.storage() };
+    }
+    const key = storageBuyKey(me, confirm.id);
+    if (!(key in (this.s.paidYes ?? {}))) {
+      const w = this.s.wallets[me];
+      if ((w?.mana ?? 0) < price) throw new ApiError(402, 'NO_MANA', CHARGE_ERROR_WORDS.NO_MANA);
+      const part = splitMana(price);
+      w.mana -= part.whole;
+      if (part.whole) w.entries.push({ id: uid(), delta: -part.whole, reason: 'storage', createdAt: now() });
+      w.tenths = (w.tenths ?? 0) + part.tenths;
+      this.s.paidYes = { ...(this.s.paidYes ?? {}), [key]: '' };
+      plans[me] = { gb, paidMonth: month, cancelled: false, told: p?.told };
+    }
+    this.save();
+    return { status: 'charged' as const, view: await this.storage() };
+  }
+  async cancelStorage() {
+    const p = this.s.storagePlans?.[this.uid()];
+    if (p?.gb) {
+      p.cancelled = true;
+      this.save();
+    }
+    return { cancelled: !!p?.gb, view: await this.storage() };
+  }
+  async storageTold(what: StorageSay) {
+    const me = this.uid();
+    const plans = (this.s.storagePlans ??= {});
+    if (what === 'near') plans[me] = { ...(plans[me] ?? { gb: null, paidMonth: null, cancelled: false }), told: { near: true } };
+    this.save();
+  }
+  async removeWork(kind: string, id: string) {
+    const me = this.uid();
+    if (kind === 'saturn_post') await this.deleteSaturnPost(id);
+    else if (kind === 'jupiter_root') await this.removeJupiterRoot(id);
+    else if (kind === 'mars_backstage') await this.removeMarsVideo(id);
+    else if (kind === 'radio_show') await this.removeRadioShow(id);
+    else if (kind === 'book') this.s.books = (this.s.books ?? []).filter((b) => !(b.id === id && b.owner === me));
+    else if (kind === 'game') this.s.games = (this.s.games ?? []).filter((g) => !(g.id === id && g.owner === me));
+    this.save();
+    return { removed: 1, freedBytes: 0, view: await this.storage() };
   }
   async findTalkDays(f: Parameters<Api['findTalkDays']>[0]) {
     const me = this.uid();

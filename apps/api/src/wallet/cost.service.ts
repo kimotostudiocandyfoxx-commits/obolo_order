@@ -176,7 +176,7 @@ export class CostService implements OnModuleInit, OnModuleDestroy {
   }
 
   async rates(): Promise<CostRates> {
-    return { usdJpy: (await this.fx()).usdJpy, gpuSecondJpy: this.cfg.GPU_SECOND_JPY, cpuSecondJpy: this.cfg.CPU_SECOND_JPY };
+    return { usdJpy: (await this.fx()).usdJpy, gpuSecondJpy: this.cfg.GPU_SECOND_JPY, cpuSecondJpy: this.cfg.CPU_SECOND_JPY, storageGbMonthUsd: this.cfg.STORAGE_GB_MONTH_USD, storageMonths: this.cfg.STORAGE_PRICE_MONTHS };
   }
 
   /** the live mana of every making (what the confirm card shows and what is charged) */

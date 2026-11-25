@@ -256,6 +256,18 @@ const Env = z.object({
   /** our Cloud Run GPU (L4 + its CPU / memory) and CPU (the API, renders) per second, in yen */
   GPU_SECOND_JPY: z.coerce.number().min(0).default(0.05),
   CPU_SECOND_JPY: z.coerce.number().min(0).default(0.01),
+  /**
+   * R18 (docs/マナの値段.md 13.): Bluena's room — included for a member / everyone else (GB), the storage price (Cloudflare
+   * R2, USD per GB-month; egress free), the R2 operations a 保存の魔法 tier's price allows per GB a month, the grace when the
+   * renewal finds too little mana, and the months of storage a making's price includes
+   */
+  STORAGE_MEMBER_GB: z.coerce.number().min(0).default(5),
+  STORAGE_FREE_GB: z.coerce.number().min(0).default(1),
+  STORAGE_GB_MONTH_USD: z.coerce.number().min(0).default(0.015),
+  STORAGE_CLASS_A_PER_GB: z.coerce.number().min(0).default(100),
+  STORAGE_CLASS_B_PER_GB: z.coerce.number().min(0).default(1000),
+  STORAGE_GRACE_DAYS: z.coerce.number().min(0).default(7),
+  STORAGE_PRICE_MONTHS: z.coerce.number().min(0).default(12),
   /** a making's price follows its recorded costs (p90) once this many makings were recorded in the last 30 days */
   COST_REFINE_MIN_SAMPLES: z.coerce.number().min(3).default(20),
   /**
