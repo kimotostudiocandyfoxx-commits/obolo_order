@@ -10965,6 +10965,244 @@
         "design/mv-art/out/home3-bg-mercury.jpg"
       ],
       "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. Vertical phone wallpaper 9:16. Ground-level view of a chill lo-fi lagoon in the afternoon: palm trees, hammocks, a calm round turquoise lagoon, soft pastel clouds. The lower two-thirds are open water, empty, for many small boats floating in front. No characters, no people, no boats, no text."
+    },
+    {
+      "id": "exp-mercury-sea",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/exp-mercury-map.jpg"
+      ],
+      "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. Vertical phone wallpaper 9:16. A high aerial drone view looking straight down at a vast sparkling turquoise and deep blue ocean, soft white cloud wisps drifting below the camera, gentle waves and light glints. Only open sea, absolutely no islands, no land, no boats, no objects, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-mercury-me",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-mercury.jpg"
+      ],
+      "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. A cosy personal home island: a cute small beach house with a wooden pier, palm trees, a hammock, sand and grass, warm and homely. Seen from high above at a gentle 3/4 aerial angle, like a game map piece. A single small island floating alone, centered, the whole island in frame with a wide margin, a thin ring of shallow turquoise water and white surf around its shore. Plain solid pure white background outside the island, no ocean filling the frame, no shadow, no text, no people.",
+      "always": false
+    },
+    {
+      "id": "isl-mercury-edm",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/exp-mercury-map.jpg"
+      ],
+      "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. An EDM festival island: glowing neon speaker towers, laser beams, a lit festival stage. Seen from high above at a gentle 3/4 aerial angle, like a game map piece. A single small island floating alone, centered, the whole island in frame with a wide margin, a thin ring of shallow turquoise water and white surf around its shore. Plain solid pure white background outside the island, no ocean filling the frame, no shadow, no text, no people.",
+      "always": false
+    },
+    {
+      "id": "isl-mercury-hiphop",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/exp-mercury-map.jpg"
+      ],
+      "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. A hip-hop kingdom island: a compact street city with graffiti walls, a basketball court and boomboxes. Seen from high above at a gentle 3/4 aerial angle, like a game map piece. A single small island floating alone, centered, the whole island in frame with a wide margin, a thin ring of shallow turquoise water and white surf around its shore. Plain solid pure white background outside the island, no ocean filling the frame, no shadow, no text, no people.",
+      "always": false
+    },
+    {
+      "id": "isl-mercury-ballad",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/exp-mercury-map.jpg"
+      ],
+      "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. A gentle ballad island: soft green hills, a white lighthouse, flowers, calm and romantic. Seen from high above at a gentle 3/4 aerial angle, like a game map piece. A single small island floating alone, centered, the whole island in frame with a wide margin, a thin ring of shallow turquoise water and white surf around its shore. Plain solid pure white background outside the island, no ocean filling the frame, no shadow, no text, no people.",
+      "always": false
+    },
+    {
+      "id": "isl-mercury-rock",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/exp-mercury-map.jpg"
+      ],
+      "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. A rock volcano island: a dramatic volcano glowing with lava, black sand, amps and stage lights. Seen from high above at a gentle 3/4 aerial angle, like a game map piece. A single small island floating alone, centered, the whole island in frame with a wide margin, a thin ring of shallow turquoise water and white surf around its shore. Plain solid pure white background outside the island, no ocean filling the frame, no shadow, no text, no people.",
+      "always": false
+    },
+    {
+      "id": "isl-mercury-chill",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/exp-mercury-map.jpg"
+      ],
+      "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. A chill lo-fi atoll: a round turquoise lagoon ring with palm trees and hammocks. Seen from high above at a gentle 3/4 aerial angle, like a game map piece. A single small island floating alone, centered, the whole island in frame with a wide margin, a thin ring of shallow turquoise water and white surf around its shore. Plain solid pure white background outside the island, no ocean filling the frame, no shadow, no text, no people.",
+      "always": false
+    },
+    {
+      "id": "isl-mercury-citypop",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/exp-mercury-map.jpg"
+      ],
+      "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. A city-pop bay island: pastel 80s seaside buildings, a highway along the shore, sunset neon signs. Seen from high above at a gentle 3/4 aerial angle, like a game map piece. A single small island floating alone, centered, the whole island in frame with a wide margin, a thin ring of shallow turquoise water and white surf around its shore. Plain solid pure white background outside the island, no ocean filling the frame, no shadow, no text, no people.",
+      "always": false
+    },
+    {
+      "id": "exp-mercury-citypop",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-mercury.jpg"
+      ],
+      "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. Vertical phone wallpaper 9:16. Ground-level view of a city-pop seaside bay at dusk: pastel 80s buildings, a seaside highway with retro cars, pink and purple sunset sky, neon signs reflecting on the water. The lower two-thirds are open water, empty, for many small boats floating in front. No characters, no people, no boats, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-mercury-anison",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/exp-mercury-map.jpg"
+      ],
+      "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. An anime-song archipelago: three small islands joined by arched bridges, a big sparkling stage and colourful banners. Seen from high above at a gentle 3/4 aerial angle, like a game map piece. A single small island floating alone, centered, the whole island in frame with a wide margin, a thin ring of shallow turquoise water and white surf around its shore. Plain solid pure white background outside the island, no ocean filling the frame, no shadow, no text, no people.",
+      "always": false
+    },
+    {
+      "id": "exp-mercury-anison",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-mercury.jpg"
+      ],
+      "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. Vertical phone wallpaper 9:16. Ground-level view of a festive anime-song island stage: a big sparkling stage, colourful banners and penlight-coloured lights over the water, cheerful. The lower two-thirds are open water, empty, for many small boats floating in front. No characters, no people, no boats, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-mercury-jazz",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/exp-mercury-map.jpg"
+      ],
+      "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. A jazz cove island: a small brick jazz bar on a cliff, warm lamps, a saxophone-shaped rock. Seen from high above at a gentle 3/4 aerial angle, like a game map piece. A single small island floating alone, centered, the whole island in frame with a wide margin, a thin ring of shallow turquoise water and white surf around its shore. Plain solid pure white background outside the island, no ocean filling the frame, no shadow, no text, no people.",
+      "always": false
+    },
+    {
+      "id": "exp-mercury-jazz",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-mercury.jpg"
+      ],
+      "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. Vertical phone wallpaper 9:16. Ground-level view of a cosy jazz cove at night: a small brick jazz bar on the shore with warm lamps, a quiet cove, starry deep blue sky. The lower two-thirds are open water, empty, for many small boats floating in front. No characters, no people, no boats, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-mercury-matsuri",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/exp-mercury-map.jpg"
+      ],
+      "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. A summer festival island: red torii gate, rows of paper lanterns, festival stalls, fireworks. Seen from high above at a gentle 3/4 aerial angle, like a game map piece. A single small island floating alone, centered, the whole island in frame with a wide margin, a thin ring of shallow turquoise water and white surf around its shore. Plain solid pure white background outside the island, no ocean filling the frame, no shadow, no text, no people.",
+      "always": false
+    },
+    {
+      "id": "exp-mercury-matsuri",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-mercury.jpg"
+      ],
+      "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. Vertical phone wallpaper 9:16. Ground-level view of a Japanese summer festival beach at night: rows of paper lanterns, festival stalls, a red torii gate, fireworks over the sea. The lower two-thirds are open water, empty, for many small boats floating in front. No characters, no people, no boats, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-mercury-rain",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/exp-mercury-map.jpg"
+      ],
+      "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. A rainy-day island: soft rain clouds above, hydrangeas, a little glass cafe, puddles. Seen from high above at a gentle 3/4 aerial angle, like a game map piece. A single small island floating alone, centered, the whole island in frame with a wide margin, a thin ring of shallow turquoise water and white surf around its shore. Plain solid pure white background outside the island, no ocean filling the frame, no shadow, no text, no people.",
+      "always": false
+    },
+    {
+      "id": "exp-mercury-rain",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-mercury.jpg"
+      ],
+      "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. Vertical phone wallpaper 9:16. Ground-level view of a gentle rainy seaside town: soft rain, hydrangeas, a small glass cafe with warm light, misty calm sea, relaxing mood. The lower two-thirds are open water, empty, for many small boats floating in front. No characters, no people, no boats, no text.",
+      "always": false
     }
   ],
   "redo": []
