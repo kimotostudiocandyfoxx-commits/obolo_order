@@ -47,7 +47,7 @@ export const findManaGem = (id: string): ManaGem | undefined => MANA_GEMS.find((
  * once and redo each once (look 3+3, kororin design 3+3, jacket art 3+3, song 2+2, MV 8+8 = 38) and a little more.
  * PLACEHOLDER (P-WALLET-2): the operator decides the number.
  */
-export const STARTER_GEM_MANA = 40;
+export const STARTER_GEM_MANA = 88;
 /**
  * What making costs: client 2026-11-25 — no fixed numbers any more. MAKE_COST (manaPrice.ts) is the fallback of the price
  * rule (manaFor: cost + Stripe's fee + 8%); the API serves and charges the live prices. Voice kororins, photo /
