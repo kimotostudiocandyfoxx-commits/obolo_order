@@ -89,6 +89,9 @@ const Env = z.object({
   /** a step of GAME_MODEL that takes longer than this gives way to the next (ms) */
   GAME_MODEL_TIMEOUT_MS: z.coerce.number().min(10_000).max(600_000).default(150_000),
   NOVEL_MODEL_TIMEOUT_MS: z.coerce.number().min(5_000).max(300_000).default(60_000),
+  /** R13: the model a song's lyrics with metatags are written with (a chain like NOVEL_MODEL; Claude later = change this) */
+  LYRICS_MODEL: z.string().default('gemini:gemini-2.5-flash,gemini:gemini-flash-latest'),
+  LYRICS_MODEL_TIMEOUT_MS: z.coerce.number().min(5_000).max(120_000).default(30_000),
 
   /** Stripe (the Eclipse day 7, ¥88/month). Without the secret key the payment runs in demo mode
    *  (no charge) — once it is set, POST /me/order is refused and only a paid Checkout counts. */

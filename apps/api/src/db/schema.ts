@@ -8,7 +8,7 @@
  * planet tables carry created_at / updated_at / deleted_at (soft delete).
  */
 import { sql } from 'drizzle-orm';
-import type { AtelierLayout, BuddySource, ChapterView, PuniLook, SpellTag, TalkBeat, TalkFace, TalkMotion, WorkMaterial, WorkOrigin, WorkVersion } from '@obolo/shared';
+import type { AtelierLayout, BuddySource, ChapterView, PuniLook, SongLyrics, SpellTag, TalkBeat, TalkFace, TalkMotion, WorkMaterial, WorkOrigin, WorkVersion } from '@obolo/shared';
 import {
   bigint,
   boolean,
@@ -998,7 +998,9 @@ export const spellBook = pgTable(
     kind: text('kind').notNull(),
     name: text('name').notNull(),
     tagsJson: jsonb('tags_json').$type<SpellTag[]>().notNull(),
-    /** spellKey(kind, tags): the same spell is not kept twice */
+    /** R13: a song spell's lyrics with metatags (null: tags only) */
+    lyricsJson: jsonb('lyrics_json').$type<SongLyrics>(),
+    /** spellKey(kind, tags) (a song with lyrics: songSpellKey): the same spell is not kept twice */
     spellKey: text('spell_key').notNull(),
     usedAt: timestamp('used_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),

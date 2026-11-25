@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, Inject, Param, ParseUUIDPipe, Post, Req, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
-import { ComposeChatBody, ComposeDesignBody, InstrumentalBody, SingBody, SongEditBody, FullSongBody, spellKey, spellPrompt } from '@obolo/shared';
+import { ComposeChatBody, ComposeDesignBody, InstrumentalBody, SingBody, SongEditBody, FullSongBody, lyricsSections, songSpellKey, spellPrompt } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
@@ -71,8 +71,10 @@ export class ComposeController {
     // a song costs mana (2): taken before the studio starts; given back if the job cannot be queued. R11: from the Moon
     // atelier only with the member's yes to the plan and its price (once per yes)
     const { confirm, spell, ...rest } = b;
-    // R11: the work is made from exactly the spell said yes to (its English)
-    const song = spell ? { ...rest, instrumentalPrompt: spellPrompt('song', spell).slice(0, 500) } : rest;
+    // R11: the work is made from exactly the spell said yes to (its English); R13: and sung from exactly the lyrics said
+    // yes to (their sections come from them, not from the request)
+    const styled = spell ? { ...rest, instrumentalPrompt: spellPrompt('song', spell).slice(0, 500) } : rest;
+    const song = b.lyrics ? { ...styled, sections: lyricsSections(b.lyrics), ...(b.lyrics.title && !b.title ? { title: b.lyrics.title } : {}) } : styled;
     return startConfirmed({
       ledger: this.ledger,
       db: this.db,
@@ -81,7 +83,7 @@ export class ComposeController {
       userId,
       kind: 'song',
       confirm,
-      spell: spell ? spellKey('song', spell) : null,
+      spell: songSpellKey(spell, b.lyrics),
       required: b.from === 'atelier',
       create: () => this.jobs.create(userId, 'song', { body: song, origin: `${req.protocol}://${req.get('host')}` }),
     });

@@ -5,7 +5,7 @@ import { Database } from '../db/db';
 import { createEmailSender } from './email';
 import { createKv, KvStore } from './kv';
 import { BullQueue, CloudTasksQueue, InlineQueue, JobQueue } from './queue';
-import { BUDDY_LLM, EMAIL, GAME_LLM, IMAGES, KV, LLM, LOOK_IMAGES, NOVEL_LLM, QUEUE } from './tokens';
+import { BUDDY_LLM, EMAIL, GAME_LLM, IMAGES, KV, LLM, LOOK_IMAGES, LYRICS_LLM, NOVEL_LLM, QUEUE } from './tokens';
 
 @Global()
 @Module({
@@ -86,6 +86,17 @@ import { BUDDY_LLM, EMAIL, GAME_LLM, IMAGES, KV, LLM, LOOK_IMAGES, NOVEL_LLM, QU
         return llm;
       },
     },
+    // R13: a song's lyrics with metatags (LYRICS_MODEL)
+    {
+      provide: LYRICS_LLM,
+      inject: [CONFIG],
+      useFactory: (c: AppConfig): LlmProvider => {
+        const log = new Logger('LLM');
+        const llm = createTaskLlm(c.LYRICS_MODEL, { geminiApiKey: c.GEMINI_API_KEY, anthropicApiKey: c.ANTHROPIC_API_KEY, openaiApiKey: c.OPENAI_API_KEY }, { timeoutMs: c.LYRICS_MODEL_TIMEOUT_MS, onError: (p, e) => log.warn(`lyrics: ${p} failed, next: ${String(e)}`) });
+        log.log(`lyrics chain: ${llm.name}`);
+        return llm;
+      },
+    },
     {
       provide: GAME_LLM,
       inject: [CONFIG],
@@ -97,7 +108,7 @@ import { BUDDY_LLM, EMAIL, GAME_LLM, IMAGES, KV, LLM, LOOK_IMAGES, NOVEL_LLM, QU
       },
     },
   ],
-  exports: [CONFIG, Database, KV, QUEUE, EMAIL, LLM, BUDDY_LLM, NOVEL_LLM, GAME_LLM, IMAGES, LOOK_IMAGES],
+  exports: [CONFIG, Database, KV, QUEUE, EMAIL, LLM, BUDDY_LLM, NOVEL_LLM, GAME_LLM, LYRICS_LLM, IMAGES, LOOK_IMAGES],
 })
 export class InfraModule implements OnApplicationShutdown {
   constructor(

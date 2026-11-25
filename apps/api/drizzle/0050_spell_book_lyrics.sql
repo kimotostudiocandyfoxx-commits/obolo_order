@@ -1,0 +1,1 @@
+ALTER TABLE "spell_book" ADD COLUMN "lyrics_json" jsonb;

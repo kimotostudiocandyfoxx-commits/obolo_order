@@ -476,6 +476,9 @@ export interface SongPhrase {
   /** where the line starts in the design (beats from the top) and how long its slot is */
   startBeat: number;
   beats: number;
+  /** R13: its block's metatag label (〔サビ〕〔2番Aメロ〕) and key (lyricBlockKeys: 'chorus#2'), for a song sung from lyrics with metatags */
+  label?: string;
+  block?: string;
 }
 
 /** How the stored parts are put together (changing these costs no AI call). */

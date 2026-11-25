@@ -1,5 +1,5 @@
 import { HttpStatus, Logger } from '@nestjs/common';
-import type { FullSongBody, InstrumentalBody } from '@obolo/shared';
+import { lyricsSheet, type FullSongBody, type InstrumentalBody } from '@obolo/shared';
 import { apiError } from '../common/errors';
 
 const log = new Logger('Music');
@@ -96,6 +96,9 @@ export async function generateSong(
       body: JSON.stringify({
         prompt: body.prompt,
         lyrics: body.sections.flatMap((s) => s.lines.map((l) => ({ section: s.name, text: l.text }))),
+        // R13: the lyrics with their metatags as ACE-Step reads them ([Pre-Chorus - building energy] …); the studio sings
+        // this sheet (a studio not yet redeployed ignores it and sings `lyrics` with its own verse / chorus tags)
+        ...(body.lyrics ? { sheet: lyricsSheet(body.lyrics) } : {}),
         seconds: Math.max(10, Math.min(180, body.seconds)),
         bpm: body.bpm,
         keyRoot: body.keyRoot,

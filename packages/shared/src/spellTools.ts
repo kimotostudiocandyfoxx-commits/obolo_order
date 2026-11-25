@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { SpellTags, spellDefaultLabels, spellFrom, type SpellKind, type SpellTag } from './spell';
+import { SongLyrics } from './lyrics';
 
 /**
  * R12 (client 2026-11-25): the two tools {bati} carries — never shown in the talk all the time; {bati} brings them out
@@ -23,7 +24,9 @@ export const SaveSpellBody = z.object({
   tags: SpellTags,
   /** none: a name from the spell's content (spellBookName) */
   name: z.string().trim().min(1).max(SPELL_NAME_MAX).optional(),
-});
+  /** R13: a song spell's second part, its lyrics with metatags (kept with the style talismans) */
+  lyrics: SongLyrics.optional(),
+}).refine((b) => !b.lyrics || b.kind === 'song', { message: 'lyrics only with a song spell' });
 export type SaveSpellBody = z.infer<typeof SaveSpellBody>;
 export const RenameSpellBody = z.object({ name: z.string().trim().min(1).max(40) });
 export type RenameSpellBody = z.infer<typeof RenameSpellBody>;
@@ -32,6 +35,8 @@ export interface SavedSpell {
   kind: SpellBookKind;
   name: string;
   tags: SpellTag[];
+  /** R13: a song spell's lyrics with metatags (none: the style talismans only — a compass reading never has lyrics) */
+  lyrics?: SongLyrics;
   createdAt: string;
   /** the last time it was brought back as the spell (none: never) */
   usedAt: string | null;

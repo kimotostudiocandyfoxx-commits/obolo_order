@@ -1,4 +1,4 @@
-import { MAKE_COST, spellFrom, spellEdit, spellKey, type JobView, type MakeConfirm } from '@obolo/shared';
+import { lyricsEdit, lyricsFallback, MAKE_COST, songSpellKey, spellFrom, spellEdit, spellKey, type JobView, type MakeConfirm } from '@obolo/shared';
 import { LedgerError } from '@obolo/ledger';
 import { HttpException } from '@nestjs/common';
 import { describe, expect, it } from 'vitest';
@@ -108,6 +108,21 @@ describe('R11: a paid making from the Moon atelier is charged only with the yes'
     expect(l.rows).toHaveLength(0);
     await startConfirmed({ ledger: l, db, ...f, userId: 'u1', kind: 'song', confirm: ok, spell: spellKey('song', tags), required: true });
     expect(l.rows).toHaveLength(1);
+  });
+  it('R13: a song’s yes covers its lyrics too — changed lyrics (even one tag) is another spell; price unchanged', async () => {
+    const l = new MemLedger();
+    const f = fakes();
+    const tags = spellFrom('song', '夏の海の明るい曲');
+    const lyrics = lyricsFallback(tags);
+    const ok = { ...yes(), spell: songSpellKey(tags, lyrics)! };
+    const other = lyricsEdit(lyrics, 'ささやきを外して')!.lyrics;
+    expect(await code(startConfirmed({ ledger: l, db, ...f, userId: 'u1', kind: 'song', confirm: ok, spell: songSpellKey(tags, other), required: true }))).toBe('409 SPELL_CHANGED');
+    expect(await code(startConfirmed({ ledger: l, db, ...f, userId: 'u1', kind: 'song', confirm: ok, spell: songSpellKey(tags, null), required: true }))).toBe('409 SPELL_CHANGED');
+    expect(l.rows).toHaveLength(0);
+    await startConfirmed({ ledger: l, db, ...f, userId: 'u1', kind: 'song', confirm: ok, spell: songSpellKey(tags, lyrics), required: true });
+    expect(l.rows).toHaveLength(1);
+    expect(l.balance).toBe(10 - MAKE_COST.song);
+    expect(MAKE_COST.song).toBe(2);
   });
   it('the planets’ own studios (not the atelier) keep charging as before', async () => {
     const l = new MemLedger();

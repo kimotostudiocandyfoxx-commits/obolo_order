@@ -1,5 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { SPELL_BOOK_MAX, spellBookName, spellKey, spellNameClean, spellNameUnique, spellNormalize, type RenameSpellBody, type SaveSpellBody, type SaveSpellResult, type SavedSpell, type SpellBookKind } from '@obolo/shared';
+import { SPELL_BOOK_MAX, songSpellKey, spellBookName, spellKey, spellNameClean, spellNameUnique, spellNormalize, type RenameSpellBody, type SaveSpellBody, type SaveSpellResult, type SavedSpell, type SpellBookKind } from '@obolo/shared';
 import { and, desc, eq } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
@@ -8,7 +8,7 @@ import { spellBook } from '../db/schema';
 type Row = typeof spellBook.$inferSelect;
 type NewRow = typeof spellBook.$inferInsert;
 
-export const view = (r: Row): SavedSpell => ({ id: r.id, kind: r.kind as SpellBookKind, name: r.name, tags: r.tagsJson, createdAt: r.createdAt.toISOString(), usedAt: r.usedAt?.toISOString() ?? null });
+export const view = (r: Row): SavedSpell => ({ id: r.id, kind: r.kind as SpellBookKind, name: r.name, tags: r.tagsJson, ...(r.lyricsJson ? { lyrics: r.lyricsJson } : {}), createdAt: r.createdAt.toISOString(), usedAt: r.usedAt?.toISOString() ?? null });
 
 /**
  * R12 (client 2026-11-25): {bati}'s スペルブック — the spells a member keeps, on the server (spell_book), only their own.
@@ -28,13 +28,15 @@ export class SpellBookService {
   async save(userId: string, b: SaveSpellBody): Promise<SaveSpellResult> {
     const tags = spellNormalize(b.kind, b.tags);
     if (!tags.length) throw apiError(HttpStatus.BAD_REQUEST, 'NO_SPELL', 'No spell to keep');
-    const key = spellKey(b.kind, tags);
+    // R13: a song spell keeps both parts (style talismans + lyrics with metatags); the same pair is kept once
+    const lyrics = b.kind === 'song' ? b.lyrics : undefined;
+    const key = lyrics ? songSpellKey(tags, lyrics)! : spellKey(b.kind, tags);
     const rows = await this.rows(userId);
     const same = rows.find((r) => r.spellKey === key);
     if (same) return { ...view(same), already: true };
     if (rows.length >= SPELL_BOOK_MAX) throw apiError(HttpStatus.CONFLICT, 'SPELL_BOOK_FULL', 'The spell book is full');
     const name = spellNameUnique(b.name ? spellNameClean(b.name) || spellBookName(b.kind, tags) : spellBookName(b.kind, tags), rows.map((r) => r.name));
-    return view(await this.insert({ userId, kind: b.kind, name, tagsJson: tags, spellKey: key }));
+    return view(await this.insert({ userId, kind: b.kind, name, tagsJson: tags, lyricsJson: lyrics ?? null, spellKey: key }));
   }
 
   async rename(userId: string, id: string, b: RenameSpellBody): Promise<SavedSpell> {

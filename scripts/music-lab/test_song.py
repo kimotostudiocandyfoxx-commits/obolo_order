@@ -18,6 +18,9 @@ lines = [app.LyricLine(section="verse", text="あさのひかり"), app.LyricLin
 text = app.format_lyrics(lines)
 print(text)
 assert text == "[Verse]\nあさのひかり\nまどをあけて\n\n[Chorus]\nラーメン ラーメン", text
+sheet = "[Intro]\n\n[Verse]\nあさのひかり\n\n[Chorus - harmonies]\nラーメン\n\n[Outro - fade out]"
+assert app.format_lyrics(lines, True, sheet) == sheet
+assert app.format_lyrics(lines, False, "  ") == text
 
 with tempfile.TemporaryDirectory() as d:
     # 12 s test "song": a gliding sung-like tone over chords and a beat

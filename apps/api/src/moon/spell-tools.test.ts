@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { GUARDS_METADATA } from '@nestjs/common/constants';
 import { MockProvider } from '@obolo/ai';
-import { SPELL_BOOK_MAX, spellFrom, spellKey, type SpellTag } from '@obolo/shared';
+import { lyricsEdit, lyricsFallback, SaveSpellBody, SPELL_BOOK_MAX, songSpellKey, spellFrom, spellKey, type SpellTag } from '@obolo/shared';
 import { describe, expect, it } from 'vitest';
 import { AuthGuard } from '../auth/auth.guard';
 import type { spellBook } from '../db/schema';
@@ -54,6 +54,26 @@ describe('R12 spell book: POST/GET/PATCH/DELETE /moon/spellbook', () => {
     expect(b).toMatchObject({ id: a.id, already: true });
     expect(await s.list('u1')).toHaveLength(1);
   });
+  it('R13: a song spell keeps both parts — style talismans and the lyrics with metatags — and gives both back', async () => {
+    const { s, rows } = bookOf();
+    const tags = spellFrom('song', '夏の海のポップ');
+    const lyrics = lyricsFallback(tags);
+    const a = await s.save('u1', { kind: 'song', tags, lyrics });
+    expect(a.lyrics).toEqual(lyrics);
+    expect(rows[0].spellKey).toBe(songSpellKey(a.tags, lyrics));
+    // the same pair again is the one kept; the same tags with other lyrics is another spell
+    expect((await s.save('u1', { kind: 'song', tags, lyrics })).already).toBe(true);
+    const other = lyricsEdit(lyrics, 'ささやきを外して')!.lyrics;
+    const b = await s.save('u1', { kind: 'song', tags, lyrics: other });
+    expect(b.already).toBeUndefined();
+    const back = (await s.list('u1')).find((x) => x.id === a.id)!;
+    expect(back.lyrics?.blocks.map((x) => x.section)).toEqual(lyrics.blocks.map((x) => x.section));
+    // the tags-only spell (a compass reading) has no lyrics
+    const c = await s.save('u1', { kind: 'song', tags: spellFrom('song', '雨の街のジャズ') });
+    expect(c.lyrics).toBeUndefined();
+    // lyrics only with a song spell
+    expect(SaveSpellBody.safeParse({ kind: 'art', tags: spellFrom('art', '夜の海'), lyrics }).success).toBe(false);
+  });
   it('another spell with the same name gets a number; a rename stays unique and clean', async () => {
     const { s } = bookOf();
     await s.save('u1', { kind: 'song', tags: spellFrom('song', '夏の海のポップ') });
@@ -67,7 +87,7 @@ describe('R12 spell book: POST/GET/PATCH/DELETE /moon/spellbook', () => {
   it(`at most ${SPELL_BOOK_MAX}: one more is refused (409) until one is thrown away`, async () => {
     const { s, rows } = bookOf();
     const one = (i: number): SpellTag[] => [{ ja: `星${i}`, en: `star ${i}`, group: 'theme' }, { ja: 'ポップ', en: 'pop', group: 'genre' }];
-    for (let i = 0; i < SPELL_BOOK_MAX; i++) rows.push({ id: `id-${i}`, userId: 'u1', kind: 'song', name: `n${i}`, tagsJson: one(i), spellKey: spellKey('song', one(i)), usedAt: null, createdAt: new Date(i), updatedAt: new Date(i) });
+    for (let i = 0; i < SPELL_BOOK_MAX; i++) rows.push({ id: `id-${i}`, userId: 'u1', kind: 'song', name: `n${i}`, tagsJson: one(i), lyricsJson: null, spellKey: spellKey('song', one(i)), usedAt: null, createdAt: new Date(i), updatedAt: new Date(i) });
     expect(await status(s.save('u1', { kind: 'song', tags: one(999) }))).toBe(409);
     // another member's book is their own
     expect(await status(s.save('u2', { kind: 'song', tags: one(999) }))).toBe(200);

@@ -162,7 +162,7 @@ def ace_song(engine: "AceStep15", r: "SongReq", seconds: float, out_dir: str) ->
     from acestep.inference import GenerationConfig, GenerationParams, generate_music
 
     key = f"{NAMES[r.keyRoot]} {'Major' if r.scale == 'major' else 'minor'}"
-    lyrics = format_lyrics(r.lyrics, r.outro)
+    lyrics = format_lyrics(r.lyrics, r.outro, r.sheet)
     params = GenerationParams(
         task_type="text2music",
         caption=sung_caption(r),
@@ -209,8 +209,13 @@ def lm_handler():
         return _lm["h"]
 
 
-def format_lyrics(lines: list["LyricLine"], outro: bool = False) -> str:
-    """Our lines → ACE-Step lyrics with structure tags ([Verse] / [Chorus] / [Bridge])."""
+def format_lyrics(lines: list["LyricLine"], outro: bool = False, sheet: str | None = None) -> str:
+    """Our lines → ACE-Step lyrics with structure tags ([Verse] / [Chorus] / [Bridge]).
+    R13: `sheet` — the lyrics with their metatags as the API laid them out (ACE-Step's own conventions:
+    [Intro] [Verse 1] [Pre-Chorus - building energy] [Chorus - harmonies] [Guitar Solo] [Outro - fade out] …)
+    is sung as it is; it carries its own intro / outro."""
+    if sheet and sheet.strip():
+        return sheet.strip()[:4000]
     out: list[str] = ["[Intro]", ""] if outro else []
     last = None
     for l in lines:
@@ -601,6 +606,9 @@ class SongReq(BaseModel):
     seed: int | None = Field(None, ge=0)
     # [Intro] / [Outro] around the lyrics, so the song starts and ends like a song (lab r04: abrupt ends)
     outro: bool = True
+    # R13: the lyrics with metatags, already in ACE-Step's form (sung as given; `lyrics` still lists the sung lines for
+    # the take check and the line times)
+    sheet: str | None = Field(None, max_length=4000)
     # ACE-Step's 5Hz language model plans the song first ("thinking": melody/structure codes).
     # Studio lab r02 (2026-10-09): overall 6.9 with it vs 3.1 without (lines skipped, no singing) → on
     lm: bool = True
@@ -823,7 +831,7 @@ def ace_extend(engine: "AceStep15", r: ExtendReq, out_dir: str) -> tuple[str, li
         chunk_mask_mode="explicit",
         repaint_wav_crossfade_sec=0.5,
         caption=sung_caption(r),
-        lyrics=format_lyrics(r.lyrics, r.outro),
+        lyrics=format_lyrics(r.lyrics, r.outro, r.sheet),
         instrumental=False,
         vocal_language=r.language,
         bpm=r.bpm,

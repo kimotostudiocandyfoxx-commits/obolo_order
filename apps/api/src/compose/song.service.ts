@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { applyMixEdit, type ChatTurn, type LlmProvider, moderateText, parseSingDirection, parseSongEdit, phraseText, singDirectionSystem, songEditSystem } from '@obolo/ai';
-import type { FullSongBody, SingBody, SingDirection, SongEditBody, SongEditCommand, SongEditResult, SongMix, SongPhrase, SongView, VoiceSlot } from '@obolo/shared';
+import { lyricBlockKeys, lyricBlockLabels, lyricsPrompt, type FullSongBody, type SingBody, type SingDirection, type SongEditBody, type SongEditCommand, type SongEditResult, type SongLyrics, type SongMix, type SongPhrase, type SongView, type VoiceSlot } from '@obolo/shared';
 import { and, desc, eq, isNotNull, isNull, sql } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { AppConfig, CONFIG } from '../config';
@@ -32,6 +32,16 @@ interface StoredDesign {
   guideUrl?: string;
   /** acestep: whether the vocal is in the member's voice */
   voiced?: boolean;
+  /** R13: the lyrics with metatags it was sung from (the yes covered them) */
+  lyrics?: SongLyrics;
+}
+
+/** R13: the sung lines of lyrics with metatags, each with the engine's section, its block's label and key */
+export function lyricLinesOf(l: SongLyrics): { section: SongPhrase['section']; text: string; label: string; block: string }[] {
+  const labels = lyricBlockLabels(l);
+  const keys = lyricBlockKeys(l);
+  const engine = (s: string): SongPhrase['section'] => (s === 'chorus' || s === 'final-chorus' ? 'chorus' : s === 'bridge' ? 'bridge' : 'verse');
+  return l.blocks.flatMap((b, i) => b.lines.map((text) => ({ section: engine(b.section), text, label: labels[i], block: keys[i] })));
 }
 
 /** How the singer should sing, by genre (studio lab r05: rap lines were skipped / mumbled with pop words). */
@@ -54,7 +64,7 @@ function songPrompt(instrumentalPrompt: string, genre = '') {
 }
 
 /** Lyric lines (in order) with when they are sung: the studio's own times, else spread over the song. */
-function timedPhrases(lines: { section: SongPhrase['section']; text: string }[], made: Pick<MadeSong, 'lines' | 'seconds'>, bpm: number, url: string): SongPhrase[] {
+function timedPhrases(lines: { section: SongPhrase['section']; text: string; label?: string; block?: string }[], made: Pick<MadeSong, 'lines' | 'seconds'>, bpm: number, url: string): SongPhrase[] {
   const spb = 60 / bpm;
   const times = made.lines;
   const start0 = times[0]?.start ?? made.seconds * 0.1;
@@ -74,6 +84,7 @@ function timedPhrases(lines: { section: SongPhrase['section']; text: string }[],
       index: i,
       section: l.section,
       text: l.text,
+      ...(l.label ? { label: l.label, block: l.block } : {}),
       slot: 'self' as const,
       url,
       seconds: Math.round(Math.max(0.3, end - start) * 100) / 100,
@@ -204,7 +215,8 @@ export class SongService {
     const lyrics = body.sections.flatMap((s) => s.lines.map((l) => l.text)).join('\n');
     if ((await moderateText(lyrics)).flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'CONTENT_FLAGGED', 'This cannot be sung');
     if (!this.cfg.MUSIC_URL) throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'MUSIC_OFF', 'The music studio is not connected yet');
-    const prompt = songPrompt(body.instrumentalPrompt, body.genre);
+    // R13: the lyric tags' words join the caption (ACE-Step: caption and lyric tags agree)
+    const prompt = lyricsPrompt(songPrompt(body.instrumentalPrompt, body.genre), body.lyrics);
     const made = await generateSong(this.cfg.MUSIC_URL, { ...body, prompt, voice: await this.voiceSample(userId) });
     const [mixM, vocM, instM, guideM] = await Promise.all([
       this.media.storeAudio(userId, 'audio/mp4', made.mix, origin),
@@ -212,7 +224,7 @@ export class SongService {
       this.media.storeAudio(userId, 'audio/mp4', made.instrumental, origin),
       this.media.storeAudio(userId, 'audio/mp4', made.guide, origin),
     ]);
-    const lines = body.sections.flatMap((s) => s.lines.map((l) => ({ section: s.name, text: l.text })));
+    const lines = body.lyrics ? lyricLinesOf(body.lyrics) : body.sections.flatMap((s) => s.lines.map((l) => ({ section: s.name, text: l.text })));
     const phrases = timedPhrases(lines, made, body.bpm, vocM.url);
     const design: StoredDesign = {
       genre: body.genre,
@@ -228,6 +240,7 @@ export class SongService {
       vocalsUrl: vocM.url,
       guideUrl: guideM.url,
       voiced: made.voiced,
+      ...(body.lyrics ? { lyrics: body.lyrics } : {}),
     };
     const mix: SongMix = { ...DEFAULT_MIX, gaps: phrases.map(() => 0) };
     const [row] = await this.db.write

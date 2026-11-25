@@ -351,6 +351,13 @@
       "when": 1795571846075,
       "tag": "0049_spell_book",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1795575433093,
+      "tag": "0050_spell_book_lyrics",
+      "breakpoints": true
     }
   ]
 }
