@@ -592,6 +592,13 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .exp.map.trip .tlabel{display:block}
 .exp .isl.popin2{animation:islin .6s cubic-bezier(.2,1.5,.4,1) both}
 @keyframes islin{from{opacity:0;transform:translate(-50%,-50%) scale(.4)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+.exp .eb.fl.kor img{animation:khop .9s cubic-bezier(.3,0,.7,1) infinite alternate;border-radius:50%}
+@keyframes khop{0%{transform:translateY(0) scale(1.06,.94)}40%{transform:translateY(-14px) scale(.96,1.04)}100%{transform:translateY(-18px) scale(1,1)}}
+.exp .skor{position:absolute;left:50%;top:22%;transform:translateX(-50%);z-index:4;display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none;animation:skin .5s cubic-bezier(.2,1.6,.4,1)}
+.exp .skor img{width:170px;height:170px;object-fit:contain;filter:drop-shadow(0 10px 16px rgba(40,0,60,.4))}
+.exp .skor .sbub{max-width:80vw;padding:14px 20px;border-radius:22px;background:#fff;color:#2a1a40;font:900 18px/1.4 var(--f-body);box-shadow:0 10px 26px rgba(40,0,60,.3);text-align:center}
+.exp.pier .skor{top:14%}
+@keyframes skin{from{transform:translateX(-50%) scale(.3);opacity:0}to{transform:translateX(-50%) scale(1);opacity:1}}
 .exp{position:absolute;inset:0;z-index:42;overflow:hidden;pointer-events:none;opacity:0;transition:opacity .35s}
 .exp.on{opacity:1;pointer-events:auto}
 .exp{background:#0b3a66}
@@ -881,9 +888,9 @@ function korPicker(done){
   d.onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.classList.contains('ok')){window.MYKORO=sel;d.style.display='none';done();return}sel=+b.dataset.i;d.querySelectorAll('.g button').forEach(x=>x.setAttribute('aria-pressed',x===b))};
   ph.appendChild(d);
 }
-function setupRoll(){
+function setupRoll(){setTimeout(()=>{if(cur!=='saturn'||!CONT.saturn)return;predecode(['exp-saturn-sea',...CONT.saturn.flatMap(c=>['isl-saturn-'+c.k,'exp-saturn-'+c.k]),'isl-saturn-me'])},1200);
   const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,F=H*.86,L=W*.04,Rw=W*.96;
-  const base=[{n:ME,k:'mine'},...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'れい',k:'oshi'}];
+  const base=[{n:ME,k:'mine'},...OSHIX(),...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'れい',k:'oshi'}];
   const total=window.KTOTAL||24,rest=base.slice(1),all=[base[0]];for(let i=1;i<total;i++)all.push(rest[(i-1)%rest.length]);
   const mb=(S7()||SD())?8:MAXB;QUEUE=all.slice(mb);rolls=[];all.slice(0,mb).forEach((o,i)=>rolls.push(makeBall(o,i,i)));
   if(SE())startSim3D();else startSim();
@@ -1052,6 +1059,32 @@ WORKS.jupiter=[JTAG('雨上がりの町','みお','水彩',['やさしい','風�
 WORKS.jupiter.push(...['夕焼けの町','屋根の上のねこ','ラーメン','さくら通り','月と海'].map((title,i)=>({title,by:ME,genre:['水彩','アニメ塗り','油絵','アニメ塗り','水彩'][i],mood:[['風景','あたたか'],['ねこ','かわいい'],['あたたか','食べもの'],['花','人物'],['夜','風景']][i],ai:i+1,mine:1})));
 RULE.jupiter={watercolor:{g:['水彩'],m:['やさしい','パステル']},anime:{g:['アニメ塗り'],m:['キラキラ','人物']},pixel:{g:['ドット絵'],m:['ゲーム','レトロ']},oil:{g:['油絵'],m:['あたたか']},yumekawa:{g:['ゆめかわ'],m:['パステル','かわいい']},
   cats:{g:[],m:['ねこ','どうぶつ']},nightview:{g:[],m:['夜景','夜']},wamodern:{g:['和モダン'],m:['和風']},retropop:{g:['レトロ','ポップ'],m:['ポップ','あざやか']},mono:{g:['モノクロ'],m:['白黒']}};
+CONT.saturn=[
+  {k:'chat',n:'おしゃべり広場',tags:['雑談','ゆるい','日常']},
+  {k:'koi',n:'恋バナの部屋',tags:['恋バナ','ドキドキ','好きな人']},
+  {k:'oshi',n:'推し語りステージ',tags:['推し','アイドル','ライブ']},
+  {k:'school',n:'放課後テラス',tags:['学校','部活','テスト']},
+  {k:'night',n:'夜ふかしラウンジ',tags:['夜','眠れない','深夜']},
+  {k:'game',n:'ゲーム実況の島',tags:['ゲーム','実況','対戦'],by:'タク'},
+  {k:'warai',n:'お笑い劇場',tags:['お笑い','ボケ','ツッコミ'],by:'ショウ'},
+  {k:'anime',n:'アニメ語りカフェ',tags:['アニメ','マンガ','名シーン'],by:'ぽんず'},
+  {k:'asa',n:'おはよう広場',tags:['朝','おはよう','元気'],by:'はるか'},
+  {k:'nemui',n:'ねむねむ星',tags:['眠い','ゆるい','おやすみ'],by:'みお'}];
+const SL=(t,b,g,m)=>({title:t,by:b,genre:g,mood:m});
+WORKS.saturn=[SL('今日なにしてた？','Rio','雑談',['ゆるい','日常']),SL('コンビニの新作、当たりだった','そら','雑談',['日常']),SL('雨の日ってなんか好き','みお','雑談',['ゆるい']),SL('最近ハマってること聞いて','YUZU','雑談',['日常']),
+ SL('好きな人と目が合った…！','はるか','恋バナ',['ドキドキ','好きな人']),SL('LINEの返事が来ない','ことね','恋バナ',['好きな人']),SL('告白ってどうやるの','REN','恋バナ',['ドキドキ']),SL('片思い3か月目','みお','恋バナ',['好きな人','夜']),
+ SL('推しのライブ当たった！','YUZU','推し',['ライブ','アイドル']),SL('推しの新曲、神すぎる','ぽんず','推し',['アイドル']),SL('推しが尊い、以上','はるか','推し',['アイドル']),SL('ペンライトの色、何にする？','ことね','推し',['ライブ']),
+ SL('部活おわった〜','そら','学校',['部活']),SL('明日テストなの忘れてた','ショウ','学校',['テスト']),SL('文化祭の準備たのしい','Nagi','学校',['日常']),SL('先生の口ぐせがツボ','kei','学校',['お笑い']),
+ SL('眠れない人、いる？','REN','夜',['眠れない','深夜']),SL('深夜のラーメンは正義','タク','夜',['深夜']),SL('星がきれいだよ','Nagi','夜',['夜']),SL('2時なのに目が冴えてる','kei','夜',['眠れない']),
+ SL('ランクやっと上がった！','タク','ゲーム',['対戦']),SL('このボス強すぎない？','ショウ','ゲーム',['実況']),SL('一緒にやる人募集〜','Rio','ゲーム',['対戦']),
+ SL('今日いちばん笑ったこと','ショウ','お笑い',['ボケ']),SL('ツッコミ待ちです','kei','お笑い',['ツッコミ','ボケ']),SL('犬が靴下を盗んでいった','そら','お笑い',['日常','ボケ']),
+ SL('最終回で泣いた','ぽんず','アニメ',['名シーン']),SL('今期いちばん好きなアニメ','ことね','アニメ',['マンガ']),SL('あのシーン、何回も見ちゃう','YUZU','アニメ',['名シーン']),
+ SL('おはよう！今日もがんばろ','はるか','朝',['おはよう','元気']),SL('朝ごはん、パン派？ごはん派？','Rio','朝',['おはよう']),SL('今日は晴れ！','そら','朝',['元気']),
+ SL('もう眠い…おやすみ','みお','眠い',['おやすみ','ゆるい']),SL('布団から出られない','kei','眠い',['ゆるい']),SL('いい夢みてね','はるか','眠い',['おやすみ'])
+].map((w,i)=>({...w,v:(i%5)+1}));
+WORKS.saturn.push(...['明日もがんばるZE','今日はカレー','いい曲みつけた'].map((title,i)=>({title,by:ME,genre:['雑談','雑談','推し'][i],mood:[['日常'],['日常','ゆるい'],['アイドル']][i],v:i+1,mine:1})));
+RULE.saturn={chat:{g:['雑談'],m:['ゆるい','日常']},koi:{g:['恋バナ'],m:['好きな人','ドキドキ']},oshi:{g:['推し'],m:['アイドル','ライブ']},school:{g:['学校'],m:['部活','テスト']},night:{g:['夜'],m:['深夜','眠れない']},
+  game:{g:['ゲーム'],m:['対戦','実況']},warai:{g:['お笑い'],m:['ボケ','ツッコミ']},anime:{g:['アニメ'],m:['名シーン','マンガ']},asa:{g:['朝'],m:['おはよう','元気']},nemui:{g:['眠い'],m:['おやすみ']}};
 const ESLOT=[[.25,.2,.37],[.76,.23,.37],[.5,.37,.32],[.21,.55,.42],[.8,.57,.42]],EME=[.5,.85,.56];
 const FAVN=5;let FAV={};
 function favGet(pl){if(FAV[pl])return FAV[pl];let v=null;try{v=JSON.parse(localStorage.getItem('obolo-sky-'+pl)||'null')}catch(e){}
@@ -1139,6 +1172,12 @@ const SKYV={
     pierFrom:[-.2,.5,.35],pierTo:[.5,.8,1.45],pierOut:[1.25,.55,.45],
     show(b,st,o){const r=EX.region,sk='song-'+((b.w&&b.w.song)||o.song||r.song||1),vn=vinyl(st,A['jart-'+((b.i%5)+1)]||'','50%','36%','74%');if(vn&&vn.el)vn.el.style.zIndex='1';const dur=playSong(sk);lyricsStart(st,sk,'63%');
       const kt=kinTitle(st,{top:'7%',label:'',noby:1,title:b.title,by:b.n,c:'#38c8ff',c2:'#bdf0ff',g:'rgba(56,200,255,.6)'});return{dur,whoTop:'73%',close(){lyricsStop();vn.out();kt.out();stopSong()}}}},
+  saturn:{motion:'flutter',kind:'kor',hint:'の輪',rider:(w,i)=>`<img alt="" src="${korImg(w.by,i)}">`,tag:w=>'',
+    pierFrom:[.5,-.1,.4],pierTo:[.5,.62,1.7],pierOut:[1.2,.5,.6],
+    show(b,st,o){const pier=$('exp').classList.contains('pier'),k=document.createElement('div');k.className='skor';
+      k.innerHTML=(pier?'':`<img alt="" src="${korImg(b.n,b.i)}">`)+'<div class="sbub"></div>';k.querySelector('.sbub').textContent='「'+b.title+'」';st.appendChild(k);popSound();
+      const vk='voice-'+String((b.w.v||1)).padStart(2,'0');const tm=setTimeout(()=>{if(A[vk])playVoice(vk)},260);
+      return{dur:5,whoTop:'72%',close(){clearTimeout(tm);k.remove()}}}},
   jupiter:{motion:'flutter',hint:'の森',rider:(w,i)=>`<img alt="" src="${A['bfly3-'+((i%4)+1)]||''}"><i class="eart" style="background-image:url(${A['jart-'+(w.ai||1)]||''})"></i>`,
     tag:w=>`#${w.genre} ${w.mood.slice(0,2).map(x=>'#'+x).join(' ')}`,
     pierFrom:[.5,.08,.3],pierTo:[.5,.88,1.05],pierOut:[.5,-.2,.3],
@@ -1150,7 +1189,7 @@ function spawnStrangers(r){if(SKYV[EX.pl].motion==='flutter')return spawnFlutter
     dragify(b,e,tap,()=>{const H=ph.clientHeight;b.lane=clamp(b.y/H,.42,.9);b.sc=lerpPts(b.lane,[[.5,.5],[.69,.78],[.83,1.08]]);b.x=clamp(b.x,-40,W+40)});return b});
   let last=performance.now();const step=now=>{const dt=Math.min(.05,(now-last)/1000);last=now;const ts=now/1000;for(const b of EX.boats){if(b.e.classList.contains('held')||b.drag)continue;b.x+=b.v*dt;if(b.x>W+60)b.x=-60;if(b.x<-60)b.x=W+60;const y=b.lane*H+Math.sin(ts*1.6+b.i)*4;b.y=y;b.e.style.transform=`translate3d(${b.x}px,${y}px,0) scale(${b.sc})`;b.e.querySelector('img').style.transform=b.v<0?'scaleX(-1)':''}EX.raf=requestAnimationFrame(step)};EX.raf=requestAnimationFrame(step)}
 function spawnFlutter(r){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,ex=$('exp');const ws=drift(EX.pl,r.k).slice(0,7).sort(()=>Math.random()-.5);
-  EX.boats=ws.map((w,i)=>{const n=w.by,S=GLADE[i%7],e=document.createElement('div');e.className='eb fl';e.innerHTML=`${SKYV[EX.pl].rider(w,i)}<span>${w.mine?'★ じぶん':n}</span>`;ex.appendChild(e);
+  EX.boats=ws.map((w,i)=>{const n=w.by,S=GLADE[i%7],e=document.createElement('div');e.className='eb fl'+(SKYV[EX.pl].kind?' '+SKYV[EX.pl].kind:'');e.innerHTML=`${SKYV[EX.pl].rider(w,i)}<span>${w.mine?'★ じぶん':n}</span>`;ex.appendChild(e);
     const b={n,i,e,sc:S[2],cx:S[0],cy:S[1],ax:.05,ay:.02,w1:.5+((i*17)%7)*.07,w2:.7+((i*11)%5)*.09,p1:i*1.7,p2:i*2.3,t:0,x:W*(i%2?1.1:-.1),y:H*.55,title:w.title,w};
     const tap=()=>{if(EX.auto){clearTimeout(EX.auto.tm);if(EX.open)EX.open.close();EX.auto.n++;EX.auto.tm=setTimeout(autoNext,(expShow(b,{auto:true})||60)*1000+400)}else expShow(b)};
     dragify(b,e,tap,()=>dropFloat(b,[[.45,.55],[.65,.8],[.82,1.05]],[2,2],[.06,.94,.34,.88]));return b});
