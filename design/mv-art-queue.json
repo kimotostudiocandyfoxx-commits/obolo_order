@@ -14493,29 +14493,5 @@
       "always": false
     }
   ],
-  "redo": [
-    "isl-pluto-love",
-    "isl-uranus-acst",
-    "isl-uranus-me",
-    "isl-uranus-mono",
-    "isl-uranus-mug",
-    "isl-uranus-neko",
-    "isl-uranus-retro",
-    "isl-uranus-sticker",
-    "isl-uranus-tee",
-    "isl-uranus-tote",
-    "isl-uranus-wa",
-    "isl-uranus-yume",
-    "isl-venus-anime",
-    "isl-venus-asa",
-    "isl-venus-chat",
-    "isl-venus-game",
-    "isl-venus-koi",
-    "isl-venus-me",
-    "isl-venus-nemui",
-    "isl-venus-night",
-    "isl-venus-oshi",
-    "isl-venus-school",
-    "isl-venus-warai"
-  ]
+  "redo": []
 }
