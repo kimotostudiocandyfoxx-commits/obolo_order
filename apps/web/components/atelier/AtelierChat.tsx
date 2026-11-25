@@ -39,6 +39,7 @@ import { BowlFx, TEMPLE_PLATE, type BowlState } from './BowlFx';
 import { faceTo, FLIES, uid, versionsOf, type Msg, type Work } from './work';
 import { CHANGE, IDEA_CHIPS, isYes, planOf, spellKindOf, YES, type Plan } from './plan';
 import { SpellCard } from './SpellCard';
+import { spellChipStyle, spellLookPreview, type SpellLook } from './spellLooks';
 
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 const TAUGHT_KEY = 'obolo.atelier.taught';
@@ -869,6 +870,9 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     // back view painted yet)
     { id: 'me', name: me?.displayName ?? '', look: selfLook(me), color: SELF_COLOR, tone: selfTone(me), self: true, avatar: me?.lookIcon, views: viewsOf('talk-user') },
   ];
+  // the spell card's look: the 木札 until the client picks a talisman (review: localStorage obolo.spell.look = A…E)
+  const [spellLook, setSpellLook] = useState<SpellLook>('wood');
+  useEffect(() => setSpellLook(spellLookPreview()), []);
   const items: TalkItem[] = msgs.filter((m) => !hidden(m)).map((m) =>
     m.who === 'me'
       ? { id: m.id, who: 'me', text: m.text, mark: { kind: 'local', id: m.id }, ...(m.file ? clipItem(m.file) : {}) }
@@ -895,15 +899,15 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
               : undefined,
             name: m.speaker && story ? story.speaker(m.speaker).name : undefined,
             // client 2026-11-24: a picture right in the talk (where it came from, small under it); R11: the plan's card
-            extra: m.pic ? <PicBubble pic={m.pic} /> : m.plan ? <SpellCard spell={m.plan} onDrop={pending && 'plan' in pending && pending.plan.id === m.id && !m.plan.done ? (en) => dropTag(pending.plan, en) : undefined} /> : undefined,
+            extra: m.pic ? <PicBubble pic={m.pic} /> : m.plan ? <SpellCard spell={m.plan} variant={spellLook} onDrop={pending && 'plan' in pending && pending.plan.id === m.id && !m.plan.done ? (en) => dropTag(pending.plan, en) : undefined} /> : undefined,
             chips: m.changed
               ? [{ label: m.changed.undone ? '元に戻した' : '元に戻す', onPick: () => undoChange(m.id), disabled: busy || !!m.changed.undone }]
               : m.plan
                 ? m.plan.done === 'yes'
-                  ? [{ label: 'OK！', onPick: () => undefined, disabled: true }]
+                  ? [{ label: 'OK！', onPick: () => undefined, disabled: true, style: spellChipStyle(spellLook) }]
                   : m.plan.done
                     ? undefined
-                    : m.chips?.map((c) => ({ label: c, onPick: () => chip(c, m.id), disabled: busy || !(pending && 'plan' in pending && pending.plan.id === m.id) }))
+                    : m.chips?.map((c) => ({ label: c, onPick: () => chip(c, m.id), disabled: busy || !(pending && 'plan' in pending && pending.plan.id === m.id), style: spellChipStyle(spellLook) }))
                 : m.chips?.map((c) => ({ label: c, onPick: () => chip(c), disabled: busy })),
           }
         : {

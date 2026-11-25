@@ -4,6 +4,7 @@ import type { SpellTag } from '@obolo/shared';
 import type { AtelierKind } from '@/lib/atelier/unlock';
 import { KIND_WORD } from './intent';
 import { KindMark } from './WorkCard';
+import { FRAME, LOOK_CSS, Talisman, useSpellFont, type SpellLook } from './spellLooks';
 
 /** the incantation face for the tags (Google Fonts, loaded in app/layout.tsx; OFL) */
 export const SPELL_FONT = '"Yuji Syuku", "Shippori Mincho", "Hiragino Mincho ProN", serif';
@@ -61,10 +62,40 @@ function Fuda({ tag, mode, delay, onDrop }: { tag: SpellTag; mode: 'still' | 'dr
  * never shown). Tags put on by the last change drop in, ones taken off fall away; the mana it takes and the mana you
  * have under them (the buttons are the bubble's chips). `onDrop`: while the card is the one waiting, a tag's ✕.
  */
-export function SpellCard({ spell, onDrop }: { spell: { kind: AtelierKind; tags: SpellTag[]; added?: SpellTag[]; removed?: SpellTag[]; price: number; have: number | null; done?: string }; onDrop?: (en: string) => void }) {
+export function SpellCard({ spell, onDrop, variant = 'wood' }: { spell: { kind: AtelierKind; tags: SpellTag[]; added?: SpellTag[]; removed?: SpellTag[]; price: number; have: number | null; done?: string }; onDrop?: (en: string) => void; variant?: SpellLook }) {
+  useSpellFont(variant);
   const added = new Set((spell.added ?? []).map((t) => t.en));
   const short = spell.have != null && spell.have < spell.price;
   let k = 0;
+  if (variant !== 'wood') {
+    // client 2026-11-24: the talisman looks (spellLooks.tsx); the same tags, drops and mana, dressed per look
+    const f = FRAME[variant];
+    return (
+      <span className={`relative mt-1 block w-[min(340px,calc(100vw-72px))] overflow-hidden px-2 pb-2 pt-2 ${f.cardClass}`} style={f.card} data-testid="spell-card" data-look={variant}>
+        <style>{LOOK_CSS}</style>
+        {f.back}
+        <span className="relative flex items-center gap-1.5 pl-0.5 pr-1" style={f.title}>
+          <KindMark kind={spell.kind} className="h-3.5 w-3.5" />
+          {KIND_WORD[spell.kind]}のスペル
+          {f.titleMark}
+        </span>
+        <span className={`relative mt-1.5 flex flex-wrap ${f.row}`}>
+          {spell.tags.map((t) => (
+            <Talisman key={`${t.group}-${t.en}`} look={variant} tilt={Number(tiltOf(t.ja))} tag={t} mode={added.has(t.en) ? 'drop' : 'still'} delay={added.has(t.en) ? 120 + 160 * k++ : k++ * 40} onDrop={onDrop ? () => onDrop(t.en) : undefined} />
+          ))}
+          {(spell.removed ?? []).map((t, i) => (
+            <Talisman key={`gone-${t.en}`} look={variant} tilt={Number(tiltOf(t.ja))} tag={t} mode="fall" delay={i * 120} />
+          ))}
+        </span>
+        <span className={`relative mt-2 flex items-baseline justify-between gap-2 border-t pt-1.5 text-[11.5px] ${f.rule}`} style={f.mana}>
+          <span>
+            使うマナ <b style={f.price}>{spell.price}</b>
+          </span>
+          {spell.have != null && <span style={short ? f.short : f.have}>いま {spell.have}マナ</span>}
+        </span>
+      </span>
+    );
+  }
   return (
     <span className="mt-1 block w-[min(330px,78vw)] rounded-xl border border-[#4a3410]/15 bg-[linear-gradient(180deg,rgba(255,250,238,.75),rgba(244,230,200,.75))] px-2.5 pb-2 pt-1.5 text-[#4a3410]" data-testid="spell-card">
       <style>{CSS}</style>

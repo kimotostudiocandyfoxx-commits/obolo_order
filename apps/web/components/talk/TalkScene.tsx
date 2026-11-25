@@ -81,7 +81,8 @@ export type TalkItem = {
   card?: { thumb: ReactNode; full?: ReactNode; label?: string };
   /** a voice message: a play button in the bubble (the speaker's mouth moves while it plays) */
   voice?: { url: string | null; seconds: number | null };
-  chips?: { label: string; onPick: () => void; disabled?: boolean }[];
+  /** `style`: a chip dressed for its card (the spell card's talisman look) */
+  chips?: { label: string; onPick: () => void; disabled?: boolean; style?: React.CSSProperties }[];
   /** under the words: the pages looked up, a map, a note */
   extra?: ReactNode;
   /** still being written (streaming) */
@@ -1707,7 +1708,7 @@ function Bubble({
         {item.chips && item.chips.length > 0 && !clamp && (
           <div className="flex flex-wrap gap-1.5 px-4 pb-3 -mt-1">
             {item.chips.map((c) => (
-              <button key={c.label} onClick={c.onPick} disabled={c.disabled} className="rounded-full px-3 py-1.5 text-[13px] font-bold disabled:opacity-40" style={{ background: `${ink}1a`, color: ink, boxShadow: `inset 0 0 0 1px ${ink}33` }}>
+              <button key={c.label} onClick={c.onPick} disabled={c.disabled} className="rounded-full px-3 py-1.5 text-[13px] font-bold disabled:opacity-40" style={{ background: `${ink}1a`, color: ink, boxShadow: `inset 0 0 0 1px ${ink}33`, ...c.style }}>
                 {c.label}
               </button>
             ))}
