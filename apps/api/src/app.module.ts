@@ -68,7 +68,8 @@ import { ChangeablesController } from './planets/changeables.controller';
 import { PlanetHomeService } from './planets/planet-home.service';
 import { WorkSafetyController } from './planets/work-safety.controller';
 import { WorkSafetyService } from './planets/work-safety.service';
-import { ContinentsController, PlanetWorksAdminController, PlanetWorksController } from './planets/continents.controller';
+import { ContinentsController, PlanetSongsController, PlanetWorksAdminController, PlanetWorksController } from './planets/continents.controller';
+import { PlanetSongsService } from './planets/planet-songs.service';
 import { ContinentsService } from './planets/continents.service';
 import { PlanetWorksService } from './planets/planet-works.service';
 import { AdminRadioController, BluenaController, RadioController } from './radio/radio.controller';
@@ -123,6 +124,7 @@ import { StorageWorksService } from './storage/storage-works.service';
     WorkSafetyController,
     ContinentsController,
     PlanetWorksController,
+    PlanetSongsController,
     PlanetWorksAdminController,
     PlanetHomeController,
     ChangeablesController,
@@ -184,6 +186,7 @@ import { StorageWorksService } from './storage/storage-works.service';
     WorkSafetyService,
     PlanetWorksService,
     ContinentsService,
+    PlanetSongsService,
     PlanetHomeService,
     RadioService,
     InvitesService,

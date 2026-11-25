@@ -407,6 +407,13 @@
       "when": 1795615840626,
       "tag": "0057_person_hides_saturn_plazas",
       "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "7",
+      "when": 1795617840626,
+      "tag": "0058_mercury_continent_pictures",
+      "breakpoints": true
     }
   ]
 }

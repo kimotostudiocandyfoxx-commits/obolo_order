@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import sharp from 'sharp';
 import { and, desc, eq, isNull } from 'drizzle-orm';
 import { apiError } from '../common/errors';
-import { phraseStarts } from '../compose/mix';
+import { timedLyrics } from '../compose/lyrics';
 import { AppConfig, CONFIG } from '../config';
 import { Database } from '../db/db';
 import { jupiterRoots, marsBackstage, mvProjects, songs, users } from '../db/schema';
@@ -82,18 +82,7 @@ export class MvService {
   }
 
   private lyricLines(s: SongRow) {
-    const all = s.phrasesJson as unknown as SongPhrase[];
-    if (!all.some((p) => p.text?.trim())) return [];
-    const bpm = Number((s.designJson as { bpm?: number }).bpm) || 100;
-    const mix = s.mixJson as unknown as SongMix;
-    const tempo = mix.tempo || 1;
-    // every line's start (gaps are per line, so before leaving out the ones without words)
-    const starts = phraseStarts(all, bpm, { delayBeats: mix.delayBeats ?? 0, gaps: mix.gaps ?? [] }).map((t) => t / tempo);
-    const spb = 60 / bpm;
-    return all
-      .map((p, i) => ({ p, t: starts[i], next: i + 1 < all.length ? starts[i + 1] : Infinity }))
-      .filter(({ p }) => p.text?.trim())
-      .map(({ p, t, next }) => ({ t, end: Math.min(next - 0.05, t + (Math.max(p.seconds, p.beats * spb) + 0.4) / tempo), text: p.text.trim(), chorus: p.section === 'chorus' }));
+    return timedLyrics(s.phrasesJson as unknown as SongPhrase[], s.designJson as { bpm?: number }, s.mixJson as unknown as SongMix);
   }
 
   private async view(p: Row): Promise<MvProjectView> {

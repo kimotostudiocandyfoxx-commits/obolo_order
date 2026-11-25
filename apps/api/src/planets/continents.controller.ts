@@ -9,6 +9,7 @@ import { AppConfig, CONFIG } from '../config';
 import type { KvStore } from '../infra/kv';
 import { KV } from '../infra/tokens';
 import { ContinentsService } from './continents.service';
+import { PlanetSongsService } from './planet-songs.service';
 import { PlanetWorksService } from './planet-works.service';
 
 const planetOf = (p: string): HomePlanet => {
@@ -102,6 +103,18 @@ export class PlanetWorksController {
   async save(@UserId() userId: string, @Param('kind') kind: string, @Param('id', new ParseUUIDPipe()) id: string, @Body() body: unknown) {
     await rateLimit(this.kv, `work-save:${userId}`, 120, 600);
     return this.works.save(userId, kindOf(kind), id, parseBody(PlanetWorkHideBody, body).on);
+  }
+}
+
+/** handoff 02 §2: a Mercury song opened — sound, jacket, title and the lyrics with their times (PlanetSongView) */
+@Controller('planet-works/planet_post')
+@UseGuards(AuthGuard)
+export class PlanetSongsController {
+  constructor(private readonly songs: PlanetSongsService) {}
+
+  @Get(':id/song')
+  song(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string) {
+    return this.songs.song(userId, id);
   }
 }
 

@@ -458,3 +458,28 @@ export function figureFor(figures: PlanetFigures | null | undefined, planet: Hom
   const f = figures ?? {};
   return { planet, ride: PLANET_RIDE[planet], figure, url: f[figure] ?? null, ...(planet === 'saturn' ? { ball: f.saturnBall ?? null } : {}) };
 }
+
+// --- 02 Mercury: a song opened (handoff planets-02-mercury.md §2, M-R288) -------------------------------------------
+
+/** one sung line and when it starts in the song (seconds); `end` when known (per-character times can be added later) */
+export interface SongLyricLine {
+  t: number;
+  end?: number;
+  text: string;
+}
+
+/**
+ * GET /planet-works/planet_post/:id/song — what Mercury needs to play a song the Mercury way: the sound, the jacket
+ * (printed over the whole picture disc), the title, the title read in its maker's voice (none yet: null) and the
+ * lyrics with their times (a song whose times cannot be had plays without lyrics: []).
+ */
+export interface PlanetSongView {
+  kind: 'planet_post';
+  id: string;
+  title: string;
+  url: string;
+  art: string | null;
+  seconds: number | null;
+  titleVoice: string | null;
+  lyrics: SongLyricLine[];
+}
