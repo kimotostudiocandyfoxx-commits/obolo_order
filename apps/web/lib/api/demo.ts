@@ -474,7 +474,7 @@ export class DemoApi implements Api {
     if (want('pluto')) for (const b of (this.s.books ?? []).filter((x) => x.owner === me)) out.push(w({ kind: 'book', id: b.id, planet: 'pluto', title: b.title, image: b.cover, createdAt: b.createdAt }));
     if (want('neptune')) for (const g of (this.s.games ?? []).filter((x) => x.owner === me)) out.push(w({ kind: 'game', id: g.id, planet: 'neptune', title: g.title, image: g.cover ?? null, createdAt: g.createdAt, flown: !!g.flownAt }));
     // story 2026-11-25: グッズ (Uranus)
-    if (want('uranus')) for (const g of (this.s.goods ?? []).filter((x) => x.owner === me)) out.push(w({ kind: 'goods', id: g.id, planet: 'uranus', title: g.title, image: g.artUrl, createdAt: g.createdAt, flown: !!g.flownAt }));
+    if (want('uranus')) for (const g of (this.s.goods ?? []).filter((x) => x.owner === me)) out.push(w({ kind: 'goods', id: g.id, planet: 'uranus', title: g.title, image: g.artUrl, createdAt: g.createdAt, flown: !!g.flownAt, goodsKind: g.kind }));
     const q = f.q?.trim().toLowerCase();
     // M-R253 §1: a work's other tries are inside it, not listed
     const moon = await this.moonWorks();

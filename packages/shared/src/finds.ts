@@ -82,6 +82,8 @@ export interface FoundWork {
   createdAt: string;
   /** on its planet already (flown / public) */
   flown?: boolean;
+  /** a goods item's kind as stored (トート … 缶バッジ) — Bluena shows it as made, whatever its title */
+  goodsKind?: string;
   stars: number;
   mark: ItemMarkId | null;
   /** M-R253: the Moon atelier's work this is the face of (its other tries are inside it, not listed) */

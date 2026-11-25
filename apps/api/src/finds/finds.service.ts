@@ -147,7 +147,7 @@ export class FindsService {
           .where(and(eq(goods.userId, userId), isNull(goods.deletedAt), ilike(goods.title)))
           .orderBy(desc(goods.createdAt))
           .limit(LIMIT)
-          .then((rows) => rows.map((r) => this.w('goods', r.id, 'uranus', r.title, r.createdAt, { image: r.artUrl, flown: !!r.flownAt }))),
+          .then((rows) => rows.map((r) => this.w('goods', r.id, 'uranus', r.title, r.createdAt, { image: r.artUrl, flown: !!r.flownAt, goodsKind: r.kind }))),
       );
     if (want('pluto'))
       jobs.push(

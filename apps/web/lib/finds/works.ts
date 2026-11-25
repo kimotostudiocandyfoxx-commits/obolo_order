@@ -1,6 +1,6 @@
 'use client';
 
-import { goodsKindOf, KIND_HOME_PLANET, matchesFind, type BluenaPlanet, type FindWorksQuery, type FoundWork, type MarkedKind } from '@obolo/shared';
+import { goodsKindOf, isGoodsKind, KIND_HOME_PLANET, matchesFind, type BluenaPlanet, type FindWorksQuery, type FoundWork, type MarkedKind } from '@obolo/shared';
 import type { GlyphId } from '@/components/bluena/glyphs';
 import { shelf } from '@/components/atelier/shelf';
 import type { Work } from '@/components/atelier/work';
@@ -53,9 +53,9 @@ export function workOf(f: FoundWork, local?: Work): Work {
   const kind = PLANET_KIND[f.planet] ?? 'image';
   const ref: Work['ref'] =
     f.kind === 'book' ? { bookId: f.id } : f.kind === 'game' ? { gameId: f.id } : f.kind === 'goods' ? { goodsId: f.id } : f.kind === 'saturn_post' ? { postId: f.id } : f.kind === 'jupiter_root' ? { rootId: f.id } : f.kind === 'song' ? { songId: f.id } : f.kind === 'mars_backstage' ? { backstageId: f.id } : f.kind === 'radio_show' ? { showId: f.id } : {};
-  // story 2026-11-25: a goods item — its kind is in its name (goodsTitle: the art's title + the kind), else a tote
+  // story 2026-11-25: a goods item — its kind as stored; an older answer without it: from its name, else a tote
   if (kind === 'goods') {
-    const g = goodsKindOf(f.title) ?? 'トート';
+    const g = (f.goodsKind && isGoodsKind(f.goodsKind) ? f.goodsKind : null) ?? goodsKindOf(f.title) ?? 'トート';
     return { id: f.id, kind, prompt: '', status: 'ready', saved: true, title: f.title, image: f.image ?? undefined, ref, flown: f.flown, home: 'uranus', goods: { id: f.id, kind: g, rootId: null, artUrl: f.image ?? '', title: f.title, flownAt: f.flown ? f.createdAt : null, home: 'uranus', createdAt: f.createdAt } };
   }
   if (kind === 'novel' || kind === 'game') return { id: f.id, kind, prompt: '', status: 'ready', saved: true, title: f.title, image: f.image ?? (kind === 'novel' ? bookCoverUrl(f.title) : undefined), ref, flown: f.flown, home: KIND_HOME_PLANET[kind] };
