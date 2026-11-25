@@ -1827,6 +1827,9 @@ export function Marked({ text, upto, marks }: { text: string; upto?: number; /**
  * newest at the bottom; the older ones move up and fade toward the top. It follows the newest while you are at the
  * bottom; scrolled up, it stays where you read and 〔いまに戻る〕 brings you back.
  */
+/** room under the newest bubble for its soft shadow, so the scroll box never cuts it into a hard line (the box reaches this much lower, padded back up) */
+const SHADOW_ROOM = 30;
+
 function TalkLog<U>({ top, bottom, units, keyOf, render, live, onReachTop }: { onReachTop?: () => void; top: number; bottom: number; units: U[]; keyOf: (u: U) => string; render: (u: U, newest: boolean) => ReactNode; /** the characters out of the line being said (follows it while typed) */ live: number }) {
   const box = useRef<HTMLDivElement>(null);
   const [atEnd, setAtEnd] = useState(true);
@@ -1900,9 +1903,9 @@ function TalkLog<U>({ top, bottom, units, keyOf, render, live, onReachTop }: { o
           if (end !== atEnd) setAtEnd(end);
         }}
         className="no-scrollbar pointer-events-auto absolute inset-x-0 z-[8] overflow-y-auto overscroll-contain px-4"
-        style={{ top, bottom, ['--relic-room' as string]: room ? `${Math.round(Math.max(150, room * 0.56))}px` : undefined, WebkitMaskImage: 'linear-gradient(to bottom, transparent 0, rgba(0,0,0,.25) 9%, #000 34%)', maskImage: 'linear-gradient(to bottom, transparent 0, rgba(0,0,0,.25) 9%, #000 34%)' }}
+        style={{ top, bottom: Math.max(0, bottom - SHADOW_ROOM), ['--relic-room' as string]: room ? `${Math.round(Math.max(150, room * 0.56))}px` : undefined, WebkitMaskImage: 'linear-gradient(to bottom, transparent 0, rgba(0,0,0,.25) 9%, #000 34%)', maskImage: 'linear-gradient(to bottom, transparent 0, rgba(0,0,0,.25) 9%, #000 34%)' }}
       >
-        <div ref={inner} className="flex min-h-full flex-col justify-end gap-2.5 pb-1 pt-[30%]">
+        <div ref={inner} className="flex min-h-full flex-col justify-end gap-2.5 pt-[30%]" style={{ paddingBottom: 4 + SHADOW_ROOM }}>
           {units.map((u, k) => (
             <div key={keyOf(u)} className="flex flex-col">
               {render(u, k === units.length - 1)}
