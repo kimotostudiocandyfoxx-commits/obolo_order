@@ -172,9 +172,10 @@ for k in ['saturn','jupiter','mercury','mars','venus','uranus','pluto','neptune'
 import glob as _g
 for f in sorted(_g.glob(f'{O}/isl-*.jpg')):
     k=os.path.basename(f)[:-4]; o=unwhite(Image.open(f)); bb=o.getbbox(); o=o.crop(bb) if bb else o; o.thumbnail((380,380),Image.LANCZOS); A[k]=uri(o,84)
+_REDO=set(json.load(open(H+'/../mv-art-queue.json')).get('redo',[]))
 for f in sorted(_g.glob(f'{O}/exp-*.jpg')):
     k=os.path.basename(f)[:-4]
-    if k.startswith('exp-mercury'): continue
+    if k.startswith('exp-mercury') or k in _REDO: continue  # pictures waiting to be redone are left out
     im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A[k]=uri(im,76)
 for nm in ['map','sea','edm','hiphop','ballad','rock','chill','citypop','anison','jazz','matsuri','rain']+[k+'-pier' for k in ['edm','hiphop','ballad','rock','chill','citypop','anison','jazz','matsuri','rain']]:
     f=f'{O}/exp-mercury-{nm}.jpg'
