@@ -5,8 +5,8 @@ import type { SpellTag } from '@obolo/shared';
 
 /**
  * Client 2026-11-24: 「スペルの札をもっと魔法っぽく — 木札よりキョンシーのおでこのお札みたいに。文字も。何パターンか見せて」.
- * Five talisman looks for the spell card, behind SpellCard's `variant` (the default stays the 木札 until the client
- * picks one). Each look brings its own tag, card frame, mana line, chip style, motions (in / away) and one Google Font
+ * Five talisman looks for the spell card (all approved 2026-11-25; the 木札 is gone): the work kind picks one
+ * (SPELL_LOOK_BY_KIND). Each look brings its own tag, card frame, mana line, chip style, motions (in / away) and one Google Font
  * (OFL), loaded only when that look is shown.
  *   A reifu     霊符 — the jiangshi talisman: long yellow strips, cinnabar brush, 勅令 and a 月 seal, red glow; burns away
  *   B tenfu     天符 — celestial ofuda: night-indigo paper, gold leaf rule, crescent and stars, glowing gold; turns to stardust
@@ -14,36 +14,41 @@ import type { SpellTag } from '@obolo/shared';
  *   D hikari    光符 — paper lit from within (the bowl's water light), floating with a slow bob; melts into light (Yusei Magic)
  *   E jufu      呪符 — black lacquer slips with vermilion letters and a turning magic circle, on washi; stamped on, peeled off
  */
-export const SPELL_LOOKS = ['wood', 'reifu', 'tenfu', 'rune', 'hikari', 'jufu'] as const;
-export type SpellLook = (typeof SPELL_LOOKS)[number];
-export type TalismanLook = Exclude<SpellLook, 'wood'>;
+export const SPELL_LOOKS = ['reifu', 'tenfu', 'rune', 'hikari', 'jufu'] as const;
+export type TalismanLook = (typeof SPELL_LOOKS)[number];
 export const SPELL_LOOK_LETTER: Record<TalismanLook, string> = { reifu: 'A', tenfu: 'B', rune: 'C', hikari: 'D', jufu: 'E' };
 
-/** review only: `localStorage['obolo.spell.look']` = A…E (or a look's name) shows that look in the real chat */
-export const SPELL_LOOK_KEY = 'obolo.spell.look';
-export function spellLookPreview(): SpellLook {
-  try {
-    const v = (localStorage.getItem(SPELL_LOOK_KEY) ?? '').trim();
-    const byLetter = (Object.keys(SPELL_LOOK_LETTER) as TalismanLook[]).find((k) => SPELL_LOOK_LETTER[k] === v.toUpperCase());
-    return byLetter ?? ((SPELL_LOOKS as readonly string[]).includes(v) ? (v as SpellLook) : 'wood');
-  } catch {
-    return 'wood';
-  }
-}
+/**
+ * Client 2026-11-25 (all five approved): which talisman each kind of work casts with — the one place to change it.
+ * 'novel' / 'book' / 'game' are not atelier kinds yet; they light up as soon as those kinds exist.
+ * Everything not listed (look / dress-up, bati, lookup, voice, radio, …) casts with B for now.
+ */
+export const SPELL_LOOK_BY_KIND: Record<string, TalismanLook> = {
+  art: 'tenfu',
+  image: 'tenfu',
+  song: 'hikari',
+  video: 'rune',
+  novel: 'reifu',
+  book: 'reifu',
+  game: 'jufu',
+};
+export const SPELL_LOOK_DEFAULT: TalismanLook = 'tenfu';
+export const spellLookFor = (kind: string): TalismanLook => SPELL_LOOK_BY_KIND[kind] ?? SPELL_LOOK_DEFAULT;
 
-const FONT: Record<TalismanLook, { family: string; css: string }> = {
+/** `css: null` — already loaded for the whole app (app/layout.tsx) */
+const FONT: Record<TalismanLook, { family: string; css: string | null }> = {
   reifu: { family: '"Yuji Boku"', css: 'Yuji+Boku' },
   tenfu: { family: '"Zen Antique"', css: 'Zen+Antique' },
   rune: { family: '"Shippori Antique B1"', css: 'Shippori+Antique+B1' },
-  hikari: { family: '"Yusei Magic"', css: 'Yusei+Magic' },
+  hikari: { family: '"Yusei Magic"', css: null },
   jufu: { family: '"Kaisei Decol"', css: 'Kaisei+Decol:wght@700' },
 };
 const face = (look: TalismanLook) => `${FONT[look].family}, "Shippori Mincho", "Hiragino Mincho ProN", serif`;
 
-/** the look's font, fetched once when it is first shown (display=swap) */
-export function useSpellFont(look: SpellLook) {
+/** only the font of the look in use, fetched once when it is first shown (display=swap) */
+export function useSpellFont(look: TalismanLook) {
   useEffect(() => {
-    if (look === 'wood') return;
+    if (!FONT[look].css) return;
     const id = `spell-font-${look}`;
     if (document.getElementById(id)) return;
     const l = document.createElement('link');
@@ -510,7 +515,7 @@ export const FRAME: Record<TalismanLook, LookFrame> = {
 };
 
 /** the bubble's chips under a card in this look (〔このスペルで作って〕〔変える〕) */
-export function spellChipStyle(look: SpellLook): CSSProperties | undefined {
+export function spellChipStyle(look: TalismanLook): CSSProperties {
   switch (look) {
     case 'reifu':
       return { fontFamily: face('reifu'), fontWeight: 400, fontSize: 14, color: '#a8120a', borderRadius: 3, background: `${FIBRE_V}, linear-gradient(180deg, #f6dc6a, #e8bb3a)`, backgroundBlendMode: 'multiply, normal', boxShadow: 'inset 0 0 0 1px rgba(168,18,10,.45), 0 0 8px rgba(255,90,40,.35), 0 2px 3px rgba(60,10,0,.35)' };
@@ -522,7 +527,5 @@ export function spellChipStyle(look: SpellLook): CSSProperties | undefined {
       return { fontFamily: face('hikari'), fontSize: 14.5, color: '#f2fdff', borderRadius: 999, background: 'linear-gradient(180deg, rgba(60,140,220,.85), rgba(20,60,140,.9))', boxShadow: 'inset 0 0 0 1px rgba(200,245,255,.7), 0 0 12px rgba(90,205,255,.55)', textShadow: '0 0 5px #8fe8ff' };
     case 'jufu':
       return { fontFamily: face('jufu'), fontWeight: 700, fontSize: 13.5, color: '#ff5a36', borderRadius: 3, background: 'linear-gradient(180deg, #2a1a18, #120b0b)', boxShadow: 'inset 0 0 0 1px rgba(214,58,32,.6), 0 2px 4px rgba(40,10,0,.35)', textShadow: '0 0 4px rgba(255,70,30,.6)' };
-    default:
-      return undefined;
   }
 }
