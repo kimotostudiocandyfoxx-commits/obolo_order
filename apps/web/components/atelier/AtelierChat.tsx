@@ -719,7 +719,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     const wasOpen = toolRef.current?.kind === 'book';
     if (!wasOpen) setTool({ kind: 'book', mode: 'open', page: 0, spells: [sp], key: Date.now() });
     // the book stays open while the talismans come out of it, then it closes
-    later(wasOpen ? 1300 : 1700, bookAway);
+    later(wasOpen ? 2000 : 2200, bookAway);
     void getApi().usedSpell(sp.id).catch(() => undefined);
     lastKept.current = sp;
     void propose(kind, sp.name, undefined, {}, undefined, { tags: sp.tags, added: [], removed: [] }, { lead: [SPELL_TOOL_LINES.bookUse, { spell: sp.name }], from: 'book' });
