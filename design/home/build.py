@@ -158,6 +158,13 @@ if os.path.exists(f):
     h_,w_=g_.shape; ys,xs=np.where(g_[:h_//2]);
     if len(xs)>50: A['spk-panel']=_json.dumps([round(np.percentile(xs,3)/w_,3),round(np.percentile(ys,3)/h_,3),round((np.percentile(xs,97)-np.percentile(xs,3))/w_,3),round((np.percentile(ys,97)-np.percentile(ys,3))/h_,3)])
     o.thumbnail((260,260),Image.LANCZOS); A['speaker3']=uri(o,86); A['spk-ar']=str(round(o.width/o.height,4))
+for pl in ['mars','venus','uranus','pluto','neptune']:
+    for key,k2 in [('main',f'bg5-{pl}'),('hv',f'bg5-{pl}-hv'),('prof',f'bg5-{pl}-prof')]:
+        f=f'{O}/home5-{pl}-{key}.jpg'
+        if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A[k2]=uri(im,76)
+    for k in 'user kimorin monban mikie brother sister'.split():
+        f=f'{O}/p5-{pl}-{k}.jpg'
+        if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((220,220),Image.LANCZOS); A[f'p5-{pl}-{k}']=uri(o,84)
 VD=os.environ.get('VOICE_DIR')
 if VD:
     for n in range(1,6):
