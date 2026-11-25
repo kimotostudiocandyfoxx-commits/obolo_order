@@ -3,7 +3,7 @@ import type { ContinentLandingView, ContinentSkyView, ContinentView, FavouriteSl
 import type { IncantBody, IncantView } from '@obolo/shared';
 import type { ArtTitleBody, ArtTitleView } from '@obolo/shared';
 import type { LyricsBody, LyricsView, SongLyrics, SongTweakBody, SongTweakResult, SongVoiceBody, SongVoiceQuoteView, SongVoiceUseView, SongVoiceVersion } from '@obolo/shared';
-import type { BookView, CompassSpell, GameBrokenBody, GameBuildBody, GameView, MoonCompassBody, NovelChapterBody, SaveSpellBody, SaveSpellResult, SavedSpell } from '@obolo/shared';
+import type { BookView, CompassSpell, GameBrokenBody, GameBuildBody, GameView, GoodsMakeBody, GoodsView, MoonCompassBody, NovelChapterBody, SaveSpellBody, SaveSpellResult, SavedSpell } from '@obolo/shared';
 import type { ClipFile, ClipStartBody, ClipUploadStart, ChangeResult, HomeOshi, HomePlanet, PlanetHomeView, AddVersionBody, CreateMoonWorkBody, DemoJobBody, MakeConfirm, MakeKind, SpellBody, SpellKind, SpellTag, SpellView, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiHistoryPage, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView, MvEditBody, MvPicturesBody, MvRedrawBody } from '@obolo/shared';
 import type {
   MembersDay,
@@ -196,6 +196,17 @@ export interface Api {
   game(id: string): Promise<GameView>;
   /** the version did not run in the sandbox: its mana back (soon after it was built, a few a day) */
   gameBroken(id: string, body: GameBrokenBody): Promise<{ refunded: number }>;
+  /** 05: a book to Pluto / a game to Neptune ({on: false}: back to the Moon) */
+  flyBook(id: string, on?: boolean): Promise<{ id: string; flownAt: string | null }>;
+  flyGame(id: string, on?: boolean): Promise<{ id: string; flownAt: string | null }>;
+  /** story 2026-11-25: a game's case picture — one of your own arts (a Jupiter root), or null for the neon face */
+  setGameCover(id: string, rootId: string | null): Promise<GameView>;
+  /** story 2026-11-25 (グッズ): a kind + one of your own arts (free, made at once) */
+  makeGoods(body: GoodsMakeBody): Promise<GoodsView>;
+  goodsList(): Promise<GoodsView[]>;
+  goodsOne(id: string): Promise<GoodsView>;
+  /** to the Uranus home ({on: false}: back to the Moon) */
+  flyGoods(id: string, on?: boolean): Promise<{ id: string; flownAt: string | null }>;
   /** M-R253: the Moon atelier's works — tries inside one work, the face, material, where it was made */
   moonWorks(ids?: string[]): Promise<MoonWorkView[]>;
   createMoonWork(body: CreateMoonWorkBody): Promise<MoonWorkView>;

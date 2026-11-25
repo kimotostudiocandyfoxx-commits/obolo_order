@@ -1,6 +1,6 @@
 import type { GameTier } from '@obolo/shared';
 import type { AtelierKind } from '@/lib/atelier/unlock';
-import { FLY_READY_KINDS, KIND_HOME_PLANET, type BluenaPlanet, type BookView, type GameView, type SpellTag, type SongLyrics } from '@obolo/shared';
+import { FLY_READY_KINDS, KIND_HOME_PLANET, type BluenaPlanet, type BookView, type GameView, type GoodsView, type SpellTag, type SongLyrics } from '@obolo/shared';
 import type { ClipFile, RefineTarget, WorkMaterial, WorkOrigin } from '@obolo/shared';
 import type { MadeSong } from '@/lib/mercury/compose';
 import type { VideoReel } from './video';
@@ -28,7 +28,7 @@ export type Work = {
   poster?: string | null;
   source?: { title: string; source: string; pageUrl: string };
   note?: string;
-  ref?: { /** client 2026-11-25: a book's / a game's id on the server */ bookId?: string; gameId?: string; postId?: string; rootId?: string; /** the root's photo (an MV's still, M-R253 §3) */ mediaId?: string; songId?: string; backstageId?: string; /** R13: the video's project on the server (its free changes go there) */ mvId?: string; showId?: string; demoSong?: MadeSong; style?: string; /** R17: the game tier this card was asked at (a cheap tweak that failed is offered at full) */ gameTier?: GameTier; /** a stand-in made on the review page (makers.ts makeTest) */ test?: boolean };
+  ref?: { /** client 2026-11-25: a book's / a game's id on the server */ bookId?: string; gameId?: string; /** story 2026-11-25: a goods item's id; the game whose case an art was painted for */ goodsId?: string; coverFor?: string; postId?: string; rootId?: string; /** the root's photo (an MV's still, M-R253 §3) */ mediaId?: string; songId?: string; backstageId?: string; /** R13: the video's project on the server (its free changes go there) */ mvId?: string; showId?: string; demoSong?: MadeSong; style?: string; /** R17: the game tier this card was asked at (a cheap tweak that failed is offered at full) */ gameTier?: GameTier; /** a stand-in made on the review page (makers.ts makeTest) */ test?: boolean };
   flown?: boolean;
   worn?: boolean;
   /** put into Bluena (the card's edge flashes once) */
@@ -52,6 +52,8 @@ export type Work = {
   book?: BookView;
   /** client 2026-11-25 (ゲーム): the game on its face (played in the sandbox) */
   game?: GameView;
+  /** story 2026-11-25 (グッズ): the goods item (its kind; the art printed on it is `image`) */
+  goods?: GoodsView;
   /** the spell it was last cast with (a book's / a game's change edits it) */
   spell?: SpellTag[];
   /** R17: made with the secret spell (its failure says so, and offers the normal spell) */
@@ -109,8 +111,10 @@ export function swipeTo(i: number, dir: -1 | 1, n: number): number {
 export type Msg = { id: string; who: 'me'; text: string; /** Bluena's 📎: a file from the device handed over */ file?: ClipFile } | { id: string; who: 'bati'; text: string; chips?: string[]; /** a story line: the script's speaker (KIMORIN, OBOLON, コロリン …) */ speaker?: string; /** M-R236: the works {bati} found (「★がついた曲、見せて」), shown as cards */ found?: Work[]; /** M-R263: a change {bati} made (the preview card and 〔元に戻す〕) */ changed?: { id: string; from: string; to: string; undone?: boolean }; /** client 2026-11-24: a picture in the talk (a lookup's, 「〇〇の絵を見せて」) */ pic?: { url: string; title?: string; source?: string; pageUrl?: string }; /** R11: {bati}'s spell before a paid making (its talismans float over the bowl; the talk keeps a record line) and what came of it */ plan?: { kind: AtelierKind; /** the spell's tags (Japanese shown; English never) */ tags: SpellTag[]; added?: SpellTag[]; removed?: SpellTag[]; price: number; have: number | null; done?: 'yes' | 'changed' | 'short' }; /** R13: the lyrics with metatags shown (the talk keeps a record line: 「歌詞：Aメロ・サビ…」) */ lyricsRec?: SongLyrics } | { id: string; who: 'work'; work: Work };
 
 /** the kinds that fly to a planet (〔星へ飛ばす〕) */
-// client 2026-11-25: from the one shared map (KIND_HOME_PLANET); a planet without its screen yet (Pluto's books,
-// Neptune's games) keeps its home as data and shows no 〔星へ飛ばす〕
-export const FLIES: Partial<Record<AtelierKind, 'saturn' | 'jupiter' | 'mercury' | 'mars' | 'venus'>> = Object.fromEntries(FLY_READY_KINDS.map((k) => [k, KIND_HOME_PLANET[k]]));
+// client 2026-11-25: from the one shared map (KIND_HOME_PLANET); story 2026-11-25: goods (Uranus), books (Pluto) and
+// games (Neptune) fly too now their homes show them
+export const FLIES: Partial<Record<AtelierKind, BluenaPlanet>> = Object.fromEntries(FLY_READY_KINDS.map((k) => [k, KIND_HOME_PLANET[k]]));
+/** story 2026-11-25: a work ready for 〔星へ飛ばす〕 — a book once it has its title and its opening (the first chapter) */
+export const canFly = (w: Work): boolean => !!FLIES[w.kind] && w.status === 'ready' && (w.kind !== 'novel' || (!!(w.book?.title || w.title) && (w.book ? w.book.chapters.length > 0 : !!w.ref?.bookId))) && (w.kind !== 'game' || !!w.ref?.gameId) && (w.kind !== 'goods' || !!w.ref?.goodsId || !!w.ref?.test);
 
 export const uid = () => `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;

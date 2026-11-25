@@ -6,7 +6,7 @@ import { batiKindOpensLine, JOURNEY_DONE, type BatiPersonality } from '@obolo/sh
  *   3 コロリン · 4 アート · 5 曲 · 6 映像 (MV) · 7 金星のラジオ (a recorded show).
  * After the journey (journeyDay ≥ JOURNEY_DONE) everything is open. A member who joined early is on the same day
  * schedule (only journeyDay counts). Client 2026-11-25: 本 (novel) and ゲーム open after the journey (JOURNEY_DONE),
- * with the members' later planets they belong to (Pluto, Neptune); グッズ is not made here yet.
+ * with the members' later planets they belong to (Pluto, Neptune); story 2026-11-25: グッズ too (Uranus).
  */
 export const UNLOCK_DAY = {
   look: 2,
@@ -20,6 +20,8 @@ export const UNLOCK_DAY = {
   radio: 7,
   novel: JOURNEY_DONE,
   game: JOURNEY_DONE,
+  // story 2026-11-25: グッズ (a kind + one of your arts, free) — with Uranus, after the journey
+  goods: JOURNEY_DONE,
 } as const;
 
 export type AtelierKind = keyof typeof UNLOCK_DAY;
@@ -54,6 +56,7 @@ export const LOCK_WORD: Record<AtelierKind, string> = {
   radio: 'ラジオ',
   novel: '本',
   game: 'ゲーム',
+  goods: 'グッズ',
 };
 
 /**

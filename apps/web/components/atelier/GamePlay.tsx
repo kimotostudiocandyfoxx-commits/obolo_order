@@ -102,6 +102,14 @@ export function GameFace({ game }: { game: GameView }) {
     <div>
       <GameFrame game={game} className="aspect-[3/4] w-full rounded-xl" />
       {game.howTo && <p className="mt-1 text-[12px] text-amber-50/80">{game.howTo}</p>}
+      {/* story 2026-11-25: the case's picture (Neptune's case shows it) */}
+      {game.cover && (
+        <div className="mt-1 flex items-center gap-1.5 text-[11px] text-amber-50/70" data-testid="game-cover">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={game.cover} alt="" className="h-9 w-7 rounded-sm object-cover ring-1 ring-white/30" />
+          ケースの絵
+        </div>
+      )}
       <button onClick={() => setFull(true)} className="mt-1.5 rounded-full bg-amber-200 px-3 py-1.5 text-[12px] font-bold text-slate-950" data-testid="game-full-open">
         ▶ 全画面で遊ぶ
       </button>

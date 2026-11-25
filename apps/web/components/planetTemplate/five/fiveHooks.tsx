@@ -10,6 +10,7 @@ import {
   FIVE,
   fiveTitleOf,
   fiveTitleStyle,
+  goodsKindOfWork,
   isAudioUrl,
   OPEN_MS,
   RADIO_VOICE_MS,
@@ -26,6 +27,7 @@ import type { TemplateHooks } from '../PlanetTemplateHome';
 import type { ProfileMiddleSlot } from '../Profile';
 import type { OpenWork, WorkOpener } from '../WorkView';
 import f from './Five.module.css';
+import { GoodsMock } from './GoodsMock';
 
 /** after two frames (so a transition runs from where it was placed) */
 function useNextFrame() {
@@ -122,8 +124,9 @@ export function FiveViewer({
   if (def.kind === 'goods')
     return (
       <div className={cls} style={style} data-testid="five-viewer" data-kind="goods">
-        <div className={f.bag} data-testid="tote">
-          <i style={{ backgroundImage: pic ? `url(${pic})` : undefined }} />
+        {/* story 2026-11-25: the art on its own kind (トート, Tシャツ, ステッカー, アクスタ, マグカップ, 缶バッジ), drawn in code */}
+        <div className={f.goods} data-testid="tote">
+          <GoodsMock kind={goodsKindOfWork(work)} art={pic} width={240} sway />
         </div>
         <FiveTitle kind="goods" title={title} tags={work.tags} />
       </div>
@@ -298,11 +301,11 @@ export function fiveShelf(planet: FivePlanet): ProfileMiddleSlot {
               key={w.id}
               type="button"
               className={`${f.fr} ${current === w.id ? f.cur : ''}`}
-              style={{ aspectRatio: String(SHELF_ASPECT[kind]), backgroundImage: pic ? `url(${pic})` : face ? `radial-gradient(circle at 30% 25%, ${face.a}, ${face.b} 70%)` : undefined }}
+              style={{ aspectRatio: String(SHELF_ASPECT[kind]), backgroundImage: kind === 'goods' ? undefined : pic ? `url(${pic})` : face ? `radial-gradient(circle at 30% 25%, ${face.a}, ${face.b} 70%)` : undefined }}
               onClick={() => open(w)}
               aria-label={title || SHELF[kind].label}
             >
-              {kind === 'goods' && <i style={{ backgroundImage: pic ? `url(${pic})` : undefined }} />}
+              {kind === 'goods' && <GoodsMock kind={goodsKindOfWork(w)} art={pic} width={118} />}
               {(kind === 'book' || kind === 'game') && !pic && <em>{face?.glyph ?? title}</em>}
             </button>
           );

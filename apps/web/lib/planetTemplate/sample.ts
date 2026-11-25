@@ -1,5 +1,5 @@
 import { PLANET_HOMES, type HomePlanet, type HomeRel, type HomeWork, type PlanetHomeView } from '@obolo/shared';
-import { FIVE, isFivePlanet, sampleArtIndex, sampleOpening } from './five';
+import { FIVE, isFivePlanet, sampleArtIndex, sampleGoodsKind, sampleOpening } from './five';
 import { SAMPLE_ARTS } from './jupiter';
 import { SAMPLE_SONGS, sampleSongUrl } from './mercury';
 
@@ -39,15 +39,18 @@ export function templateSample(planet: HomePlanet, now = Date.now()): PlanetHome
       // 05: the prototype's five works of each planet (G5[pl].titles) on its five pictures; Mars's MV plays the
       // prototype's song over its picture, Pluto's book opens on the prototype's first lines
       const k = sampleArtIndex(i, name);
+      // story 2026-11-25: Uranus shows each of the six kinds (its words are the kind, as the API's); Neptune's cases are
+      // half a member's art, half the neon face (no cover chosen)
+      const g = planet === 'uranus' ? (i + k) % 6 : -1;
       return {
         id: `${planet}-s${i}`,
         kind,
         author: { id: rel === 'own' ? 'me' : `u-${name}`, name, pic: null, figure: fig },
         rel,
-        text: planet === 'pluto' ? sampleOpening(name) : planet === 'neptune' ? 'タップで遊べるよ' : '',
-        title: FIVE[planet].titles[k - 1],
+        text: planet === 'pluto' ? sampleOpening(name) : planet === 'neptune' ? 'タップで遊べるよ' : planet === 'uranus' ? sampleGoodsKind(g) : '',
+        title: g >= 0 ? FIVE.uranus.titles[g] : FIVE[planet].titles[k - 1],
         url: planet === 'mars' ? sampleSongUrl(k) : null,
-        thumbUrl: `/planets/sample/art-${k}.webp`,
+        thumbUrl: planet === 'neptune' && (i + k) % 2 === 1 ? null : `/planets/sample/art-${k}.webp`,
         flownAt: at(h),
         demo: true,
       };

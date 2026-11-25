@@ -1,4 +1,7 @@
 import {
+  GOODS_PER_DAY,
+  goodsTitle,
+  type GoodsView,
   SPELL_BOOK_MAX,
   artTitleFallback,
   cleanArtTitle,
@@ -297,10 +300,12 @@ interface DemoState {
   /** R18: the demo's songs sung in the member's voice (the version in use) */
   songVoices?: Record<string, { using: SongVoiceVersion }>;
   /** client 2026-11-25: the demo's books and games (canned chapters / the canned game, no model) */
-  books?: (BookView & { owner: string })[];
+  books?: (BookView & { owner: string; flownAt?: string | null })[];
+  /** story 2026-11-25: グッズ (a kind + one of your arts) */
+  goods?: (GoodsView & { owner: string })[];
   /** R18: the demo's ふくろの魔法 (a tier, the month paid, 「やめて」) and the notices said */
   storagePlans?: Record<string, { gb: number | null; paidMonth: string | null; cancelled: boolean; told?: { near?: boolean } }>;
-  games?: (GameView & { owner: string; versions: { tags: SpellTag[]; code: string; title: string; howTo: string }[]; /** R17: each version's making and price */ kinds?: MakeKind[]; prices?: number[] })[];
+  games?: (GameView & { owner: string; flownAt?: string | null; versions: { tags: SpellTag[]; code: string; title: string; howTo: string }[]; /** R17: each version's making and price */ kinds?: MakeKind[]; prices?: number[] })[];
   /** chapters written per member and day */
   chapterDays?: Record<string, number>;
   /** M-R253: the Moon atelier's works (tries inside one work) */
@@ -467,7 +472,9 @@ export class DemoApi implements Api {
     if (want('venus')) for (const r of await this.myRadioShows()) out.push(w({ kind: 'radio_show', id: r.id, planet: 'venus', title: r.title, audio: r.audioUrl, image: r.thumbUrl, createdAt: r.createdAt, flown: r.status === 'public' }));
     // client 2026-11-25: books (Pluto) and games (Neptune)
     if (want('pluto')) for (const b of (this.s.books ?? []).filter((x) => x.owner === me)) out.push(w({ kind: 'book', id: b.id, planet: 'pluto', title: b.title, image: b.cover, createdAt: b.createdAt }));
-    if (want('neptune')) for (const g of (this.s.games ?? []).filter((x) => x.owner === me)) out.push(w({ kind: 'game', id: g.id, planet: 'neptune', title: g.title, createdAt: g.createdAt }));
+    if (want('neptune')) for (const g of (this.s.games ?? []).filter((x) => x.owner === me)) out.push(w({ kind: 'game', id: g.id, planet: 'neptune', title: g.title, image: g.cover ?? null, createdAt: g.createdAt, flown: !!g.flownAt }));
+    // story 2026-11-25: グッズ (Uranus)
+    if (want('uranus')) for (const g of (this.s.goods ?? []).filter((x) => x.owner === me)) out.push(w({ kind: 'goods', id: g.id, planet: 'uranus', title: g.title, image: g.artUrl, createdAt: g.createdAt, flown: !!g.flownAt }));
     const q = f.q?.trim().toLowerCase();
     // M-R253 §1: a work's other tries are inside it, not listed
     const moon = await this.moonWorks();
@@ -544,6 +551,7 @@ export class DemoApi implements Api {
     else if (kind === 'radio_show') await this.removeRadioShow(id);
     else if (kind === 'book') this.s.books = (this.s.books ?? []).filter((b) => !(b.id === id && b.owner === me));
     else if (kind === 'game') this.s.games = (this.s.games ?? []).filter((g) => !(g.id === id && g.owner === me));
+    else if (kind === 'goods') this.s.goods = (this.s.goods ?? []).filter((g) => !(g.id === id && g.owner === me));
     this.save();
     return { removed: 1, freedBytes: 0, view: await this.storage() };
   }
@@ -618,6 +626,15 @@ export class DemoApi implements Api {
     const f = this.s.follows ?? {};
     const isDachi = (o: string) => ((f[me] ?? []).includes(o) && (f[o] ?? []).includes(me)) || (o === 'demo-inviter' && !!this.s.dachiInviter);
     const base = { planet, owner: { id: me, name: u?.displayName ?? '' }, lastVisitAt: h?.lastVisitAt ?? null, recordColour: h?.recordColour ?? null };
+    // story 2026-11-25: your own goods / books / games once flown (the demo has no dachi of yours making them)
+    const mine = (kind: HomeWork['kind'], xs: { id: string; title: string; flownAt?: string | null; text?: string; thumb?: string | null }[]): HomeWork[] =>
+      xs.filter((x) => x.flownAt).map((x) => ({ id: x.id, kind, author: { id: me, name: u?.displayName ?? '', pic: u?.puniPic ?? null }, rel: 'own', text: x.text ?? '', title: x.title, url: null, thumbUrl: x.thumb ?? null, flownAt: x.flownAt! }));
+    const ownOf: Partial<Record<HomePlanet, () => HomeWork[]>> = {
+      uranus: () => mine('goods', (this.s.goods ?? []).filter((g) => g.owner === me).map((g) => ({ id: g.id, title: g.title, flownAt: g.flownAt, text: g.kind, thumb: g.artUrl }))),
+      pluto: () => mine('book', (this.s.books ?? []).filter((b) => b.owner === me).map((b) => ({ id: b.id, title: b.title, flownAt: b.flownAt, text: b.chapters[0]?.text.slice(0, 160), thumb: b.cover }))),
+      neptune: () => mine('game', (this.s.games ?? []).filter((g) => g.owner === me).map((g) => ({ id: g.id, title: g.title, flownAt: g.flownAt, text: g.howTo, thumb: g.cover ?? null }))),
+    };
+    if (ownOf[planet]) return { ...base, live: true, young: seesOnlyDachi(u?.birthYear), own: orderOwn(ownOf[planet]!(), h?.order), around: [], far: [] };
     if (planet !== 'saturn') return { ...base, live: false, young: seesOnlyDachi(u?.birthYear), own: [], around: [], far: [] };
     const hides = new Set(this.s.workHides?.[me] ?? []);
     const posts = this.s.posts.filter((p) => !p.replyToId && !p.room).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
@@ -1148,6 +1165,62 @@ export class DemoApi implements Api {
   }
   async game(id: string): Promise<GameView> {
     return this.gameOf(id);
+  }
+  async flyBook(id: string, on = true) {
+    const b = (this.s.books ?? []).find((x) => x.id === id && x.owner === this.uid());
+    if (!b) throw new ApiError(404, 'NOT_FOUND', 'Book not found');
+    b.flownAt = on ? now() : null;
+    this.save();
+    return { id, flownAt: b.flownAt };
+  }
+  async flyGame(id: string, on = true) {
+    const g = (this.s.games ?? []).find((x) => x.id === id && x.owner === this.uid());
+    if (!g) throw new ApiError(404, 'NOT_FOUND', 'Game not found');
+    g.flownAt = on ? now() : null;
+    this.save();
+    return { id, flownAt: g.flownAt };
+  }
+  /** story 2026-11-25: the case's picture — one of your own arts (this browser's Jupiter roots), or none */
+  async setGameCover(id: string, rootId: string | null): Promise<GameView> {
+    const g = (this.s.games ?? []).find((x) => x.id === id && x.owner === this.uid());
+    if (!g) throw new ApiError(404, 'NOT_FOUND', 'Game not found');
+    const root = rootId ? (this.s.jroots ?? []).find((r) => r.id === rootId && r.owner === this.uid() && r.kind === 'photo') : null;
+    if (rootId && !root) throw new ApiError(404, 'NOT_FOUND', 'Art not found');
+    g.cover = root?.url ?? null;
+    this.save();
+    return this.gameOf(id);
+  }
+  /** story 2026-11-25 (グッズ): free, at once, from one of your own arts (GOODS_PER_DAY a day, as the API) */
+  async makeGoods(body: Parameters<Api['makeGoods']>[0]): Promise<GoodsView> {
+    const me = this.uid();
+    const root = (this.s.jroots ?? []).find((r) => r.id === body.rootId && r.owner === me && r.kind === 'photo');
+    if (!root) throw new ApiError(404, 'NOT_FOUND', 'Art not found');
+    const day = new Date().toDateString();
+    const today = (this.s.goods ?? []).filter((g) => g.owner === me && new Date(g.createdAt).toDateString() === day).length;
+    if (today >= GOODS_PER_DAY) throw new ApiError(429, 'GOODS_LIMIT', '今日は、もうたくさん作ったね');
+    await sleep(900);
+    const g: GoodsView & { owner: string } = { id: uid(), owner: me, kind: body.kind, rootId: root.id, artUrl: root.url, title: body.title || goodsTitle(body.kind, root.title), flownAt: null, home: 'uranus', createdAt: now() };
+    this.s.goods = [g, ...(this.s.goods ?? [])];
+    this.save();
+    const { owner: _o, ...view } = g;
+    return view;
+  }
+  async goodsList(): Promise<GoodsView[]> {
+    const me = this.uid();
+    return (this.s.goods ?? []).filter((g) => g.owner === me).map(({ owner: _o, ...g }) => g);
+  }
+  async goodsOne(id: string): Promise<GoodsView> {
+    const g = (this.s.goods ?? []).find((x) => x.id === id);
+    if (!g) throw new ApiError(404, 'NOT_FOUND', 'Goods not found');
+    const { owner: _o, ...view } = g;
+    return view;
+  }
+  async flyGoods(id: string, on = true) {
+    const g = (this.s.goods ?? []).find((x) => x.id === id && x.owner === this.uid());
+    if (!g) throw new ApiError(404, 'NOT_FOUND', 'Goods not found');
+    g.flownAt = on ? now() : null;
+    this.save();
+    return { id, flownAt: g.flownAt };
   }
   async gameBroken(id: string, body: Parameters<Api['gameBroken']>[1]): Promise<{ refunded: number }> {
     const g = (this.s.games ?? []).find((x) => x.id === id && x.owner === this.uid());

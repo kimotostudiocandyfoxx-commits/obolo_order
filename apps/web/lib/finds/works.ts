@@ -1,6 +1,6 @@
 'use client';
 
-import { KIND_HOME_PLANET, matchesFind, type BluenaPlanet, type FindWorksQuery, type FoundWork, type MarkedKind } from '@obolo/shared';
+import { goodsKindOf, KIND_HOME_PLANET, matchesFind, type BluenaPlanet, type FindWorksQuery, type FoundWork, type MarkedKind } from '@obolo/shared';
 import type { GlyphId } from '@/components/bluena/glyphs';
 import { shelf } from '@/components/atelier/shelf';
 import type { Work } from '@/components/atelier/work';
@@ -22,10 +22,10 @@ export const PLANET_COLOR: Record<BluenaPlanet, string> = {
 };
 export const PLANET_GLYPH: Record<BluenaPlanet, GlyphId> = { saturn: 'voice', jupiter: 'art', mercury: 'song', mars: 'video', venus: 'radio', uranus: 'goods', pluto: 'book', neptune: 'game' };
 export const PLANET_NAME: Record<BluenaPlanet, string> = { saturn: '土星', jupiter: '木星', mercury: '水星', mars: '火星', venus: '金星', uranus: '天王星', pluto: '冥王星', neptune: '海王星' };
-/** what the Moon atelier makes for each planet (none yet: グッズ) */
-export const PLANET_KIND: Record<BluenaPlanet, AtelierKind | null> = { saturn: 'voice', jupiter: 'art', mercury: 'song', mars: 'video', venus: 'radio', uranus: null, pluto: 'novel', neptune: 'game' };
+/** what the Moon atelier makes for each planet (story 2026-11-25: グッズ too) */
+export const PLANET_KIND: Record<BluenaPlanet, AtelierKind | null> = { saturn: 'voice', jupiter: 'art', mercury: 'song', mars: 'video', venus: 'radio', uranus: 'goods', pluto: 'novel', neptune: 'game' };
 /** client 2026-11-25: the one shared map (KIND_HOME_PLANET), for the kinds the atelier makes */
-export const KIND_PLANET: Partial<Record<AtelierKind, BluenaPlanet>> = Object.fromEntries(Object.entries(KIND_HOME_PLANET).filter(([k]) => k !== 'goods' && k !== 'book'));
+export const KIND_PLANET: Partial<Record<AtelierKind, BluenaPlanet>> = Object.fromEntries(Object.entries(KIND_HOME_PLANET).filter(([k]) => k !== 'book'));
 
 /** when a device-made item was made (its id starts with Date.now() in base 36, work.ts uid) */
 export function madeAt(id: string): string {
@@ -43,6 +43,7 @@ export function workMarkRef(w: Work): { kind: MarkedKind; id: string } {
   if (w.kind === 'radio' && r.showId) return { kind: 'radio_show', id: r.showId };
   if (w.kind === 'novel' && r.bookId) return { kind: 'book', id: r.bookId };
   if (w.kind === 'game' && r.gameId) return { kind: 'game', id: r.gameId };
+  if (w.kind === 'goods' && r.goodsId) return { kind: 'goods', id: r.goodsId };
   return { kind: 'local', id: w.id };
 }
 
@@ -51,7 +52,12 @@ export function workOf(f: FoundWork, local?: Work): Work {
   if (local) return local;
   const kind = PLANET_KIND[f.planet] ?? 'image';
   const ref: Work['ref'] =
-    f.kind === 'book' ? { bookId: f.id } : f.kind === 'game' ? { gameId: f.id } : f.kind === 'saturn_post' ? { postId: f.id } : f.kind === 'jupiter_root' ? { rootId: f.id } : f.kind === 'song' ? { songId: f.id } : f.kind === 'mars_backstage' ? { backstageId: f.id } : f.kind === 'radio_show' ? { showId: f.id } : {};
+    f.kind === 'book' ? { bookId: f.id } : f.kind === 'game' ? { gameId: f.id } : f.kind === 'goods' ? { goodsId: f.id } : f.kind === 'saturn_post' ? { postId: f.id } : f.kind === 'jupiter_root' ? { rootId: f.id } : f.kind === 'song' ? { songId: f.id } : f.kind === 'mars_backstage' ? { backstageId: f.id } : f.kind === 'radio_show' ? { showId: f.id } : {};
+  // story 2026-11-25: a goods item — its kind is in its name (goodsTitle: the art's title + the kind), else a tote
+  if (kind === 'goods') {
+    const g = goodsKindOf(f.title) ?? 'トート';
+    return { id: f.id, kind, prompt: '', status: 'ready', saved: true, title: f.title, image: f.image ?? undefined, ref, flown: f.flown, home: 'uranus', goods: { id: f.id, kind: g, rootId: null, artUrl: f.image ?? '', title: f.title, flownAt: f.flown ? f.createdAt : null, home: 'uranus', createdAt: f.createdAt } };
+  }
   if (kind === 'novel' || kind === 'game') return { id: f.id, kind, prompt: '', status: 'ready', saved: true, title: f.title, image: f.image ?? (kind === 'novel' ? bookCoverUrl(f.title) : undefined), ref, flown: f.flown, home: KIND_HOME_PLANET[kind] };
   return { id: f.id, kind, prompt: '', status: 'ready', saved: true, title: f.title, image: kind === 'video' ? undefined : (f.image ?? undefined), poster: kind === 'video' ? f.image : undefined, audio: f.audio ?? undefined, video: f.video ?? undefined, ref, flown: f.flown };
 }

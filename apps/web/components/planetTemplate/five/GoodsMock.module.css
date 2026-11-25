@@ -1,0 +1,210 @@
+/* Story session 2026-11-25 (グッズ): the six mock-ups, the art composited in code. Every size is a share of --w. */
+.m {
+  --w: 240px;
+  position: relative;
+  width: var(--w);
+  margin: 0 auto;
+  filter: drop-shadow(0 calc(var(--w) * 0.06) calc(var(--w) * 0.1) rgba(0, 0, 0, 0.45));
+}
+.m i {
+  position: absolute;
+  display: block;
+  background: #ddd center / cover no-repeat;
+}
+.sway {
+  animation: gsway 2.8s ease-in-out infinite alternate;
+  transform-origin: 50% -8%;
+}
+@keyframes gsway {
+  from {
+    transform: rotate(-3deg);
+  }
+  to {
+    transform: rotate(3deg);
+  }
+}
+
+/* トート: the cream bag and its handle (as the Uranus viewer's) */
+.tote {
+  aspect-ratio: 0.86;
+  margin-top: calc(var(--w) * 0.16);
+  border-radius: calc(var(--w) * 0.04) calc(var(--w) * 0.04) calc(var(--w) * 0.07) calc(var(--w) * 0.07);
+  background: linear-gradient(#fbf6ec, #efe5d2);
+}
+.tote::before {
+  content: '';
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  top: calc(var(--w) * -0.14);
+  height: calc(var(--w) * 0.19);
+  border: calc(var(--w) * 0.028) solid #e6d9bf;
+  border-bottom: 0;
+  border-radius: calc(var(--w) * 0.16) calc(var(--w) * 0.16) 0 0;
+}
+.tote i {
+  left: 14%;
+  right: 14%;
+  top: 16%;
+  aspect-ratio: 1;
+  border-radius: calc(var(--w) * 0.016);
+}
+
+/* Tシャツ: the shirt (svg) with the art on its chest */
+.tee {
+  aspect-ratio: 1;
+}
+.tee svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.tee i {
+  left: 33%;
+  right: 33%;
+  top: 30%;
+  aspect-ratio: 1;
+  border-radius: 2px;
+  mix-blend-mode: multiply;
+}
+
+/* ステッカー: die-cut with a white edge, tilted, a corner lifting */
+.sticker {
+  aspect-ratio: 1;
+  width: calc(var(--w) * 0.82);
+  margin-top: calc(var(--w) * 0.08);
+  margin-bottom: calc(var(--w) * 0.08);
+  transform: rotate(-6deg);
+  border-radius: calc(var(--w) * 0.12);
+  background: #fff;
+}
+.sticker i {
+  inset: 6.5%;
+  border-radius: calc(var(--w) * 0.09);
+}
+.sticker b {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 22%;
+  height: 22%;
+  border-radius: 0 0 calc(var(--w) * 0.12) 0;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0) 49%, #e9e9ee 50%, #fff 70%);
+  box-shadow: -2px -2px 6px rgba(0, 0, 0, 0.18);
+}
+
+/* アクスタ: a clear acrylic panel on its base */
+.acry {
+  width: calc(var(--w) * 0.78);
+}
+.panel {
+  position: relative;
+  aspect-ratio: 0.78;
+  border-radius: calc(var(--w) * 0.06);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.12) 45%, rgba(255, 255, 255, 0.35));
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  box-shadow: inset 0 0 calc(var(--w) * 0.05) rgba(255, 255, 255, 0.6);
+}
+.panel i {
+  left: 9%;
+  right: 9%;
+  top: 7%;
+  bottom: 7%;
+  border-radius: calc(var(--w) * 0.035);
+}
+.panel::after {
+  content: '';
+  position: absolute;
+  left: 12%;
+  top: 4%;
+  width: 18%;
+  height: 60%;
+  border-radius: 40%;
+  background: linear-gradient(rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0));
+  transform: skewX(-12deg);
+  pointer-events: none;
+}
+.base {
+  width: 76%;
+  height: calc(var(--w) * 0.07);
+  margin: -2px auto 0;
+  border-radius: 50%;
+  background: linear-gradient(rgba(255, 255, 255, 0.85), rgba(200, 220, 240, 0.55));
+  border: 2px solid rgba(255, 255, 255, 0.9);
+}
+
+/* マグカップ: the art wrapped on the cup, its handle on the right */
+.mug {
+  aspect-ratio: 1.12;
+  width: calc(var(--w) * 0.95);
+}
+.cup {
+  position: absolute;
+  left: 4%;
+  top: 6%;
+  width: 72%;
+  bottom: 2%;
+  border-radius: calc(var(--w) * 0.02) calc(var(--w) * 0.02) calc(var(--w) * 0.12) calc(var(--w) * 0.12);
+  background: linear-gradient(90deg, #d9d9d6, #fff 30%, #fbfbf9 60%, #cfcfcb);
+  overflow: hidden;
+}
+.cup::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 9%;
+  background: radial-gradient(ellipse at 50% 0, #3a2414 60%, #ececea 62%);
+}
+.cup i {
+  left: 12%;
+  right: 12%;
+  top: 20%;
+  bottom: 14%;
+  border-radius: 3px;
+}
+.cup::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.18), rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0) 70%, rgba(0, 0, 0, 0.2));
+  pointer-events: none;
+}
+.handle {
+  position: absolute;
+  right: 2%;
+  top: 26%;
+  width: 30%;
+  height: 46%;
+  border: calc(var(--w) * 0.06) solid #ecece8;
+  border-left: 0;
+  border-radius: 0 50% 50% 0;
+}
+
+/* 缶バッジ: a round badge, a metal rim and a shine */
+.badge {
+  aspect-ratio: 1;
+  width: calc(var(--w) * 0.78);
+  margin-top: calc(var(--w) * 0.08);
+  margin-bottom: calc(var(--w) * 0.08);
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f4f4f6, #a9acb3);
+}
+.badge i {
+  inset: 4%;
+  border-radius: 50%;
+}
+.badge b {
+  position: absolute;
+  inset: 4%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 38%), radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0) 62%, rgba(0, 0, 0, 0.22));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sway {
+    animation: none;
+  }
+}

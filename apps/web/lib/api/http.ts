@@ -218,6 +218,27 @@ export class HttpApi implements Api {
   gameBroken(id: string, body: Parameters<Api['gameBroken']>[1]) {
     return this.req<Awaited<ReturnType<Api['gameBroken']>>>('POST', `/moon/games/${id}/broken`, body);
   }
+  flyBook(id: string, on = true) {
+    return this.req<Awaited<ReturnType<Api['flyBook']>>>('POST', `/moon/books/${id}/fly`, { on });
+  }
+  flyGame(id: string, on = true) {
+    return this.req<Awaited<ReturnType<Api['flyGame']>>>('POST', `/moon/games/${id}/fly`, { on });
+  }
+  setGameCover(id: string, rootId: string | null) {
+    return this.req<Awaited<ReturnType<Api['setGameCover']>>>('PUT', `/moon/games/${id}/cover`, { rootId });
+  }
+  makeGoods(body: Parameters<Api['makeGoods']>[0]) {
+    return this.req<Awaited<ReturnType<Api['makeGoods']>>>('POST', '/moon/goods', body);
+  }
+  goodsList() {
+    return this.req<Awaited<ReturnType<Api['goodsList']>>>('GET', '/moon/goods');
+  }
+  goodsOne(id: string) {
+    return this.req<Awaited<ReturnType<Api['goodsOne']>>>('GET', `/moon/goods/${id}`);
+  }
+  flyGoods(id: string, on = true) {
+    return this.req<Awaited<ReturnType<Api['flyGoods']>>>('POST', `/moon/goods/${id}/fly`, { on });
+  }
   demoJob({ pay: _pay, ...body }: Parameters<Api['demoJob']>[0]) {
     return this.req<Awaited<ReturnType<Api['demoJob']>>>('POST', '/jobs/demo', body);
   }

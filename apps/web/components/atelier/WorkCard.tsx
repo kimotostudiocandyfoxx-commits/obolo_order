@@ -14,7 +14,8 @@ import { BoothMixer } from '@/lib/venus/booth';
 import type { AtelierKind } from '@/lib/atelier/unlock';
 import { countdown, jobView, onJobs } from '@/lib/atelier/jobs';
 import { lyricBlockLabels, lyricHintLabel, type RefineTarget, type SongLyrics, type WorkMaterial } from '@obolo/shared';
-import { faceTo, FLIES, swipeTo, versionsOf, type Work } from './work';
+import { canFly, faceTo, FLIES, swipeTo, versionsOf, type Work } from './work';
+import { GoodsMock } from '@/components/planetTemplate/five/GoodsMock';
 import { BookById, BookFace } from './BookRead';
 import { GameById, GameFace } from './GamePlay';
 
@@ -204,7 +205,13 @@ export function WorkCard({
 
         {!showMaking && w.kind === 'novel' && (w.book ? <BookFace book={w.book} /> : w.ref?.bookId ? <BookById id={w.ref.bookId} load={loadBook} /> : null)}
         {!showMaking && w.kind === 'game' && (w.game ? <GameFace game={w.game} /> : w.ref?.gameId ? <GameById id={w.ref.gameId} own load={loadGame} /> : null)}
-        {!showMaking && shown.image && !isCraftWork(w) && (
+        {/* story 2026-11-25: グッズ — the art composited onto its kind's mock-up (nothing painted) */}
+        {!showMaking && w.kind === 'goods' && w.status === 'ready' && (
+          <div className="rounded-xl bg-gradient-to-b from-sky-200/15 to-transparent py-3" data-testid="goods-card">
+            <GoodsMock kind={w.goods?.kind ?? 'トート'} art={shown.image ?? w.goods?.artUrl} width={190} />
+          </div>
+        )}
+        {!showMaking && shown.image && !isCraftWork(w) && w.kind !== 'goods' && (
           <div
             className="relative"
             onClick={(e) => {
@@ -304,7 +311,7 @@ export function WorkCard({
               {on ? '❚❚ 止める' : '▶ 再生'}
             </button>
           )}
-          {onAgain && w.kind !== 'novel' && w.kind !== 'game' && (
+          {onAgain && w.kind !== 'novel' && w.kind !== 'game' && w.kind !== 'goods' && (
             <button onClick={onAgain} disabled={busy} className={`${btn} border border-white/20`}>
               やり直し
             </button>
@@ -319,7 +326,7 @@ export function WorkCard({
               {w.worn ? 'これになった' : 'これにする'}
             </button>
           )}
-          {planet && onFly && w.status === 'ready' && w.saved && (
+          {planet && onFly && canFly(w) && w.saved && (
             <button onClick={onFly} disabled={busy || w.flown} className={`${btn} bg-sky-300 font-bold text-slate-950`}>
               <PlanetMark id={planet} size={14} />
               {w.flown ? '飛んでいった' : '星へ飛ばす'}

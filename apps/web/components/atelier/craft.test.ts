@@ -2,7 +2,7 @@ import { CRAFT_LINES, MOON_LINES, type BookView } from '@obolo/shared';
 import { describe, expect, it } from 'vitest';
 import { craftAnswer, craftBegin, craftConfirmLine, craftDoneLines, craftSpellKind, wantsNew } from './craft';
 import { contentOf, detect, isBare } from './intent';
-import { FLIES, type Work } from './work';
+import { canFly, FLIES, type Work } from './work';
 
 const book = (n: number, done = false): BookView => ({ id: 'b1', title: '森の鈴', tags: [], cover: null, chapters: Array.from({ length: n }, (_, i) => ({ n: i + 1, title: 't', text: 'x', tags: [], at: '' })), done, home: 'pluto', createdAt: '', updatedAt: '' });
 
@@ -43,10 +43,21 @@ describe('本・ゲーム in the Moon chat', () => {
     expect(wantsNew('新しい本を作って')).toBe(true);
     expect(wantsNew('もっと難しく')).toBe(false);
   });
-  it('home planets from the one shared map; books and games keep theirs but are not flown yet', () => {
-    expect(FLIES.novel).toBeUndefined();
-    expect(FLIES.game).toBeUndefined();
+  it('home planets from the one shared map; story 2026-11-25: books, games and goods fly to theirs', () => {
+    expect(FLIES.novel).toBe('pluto');
+    expect(FLIES.game).toBe('neptune');
+    expect(FLIES.goods).toBe('uranus');
     expect(FLIES.song).toBe('mercury');
+  });
+  it('〔星へ飛ばす〕 for a book once it has its title and its opening (the first chapter); a game / goods once kept', () => {
+    const book = (chapters: number, title = '夜の学校') => ({ id: 'b', kind: 'novel' as const, prompt: '', status: 'ready' as const, title, ref: { bookId: 'b1' }, book: { id: 'b1', title, tags: [], cover: null, chapters: Array.from({ length: chapters }, (_, i) => ({ n: i + 1, title: '', text: 'x', tags: [], at: '' })), done: false, home: 'pluto' as const, createdAt: '', updatedAt: '' } });
+    expect(canFly(book(1))).toBe(true);
+    expect(canFly(book(0))).toBe(false);
+    expect(canFly(book(1, ''))).toBe(false);
+    expect(canFly({ id: 'g', kind: 'game', prompt: '', status: 'ready', ref: { gameId: 'g1' } })).toBe(true);
+    expect(canFly({ id: 'g', kind: 'game', prompt: '', status: 'making' })).toBe(false);
+    expect(canFly({ id: 'x', kind: 'goods', prompt: '', status: 'ready', ref: { goodsId: 'x1' } })).toBe(true);
+    expect(canFly({ id: 'l', kind: 'look', prompt: '', status: 'ready' })).toBe(false);
   });
 });
 

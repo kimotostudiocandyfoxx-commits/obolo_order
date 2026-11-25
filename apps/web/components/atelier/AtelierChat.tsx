@@ -22,6 +22,7 @@ import { choiceOf, detectOpen, pickOpen, type OpenAsk } from '@/lib/bluena/find'
 import { EDIT_EVENT, openInBluena, takeEdit } from '@/lib/bluena/edit';
 import { isStorageAsk, isStorageCancel, storageTierOf, STORAGE_LINES, type StorageTierPrice, type StorageView } from '@obolo/shared';
 import { ART_TITLE_LINES, artTitleTalk, type ArtTitleTalk } from '@obolo/shared';
+import { coverTalk, GAME_COVER_LINES, GOODS_LINES, goodsKindOf, MAKE_COST, pickArt, type GoodsArt, type GoodsKind } from '@obolo/shared';
 import { BATI_REST_HINT, type BatiRest, BLUENA_LINES, formatMana, LOOK_LOCKED_LINE, gameTierFor, gameMakeKind, matchGameTemplate, type GameTemplateId, type GameTier } from '@obolo/shared';
 import { daysUntil, isOpen, KINDS, lockLine, openKinds, openLessons, type AtelierKind, type Lesson } from '@/lib/atelier/unlock';
 import { historyOf, recentRequest } from './carry';
@@ -57,7 +58,7 @@ function meItem(m: { id: string; text: string; file?: ClipFile | null }): TalkIt
 import { useClipSend } from '@/lib/clip/useClip';
 import { BowlFx, TEMPLE_PLATE, type BowlState } from './BowlFx';
 import { useCastWait } from './CastClock';
-import { faceTo, FLIES, uid, versionsOf, type Msg, type Work } from './work';
+import { canFly, faceTo, uid, versionsOf, type Msg, type Work } from './work';
 import { isYes, planOf, spellKindOf, type Plan } from './plan';
 import { FloatingSpell, floatLayout, MANA_H, SpellRecord, type FloatSpell } from './FloatingSpell';
 import { LyricSheet, LyricsRecord } from './LyricSheet';
@@ -131,7 +132,11 @@ type PlanAsk = {
 type VoiceAsk = { card: Work; price: number; spell: string };
 /** R18: ふくろの魔法 — which size (the tiers said), then the yes to its price */
 type StorageAsk = { tiers: StorageTierPrice[]; plan: StorageView['plan']; gb?: number; price?: number };
-type Pending = { storage: StorageAsk } | { kind: AtelierKind } | { gameTrial: { said: string } } | { radioName: string } | { tweak: Work } | { voiceSpell: VoiceAsk } | { voiceAgain: true } | { use: AtelierKind; materials: Work[] } | { plan: PlanAsk } | { craft: CraftAsk } | { after: Work } | { tool: ToolAsk; spell?: SavedSpell; forKind?: AtelierKind; content?: string } | null;
+/** story 2026-11-25 (グッズ): what is known so far — the kind, the art (one of the member's own, newest first) */
+type GoodsAsk = { kind?: GoodsKind; art?: GoodsArt; arts: GoodsArt[]; said: string };
+/** story 2026-11-25: a game just made — its case: one of the member's arts, {bati} paints one, or the neon face */
+type CoverAsk = { game: Work; arts: GoodsArt[] };
+type Pending = { goods: GoodsAsk } | { cover: CoverAsk } | { storage: StorageAsk } | { kind: AtelierKind } | { gameTrial: { said: string } } | { radioName: string } | { tweak: Work } | { voiceSpell: VoiceAsk } | { voiceAgain: true } | { use: AtelierKind; materials: Work[] } | { plan: PlanAsk } | { craft: CraftAsk } | { after: Work } | { tool: ToolAsk; spell?: SavedSpell; forKind?: AtelierKind; content?: string } | null;
 /** R12: {bati}'s tool out in the sky (the compass while it reads; the spell book open, or taking a spell in) */
 type ToolShow = { kind: 'compass'; phase: CompassPhase; leaving?: boolean; key: number } | { kind: 'book'; mode: BookMode; page: number; spells: SavedSpell[]; saving?: BookSaving; key: number } | null;
 
@@ -346,6 +351,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
    * under them) and asks; a yes in words (「OK」「いいよ」「作って」) casts it, other words change it — no buttons.
    */
   const run = (kind: AtelierKind, prompt: string, prev?: Work, opts: MakeOpts = {}) => {
+    // story 2026-11-25: グッズ is asked in words (which kind, which art), then made at once
+    if (kind === 'goods' && !opts.goods && !story) return void goodsStart(prompt);
     const cost = story?.test ? null : atelierMakeCost(kind, day, kind === 'game' && !!prev, manaPricesNow());
     if ((!cost && !(isCraftKind(kind) && !story)) || opts.confirm) return start(kind, prompt, prev, opts);
     if (!prev && !opts.materials?.length && isBare(prompt)) {
@@ -751,6 +758,11 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       // client 2026-11-25: a chapter / a game made — {bati} asks what next; the next words change it (or start a new one)
       for (const l of craftDoneLines(w)) sayT(l.text, l.vars);
       if (!w.book?.done) setPending({ after: w });
+      // story 2026-11-25: a new game (its first build, no case picture yet) — {bati} offers its case
+      if (w.kind === 'game' && w.game && !w.game.cover && w.game.version === 0) void coverOffer(w);
+    } else if (w.kind === 'goods' && w.status === 'ready') {
+      // story 2026-11-25 (グッズ): made at once, kept in Bluena; 〔星へ飛ばす〕 sends it to the Uranus shop
+      sayT(GOODS_LINES.done, { title: w.title ?? '' });
     } else if (w.kind === 'song' && w.status === 'ready') {
       // R13 (client): a song made — {bati} asks if it should be changed more (free: tempo, length, 2番カット …); R18: now
       // and then (the first song, then at most once every few, never twice in a row) 君の声にする魔法 too — no price
@@ -760,6 +772,11 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     } else if (DONE[w.kind]) say(DONE[w.kind]);
     // story 2026-11-25: a picture made — {bati}'s one title for it (kept already; words change it, no buttons)
     if (!story && w.kind === 'art' && w.status === 'ready' && w.title) sayT(ART_TITLE_LINES.propose, { title: w.title });
+    // story 2026-11-25: painted for a game's case — it is on the case now
+    if (!story && w.kind === 'art' && w.status === 'ready' && w.ref?.coverFor && w.image) {
+      coverOn(w.ref.coverFor, w.image);
+      sayT(GAME_COVER_LINES.painted);
+    }
     if (w.status === 'ready' && !story) void tipCheck();
     // R18: the room after it (80%: said once)
     if (w.status === 'ready' && !story) void storageNotice();
@@ -987,6 +1004,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       });
     }
     if (isCraftKind(kind)) return craftAsk(craftBegin(kind, content, isBare(content)));
+    if (kind === 'goods' && !story) return void goodsStart(content);
     // R12: a kept spell that fits the words — {bati} offers it now and then (「スペルブックの『…』をもとにする？」)
     if (suggestFromBook(kind, content)) return;
     // R11: one that spends mana: {bati}'s question or plan first (run)
@@ -1110,6 +1128,114 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     } finally {
       setBusy(false);
     }
+  };
+
+  // ── story 2026-11-25 (グッズ・ゲームのケース): the member's own arts, chosen in words ──
+  /** the member's arts (their Jupiter pictures), newest first */
+  const myArts = async (): Promise<GoodsArt[]> =>
+    (await getApi()
+      .jupiterRoots()
+      .catch(() => []))
+      .filter((r) => r.kind === 'photo')
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      .map((r) => ({ id: r.id, title: r.title ?? null, url: r.url }));
+  /** the arts shown small under {bati}'s question (a tap opens them) */
+  const artCards = (arts: GoodsArt[]): Work[] => arts.slice(0, 8).map((a) => ({ id: `art-${a.id}`, kind: 'art', prompt: '', status: 'ready', title: a.title ?? undefined, image: a.url, ref: { rootId: a.id }, saved: true }));
+  const sayArts = (tpl: string, arts: GoodsArt[], vars: Record<string, string | number> = {}) => setMsgs((m) => [...m, { id: uid(), who: 'bati', text: tline(tpl, vars), found: artCards(arts) }]);
+  /** an art named by its title in the words (the start: 「星の森でトートを作って」) */
+  const artNamed = (arts: GoodsArt[], words: string) => arts.find((a) => a.title && words.replace(/\s/g, '').includes(a.title.replace(/\s/g, '')));
+  /** 「グッズを作りたい」: the kind and the art said already count; the rest is asked */
+  const goodsStart = async (content: string) => {
+    setBusy(true);
+    const arts = await myArts();
+    setBusy(false);
+    if (!arts.length) return sayT(GOODS_LINES.noArt);
+    const said = isBare(content) ? '' : content;
+    // an art brought in from Bluena is the one
+    const mat = matsRef.current.find((m) => m.kind === 'art' && m.ref?.rootId);
+    if (mat) setMats([]);
+    const art = (mat && arts.find((a) => a.id === mat.ref?.rootId)) || artNamed(arts, said) || undefined;
+    goodsNext({ kind: goodsKindOf(content) ?? undefined, art, arts, said });
+  };
+  const goodsNext = (a: GoodsAsk) => {
+    if (!a.kind) {
+      setPending({ goods: a });
+      return sayT(GOODS_LINES.askKind);
+    }
+    if (!a.art) {
+      setPending({ goods: a });
+      return sayArts(GOODS_LINES.askArt, a.arts);
+    }
+    setPending(null);
+    sayT(GOODS_LINES.make);
+    castNow(1200);
+    void start('goods', a.said || `${a.art.title ?? ''}${a.kind}`, undefined, { goods: { kind: a.kind, rootId: a.art.id, image: a.art.url } });
+  };
+  const goodsAnswer = (a: GoodsAsk, text: string) => {
+    if (!a.kind) {
+      const k = goodsKindOf(text) ?? (/おまかせ|なんでも|どれでも/.test(text) ? 'トート' : null);
+      if (!k) {
+        setPending({ goods: a });
+        return sayT(GOODS_LINES.kindAgain);
+      }
+      return goodsNext({ ...a, kind: k, art: a.art ?? artNamed(a.arts, text) });
+    }
+    const art = pickArt(a.arts, text);
+    if (!art) {
+      setPending({ goods: a });
+      return sayT(GOODS_LINES.artAgain);
+    }
+    goodsNext({ ...a, art, kind: goodsKindOf(text) ?? a.kind });
+  };
+  /** a game's case shows a picture (Neptune): the game card on the talk shows it too */
+  const coverOn = (gameId: string, url: string | null) =>
+    setMsgs((m) => m.map((x) => (x.who === 'work' && x.work.ref?.gameId === gameId && x.work.game ? { ...x, work: { ...x.work, game: { ...x.work.game, cover: url } } } : x)));
+  /** a game made: {bati} offers its case — one of your arts, or one it paints at the art's price; none: the neon face */
+  const coverOffer = async (game: Work) => {
+    const arts = await myArts();
+    const mana = formatMana(manaPricesNow().jacketArt ?? MAKE_COST.jacketArt);
+    if (arts.length) sayArts(GAME_COVER_LINES.offer, arts, { mana });
+    else sayT(GAME_COVER_LINES.offer, { mana });
+    setPending({ cover: { game, arts } });
+  };
+  /** the answer: an art by its name / 「新しいの」, 「描いて」, 「いらない」; false = not about the case (a tweak, another kind) */
+  const coverAnswer = (c: CoverAsk, text: string): boolean => {
+    const gameId = c.game.ref?.gameId;
+    if (!gameId) return false;
+    const it = detect(text, false, markNames());
+    if (it.kind === 'find' || (it.kind === 'make' && it.what !== 'art' && it.what !== 'image' && it.what !== 'game' && it.what !== 'lookup')) return false;
+    const t = coverTalk(text);
+    if (t === 'none') {
+      setPending({ after: c.game });
+      sayT(GAME_COVER_LINES.none);
+      return true;
+    }
+    if (t === 'paint') {
+      setPending(null);
+      sayT(GAME_COVER_LINES.paint);
+      const words = isBare(text.replace(/描いて|かいて|描く|かく|バティ|おまかせ|が|で|ケース|の絵|絵/g, '')) ? `${c.game.title ?? 'ゲーム'}のゲームのケースの絵` : text;
+      // the art's own spell, price and yes (jacketArt); once painted it goes on this game (MakeOpts.coverFor)
+      void propose('art', words.slice(0, 200), undefined, { coverFor: gameId });
+      return true;
+    }
+    const art = pickArt(c.arts, text);
+    if (art) {
+      void getApi()
+        .setGameCover(gameId, art.id)
+        .then((g) => {
+          coverOn(gameId, g.cover ?? art.url);
+          sayT(GAME_COVER_LINES.picked, { title: art.title || '絵' });
+        })
+        .catch((e) => say(failLine(e)));
+      setPending({ after: c.game });
+      return true;
+    }
+    if (/アート|絵|イラスト|ケース|カバー/.test(text) && c.arts.length) {
+      setPending({ cover: c });
+      sayT(GOODS_LINES.artAgain);
+      return true;
+    }
+    return false;
   };
 
   /**
@@ -1253,6 +1379,11 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       return true;
     }
     if (w.kind === 'video') return videoAfter(w, text);
+    // story 2026-11-25: 「ケースの絵を変えて」 — the case's picture again
+    if (w.kind === 'game' && /ケース|カバー|パッケージ/.test(text)) {
+      void coverOffer(cardOf(w.id) ?? w);
+      return true;
+    }
     if (it.kind === 'make' && it.what === w.kind && wantsNew(text)) {
       void craftAsk(craftBegin(w.kind as 'novel' | 'game', '', true));
       return true;
@@ -1679,6 +1810,16 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     if (p && 'craft' in p) {
       const it = detect(text, false, markNames());
       if (!(it.kind === 'make' && it.what !== p.craft.kind && it.what !== 'lookup') && it.kind !== 'find') return void craftAsk(craftAnswer(p.craft, text));
+    }
+    // story 2026-11-25 (グッズ): the answer to {bati}'s kind / art question (unless another kind is asked for)
+    if (p && 'goods' in p) {
+      const it = detect(text, false, markNames());
+      if (!(it.kind === 'make' && it.what !== 'goods' && it.what !== 'lookup' && it.what !== 'art' && it.what !== 'image') && it.kind !== 'find') return void goodsAnswer(p.goods, text);
+    }
+    // story 2026-11-25: the game's case (an art, 「描いて」, 「いらない」); other words are the game's change as before
+    if (p && 'cover' in p && !story) {
+      if (coverAnswer(p.cover, text)) return;
+      if (craftAfter(p.cover.game, text)) return;
     }
     // R16: 「ブルーナの〇〇流して」 said plainly as one of your works goes before a change of the work on the table
     if (!story && detectOpen(text)?.strong && openAsk(text)) return;
@@ -2199,7 +2340,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
             mark: m.work.status === 'ready' ? workMarkRef(m.work) : undefined,
             // 〔星へ飛ばす〕 right on the bubble (the story's fly choice is made here), as on the opened card
             chips:
-              FLIES[m.work.kind] && m.work.status === 'ready' && (m.work.saved || !!story)
+              canFly(m.work) && (m.work.saved || !!story)
                 ? [{ label: m.work.flown ? '飛んでいった' : '星へ飛ばす', onPick: () => void flyIt(m.work), disabled: busy || !!m.work.flown }]
                 : undefined,
             card: {

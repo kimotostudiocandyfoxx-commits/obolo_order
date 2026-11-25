@@ -1,4 +1,4 @@
-import { STORAGE_LINES, artTitleFallback, type SpellTag, type GameTemplateId, type GameTier, CRAFT_LINES, KIND_HOME_PLANET, spellFrom, KORORIN_VOICE_STYLE, neoVoiceUrl, withTarget, lyricsLines, lyricsSections, type JobView, type MakeConfirm, type Me, type RefineTarget, type VideoParams, type WorkVersion, VIDEO_LINES, videoParams } from '@obolo/shared';
+import { STORAGE_LINES, artTitleFallback, goodsTitle, type GoodsKind, type SpellTag, type GameTemplateId, type GameTier, CRAFT_LINES, KIND_HOME_PLANET, spellFrom, KORORIN_VOICE_STYLE, neoVoiceUrl, withTarget, lyricsLines, lyricsSections, type JobView, type MakeConfirm, type Me, type RefineTarget, type VideoParams, type WorkVersion, VIDEO_LINES, videoParams } from '@obolo/shared';
 import { demoStickerArt } from '@/lib/look';
 import { ApiError, getApi } from '@/lib/api';
 import type { AtelierKind } from '@/lib/atelier/unlock';
@@ -54,6 +54,10 @@ export type MakeOpts = {
   game?: { tier: GameTier; template?: GameTemplateId };
   /** R17: the secret spell's grant (only after a member said its passphrase; the server checks it) and its price */
   premium?: { grant: string; price: number };
+  /** story 2026-11-25 (グッズ): the kind and the art chosen in the talk (free, made at once) */
+  goods?: { kind: GoodsKind; rootId: string; image?: string; title?: string };
+  /** story 2026-11-25: an art painted for a game's case (it goes on that game once made) */
+  coverFor?: string;
 };
 
 /** the review page's stand-in times (M-R253 §4): a 2-minute one (said up front) and a 20-second one (waited in place) */
@@ -118,7 +122,7 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
       // the review page: a 20-second stand-in job (waited in place, no time said)
       if (!ctx.live) {
         const job = await api.demoJob({ seconds: DEMO_SECONDS.art!, failTimes: 0, pay: pay('jacketArt') });
-        return { ...base, prompt: words, status: 'making', ref: { style }, started: { job, what: 'art', words: `${words}${style ?? ''}` } };
+        return { ...base, prompt: words, status: 'making', ref: { style, ...(opts.coverFor ? { coverFor: opts.coverFor } : {}) }, started: { job, what: 'art', words: `${words}${style ?? ''}`, ...(opts.coverFor ? { extra: { coverFor: opts.coverFor } } : {}) } };
       }
       const r = await api.stickerArt(words, style, paid);
       // story 2026-11-25: {bati}'s one title from the spell (a redo keeps the title it has)
@@ -129,7 +133,9 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
         const blob = await fetch(r.url).then((x) => (x.ok ? x.blob() : Promise.reject(new Error(String(x.status)))));
         const ph = await api.uploadPhoto(blob);
         const root = await api.addJupiterRoot({ mediaId: ph.id, ...(spell ? { spell } : {}), title });
-        return done({ ...w, ref: { ...w.ref, rootId: root.id, mediaId: ph.id } });
+        // story 2026-11-25: painted for a game's case — it goes on that game (and stays an art of yours)
+        if (opts.coverFor) await api.setGameCover(opts.coverFor, root.id).catch(() => undefined);
+        return done({ ...w, ref: { ...w.ref, rootId: root.id, mediaId: ph.id, ...(opts.coverFor ? { coverFor: opts.coverFor } : {}) } });
       } catch {
         return { ...w, note: 'ブルーナに、うまくしまえなかった' };
       }
@@ -224,6 +230,13 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
       const b = await withTimeout(api.novelChapter({ bookId, tags, said: said.slice(0, 200) }), 120_000);
       return { ...base, prompt: said, title: b.title, book: b, image: b.cover ?? bookCoverUrl(b.title, bookSub(b)), ref: { bookId: b.id }, spell: bookId ? prev?.spell : tags, home: KIND_HOME_PLANET.novel, saved: true };
     }
+    case 'goods': {
+      // story 2026-11-25: a kind + one of your arts — free, nothing painted (the card composites the art onto the mock-up)
+      const g = opts.goods;
+      if (!g) throw new ApiError(400, 'VALIDATION', 'no goods');
+      const v = await api.makeGoods({ kind: g.kind, rootId: g.rootId, ...(g.title ? { title: g.title } : {}) });
+      return { ...base, prompt: said, title: v.title, image: v.artUrl, goods: v, ref: { goodsId: v.id, rootId: v.rootId ?? undefined }, home: KIND_HOME_PLANET.goods, saved: true };
+    }
     case 'game': {
       // client 2026-11-25: built in the background with the yes (12, then 3 a tweak); the job host finishes the card
       const tags = opts.plan?.tags ?? spellFrom('game', said);
@@ -277,7 +290,9 @@ export async function finishJob(w: Watched, job: JobView, live = getApi().mode =
       const api = getApi();
       const ph = await api.uploadPhoto(await fetch(image).then((x) => x.blob()));
       const root = await api.addJupiterRoot({ mediaId: ph.id, title });
-      made = { ...made, ref: { ...made.ref, rootId: root.id, mediaId: ph.id } };
+      const coverFor = w.extra?.coverFor;
+      if (coverFor) await api.setGameCover(coverFor, root.id).catch(() => undefined);
+      made = { ...made, ref: { ...made.ref, rootId: root.id, mediaId: ph.id, ...(coverFor ? { coverFor } : {}) } };
     } catch {
       /* the card only */
     }
@@ -324,7 +339,7 @@ const PLANET_KINDS: AtelierKind[] = ['voice', 'art', 'song', 'video', 'radio'];
  */
 export async function keep(base: Work | undefined, made: Work, target?: RefineTarget): Promise<Work> {
   // client 2026-11-25: a book grows chapter by chapter and a game keeps its versions on the server: one face, no tries
-  if (made.kind === 'novel' || made.kind === 'game') return { ...made, id: base?.id ?? made.id, origin: base?.origin ?? made.origin, versions: undefined, active: undefined, job: undefined, target: undefined, saved: true };
+  if (made.kind === 'novel' || made.kind === 'game' || made.kind === 'goods') return { ...made, id: base?.id ?? made.id, origin: base?.origin ?? made.origin, versions: undefined, active: undefined, job: undefined, target: undefined, saved: true };
   let w = stack(base, made, target);
   if (w.status !== 'ready' || w.ref?.test) return w;
   if (PLANET_KINDS.includes(w.kind)) {
@@ -381,6 +396,12 @@ async function makeTest(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: Work
       const words = prev?.kind === 'video' ? `${prev.prompt}。${prompt}` : prompt;
       return { ...base, prompt: words, title: 'MV（おためし）', image: demoStickerArt(words.slice(0, 60)), note: 'おためしでは映像は作らず、絵だけを置いています' };
     }
+    case 'goods': {
+      // the review page: the art brought in, on its kind (nothing kept)
+      const kind = 'トート' as GoodsKind;
+      const image = demoStickerArt(prompt.slice(0, 60));
+      return { ...base, title: goodsTitle(kind, null), image, goods: { id: base.id, kind, rootId: null, artUrl: image, title: goodsTitle(kind, null), flownAt: null, home: 'uranus', createdAt: new Date().toISOString() } };
+    }
     case 'radio':
       return { ...base, status: 'record', saved: false, title: (prompt || `${ctx.me?.displayName ?? ''}のラジオ`).slice(0, 40) };
     default:
@@ -412,6 +433,10 @@ export async function fly(w: Work, ctx: Ctx): Promise<void> {
   else if (w.kind === 'video' && w.reel && api.mode !== 'live') {
     // R13: the review page's video (canned frames, no server): flown in the talk only
   } else if (w.kind === 'radio' && r.showId) await api.publishRadioShow(r.showId, true);
+  // story 2026-11-25: goods to Uranus, a book (its title and opening there) to Pluto, a game to Neptune
+  else if (w.kind === 'goods' && r.goodsId) await api.flyGoods(r.goodsId, true);
+  else if (w.kind === 'novel' && r.bookId) await api.flyBook(r.bookId, true);
+  else if (w.kind === 'game' && r.gameId) await api.flyGame(r.gameId, true);
   else throw new ApiError(400, 'NOT_KEPT', 'not kept');
   if (LOCAL_KINDS.includes(w.kind) || r.demoSong) putShelf({ ...w, flown: true });
 }
@@ -430,6 +455,7 @@ async function discardThing(w: Work): Promise<void> {
   else if (w.kind === 'art' && r.rootId) await api.removeWork('jupiter_root', r.rootId);
   else if (w.kind === 'video' && r.backstageId) await api.removeWork('mars_backstage', r.backstageId);
   else if (w.kind === 'radio' && r.showId) await api.removeWork('radio_show', r.showId);
+  else if (w.kind === 'goods' && r.goodsId) await api.removeWork('goods', r.goodsId);
 }
 
 /** wear it: your look / {bati}'s dress-up */

@@ -5,6 +5,8 @@ import type { AtelierKind } from '@/lib/atelier/unlock';
  * R12 (client): the words of a request to make (作って / 描いて / ほしい / 魔法で …) and of a search for something that
  * exists (探して / 見せて / 見たい / 調べて / 〇〇の画像ある？). Only a search word with no making word is a picture search.
  */
+/** story 2026-11-25: グッズ and its six kinds (トート, Tシャツ, ステッカー, アクスタ, マグカップ, 缶バッジ) */
+const GOODS_WORD = /グッズ|ぐっず|トート|Tシャツ|ティーシャツ|ステッカー|シール|アクスタ|アクリルスタンド|マグカップ|マグ(?!ロ)|缶バッ[ジチ]/i;
 const ART_WORD = /アート|絵|イラスト|画像|がぞう|写真|しゃしん|ペイント|お絵かき|おえかき|ピクチャ/;
 // 「え、かいて」「えかいて」: 絵 in kana (only in front of a drawing / making word)
 const KANA_E = /(^|[^ぁ-ん])え(を|、|,|\s)?(かいて|描いて|つくって|作って|ほしい|欲しい)/;
@@ -33,6 +35,8 @@ const WORDS: [AtelierKind, RegExp][] = [
   // client 2026-11-25: a book (a story chapter by chapter) and a small game
   ['novel', /小説|物語|ものがたり|お話(を|に|が|、|。|！|$)|おはなし(を|に|が|、|。|$)|(?<!日|見|絵)本(を|に|が|、|。|！|$)|ブック/],
   ['game', /ゲーム/],
+  // story 2026-11-25: グッズ — a kind of goods with one of your arts on it
+  ['goods', GOODS_WORD],
 ];
 
 const REFINE = /もっと|やり直|やりなお|ちがう|違う|変えて|かえて|にして|っぽく|明るく|暗く|元気に|静かに|かわいく|かっこよく|足して|入れて/;
@@ -123,6 +127,8 @@ export function detect(text: string, hasCard: boolean, names?: MarkNames): Inten
   // 「姿を変身」 is the look
   if (kinds.includes('look') && kinds.includes('bati') && !/バティ|着せ?かえ|着替え/.test(t)) kinds = kinds.filter((k) => k !== 'bati');
   if (kinds.includes('video') && kinds.includes('song')) kinds = kinds.filter((k) => k !== 'song'); // 「この曲のMV」
+  // 「この絵でトートを作って」: the art is what goes on the goods
+  if (kinds.includes('goods')) kinds = kinds.filter((k) => k !== 'art' && k !== 'image' && (k !== 'game' || !/グッズ/.test(t)));
   if (kinds.includes('radio') && kinds.includes('song')) kinds = kinds.filter((k) => k !== 'song'); // 「曲を流すラジオ」
   if (kinds.length === 1) return { kind: 'make', what: kinds[0], content: contentOf(t) };
   if (kinds.length > 1) return { kind: 'ask', options: kinds };
@@ -146,6 +152,7 @@ export const KIND_WORD: Record<AtelierKind, string> = {
   radio: 'ラジオ番組',
   novel: '本',
   game: 'ゲーム',
+  goods: 'グッズ',
 };
 
 /** the request names only the kind (「アートを作って」): {bati} asks what it should be */
@@ -174,6 +181,7 @@ export const ASK: Record<AtelierKind, string> = {
   radio: '番組の名前は？',
   novel: 'どんなお話にする？',
   game: 'どんなゲームにする？',
+  goods: 'どんなグッズにする？',
 };
 export const DONE: Record<AtelierKind, string> = {
   look: 'どう？ 気に入ったら〔これにする〕。「もっと…」で、まだ変えられるよ',
@@ -188,6 +196,8 @@ export const DONE: Record<AtelierKind, string> = {
   // (books and games say CRAFT_LINES after they are made)
   novel: '',
   game: '',
+  // (goods say GOODS_LINES)
+  goods: '',
 };
 
 /**
@@ -222,7 +232,7 @@ export function wantsPicture(text: string): boolean {
  * 「〜にしたい」「〜がいい」, or 「やっぱり〜」) drop it and start that kind (its words carried over). Null: a change of the spell.
  */
 /** how {bati} names a kind in a short line (「曲はやめて、絵にしよう」) */
-export const KIND_NOUN: Record<AtelierKind, string> = { look: '姿', bati: '着せかえ', lookup: '調べもの', image: '絵', voice: 'コロリン', art: '絵', song: '曲', video: '動画', radio: 'ラジオ', novel: '本', game: 'ゲーム' };
+export const KIND_NOUN: Record<AtelierKind, string> = { look: '姿', bati: '着せかえ', lookup: '調べもの', image: '絵', voice: 'コロリン', art: '絵', song: '曲', video: '動画', radio: 'ラジオ', novel: '本', game: 'ゲーム', goods: 'グッズ' };
 export type SpellTurn = { cancel: true } | { switchTo: AtelierKind; content: string };
 const CANCEL = /やめ(?:て|る|た|とく|ておく|とこ|ましょう|よう|よっか|ます)?(?:[。！!、\s　]|$|て|よ|ね|な|わ|に|で|ちゃ)|止めて|キャンセル|きゃんせる|なしで|無しで|なしに|いらない|要らない|いらん|もういい|中止|とりやめ|取りやめ/;
 const OTHER_KIND: [AtelierKind, RegExp][] = [
@@ -233,6 +243,7 @@ const OTHER_KIND: [AtelierKind, RegExp][] = [
   ['game', /ゲーム/],
   ['voice', /コロリン|ころりん|つぶやき/],
   ['radio', /ラジオ|番組/],
+  ['goods', GOODS_WORD],
 ];
 /** what is said about the making itself (「曲を作るのを」「やっぱり」「これ」): nothing about a talisman */
 const ABOUT_IT = /曲|歌|うた|音楽|画像|がぞう|絵|イラスト|アート|写真|動画|映像|MV|ＭＶ|ムービー|ビデオ|小説|物語|お話|本|ゲーム|コロリン|ラジオ|番組|作る|つくる|作り|つくり|作成|生成|の|を|は|が|も|やっぱり|やっぱ|やはり|これ|それ|この|その|今回|今日|スペル|全部|ぜんぶ|もう|うーん|ううん|いや|じゃあ|えっと|ごめん|ごめんね|ちょっと|今の|いまの|やつ|[、。！!？?\s　ー〜]/gi;

@@ -19,7 +19,7 @@ import { BATI_VARIANTS, type BatiVariantSet } from './batiVariants';
 // --- 1. versions ------------------------------------------------------------------------------------------------
 
 /** what the Moon atelier makes (the web's AtelierKind) */
-export const MOON_WORK_KINDS = ['look', 'bati', 'lookup', 'image', 'voice', 'art', 'song', 'video', 'radio', 'novel', 'game'] as const;
+export const MOON_WORK_KINDS = ['look', 'bati', 'lookup', 'image', 'voice', 'art', 'song', 'video', 'radio', 'novel', 'game', 'goods'] as const;
 export type MoonWorkKind = (typeof MOON_WORK_KINDS)[number];
 /** tries kept in one work (the oldest goes first when there are more) */
 export const MAX_VERSIONS = 12;

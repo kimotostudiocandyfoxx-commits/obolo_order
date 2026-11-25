@@ -85,4 +85,14 @@ describe('R13: プロンプト / 呪文 in a request are the spell', () => {
     expect(it0).toMatchObject({ kind: 'make', what: 'art' });
     expect(it0.kind === 'make' && it0.content).not.toMatch(/プロンプト/);
   });
+  it('story 2026-11-25: グッズ and its kinds (an art named with it is what goes on it)', () => {
+    expect(detect('グッズを作りたい', false)).toMatchObject({ kind: 'make', what: 'goods' });
+    expect(detect('トートを作って', false)).toMatchObject({ kind: 'make', what: 'goods' });
+    expect(detect('この絵でマグカップを作って', false)).toMatchObject({ kind: 'make', what: 'goods' });
+    expect(detect('缶バッジにしたい', false)).toMatchObject({ kind: 'make', what: 'goods' });
+    expect(detect('ゲームのグッズを作って', false)).toMatchObject({ kind: 'make', what: 'goods' });
+    expect(isBare('グッズを作りたい')).toBe(true);
+    // a picture is still a picture
+    expect(detect('夜の海の絵を描いて', false)).toMatchObject({ kind: 'make', what: 'art' });
+  });
 });

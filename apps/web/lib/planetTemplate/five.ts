@@ -1,4 +1,4 @@
-import type { HomePlanet, HomeWork, WorkTags } from '@obolo/shared';
+import { GOODS_KINDS, isGoodsKind, type GoodsKind, type HomePlanet, type HomeWork, type WorkTags } from '@obolo/shared';
 import type { TitleStyle } from './mercury';
 
 /**
@@ -30,7 +30,7 @@ export interface FivePlanetDef {
 export const FIVE: Record<FivePlanet, FivePlanetDef> = {
   mars: { kind: 'mv', placeName: 'シアター', top: 0.12, titles: ['ネオンの夜', '走れ', 'パーティー', '夜のバラード', 'はじまりの歌'], glow: '#ff5fd2' },
   venus: { kind: 'radio', placeName: 'ブース', top: 0.14, titles: ['深夜のひとりごと', 'ラーメン報告', 'ねこラジオ', '夏の作戦会議', '月夜の雑談'], glow: '#ffb36b' },
-  uranus: { kind: 'goods', placeName: 'お店', top: 0.16, titles: ['夕焼けトート', 'ねこトート', 'ラーメントート', 'さくらトート', '月夜トート'], glow: '#4fe0ff' },
+  uranus: { kind: 'goods', placeName: 'お店', top: 0.16, titles: ['夕焼けトート', 'ねこTシャツ', 'ラーメンステッカー', 'さくらアクスタ', '月夜マグカップ', '星の缶バッジ'], glow: '#4fe0ff' },
   pluto: { kind: 'book', placeName: '図書館', top: 0.22, titles: ['夕焼けの町の約束', '屋根の上のねこ', 'ラーメンと魔法', 'さくら通りの手紙', '月と海の物語'], glow: '#b48cff' },
   neptune: { kind: 'game', placeName: 'ゲーム小屋', top: 0.12, titles: ['ネオンランナー', 'ねこジャンプ', 'ラーメンパズル', 'さくらレース', 'ムーンダイブ'], glow: '#ff4fd8' },
 };
@@ -103,6 +103,20 @@ export function fiveTitleOf(w: Pick<HomeWork, 'title' | 'text'>): string {
 }
 
 // --- each kind's viewer -------------------------------------------------------------------------------------------
+
+/**
+ * story 2026-11-25 Uranus: which mock-up a goods item is drawn on — its kind (the home's words carry it), else its main
+ * tag (goodsTags), else a tote
+ */
+export function goodsKindOfWork(w: Pick<HomeWork, 'text' | 'tags'>): GoodsKind {
+  const t = (w.text ?? '').trim();
+  if (isGoodsKind(t)) return t;
+  const m = w.tags?.main ?? '';
+  return isGoodsKind(m) ? m : 'トート';
+}
+/** the sample's goods: one of each kind, by the sample title it carries (FIVE.uranus.titles, in GOODS_KINDS' order) */
+export const SAMPLE_GOODS_KINDS: readonly GoodsKind[] = ['トート', 'Tシャツ', 'ステッカー', 'アクスタ', 'マグカップ', '缶バッジ'];
+export const sampleGoodsKind = (i: number) => SAMPLE_GOODS_KINDS[i % SAMPLE_GOODS_KINDS.length] ?? GOODS_KINDS[0];
 
 /** a Mars work is an MV (a film); the sample plays a song over its picture (the prototype's playSong) */
 export const isAudioUrl = (u: string | null | undefined) => /\.(mp3|m4a|aac|wav|ogg|opus)(\?|#|$)/i.test(u ?? '');
