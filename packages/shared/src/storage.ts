@@ -15,7 +15,7 @@ import { DEFAULT_PRICE_RULE, DEFAULT_STORAGE_GB_MONTH_USD, DEFAULT_USD_JPY, fxMo
  *    ever deleted automatically; over the quota, new uploads and makings stop until the member is under it again.
  *  - 「保存の魔法をやめて」: it ends at the month's end (the next renewal lapses instead of charging).
  *  - {bati} says once at 80% 「ブルーナがいっぱいになってきたよ。」; at 100% making / uploading stop with
- *    「ブルーナがいっぱいだよ。何かを消すか、保存の魔法で広げてね。」 (every style: STORAGE_VARIANTS).
+ *    「ブルーナがいっぱいだよ。いらないものを消すか、保存の魔法で広げてね。」 (every style: STORAGE_VARIANTS).
  */
 
 /** the expansion tiers (GB a month) */

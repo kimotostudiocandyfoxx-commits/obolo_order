@@ -133,8 +133,8 @@ describe('R18: words', () => {
     expect(storageWrite('POST', '/media/files/x/parts/1')).toBe(false);
   });
   it('the lines in every style, the same placeholders and sentences; ていねい writes デス／マス', () => {
-    expect(STORAGE_LINES.near).toBe('ブルーナがいっぱいになってきたよ。');
-    expect(STORAGE_LINES.full).toBe('ブルーナがいっぱいだよ。何かを消すか、保存の魔法で広げてね。');
+    expect(STORAGE_LINES.near).toBe('ブルーナがいっぱいになってきたよ。いらないものを消すか、保存の魔法で広げられるよ。');
+    expect(STORAGE_LINES.full).toBe('ブルーナがいっぱいだよ。いらないものを消すか、保存の魔法で広げてね。');
     const holes = (x: string) => [...x.matchAll(/\{[a-z0-9]+\}/g)].map((m) => m[0]).sort();
     const sentences = (x: string) => (x.match(/[^！？。!?]+[！？。!?]*/g) ?? [x]).length;
     for (const line of STORAGE_LINE_TEXTS) {
