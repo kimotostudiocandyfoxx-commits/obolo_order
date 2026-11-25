@@ -433,6 +433,8 @@ export function failLine(e: unknown): string {
   if (code === 'MODERATION') return 'その言葉は使えないみたい。別の言い方にしてみて';
   if (code === 'RESTYLE_TRIES' || code === 'LOOK_REFINES' || code === 'STICKER_TRIES') return '今日の魔法は、ここまで。また明日、つづきをしよう';
   if (code === 'NO_MANA' && e instanceof ApiError) return e.message;
+  // client 2026-11-25: a resident's confirmed look stays as it is until they join (the API's words: LOOK_LOCKED_LINE)
+  if (code === 'LOOK_LOCKED' && e instanceof ApiError) return e.message;
   // R18: a full Bluena — {bati}'s line (every style: STORAGE_VARIANTS)
   if (code === 'STORAGE_FULL' || code === 'STORAGE_QUOTA') return STORAGE_LINES.full;
   if (code === 'DEMO') return 'これは、ここ（おためし）では作れないんだ';

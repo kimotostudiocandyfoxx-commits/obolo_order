@@ -63,8 +63,9 @@ export function featureOfPath(path: string): UsageFeature {
 export function featureOfJob(name: string): UsageFeature {
   if (name === 'buddy.summarize') return 'memory';
   if (name === 'voice.line' || name === 'voice.bati') return 'voice';
-  // client 2026-11-25: the planet figures nobody paid for (the first look, the backfill) are absorbed (ABSORBED_FEATURES);
-  // a paid profile look change tags its job as that making (PlanetFiguresService.make)
+  // client 2026-11-25: the planet figures nobody can pay for any more (the admin backfill of looks confirmed before the
+  // first look was charged) are absorbed (ABSORBED_FEATURES); the first look and every profile look change tag their job
+  // as that profileLook making (PlanetFiguresService.make); so do the talk's pictures (LookService.talkLook)
   if (name === 'look.figures' || name === 'look.chibi') return 'figures';
   if (name.startsWith('bati.') || name === 'talk.look') return 'look';
   return 'other';

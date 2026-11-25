@@ -230,3 +230,35 @@ describe('R11: a paid making from the Moon atelier is charged only with the yes'
     expect(spent(l)).toBeCloseTo(MAKE_COST.song, 6);
   });
 });
+
+describe('client 2026-11-25: the first profile look, taken whole at the end of day 2 (chargeWhole)', () => {
+  it('the full price once per key: the whole mana now, the tenths waiting; a retry takes nothing', async () => {
+    const l = new MemLedger();
+    l.balance = 88;
+    const seen = await costScope.run({ feature: 'other', userId: 'u1' }, async () => {
+      const r = await l.chargeWhole(db, 'u1', 'profileLook', 'make:profileLook:first:u1', 'first');
+      expect(r).toMatchObject({ price: MAKE_COST.profileLook, taken: Math.floor(MAKE_COST.profileLook), waiting: 0, repeat: false });
+      return costScope.get();
+    });
+    expect(seen).toMatchObject({ kind: 'profileLook', job: 'make:profileLook:first:u1', paid: true });
+    expect(l.rows).toEqual([{ userId: 'u1', delta: -Math.floor(MAKE_COST.profileLook), reason: 'generation', idempotencyKey: 'make:profileLook:first:u1', refType: 'profileLook', refId: 'first' }]);
+    expect(88 - l.balance + l.tenths.pendingTenths / 10).toBeCloseTo(MAKE_COST.profileLook, 6);
+    const again = await l.chargeWhole(db, 'u1', 'profileLook', 'make:profileLook:first:u1', 'first');
+    expect(again.repeat).toBe(true);
+    expect(l.rows).toHaveLength(1);
+  });
+  it('short of the price: what the balance holds now, the rest waits (never below 0, never refused)', async () => {
+    const l = new MemLedger();
+    l.balance = 5;
+    const r = await l.chargeWhole(db, 'u1', 'profileLook', 'make:profileLook:first:u1');
+    expect(r.taken).toBe(5);
+    expect(r.waiting).toBe(Math.floor(MAKE_COST.profileLook) - 5);
+    expect(l.balance).toBe(0);
+    // the rest waits with the tenths: the next mana pays it
+    const waiting = Math.round(MAKE_COST.profileLook * 10) - 50;
+    expect(l.tenths.pendingTenths).toBe(waiting);
+    l.balance = 88;
+    await l.addTenths({} as Tx, 'u1', 'story', 1);
+    expect(l.balance).toBe(88 - Math.floor((waiting + 1) / 10));
+  });
+});

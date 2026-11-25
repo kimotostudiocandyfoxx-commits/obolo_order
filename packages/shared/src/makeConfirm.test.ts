@@ -12,8 +12,11 @@ describe('R11: nothing that spends mana starts without a yes', () => {
     expect(atelierMakeCost('art', 5)).toEqual({ kind: 'jacketArt', mana: MAKE_COST.jacketArt });
     expect(atelierMakeCost('video', 5)).toEqual({ kind: 'mv', mana: MAKE_COST.mv });
     for (const k of ['voice', 'radio', 'lookup', 'image']) expect(atelierMakeCost(k, JOURNEY_DONE)).toBeNull();
-    // the look and the dress-up: free on the first journey, the look's mana after it
-    expect(atelierMakeCost('look', 4)).toBeNull();
+    // the dress-up: free on the first journey, the look's mana after it; your own look: free until it is confirmed at
+    // the end of day 2, a full profileLook after it (client 2026-11-25)
+    expect(atelierMakeCost('bati', 4)).toBeNull();
+    expect(atelierMakeCost('look', 2)).toBeNull();
+    expect(atelierMakeCost('look', 4)).toEqual({ kind: 'profileLook', mana: MAKE_COST.profileLook });
     expect(atelierMakeCost('bati', JOURNEY_DONE)).toEqual({ kind: 'look', mana: MAKE_COST.look });
     // client 2026-11-25: your own look's change covers the planet figures of the look chosen
     expect(atelierMakeCost('look', JOURNEY_DONE)).toEqual({ kind: 'profileLook', mana: MAKE_COST.profileLook });

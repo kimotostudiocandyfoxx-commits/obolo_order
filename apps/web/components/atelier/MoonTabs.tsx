@@ -121,8 +121,10 @@ export function DachiTab({ threads, open, onOpen, onBack, banner, renderThread, 
   const lonely = !threads.some((t) => t.id !== 'kimorin' && t.id !== 'mikie') && (me?.journeyDay ?? 0) >= 3;
   // the back stands as in the talk, only on a short screen a little lower, its head no higher than 72% down (so the
   // hall's middle row stays clear of it; the front row keeps out of its way, Strollers' `back`)
-  const lift = hs.h ? -Math.max(0, hs.h * 0.72 - (selfBackRects(hs.w, hs.h)[0]?.y ?? hs.h)) : 0;
-  const back = hall.length || outside.length ? { rects: selfBackRects(hs.w, hs.h, lift), host } : undefined;
+  // client 2026-11-25: your look's own back view when it is made (Me.lookBack), else the talk cast's
+  const own = me?.lookBack ?? null;
+  const lift = hs.h ? -Math.max(0, hs.h * 0.72 - (selfBackRects(hs.w, hs.h, 0, own)[0]?.y ?? hs.h)) : 0;
+  const back = hall.length || outside.length ? { rects: selfBackRects(hs.w, hs.h, lift, own), host } : undefined;
   return (
     <div ref={host} className="relative flex min-h-0 flex-1 flex-col overflow-hidden" data-testid="dachi-tab">
       <div className="absolute inset-x-0 top-0 z-[20]">
@@ -183,7 +185,7 @@ export function DachiTab({ threads, open, onOpen, onBack, banner, renderThread, 
         )}
       </div>
       {/* R10 (client): your back in front, over the ダチ (never in the way of a tap); their names stay above it */}
-      {back && <SelfBack w={hs.w} h={hs.h} lift={lift} className="z-[18]" />}
+      {back && <SelfBack w={hs.w} h={hs.h} lift={lift} own={own} className="z-[18]" />}
       {/* R10: the Bluena device, bottom left, where it sits beside the mic in a talk */}
       {onDevice && <DeviceButton onClick={onDevice} floating />}
       {/* R10: ≡ every ダチ talk, newest first (like a chat app's list) */}

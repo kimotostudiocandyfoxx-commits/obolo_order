@@ -25,6 +25,7 @@ import {
   MAKE_COST_ESTIMATE,
   RUNWARE_REF_PRICES,
   pictureUsd,
+  profileLookParts,
   estimateJpy,
   DEFAULT_COST_RATES,
 } from './manaPrice';
@@ -145,24 +146,25 @@ describe('the quoted mana', () => {
     expect(pictureUsd('civitai:123@456')).toBeLessThan(0.01);
     expect(pictureUsd('someone:new@1')).toBeGreaterThanOrEqual(0.05);
   });
-  it('client 2026-11-25: a profile look change covers its 2 klein pictures + the Saturn chibi (klein) + the Saturn ball and 7 planet chibis (Qwen) ≈ 21 mana', () => {
+  it('client 2026-11-25: the profile look covers everything painted for a look ≈ 25.7 mana', () => {
     const e = MAKE_COST_ESTIMATE.profileLook;
-    // 3 × FLUX.2 klein 4B with a reference + 8 × Qwen-Image 2.1 Turbo (costs.json: $0.01413) + the words check
+    // 13 × FLUX.2 klein 4B with a reference (2 candidates, the standee, the chibi, 3 expressions, 4 blink / mouth parts,
+    // the back view, the Saturn chibi) + 8 × Qwen-Image 2.1 Turbo (costs.json: $0.01413) + the words check
     expect(pictureUsd('alibaba:qwen-image@2.1-turbo', true)).toBe(0.01413);
-    expect(e.usd).toBeCloseTo(3 * pictureUsd('runware:400@4', true) + 8 * 0.01413 + 0.0005, 6);
-    // the 2 look pictures and the 9 figures, kept 12 months
-    expect(e.storedBytes).toBe(11 * 1.5 * 1024 ** 2);
+    expect(profileLookParts().reduce((a, p) => a + p.count, 0)).toBe(21);
+    expect(e.usd).toBeCloseTo(13 * pictureUsd('runware:400@4', true) + 8 * 0.01413 + 0.0005, 6);
+    // 18 pictures (2 candidates, 7 of the look's own set with the round icon, 9 figures) and 4 small patches, kept 12 months
+    expect(e.storedBytes).toBe(18 * 1.5 * 1024 ** 2 + 4 * 0.125 * 1024 ** 2);
     const yen = estimateJpy(e, DEFAULT_COST_RATES);
-    expect(yen).toBeGreaterThan(18.7);
-    expect(yen).toBeLessThan(20);
+    expect(yen).toBeGreaterThan(22.5);
+    expect(yen).toBeLessThan(23.5);
     expect(MAKE_COST.profileLook).toBe(manaFor10(yen));
-    expect(MAKE_COST.profileLook).toBeGreaterThanOrEqual(21);
-    expect(MAKE_COST.profileLook).toBeLessThan(22);
+    expect(MAKE_COST.profileLook).toBe(25.7);
     // {bati}'s dress-up keeps its own price
     expect(MAKE_COST.look).toBeLessThan(MAKE_COST.profileLook);
     // the figures follow their models (SATURN_CHIBI_MODEL / SATURN_BALL_MODEL / PLANET_CHIBI_MODEL)
     const cheap = makeCostEstimates({ ...DEFAULT_MAKE_SETUP, saturnBallModel: 'runware:400@4', planetChibiModel: 'runware:400@4' });
-    expect(cheap.profileLook.usd).toBeLessThan(e.usd / 5);
+    expect(cheap.profileLook.usd).toBeLessThan(e.usd / 3);
   });
   it('R17: a song on Runware is about 2–3 mana', () => {
     expect(MAKE_COST.song).toBeLessThanOrEqual(3);

@@ -294,9 +294,9 @@ export function fishCostUsd(text: string): number {
  * R17 (client 2026-11-25, cheaper games): gameTrial = the first game, one of the prepared templates filled in by a
  * Flash-class model; game / gameTweak = the member's own request on the cheap chain (GAME_MODEL_CHEAP); gamePro /
  * gameTweakPro = the full chain (GAME_MODEL_FULL) — a request that needs it, or a tweak the cheap chain could not make.
- * Client 2026-11-25 (planet figures): profileLook = a change of the member's own profile look (a paid round of its
- * pictures, and the figures of the look chosen: the Saturn chibi and ball and the seven planets' chibis); 'look' is
- * {bati}'s dress-up.
+ * Client 2026-11-25: profileLook = the member's own profile look, everything painted for it (its candidates, the talk's
+ * pictures, the back view and the figures on every home planet: profileLookParts) — taken when the first look is
+ * confirmed at the end of day 2 (LookService.confirmFirstLook) and for every change after it; 'look' is {bati}'s dress-up.
  */
 export const MAKE_KINDS = ['look', 'kororinDesign', 'jacketArt', 'song', 'songPremium', 'songVoice', 'mv', 'story', 'game', 'gameTweak', 'mvPictures', 'mvRedraw', 'gameTrial', 'gamePro', 'gameTweakPro', 'profileLook'] as const;
 export type MakeKind = (typeof MAKE_KINDS)[number];
@@ -397,14 +397,18 @@ export function makeCostEstimates(s: MakeSetup = DEFAULT_MAKE_SETUP): Record<Mak
   const n = (x: number) => Math.max(1, Math.round(x));
   const pics = (model: string, count: number, refs: boolean) => n(count) * pictureUsd(model, refs);
   const lookUsd = Math.max(pics(s.lookModel, s.paidLookCandidates, true), pics(s.batiModel, s.paidLookCandidates, true));
-  const figures = planetFiguresUsd(s);
   return {
     look: { usd: lookUsd + WORDS_USD, note: `着せ替え ${s.batiModel} ×${n(s.paidLookCandidates)} 枚（参照画像つき）＋言葉の確認＋保存12か月`, storedBytes: n(s.paidLookCandidates) * PICTURE_STORED_BYTES },
-    // client 2026-11-25: the profile look's change — its pictures and the figures of the look chosen on every home planet
+    // client 2026-11-25 (decision 1): the profile look — EVERYTHING painted for one look: its candidates, the talk's
+    // pictures (the standee, the small chibi, the expressions, the blink / mouth parts), the back view, the figures on
+    // every home planet, the words check and 12 months of storing all of them (profileLookParts)
     profileLook: {
-      usd: pics(s.lookModel, s.paidLookCandidates, true) + figures + WORDS_USD,
-      note: `姿 ${s.lookModel} ×${n(s.paidLookCandidates)} 枚＋土星のちびキャラ ${s.saturnChibiModel} ×1＋土星のボール ${s.saturnBallModel} ×1＋7つの星のちびキャラ ${s.planetChibiModel} ×7（どれも姿を参照）＋言葉の確認＋保存12か月`,
-      storedBytes: (n(s.paidLookCandidates) + PLANET_FIGURE_COUNT) * PICTURE_STORED_BYTES,
+      usd: profileLookParts(s).reduce((a, p) => a + p.count * p.usd, 0) + WORDS_USD,
+      note: profileLookParts(s)
+        .map((p) => `${p.label} ${p.model} ×${p.count}`)
+        .join('＋')
+        .concat('（どれも姿を参照）＋言葉の確認＋保存12か月'),
+      storedBytes: (n(s.paidLookCandidates) + LOOK_SET_STORED.pictures + PLANET_FIGURE_COUNT) * PICTURE_STORED_BYTES + LOOK_SET_STORED.patches * LOOK_PART_STORED_BYTES,
     },
     kororinDesign: { usd: pics(s.kororinModel, s.kororinCandidates, true) + WORDS_USD, cpuSeconds: 10, note: `${s.kororinModel} ×${n(s.kororinCandidates)} 枚（見本の絵つき）＋切り抜き CPU＋保存12か月`, storedBytes: n(s.kororinCandidates) * PICTURE_STORED_BYTES },
     jacketArt: { usd: pics(s.artModel, 1, false) + WORDS_USD, note: `${s.artModel} ×1 枚＋言葉の確認＋保存12か月`, storedBytes: PICTURE_STORED_BYTES },
@@ -424,6 +428,50 @@ export function makeCostEstimates(s: MakeSetup = DEFAULT_MAKE_SETUP): Record<Mak
     mvPictures: { usd: 0.002, cpuSeconds: 180, note: '動き選び Gemini＋描画 CPU p90 180秒＋保存12か月（MP4 約11MB）', storedBytes: VIDEO_STORED_BYTES },
     mvRedraw: { usd: 4 * RUNWARE_PRICES['runware:400@4'] + 0.002, cpuSeconds: 180, note: 'FLUX.2 klein 4B ×最大4 場面＋描画 CPU＋保存12か月（新しい MP4・場面）', storedBytes: VIDEO_STORED_BYTES + 4 * 0.125 * MIB },
   };
+}
+
+/**
+ * Client 2026-11-25 (decision 1): what the talk job paints for one look of one's own (LookService.talkLook, apps/api
+ * look/talk.ts; LOOK_MODEL = FLUX.2 klein 4B, each with the look as reference): the standee (the look standing, the talk's
+ * normal face), the small chibi NEO (POST /me/look/chibi, made with the talk now), the expressions SELF_TALK_FACES but
+ * 'normal' (smile, surprised, shy: 'thinking' and 'sad' are {bati}'s only, 'normal' is the standee itself), and an
+ * eyes-closed and an open-mouth edit of each TALK_PART_FACES face (normal, smile). No コロリン mini any more (M-R241).
+ * A picture that fails is painted again once (settleWithRetry) and a cut-out too near its key colour is re-keyed by one
+ * more edit (cutoutChecked): neither is counted, like the figures' second try.
+ */
+export const LOOK_TALK_PICTURES = { standee: 1, chibi: 1, faces: 3, parts: 4 } as const;
+/** client 2026-11-25: the member's back view (後ろ姿; LookService.backView, LOOK_MODEL with the standee as reference) */
+export const LOOK_BACK_PICTURES = 1;
+/**
+ * what one look keeps in Bluena besides its candidates and figures: the standee, the chibi, the three expressions, the
+ * back view and the round icon (cut by CPU from the look) as pictures; the four blink / mouth parts as small patches
+ */
+export const LOOK_SET_STORED = { pictures: 7, patches: 4 } as const;
+/** one blink / mouth patch (a small cut-out PNG around the eyes or the mouth) */
+export const LOOK_PART_STORED_BYTES = 0.125 * MIB;
+
+/** one line of the profile look's price: what is painted, on which model, how many, at what each (USD) */
+export interface ProfileLookPart {
+  label: string;
+  model: string;
+  count: number;
+  usd: number;
+}
+/** client 2026-11-25 (decision 1): the pictures of one profile look, line by line (makeCostEstimates' profileLook) */
+export function profileLookParts(s: MakeSetup = DEFAULT_MAKE_SETUP): ProfileLookPart[] {
+  const t = LOOK_TALK_PICTURES;
+  const look = (label: string, count: number): ProfileLookPart => ({ label, model: s.lookModel, count, usd: pictureUsd(s.lookModel, true) });
+  return [
+    look('姿の候補', Math.max(1, Math.round(s.paidLookCandidates))),
+    look('立ち姿', t.standee),
+    look('小さなちびNEO', t.chibi),
+    look('話す時の表情（笑顔・おどろき・てれ）', t.faces),
+    look('まばたき・口の部品', t.parts),
+    look('後ろ姿', LOOK_BACK_PICTURES),
+    { label: '土星のちびキャラ', model: s.saturnChibiModel, count: 1, usd: pictureUsd(s.saturnChibiModel, true) },
+    { label: '土星のボール', model: s.saturnBallModel, count: 1, usd: pictureUsd(s.saturnBallModel, true) },
+    { label: '7つの星のちびキャラ', model: s.planetChibiModel, count: PLANET_FIGURE_COUNT - 2, usd: pictureUsd(s.planetChibiModel, true) },
+  ];
 }
 
 /** client 2026-11-25: the figures of one look — the Saturn chibi, the Saturn ball and the seven other planets' chibis */
@@ -539,8 +587,9 @@ export const MAKE_COST: Readonly<ManaPrices> = Object.freeze(manaPrices());
  * What the free features are recorded as (gen_costs.kind / the usage row's ref_type). Their cost is added up per member
  * and taken a whole mana at a time (R18: a non-member past the first journey is stopped at 0 mana — access.ts). 'dachi'
  * (the ダチ talk) is never taken: an unrecovered marketing cost. 'figures' (client 2026-11-25: the planet figures of a
- * look no one paid for — the first look of the journey, a look worn again whose figures were never made, the admin
- * backfill) is never taken either: absorbed like 'dachi' (ABSORBED_FEATURES).
+ * look no one paid for — only where nobody can pay any more: the admin backfill for looks decided before the first look
+ * was charged, and a look worn again whose figures were never made) is never taken either: absorbed like 'dachi'
+ * (ABSORBED_FEATURES). The first look's figures are part of its profileLook price now (client 2026-11-25: nothing absorbed).
  */
 export const USAGE_FEATURES = ['chat', 'search', 'draw', 'voice', 'spell', 'lyrics', 'compass', 'songEdit', 'videoEdit', 'novel', 'unfurl', 'listen', 'memory', 'look', 'story', 'dachi', 'figures', 'other'] as const;
 export type UsageFeature = (typeof USAGE_FEATURES)[number];

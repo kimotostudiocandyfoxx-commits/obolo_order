@@ -18,11 +18,16 @@ const missing = (f: (typeof PLANET_FIGURES)[number]) => {
   return sql`((${e} ->> ${f}) IS NULL AND COALESCE((${e} ->> ${triesKey(f)})::int, 0) < ${FIGURE_TRIES})`;
 };
 
+/** the own look was confirmed (lock.ts lookConfirmedOf): past day 2, day 2 finished, or confirmed */
+const confirmed = sql`(${users.journeyDay} > 2 OR (${users.journeyDay} = 2 AND ${users.journeyCompletedAt} IS NOT NULL) OR (${users.onboardingJson} ->> 'look.confirmed') IS NOT NULL)`;
+
 /**
  * M-R262 backfill, client 2026-11-25 (admin token only): members whose look has planet figures still to make (made
  * before the figures existed, or one that failed) get them made in the background — `limit` at a time (default 50,
  * at most 500), oldest first; a figure already made or out of its tries (FIGURE_TRIES)
- * is never painted again. Absorbed (no mana).
+ * is never painted again. Absorbed (no mana): only for looks nobody can pay for any more — confirmed before the first
+ * look's price was taken (client 2026-11-25), or a figure that failed. A first look not confirmed yet (day 2) is left
+ * alone: its figures are painted when it is confirmed, as its profileLook making.
  *   curl -X POST -H "x-admin-token: …" "https://<api>/admin/chibi-backfill?limit=50"
  *   (the same at /admin/figures-backfill)
  */
@@ -44,7 +49,7 @@ export class ChibiBackfillController {
     const rows = await this.db.read
       .select({ id: users.id, look: users.avatarUrl })
       .from(users)
-      .where(and(isNotNull(users.avatarUrl), isNull(users.deletedAt), or(...PLANET_FIGURES.map(missing))))
+      .where(and(isNotNull(users.avatarUrl), isNull(users.deletedAt), confirmed, or(...PLANET_FIGURES.map(missing))))
       .orderBy(users.createdAt)
       .limit(n);
     const origin = `${req.protocol}://${req.get('host')}`;

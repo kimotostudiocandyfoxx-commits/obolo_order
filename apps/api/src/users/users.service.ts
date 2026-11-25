@@ -32,6 +32,7 @@ import { LedgerService } from '../wallet/ledger.service';
 import { activeBati, batiSummaries, batiViewExtra, lookHistory } from '../look/batis';
 import { talkLookOf } from '../look/talk';
 import { figuresOf } from '../look/figures';
+import { lookBackOf, lookLockedOf } from '../look/lock';
 import { activeMember, isTester } from './tester';
 
 /** Bati's expression pictures, kept in onboardingJson['bati.faces'] (JSON) */
@@ -74,6 +75,9 @@ export function toMe(u: typeof users.$inferSelect): Me {
     lookStandee: (u.onboardingJson as Record<string, string> | null)?.['look.standee'] ?? null,
     lookChibi: (u.onboardingJson as Record<string, string> | null)?.['look.chibi'] ?? null,
     lookIcon: (u.onboardingJson as Record<string, string> | null)?.['look.icon'] ?? null,
+    // client 2026-11-25: the look from behind (made with the talk's pictures), and whether the look can be changed now
+    lookBack: lookBackOf(u),
+    lookLocked: lookLockedOf(u),
     // M-R232〜M-R235: the look in the side-by-side talk (made in the background when the look was decided)
     talk: talkLookOf((u.onboardingJson ?? {}) as Record<string, string>, 'me', u.avatarUrl),
     // M-R223: the looks worn so far (the one worn now last when it was never noted)

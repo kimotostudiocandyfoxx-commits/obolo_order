@@ -24,7 +24,7 @@ export interface JobPayloads {
   'bati.faces': { userId: string; origin: string };
   /** a rare {bati}'s fixed story lines rewritten once at its birth (M-R217) */
   'bati.lines': { userId: string; batiId: string };
-  /** M-R232〜M-R235: the talk's expressions, blink / mouth parts and コロリン mini of a decided look (LookService.talkLook) */
+  /** M-R232〜M-R235: the talk's expressions and blink / mouth parts of a decided look, and (client 2026-11-25) your own look's chibi and back view (LookService.talkLook) */
   'talk.look': { userId: string; origin: string; who: 'me' | 'bati' };
   /** M-R262: the old name of 'look.figures' (a task still in a queue makes the figures of the look worn now) */
   'look.chibi': { userId: string; origin: string };

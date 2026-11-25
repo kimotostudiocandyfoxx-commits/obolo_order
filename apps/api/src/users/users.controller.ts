@@ -1,10 +1,12 @@
 import { z } from 'zod';
-import { Body, Controller, Get, Headers, HttpCode, Inject, NotFoundException, Patch, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Headers, HttpCode, Inject, NotFoundException, Optional, Patch, Post, Put, Req, UseGuards } from '@nestjs/common';
+import type { Request } from 'express';
 import { timingSafeEqual } from 'node:crypto';
 import { AdvanceJourneyBody, AtelierLayout, ConsentBody, CompleteJourneyDayBody, CompleteLap2Body, AdminJumpBody, MEMBERS_DAYS, UpdateProfileBody } from '@obolo/shared';
 import { AppConfig, CONFIG } from '../config';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { parseBody } from '../common/validate';
+import { LookService } from '../look/look.service';
 import { UsersService } from './users.service';
 
 /** SYS-S002's flags (short keys, short values) */
@@ -16,6 +18,8 @@ export class UsersController {
   constructor(
     private readonly users: UsersService,
     @Inject(CONFIG) private readonly cfg: AppConfig,
+    /** client 2026-11-25: the first look confirmed (and its full profileLook taken) when day 2 is finished */
+    @Optional() private readonly look?: LookService,
   ) {}
 
   @Get()
@@ -49,8 +53,12 @@ export class UsersController {
 
   @Post('journey/complete')
   @HttpCode(200)
-  completeDay(@UserId() userId: string, @Body() body: unknown) {
-    return this.users.completeJourneyDay(userId, parseBody(CompleteJourneyDayBody, body));
+  async completeDay(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
+    const b = parseBody(CompleteJourneyDayBody, body);
+    const me = await this.users.completeJourneyDay(userId, b);
+    // client 2026-11-25: the night of day 2 confirms the profile look — its full price from the gem (once per member)
+    if (b.day !== 2 || !this.look) return me;
+    return (await this.look.confirmFirstLook(userId, `${req.protocol}://${req.get('host')}`)).me;
   }
 
   /** SYS-S002 from the settings (becoming Obolo Order early): its flags, kept as sys.<key> */

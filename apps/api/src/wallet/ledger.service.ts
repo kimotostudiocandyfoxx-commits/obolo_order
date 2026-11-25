@@ -220,6 +220,33 @@ export class LedgerService {
       },
     };
   }
+
+  /**
+   * Client 2026-11-25 (the first profile look, confirmed at the end of day 2): a making's full price taken without a
+   * yes card and without stopping the journey — a normal 'generation' row under `key` (idempotent: the same key never
+   * takes twice; a retry returns the first one's numbers). When the balance is short, the whole mana it holds are taken
+   * now and the rest waits with the tenths (addTenths), taken a whole mana at a time from the next mana — never absorbed,
+   * never below 0. Returns the price, the mana taken now and the mana still waiting.
+   */
+  async chargeWhole(db: Database, userId: string, kind: MakeKind, key: string, refId?: string): Promise<{ price: number; taken: number; waiting: number; repeat: boolean }> {
+    const price = await this.priceOf(kind);
+    let out = { price, taken: 0, waiting: 0, repeat: false };
+    await db.write.transaction(async (tx) => {
+      const before = await this.deltaOf(tx, key);
+      if (before != null) {
+        out = { price, taken: -before, waiting: 0, repeat: true };
+        return;
+      }
+      const balance = await this.lockedBalance(tx, userId);
+      const { whole, tenths } = splitMana(price);
+      const taken = Math.max(0, Math.min(whole, balance));
+      await this.applyMana(tx, { userId, delta: -taken, reason: 'generation', idempotencyKey: key, refType: kind, refId });
+      const r = await this.addTenths(tx, userId, kind, tenths + (whole - taken) * 10);
+      out = { price, taken: taken + r.taken, waiting: Math.max(0, whole - taken - r.taken), repeat: false };
+    });
+    if (!out.repeat) costScope.tag({ kind, job: key, paid: true });
+    return out;
+  }
 }
 
 /** a charge refused, as the API's error (no codes on screen: the words are {bati}'s) */

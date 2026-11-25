@@ -1,3 +1,4 @@
+import { formatMana, MAKE_COST } from '@obolo/shared';
 import type { Step } from './script';
 
 /**
@@ -541,6 +542,14 @@ export const DAY2: Step[] = [
   { t: 'face', who: '@bati', expr: 'sparkle' },
   { t: 'say', who: 'バティ', text: 'ねえ、{neo}。ボク、まだ、ぜんぜん眠くない。' },
   { t: 'say', who: 'バティ', text: '明日まで、いっぱい、おしゃべりしよ！' },
+  // client 2026-11-25 (nothing absorbed): the night of day 2 confirms the profile look — its full price (everything painted
+  // for it: the talk's faces, the back view, the figures on every home planet) is taken from the gem when the day is
+  // finished (POST /me/journey/complete → LookService.confirmFirstLook). PLACEHOLDER (story chat): the notice's words are
+  // provisional; a look of the preset forms (no own look) takes nothing and is told nothing
+  { t: 'branch', key: 'look', cases: { '': 'look-kept' }, otherwise: 'look-paid' },
+  { t: 'label', id: 'look-paid' },
+  { t: 'notice', text: `{neo}の姿は、これで決まり。8つの星で会う{neo}、話す時の顔、後ろ姿も、この姿から描きます（マナジェムから ${formatMana(MAKE_COST.profileLook)}マナ）。姿は、Obolo Orderに入ると、また変えられます` },
+  { t: 'label', id: 'look-kept' },
   { t: 'sprite', image: null },
   { t: 'black', fade: 0.8 }, // 暗くフェード
   // 〔完了画面：3日目まで24時間のカウントダウン。その下に、{bati}とのチャット〕〔0になったら、3日目が始まる〕（M-R269: no

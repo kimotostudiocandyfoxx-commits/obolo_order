@@ -64,6 +64,8 @@ import {
   MEMBERS_DAYS,
   type MembersDay,
   MAKE_COST,
+  LOOK_LOCKED_LINE,
+  profileLookLocked,
   CHARGE_ERROR_WORDS,
   confirmKey,
   spellEdit,
@@ -1704,8 +1706,25 @@ export class DemoApi implements Api {
       const story = { ...(u.story ?? {}), ...Object.fromEntries(Object.entries(answers ?? {}).map(([k, v]) => [`d${day}.${k}`, v])) };
       // M-R231: the first journey's last day done — the app's day 9 (the 2nd egg's morning) opens after the day's wait
       if (day === 8 && !story['eggs.day9']) story['eggs.day9'] = new Date(Date.now() + 24 * 3_600_000).toISOString();
+      // client 2026-11-25: the night of day 2 confirms the profile look — its full price from the gem, once (like the API)
+      if (day === 2 && !story['look.confirmed']) {
+        story['look.confirmed'] = u.avatarUrl ?? '-';
+        if (u.avatarUrl) this.chargeWhole('profileLook');
+      }
       return { journeyCompletedAt: now(), story };
     });
+  }
+
+  /** client 2026-11-25: like LedgerService.chargeWhole — the whole mana the gem holds now, the rest waits with the tenths */
+  private chargeWhole(kind: MakeKind) {
+    const w = this.s.wallets[this.uid()];
+    if (!w) return;
+    const part = splitMana(MAKE_COST[kind]);
+    const taken = Math.max(0, Math.min(part.whole, w.mana));
+    w.mana -= taken;
+    w.lastActivity = now();
+    w.entries.push({ id: uid(), delta: -taken, reason: 'generation', createdAt: now() });
+    this.addTenths(w, kind, part.tenths + (part.whole - taken) * 10);
   }
 
   async completeLap2(chapter: number, answers?: Record<string, string>) {
@@ -1807,6 +1826,7 @@ export class DemoApi implements Api {
 
   async lookCandidates(body: Parameters<Api['lookCandidates']>[0]) {
     const u = this.s.users[this.uid()];
+    demoUnlocked(u);
     const key = `obolo.look.tries.${u.id}`;
     const used = Number(localStorage.getItem(key) ?? 0);
     if (u.journeyDay < JOURNEY_DONE && used >= 8) throw new ApiError(429, 'LOOK_TRIES', 'もう作り直せません');
@@ -1835,6 +1855,7 @@ export class DemoApi implements Api {
 
   async refineLook(mediaId: string | null, instruction: string, magic?: boolean, paid?: Paid) {
     const u = this.s.users[this.uid()];
+    demoUnlocked(u);
     if (magic) return this.lookMagic(mediaId, instruction, paid);
     if (this.refinesLeft() <= 0) throw new ApiError(429, 'LOOK_REFINES', 'もう描き直せません');
     // null: the look worn now (the second journey's basin)
@@ -1934,6 +1955,7 @@ export class DemoApi implements Api {
   }
 
   async chooseLook(mediaId: string) {
+    demoUnlocked(this.s.users[this.uid()]);
     const c = this.lookCache.find((x) => x.id === mediaId);
     if (!c) throw new ApiError(404, 'NOT_FOUND', 'not found');
     // M-R223: the looks worn so far (Bluena's first shelf)
@@ -2832,7 +2854,15 @@ function withTalk<T extends Me | undefined>(u: T): T {
   // the client's talk cast (public/talk): the NEO for you, the round {bati} for yours
   const talk = u.avatarUrl ? castLook('user', u.avatarUrl) : null;
   const bati = u.bati?.imageUrl ? { ...u.bati, talk: castLook('bati', u.bati.imageUrl) } : u.bati;
-  return { ...u, talk, bati } as T;
+  return { ...u, talk, bati, lookLocked: demoLookLocked(u) } as T;
+}
+
+/** client 2026-11-25: like the API (lock.ts) — a resident's confirmed look stays as it is until they join */
+function demoLookLocked(u: Me): boolean {
+  return profileLookLocked({ journeyDay: u.journeyDay, journeyCompletedAt: u.journeyCompletedAt, confirmed: !!u.story?.['look.confirmed'], hasLook: !!u.avatarUrl, member: isActiveMember(u) });
+}
+function demoUnlocked(u: Me) {
+  if (demoLookLocked(u)) throw new ApiError(403, 'LOOK_LOCKED', LOOK_LOCKED_LINE.replace('{neo}', u.displayName || 'きみ'));
 }
 
 /** the demo's face for a reply: surprised at a question, a hop at something nice, else a smile */

@@ -22,8 +22,8 @@ export type MakeConfirm = z.infer<typeof MakeConfirm>;
 /**
  * What a making in the Moon atelier costs (MAKE_COST), or null when it is free. Free: the kororin (a voice), the radio
  * show, lookups, pictures found. The look and {bati}'s dress-up are free during the first journey (the API's rule).
- * Client 2026-11-25: a change of your own look is 'profileLook' (its pictures + the figures on every home planet);
- * {bati}'s dress-up is 'look'.
+ * Client 2026-11-25: a change of your own look after day 2 is 'profileLook' (everything painted for a look:
+ * profileLookParts) — only an Obolo Order member may make one (LOOK_LOCKED); {bati}'s dress-up is 'look'.
  */
 export function atelierMakeCost(
   kind: string,
@@ -34,7 +34,10 @@ export function atelierMakeCost(
 ): { kind: MakeKind; mana: number } | null {
   const done = (journeyDay ?? JOURNEY_DONE) >= JOURNEY_DONE;
   // client 2026-11-25: a game spends mana (its first build, then each tweak); a book's chapters are free ('novel': null)
-  const k: MakeKind | null = kind === 'song' ? 'song' : kind === 'art' ? 'jacketArt' : kind === 'video' ? 'mv' : kind === 'game' ? gameMakeKind(recast, gameTier) : kind === 'look' && done ? 'profileLook' : kind === 'bati' && done ? 'look' : null;
+  // client 2026-11-25: your own look is confirmed at the end of day 2 (its price taken then); every change after it — a
+  // member's, a resident's stays as it is — is a full profileLook, on the journey too
+  const lookPaid = (journeyDay ?? JOURNEY_DONE) > 2;
+  const k: MakeKind | null = kind === 'song' ? 'song' : kind === 'art' ? 'jacketArt' : kind === 'video' ? 'mv' : kind === 'game' ? gameMakeKind(recast, gameTier) : kind === 'look' && lookPaid ? 'profileLook' : kind === 'bati' && done ? 'look' : null;
   return k ? { kind: k, mana: prices[k] ?? MAKE_COST[k] } : null;
 }
 

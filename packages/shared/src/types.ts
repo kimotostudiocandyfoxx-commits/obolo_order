@@ -60,6 +60,16 @@ export interface Me {
   lookStandee?: string | null;
   /** the small chibi NEO without a background (M-R155/M-R161): the butterfly, the owl, the captain… (POST /me/look/chibi) */
   lookChibi?: string | null;
+  /**
+   * client 2026-11-25: the look seen from behind (後ろ姿), painted with the talk's pictures (FLUX.2 klein 4B from the
+   * standee, cut out) — your back in the over-the-shoulder talk and the Moon's ダチ hall (SelfBack); null until made
+   */
+  lookBack?: string | null;
+  /**
+   * client 2026-11-25: the own profile look can't be changed now (confirmed at the end of day 2, not an Obolo Order
+   * member: membership.ts profileLookLocked) — the API refuses a change with LOOK_LOCKED
+   */
+  lookLocked?: boolean;
   /** the chosen look cut to a round 512px icon around the face (no painting) */
   lookIcon?: string | null;
   /** M-R232〜M-R235: the look in the side-by-side talk — standing, its expressions with blink / mouth parts, its コロリン mini */

@@ -25,6 +25,7 @@ import { canUseMedia } from '../voice/media-consent';
 import { costScope } from '../wallet/cost-scope';
 import { PlanetFiguresService } from './figures.service';
 import type { FigureStore } from './figures';
+import { firstLookKey, LOOK_CONFIRMED_KEY, lookConfirmedOf, lookLocked, lookLockedOf } from './lock';
 
 /**
  * Generations per OBOLO NEO. The story (2026-10-14) lets the visitor redraw "何度でも", so the screen
@@ -81,6 +82,15 @@ const CHIBI_PROMPT = (key: KeyName) =>
   'face, hair, animal ears, oversized hood and cloak, colours and the round gold-rimmed sunglasses, simplified and cute, soft painted style. ' +
   'Full body, standing, facing the viewer, both hands a little forward as if holding something, the whole figure inside the frame with margin ' +
   'around it, on ' +
+  keyedBackground(KEY_WORDS[key]) +
+  '. Safe for children. No text, no letters.';
+// client 2026-11-25: the member's back (後ろ姿) — your back in the over-the-shoulder talk and the Moon's ダチ hall
+// (SelfBack), painted from the standee on the same key colour and cut out like it
+const BACK_PROMPT = (key: KeyName) =>
+  'Draw the same character as the attached full-body figure, seen from directly behind: the back of the head and hair, ' +
+  'the animal ears, the back of the oversized hood and cloak, the same colours, clothes, shoes and the same painted style. ' +
+  'Standing straight, facing away from the viewer, no face visible, the arms relaxed at the sides, the same height and ' +
+  'proportions, the whole figure inside the frame with margin around it, on ' +
   keyedBackground(KEY_WORDS[key]) +
   '. Safe for children. No text, no letters.';
 // M-R262 / M-R275 (client 2026-11-25): the Saturn mini figure is the 2D anime chibi2 now, one of the planet figures
@@ -168,11 +178,37 @@ export class LookService {
   }
 
   /**
-   * the look's mana — none on day 2 (M-R223, D03-S004 「2日目はマナを使わない」). Client 2026-11-25: a change of the
-   * profile look is 'profileLook' (its pictures + the planet figures of the look chosen)
+   * the look's mana — none on day 2 (M-R223, D03-S004 「2日目はマナを使わない」): the first look is taken whole when it is
+   * confirmed at the end of day 2 (confirmFirstLook), its work on day 2 recorded as that making. Client 2026-11-25: a
+   * change after it is 'profileLook' (everything painted for a look: profileLookParts)
    */
-  private async lookFee(userId: string, journeyDay: number, unlimited: boolean) {
-    return journeyDay <= 2 ? { refund: async () => undefined } : this.fee(userId, 'profileLook', unlimited);
+  private async lookFee(u: typeof users.$inferSelect, unlimited: boolean) {
+    if (lookConfirmedOf(u)) return this.fee(u.id, 'profileLook', unlimited);
+    this.firstLookScope(u, unlimited);
+    return { refund: async () => undefined };
+  }
+
+  /**
+   * client 2026-11-25 (nothing absorbed): before the first look is confirmed, what is painted for it (its rounds, the talk's
+   * pictures, the back view) is recorded as the first look's profileLook making — its mana is taken at the end of day 2
+   */
+  private firstLookScope(u: typeof users.$inferSelect, unlimited: boolean) {
+    if (!unlimited && !lookConfirmedOf(u)) costScope.tag({ kind: 'profileLook', job: firstLookKey(u.id), paid: true });
+  }
+
+  /** client 2026-11-25: a resident's own look stays as it is once confirmed, until they join the Order (LOOK_LOCKED) */
+  private unlocked(u: typeof users.$inferSelect, unlimited: boolean) {
+    if (!unlimited && lookLockedOf(u)) throw lookLocked(u);
+  }
+
+  /**
+   * the paid making a look's own pictures belong to (the standee, the chibi, the talk's, the back view): the profile look
+   * round it was chosen from (kept 30 days per picture), else the first look while it is not confirmed yet
+   */
+  private async tagLookJob(u: typeof users.$inferSelect, url: string | null) {
+    const job = url ? await this.kv.get(`look:paid:${url}`).catch(() => null) : null;
+    if (job) costScope.tag({ kind: 'profileLook', job, paid: true });
+    else this.firstLookScope(u, false);
   }
 
   /** how long a paid round's pictures remember the yes that paid for them (the figures of the one chosen are part of it) */
@@ -235,14 +271,15 @@ export class LookService {
     const limited = u.journeyDay < JOURNEY_DONE && !unlimited;
     const used = Number((await this.kv.get(key)) ?? 0);
     if (limited && used >= NEO_LOOK_TRIES) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'LOOK_TRIES', 'もう作り直せません');
-    // M-R223: no mana on day 2 (the look is made on the Moon then)
-    const fee = await this.lookFee(userId, u.journeyDay, unlimited);
+    this.unlocked(u, unlimited);
+    // M-R223: no mana on day 2 (the look is made on the Moon then; it is taken whole when confirmed)
+    const fee = await this.lookFee(u, unlimited);
     const tries = await this.kv.incr(key, TRY_TTL);
 
     // the look for their age band (M-R172; the birth year itself never reaches the painter), in the touch of each of the
     // four (M-R173: two Japanese anime semi-real, two character anime)
     const band = ageBand(Number((u.onboardingJson as Record<string, string> | null)?.birthYear) || null);
-    const made = await settleWithRetry(this.lookCount(u.journeyDay > 2 && !unlimited), (i) => this.looks.generate(withAgeBand(withTouch(prompt(i), i), band), i, refs));
+    const made = await settleWithRetry(this.lookCount(lookConfirmedOf(u) && !unlimited), (i) => this.looks.generate(withAgeBand(withTouch(prompt(i), i), band), i, refs));
     if (!made.some((r) => r.status === 'fulfilled')) await fee.refund();
     const candidates = [];
     for (const r of made) {
@@ -268,9 +305,10 @@ export class LookService {
     if (limited && (await this.refinesLeft(userId, true)) <= 0) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'LOOK_REFINES', 'もう描き直せません');
     const src = body.mediaId ? await this.media.imageData(userId, body.mediaId, 'avatar') : await this.current(userId, u.avatarUrl);
     if (!src) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Image not found');
-    const fee = await this.lookFee(userId, u.journeyDay, unlimited);
+    this.unlocked(u, unlimited);
+    const fee = await this.lookFee(u, unlimited);
     await this.kv.incr(`look:refine:${userId}`, TRY_TTL);
-    const made = await settleWithRetry(this.lookCount(u.journeyDay > 2 && !unlimited), (i) => this.looks.generate(refineLookPrompt(body.instruction, i), i, [src]));
+    const made = await settleWithRetry(this.lookCount(lookConfirmedOf(u) && !unlimited), (i) => this.looks.generate(refineLookPrompt(body.instruction, i), i, [src]));
     if (!made.some((r) => r.status === 'fulfilled')) await fee.refund();
     const candidates = [];
     for (const r of made) {
@@ -291,8 +329,9 @@ export class LookService {
 
   /**
    * Bati's magic in Bati's room (P-BATI-ROOM): the look worn now (or a candidate of it) changed by the wish, as often as
-   * BATI_MAGIC_PER_DAY rounds a day, so the visitor can keep going until they like it. Free during the first journey;
-   * after it each round takes the look's mana. `refinesLeft` = the rounds left today.
+   * BATI_MAGIC_PER_DAY rounds a day, so the visitor can keep going until they like it. Free until the first look is
+   * confirmed (the end of day 2: its mana is taken then); after it only an Obolo Order member may change the look, each
+   * round at the profile look's mana (client 2026-11-25). `refinesLeft` = the rounds left today.
    */
   private async magic(userId: string, body: RefineLookBody, origin: string, unlimited: boolean): Promise<NeoLookResult> {
     const u = await this.user(userId);
@@ -302,11 +341,14 @@ export class LookService {
     if (!unlimited && used >= BATI_MAGIC_PER_DAY) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'LOOK_REFINES', '今日はもう描き直せません');
     const src = body.mediaId ? await this.media.imageData(userId, body.mediaId, 'avatar') : await this.current(userId, u.avatarUrl);
     if (!src) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Image not found');
-    const fee = u.journeyDay < JOURNEY_DONE ? { refund: async () => undefined } : await this.fee(userId, 'profileLook', unlimited, { ...body, spell: body.spell ? spellKey('look', body.spell) : null });
+    this.unlocked(u, unlimited);
+    const confirmed = lookConfirmedOf(u);
+    const fee = confirmed ? await this.fee(userId, 'profileLook', unlimited, { ...body, spell: body.spell ? spellKey('look', body.spell) : null }) : { refund: async () => undefined };
+    if (!confirmed) this.firstLookScope(u, unlimited);
     const n = await this.kv.incr(key, 60 * 60 * 26);
     // R11: made from exactly the spell said yes to
     const asked = body.spell ? spellPrompt('look', body.spell) : body.instruction;
-    const made = await settleWithRetry(this.lookCount(u.journeyDay >= JOURNEY_DONE && !unlimited), (i) => this.looks.generate(refineLookPrompt(asked, i), i, [src]));
+    const made = await settleWithRetry(this.lookCount(confirmed && !unlimited), (i) => this.looks.generate(refineLookPrompt(asked, i), i, [src]));
     const candidates = [];
     for (const r of made) {
       if (r.status === 'fulfilled') {
@@ -450,6 +492,8 @@ export class LookService {
     if (j[`look.${kind}`] && j[`look.${kind}.of`] === u.avatarUrl) return toMe(u);
     const src = await this.current(userId, u.avatarUrl);
     if (!src) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Look not found');
+    // client 2026-11-25: part of the look's profileLook making (its price covers the standee and the chibi)
+    await this.tagLookJob(u, u.avatarUrl);
     const key = await chooseKey(src.data);
     const img = await this.looks.generate(kind === 'chibi' ? CHIBI_PROMPT(key) : STANDEE_PROMPT(key), 0, [src]);
     const cut = await this.cut(img, 1024, key);
@@ -471,7 +515,8 @@ export class LookService {
     return { data, mime };
   }
 
-  async choose(userId: string, mediaId: string, origin?: string): Promise<Me> {
+  async choose(userId: string, mediaId: string, origin?: string, unlimited = false): Promise<Me> {
+    this.unlocked(await this.user(userId), unlimited);
     const m = await this.media.getOwned(userId, mediaId, 'avatar');
     if (!m) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Image not found');
     return this.wearLook(userId, m.url, origin, true);
@@ -513,11 +558,14 @@ export class LookService {
       .where(eq(users.id, userId))
       .returning();
     for (const d of dropped) await this.media.removeByUrl(userId, d).catch(() => undefined);
-    // M-R234: the decided look's expressions, blink / mouth parts and コロリン, in the background
+    // client 2026-11-25: a look chosen before the first look is confirmed: its pictures are the first look's making
+    const confirmed = lookConfirmedOf(nu);
+    if (!confirmed && isNew) await this.kv.set(`look:paid:${url}`, firstLookKey(userId), LookService.PAID_TTL).catch(() => undefined);
+    // M-R234: the decided look's expressions, blink / mouth parts, chibi and back view, in the background
     if (origin) await this.enqueueTalk(userId, 'me', url, origin);
-    // client 2026-11-25 (M-R262): the look's figures on every home planet — the first look's free (absorbed), a paid
-    // profile look change's as that making
-    if (origin) await this.enqueueFigures(userId, origin, url, isNew);
+    // client 2026-11-25 (M-R262): the look's figures on every home planet — a paid profile look change's as that making;
+    // the first journey's are painted once, for the look confirmed at the end of day 2 (confirmFirstLook)
+    if (origin && confirmed) await this.enqueueFigures(userId, origin, url, isNew);
     return toMe(nu);
   }
 
@@ -529,7 +577,7 @@ export class LookService {
   async removeLook(userId: string): Promise<Me> {
     const u = await this.user(userId);
     const j = { ...((u.onboardingJson ?? {}) as Record<string, string>) };
-    const urls = new Set<string>([u.avatarUrl, ...lookHistory(j).flatMap((h) => [h.url, h.icon]), j['look.standee'], j['look.icon'], j['look.chibi']].filter((x): x is string => !!x));
+    const urls = new Set<string>([u.avatarUrl, ...lookHistory(j).flatMap((h) => [h.url, h.icon]), j['look.standee'], j['look.icon'], j['look.chibi'], j['look.back']].filter((x): x is string => !!x));
     try {
       const t = j['talk.me'] ? (JSON.parse(j['talk.me']) as { stand?: string; faces?: Record<string, { url?: string; blink?: string; mouth?: string }> }) : null;
       if (t?.stand) urls.add(t.stand);
@@ -537,7 +585,8 @@ export class LookService {
     } catch {
       /* an unreadable talk look: just dropped */
     }
-    for (const k of Object.keys(j)) if (k.startsWith('look.') || k === 'talk.me' || /^d\d+\.look$/.test(k)) delete j[k];
+    // (the first look's confirmation stays: it was paid for; a new look after it is a change)
+    for (const k of Object.keys(j)) if ((k.startsWith('look.') && !k.startsWith(LOOK_CONFIRMED_KEY)) || k === 'talk.me' || /^d\d+\.look$/.test(k)) delete j[k];
     // client 2026-11-25: the planet figures (and the Saturn mini figure) were made from the look: they go too
     if (u.chibiPicUrl) urls.add(u.chibiPicUrl);
     for (const e of Object.values((u.planetFigures ?? {}) as FigureStore)) for (const [k, v] of Object.entries(e)) if (!k.includes('#') && v) urls.add(v);
@@ -550,6 +599,7 @@ export class LookService {
   async restoreLook(userId: string, url: string, origin?: string): Promise<Me> {
     const u = await this.user(userId);
     if (u.avatarUrl === url) return toMe(u);
+    this.unlocked(u, false);
     if (!lookHistory((u.onboardingJson ?? {}) as Record<string, string>).some((h) => h.url === url)) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Not one of your looks');
     return this.wearLook(userId, url, origin, false);
   }
@@ -1040,11 +1090,20 @@ export class LookService {
     let u = await this.user(userId);
     const of = who === 'me' ? u.avatarUrl : u.batiImageUrl;
     if (!of) return;
+    // client 2026-11-25: your own look's talk pictures, chibi and back view are part of its profileLook making
+    if (who === 'me') await this.tagLookJob(u, of);
     const j0 = (u.onboardingJson ?? {}) as Record<string, string>;
-    if (storedTalk(j0, who, of) && !storedTalk(j0, who, of)?.making) return;
+    // client 2026-11-25: the back view of a look whose talk was made before it existed
+    if (storedTalk(j0, who, of) && !storedTalk(j0, who, of)?.making) return void (who === 'me' && (await this.backView(userId, origin).catch((e: unknown) => this.log.warn(`back view failed: ${String(e)}`))));
     // your own stands full length (the standee); {bati}'s picture already does
     if (who === 'me' && !(j0['look.standee'] && j0['look.standee.of'] === of)) {
       await this.standee(userId, origin).catch((e: unknown) => this.log.warn(`talk standee failed: ${String(e)}`));
+      u = await this.user(userId);
+    }
+    // client 2026-11-25: the look's small chibi and its back view go with the talk's pictures (one making: profileLook)
+    if (who === 'me') {
+      await this.standee(userId, origin, 'chibi').catch((e: unknown) => this.log.warn(`talk chibi failed: ${String(e)}`));
+      await this.backView(userId, origin).catch((e: unknown) => this.log.warn(`back view failed: ${String(e)}`));
       u = await this.user(userId);
     }
     const j1 = (u.onboardingJson ?? {}) as Record<string, string>;
@@ -1105,6 +1164,75 @@ export class LookService {
       .update(users)
       .set({ onboardingJson: { ...((cur.onboardingJson ?? {}) as Record<string, string>), [`talk.${who}`]: JSON.stringify(look) }, updatedAt: new Date() })
       .where(eq(users.id, userId));
+  }
+
+  /**
+   * client 2026-11-25: the look worn now seen from behind (後ろ姿) — one FLUX.2 klein 4B picture (LOOK_MODEL) from the
+   * standee on the key colour farthest from its colours, cut out like the talk's pictures, stored through MediaService.
+   * Once per look (kept with the look it was made from); your back in the over-the-shoulder talk and the ダチ hall.
+   */
+  async backView(userId: string, origin: string): Promise<Me> {
+    const u = await this.user(userId);
+    if (!u.avatarUrl) return toMe(u);
+    const j = (u.onboardingJson ?? {}) as Record<string, string>;
+    if (j['look.back'] && j['look.back.of'] === u.avatarUrl) return toMe(u);
+    const standee = j['look.standee.of'] === u.avatarUrl ? j['look.standee'] : null;
+    const png = await this.media.bytesByUrl(userId, standee ?? u.avatarUrl);
+    if (!png) return toMe(u);
+    await this.tagLookJob(u, u.avatarUrl);
+    const key = await chooseKey(png);
+    const img = await this.looks.generate(BACK_PROMPT(key), 21, [await onKey(png, key)]);
+    const cut = await this.cut(img, 1024, key);
+    const m = cut ? await this.media.storeImage(userId, 'avatar', 'image/png', cut, origin) : await this.media.storeImage(userId, 'avatar', img.mime, img.data, origin);
+    const cur = await this.user(userId);
+    // the look changed meanwhile: this back is not of the look worn now
+    if (cur.avatarUrl !== u.avatarUrl) {
+      await this.media.removeByUrl(userId, m.url).catch(() => undefined);
+      return toMe(cur);
+    }
+    const old = (cur.onboardingJson as Record<string, string> | null)?.['look.back'];
+    const [nu] = await this.db.write
+      .update(users)
+      .set({ onboardingJson: { ...((cur.onboardingJson ?? {}) as Record<string, string>), 'look.back': m.url, 'look.back.of': u.avatarUrl }, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    if (old && old !== m.url) await this.media.removeByUrl(userId, old).catch(() => undefined);
+    return toMe(nu);
+  }
+
+  /**
+   * Client 2026-11-25 (nothing absorbed): the first look is confirmed when day 2 is finished (the night on the Moon). Its
+   * full profileLook price — everything painted for it: the candidates, the talk's pictures, the back view, the figures
+   * on every home planet and their storage — is taken from the member's mana (the 88 of the mana gem, given at sign-up)
+   * as one charge (LedgerService.chargeWhole: one per member, never twice). A balance short of it never stops the
+   * journey: what it cannot take now waits with the tenths and is taken from the next mana. Then the confirmed look's
+   * figures are painted, as that making. From now on a resident's look stays as it is (LOOK_LOCKED) until they join.
+   * Returns the member and the mana the look took (0: nothing taken — no own look, already confirmed, not day 2's end).
+   */
+  async confirmFirstLook(userId: string, origin: string): Promise<{ me: Me; mana: number }> {
+    const u = await this.user(userId);
+    const j = (u.onboardingJson ?? {}) as Record<string, string>;
+    if (j[LOOK_CONFIRMED_KEY] || u.journeyDay !== 2 || !u.journeyCompletedAt) return { me: toMe(u), mana: 0 };
+    const look = u.avatarUrl;
+    let mana = 0;
+    if (look) {
+      const r = await this.ledger.chargeWhole(this.db, userId, 'profileLook', firstLookKey(userId), 'first');
+      mana = r.price;
+      if (r.waiting > 0) this.log.warn(`first look: ${userId} short by ${r.waiting} mana — waiting with the tenths`);
+    }
+    const cur = await this.user(userId);
+    const [nu] = await this.db.write
+      .update(users)
+      .set({ onboardingJson: { ...((cur.onboardingJson ?? {}) as Record<string, string>), [LOOK_CONFIRMED_KEY]: look ?? '-', [`${LOOK_CONFIRMED_KEY}.mana`]: String(mana) }, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    if (look) {
+      await this.kv.set(`look:paid:${look}`, firstLookKey(userId), LookService.PAID_TTL).catch(() => undefined);
+      // the talk's pictures and the back view were made when it was chosen (made now if they were not); the figures now
+      await this.enqueueTalk(userId, 'me', look, origin);
+      await this.enqueueFigures(userId, origin, look, true);
+    }
+    return { me: toMe(nu), mana };
   }
 
   async name(userId: string, name: string): Promise<Me> {

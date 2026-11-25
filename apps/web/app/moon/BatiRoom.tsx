@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { BatiLook } from '@/components/bati/BatiLook';
+import { LOOK_LOCKED_LINE } from '@obolo/shared';
 
 /**
  * Bati's room (the Moon; client 2026-11-22: "24時間の間はバティと喋らせまくる時間にしたい"): next to the chat,
@@ -94,8 +95,11 @@ function MeSheet({ onClose, onDone, name: given }: { onClose: () => void; onDone
   const [busy, setBusy] = useState(false);
   const [candidates, setCandidates] = useState<{ id: string; url: string }[]>([]);
   const [pick, setPick] = useState<string | null>(null);
-  const [line, setLine] = useState<string>(LINES[mode].open.replace('{name}', name));
-  const [ended, setEnded] = useState(false);
+  // client 2026-11-25: a resident's look stays as it is once confirmed (day 2's night) until they join — {bati} says so
+  // (PLACEHOLDER line, LOOK_LOCKED_LINE) and offers no magic
+  const locked = mode === 'me' && !!me?.lookLocked;
+  const [line, setLine] = useState<string>(locked ? LOOK_LOCKED_LINE.replace('{neo}', name) : LINES[mode].open.replace('{name}', name));
+  const [ended, setEnded] = useState(locked);
 
   const shown = candidates.find((c) => c.id === pick)?.url ?? current;
   const hist = me?.lookHistory ?? [];
@@ -122,6 +126,9 @@ function MeSheet({ onClose, onDone, name: given }: { onClose: () => void; onDone
       if (code === 'RESTYLE_TRIES' || code === 'LOOK_REFINES') {
         setEnded(true);
         setLine(LINES.limit);
+      } else if (code === 'LOOK_LOCKED') {
+        setEnded(true);
+        setLine(LOOK_LOCKED_LINE.replace('{neo}', name));
       } else if (code === 'MODERATION') setLine(LINES.words);
       else if (code === 'NO_MANA' && e instanceof ApiError) setLine(e.message);
       else setLine(LINES.failed);
@@ -227,7 +234,7 @@ function MeSheet({ onClose, onDone, name: given }: { onClose: () => void; onDone
           </button>
         )}
         {/* M-R223 〔前に戻す〕: the look worn before this one */}
-        {!pick && prevLook && (
+        {!pick && prevLook && !locked && (
           <button
             className="mt-3 w-full text-[12px] text-white/60 underline"
             disabled={busy}

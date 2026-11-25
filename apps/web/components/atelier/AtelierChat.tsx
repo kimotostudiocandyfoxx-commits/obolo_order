@@ -21,7 +21,7 @@ import { findAll, PLANET_NAME, workMarkRef, type Found } from '@/lib/finds/works
 import { choiceOf, detectOpen, pickOpen, type OpenAsk } from '@/lib/bluena/find';
 import { EDIT_EVENT, openInBluena, takeEdit } from '@/lib/bluena/edit';
 import { isStorageAsk, isStorageCancel, storageTierOf, STORAGE_LINES, type StorageTierPrice, type StorageView } from '@obolo/shared';
-import { BATI_REST_HINT, type BatiRest, BLUENA_LINES, formatMana, gameTierFor, gameMakeKind, matchGameTemplate, type GameTemplateId, type GameTier } from '@obolo/shared';
+import { BATI_REST_HINT, type BatiRest, BLUENA_LINES, formatMana, LOOK_LOCKED_LINE, gameTierFor, gameMakeKind, matchGameTemplate, type GameTemplateId, type GameTier } from '@obolo/shared';
 import { daysUntil, isOpen, KINDS, lockLine, openKinds, openLessons, type AtelierKind, type Lesson } from '@/lib/atelier/unlock';
 import { historyOf, recentRequest } from './carry';
 import { usePartner } from '@/lib/partner';
@@ -936,6 +936,9 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     }
     // R12 (client): not open yet → the kind by name and the day it opens (「絵は、4日目から作れるようになるよ。」)
     if (!isOpen(kind, day)) return setMsgs((m) => [...m, { id: uid(), who: 'bati', text: lockLine(kind, day, batiVoice?.personality ?? 'genki') }]);
+    // client 2026-11-25: a resident's own look stays as it is once confirmed (day 2's night) until they join the Order —
+    // {bati} says so instead of offering a spell (PLACEHOLDER line, LOOK_LOCKED_LINE); {bati}'s own dress-up stays open
+    if (kind === 'look' && me?.lookLocked) return setMsgs((m) => [...m, { id: uid(), who: 'bati', text: LOOK_LOCKED_LINE.replace('{neo}', me.displayName || 'きみ') }]);
     // R12: only the kind named (「画像を作りたい」) → what was asked for a few turns ago (「空飛ぶクジラが…」)
     if (isBare(content)) {
       const r = recentRequest(msgsRef.current);
@@ -2118,9 +2121,9 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   const people: TalkPerson[] = [
     // (no {bati} yet: the neutral stand-in, the egg, smaller — client 2026-11-24)
     { id: 'bati', name: partner.name, look: batiLook(me?.bati, partner.face), color: BATI_COLOR, ...(own.placeholder && !story ? { scale: 0.55, headAt: 0.5 } : {}) },
-    // client 2026-11-24: face to face over your shoulder — your back in the front (the talk cast's back: looks have no
-    // back view painted yet)
-    { id: 'me', name: me?.displayName ?? '', look: selfLook(me), color: SELF_COLOR, tone: selfTone(me), self: true, avatar: me?.lookIcon, views: viewsOf('talk-user') },
+    // client 2026-11-24: face to face over your shoulder — your back in the front: your look's own back view (client
+    // 2026-11-25, painted with the talk's pictures), the talk cast's back until it is made
+    { id: 'me', name: me?.displayName ?? '', look: selfLook(me), color: SELF_COLOR, tone: selfTone(me), self: true, avatar: me?.lookIcon, views: { ...viewsOf('talk-user'), ...(me?.lookBack ? { back: me.lookBack } : {}) } },
   ];
   const itemsRaw: TalkItem[] = msgs.filter((m) => !hidden(m)).map((m) =>
     m.who === 'me'

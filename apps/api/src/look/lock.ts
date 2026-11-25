@@ -1,0 +1,38 @@
+import { HttpStatus } from '@nestjs/common';
+import { LOOK_LOCKED_LINE, lookConfirmed, profileLookLocked } from '@obolo/shared';
+import { apiError } from '../common/errors';
+import type { users } from '../db/schema';
+import { activeMember } from '../users/tester';
+
+type Row = typeof users.$inferSelect;
+const story = (u: Row) => (u.onboardingJson ?? {}) as Record<string, string>;
+
+/** the key the first look's confirmation (end of day 2) is kept under in onboardingJson: the look confirmed */
+export const LOOK_CONFIRMED_KEY = 'look.confirmed';
+
+/**
+ * the first look's profileLook making: the ledger row taken when it is confirmed (idempotent: one per member, a retry or
+ * a second call never takes it twice) and the job its day-2 pictures are recorded under
+ */
+export const firstLookKey = (userId: string) => `make:profileLook:first:${userId}`;
+
+/** client 2026-11-25: the own look was confirmed (at the end of day 2, or the member is past it) */
+export function lookConfirmedOf(u: Row): boolean {
+  return lookConfirmed({ journeyDay: u.journeyDay, journeyCompletedAt: u.journeyCompletedAt, confirmed: !!story(u)[LOOK_CONFIRMED_KEY] });
+}
+
+/** client 2026-11-25: a change of the own profile look is refused — confirmed, and not an Obolo Order member */
+export function lookLockedOf(u: Row): boolean {
+  return profileLookLocked({ journeyDay: u.journeyDay, journeyCompletedAt: u.journeyCompletedAt, confirmed: !!story(u)[LOOK_CONFIRMED_KEY], hasLook: !!u.avatarUrl, member: activeMember(u) });
+}
+
+/** 403 LOOK_LOCKED with {bati}'s words (PLACEHOLDER line, LOOK_LOCKED_LINE) */
+export function lookLocked(u: Row) {
+  return apiError(HttpStatus.FORBIDDEN, 'LOOK_LOCKED', LOOK_LOCKED_LINE.replace('{neo}', u.displayName || 'きみ'));
+}
+
+/** the back view of the look worn now (made with the talk's pictures; none for another look) */
+export function lookBackOf(u: Row): string | null {
+  const j = story(u);
+  return j['look.back'] && j['look.back.of'] === u.avatarUrl ? j['look.back'] : null;
+}
