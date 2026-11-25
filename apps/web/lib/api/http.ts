@@ -1,5 +1,5 @@
 import type { BatiEggKind, BatiRole, Me, MembersDay, LineVoicesBody, LineVoicesView, MvProjectView, StoryResult, TimelinePlanet } from '@obolo/shared';
-import type { Api, Paid } from './types';
+import type { Api, BuddyChatOpts, Paid } from './types';
 import { ApiError } from './types';
 import { tokenStore } from './token';
 
@@ -82,8 +82,8 @@ export class HttpApi implements Api {
   buddyQuota() {
     return this.req<Awaited<ReturnType<Api['buddyQuota']>>>('GET', '/buddy/quota');
   }
-  buddyChat(text: string, locale: 'ja' | 'en') {
-    return this.req<Awaited<ReturnType<Api['buddyChat']>>>('POST', '/buddy/chat', { text, locale });
+  buddyChat(text: string, locale: 'ja' | 'en', opts?: BuddyChatOpts) {
+    return this.req<Awaited<ReturnType<Api['buddyChat']>>>('POST', '/buddy/chat', { text, locale, ...(opts?.history ? { history: opts.history } : {}), ...(opts?.canMake ? { canMake: true } : {}) });
   }
   /** POST /buddy/chat/stream (Server-Sent Events): `text` pieces, then `done` (the saved reply) or `error` */
   async buddyChatStream(text: string, locale: 'ja' | 'en', onText: (piece: string) => void) {

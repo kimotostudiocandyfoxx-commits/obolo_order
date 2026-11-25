@@ -24,7 +24,10 @@ describe('atelier unlock by journey day (M-R210)', () => {
   });
   it('says how many days are left', () => {
     expect(daysUntil('radio', 3)).toBe(4);
-    expect(lockLine('song', 3)).toBe('それは2日後に作れるようになるよ');
+    expect(lockLine('song', 3)).toBe('曲は、5日目から作れるようになるよ。');
+    expect(lockLine('art', 2)).toBe('絵は、4日目から作れるようになるよ。');
+    expect(lockLine('novel', 2)).toBe('本は、旅が終わったら作れるようになるよ。');
+    expect(lockLine('art', 2, 'kansai')).toBe('絵は、4日目から作れるようになるで。');
   });
   it('teaches each new thing once on the journey', () => {
     expect(openLessons(2)).toEqual(['basics']);

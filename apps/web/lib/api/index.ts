@@ -26,7 +26,7 @@ function reviewStandIns(api: Api): Api {
   const guest = () => isDemoMode() && !tokenStore.get();
   const chat = api.buddyChat.bind(api);
   const picture = api.buddyPicture.bind(api);
-  api.buddyChat = (text, locale) => (guest() ? guestBuddyChat(text, locale) : chat(text, locale));
+  api.buddyChat = (text, locale, opts) => (guest() ? guestBuddyChat(text, locale) : chat(text, locale, opts));
   api.buddyPicture = (question, answer) => (guest() ? guestBuddyPicture(question) : picture(question, answer));
   return api;
 }

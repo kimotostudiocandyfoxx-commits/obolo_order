@@ -91,6 +91,9 @@ export interface UploadedVideo {
 /** R11: a paid making asked in the Moon atelier carries the member's yes to the plan and its price */
 export type Paid = { confirm?: MakeConfirm; /** the spell said yes to (its key is confirm.spell) */ spell?: SpellTag[] };
 
+/** R12: what the Moon atelier's chat sends with a message (BuddyChatBody) */
+export type BuddyChatOpts = { history?: { role: 'user' | 'buddy'; text: string }[]; canMake?: boolean };
+
 export interface Api {
   readonly mode: 'live' | 'demo';
   /** Entry: members and invited people get a 6-digit code; anyone else → NOT_INVITED. */
@@ -105,7 +108,8 @@ export interface Api {
   updateBuddyProfile(body: UpdateBuddyProfileBody): Promise<BuddyProfileView>;
   buddyMessages(cursor?: string): Promise<Paged<BuddyMessageView>>;
   buddyQuota(): Promise<BuddyQuotaView>;
-  buddyChat(text: string, locale: Locale): Promise<BuddyChatResponse>;
+  /** R12: `opts.history` — the talk's own recent turns (oldest first); `opts.canMake` — the chat can make works */
+  buddyChat(text: string, locale: Locale, opts?: BuddyChatOpts): Promise<BuddyChatResponse>;
   /** the same, with the ordinary answer shown as it is written (live API only) */
   buddyChatStream?(text: string, locale: Locale, onText: (piece: string) => void): Promise<BuddyChatResponse>;
   buddyForget(): Promise<void>;

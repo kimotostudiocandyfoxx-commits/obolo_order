@@ -1,4 +1,4 @@
-import { JOURNEY_DONE } from '@obolo/shared';
+import { batiKindOpensLine, JOURNEY_DONE, type BatiPersonality } from '@obolo/shared';
 
 /**
  * What the Moon atelier (〔月で作る〕, one Bati chat — M-R210) can do today. On the first journey each day opens more:
@@ -41,12 +41,29 @@ export function daysUntil(kind: AtelierKind, day: number | null | undefined): nu
   return done(day) ? 0 : Math.max(0, UNLOCK_DAY[kind] - day!);
 }
 
+/** R12: how a kind not open yet is named in {bati}'s line (「絵は、4日目から作れるようになるよ」) */
+export const LOCK_WORD: Record<AtelierKind, string> = {
+  look: '姿を変えるの',
+  bati: '着せかえ',
+  lookup: '調べもの',
+  image: '絵を見るの',
+  voice: 'コロリン',
+  art: '絵',
+  song: '曲',
+  video: '映像',
+  radio: 'ラジオ',
+  novel: '本',
+  game: 'ゲーム',
+};
+
 /**
- * {bati}'s line when a kind not open yet is asked for (M-R210).
+ * {bati}'s line when a kind not open yet is asked for (M-R210). R12 (client): it names the kind and the day it opens
+ * (「絵は、4日目から作れるようになるよ。」; a kind of after the journey: 「本は、旅が終わったら…」), in {bati}'s manner.
  * PLACEHOLDER (P-ATELIER-3): provisional until the story script lands.
  */
-export function lockLine(kind: AtelierKind, day: number | null | undefined): string {
-  return `それは${daysUntil(kind, day)}日後に作れるようになるよ`;
+export function lockLine(kind: AtelierKind, day: number | null | undefined, personality: BatiPersonality = 'genki'): string {
+  const open = UNLOCK_DAY[kind];
+  return batiKindOpensLine(personality, LOCK_WORD[kind], open >= JOURNEY_DONE ? 'after' : open);
 }
 
 /**

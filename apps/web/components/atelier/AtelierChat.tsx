@@ -10,12 +10,13 @@ import { BATI_COLOR, batiLook, characterLook, SELF_COLOR, selfLook, selfTone } f
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { batiLine, batiLineVoiceOf } from '@/lib/onboarding/batiLine';
-import { atelierMakeCost, CRAFT_LINES, KIND_HOME_PLANET, spellFrom, spellKey, type SpellTag, type SpellView, HOME_OF_WORK, PLANET_HOMES, TALK_BUBBLE_COLOUR, TALK_COLOR_KEY, type ChangeResult, type Me, changeableById, changeLines, changeRequest, etaMinutes, fillLine, homecomingSay, MOON_LINES, type RefineTarget, type WorkMaterial, batiDaysLeftLine, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId, SPELL_TOOL_LINES, TOOL_STORY_LINES, bookMatch, findSpell, shouldSuggestBook, spellScore, spellFrom as spellFromWords, type CompassSpell, type SavedSpell, type SpellBookKind } from '@obolo/shared';
+import { atelierMakeCost, CRAFT_LINES, KIND_HOME_PLANET, spellFrom, spellKey, type SpellTag, type SpellView, HOME_OF_WORK, PLANET_HOMES, TALK_BUBBLE_COLOUR, TALK_COLOR_KEY, type ChangeResult, type Me, changeableById, changeLines, changeRequest, etaMinutes, fillLine, homecomingSay, MOON_LINES, type RefineTarget, type WorkMaterial, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId, SPELL_TOOL_LINES, TOOL_STORY_LINES, bookMatch, findSpell, shouldSuggestBook, spellScore, spellFrom as spellFromWords, type CompassSpell, type SavedSpell, type SpellBookKind } from '@obolo/shared';
 import { useMarkRing } from '@/components/finds/MarkRing';
 import { viewsOf } from '@/lib/story/views';
 import { markNames } from '@/lib/finds/marks';
 import { findAll, PLANET_NAME, workMarkRef } from '@/lib/finds/works';
-import { daysUntil, isOpen, openKinds, openLessons, type AtelierKind, type Lesson } from '@/lib/atelier/unlock';
+import { daysUntil, isOpen, KINDS, lockLine, openKinds, openLessons, type AtelierKind, type Lesson } from '@/lib/atelier/unlock';
+import { historyOf, recentRequest } from './carry';
 import { usePartner } from '@/lib/partner';
 import { useAtelierCtx } from './ctx';
 import { ASK, DONE, detect, greetingOf, isBare, KIND_WORD, wantsPicture } from './intent';
@@ -444,7 +445,13 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       if (line('compass')) showCompass('open', 3800);
       return opened;
     }
-    if (!isOpen(kind, day)) return setMsgs((m) => [...m, { id: uid(), who: 'bati', text: batiDaysLeftLine(batiVoice?.personality ?? 'genki', daysUntil(kind, day)) }]);
+    // R12 (client): not open yet → the kind by name and the day it opens (「絵は、4日目から作れるようになるよ。」)
+    if (!isOpen(kind, day)) return setMsgs((m) => [...m, { id: uid(), who: 'bati', text: lockLine(kind, day, batiVoice?.personality ?? 'genki') }]);
+    // R12: only the kind named (「画像を作りたい」) → what was asked for a few turns ago (「空飛ぶクジラが…」)
+    if (isBare(content)) {
+      const r = recentRequest(msgsRef.current);
+      if (r && r.what === kind && r.content) content = r.content;
+    }
     // client 2026-11-25: a book / a game starts with {bati}'s 2–4 short questions
     if (isCraftKind(kind)) return craftAsk(craftBegin(kind, content, isBare(content)));
     // R12: a kept spell that fits the words — {bati} offers it now and then (「スペルブックの『…』をもとにする？」)
@@ -517,8 +524,16 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
    */
   const converse = async (text: string) => {
     setBusy(true);
+    let handoff: AtelierKind | null = null;
     try {
-      const r = await Promise.race([getApi().buddyChat(text, 'ja'), new Promise<never>((_, no) => setTimeout(() => no(new Error('slow')), 25_000))]);
+      // R12 (client: "it forgets the message from two turns ago"): the talk itself goes with the message — the last 20
+      // turns, the app's own lines and the cards made included — and the same call says when it is a making request
+      const history = historyOf(msgsRef.current);
+      const r = await Promise.race([getApi().buddyChat(text, 'ja', { history, canMake: !story }), new Promise<never>((_, no) => setTimeout(() => no(new Error('slow')), 25_000))]);
+      if (r.make && (KINDS as string[]).includes(r.make)) {
+        handoff = r.make as AtelierKind;
+        return;
+      }
       setMsgs((m) => [...m, { id: uid(), who: 'bati', text: r.reply.text }]);
       const noPic = !!r.kind && r.kind !== 'normal';
       const drawn = r.reply.image?.url;
@@ -534,6 +549,14 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     } finally {
       setBusy(false);
     }
+    // R12: the reply's own classification found a making request the words missed → the making flow (no search)
+    if (handoff) makeFrom(handoff, text);
+  };
+  /** R12: a making request → its kind's flow, with what was asked for in the turns before when this one names nothing */
+  const makeFrom = (kind: AtelierKind, text: string) => {
+    const own = contentOf(text);
+    const r = recentRequest(msgsRef.current);
+    ask(kind, !isBare(own) ? own : r && r.what === kind ? r.content : '');
   };
   /** 「〇〇の絵を見せて」: the picture straight into the talk */
   const showPicture = async (what: string) => {
@@ -897,11 +920,25 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     if (!story && changeAsk(text)) return;
     if (p && 'voiceAgain' in p) return void run('voice', text);
     if (p && 'use' in p) return void run(p.use, text, undefined, { materials: p.materials });
-    if (p && 'kind' in p && p.kind === 'lookup') return void converse(text);
-    if (p && 'kind' in p && p.kind === 'image') return void showPicture(text);
-    if (p && 'kind' in p) return void run(p.kind, text);
+    // R12: the answer to {bati}'s question — unless it asks for another kind, or to make it (「魔法で作って欲しい」
+    // after 「なんの絵を見る？」 is the picture asked for before, made — not searched)
+    const again = p && 'kind' in p ? detect(text, false, markNames()) : null;
+    const other = (again?.kind === 'make' && p && 'kind' in p && again.what !== p.kind && again.what !== 'lookup') || (again?.kind === 'makeAny' && p && 'kind' in p && p.kind === 'lookup');
+    if (p && 'kind' in p && !other) {
+      if (again?.kind === 'makeAny') return makeFrom(p.kind === 'image' ? 'art' : p.kind, text);
+      if (again?.kind === 'make' && again.what === p.kind) return ask(p.kind, again.content);
+      if (p.kind === 'lookup') return void converse(text);
+      if (p.kind === 'image') return void showPicture(text);
+      return void run(p.kind, text);
+    }
     const last = lastWork();
     const it = detect(text, !!last, markNames());
+    // R12: 「魔法で作って欲しい」 — the making request of the turns before (「空飛ぶクジラの画像…」); none → which kind
+    if (it.kind === 'makeAny') {
+      const r = recentRequest(msgsRef.current);
+      if (r) return ask(r.what, r.content);
+      if (!story) return void converse(text);
+    }
     if (it.kind === 'find') return void showFound(it);
     // client 2026-11-24: a lookup is answered right in the talk (short, plain words; a picture as a picture bubble)
     if (it.kind === 'make' && it.what === 'lookup') return void converse(text);

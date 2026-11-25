@@ -2,6 +2,19 @@ import type { BluenaPlanet, ItemMarkId, MarkNames } from '@obolo/shared';
 import type { AtelierKind } from '@/lib/atelier/unlock';
 
 /**
+ * R12 (client): the words of a request to make (作って / 描いて / ほしい / 魔法で …) and of a search for something that
+ * exists (探して / 見せて / 見たい / 調べて / 〇〇の画像ある？). Only a search word with no making word is a picture search.
+ */
+const ART_WORD = /アート|絵|イラスト|画像|がぞう|写真|しゃしん|ペイント|お絵かき|おえかき|ピクチャ/;
+// 「え、かいて」「えかいて」: 絵 in kana (only in front of a drawing / making word)
+const KANA_E = /(^|[^ぁ-ん])え(を|、|,|\s)?(かいて|描いて|つくって|作って|ほしい|欲しい)/;
+const ART = new RegExp(`${ART_WORD.source}|描いて|描きたい|描く|描け|かいて|かきたい|${KANA_E.source}`);
+const MAKE = /作って|つくって|作りたい|つくりたい|作ろ|つくろ|作れ|つくれ|作る|つくる|創って|描いて|描きたい|描く|描け|かいて|かきたい|生成|ほしい|欲しい|魔法で|まほうで|スペル/;
+const SEE = /見せて|みせて|見たい|(?<!て)みたい(?!な)|探して|さがして|探したい|さがしたい|調べて|しらべて|検索|けんさく|ある[？?]|あります[かー]?[？?]?|ない[？?]/;
+/** R12: a request to make with no kind named (「魔法で作って欲しい」): the kind comes from the talk before (carry.ts) */
+const MAKE_ANY = /作って|つくって|作りたい|つくりたい|作れる|つくれる|創って|魔法で|まほうで|生成して/;
+
+/**
  * What a request in the Moon atelier's chat asks for (M-R210): plain keyword matching, no model. More than one kind,
  * or none at all, is ambiguous — {bati} asks back. Words that only change the last thing made ("もっと明るく",
  * "やり直して") are a refinement of the newest card.
@@ -9,12 +22,13 @@ import type { AtelierKind } from '@/lib/atelier/unlock';
 const WORDS: [AtelierKind, RegExp][] = [
   ['look', /姿|見た目|プロフィール|アイコン|自分の顔/],
   ['bati', /着せ?かえ|着替え|変身|コスプレ/],
-  ['image', /画像|写真を見せ|絵を見せ|見せて/],
-  ['lookup', /調べ|教えて|ってなに|って何|とは[？?]?$|知りたい/],
+  // R12: seeing / finding a picture needs a clear search word (SEE); 「画像を作って」 is art (detect sorts them)
+  ['image', /画像|がぞう|写真|しゃしん|絵|イラスト|見せて|みせて/],
+  ['lookup', /調べ|しらべ|教えて|おしえて|ってなに|って何|とは[？?]?$|知りたい|しりたい/],
   ['voice', /コロリン|ころりん|つぶや|メモ/],
-  ['art', /アート|絵|描いて|イラスト/],
-  ['song', /曲|歌|うた/],
-  ['video', /映像|MV|ＭＶ|ムービー|動画/i],
+  ['art', ART],
+  ['song', /曲|歌|うた|音楽|おんがく|ソング|BGM|ＢＧＭ|メロディ/i],
+  ['video', /映像|えいぞう|MV|ＭＶ|ムービー|動画|どうが|ビデオ/i],
   ['radio', /ラジオ|番組/],
   // client 2026-11-25: a book (a story chapter by chapter) and a small game
   ['novel', /小説|物語|ものがたり|お話(を|に|が|、|。|！|$)|おはなし(を|に|が|、|。|$)|(?<!日|見|絵)本(を|に|が|、|。|！|$)|ブック/],
@@ -23,16 +37,40 @@ const WORDS: [AtelierKind, RegExp][] = [
 
 const REFINE = /もっと|やり直|やりなお|ちがう|違う|変えて|かえて|にして|っぽく|明るく|暗く|元気に|静かに|かわいく|かっこよく|足して|入れて/;
 
-export type Intent = { kind: 'find'; star: boolean; mark?: ItemMarkId; planet?: BluenaPlanet } | { kind: 'make'; what: AtelierKind; content: string } | { kind: 'refine'; content: string } | { kind: 'ask'; options: AtelierKind[] } | { kind: 'talk'; content: string };
+export type Intent =
+  | { kind: 'find'; star: boolean; mark?: ItemMarkId; planet?: BluenaPlanet }
+  | { kind: 'make'; what: AtelierKind; content: string }
+  | { kind: 'refine'; content: string }
+  | { kind: 'ask'; options: AtelierKind[] }
+  | { kind: 'talk'; content: string }
+  /** R12: 「魔法で作って欲しい」 — making, no kind named */
+  | { kind: 'makeAny'; content: string };
 
 /** the words around the keyword: 「」 quotes win, otherwise the request with the "make a …" part taken off */
 export function contentOf(text: string): string {
   const q = text.match(/[「『"](.+?)[」』"]/);
   if (q) return q[1].trim();
-  return text
-    .replace(/(を|で|の)?(作って|つくって|作りたい|つくりたい|作る|つくる|お願い|おねがい|ください|して|ちょうだい)[！!。]*$/, '')
+  // R12: a greeting before the request is not what to make (「ヤッホー画像を作って…」)
+  const t = text.replace(/^(ヤッホー|やっほー|やっほ|ヤッホ|ねえバティ|ねえ|ねぇ|ねー|あのね|あの|えっと|バティ)[、,！!\s　ー〜]*/, '').trim();
+  // R12: the description after the request (「画像を作って欲しいんだけど、空飛ぶクジラが…」) is what to make
+  const m = REQUEST.exec(t);
+  if (m) {
+    const after = t.slice(m.index + m[0].length).replace(/^[、。,.！!？?\s　]+/, '').trim();
+    if (after.replace(/[、。！!？?\s　]/g, '').length >= 2) {
+      const before = t
+        .slice(0, m.index)
+        .replace(/(画像|がぞう|写真|絵|イラスト|アート|曲|歌|音楽|動画|映像|MV|ムービー|本|小説|物語|ゲーム)$/i, '')
+        .trim();
+      return [before, after].filter(Boolean).join('、').replace(/[！!。]+$/, '');
+    }
+  }
+  return t
+    .replace(/(を|で|の)?(作って|つくって|作りたい|つくりたい|作る|つくる|描いて|かいて|お願い|おねがい|ください|して|ちょうだい)(欲しい|ほしい|ください|くれる|くれない)?(な|の|よ|ね)?[？?！!。]*$/, '')
+    .replace(/(を|が|の)?(欲しい|ほしい)[な！!。]*$/, '')
     .trim();
 }
+/** 「〇〇を作って欲しいんだけど」: the making words, with what may follow them */
+const REQUEST = /(を|で|の|が)?(作って|つくって|描いて|かいて|作りたい|つくりたい|描きたい|作れる|つくれる|生成して)(欲しい|ほしい|ください|くれる|くれない|ちょうだい|もらえる|みて)?(ん?だ?けど|んですけど|んだが|が|な|の|よ|ね)?[？?！!。、]*/;
 
 /**
  * M-R236 §4: 「★がついた曲、見せて」「♠の画像、出して」 — show your works with a ★ / a mark (a mark by its sign, its
@@ -68,14 +106,27 @@ export function detect(text: string, hasCard: boolean, names?: MarkNames): Inten
   const found = detectFind(t, names);
   if (found) return found;
   let kinds = WORDS.filter(([, re]) => re.test(t)).map(([k]) => k);
-  // 「絵を見せて」 is a picture to see, not art to make; 「姿を変身」 is the look
-  if (kinds.includes('image')) kinds = kinds.filter((k) => k !== 'art');
+  // R12 (client): a picture to SEE needs a search word and no making word (「絵を見せて」「パンダの写真ある？」); with a
+  // making word it is art (「画像を作って欲しい」「イラストほしい」「え、かいて」); with neither, a picture word is art too
+  const making = MAKE.test(t);
+  const seeing = SEE.test(t) && !making;
+  if (kinds.includes('image')) {
+    if (seeing) kinds = kinds.filter((k) => k !== 'art' && k !== 'lookup');
+    else kinds = kinds.filter((k) => k !== 'image');
+  }
+  // 「描き方を教えて」 is a question
+  if (kinds.includes('lookup') && /(方|かた)(を|って|が)?(教えて|おしえて|知りたい|しりたい)/.test(t)) kinds = ['lookup'];
+  else if (kinds.includes('lookup') && making) kinds = kinds.filter((k) => k !== 'lookup');
+  // 「お話をかいて」 is a book (かいて = 書いて); a drawing word beside another kind with no picture named goes with it
+  if (kinds.includes('art') && kinds.length > 1 && !ART_WORD.test(t) && !KANA_E.test(t)) kinds = kinds.filter((k) => k !== 'art');
+  // 「姿を変身」 is the look
   if (kinds.includes('look') && kinds.includes('bati') && !/バティ|着せ?かえ|着替え/.test(t)) kinds = kinds.filter((k) => k !== 'bati');
   if (kinds.includes('video') && kinds.includes('song')) kinds = kinds.filter((k) => k !== 'song'); // 「この曲のMV」
   if (kinds.includes('radio') && kinds.includes('song')) kinds = kinds.filter((k) => k !== 'song'); // 「曲を流すラジオ」
   if (kinds.length === 1) return { kind: 'make', what: kinds[0], content: contentOf(t) };
   if (kinds.length > 1) return { kind: 'ask', options: kinds };
   if (hasCard && REFINE.test(t)) return { kind: 'refine', content: t };
+  if (MAKE_ANY.test(t)) return { kind: 'makeAny', content: contentOf(t) };
   // a question is a lookup; anything else is just talk ({bati} asks what to do with it)
   if (/[？?]$|なに|なんで|どうして|いつ|どこ/.test(t)) return { kind: 'make', what: 'lookup', content: t };
   return { kind: 'talk', content: t };
@@ -100,6 +151,8 @@ export const KIND_WORD: Record<AtelierKind, string> = {
 export function isBare(content: string): boolean {
   let t = content;
   for (const [, re] of WORDS) t = t.replace(new RegExp(re.source, 'g' + re.flags.replace('g', '')), '');
+  // R12: the request's own words (欲しい / 魔法で / お願い / ヤッホー …) say nothing about what to make either
+  t = t.replace(/ヤッホー|やっほー|やっほ|ねえ|ねぇ|バティ|魔法|まほう|欲しい|ください|ちょうだい|お願い|おねがい|んだけど|けど|なにか|何か|なんか|一つ|ひとつ|一枚|いちまい|描|かい/g, '');
   // 「新しく曲を作って」 (M-R253 §1: a new card) names only the kind too
   return t.replace(/新しく|あたらしく|別の|べつの|もう一つ|もうひとつ/g, '').replace(/[をのでとにがはもへ、。！!？?\s　]|作|つく|して|ほしい|たい/g, '').length < 2;
 }
