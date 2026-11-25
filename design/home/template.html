@@ -1085,6 +1085,42 @@ WORKS.saturn=[SL('今日なにしてた？','Rio','雑談',['ゆるい','日常'
 WORKS.saturn.push(...['明日もがんばるZE','今日はカレー','いい曲みつけた'].map((title,i)=>({title,by:ME,genre:['雑談','雑談','推し'][i],mood:[['日常'],['日常','ゆるい'],['アイドル']][i],v:i+1,mine:1})));
 RULE.saturn={chat:{g:['雑談'],m:['ゆるい','日常']},koi:{g:['恋バナ'],m:['好きな人','ドキドキ']},oshi:{g:['推し'],m:['アイドル','ライブ']},school:{g:['学校'],m:['部活','テスト']},night:{g:['夜'],m:['深夜','眠れない']},
   game:{g:['ゲーム'],m:['対戦','実況']},warai:{g:['お笑い'],m:['ボケ','ツッコミ']},anime:{g:['アニメ'],m:['名シーン','マンガ']},asa:{g:['朝'],m:['おはよう','元気']},nemui:{g:['眠い'],m:['おやすみ']}};
+/* skies of the five planets (M-R322): continents, rules, sample works */
+const C5=(k,n,tags,by)=>({k,n,tags,...(by?{by}:{})});
+CONT.mars=[C5('edm','ネオン地区',['EDM','ダンス']),C5('hiphop','ストリート地区',['ヒップホップ']),C5('ballad','ラブソング通り',['バラード','しっとり']),C5('rock','ライブハウス街',['ロック','バンド']),C5('chill','ローファイ横丁',['チル','作業用']),
+  C5('citypop','シティポップ・ハイウェイ',['シティポップ','夜ドライブ'],'Nagi'),C5('anison','アニソン劇場街',['アニソン','アニメ'],'ぽんず'),C5('jazz','ジャズバー通り',['ジャズ','おしゃれ'],'kei'),C5('matsuri','夏祭り商店街',['夏','祭り'],'ことね'),C5('rain','雨の路地',['雨','しっとり'],'みお')];
+RULE.mars=RULE.mercury;WORKS.mars=WORKS.mercury.map((w,i)=>({...w,ai:(i%5)+1}));
+CONT.venus=[C5('chat','おしゃべり雲',['雑談','ゆるい']),C5('koi','恋バナ放送局',['恋バナ']),C5('oshi','推し語りラジオ',['推し','アイドル']),C5('school','放課後ステーション',['学校','部活']),C5('night','深夜のひとりごと雲',['夜','深夜']),
+  C5('game','ゲーム実況FM',['ゲーム'],'タク'),C5('warai','お笑いラジオ',['お笑い'],'ショウ'),C5('anime','アニメ語りの雲',['アニメ'],'ぽんず'),C5('asa','おはようラジオ',['朝','おはよう'],'はるか'),C5('nemui','ねむねむFM',['眠い','おやすみ'],'みお')];
+RULE.venus=RULE.saturn;WORKS.venus=WORKS.saturn.map((w,i)=>({...w,title:w.title.replace(/[！？…。]+$/,'')+(i%3===0?'の回':''),ai:(i%5)+1}));
+CONT.uranus=[C5('tote','トートの店',['トート']),C5('tee','Tシャツの店',['Tシャツ']),C5('sticker','ステッカー屋',['ステッカー']),C5('acst','アクスタの店',['アクスタ']),C5('mug','マグカップ屋',['マグカップ']),
+  C5('yume','ゆめかわ雑貨店',['ゆめかわ','パステル'],'ぽんず'),C5('retro','レトロポップ屋',['レトロ','ポップ'],'YUZU'),C5('wa','和モダン堂',['和風'],'ことね'),C5('neko','ねこグッズ屋',['ねこ'],'みお'),C5('mono','モノクロ・セレクト',['モノクロ'],'kei')];
+RULE.uranus={tote:{g:['トート'],m:[]},tee:{g:['Tシャツ'],m:[]},sticker:{g:['ステッカー'],m:[]},acst:{g:['アクスタ'],m:[]},mug:{g:['マグカップ'],m:[]},yume:{g:[],m:['ゆめかわ','パステル']},retro:{g:[],m:['レトロ','ポップ']},wa:{g:[],m:['和風','和モダン']},neko:{g:[],m:['ねこ']},mono:{g:[],m:['モノクロ','白黒']}};
+const GK=['トート','Tシャツ','ステッカー','アクスタ','マグカップ'],GM=[['ねこ','かわいい'],['パステル','ゆめかわ'],['レトロ','ポップ'],['和風','花'],['モノクロ','白黒'],['夜','風景'],['ポップ','夏']];
+WORKS.uranus=WORKS.jupiter.filter(w=>!w.mine).map((w,i)=>({title:w.title+' '+GK[i%5],by:w.by,genre:GK[i%5],mood:[...GM[i%7]],ai:w.ai}));
+CONT.pluto=[C5('fantasy','ファンタジーの塔',['ファンタジー','魔法']),C5('love','恋の庭の書架',['恋愛']),C5('horror','地下のこわい書庫',['ホラー','こわい']),C5('daily','日常の窓辺',['日常','やさしい']),C5('sf','SFの天文台',['SF','宇宙']),
+  C5('mystery','ミステリーの迷路',['ミステリー'],'kei'),C5('tears','泣ける本の小部屋',['泣ける'],'みお'),C5('laugh','笑える本のサロン',['笑える'],'ショウ'),C5('short','短編の宝石箱',['短い'],'はるか'),C5('adventure','冒険の本の船',['わくわく','冒険'],'タク')];
+RULE.pluto={fantasy:{g:['ファンタジー'],m:['魔法']},love:{g:['恋愛'],m:[]},horror:{g:['ホラー'],m:['こわい']},daily:{g:['日常'],m:['やさしい']},sf:{g:['SF'],m:['宇宙']},mystery:{g:['ミステリー'],m:[]},tears:{g:[],m:['泣ける']},laugh:{g:[],m:['笑える']},short:{g:[],m:['短い']},adventure:{g:[],m:['わくわく','冒険']}};
+const BK=(t,b,g,m)=>({title:t,by:b,genre:g,mood:m});
+WORKS.pluto=[BK('月の図書館と魔法の鍵','ぽんず','ファンタジー',['魔法','わくわく','長い']),BK('竜の背中で眠る夜','タク','ファンタジー',['冒険','わくわく']),BK('星をひろう魔女','はるか','ファンタジー',['魔法','やさしい','短い']),
+ BK('となりの席の約束','ことね','恋愛',['泣ける','やさしい']),BK('放課後の告白','みお','恋愛',['短い','やさしい']),BK('雨の日だけの恋人','REN','恋愛',['泣ける','長い']),
+ BK('真夜中の三面鏡','kei','ホラー',['こわい','短い']),BK('階段が一段ふえる','ショウ','ホラー',['こわい','笑える']),BK('呼ばないで','REN','ホラー',['こわい']),
+ BK('ねこと朝ごはん','みお','日常',['やさしい','短い']),BK('コンビニの夜勤さん','そら','日常',['笑える','やさしい']),BK('おばあちゃんの梅ジャム','はるか','日常',['泣ける','やさしい']),
+ BK('火星行きの最終便','Nagi','SF',['宇宙','わくわく']),BK('ロボットは夢を見る','kei','SF',['泣ける','宇宙']),BK('1000年後の教室','YUZU','SF',['わくわく','長い']),
+ BK('消えた音楽室の鍵','kei','ミステリー',['わくわく']),BK('犯人はこの中にいない','ショウ','ミステリー',['笑える','短い']),BK('三日月ホテルの密室','Rio','ミステリー',['長い']),
+ BK('しっぽの長い冒険','タク','ファンタジー',['冒険','笑える']),BK('海賊ねこの宝の地図','ぽんず','日常',['冒険','わくわく','笑える'])].map((w,i)=>({...w,ai:(i%5)+1}));
+CONT.neptune=[C5('action','アクションのドーム',['アクション']),C5('puzzle','パズルのドーム',['パズル']),C5('race','レースのドーム',['レース']),C5('rhythm','リズムのドーム',['リズム','音楽']),C5('shoot','シューティングのドーム',['シューティング']),
+  C5('quiz','クイズのドーム',['クイズ'],'Rio'),C5('party','みんなで遊ぶドーム',['みんなで'],'YUZU'),C5('solo','ひとりでじっくりドーム',['ひとりで','じっくり'],'kei'),C5('quick','すぐ遊べるドーム',['すぐ終わる'],'そら'),C5('retro','レトロゲームのドーム',['レトロ','ドット絵'],'タク')];
+RULE.neptune={action:{g:['アクション'],m:[]},puzzle:{g:['パズル'],m:[]},race:{g:['レース'],m:[]},rhythm:{g:['リズム'],m:['音楽']},shoot:{g:['シューティング'],m:[]},quiz:{g:['クイズ'],m:[]},party:{g:[],m:['みんなで']},solo:{g:[],m:['ひとりで','じっくり']},quick:{g:[],m:['すぐ終わる']},retro:{g:[],m:['レトロ','ドット絵']}};
+const GA=(t,b,g,m)=>({title:t,by:b,genre:g,mood:m});
+WORKS.neptune=[GA('ネオンランナー','タク','アクション',['ひとりで','すぐ終わる']),GA('ねこジャンプ','みお','アクション',['すぐ終わる','みんなで']),GA('忍者の屋根伝い','ショウ','アクション',['じっくり','ひとりで']),
+ GA('ラーメンパズル','ぽんず','パズル',['じっくり','ひとりで']),GA('おにぎり落とし','はるか','パズル',['すぐ終わる']),GA('星座つなぎ','Nagi','パズル',['じっくり','ひとりで']),
+ GA('さくらレース','YUZU','レース',['みんなで','すぐ終わる']),GA('深海カーチェイス','REN','レース',['みんなで']),GA('ほうきでレース','ことね','レース',['すぐ終わる']),
+ GA('ムーンダイブ','そら','リズム',['音楽','すぐ終わる']),GA('太鼓でドン','タク','リズム',['音楽','みんなで']),GA('ペンライト・ラッシュ','YUZU','リズム',['音楽']),
+ GA('星くずシューター','kei','シューティング',['レトロ','ドット絵']),GA('クラゲ迎撃せよ','Rio','シューティング',['すぐ終わる']),
+ GA('3秒クイズ','Rio','クイズ',['すぐ終わる','みんなで']),GA('推しクイズ王','はるか','クイズ',['みんなで']),GA('8bitダンジョン','タク','アクション',['レトロ','ドット絵','じっくり']),GA('ドットの釣り堀','そら','パズル',['レトロ','ドット絵','ひとりで'])].map((w,i)=>({...w,ai:(i%5)+1}));
+const UNIT={mercury:'曲',jupiter:'作品',saturn:'人',mars:'本',venus:'番組',uranus:'個',pluto:'冊',neptune:'こ'};
+const HOMEW={mercury:'きみの島',jupiter:'きみの森',saturn:'きみのレコード',mars:'きみのシアター',venus:'きみのブース',uranus:'きみのお店',pluto:'きみの図書館',neptune:'きみのゲーム小屋'};
 const ESLOT=[[.25,.2,.37],[.76,.23,.37],[.5,.37,.32],[.21,.55,.42],[.8,.57,.42]],EME=[.5,.85,.56];
 const FAVN=5;let FAV={};
 function favGet(pl){if(FAV[pl])return FAV[pl];let v=null;try{v=JSON.parse(localStorage.getItem('obolo-sky-'+pl)||'null')}catch(e){}
@@ -1128,7 +1164,7 @@ function searchList(){const pl=EX.pl,q=$('eq').value.trim().replace(/^#/,'').toL
   const rs=CONT[pl].map(c=>({c,s:sc(c)})).filter(x=>x.s>=0).sort((a,b)=>b.s-a.s||EX.rk[a.c.k]-EX.rk[b.c.k]);
   L.innerHTML=`<div class="cap">${q||ESTAG?rs.length+'件':'大陸いちらん'}</div>`+(rs.length?'':'<div class="cap none">見つからなかった… 別のことばで探してみて</div>');
   rs.forEach(({c})=>{const r=document.createElement('div');r.className='esr';const on=f.includes(c.k);
-    r.innerHTML=`<div class="th" style="background-image:url(${islImg(pl,c.k)})"></div><div class="t"><b>${c.n}</b><small>🌊 ${drift(pl,c.k).length}${pl==='jupiter'?'作品':pl==='saturn'?'人':'曲'}</small></div><button type="button" class="st${on?' on':''}" aria-label="お気に入り">${on?'★':'☆'}</button><button type="button" class="go">降りる</button>`;
+    r.innerHTML=`<div class="th" style="background-image:url(${islImg(pl,c.k)})"></div><div class="t"><b>${c.n}</b><small>🌊 ${drift(pl,c.k).length}${UNIT[pl]||'こ'}</small></div><button type="button" class="st${on?' on':''}" aria-label="お気に入り">${on?'★':'☆'}</button><button type="button" class="go">降りる</button>`;
     r.querySelector('.go').onclick=()=>{closeSearch();expLand({...c,x:.5,y:.45})};
     r.querySelector('.st').onclick=()=>{const ff=favGet(pl);if(ff.includes(c.k)){ff[ff.indexOf(c.k)]=null;favSave(pl);drawSky();toast('☆ '+c.n+' をはずしたよ');searchList();return}
       const res=addFav(c);if(res==='added'){drawSky();chime();toast('☆ '+c.n+' をじぶんの空に追加');searchList()}else if(res==='full'){closeSearch();startSwap(c)}};
@@ -1169,7 +1205,7 @@ function expLand(r){const ex=$('exp'),c=EXP[EX.pl],em=$('emap');closeSearch();en
 const SKYV={
   mercury:{motion:'sail',hint:'の海',rider:(w,i)=>`<img alt="" src="${A['ship3-'+((i%4)+1)]||''}">`,
     tag:w=>`#${w.genre} ${w.bpm}BPM ${w.mood.slice(0,2).map(x=>'#'+x).join(' ')}`,
-    pierFrom:[-.2,.5,.35],pierTo:[.5,.8,1.45],pierOut:[1.25,.55,.45],
+    pierFrom:[-.2,.5,.35],pierTo:[.2,.86,1.0],pierOut:[1.25,.55,.45],
     show(b,st,o){const r=EX.region,sk='song-'+((b.w&&b.w.song)||o.song||r.song||1),vn=vinyl(st,A['jart-'+((b.i%5)+1)]||'','50%','36%','74%');if(vn&&vn.el)vn.el.style.zIndex='1';const dur=playSong(sk);lyricsStart(st,sk,'63%');
       const kt=kinTitle(st,{top:'7%',label:'',noby:1,title:b.title,by:b.n,c:'#38c8ff',c2:'#bdf0ff',g:'rgba(56,200,255,.6)'});return{dur,whoTop:'73%',close(){lyricsStop();vn.out();kt.out();stopSong()}}}},
   saturn:{motion:'flutter',kind:'kor',hint:'の輪',rider:(w,i)=>`<img alt="" src="${korImg(w.by,i)}">`,tag:w=>'',
@@ -1178,9 +1214,12 @@ const SKYV={
       k.innerHTML=(pier?'':`<img alt="" src="${korImg(b.n,b.i)}">`)+'<div class="sbub"></div>';k.querySelector('.sbub').textContent='「'+b.title+'」';st.appendChild(k);popSound();
       const vk='voice-'+String((b.w.v||1)).padStart(2,'0');const tm=setTimeout(()=>{if(A[vk])playVoice(vk)},260);
       return{dur:5,whoTop:'72%',close(){clearTimeout(tm);k.remove()}}}},
+  ...Object.fromEntries([['mars','ufo',14],['venus','radio',6],['uranus','balloon',5],['pluto','book',6],['neptune','bubble',5]].map(([pl,sp,dur])=>[pl,{motion:'flutter',hint:'',rider:(w,i)=>`<img alt="" src="${A['sp2-'+sp]||A['sp-'+sp]||''}">`,tag:w=>'',
+    pierFrom:[.5,-.1,.35],pierTo:[.2,.88,.9],pierOut:[1.2,.3,.4],
+    show(b,st,o){const v=viewer(st,pl,{ai:b.w.ai||1,title:b.title});return{dur,whoTop:'78%',close(){v.close()}}}}])),
   jupiter:{motion:'flutter',hint:'の森',rider:(w,i)=>`<img alt="" src="${A['bfly3-'+((i%4)+1)]||''}"><i class="eart" style="background-image:url(${A['jart-'+(w.ai||1)]||''})"></i>`,
     tag:w=>`#${w.genre} ${w.mood.slice(0,2).map(x=>'#'+x).join(' ')}`,
-    pierFrom:[.5,.08,.3],pierTo:[.5,.88,1.05],pierOut:[.5,-.2,.3],
+    pierFrom:[.5,.08,.3],pierTo:[.2,.86,.95],pierOut:[.5,-.2,.3],
     show(b,st,o){const art=openArt(st,{img:A['jart-'+(b.w.ai||1)]||'',title:b.title});chime();return{dur:7,whoTop:'76%',close(){art.close()}}}}};
 const GLADE=[[.22,.5,.55],[.55,.46,.55],[.82,.55,.6],[.14,.66,.8],[.42,.64,.8],[.72,.7,.82],[.3,.82,1.05]];
 function spawnStrangers(r){if(SKYV[EX.pl].motion==='flutter')return spawnFlutter(r);const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,ex=$('exp');const pool=drift(EX.pl,r.k);const ws=pool.slice(0,7).sort(()=>Math.random()-.5);
@@ -1228,7 +1267,7 @@ function expShow(b,o){o=o||{};if(EX.open)return;const ex=$('exp'),st=$('estage')
   const ob=document.createElement('button');ob.type='button';if(b.w&&b.w.mine)ob.style.display='none';ob.className='oshib'+(oshi.has(b.n)?' done':'');ob.setAttribute('aria-label','推す');ob.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3s-7.6-4.6-7.6-10.2A4.3 4.3 0 0 1 12 7.4a4.3 4.3 0 0 1 7.6 2.7c0 5.6-7.6 10.2-7.6 10.2z"/></svg>';acts.appendChild(ob);
   ob.onclick=ev=>{ev.stopPropagation();if(oshi.has(b.n))return;oshi.add(b.n);ob.classList.add('done','pop');chime();
     for(let k=0;k<12;k++){const h=document.createElement('i');h.className='heartp';h.textContent='💗';h.style.left='50%';h.style.top='88%';h.style.setProperty('--dx',(Math.random()*160-80)+'px');h.style.setProperty('--dy',(-60-Math.random()*120)+'px');st.appendChild(h);setTimeout(()=>h.remove(),1000)}
-    toast('💗 '+b.n+' を推しにしたよ。これから'+(EX.pl==='jupiter'?'きみの森':'きみの島')+'にも来てくれるよ')};
+    toast('💗 '+b.n+' を推しにしたよ。これから'+(HOMEW[EX.pl]||'きみの星')+'にも来てくれるよ')};
   const rb=document.createElement('button');rb.type='button';rb.className='repb';rb.setAttribute('aria-label','通報・非表示');rb.textContent='⋯';st.appendChild(rb);rb.onclick=ev=>{ev.stopPropagation();repMenu(b,st)};
   const t0=performance.now();EX.open={close(){st.style.pointerEvents='none';sv.close();who.remove();acts.remove();rb.remove();const m=st.querySelector('.repmenu');if(m)m.remove();ex.classList.remove('show');b.e.classList.remove('held');EX.open=null}};
   st.style.pointerEvents='auto';st.onclick=ev=>{if(ev.target.closest('.oshib,.favb,.repb,.repmenu,.aend'))return;if(performance.now()-t0>300){if(EX.auto){autoStop();return}EX.open&&EX.open.close();st.style.pointerEvents='none'}};return dur}
@@ -1258,10 +1297,11 @@ const G5={mars:{t:'mv',place:'シアター',home:[.79,.54],titles:['ネオンの
   pluto:{t:'book',place:'図書館',home:[.68,.36],titles:['夕焼けの町の約束','屋根の上のねこ','ラーメンと魔法','さくら通りの手紙','月と海の物語'],c:'#b48cff'},
   neptune:{t:'game',place:'ゲーム小屋',home:[.84,.44],titles:['ネオンランナー','ねこジャンプ','ラーメンパズル','さくらレース','ムーンダイブ'],c:'#ff4fd8'}};
 const isG5=()=>!!(G5[cur]&&mode==='anime'&&A['bg5-'+cur]);
-const G5IMG=(pl,n)=>A['p5-'+pl+'-'+CHB(n)]||A['chibi-'+CHB(n)]||'';
+const G5SP={mars:'ufo',venus:'radio',uranus:'balloon',pluto:'book',neptune:'bubble'};
+const G5IMG=(pl,n)=>(n!==ME&&CHB(n)==='user'&&!PEOPLE.some(p=>p.n===n)&&A['sp2-'+G5SP[pl]])||A['p5-'+pl+'-'+CHB(n)]||A['chibi-'+CHB(n)]||'';
 let GF=[],GQ=[],Graf=0,GOPEN=null,GV=null,GNB=0;
 function stopG5(){cancelAnimationFrame(Graf);GF=[];GQ=[];if(GV)stopG5play();if(GOPEN)GOPEN.close()}
-function setupG5(){const base=[...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'れい',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'}];
+function setupG5(){setTimeout(()=>{if(!CONT[cur])return;predecode(['exp-'+cur+'-sea',...CONT[cur].flatMap(c=>['isl-'+cur+'-'+c.k,'exp-'+cur+'-'+c.k]),'isl-'+cur+'-me'])},1200);const base=[...OSHIX(),...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'れい',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'}];
   GF=[];GQ=base.slice(8);base.slice(0,8).forEach((o,i)=>GF.push(makeG5(o,i,i)));let last=performance.now();const ph=$('phone');
   const step=now=>{const dt=Math.min(.05,(now-last)/1000);last=now;const W=ph.clientWidth,H=ph.clientHeight,ts=now/1000;
     for(const b of GF){if(b.gone||b.drag)continue;b.t+=dt;const tx=(b.cx+Math.sin(b.t*b.w1+b.p1)*b.ax)*W,ty=(b.cy+Math.sin(b.t*b.w2+b.p2)*b.ay)*H+Math.sin(ts*2+b.i)*3;b.x+=(tx-b.x)*Math.min(1,dt*3);b.y+=(ty-b.y)*Math.min(1,dt*3);
@@ -1270,7 +1310,7 @@ function makeG5(o,i,slot){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight
   e.innerHTML=`<img alt="" src="${G5IMG(cur,o.n)}"><span class="nm">${o.n}</span>`;$('sky').appendChild(e);const ai=(i*2+o.n.length)%5+1;
   const b={o,e,i,ai,slot,sc:S[2],cx:S[0],cy:S[1],ax:S[3],ay:S[4],w1:.4+((i*17)%7)*.05,w2:.6+((i*11)%5)*.07,p1:i*1.7,p2:i*2.3,t:0,x:W*(i%2?1.1:-.1),y:H*.6,gone:false};
   dragify(b,e,()=>popG5(b),()=>dropFloat(b,[[.44,.5],[.62,.82],[.83,1.22]],[.53,.74],[.06,.94,.36,.9]));return b}
-function viewer(into,pl,o){const c=G5[pl],title=c.titles[o.ai-1],st=TSTYLE[title]||{f:"'Dela Gothic One'"},tt=`<div class="ttl2" style="font-family:${st.f},var(--f-body)">${[...title].map(ch=>`<span class="${chk(ch)}">${ch}</span>`).join('')}</div>`,art=A['jart-'+o.ai]||'';
+function viewer(into,pl,o){const c=G5[pl],title=o.title||c.titles[o.ai-1],st=TSTYLE[title]||{f:"'Dela Gothic One'"},tt=`<div class="ttl2" style="font-family:${st.f},var(--f-body)">${[...title].map(ch=>`<span class="${chk(ch)}">${ch}</span>`).join('')}</div>`,art=A['jart-'+o.ai]||'';
   const v=document.createElement('div');let stop=()=>{};
   if(c.t==='mv'){v.className='vw mvv';v.style.top='12%';v.innerHTML=`<div class="scr"><i style="background-image:url(${art})"></i></div>${tt}`;playSong('song-'+o.ai);stop=()=>stopSong()}
   if(c.t==='radio'){v.className='vw rdv';v.style.top='14%';v.innerHTML=`<div class="disc2" style="background-image:url(${art})"></div><span class="air">ON AIR</span><div class="wave">${Array.from({length:15},(_,i)=>`<b style="height:${10+((i*7)%5)*6}px;animation-delay:${(i%5)*.08}s"></b>`).join('')}</div>${tt}`;const vk='voice-'+String(o.ai).padStart(2,'0');setTimeout(()=>{if(A[vk])playVoice(vk)},500)}
