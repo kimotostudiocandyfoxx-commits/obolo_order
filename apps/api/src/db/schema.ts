@@ -8,7 +8,7 @@
  * planet tables carry created_at / updated_at / deleted_at (soft delete).
  */
 import { sql } from 'drizzle-orm';
-import type { AtelierLayout, BuddySource, ChapterView, GameMakeKind, PuniLook, SongLyrics, SpellTag, TalkBeat, TalkFace, TalkMotion, WorkMaterial, WorkOrigin, WorkVersion } from '@obolo/shared';
+import type { AtelierLayout, BuddySource, ChapterView, ContinentRule, GameMakeKind, PuniLook, SongLyrics, SpellTag, TalkBeat, TalkFace, TalkMotion, WorkMaterial, WorkOrigin, WorkVersion } from '@obolo/shared';
 import {
   bigint,
   boolean,
@@ -462,6 +462,8 @@ export const jupiterRoots = pgTable(
     kind: text('kind').notNull(), // photo | video
     url: text('url').notNull(),
     posterUrl: text('poster_url'),
+    /** planets 2-1: the spell the picture was painted with (its tags go with the post when it flies; null = a photo) */
+    spellJson: jsonb('spell_json').$type<SpellTag[]>(),
     ...timestamps,
   },
   (t) => [index('jupiter_roots_user_idx').on(t.userId, t.createdAt)],
@@ -666,13 +668,16 @@ export const bluenaSaves = pgTable(
     userId: uuid('user_id')
       .notNull()
       .references(() => users.id),
-    /** a planet post (mercury: song) */
-    postId: uuid('post_id')
-      .notNull()
-      .references(() => planetPosts.id),
+    /**
+     * planets 2-5 (M-R309 ☆): which store the work is in (@obolo/shared PLANET_WORK_KINDS). 'planet_post' = the
+     * Mercury / Mars posts of 〔ブルーナにしまう〕 (before the rebuild every save was one)
+     */
+    kind: text('kind').notNull().default('planet_post'),
+    /** the work's id in that store (a planet post, a Jupiter post, a Saturn post, a radio show) */
+    postId: uuid('post_id').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [primaryKey({ columns: [t.userId, t.postId] }), index('bluena_saves_user_idx').on(t.userId, t.createdAt)],
+  (t) => [primaryKey({ columns: [t.userId, t.kind, t.postId] }), index('bluena_saves_user_idx').on(t.userId, t.createdAt)],
 );
 
 /** Venus radio: a recorded show (or the recording a live show left). private = Bluena's Venus folder. */
@@ -1136,7 +1141,78 @@ export const planetHomes = pgTable(
     orderJson: jsonb('order_json').$type<string[]>(),
     /** M-R262 (Saturn): the record's colour (black / pink / lavender / mint / gold / sky) */
     recordColour: text('record_colour'),
+    /** planets 2-5 (M-R298): じぶんの空 — five continent keys (null = an empty slot); null = never chosen (the operator's five) */
+    continentFavsJson: jsonb('continent_favs_json').$type<(string | null)[]>(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.userId, t.planet] })],
+);
+
+/**
+ * 惑星の作り直し 2-1〜2-3 (docs/planets.md): one row per planet work (any store: kind + work_id) — its hidden tags (set
+ * when it is made, from the spell / settings), the visibility its maker chose (null = PLANET_WORK_DEFAULT_VISIBILITY)
+ * and the automatic check before it may go public (a held work stays dachi, with the reason).
+ */
+export const planetWorkMeta = pgTable(
+  'planet_work_meta',
+  {
+    kind: text('kind').notNull(),
+    workId: uuid('work_id').notNull(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    planet: text('planet').notNull(),
+    main: text('main'),
+    moodsJson: jsonb('moods_json').$type<string[]>().notNull().default([]),
+    bpm: integer('bpm'),
+    /** dachi | public; null = the default (one constant, pending the client) */
+    visibility: text('visibility'),
+    /** unchecked | ok | held */
+    checkState: text('check_state').notNull().default('unchecked'),
+    checkReason: text('check_reason'),
+    checkedAt: timestamp('checked_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.kind, t.workId] }), index('planet_work_meta_planet_idx').on(t.planet, t.createdAt), index('planet_work_meta_user_idx').on(t.userId)],
+);
+
+/**
+ * 2-4 continents (M-R298 / M-R299): the places a planet's public works drift to, as data — the operator's now
+ * (creator_id null), members' later (M-R297). rule_json = {g, m, bpm?} (@obolo/shared workScore).
+ */
+export const continents = pgTable(
+  'continents',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    planet: text('planet').notNull(),
+    key: text('key').notNull(),
+    name: text('name').notNull(),
+    creatorId: uuid('creator_id').references(() => users.id),
+    ruleJson: jsonb('rule_json').$type<ContinentRule>().notNull(),
+    /** the words it is found by (〔🔍 大陸をさがす〕 #tags) */
+    tagsJson: jsonb('tags_json').$type<string[]>().notNull().default([]),
+    /** the sky island, the landed scene, the shore view (null = not painted yet) */
+    skyUrl: text('sky_url'),
+    landUrl: text('land_url'),
+    shoreUrl: text('shore_url'),
+    sortOrder: integer('sort_order').notNull().default(0),
+    ...timestamps,
+  },
+  (t) => [uniqueIndex('continents_planet_key_uq').on(t.planet, t.key), index('continents_planet_idx').on(t.planet, t.sortOrder)],
+);
+
+/** 2-5 (M-R312): the continents a member was shown (〔旅〕) or landed on — 〔旅〕 picks the unseen ones first */
+export const continentSeen = pgTable(
+  'continent_seen',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    planet: text('planet').notNull(),
+    key: text('key').notNull(),
+    shownAt: timestamp('shown_at', { withTimezone: true }),
+    landedAt: timestamp('landed_at', { withTimezone: true }),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.planet, t.key] })],
 );

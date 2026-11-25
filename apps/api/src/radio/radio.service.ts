@@ -1,8 +1,9 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, Optional } from '@nestjs/common';
 import { LlmProvider, moderateText } from '@obolo/ai';
 import {
   CHILD_AGE,
   flyingSince,
+  genericTags,
   RADIO_LIVE_STALE_SECONDS,
   type BluenaKeptView,
   type CommsPerson,
@@ -28,6 +29,7 @@ import { Database } from '../db/db';
 import { bluenaSaves, mediaObjects, planetPosts, radioLives, radioMessages, radioShows, songs, userBlocks, userReports, users } from '../db/schema';
 import { LLM } from '../infra/tokens';
 import { activeMember } from '../users/tester';
+import { PlanetWorksService } from '../planets/planet-works.service';
 
 type ShowRow = typeof radioShows.$inferSelect;
 type LiveRow = typeof radioLives.$inferSelect;
@@ -52,6 +54,7 @@ export class RadioService {
     private readonly db: Database,
     @Inject(CONFIG) private readonly cfg: AppConfig,
     @Inject(LLM) private readonly llm: LlmProvider,
+    @Optional() private readonly works?: PlanetWorksService,
   ) {}
 
   // --- who may do what ---------------------------------------------------------------------------
@@ -109,7 +112,7 @@ export class RadioService {
       .from(bluenaSaves)
       .innerJoin(planetPosts, eq(planetPosts.id, bluenaSaves.postId))
       .leftJoin(songs, eq(songs.id, planetPosts.sourceId))
-      .where(and(eq(bluenaSaves.userId, userId), eq(planetPosts.planet, 'mercury'), isNull(planetPosts.deletedAt)))
+      .where(and(eq(bluenaSaves.userId, userId), eq(bluenaSaves.kind, 'planet_post'), eq(planetPosts.planet, 'mercury'), isNull(planetPosts.deletedAt)))
       .orderBy(desc(bluenaSaves.createdAt))
       .limit(200);
     const who = await this.people(kept.map((k) => k.ownerId));
@@ -221,6 +224,8 @@ export class RadioService {
         liveId: body.liveId ?? null,
       })
       .returning();
+    // planets 2-1: a show carries the same tag shape (its values come with Venus's handoff)
+    await this.works?.tag('radio_show', r.id, { userId, planet: 'venus', tags: genericTags(null), words: r.title });
     return (await this.showView([r], userId))[0];
   }
 
@@ -515,7 +520,7 @@ export class RadioService {
       .from(bluenaSaves)
       .innerJoin(planetPosts, eq(planetPosts.id, bluenaSaves.postId))
       .innerJoin(users, eq(users.id, planetPosts.userId))
-      .where(eq(bluenaSaves.userId, userId))
+      .where(and(eq(bluenaSaves.userId, userId), eq(bluenaSaves.kind, 'planet_post')))
       .orderBy(desc(bluenaSaves.createdAt))
       .limit(300);
     const blocked = await this.blockedWith(userId);
@@ -547,7 +552,7 @@ export class RadioService {
       if (!p || (await this.blockedWith(userId)).has(p.owner)) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Not found');
       await this.db.write.insert(bluenaSaves).values({ userId, postId }).onConflictDoNothing();
     } else {
-      await this.db.write.delete(bluenaSaves).where(and(eq(bluenaSaves.userId, userId), eq(bluenaSaves.postId, postId)));
+      await this.db.write.delete(bluenaSaves).where(and(eq(bluenaSaves.userId, userId), eq(bluenaSaves.kind, 'planet_post'), eq(bluenaSaves.postId, postId)));
     }
     return { kept: on };
   }

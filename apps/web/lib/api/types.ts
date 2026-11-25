@@ -314,7 +314,8 @@ export interface Api {
   jupiterSky(tab: 'all' | 'following' | 'friends'): Promise<JupiterFlyer[]>;
   jupiterRoots(): Promise<JupiterRootView[]>;
   /** after POST /media/photo (Jupiter is photos only; videos go to Mars's 裏スタジオ) */
-  addJupiterRoot(body: { mediaId: string }): Promise<JupiterRootView>;
+  /** planets 2-1: `spell` = the spell an atelier picture was painted with (its hidden tags fly with the post) */
+  addJupiterRoot(body: { mediaId: string; spell?: SpellTag[] }): Promise<JupiterRootView>;
   removeJupiterRoot(id: string): Promise<void>;
   createJupiterPost(body: CreateJupiterPostBody): Promise<JupiterPostView>;
   starJupiterPost(id: string, on: boolean): Promise<{ starCount: number; starredByMe: boolean }>;

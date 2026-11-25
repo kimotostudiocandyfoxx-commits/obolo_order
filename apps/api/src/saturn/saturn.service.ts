@@ -1,6 +1,6 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, Optional } from '@nestjs/common';
 import { LlmProvider, moderateText } from '@obolo/ai';
-import { flyingSince, neoVoiceUrl, type CreateSaturnPostBody, type PuniLook, type Paged, type SaturnPostRef, type SaturnPostView, type SaturnProfileView } from '@obolo/shared';
+import { flyingSince, genericTags, neoVoiceUrl, type CreateSaturnPostBody, type PuniLook, type Paged, type SaturnPostRef, type SaturnPostView, type SaturnProfileView } from '@obolo/shared';
 import { and, asc, count, desc, eq, gt, inArray, isNull, lt, or, sql, sum, type SQL } from 'drizzle-orm';
 import { decodeCursor, encodeCursor } from '../common/cursor';
 import { apiError } from '../common/errors';
@@ -11,6 +11,7 @@ import { MediaService } from '../media/media.service';
 import { VoiceService } from '../voice/voice.service';
 import { PlazaService } from './plaza.service';
 import { notChild, planetWorkScope } from '../common/child';
+import { PlanetWorksService } from '../planets/planet-works.service';
 
 type PostRow = typeof saturnPosts.$inferSelect;
 type Author = { id: string; handle: string; displayName: string; neoForm?: string | null; look?: PuniLook | null; pic?: string | null };
@@ -30,6 +31,7 @@ export class SaturnService {
     @Inject(LLM) private readonly llm: LlmProvider,
     private readonly voices: VoiceService,
     private readonly plazas: PlazaService,
+    @Optional() private readonly works?: PlanetWorksService,
   ) {}
 
   /**
@@ -228,6 +230,8 @@ export class SaturnService {
       if (repostOf) await tx.update(saturnPosts).set({ repostCount: sql`${saturnPosts.repostCount} + 1` }).where(eq(saturnPosts.id, repostOf.id));
       return row;
     });
+    // planets 2-1: a kororin carries the same tag shape (its values come with Saturn's handoff)
+    if (!replyToId) await this.works?.tag('saturn_post', p.id, { userId, planet: 'saturn', tags: genericTags(null), words: p.text });
     return this.toView(p, author, false, repostOf);
   }
 

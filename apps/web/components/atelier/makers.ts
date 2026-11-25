@@ -126,7 +126,7 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
       try {
         const blob = await fetch(r.url).then((x) => (x.ok ? x.blob() : Promise.reject(new Error(String(x.status)))));
         const ph = await api.uploadPhoto(blob);
-        const root = await api.addJupiterRoot({ mediaId: ph.id });
+        const root = await api.addJupiterRoot({ mediaId: ph.id, ...(spell ? { spell } : {}) });
         return done({ ...w, ref: { ...w.ref, rootId: root.id, mediaId: ph.id } });
       } catch {
         return { ...w, note: 'ブルーナに、うまくしまえなかった' };

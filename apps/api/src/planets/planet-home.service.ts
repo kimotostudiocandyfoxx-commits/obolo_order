@@ -16,12 +16,14 @@ import {
   isKororinPic,
   kororinOf,
   type KororinChoice,
+  readTags,
 } from '@obolo/shared';
 import { and, eq, inArray, isNull, or, sql, type SQL } from 'drizzle-orm';
 import { dachiOf, notHidden, viewerIsYoung } from '../common/child';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
-import { follows, jupiterPosts, planetHomes, planetPosts, radioShows, saturnPosts, userBlocks, users } from '../db/schema';
+import { follows, jupiterPosts, planetHomes, planetPosts, planetWorkMeta, radioShows, saturnPosts, userBlocks, users } from '../db/schema';
+import { isPublicWork, metaView } from './planet-works.service';
 
 /**
  * 星のホーム (M-R258; Saturn M-R257). One feed for every planet's home:
@@ -109,10 +111,10 @@ export function storeOf(planet: HomePlanet): Store | null {
 }
 
 /** the author in `col` is under CHILD_AGE or has no birth year (never reaches strangers) */
-const authorIsYoung = (col: SQL): SQL =>
+export const authorIsYoung = (col: SQL): SQL =>
   sql`EXISTS (SELECT 1 FROM users a WHERE a.id = ${col} AND COALESCE(NULLIF(a.onboarding_json->>'birthYear', '')::int, 9999) > EXTRACT(YEAR FROM now())::int - ${CHILD_AGE})`;
 const followsOf = (viewerId: string): SQL => sql`SELECT f.followee_id FROM follows f WHERE f.follower_id = ${viewerId}`;
-const blockedWith = (viewerId: string, col: SQL): SQL =>
+export const blockedWith = (viewerId: string, col: SQL): SQL =>
   sql`EXISTS (SELECT 1 FROM user_blocks b WHERE (b.blocker_id = ${viewerId} AND b.blocked_id = ${col}) OR (b.blocker_id = ${col} AND b.blocked_id = ${viewerId}))`;
 
 /** own works: no time limit at all (kept forever) */
@@ -122,9 +124,12 @@ export const ownWhere = (s: Store, viewerId: string): SQL => sql`(${s.live} AND 
 export const aroundWhere = (s: Store, viewerId: string, kind: PlanetWorkKind, since: Date): SQL =>
   sql`(${s.live} AND ${s.flownAt} > ${since} AND ${s.userId} <> ${viewerId} AND (${s.userId} IN (${dachiOf(viewerId)}) OR (${s.userId} IN (${followsOf(viewerId)}) AND NOT ${viewerIsYoung(viewerId)} AND NOT ${authorIsYoung(s.userId)})) AND ${notHidden(viewerId, kind, s.id)} AND NOT ${blockedWith(viewerId, s.userId)})`;
 
-/** strangers (not followed), for a viewer who is not young, never a young maker, within 88h */
+/**
+ * strangers (not followed), for a viewer who is not young, never a young maker, within 88h — and (planets 2-2) only a
+ * work that is public in effect: a dachi work never reaches a stranger
+ */
 export const farWhere = (s: Store, viewerId: string, kind: PlanetWorkKind, since: Date): SQL =>
-  sql`(${s.live} AND ${s.flownAt} > ${since} AND ${s.userId} <> ${viewerId} AND ${s.userId} NOT IN (${followsOf(viewerId)}) AND NOT ${viewerIsYoung(viewerId)} AND NOT ${authorIsYoung(s.userId)} AND ${notHidden(viewerId, kind, s.id)} AND NOT ${blockedWith(viewerId, s.userId)})`;
+  sql`(${s.live} AND ${s.flownAt} > ${since} AND ${s.userId} <> ${viewerId} AND ${s.userId} NOT IN (${followsOf(viewerId)}) AND NOT ${viewerIsYoung(viewerId)} AND NOT ${authorIsYoung(s.userId)} AND ${notHidden(viewerId, kind, s.id)} AND NOT ${blockedWith(viewerId, s.userId)} AND ${isPublicWork(kind, s.id)})`;
 
 type Row = { id: string; userId: string; flownAt: Date | string; text: string | null; title: string | null; url: string | null; thumb: string | null; seconds: number | null; name: string; pic: string | null; chibi?: string | null; kPic?: number | null; figure?: string | null; ball?: string | null };
 
@@ -188,15 +193,26 @@ export class PlanetHomeService {
       cfg.far && !young ? this.rows(s, farWhere(s, viewerId, kind, since), sql`random()`, HOME_FAR_MAX, planet) : Promise.resolve([] as Row[]),
       this.dachiIds(viewerId),
     ]);
+    // planets 2-1 / 2-2: every work carries its hidden tags; your own also their visibility (and why one is held)
+    const ids = [...own, ...around, ...far].map((r) => r.id);
+    const metas = ids.length ? (((await this.db.read.select().from(planetWorkMeta).where(and(eq(planetWorkMeta.kind, kind), inArray(planetWorkMeta.workId, ids)))) ?? []) as (typeof planetWorkMeta.$inferSelect)[]) : [];
+    const byId = new Map(metas.map((m) => [m.workId, m]));
+    const tagged = (w: HomeWork, mine = false): HomeWork => {
+      const m = byId.get(w.id);
+      const tags = m ? readTags(m.main, m.moodsJson, m.bpm) : undefined;
+      if (!mine) return tags ? { ...w, tags } : w;
+      const v = metaView(kind, w.id, m);
+      return { ...w, ...(tags ? { tags } : {}), visibility: v.visibility, heldReason: v.check === 'held' ? v.reason : null };
+    };
     return {
       ...base,
       live: true,
       own: orderOwn(
-        own.map((r) => toWork(r, kind, 'own')),
+        own.map((r) => tagged(toWork(r, kind, 'own'), true)),
         h?.orderJson,
       ),
-      around: around.map((r) => toWork(r, kind, dachi.has(r.userId) ? 'dachi' : 'oshi')),
-      far: far.map((r) => toWork(r, kind, 'stranger')),
+      around: around.map((r) => tagged(toWork(r, kind, dachi.has(r.userId) ? 'dachi' : 'oshi'))),
+      far: far.map((r) => tagged(toWork(r, kind, 'stranger'))),
     };
   }
 

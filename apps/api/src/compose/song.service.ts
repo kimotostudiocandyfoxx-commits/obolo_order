@@ -50,6 +50,8 @@ interface StoredDesign {
   voiced?: boolean;
   /** R13: the lyrics with metatags it was sung from (the yes covered them) */
   lyrics?: SongLyrics;
+  /** planets 2-1: the spell said yes to (its genre / mood / theme words become the song's hidden planet tags) */
+  spell?: FullSongBody['spell'];
 }
 
 /** R13: the sung lines of lyrics with metatags, each with the engine's section, its block's label and key */
@@ -320,6 +322,7 @@ export class SongService {
       voiced: false,
       cost: { usd: got.costUsd, model: got.model, taskUUID: got.taskUUID },
       ...(body.lyrics ? { lyrics: body.lyrics } : {}),
+      ...(body.spell ? { spell: body.spell } : {}),
       // R17: the take as sung is the original every free change is made from (at `tempo`); `first` is what was delivered
       ...(out.tempo !== 1 ? { tempo: out.tempo, original: { mixUrl: mixM.url, seconds: secs, phrases }, first: { mixUrl: out.mixUrl, seconds: out.seconds, phrases: out.phrases } } : {}),
     };
@@ -373,6 +376,7 @@ export class SongService {
       guideUrl: guideM.url,
       voiced: made.voiced,
       ...(body.lyrics ? { lyrics: body.lyrics } : {}),
+      ...(body.spell ? { spell: body.spell } : {}),
     };
     const mix: SongMix = { ...DEFAULT_MIX, gaps: phrases.map(() => 0) };
     const [row] = await this.db.write

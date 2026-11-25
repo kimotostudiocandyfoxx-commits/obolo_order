@@ -1,7 +1,8 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, Optional } from '@nestjs/common';
 import { LlmProvider, moderateText } from '@obolo/ai';
 import {
   JUPITER_DEFAULT_BRANCHES,
+  artTags,
   flyingSince as sharedFlyingSince,
   splitFlying,
   type CreateJupiterPostBody,
@@ -19,6 +20,7 @@ import { Database } from '../db/db';
 import { follows, jupiterPosts, jupiterReplies, jupiterRoots, mediaObjects, starEvents, users } from '../db/schema';
 import { LLM } from '../infra/tokens';
 import { notChild, planetWorkScope } from '../common/child';
+import { PlanetWorksService } from '../planets/planet-works.service';
 
 type PostRow = typeof jupiterPosts.$inferSelect;
 
@@ -39,6 +41,7 @@ export class JupiterService {
   constructor(
     private readonly db: Database,
     @Inject(LLM) private readonly llm: LlmProvider,
+    @Optional() private readonly works?: PlanetWorksService,
   ) {}
 
   // --- 根っこ ------------------------------------------------------------------------------------
@@ -61,7 +64,7 @@ export class JupiterService {
       .where(and(eq(mediaObjects.id, body.mediaId), eq(mediaObjects.userId, userId), isNull(mediaObjects.deletedAt)));
     if (m?.kind === 'video') throw apiError(HttpStatus.BAD_REQUEST, 'VIDEO_GOES_TO_MARS', 'Videos are kept in the Mars backstage studio');
     if (!m || m.kind !== 'photo') throw apiError(HttpStatus.BAD_REQUEST, 'MEDIA_NOT_FOUND', 'Upload the photo first');
-    const [r] = await this.db.write.insert(jupiterRoots).values({ userId, mediaId: m.id, kind: 'photo', url: m.url }).returning();
+    const [r] = await this.db.write.insert(jupiterRoots).values({ userId, mediaId: m.id, kind: 'photo', url: m.url, spellJson: body.spell ?? null }).returning();
     return { id: r.id, kind: 'photo', url: r.url, posterUrl: null, createdAt: r.createdAt.toISOString() };
   }
 
@@ -90,6 +93,8 @@ export class JupiterService {
       .insert(jupiterPosts)
       .values({ userId, rootId: root.id, kind: root.kind, url: root.url, posterUrl: root.posterUrl, text: body.text, filter: body.filter, branch: body.branch })
       .returning();
+    // planets 2-1: the hidden tags, from the spell the picture was painted with (a photo: none yet)
+    await this.works?.tag('jupiter_post', p.id, { userId, planet: 'jupiter', tags: artTags(root.spellJson), words: p.text });
     const [author] = await this.db.write.select(authorCols).from(users).where(eq(users.id, userId));
     return this.toView(p, author, false);
   }

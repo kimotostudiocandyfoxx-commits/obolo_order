@@ -1,8 +1,10 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, Optional } from '@nestjs/common';
 import { LlmProvider, moderateText } from '@obolo/ai';
 import {
   MARS_VIDEO_SECONDS,
   flyingSince,
+  genericTags,
+  songTags,
   splitFlying,
   type CreatePlanetPostBody,
   type PlanetAuthor,
@@ -19,6 +21,7 @@ import { follows, marsBackstage, mvProjects, planetPosts, planetReplies, songs, 
 import { LLM } from '../infra/tokens';
 import { MediaService } from '../media/media.service';
 import { notChild, planetWorkScope } from '../common/child';
+import { PlanetWorksService } from './planet-works.service';
 
 type PostRow = typeof planetPosts.$inferSelect;
 
@@ -40,6 +43,7 @@ export class PlanetPostsService {
     private readonly db: Database,
     private readonly media: MediaService,
     @Inject(LLM) private readonly llm: LlmProvider,
+    @Optional() private readonly works?: PlanetWorksService,
   ) {}
 
   async create(userId: string, planet: TimelinePlanet, body: CreatePlanetPostBody, origin: string): Promise<PlanetPostView> {
@@ -48,6 +52,8 @@ export class PlanetPostsService {
       if (mod.flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'MODERATION', 'This post breaks the community rules');
     }
     let values: typeof planetPosts.$inferInsert;
+    // planets 2-1: the hidden tags, from the song's settings (Mars: the generic shape until its handoff says)
+    let tags = genericTags(null);
     if (planet === 'mercury') {
       const [s] = await this.db.write
         .select()
@@ -55,6 +61,7 @@ export class PlanetPostsService {
         .where(and(eq(songs.id, body.sourceId), eq(songs.userId, userId), isNull(songs.deletedAt)));
       if (!s) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Song not found');
       values = { planet, userId, kind: 'song', sourceId: s.id, title: body.title || s.title, text: body.text, url: s.mixUrl, seconds: s.seconds };
+      tags = songTags(s.designJson);
     } else {
       const [v] = await this.db.write
         .select()
@@ -72,6 +79,7 @@ export class PlanetPostsService {
       values = { planet, userId, kind: 'video', sourceId: v.id, title: body.title || v.title || '', text: body.text, url: sq.url, posterUrl: sq.posterUrl, seconds: sq.seconds };
     }
     const [p] = await this.db.write.insert(planetPosts).values(values).returning();
+    await this.works?.tag('planet_post', p.id, { userId, planet, tags, words: `${p.title} ${p.text}` });
     const [author] = await this.db.write.select(authorCols).from(users).where(eq(users.id, userId));
     return this.toView(p, author, false, []);
   }
