@@ -171,6 +171,7 @@ export class MockProvider implements LlmProvider {
   }
   /** Offline: a fixed read keeps the compass testable */
   async perceive(_input: unknown, prompt: string): Promise<string> {
+    if (prompt.includes('COMPASS_SPELL')) return mockCompassSpell(prompt);
     const song = prompt.includes('song');
     return JSON.stringify({
       cards: song
@@ -185,6 +186,7 @@ export class MockProvider implements LlmProvider {
   }
   async chat(req: ChatRequest): Promise<string> {
     const last = [...req.history].reverse().find((t) => t.role === 'user')?.text ?? '';
+    if (req.system.includes('COMPASS_SPELL')) return mockCompassSpell(req.system);
     if (req.json && req.system.includes('SONG_DESIGN')) return mockSongDesign(last);
     if (req.json && req.system.includes('SONG_EDIT')) return mockSongEdit(last);
     const ja = /[぀-ヿ一-龯]/.test(last) || req.system.includes('あなたは');
@@ -322,4 +324,29 @@ export function createBuddyLlm(cfg: LlmConfig): LlmProvider {
   if (!cfg.anthropicApiKey) return base;
   const claude = new ClaudeProvider(cfg.anthropicApiKey, cfg.anthropicModel || undefined);
   return base.name === 'mock' ? claude : new FallbackProvider([claude, base], cfg.onError);
+}
+
+/** Offline: the compass's fixed reads (a picture: a watercolour seaside at dusk; a song: a night-drive city pop) */
+export function mockCompassSpell(prompt: string): string {
+  const song = /listen to the song|song video/.test(prompt);
+  return JSON.stringify({
+    tags: song
+      ? [
+          { ja: '夜のドライブ', en: 'a night drive through the city', group: 'theme' },
+          { ja: 'シティポップ', en: '1980s city pop', group: 'genre' },
+          { ja: 'しっとり', en: 'mellow', group: 'mood' },
+          { ja: 'ふつうの速さ', en: 'mid tempo', group: 'tempo' },
+          { ja: 'シンセ', en: 'synthesizer', group: 'instrument' },
+          { ja: 'ベース', en: 'bass', group: 'instrument' },
+          { ja: 'やさしい歌声', en: 'soft vocals', group: 'voice' },
+        ]
+      : [
+          { ja: '夕暮れの海辺', en: 'a seaside at dusk', group: 'theme' },
+          { ja: '水彩', en: 'watercolor', group: 'style' },
+          { ja: 'なつかしい', en: 'nostalgic', group: 'mood' },
+          { ja: 'やわらかい色', en: 'soft pastel colors', group: 'color' },
+          { ja: '夕焼け', en: 'sunset light', group: 'light' },
+          { ja: '遠くから', en: 'wide view', group: 'composition' },
+        ],
+  });
 }

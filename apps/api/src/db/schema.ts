@@ -983,6 +983,30 @@ export const games = pgTable(
   (t) => [index('games_user_idx').on(t.userId, t.createdAt)],
 );
 
+/**
+ * R12 (client 2026-11-25): the スペルブック — the spells a member keeps ({bati}'s tool): the kind, the talismans (Japanese
+ * labels + the English behind them), a name from what it is about (renamed in words). At most SPELL_BOOK_MAX a member;
+ * the same tag set is kept once (spell_key). Thrown away = gone (a hard delete: nothing else points at a kept spell).
+ */
+export const spellBook = pgTable(
+  'spell_book',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    kind: text('kind').notNull(),
+    name: text('name').notNull(),
+    tagsJson: jsonb('tags_json').$type<SpellTag[]>().notNull(),
+    /** spellKey(kind, tags): the same spell is not kept twice */
+    spellKey: text('spell_key').notNull(),
+    usedAt: timestamp('used_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('spell_book_user_idx').on(t.userId, t.createdAt), uniqueIndex('spell_book_user_key_uq').on(t.userId, t.spellKey)],
+);
+
 /** M-R253 §5: a flown work that came home and was told about ({bati}'s report is said once) */
 export const workHomecomings = pgTable(
   'work_homecomings',

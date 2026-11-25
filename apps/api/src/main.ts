@@ -32,6 +32,8 @@ async function bootstrap() {
   app.use('/voice/register', express.json({ limit: '8mb' }));
   // 〔🧭 スペルコンパス〕: a picture or a 10-second song clip
   app.use('/buddy/compass', express.json({ limit: '8mb' }));
+  // R12: a pasted image read by the Moon's compass
+  app.use('/moon/compass', express.json({ limit: '8mb' }));
   // Stripe signs the exact bytes it sends
   app.use('/billing/webhook', express.raw({ type: '*/*', limit: '1mb' }));
   app.useBodyParser('json', { limit: '64kb' });

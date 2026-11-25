@@ -300,6 +300,15 @@ export class FilesService {
     return { ok: true };
   }
 
+  /** R12 (the Moon's compass): the bytes of one of your own photos (null: not yours, not a photo, or not there) */
+  async photo(userId: string, id: string): Promise<{ mime: string; data: Buffer } | null> {
+    const r = await this.row(id);
+    if (!r || r.userId !== userId || (metaOf(r.meta)?.sub ?? 'file') !== 'photo') return null;
+    const got = await this.bytes(r);
+    const data = Buffer.isBuffer(got.body) ? got.body : got.body ? Buffer.from(await new Response(got.body).arrayBuffer()) : null;
+    return data ? { mime: r.mime, data } : null;
+  }
+
   /**
    * POST /media/files/:id/look — a file handed to {bati}: a picture is looked at (the chat's perceive), and {bati} says
    * one short thing about it; anything else (or no eyes) gets a line by kind. Only your own files.

@@ -34,6 +34,9 @@ import { MoonWorksController } from './moon/moon-works.controller';
 import { MoonWorksService } from './moon/moon-works.service';
 import { SpellController } from './moon/spell.controller';
 import { SpellService } from './moon/spell.service';
+import { SpellToolsController } from './moon/spell-tools.controller';
+import { SpellBookService } from './moon/spell-book.service';
+import { MoonCompassService } from './moon/moon-compass.service';
 import { CraftController } from './craft/craft.controller';
 import { GameService } from './craft/game.service';
 import { NovelService } from './craft/novel.service';
@@ -122,6 +125,7 @@ import { WalletController } from './wallet/wallet.controller';
     FindsController,
     MoonWorksController,
     SpellController,
+    SpellToolsController,
     CraftController,
     LinksController,
   ],
@@ -166,6 +170,8 @@ import { WalletController } from './wallet/wallet.controller';
     FindsService,
     MoonWorksService,
     SpellService,
+    SpellBookService,
+    MoonCompassService,
     NovelService,
     GameService,
     LinksService,
