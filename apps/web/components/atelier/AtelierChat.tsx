@@ -4,7 +4,9 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { TalkComposer } from '@/components/talk/TalkComposer';
 import { talkMuted, TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/TalkScene';
 import { batiVoiceUrl, speakable } from '@/lib/atelier/batiSpeak';
-import { canPlay, playClip, readyClip, VOICE_WAIT_MS } from '@/lib/voice/webVoice';
+import { canPlay, loadClip, playClip, readyClip, VOICE_WAIT_MS } from '@/lib/voice/webVoice';
+import { BARGE_FADE_MS, onBargeIn } from '@/lib/voice/barge';
+import { restyleAnswer, songStyleChange } from './songTurn';
 import { logVoice } from '@/lib/voice/voiceLog';
 import { BATI_COLOR, batiLook, characterLook, SELF_COLOR, selfLook, selfTone } from '@/lib/talk/looks';
 import { ApiError, getApi } from '@/lib/api';
@@ -37,7 +39,7 @@ import { DeviceButton } from './DeviceButton';
 import { ClipRelic } from '@/components/relic/ClipRelics';
 import { PortalRelic } from '@/components/relic/PortalRelic';
 import { CLUSTER_MAX } from '@/lib/relic/layout';
-import { linkDomain, wordsAndLinks, type ClipFile, isLyricsTalk, lyricsDiff, lyricsEdit, lyricsFallback, lyricsSecondVerse, ownLyricsOf, parseTweak, songSpellKey, SONG_LINES, type LyricsView, type SongLyrics } from '@obolo/shared';
+import { talkPlain, linkDomain, wordsAndLinks, type ClipFile, isLyricsTalk, lyricsDiff, lyricsEdit, lyricsFallback, lyricsSecondVerse, ownLyricsOf, parseTweak, songSpellKey, SONG_LINES, type LyricsView, type SongLyrics } from '@obolo/shared';
 
 /** R12: your line in the Bati chat — a file handed over floats as its relic; a URL in your words becomes a portal */
 function meItem(m: { id: string; text: string; file?: ClipFile | null }): TalkItem {
@@ -102,7 +104,18 @@ export function newTalk(me: Pick<Me, 'displayName' | 'bati'> | null | undefined,
 }
 
 /** R11: a plan waiting for the member's yes (the message its card is on, what is made with it, its price) */
-type PlanAsk = { id: string; plan: Plan; prompt: string; prev?: Work; opts: MakeOpts; price: number };
+type PlanAsk = {
+  id: string;
+  plan: Plan;
+  prompt: string;
+  prev?: Work;
+  opts: MakeOpts;
+  price: number;
+  /** R14: {bati} asked 「歌詞も、{restyle}っぽく書きなおす？」 (the genre changed a lot; the lyrics stayed) */
+  restyle?: string;
+  /** R14: the style talismans are out, the lyrics are still being written (a yes meanwhile waits for them) */
+  writing?: boolean;
+};
 /** client 2026-11-25: {bati}'s questions for a book / a game (`craft`), and a book / a game just made (its next words change it: `after`) */
 type Pending = { kind: AtelierKind } | { radioName: string } | { tweak: Work } | { voiceAgain: true } | { use: AtelierKind; materials: Work[] } | { plan: PlanAsk } | { craft: CraftAsk } | { after: Work } | { tool: ToolAsk; spell?: SavedSpell; forKind?: AtelierKind; content?: string } | null;
 /** R12: {bati}'s tool out in the sky (the compass while it reads; the spell book open, or taking a spell in) */
@@ -300,6 +313,17 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     }
     return propose(kind, prompt, prev, opts);
   };
+  /** R14: the last lines of the talk (the model reads a correction 「全然違うよ…」 against them) */
+  const talkHistory = () =>
+    msgsRef.current
+      .filter((m): m is Extract<Msg, { who: 'me' | 'bati' }> => (m.who === 'me' || m.who === 'bati') && !!m.text?.trim())
+      .slice(-6)
+      .map((m) => ({ who: m.who as 'me' | 'bati', text: talkPlain(m.text).slice(0, 300) || m.text.slice(0, 300) }))
+      .filter((h) => h.text.trim());
+  /** R14: the spell being shown / changed now (a change during the lyrics' writing makes the old lyrics late) */
+  const spellGen = useRef(0);
+  /** R14: a yes said while the lyrics were still being written (cast as soon as they come) */
+  const yesWaiting = useRef<string | null>(null);
   const manaNow = () =>
     getApi()
       .wallet()
@@ -329,11 +353,22 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     const asked = before || craft ? styleSaid : prev ? (lyricEdit ? prev.prompt : `${prev.prompt}。${styleSaid}`) : styleSaid;
     // a game's change edits the spell it was cast with (「もっと難しく」); a chapter's spell is fresh from the words
     const was = before ? before.plan.tags : (kind === 'game' || kind === 'video') && prev?.spell?.length ? prev.spell : undefined;
-    const v =
+    const gen = ++spellGen.current;
+    const hist = talkHistory();
+    // R14: a song's style changed while its spell waits (「全然違うよ、サイケデリックトランスにして」): the style spell only
+    // (the model, with the talk) — the lyrics stay, and {bati} asks once when the genre changed a lot
+    let restyle = null as string | null;
+    const v: SpellView =
       view ??
-      (await getApi()
-        .moonSpell({ kind: sk, said: asked.slice(0, 200) || 'おまかせ', ...(was ? { tags: was } : {}) })
-        .catch((): SpellView => (before ? { tags: before.plan.tags, added: [], removed: [] } : { tags: spellFrom(sk, asked || 'おまかせ'), added: [], removed: [] })));
+      (twoPart && before
+        ? await songStyleChange(getApi(), { tags: before.plan.tags, said: asked || said, lyrics: before.plan.lyrics, history: hist }).then((r) => {
+            restyle = r.restyle;
+            return r.view;
+          })
+        : await getApi()
+            .moonSpell({ kind: sk, said: asked.slice(0, 200) || 'おまかせ', ...(was ? { tags: was } : {}), ...(hist.length ? { history: hist } : {}) })
+            .catch((): SpellView => (before ? { tags: before.plan.tags, added: [], removed: [] } : { tags: spellFrom(sk, asked || 'おまかせ'), added: [], removed: [] })));
+    if (gen !== spellGen.current) return;
     const [have] = await Promise.all([manaNow()]);
     setBusy(false);
     // R13: a video's spell has exactly one song talisman (picked by its name); its price follows what it is for
@@ -343,7 +378,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     // R13: the lyrics carry over a change of the style talismans; a fresh song gets them written for its style
     const plan: Plan = twoPart && before?.plan.lyrics ? { ...plan0, lyrics: before.plan.lyrics } : plan0;
     const id = uid();
-    const text = extra?.lead ? tline(extra.lead[0], extra.lead[1]) : tline(before ? MOON_LINES.replan : twoPart ? SONG_LINES.songPlan : MOON_LINES.plan);
+    const genreNow = vv.tags.find((t) => t.group === 'genre')?.ja;
+    const text = extra?.lead ? tline(extra.lead[0], extra.lead[1]) : before && v.respelled && kind === 'song' && genreNow ? tline(SONG_LINES.styleRespell, { genre: genreNow }) : tline(before ? MOON_LINES.replan : twoPart ? SONG_LINES.songPlan : MOON_LINES.plan);
     const fid = before && floatingRef.current ? floatingRef.current.id : id;
     setMsgs((m) => [...m, { id, who: 'bati', text, plan: { kind, tags: plan.tags, price, have } }]);
     setFloating((f) => ({ id: fid, kind, look: spellLookFor(kind), tags: plan.tags, removed: before ? plan.removed : [], price, have, from: extra?.from, lyrics: twoPart && before && f?.lyrics ? f.lyrics : undefined }));
@@ -351,7 +387,9 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     // a redo is asked with the change's own words (the card's words carry over); a new one with the spell's
     const ask: PlanAsk = { id, plan, prompt: craft ? (before ? `${before.prompt}、${said}` : said) : prev ? (before ? `${before.prompt}、${styleSaid}` : styleSaid) : plan.words, prev, opts, price };
     if (twoPart && !plan.lyrics) {
-      // the style talismans come out first (「曲調のスペルはこんなんだね。」); meanwhile {bati} writes the lyrics
+      // the style talismans come out first (「曲調のスペルはこんなんだね。」); meanwhile {bati} writes the lyrics — R14: and
+      // the spell already waits (a change now makes it again; a yes now waits for the lyrics)
+      setPending({ plan: { ...ask, writing: true } });
       const t0 = Date.now();
       const base = extra?.lyrics ?? prev?.lyrics;
       const got: LyricsView = lyricEdit && prev?.lyrics
@@ -366,17 +404,47 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       // the talismans finish coming in before the sheet (each 230 ms, then a breath)
       const wait = 1400 + plan.tags.length * 230 - (Date.now() - t0);
       if (wait > 0) await new Promise((r) => setTimeout(r, wait));
-      if (floatingRef.current?.id !== fid || floatingRef.current.leaving) return;
+      if (floatingRef.current?.id !== fid || floatingRef.current.leaving || gen !== spellGen.current) return;
       showLyrics(fid, got, lyricEdit && got.how === 'edit' ? prev!.lyrics! : null);
       if (lyricEdit) lyricsFailed.current = got.how === 'kept' ? lyricsFailed.current + 1 : 0;
       const lead = lyricEdit ? (got.how === 'edit' ? SONG_LINES.lyricsChanged : SONG_LINES.songLyrics) : got.declined === 'copy' ? SONG_LINES.lyricsCopy : got.declined === 'flagged' ? SONG_LINES.lyricsFlagged : got.how === 'own' ? SONG_LINES.lyricsOwn : SONG_LINES.songLyrics;
       setMsgs((m) => [...m, ...(got.declined === 'flagged' ? [{ id: uid(), who: 'bati' as const, text: tline(lead) }] : []), { id: uid(), who: 'bati', text: tline(got.declined === 'flagged' ? SONG_LINES.songLyrics : lead), lyricsRec: got.lyrics }]);
-      // the question once the sheet is out (a yes said meanwhile already counts)
+      const done: PlanAsk = { ...ask, plan: { ...plan, lyrics: got.lyrics } };
+      // R14: a yes said while they were being written: cast now, with them
+      if (yesWaiting.current === ask.id) {
+        yesWaiting.current = null;
+        return void accept(done);
+      }
+      // the question once the sheet is out
       askLater(fid, 4200);
-      return setPending({ plan: { ...ask, plan: { ...plan, lyrics: got.lyrics } } });
+      return setPending({ plan: done });
+    }
+    // R14: the genre changed a lot and the lyrics stayed: {bati} asks once whether to write them again for it
+    if (restyle) {
+      setMsgs((m) => [...m, { id: uid(), who: 'bati', text: tline(SONG_LINES.lyricsRestyleAsk, { genre: restyle! }) }]);
+      return setPending({ plan: { ...ask, restyle } });
     }
     setMsgs((m) => [...m, { id: uid(), who: 'bati', text: tline(craft ? craftConfirmLine(kind, prev) : MOON_LINES.confirm) }]);
     setPending({ plan: ask });
+  };
+  /**
+   * R14: 「歌詞も、〇〇っぽく書きなおす？」 answered yes — the lyrics written again for the style spell as it is now (the
+   * writer gets the style talismans and the genre's guidance), then the question
+   */
+  const restyleLyrics = async (pa: PlanAsk) => {
+    const fid = floatingRef.current?.id;
+    const gen = ++spellGen.current;
+    setBusy(true);
+    const got = await getApi()
+      .moonLyrics({ tags: pa.plan.tags, said: `${pa.plan.words || pa.prompt}（${pa.restyle ?? ''}っぽく）`.slice(0, 1200) })
+      .catch((): LyricsView => ({ lyrics: lyricsFallback(pa.plan.tags), how: 'new' }));
+    setBusy(false);
+    if (gen !== spellGen.current) return;
+    if (fid) showLyrics(fid, got, null);
+    const id = uid();
+    setMsgs((m) => [...m, { id, who: 'bati', text: tline(SONG_LINES.lyricsRestyled, { genre: pa.restyle ?? '' }), lyricsRec: got.lyrics }]);
+    if (fid) askLater(fid, 3400);
+    setPending({ plan: { ...pa, id: pa.id, restyle: undefined, plan: { ...pa.plan, added: [], removed: [], lyrics: got.lyrics } } });
   };
   /** R13: 「このスペルで作る？…」 a moment after the lyric sheet came out or changed (not when the spell is gone or cast) */
   const askTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -1146,6 +1214,21 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       // R13 fix: 「やめて」「曲を作るのをやめて画像を作りたい」 — the spell goes (before any reading as a change of it)
       const turn = story ? null : spellPendingTurn(text, p.plan.plan.kind);
       if (turn) return dropSpell(p.plan.plan.kind, p.plan.id, turn);
+      // R14: 「歌詞も、〇〇っぽく書きなおす？」 — yes writes them again, no keeps them (then the usual question)
+      if (p.plan.restyle) {
+        const a = restyleAnswer(text);
+        if (a === 'yes') return void restyleLyrics(p.plan);
+        if (a === 'no') {
+          setPending({ plan: { ...p.plan, restyle: undefined } });
+          sayT(SONG_LINES.lyricsKept);
+          return sayT(MOON_LINES.confirm);
+        }
+      }
+      // R14: a yes while the lyrics are still being written: cast as soon as they come
+      if (p.plan.writing && isYes(text)) {
+        yesWaiting.current = p.plan.id;
+        return setPending(p);
+      }
       if (isYes(text)) return void accept(p.plan);
       // R12: 「魔法で作って欲しい」 (making, nothing to change) is a yes; 「画像を作りたい」 (the same kind, nothing to change)
       // changes nothing — {bati} asks again
@@ -1488,10 +1571,14 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   // what was in the talk when it opened shows at once and is not read again (the greeting of a fresh talk is)
   if (known.current === null) known.current = new Set(msgs.filter((m) => story || m.who !== 'bati' || msgs.some((x) => x.who === 'me')).map((m) => m.id));
   const voiceHeld = useRef(new Set<string>());
+  /** R14: how long each line's voice is (its words come out at that pace) */
+  const voiceMs = useRef(new Map<string, number>());
+  const talkStateRef = useRef(talkState);
+  talkStateRef.current = talkState;
   const [, rerender] = useState(0);
   const [toPlay, setToPlay] = useState<{ url: string; g: number } | null>(null);
   const speakGen = useRef(0);
-  const speakClip = useRef<{ stop: () => void } | null>(null);
+  const speakClip = useRef<{ stop: (fadeMs?: number) => void } | null>(null);
   /** a {bati} line not shown yet: new (not looked at yet) or waiting for its voice */
   const hidden = (m: Msg) => !story && m.who === 'bati' && (!known.current!.has(m.id) || voiceHeld.current.has(m.id));
   useEffect(() => {
@@ -1502,7 +1589,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     const said = fresh.filter((m): m is Extract<Msg, { who: 'bati' }> => m.who === 'bati' && !!m.text);
     const last = said.at(-1);
     const words = last ? speakable(last.text) : '';
-    if (!last || !words || talkMuted()) return void rerender((n) => n + 1);
+    // R14: the member's turn (the mic on / typing): {bati}'s new lines are words only, no voice over theirs
+    if (!last || !words || talkMuted() || talkStateRef.current.listening) return void rerender((n) => n + 1);
     const g = ++speakGen.current;
     voiceHeld.current.add(last.id);
     rerender((n) => n + 1);
@@ -1514,6 +1602,10 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       if (g !== speakGen.current) return;
       voiceHeld.current.delete(last.id);
       if (ready && url && canPlay()) {
+        // R14: the words come out at the voice's pace (a faster {bati} reveals faster), when the voice reads the line whole
+        const buf = await loadClip(url);
+        if (g !== speakGen.current) return;
+        if (buf && words.length >= [...talkPlain(last.text).replace(/\s+/g, ' ').trim()].length - 1) voiceMs.current.set(last.id, buf.duration * 1000);
         // the bubble and the voice in the same frame (the clip starts in the effect after the talk has shown the line)
         logVoice('together', last.id, performance.now() - t0);
         setToPlay({ url, g });
@@ -1527,7 +1619,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     })();
   }, [msgs, story]);
   useEffect(() => {
-    if (!toPlay || toPlay.g !== speakGen.current || talkMuted()) return;
+    if (!toPlay || toPlay.g !== speakGen.current || talkMuted() || talkStateRef.current.listening) return;
     const { url, g } = toPlay;
     void (async () => {
       const clip = await playClip(url);
@@ -1539,6 +1631,21 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     })();
   }, [toPlay]);
   useEffect(() => () => void (speakGen.current++, speakClip.current?.stop()), []);
+  // R14 (client 2026-11-25): barge-in — the mic pressed / typing started while {bati} speaks: the voice fades out, the
+  // line waiting for its voice shows at once (as words), nothing queued is said; the next reply speaks as usual
+  useEffect(
+    () =>
+      onBargeIn(() => {
+        speakGen.current++;
+        speakClip.current?.stop(BARGE_FADE_MS);
+        speakClip.current = null;
+        voiceHeld.current.clear();
+        setToPlay(null);
+        setSpeaking(null);
+        rerender((n) => n + 1);
+      }),
+    [],
+  );
 
   // M-R232: the side-by-side talk — you at the right, {bati} (or the story's speaker) at the left, the Moon behind
   const people: TalkPerson[] = [
@@ -1556,6 +1663,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
             id: m.id,
             who: 'bati',
             text: m.text,
+            ...(voiceMs.current.has(m.id) ? { voiceMs: voiceMs.current.get(m.id) } : {}),
             mark: { kind: 'local', id: m.id },
             card: m.changed
               ? { label: m.text, thumb: <ChangePreview change={m.changed} />, full: <ChangePreview change={m.changed} big /> }

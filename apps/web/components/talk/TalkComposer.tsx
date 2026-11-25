@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { MicGlyph, SendGlyph } from '@/components/dachi/HoldMic';
 import { micTrouble, useDictation } from '@/lib/useDictation';
+import { bargeIn } from '@/lib/voice/barge';
 
 /**
  * The talk's bottom (M-R232 §3): the mic button in the middle; the keyboard only when answering in letters (⌨ at the
@@ -68,7 +69,11 @@ export function TalkComposer({
           autoFocus
           value={text}
           maxLength={maxLength}
-          onChange={(e) => setText(e.target.value)}
+          onChange={(e) => {
+            // R14: starting to type takes the turn (a voice still speaking stops)
+            if (!text && e.target.value) bargeIn();
+            setText(e.target.value);
+          }}
           onFocus={() => setFocus(true)}
           onBlur={() => setFocus(false)}
           placeholder={placeholder}
@@ -108,7 +113,12 @@ export function TalkComposer({
         <input ref={field} value={text} onChange={(e) => setText(e.target.value)} className="sr-only" tabIndex={-1} aria-hidden />
         {/* the prototype's big glowing mic (design/talk/proto.html .mic) */}
         <button
-          onClick={() => (mic.supported ? mic.toggle() : setTyping(true))}
+          onClick={() => {
+            // R14 (client 2026-11-25): the mic pressed while {bati} speaks — {bati} stops, its words show whole, you talk
+            if (!mic.listening) bargeIn();
+            if (mic.supported) mic.toggle();
+            else setTyping(true);
+          }}
           disabled={disabled}
           aria-label={mic.listening ? '話し終わる' : '話す'}
           className="grid h-[74px] w-[74px] place-items-center rounded-full text-[#070b24] transition active:scale-95 disabled:opacity-40"
@@ -116,7 +126,7 @@ export function TalkComposer({
         >
           <MicGlyph className="h-[30px] w-[30px]" />
         </button>
-        <button onClick={() => setTyping(true)} aria-label="文字で答える" className="absolute right-0 top-1/2 grid h-[42px] w-[42px] -translate-y-1/2 place-items-center rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] backdrop-blur-[10px] text-[15px] text-[#f4f1ff]">
+        <button onClick={() => (bargeIn(), setTyping(true))} aria-label="文字で答える" className="absolute right-0 top-1/2 grid h-[42px] w-[42px] -translate-y-1/2 place-items-center rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] backdrop-blur-[10px] text-[15px] text-[#f4f1ff]">
           ⌨
         </button>
       </div>

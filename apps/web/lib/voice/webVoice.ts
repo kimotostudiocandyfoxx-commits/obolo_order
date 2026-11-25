@@ -1,6 +1,7 @@
 'use client';
 
 import { audioCtx, masterBus, unlockAudio } from '@/lib/onboarding/audio';
+import { setSpeaking } from './barge';
 
 /**
  * Voice clips through Web Audio (M-R239): decoded buffers on the one shared AudioContext under the "ambient" session,
@@ -8,10 +9,11 @@ import { audioCtx, masterBus, unlockAudio } from '@/lib/onboarding/audio';
  * fight the story's motions for the media session. One clip at a time; an analyser gives the loudness for the
  * speaker's lip flap. URLs: https:/relative paths, blob:, idb:<id> (the demo's recordings).
  */
-export type Clip = { stop: () => void; done: Promise<void>; duration: number; level: () => number };
+/** `stop(fadeMs)`: R14 barge-in — a short fade instead of a click */
+export type Clip = { stop: (fadeMs?: number) => void; done: Promise<void>; duration: number; level: () => number };
 
 const cache = new Map<string, Promise<AudioBuffer | null>>();
-let current: { src: AudioBufferSourceNode; stop: () => void } | null = null;
+let current: { src: AudioBufferSourceNode; stop: (fadeMs?: number) => void } | null = null;
 
 async function bytesOf(url: string): Promise<ArrayBuffer | null> {
   try {
@@ -41,9 +43,10 @@ export function loadClip(url: string): Promise<AudioBuffer | null> {
   return p;
 }
 
-export function stopClip() {
-  current?.stop();
+export function stopClip(fadeMs = 0) {
+  current?.stop(fadeMs);
   current = null;
+  setSpeaking(null);
 }
 
 /** whether Web Audio can play now (it needs a tap first on iOS; a suspended context plays nothing) */
@@ -72,22 +75,37 @@ export async function playClip(url: string, opts: { volume?: number } = {}): Pro
   let end: () => void = () => undefined;
   const done = new Promise<void>((r) => (end = r));
   let stopped = false;
-  const stop = () => {
+  const stop = (fadeMs = 0) => {
     if (stopped) return;
     stopped = true;
     try {
-      src.stop();
+      if (fadeMs > 0) {
+        // R14 barge-in: down to silence in fadeMs, then stopped (no click)
+        const t = c.currentTime;
+        gain.gain.cancelScheduledValues(t);
+        gain.gain.setValueAtTime(gain.gain.value, t);
+        gain.gain.linearRampToValueAtTime(0, t + fadeMs / 1000);
+        src.stop(t + fadeMs / 1000 + 0.01);
+      } else src.stop();
     } catch {
       /* not started */
+    }
+    if (current?.src === src) {
+      current = null;
+      setSpeaking(null);
     }
     end();
   };
   src.onended = () => {
     stopped = true;
-    if (current?.src === src) current = null;
+    if (current?.src === src) {
+      current = null;
+      setSpeaking(null);
+    }
     end();
   };
   current = { src, stop };
+  setSpeaking({ stop });
   src.start();
   return {
     stop,

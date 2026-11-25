@@ -1,4 +1,4 @@
-import { spellWords, type SongLyrics, type SpellKind, type SpellTag, type SpellView } from '@obolo/shared';
+import { songGenreOf, spellWords, type GenreFamily, type SongLyrics, type SpellKind, type SpellTag, type SpellView } from '@obolo/shared';
 import type { AtelierKind } from '@/lib/atelier/unlock';
 
 /**
@@ -43,13 +43,16 @@ const GENRE: Record<string, Genre> = {
   'r&b, soul': 'hiphop',
   'classical, orchestral': 'ballad',
 };
+const FAMILY: Record<GenreFamily, Genre> = { electronic: 'edm', band: 'rock', pop: 'pop', acoustic: 'ballad', jazz: 'ballad', urban: 'hiphop', orchestral: 'ballad', traditional: 'ballad', chill: 'ballad' };
 /** the kinds whose making is a spell */
 export const spellKindOf = (kind: AtelierKind): SpellKind | null => (kind === 'song' || kind === 'art' || kind === 'video' || kind === 'look' || kind === 'bati' || kind === 'novel' || kind === 'game' ? kind : null);
 
 /** the plan for a spell as it is now */
 export function planOf(kind: AtelierKind, v: SpellView): Plan {
   const about = v.tags.filter((t) => t.group === 'theme' || t.group === 'wear');
-  const genre = GENRE[v.tags.find((t) => t.group === 'genre')?.en ?? ''];
+  const g = v.tags.find((t) => t.group === 'genre');
+  // R14: the ~50 genres of songGenres.ts — the song design's nearest by family when not one of the named ones
+  const genre = GENRE[g?.en ?? ''] ?? (g ? FAMILY[songGenreOf(g)?.family ?? 'pop'] : undefined);
   return { kind, tags: v.tags, added: v.added, removed: v.removed, genre, words: (about.length ? spellWords(about) : spellWords(v.tags)).slice(0, 60) };
 }
 

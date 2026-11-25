@@ -67,6 +67,7 @@ import {
   CHARGE_ERROR_WORDS,
   confirmKey,
   spellEdit,
+  spellCorrection,
   spellFrom,
   spellKey,
   spellOfAnswers,
@@ -972,10 +973,12 @@ export class DemoApi implements Api {
   }
 
   // M-R253 §4: a stand-in job — it only waits (the review page's 20 s and 2-minute ones)
-  // R11: the spell by the shared rules (the API's model only adds English for free words)
+  // R11: the spell by the shared rules (R14: the API builds it with its model first; the rules stand under it)
   async moonSpell(body: Parameters<Api['moonSpell']>[0]) {
     await sleep(250);
-    return body.tags?.length ? spellEdit(body.kind, body.tags, body.said) : { tags: body.answers?.length ? spellOfAnswers(body.kind, body.answers) : spellFrom(body.kind, body.said), added: [], removed: [] };
+    // R14: the same genre table as the API's rules (psytrance comes out as psytrance); a correction is a spell made again
+    if (body.tags?.length) return { ...spellEdit(body.kind, body.tags, body.said), how: 'rules' as const, ...(spellCorrection(body.said) ? { respelled: true } : {}) };
+    return { tags: body.answers?.length ? spellOfAnswers(body.kind, body.answers) : spellFrom(body.kind, body.said), added: [], removed: [], how: 'rules' as const };
   }
   // R13: the review demo's free song changes — the same parsing and ops as the API (its sketch keeps playing as it is:
   // no ffmpeg in the browser); the card's lyrics follow the cuts / repeats, and undo goes one back

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useHoldRecorder } from '@/lib/dachi/useHoldRecorder';
 import { playClip, type Clip } from '@/lib/voice/webVoice';
+import { bargeIn } from '@/lib/voice/barge';
 
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 
@@ -127,6 +128,8 @@ export function HoldMic({
                 e.preventDefault();
                 (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
                 setErr(null);
+                // R14: the member takes the turn — a voice still speaking stops (its words show whole)
+                bargeIn();
                 r.press();
               }}
               onPointerUp={r.release}
@@ -149,6 +152,8 @@ export function HoldMic({
                 e.preventDefault();
                 (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
                 setErr(null);
+                // R14: the member takes the turn — a voice still speaking stops (its words show whole)
+                bargeIn();
                 r.press();
               }}
               onPointerUp={r.release}

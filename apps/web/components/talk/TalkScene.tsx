@@ -13,6 +13,7 @@ import { AmbientFront, AmbientSky } from '@/components/story/Ambient';
 import type { Planet } from '@/lib/story/ambient';
 import { unlockAudio } from '@/lib/onboarding/audio';
 import { playClip, stopClip, type Clip } from '@/lib/voice/webVoice';
+import { BARGE_FADE_MS, onBargeIn } from '@/lib/voice/barge';
 import { OTS_BACK } from './SelfBack';
 import { RelicCluster, RelicHost } from '@/components/relic/Relic';
 
@@ -80,6 +81,8 @@ export type TalkItem = {
   faces?: TalkBeat[];
   /** a work / picture card: small in the bubble, big on a tap */
   card?: { thumb: ReactNode; full?: ReactNode; label?: string };
+  /** R14: the length of the voice reading this line (ms): its words come out at the voice's pace, ending with it */
+  voiceMs?: number;
   /** a voice message: a play button in the bubble (the speaker's mouth moves while it plays) */
   voice?: { url: string | null; seconds: number | null };
   chips?: { label: string; onPick: () => void; disabled?: boolean }[];
@@ -132,6 +135,13 @@ function speechOf(it: TalkItem, beats: TalkBeat[], streamed: boolean): Speech {
     const prev = plain[i - 1] ?? '';
     t += /[、。！？…!?]/.test(prev) ? (pace === 'slow' ? 380 : 210) : pace === 'slow' ? 105 : pace === 'slam' ? 34 : 60;
     times.push(t);
+  }
+  // R14 (client 2026-11-25: {bati} speaks faster): a line read aloud reveals at its voice's pace — the last word shows a
+  // little before the voice ends (never slower than 0.4×, never faster than 3× the typed pace)
+  if (!streamed && it.voiceMs && t > 0) {
+    const k = Math.min(3, Math.max(0.4, (it.voiceMs * 0.9) / t));
+    for (let i = 0; i < times.length; i++) times[i] = Math.round(times[i] * k);
+    t = times[times.length - 1] ?? t;
   }
   const dur = streamed ? Math.max(900, parts.length * 900) : Math.max(900, t + 250);
   return { id: it.id, who: it.who, start: Date.now(), dur, len, cuts, times, beats, typed: !streamed, mouth: !streamed, text: len > 0 };
@@ -524,6 +534,20 @@ export function TalkScene({
     say(last, undefined, streamedIds.current.has(last.id));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items, byId, loading]);
+  // R14 (client 2026-11-25): barge-in — the member pressed the mic / started typing: the voice fades out, the line being
+  // said shows whole, the lines queued after it stay in the talk as words (not said)
+  const skipRef = useRef<() => void>(() => undefined);
+  skipRef.current = () => {
+    after.current = null;
+    stopClip(BARGE_FADE_MS);
+    setSpeech((cur) => {
+      if (cur) setHold((h) => ({ ...h, [cur.who]: { face: cur.beats[cur.beats.length - 1]?.face ?? 'normal', until: Date.now() + 1200 } }));
+      return null;
+    });
+    setCursor(null);
+    onPlayingChange?.(false);
+  };
+  useEffect(() => onBargeIn(() => skipRef.current()), []);
   const alive = useRef(true);
   useEffect(() => {
     alive.current = true;
