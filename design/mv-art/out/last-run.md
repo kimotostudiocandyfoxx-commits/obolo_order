@@ -1,44 +1,9 @@
-# UI art — 2026-11-25T01:41:27.854Z
+# UI art — 2026-11-25T01:46:29.009Z
 
-Seedream 5.0 Pro / 40枚 / 約325円
+Seedream 5.0 Pro / 5枚 / 約43円
 
-- ✅ home5-mars-hv
-- ✅ home5-mars-main
-- ✅ home5-mars-prof
-- ✅ home5-neptune-hv
-- ✅ home5-neptune-main
-- ✅ home5-neptune-prof
-- ✅ home5-pluto-hv
-- ✅ home5-pluto-main
-- ✅ home5-pluto-prof
-- ✅ home5-uranus-hv
-- ✅ home5-uranus-main
-- ✅ home5-uranus-prof
-- ✅ home5-venus-hv
-- ✅ home5-venus-main
-- ✅ home5-venus-prof
-- ✅ p5-mars-brother
-- ✅ p5-mars-kimorin
-- ✅ p5-mars-mikie
-- ✅ p5-mars-monban
-- ✅ p5-mars-sister
-- ✅ p5-mars-user
-- ✅ p5-neptune-user
-- ✅ p5-pluto-brother
-- ✅ p5-pluto-kimorin
-- ✅ p5-pluto-mikie
-- ✅ p5-pluto-monban
-- ✅ p5-pluto-sister
-- ✅ p5-pluto-user
-- ✅ p5-uranus-brother
-- ✅ p5-uranus-kimorin
-- ✅ p5-uranus-mikie
-- ✅ p5-uranus-monban
-- ✅ p5-uranus-sister
-- ✅ p5-uranus-user
-- ✅ p5-venus-brother
-- ✅ p5-venus-kimorin
-- ✅ p5-venus-mikie
-- ✅ p5-venus-monban
-- ✅ p5-venus-sister
-- ✅ p5-venus-user
+- ✅ p5-neptune-brother
+- ✅ p5-neptune-kimorin
+- ✅ p5-neptune-mikie
+- ✅ p5-neptune-monban
+- ✅ p5-neptune-sister
