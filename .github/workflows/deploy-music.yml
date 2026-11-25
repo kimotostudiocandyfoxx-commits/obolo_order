@@ -42,13 +42,12 @@ jobs:
         env:
           EVENT: ${{ github.event_name }}
           GATE: ${{ vars.RELEASE_GATE }}
-          MSG: ${{ github.event.head_commit.message }}
         run: |
           go=false
           if [ "$EVENT" != "push" ] || [ "$GATE" = "off" ]; then
             go=true
-          elif printf '%s' "$MSG" | grep -q '\[release\]'; then
-            prev=$(git log --grep='\[release\]' --format=%H -2 | sed -n 2p)
+          elif git log -1 --pretty=%s | grep -Eq '^Release R[0-9]+: .*\[release\]$'; then
+            prev=$(git log -E --grep='^Release R[0-9]+: ' --format=%H -2 | sed -n 2p)
             if [ -z "$prev" ] || ! git diff --quiet "$prev" HEAD -- gpu/music; then go=true; fi
           fi
           echo "go=$go" >> "$GITHUB_OUTPUT"

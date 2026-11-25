@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     # The launch version is pinned (2026-11-23): a push deploys only when its last commit says [release]
     # (made by scripts/release.sh), or when run by hand. Set the variable RELEASE_GATE=off to deploy every push again.
-    if: ${{ vars.GCP_PROJECT_ID != '' && (github.event_name != 'push' || vars.RELEASE_GATE == 'off' || contains(github.event.head_commit.message, '[release]')) }}
+    if: ${{ vars.GCP_PROJECT_ID != '' && (github.event_name != 'push' || vars.RELEASE_GATE == 'off' || (startsWith(github.event.head_commit.message, 'Release R') && contains(github.event.head_commit.message, '[release]'))) }}
     permissions:
       contents: read
       id-token: write
