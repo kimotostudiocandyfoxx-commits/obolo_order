@@ -25,6 +25,14 @@ export const SONG_LINES = {
   spellCancel: 'わかった、{what}はやめておくね。',
   /** R13 fix: 「曲を作るのをやめて画像を作りたい」 — the spell falls away and the other kind starts */
   spellSwitch: 'わかった、{what}はやめて、{next}にしよう。',
+  /** R14 (client 2026-11-25): 「全然違うよ、サイケデリックトランスにして」 — the style spell made again for the genre asked */
+  styleRespell: 'ごめんね！　{genre}で、スペルを作りなおしたよ。',
+  /** R14: the genre changed a lot while the lyrics stay — asked once, never rewritten unasked */
+  lyricsRestyleAsk: '歌詞も、{genre}っぽく書きなおす？',
+  /** R14: yes to that — the lyrics written again for the style spell */
+  lyricsRestyled: '{genre}っぽく、歌詞を書きなおしたよ。',
+  /** R14: no to that — the lyrics stay as they are */
+  lyricsKept: 'わかった、歌詞はこのままにするね。',
   /** words that cannot be sung */
   lyricsFlagged: 'その言葉は、歌にできないんだ。ほかの言葉にしてみよう。',
   /** a song finished: the free changes offered (no buttons) */
@@ -264,5 +272,53 @@ export const SONG_VARIANTS: Record<string, BatiVariantSet> = {
     'ちょっと変えすぎたかもね。少し休んでから、また言いな。',
     'ちょっと変えすぎたかも。少し休んでから、また言って。',
     'ちょっと変えすぎたかも！　少し休んでから、また言うてな。',
+  ),
+  [SONG_LINES.styleRespell]: v(
+    'ごめんなサイ！　{genre}で、スペルを作りなおしマシタ。',
+    'ごめんな！　{genre}で、スペル作りなおしたで。',
+    'すまない。{genre}で、スペルを作りなおした。',
+    'ごめんね〜。{genre}で、スペルを作りなおしたよ〜。',
+    'ごめんね…！　{genre}で、スペルを作りなおしたの。',
+    'ごめん！　{genre}で、スペル作りなおしたよ！',
+    'ごめんね〜！　{genre}で、スペル作りなおしたよ〜。',
+    'ごめんね。{genre}で、スペルを作りなおしたよ。',
+    'ごめん。{genre}で、スペル作りなおした。',
+    'ごめんな！　{genre}で、スペル作りなおしたで！',
+  ),
+  [SONG_LINES.lyricsRestyleAsk]: v(
+    '歌詞も、{genre}っぽく書きなおしマスカ？',
+    '歌詞も、{genre}っぽく書きなおそか？',
+    '歌詞も、{genre}っぽく書きなおすか？',
+    '歌詞も、{genre}っぽく書きなおす〜？',
+    '歌詞も、{genre}っぽく書きなおす？',
+    '歌詞も、{genre}っぽく書きなおしちゃう？',
+    '歌詞も、{genre}っぽく書きなおす〜？',
+    '歌詞も、{genre}っぽく書きなおそうか？',
+    '歌詞も、{genre}っぽく書きなおす？',
+    '歌詞も、{genre}っぽく書きなおそか？',
+  ),
+  [SONG_LINES.lyricsRestyled]: v(
+    '{genre}っぽく、歌詞を書きなおしマシタ。',
+    '{genre}っぽく、歌詞を書きなおしたで。',
+    '{genre}っぽく、歌詞を書きなおした。',
+    '{genre}っぽく、歌詞を書きなおしたよ〜。',
+    '{genre}っぽく、歌詞を書きなおしたの。',
+    '{genre}っぽく、歌詞を書きなおしたよ！',
+    '{genre}っぽく、歌詞を書きなおしたよ〜。',
+    '{genre}っぽく、歌詞を書きなおしたよ。',
+    '{genre}っぽく、歌詞を書きなおした。',
+    '{genre}っぽく、歌詞を書きなおしたで！',
+  ),
+  [SONG_LINES.lyricsKept]: v(
+    'わかりマシタ、歌詞はこのままにしマス。',
+    'わかった、歌詞はこのままにしとくな。',
+    'わかった、歌詞はこのままにする。',
+    'わかった〜、歌詞はこのままにするね〜。',
+    'わかった、歌詞はこのままにするね。',
+    'おっけー、歌詞はこのままね！',
+    'わかった〜、歌詞はこのままにするね〜。',
+    'わかったよ、歌詞はこのままにしておくね。',
+    'わかった、歌詞はこのまま。',
+    'わかった、歌詞はこのままにしとくな！',
   ),
 };

@@ -156,7 +156,7 @@ export function parseTweak(said0: string): TweakParse {
 
 /** what the ops did, in {bati}'s words (「テンポを速く・2番をカット」) */
 export function tweakWhat(ops: SongTweakOp[]): string {
-  const part = (p: SongPart) => ('cycle' in p ? `${p.cycle}番` : { intro: 'イントロ', verse: 'Aメロ', 'pre-chorus': 'サビ前', chorus: 'サビ', 'final-chorus': '大サビ', bridge: 'Cメロ', instrumental: '間奏', 'guitar-solo': 'ギターソロ', 'piano-solo': 'ピアノ間奏', drop: 'ドロップ', outro: 'アウトロ' }[p.section]);
+  const part = (p: SongPart) => ('cycle' in p ? `${p.cycle}番` : { intro: 'イントロ', verse: 'Aメロ', 'pre-chorus': 'サビ前', chorus: 'サビ', 'final-chorus': '大サビ', bridge: 'Cメロ', instrumental: '間奏', 'guitar-solo': 'ギターソロ', 'piano-solo': 'ピアノ間奏', build: 'ビルド', drop: 'ドロップ', outro: 'アウトロ' }[p.section]);
   return ops
     .map((o) => {
       switch (o.op) {

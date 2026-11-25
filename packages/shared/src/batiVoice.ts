@@ -50,6 +50,15 @@ export const BATI_VOICE_TUNING: Record<BatiPersonality, { semitones: number; spe
   king: { semitones: -2, speed: 0.92 },
 };
 
+/**
+ * R14 (client 2026-11-25, iPad: 「バティの話すスピードが少し遅い。速く、歯切れよく」): how fast {bati} speaks in the Moon
+ * chat, on top of each {bati}'s own speed — Fish's prosody.speed (the pitch stays: no chipmunk), and the Gemini fallback's
+ * pitch-keeping tempo. The API's BATI_VOICE_SPEED overrides it; 1 = the voice model as made.
+ */
+export const BATI_VOICE_SPEED = 1.2;
+/** the speed {bati} speaks at: the base (BATI_VOICE_SPEED, or the server's setting) × the {bati}'s own, within Fish's 0.5–2 */
+export const batiSpeakSpeed = (own = 1, base = BATI_VOICE_SPEED) => Math.round(Math.min(2, Math.max(0.5, own * base)) * 100) / 100;
+
 /** the {bati}'s voice change on top of the model: the 1st (nth 1) none; the 2nd / 3rd by personality */
 export function batiVoiceTuning(nth: number, personality?: BatiPersonality | null): { semitones: number; speed: number } {
   if (nth <= 1 || !personality) return { semitones: 0, speed: 1 };

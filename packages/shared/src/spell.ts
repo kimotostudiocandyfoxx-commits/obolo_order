@@ -29,6 +29,8 @@ export const SpellBody = z.object({
   tags: z.array(SpellTag).max(16).optional(),
   /** client 2026-11-25: a book's / a game's answers to {bati}'s questions (a fresh spell from them: spellOfAnswers) */
   answers: z.array(z.object({ group: z.enum(SPELL_GROUPS).optional(), said: z.string().trim().max(200) })).max(6).optional(),
+  /** R14: the talk so far (the last few lines), so the model reads a correction 「全然違うよ…」 against what was asked */
+  history: z.array(z.object({ who: z.enum(['me', 'bati']), text: z.string().trim().min(1).max(300) })).max(8).optional(),
 });
 export type SpellBody = z.infer<typeof SpellBody>;
 export interface SpellView {
@@ -36,6 +38,10 @@ export interface SpellView {
   /** the tags this change put on and took off (the card drops the new ones in and lets the old ones fall away) */
   added: SpellTag[];
   removed: SpellTag[];
+  /** R14: who built it (the model, or the rules when it could not) */
+  how?: 'model' | 'rules';
+  /** R14: the words said the spell was wrong (「全然違うよ」): it was made again, not edited */
+  respelled?: boolean;
 }
 
 type Entry = { ja: string; en: string; group: SpellGroup; re: RegExp; for?: SpellKind[] };

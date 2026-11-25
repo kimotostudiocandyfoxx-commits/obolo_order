@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { songGenreNamed, spellKey, SpellTags, type SpellTag } from './spell';
+import { songGenreNamed, songStyleNamed, spellCorrection, spellKey, SpellTags, type SpellTag } from './spell';
+import { songGenreOf } from './songGenres';
 
 /**
  * R13 (client 2026-11-25): 「曲を作る時、普通のスペル以外に、メタタグ入りの歌詞を作るのが大事。メタタグもスペルにして、
@@ -31,6 +32,8 @@ export const LYRIC_SECTION_DEFS = {
   instrumental: { en: 'Instrumental', ja: '間奏', re: /間奏|インスト/, sung: false, engine: null },
   'guitar-solo': { en: 'Guitar Solo', ja: 'ギターソロ', re: /ギターソロ|ギターの?ソロ/, sung: false, engine: null, caption: 'guitar solo' },
   'piano-solo': { en: 'Piano Interlude', ja: 'ピアノ間奏', re: /ピアノ間奏|ピアノの?ソロ|ピアノの間奏/, sung: false, engine: null, caption: 'piano interlude' },
+  // R14: an electronic song's rise before its drop (psytrance, EDM …)
+  build: { en: 'Build', ja: 'ビルド', re: /ビルドパート|ビルドの部分|ビルドを/, sung: false, engine: null, caption: 'build-up' },
   drop: { en: 'Drop', ja: 'ドロップ', re: /ドロップ/, sung: false, engine: null, caption: 'big drop' },
   outro: { en: 'Outro', ja: 'おわり', re: /おわり|終わり|アウトロ|エンディング|後奏/, sung: false, engine: null },
 } as const satisfies Record<string, SectionDef>;
@@ -384,6 +387,11 @@ export function ownLyricsOf(said: string): string | null {
  */
 export function isLyricsTalk(said: string, lyrics?: Pick<SongLyrics, 'blocks'> | null): boolean {
   if (ownLyricsOf(said)) return true;
+  // R14 (client 2026-11-25: 「全然違うよ、サイケデリックトランスにして」 got new lyrics, not a new spell): words about the
+  // genre / the sound, or a correction, are a change of the style spell — unless they name the lyrics themselves
+  // (「歌詞もサイケっぽくして」)
+  if (!/歌詞|かし|フレーズ/.test(said) && (songGenreNamed(said) || spellCorrection(said))) return false;
+  if (spellCorrection(said) && songStyleNamed(said) && !/歌詞|かし/.test(said)) return false;
   const rep = lyrics ? replaceAsk(said) : null;
   if (rep && lyrics && lyricsFind(lyrics, rep.from)) return true;
   if (/歌詞|かし|フレーズ|[0-9０-９一二三]番|1番|2番|3番|番を/.test(said)) return true;
@@ -472,7 +480,7 @@ const sectionsNamed = (said: string): LyricSection[] => {
   const out: LyricSection[] = [];
   let rest = said;
   // longer names first (大サビ before サビ, サビ前 before サビ, ピアノ間奏 before 間奏)
-  for (const id of ['final-chorus', 'pre-chorus', 'piano-solo', 'guitar-solo', 'intro', 'verse', 'chorus', 'bridge', 'instrumental', 'drop', 'outro'] as LyricSection[]) {
+  for (const id of ['final-chorus', 'pre-chorus', 'piano-solo', 'guitar-solo', 'intro', 'verse', 'chorus', 'bridge', 'instrumental', 'build', 'drop', 'outro'] as LyricSection[]) {
     if (S[id].re.test(rest)) {
       out.push(id);
       rest = rest.replace(new RegExp(S[id].re.source, 'g'), '、');
@@ -645,6 +653,26 @@ export function lyricsFallback(tags: SpellTag[]): SongLyrics {
   const about = aboutOf(tags);
   const a = about[0] ?? 'きみ';
   const b = about[1] ?? '空';
+  // R14: a mostly instrumental genre (psytrance, techno, ambient …) — a few repeated, hypnotic phrases between the
+  // instrumental parts, not a story in verses
+  const genre = songGenreOf(tags.find((t) => t.group === 'genre'));
+  const how = tags.some((t) => t.group === 'voice' && t.ja === '歌なし') ? 'instrumental' : (genre?.lyrics ?? 'full');
+  if (how !== 'full') {
+    const mantra = how === 'instrumental' ? ['ひかりの中へ'] : ['ひかりの中へ', 'ひかりの中へ', 'とけていく'];
+    return {
+      title: `${a}のうた`.slice(0, 40),
+      blocks: [
+        { section: 'intro', hints: [], lines: [] },
+        { section: 'build', hints: ['building'], lines: mantra },
+        { section: 'drop', hints: [], lines: [] },
+        { section: 'instrumental', hints: [], lines: [] },
+        ...(how === 'sparse' ? [{ section: 'chorus' as const, hints: ['dreamy' as const], lines: [`${a}の　むこうへ`, 'もっと　ふかく', `${a}の　むこうへ`] }] : []),
+        { section: 'build', hints: ['building'], lines: how === 'sparse' ? ['ひとつになる', 'ひとつになる'] : [] },
+        { section: 'drop', hints: [], lines: [] },
+        { section: 'outro', hints: ['fade'], lines: [] },
+      ],
+    };
+  }
   const sad = tags.some((t) => t.group === 'mood' && /mellow|bittersweet|calm|sad|melanchol/i.test(t.en));
   const verse = sad ? [`しずかな${a}に　ひとり立って`, 'とおい日の声を　思い出す', 'ことばにできない　気持ちだけ', `${b}に　そっと　あずけてみる`] : [`まぶしい${a}の　においがして`, 'はだしのままで　かけだした', 'きのうの涙も　風がさらって', 'きょうのわたしに　会いにいく'];
   const pre = sad ? ['胸のおくで　ゆれる灯り', 'まだ　消えないで'] : ['胸のおくで　なにかが鳴る', 'もうすぐ　とどきそう'];
