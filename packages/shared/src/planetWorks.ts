@@ -179,6 +179,70 @@ export function genericTags(main: string | null | undefined, words: readonly str
   return { main: main ? clean(main) || null : null, moods: planetMoodsOf(words), bpm: null };
 }
 
+/**
+ * 2-1 Saturn (M-R316): a voice kororin's topic (its main class) and moods, from the words blown in. The plazas on the
+ * rings (prototype CONT.saturn / RULE.saturn) speak this vocabulary; 雑談 is the topic of anything else.
+ */
+export const PLANET_VOICE_TOPICS = ['雑談', '恋バナ', '推し', '学校', '夜', 'ゲーム', 'お笑い', 'アニメ', '朝', '眠い'] as const;
+export const PLANET_VOICE_MOODS = ['ゆるい', '日常', 'ドキドキ', '好きな人', 'アイドル', 'ライブ', '部活', 'テスト', '深夜', '眠れない', '対戦', '実況', 'ボケ', 'ツッコミ', '名シーン', 'マンガ', 'おはよう', '元気', 'おやすみ', '夜'] as const;
+export const VOICE_MOODS_MAX = 4;
+export const VOICE_TOPIC_DEFAULT = '雑談';
+
+/** an answer (the model's, or the word rules') kept to the vocabulary: a known topic (else 雑談), known moods only */
+export function voiceTags(topic: unknown, moods: unknown): WorkTags {
+  const t = typeof topic === 'string' ? clean(topic) : '';
+  const main = (PLANET_VOICE_TOPICS as readonly string[]).includes(t) ? t : VOICE_TOPIC_DEFAULT;
+  const ms = (Array.isArray(moods) ? moods : [])
+    .filter((m): m is string => typeof m === 'string')
+    .map(clean)
+    .filter((m, i, a) => (PLANET_VOICE_MOODS as readonly string[]).includes(m) && a.indexOf(m) === i)
+    .slice(0, VOICE_MOODS_MAX);
+  return { main, moods: ms, bpm: null };
+}
+
+/** the word rules (offline / no model): the first topic whose words appear, and every mood whose words appear */
+const VOICE_TOPIC_RULES: [RegExp, string][] = [
+  [/好きな人|片思い|告白|恋|カレシ|彼氏|彼女|デート|LINEの返事/, '恋バナ'],
+  [/推し|ライブ|ペンライト|アイドル|尊い/, '推し'],
+  [/ゲーム|ランク|ボス|対戦|実況|ガチャ/, 'ゲーム'],
+  [/アニメ|マンガ|漫画|最終回|名シーン|今期/, 'アニメ'],
+  [/学校|部活|テスト|宿題|先生|授業|文化祭|放課後|クラス/, '学校'],
+  [/笑|ウケ|ボケ|ツッコミ|ネタ|ギャグ/, 'お笑い'],
+  [/おはよう|朝ごはん|朝/, '朝'],
+  [/眠い|ねむ|おやすみ|布団|ふとん|夢/, '眠い'],
+  [/夜|深夜|眠れない|寝れない|[0-9０-９]時なのに|ラーメン|星/, '夜'],
+];
+const VOICE_MOOD_RULES: [RegExp, string][] = [
+  [/ゆる|まったり|のんびり|好き$/, 'ゆるい'],
+  [/今日|コンビニ|ごはん|新作|ハマ/, '日常'],
+  [/ドキドキ|どきどき|告白|目が合/, 'ドキドキ'],
+  [/好きな人|片思い|LINEの返事/, '好きな人'],
+  [/アイドル|推しの新曲|尊い/, 'アイドル'],
+  [/ライブ|ペンライト/, 'ライブ'],
+  [/部活/, '部活'],
+  [/テスト|試験/, 'テスト'],
+  [/深夜|[0-9０-９]時|夜中/, '深夜'],
+  [/眠れない|寝れない|目が冴え/, '眠れない'],
+  [/対戦|ランク|一緒にやる/, '対戦'],
+  [/実況|ボス/, '実況'],
+  [/ボケ|笑|盗んで/, 'ボケ'],
+  [/ツッコミ/, 'ツッコミ'],
+  [/名シーン|泣いた|あのシーン|最終回/, '名シーン'],
+  [/マンガ|漫画|今期/, 'マンガ'],
+  [/おはよう|朝ごはん/, 'おはよう'],
+  [/元気|がんばろ|頑張ろ|晴れ/, '元気'],
+  [/おやすみ|いい夢/, 'おやすみ'],
+];
+/** a voice kororin's tags from its words by the word rules alone (no model: tests, local runs) */
+export function voiceTagsOfWords(words: string): WorkTags {
+  const w = words ?? '';
+  const topic = VOICE_TOPIC_RULES.find(([re]) => re.test(w))?.[1] ?? VOICE_TOPIC_DEFAULT;
+  return voiceTags(
+    topic,
+    VOICE_MOOD_RULES.filter(([re]) => re.test(w)).map(([, m]) => m),
+  );
+}
+
 /** stored tags read back safely */
 export function readTags(main: unknown, moods: unknown, bpm: unknown): WorkTags {
   const n = Number(bpm);

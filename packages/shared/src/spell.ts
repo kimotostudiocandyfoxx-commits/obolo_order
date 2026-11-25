@@ -183,6 +183,11 @@ export const SPELL_DICTIONARY: Entry[] = [
   e('切り絵', 'paper cut art', 'style', /切り絵/, PIC),
   e('えんぴつ画', 'pencil sketch', 'style', /鉛筆|えんぴつ/, PIC),
   e('立体', '3D render', 'style', /3D|立体/i, PIC),
+  // planets 2-1 (M-R317): the touches Jupiter's forests gather by (ゆめかわの花畑・和モダンの庭・レトロポップ広場)
+  e('ゆめかわ', 'yume-kawaii dreamy pastel kawaii style', 'style', /ゆめかわ|夢かわ|ゆめかわいい/, PIC),
+  e('和モダン', 'modern Japanese wa style, flat washi patterns', 'style', /和モダン|和風モダン/, PIC),
+  e('レトロ', 'retro showa-era illustration', 'style', /レトロ|昭和/, PIC),
+  e('ポップ', 'pop art style, bold outlines and flat bright colors', 'style', /ポップアート|ポップな絵|ポップ(?!コーン)/, PIC),
   e('やわらかい色', 'soft pastel colors', 'color', /やわらかい色|パステル|淡い/, PICG),
   e('あざやかな色', 'vivid colors', 'color', /あざやか|鮮やか|カラフル/, PICG),
   e('青い色', 'blue tones', 'color', /青い色|青っぽ|ブルー/, PICG),

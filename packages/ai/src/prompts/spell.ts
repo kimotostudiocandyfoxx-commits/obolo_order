@@ -37,7 +37,7 @@ const KIND_RULES: Record<SpellKind, string> = {
     'What the user names always wins: their genre, their instruments, their mood, their tempo. If they name a genre, keep exactly that genre.',
     `Known genres (use the Japanese label and English given here when the request is one of them; for others write your own natural label): ${SONG_GENRES.map((g) => `${g.ja} = ${g.en} [${g.guide}]`).join('; ')}.`,
   ].join('\n'),
-  art: 'A picture spell: the subject and setting as theme tags (each thing the user wants to see, in their words), 1 style/touch (watercolor, anime, oil painting, pixel art …), 1–2 moods, 1–2 colour tags, 1 light, 1 composition. Read the intent: 「かわいい猫が宇宙を飛んでる絵」 → 猫, 宇宙, 飛ぶ as themes, cute mood, dreamy light … Fill touch / colour / light / composition with what suits the subject when the user did not say.',
+  art: 'A picture spell: the subject and setting as theme tags (each thing the user wants to see, in their words), 1 style/touch (watercolor, anime, oil painting, pixel art, ゆめかわ yume-kawaii, 和モダン modern Japanese, レトロ retro, ポップ pop art …), 1–2 moods, 1–2 colour tags, 1 light, 1 composition. Read the intent: 「かわいい猫が宇宙を飛んでる絵」 → 猫, 宇宙, 飛ぶ as themes, cute mood, dreamy light … Fill touch / colour / light / composition with what suits the subject when the user did not say.',
   video: 'A video spell: the pictures\' subject as themes, 1 style, a mood, colour and light; purpose / scenes / length / camera / transition / caption only when the user says them (the app fills the rest).',
   look: "An avatar look: what to wear (wear), a style and colours that fit what the user wants.",
   bati: "The buddy's outfit: what to wear (wear), a style and colours that fit what the user wants.",

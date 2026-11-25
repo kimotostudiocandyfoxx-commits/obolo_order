@@ -3,6 +3,7 @@ export * from './providers';
 export * from './claude';
 export * from './buddy';
 export * from './moderation';
+export * from './voiceTopic';
 export * from './prompts/bati';
 export * from './prompts/memory';
 export * from './prompts/compass';
