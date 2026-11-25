@@ -45,7 +45,8 @@ export function lyricsRequest(a: LyricsAsk): string {
     'The lyrics now:',
     lyricsSheet(a.lyrics),
     `The user's change (Japanese): ${a.said}`,
-    'Return the whole lyrics with the change made. Keep every block, tag and line the change does not touch exactly as it is (same words). Change only what was asked (e.g. "サビをもっと明るく" → rewrite the chorus lines brighter; "2番を足して" → add Verse + Pre-Chorus + Chorus for a second verse with new lines, after the first Chorus).',
+    'Return the whole lyrics with the change made. Keep every block, tag and line the change does not touch exactly as it is (same words). Change only what was asked (e.g. "サビをもっと明るく" → rewrite the chorus lines brighter; "2番を足して" → add Verse + Pre-Chorus + Chorus for a second verse with new lines, after the first Chorus; "サビを変えて" / "歌詞を変えて" → new lines for the chorus / the sung blocks, same mood and theme, never the same words).',
+    'A phrase to replace ("〇〇を△△に変えて", "〇〇のところを△△にして") may be misremembered or mistyped (a different kanji, a voice-input slip such as 話のままで for はだしのままで): find the line closest to it in sound or meaning and replace that phrase there, keeping the rest of the line and its rhythm.',
   ].join('\n');
 }
 

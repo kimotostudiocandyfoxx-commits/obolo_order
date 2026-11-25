@@ -22,7 +22,27 @@ export type Plan = {
   lyrics?: SongLyrics;
 };
 
-const GENRE: Record<string, Genre> = { pop: 'pop', rock: 'rock', ballad: 'ballad', 'hip hop': 'hiphop', 'dance, EDM': 'edm' };
+const GENRE: Record<string, Genre> = {
+  pop: 'pop',
+  rock: 'rock',
+  ballad: 'ballad',
+  'hip hop': 'hiphop',
+  'dance, EDM': 'edm',
+  // R13 fix: the genre talismans added with the client's 「EDM系にして」 (the song design's nearest)
+  'EDM, electronic dance music': 'edm',
+  'house music, four-on-the-floor': 'edm',
+  techno: 'edm',
+  'trance, euphoric synth': 'edm',
+  'dubstep, heavy wobble bass': 'edm',
+  'vocaloid-style j-pop, fast synth lines': 'edm',
+  'k-pop': 'pop',
+  '1980s city pop': 'pop',
+  'anime song, j-pop': 'rock',
+  'heavy metal': 'rock',
+  'punk rock': 'rock',
+  'r&b, soul': 'hiphop',
+  'classical, orchestral': 'ballad',
+};
 /** the kinds whose making is a spell */
 export const spellKindOf = (kind: AtelierKind): SpellKind | null => (kind === 'song' || kind === 'art' || kind === 'video' || kind === 'look' || kind === 'bati' || kind === 'novel' || kind === 'game' ? kind : null);
 

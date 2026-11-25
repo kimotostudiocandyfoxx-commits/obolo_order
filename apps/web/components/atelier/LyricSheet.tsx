@@ -18,6 +18,7 @@ export type FloatLyrics = { lyrics: SongLyrics; change?: LyricsChange; /** a new
 const seedOf = (s: string) => [...s].reduce((x, c) => (x * 31 + c.charCodeAt(0)) >>> 0, 7);
 
 const CSS = `
+@keyframes ls-leave{0%{opacity:1;transform:none;filter:none}100%{opacity:0;transform:translateY(-22px) scale(.97);filter:blur(6px) brightness(1.5)}}
 @keyframes ls-in{0%{opacity:0;transform:translateY(16px) scale(.97);filter:blur(6px) brightness(1.6)}100%{opacity:1;transform:none;filter:none}}
 @keyframes ls-cast{0%{opacity:1;transform:none;filter:none}35%{opacity:1;filter:brightness(1.6)}100%{opacity:0;transform:translateY(60px) scale(.25,.1);filter:brightness(2.6) blur(3px)}}
 @keyframes ls-row{0%{opacity:0;transform:translateY(8px);filter:blur(3px)}100%{opacity:1;transform:none;filter:none}}
@@ -80,7 +81,7 @@ function TagRow({ label, hints, gone, fresh, newHints, delay }: { label: string;
  * the sheet: `cx` its centre line, `top` / `height` its place in the stage (stage px), `width` its width. The rows come in
  * one by one the first time; afterwards only what changed moves.
  */
-export function LyricSheet({ sheet, cx, top, width, height, casting, foot = 0 }: { sheet: FloatLyrics; cx: number; top: number; width: number; height: number; casting?: boolean; /** room at its foot (the mana words float there) */ foot?: number }) {
+export function LyricSheet({ sheet, cx, top, width, height, casting, leaving, foot = 0 }: { sheet: FloatLyrics; cx: number; top: number; width: number; height: number; casting?: boolean; /** R13 fix: the spell called off — the sheet fades away */ leaving?: boolean; /** room at its foot (the mana words float there) */ foot?: number }) {
   useSpellFont('hikari');
   const { lyrics, change } = sheet;
   const labels = useMemo(() => lyricBlockLabels(lyrics), [lyrics]);
@@ -118,7 +119,7 @@ export function LyricSheet({ sheet, cx, top, width, height, casting, foot = 0 }:
     <div
       className="pointer-events-auto absolute"
       data-lyric-sheet
-      style={{ left: cx - width / 2, top, width, height, animation: casting ? 'ls-cast 1.25s cubic-bezier(.55,0,.75,.6) 250ms both' : 'ls-in 1.1s cubic-bezier(.25,.8,.3,1) both', transformOrigin: '50% 100%' }}
+      style={{ left: cx - width / 2, top, width, height, animation: leaving ? 'ls-leave 1s ease-in both' : casting ? 'ls-cast 1.25s cubic-bezier(.55,0,.75,.6) 250ms both' : 'ls-in 1.1s cubic-bezier(.25,.8,.3,1) both', transformOrigin: '50% 100%' }}
       aria-label={`スペル入りの歌詞：${lyrics.blocks.map((b, i) => `${labels[i]}${b.lines.length ? '、' + b.lines.join('、') : ''}`).join('。')}`}
     >
       <style>{LOOK_CSS + CSS}</style>
@@ -143,7 +144,7 @@ export function LyricSheet({ sheet, cx, top, width, height, casting, foot = 0 }:
       </div>
       <div
         ref={box}
-        className="relative overflow-y-auto overscroll-contain px-[14px] pt-[12px] pb-[8px]"
+        className="relative overflow-y-auto overscroll-contain px-[12px] pt-[10px] pb-[6px]"
         style={{ height: `calc(100% - ${foot}px)`, WebkitMaskImage: 'linear-gradient(180deg, transparent 0, #000 12px, #000 calc(100% - 16px), transparent 100%)', maskImage: 'linear-gradient(180deg, transparent 0, #000 12px, #000 calc(100% - 16px), transparent 100%)', scrollbarWidth: 'none' } as CSSProperties}
         data-testid="lyric-sheet-scroll"
       >
@@ -154,11 +155,11 @@ export function LyricSheet({ sheet, cx, top, width, height, casting, foot = 0 }:
           return (
             <div key={`${sheet.v}-${k}`}>
               {goneAt(i).map(ghost)}
-              <div className={lyricSectionSung(b.section) || b.lines.length ? 'mb-[10px]' : 'mb-[8px]'} data-lyric-block={k} {...(newBlocks.has(k) ? { 'data-lyric-new': '' } : {})}>
+              <div className={lyricSectionSung(b.section) || b.lines.length ? 'mb-[8px]' : 'mb-[6px]'} data-lyric-block={k} {...(newBlocks.has(k) ? { 'data-lyric-new': '' } : {})}>
                 <TagRow label={labels[i]} hints={b.hints} gone={goneHintsOf(k)} fresh={fresh} newHints={newHintsOf(k)} delay={first ? 200 + d : 120} />
                 {!!b.lines.length && (
                   <div
-                    className="relative mt-[5px] pl-[10px]"
+                    className="relative mt-[4px] pl-[10px]"
                     style={{
                       // a faint stave behind the words: the sheet reads as a score
                       backgroundImage: 'repeating-linear-gradient(180deg, transparent 0 6px, rgba(190,240,255,.13) 6px 7px, transparent 7px 11px)',
@@ -171,7 +172,7 @@ export function LyricSheet({ sheet, cx, top, width, height, casting, foot = 0 }:
                       return (
                         <p
                           key={`${j}-${line}`}
-                          className="m-0 rounded-[3px] px-[3px] text-[15px] leading-[1.62] tracking-[.03em]"
+                          className="m-0 rounded-[3px] px-[3px] text-[14px] leading-[1.5] tracking-[.03em]"
                           style={{ fontFamily: face('hikari'), color: '#f4fdff', textShadow: '0 0 1px rgba(255,255,255,.9), 0 0 5px rgba(120,210,255,.75), 0 1px 2px rgba(6,20,60,.65)', animation: glow ? 'ls-glow 2.6s ease-out 250ms both' : fresh ? `ls-row .7s ease-out ${(first ? 320 + d : 220) + j * 90}ms both` : undefined, overflowWrap: 'anywhere' }}
                           {...(glow ? { 'data-lyric-changed': '' } : {})}
                         >

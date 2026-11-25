@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { spellKey, SpellTags, type SpellTag } from './spell';
+import { songGenreNamed, spellKey, SpellTags, type SpellTag } from './spell';
 
 /**
  * R13 (client 2026-11-25): 「曲を作る時、普通のスペル以外に、メタタグ入りの歌詞を作るのが大事。メタタグもスペルにして、
@@ -378,15 +378,95 @@ export function ownLyricsOf(said: string): string | null {
   return null;
 }
 
-/** the words are about the lyrics (a lyric change), not the style talismans */
-export function isLyricsTalk(said: string): boolean {
+/**
+ * the words are about the lyrics (a lyric change), not the style talismans. R13 fix: with the lyrics as they are, 「〇〇を
+ * △△に変えて」 whose 〇〇 is (close to) a phrase of them is about the lyrics too (「話のままでのところを靴のままでに」)
+ */
+export function isLyricsTalk(said: string, lyrics?: Pick<SongLyrics, 'blocks'> | null): boolean {
   if (ownLyricsOf(said)) return true;
+  const rep = lyrics ? replaceAsk(said) : null;
+  if (rep && lyrics && lyricsFind(lyrics, rep.from)) return true;
   if (/歌詞|かし|フレーズ|[0-9０-９一二三]番|1番|2番|3番|番を/.test(said)) return true;
   if (Object.values(S).some((d) => d.re.test(said))) return true;
+  // R13 fix: 「ラップ系にして」「EDMにして」 name the song's genre (the style talismans), not a part of the lyrics
+  if (songGenreNamed(said)) return false;
   return Object.values(H).some((d) => d !== H.euphoric && d !== H.melancholic && d !== H.quiet && d !== H.dreamy && d.re.test(said));
 }
 
 export type LyricsEdit = { lyrics: SongLyrics; op: 'dropHint' | 'addHint' | 'dropBlock' | 'addBlock' | 'replace' };
+
+/**
+ * R13 fix (client 2026-11-25: 「話のままでのところを靴のままでにしてほしい」, meaning はだしのままで): 「〇〇を△△に（変えて）」
+ * 「〇〇のところを△△にしてほしい」「歌詞の「〇〇」を「△△」に」 — the phrase and its replacement, or null. A section or a
+ * performance tag on either side is not a phrase (「サビを明るい感じに」 is new words).
+ */
+export function replaceAsk(said: string): { from: string; to: string } | null {
+  const t = said.trim().replace(/^歌詞(?:の中)?の/, '');
+  const m = t.match(/^[「『“"]?([^「」『』“”"、。]{1,24}?)[」』”"]?(?:って(?:いう)?(?:所|ところ|とこ|部分)?|の(?:所|ところ|とこ|部分)|(?:所|ところ|とこ|部分))?(?:を|は)[、\s　]*[「『“"]?([^「」『』“”"]{1,30}?)[」』”"]?(?:に|へ|って)(?:して|変えて|かえて|変更して|直して|なおして|書き換えて|書きかえて|替えて)?(?:ほしい|欲しい|ください|くれる|くれない|ちょうだい|もらえる|お願い|おねがい)?(?:[？?。！!\s]|ね|な|よ|かな|です)*$/);
+  if (!m) return null;
+  const [, from, to] = m;
+  const meta = (x: string) => Object.values(S).some((d) => d.re.test(x)) || Object.values(H).some((d) => d.re.test(x)) || /^(歌詞|曲|歌|テンポ|もっと)/.test(x);
+  if ([...from].length < 2 || meta(from) || meta(to)) return null;
+  return { from, to };
+}
+
+/** katakana → hiragana, full-width → half-width, no spaces (how a phrase sounds, roughly) */
+const kana = (s: string) => s.normalize('NFKC').replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
+const lev = (a: string[], b: string[]) => {
+  const d = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    let prev = d[0];
+    d[0] = i;
+    for (let j = 1; j <= b.length; j++) {
+      const t = d[j];
+      d[j] = Math.min(d[j] + 1, d[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
+      prev = t;
+    }
+  }
+  return d[b.length];
+};
+const SPACE = /[\s　、。,.!！?？]/;
+const KANJI = /\p{sc=Han}/u;
+
+/**
+ * where a phrase is in the lyrics: the words as written, else the closest stretch of a line (kana-folded edit distance,
+ * at least 60% alike); a first / last kanji that does not match (話 for はだし: another reading, a voice-input slip) takes
+ * the stretch to the edge of its word. null: nothing close enough.
+ */
+export function lyricsFind(l: Pick<SongLyrics, 'blocks'>, phrase: string): { text: string; score: number } | null {
+  const p = phrase.replace(/\s|　/g, '');
+  if (!p) return null;
+  for (const b of l.blocks) for (const x of b.lines) if (x.includes(p)) return { text: p, score: 1 };
+  const pk = [...kana(p)];
+  // a short phrase is only found as written (「ピアノ」 is not 「あの」)
+  if (pk.length < 4) return null;
+  let best: { line: string; i: number; j: number; score: number; dl: number } | null = null;
+  for (const b of l.blocks)
+    for (const line of b.lines) {
+      const cs = [...line];
+      const ks = cs.map((c) => kana(c));
+      for (let i = 0; i < cs.length; i++) {
+        if (SPACE.test(cs[i])) continue;
+        for (let n = Math.max(2, pk.length - 1); n <= pk.length + 3 && i + n <= cs.length; n++) {
+          if (SPACE.test(cs[i + n - 1])) continue;
+          const w = ks.slice(i, i + n).filter((c) => !SPACE.test(c));
+          const dist = lev(w, pk);
+          const score = 1 - dist / Math.max(w.length, pk.length);
+          const dl = Math.abs(w.length - pk.length);
+          if (!best || score > best.score || (score === best.score && dl < best.dl)) best = { line, i, j: i + n, score, dl };
+        }
+      }
+    }
+  if (!best || best.score < 0.6) return null;
+  const cs = [...best.line];
+  let { i, j } = best;
+  // a kanji at the phrase's edge that is not in the line: the word around it is the one meant
+  if (KANJI.test(pk[0]) && kana(cs[i]) !== pk[0]) for (let k = 0; k < 4 && i > 0 && !SPACE.test(cs[i - 1]); k++) i--;
+  if (KANJI.test(pk[pk.length - 1]) && kana(cs[j - 1]) !== pk[pk.length - 1]) for (let k = 0; k < 4 && j < cs.length && !SPACE.test(cs[j]); k++) j++;
+  return { text: cs.slice(i, j).join(''), score: best.score };
+}
+
+const replaceIn = (line: string, from: string, to: string) => line.split(from).join(to);
 
 const sectionsNamed = (said: string): LyricSection[] => {
   const out: LyricSection[] = [];
@@ -439,14 +519,14 @@ function placeBlock(blocks: LyricBlock[], section: LyricSection): LyricBlock[] {
  * null: a change that needs new words (「サビをもっと明るく」「2番を足して」) — the model writes it.
  */
 export function lyricsEdit(l: SongLyrics, said: string): LyricsEdit | null {
-  const rep = said.match(/(?:歌詞の)?[「『“"]?([^「」『』“”"、。]{1,20}?)[」』”"]?(?:の所|のところ)?を[「『“"]?([^「」『』“”"]{1,30}?)[」』”"]?(?:に|へ)(?:して|変えて|かえて|変更|直して|なおして)?[。！!]*$/);
-  if (rep && /歌詞|[「『“"]/.test(said)) {
-    const [, from, to] = rep;
-    if (l.blocks.some((b) => b.lines.some((x) => x.includes(from)))) {
-      const blocks = l.blocks.map((b) => ({ ...b, lines: b.lines.map((x) => [...x.split(from).join(to)].slice(0, LYRIC_LINE_MAX).join('')) }));
+  const rep = replaceAsk(said);
+  if (rep) {
+    const hit = lyricsFind(l, rep.from);
+    if (hit) {
+      const blocks = l.blocks.map((b) => ({ ...b, lines: b.lines.map((x) => [...replaceIn(x, hit.text, rep.to)].slice(0, LYRIC_LINE_MAX).join('')) }));
       return { lyrics: { ...l, blocks }, op: 'replace' };
     }
-    return null;
+    if (/歌詞|[「『“"]/.test(said)) return null;
   }
   const secs = sectionsNamed(said);
   const hints = hintsNamed(said);
@@ -597,6 +677,27 @@ export function lyricsDemoEdit(l: SongLyrics, said: string): SongLyrics | null {
   const secs = sectionsNamed(said);
   const bright = /明る|あかる|元気|楽し|たのし|ハッピー|晴れ/.test(said);
   const dark = /暗く|くらく|切な|せつな|悲し|かなし|しっとり/.test(said);
+  // R13 fix: 「歌詞を変えて」「サビを変えて」「Aメロを書き直して」 — new lines for the blocks named (the lyrics: verse and chorus)
+  if (!bright && !dark && /変えて|かえて|変更|書き直|かきなお|書きかえ|書き換え|別の|べつの|ちがう|違う|新しく|あたらしく/.test(said) && (secs.length || /歌詞|かし/.test(said))) {
+    const where = secs.length ? secs : (['verse', 'chorus', 'final-chorus'] as LyricSection[]);
+    const ALT: Partial<Record<LyricSection, string[]>> = {
+      verse: ['ひかりの粒が　まどをたたく', 'ねぼけたままで　くつをはいた', 'しらない道を　えらんでみる', 'きょうのわたしを　ためしてみる'],
+      'pre-chorus': ['風のむこうで　だれかがよぶ', 'もうすぐ　なにかがはじまる'],
+      chorus: ['とどけ　とどけ　空のうた', '波をこえて　この声', 'ふたりで　えがいた　あの虹', 'きえないで　ずっと'],
+      'final-chorus': ['とどけ　とどけ　空のうた', '波をこえて　この声', 'ふたりで　えがいた　あの虹', 'きえないで　ずっと'],
+      bridge: ['しずかな夜に　ひとつ灯り', 'ゆっくり　あしたを　まっている'],
+    };
+    let changed = false;
+    const blocks = l.blocks.map((b) => {
+      const rows = ALT[b.section];
+      if (!where.includes(b.section) || !b.lines.length || !rows) return b;
+      const lines = b.lines.map((x, i) => rows[i % rows.length] ?? x);
+      if (lines.join() === b.lines.join()) return b;
+      changed = true;
+      return { ...b, lines };
+    });
+    return changed ? { ...l, blocks } : null;
+  }
   if (!bright && !dark) return null;
   const where = secs.length ? secs : (['chorus', 'final-chorus'] as LyricSection[]);
   const B = ['はじけて　はじけて　夏のうた', '笑顔で　とびこめ　青い空', 'ふたりで　つかんだ　太陽を', 'はなさない　ずっと'];

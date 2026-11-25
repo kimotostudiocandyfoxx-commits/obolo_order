@@ -13,6 +13,6 @@ describe('R11: {bati} lays out the spell before it makes anything that spends ma
     expect(p.words).toBe('夏、海');
     const q = planOf('song', spellEdit('song', p.tags, 'ロックにして'));
     expect(q.genre).toBe('rock');
-    expect(q.added.map((t) => t.ja)).toEqual(['ロック']);
+    expect(q.added.map((t) => t.ja)).toEqual(['ロック', 'エレキギター']); // R13 fix: a genre brings its own instruments
   });
 });

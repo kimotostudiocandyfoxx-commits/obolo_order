@@ -214,5 +214,65 @@ export function wantsPicture(text: string): boolean {
   return /どんな|見た目|姿|すがた|どこ|写真|絵|見せ|って何|ってなに|とは|何\?|なに\?|って？|なに？|何？/.test(text);
 }
 
+/**
+ * R13 fix (client 2026-11-25: 「曲を作るのをやめて画像を作りたい」 while a song's spell waited for its yes — {bati} took it as
+ * a change of the song's spell). While a spell waits: words that call the making off (やめて / やめる / キャンセル / なしで
+ * / いらない / もういい …, about the making itself, not a talisman: 「ピアノはやめて」 is a change) drop it; words that ask
+ * for another kind (画像 / 絵 / イラスト / アート, 動画 / MV, 本 / 小説, ゲーム, コロリン, ラジオ … with a making word, 「〜にして」
+ * 「〜にしたい」「〜がいい」, or 「やっぱり〜」) drop it and start that kind (its words carried over). Null: a change of the spell.
+ */
+/** how {bati} names a kind in a short line (「曲はやめて、絵にしよう」) */
+export const KIND_NOUN: Record<AtelierKind, string> = { look: '姿', bati: '着せかえ', lookup: '調べもの', image: '絵', voice: 'コロリン', art: '絵', song: '曲', video: '動画', radio: 'ラジオ', novel: '本', game: 'ゲーム' };
+export type SpellTurn = { cancel: true } | { switchTo: AtelierKind; content: string };
+const CANCEL = /やめ(?:て|る|た|とく|ておく|とこ|ましょう|よう|よっか|ます)?(?:[。！!、\s　]|$|て|よ|ね|な|わ|に|で|ちゃ)|止めて|キャンセル|きゃんせる|なしで|無しで|なしに|いらない|要らない|いらん|もういい|中止|とりやめ|取りやめ/;
+const OTHER_KIND: [AtelierKind, RegExp][] = [
+  ['art', /画像|がぞう|絵(?!本)|イラスト|アート|写真|しゃしん|ピクチャ/],
+  ['video', /動画|どうが|映像|えいぞう|MV|ＭＶ|ムービー|ビデオ/i],
+  ['song', /曲|歌(?!詞|声)|うた(?!う|って|い)|音楽|ソング|BGM|ＢＧＭ/i],
+  ['novel', /小説|物語|ものがたり|お話|おはなし|(?<!日|見|絵)本(?!当|気)|ブック/],
+  ['game', /ゲーム/],
+  ['voice', /コロリン|ころりん|つぶやき/],
+  ['radio', /ラジオ|番組/],
+];
+/** what is said about the making itself (「曲を作るのを」「やっぱり」「これ」): nothing about a talisman */
+const ABOUT_IT = /曲|歌|うた|音楽|画像|がぞう|絵|イラスト|アート|写真|動画|映像|MV|ＭＶ|ムービー|ビデオ|小説|物語|お話|本|ゲーム|コロリン|ラジオ|番組|作る|つくる|作り|つくり|作成|生成|の|を|は|が|も|やっぱり|やっぱ|やはり|これ|それ|この|その|今回|今日|スペル|全部|ぜんぶ|もう|うーん|ううん|いや|じゃあ|えっと|ごめん|ごめんね|ちょっと|今の|いまの|やつ|[、。！!？?\s　ー〜]/gi;
+const WANT_KIND = (re: RegExp) => new RegExp(`(?:${re.source})(?:系|の方|のほう)?(?:に(?:して|したい|しよう|する|変え|かえ|チェンジ)|が(?:いい|ほしい|欲しい|作りたい|つくりたい)|を?(?:作|つく|描|かい|生成)|で(?:お願い|おねがい|いい))`, re.flags.replace('g', ''));
+const firstOf = (t: string, current: AtelierKind) =>
+  OTHER_KIND.filter(([k]) => k !== current)
+    .map(([k, re]) => ({ k, at: t.search(re) }))
+    .filter((x) => x.at >= 0)
+    .sort((a, b) => a.at - b.at)[0]?.k;
+export function spellPendingTurn(text: string, current: AtelierKind): SpellTurn | null {
+  const t = spellSaid(text.trim());
+  const c = t.match(CANCEL);
+  const before = c ? t.slice(0, c.index) : '';
+  const about = c ? !before.replace(ABOUT_IT, '').length : false;
+  const after = c ? t.slice(c.index! + c[0].length) : t;
+  const other = (s: string) => {
+    const it = detect(s, false);
+    if (it.kind === 'make' && it.what !== current && it.what !== 'lookup') return it.what === 'image' && current !== 'art' && MAKE.test(s) ? 'art' : it.what;
+    return firstOf(s, current);
+  };
+  const contentFor = (s: string, k: AtelierKind) => {
+    const it = detect(s, false);
+    const raw = it.kind === 'make' && it.what === k ? it.content : contentOf(s);
+    return raw
+      .replace(/^(やっぱり|やっぱ|やはり|それより|じゃあ)[、\s　]*/, '')
+      .replace(/(系|の方|のほう)?(に(して|したい|しよう|する)?|がいい|が(ほしい|欲しい))[！!。]*$/, '')
+      .trim();
+  };
+  // 「曲を作るのをやめて画像を作りたい」「やめて、動画にして」
+  if (c && about) {
+    const k = after.trim() ? other(after) : undefined;
+    return k ? { switchTo: k, content: contentFor(after, k) } : { cancel: true };
+  }
+  // 「やっぱり画像」「画像にして」「動画がいい」「ゲームを作りたい」
+  const k = other(t);
+  if (!k) return null;
+  const re = OTHER_KIND.find(([x]) => x === k)?.[1];
+  if ((re && WANT_KIND(re).test(t)) || (/やっぱり|やっぱ|やはり|それより/.test(t) && !!re && re.test(t))) return { switchTo: k, content: contentFor(t, k) };
+  return null;
+}
+
 /** client 2026-11-24: answered by {bati} in the talk (no menu, no card): plain talk and lookups */
 export const conversational = (it: Intent) => it.kind === 'talk' || (it.kind === 'make' && it.what === 'lookup');

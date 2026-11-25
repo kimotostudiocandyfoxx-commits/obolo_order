@@ -193,6 +193,6 @@ describe('R12 compass: POST /moon/compass', () => {
   });
   it('cleanRead drops names and Latin labels, keeps the common genre words (in the dictionary’s labels)', () => {
     const tags = cleanRead('song', JSON.stringify({ tags: [{ ja: 'EDM', en: 'dance, EDM', group: 'genre' }, { ja: 'Taylor風', en: 'pop', group: 'genre' }, { ja: '明るい', en: 'bright', group: 'mood' }, { ja: '声', en: 'sounds like Jane Doe', group: 'voice' }] }));
-    expect(tags.map((t) => t.ja)).toEqual(['ダンス', '明るい']);
+    expect(tags.map((t) => t.ja)).toEqual(['EDM', '明るい']); // R13 fix: EDM is a genre talisman of its own
   });
 });

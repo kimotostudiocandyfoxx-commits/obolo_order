@@ -116,14 +116,33 @@ export const SPELL_DICTIONARY: Entry[] = [
   e('わくわく', 'exciting', 'mood', /わくわく|ワクワク|ドキドキ|どきどき/, TALE),
   e('おもしろい', 'funny', 'mood', /おもしろ|面白|笑える|ギャグ/, TALE),
   // a song's genre
-  e('ポップ', 'pop', 'genre', /ポップ|pop/i, SONG),
+  // R13 fix (client 2026-11-25: 「ピアノ系からEDM系にしてほしい」): every common genre word is a genre talisman of its own
+  // (the longer names first: シティポップ / K-POP before ポップ, ダブステップ before ステップ …)
+  e('シティポップ', '1980s city pop', 'genre', /シティ・?ポップ|シティーポップ|city ?pop/i, SONG),
+  e('アニソン', 'anime song, j-pop', 'genre', /アニソン|アニメソング|アニメの(曲|歌)|アニメっぽい曲/, SONG),
+  e('ボカロ', 'vocaloid-style j-pop, fast synth lines', 'genre', /ボカロ|ボーカロイド|vocaloid/i, SONG),
+  e('K-POP', 'k-pop', 'genre', /K-?POP|Ｋ-?ＰＯＰ|ケーポップ|韓国の?(曲|歌|ポップ)/i, SONG),
+  e('ポップ', 'pop', 'genre', /ポップ|J-?POP|pop/i, SONG),
+  e('メタル', 'heavy metal', 'genre', /メタル|metal/i, SONG),
+  e('パンク', 'punk rock', 'genre', /パンク|punk/i, SONG),
   e('ロック', 'rock', 'genre', /ロック|rock/i, SONG),
   e('バラード', 'ballad', 'genre', /バラード|ballad/i, SONG),
-  e('ヒップホップ', 'hip hop', 'genre', /ヒップホップ|ラップ|hip ?hop/i, SONG),
-  e('ダンス', 'dance, EDM', 'genre', /ダンス|EDM|クラブ|テクノ/i, SONG),
-  e('ジャズ', 'jazz', 'genre', /ジャズ/, SONG),
+  e('R&B', 'r&b, soul', 'genre', /R&B|Ｒ＆Ｂ|R＆B|アールアンドビー|リズムアンドブルース|ソウル(?!フル)/i, SONG),
+  e('ヒップホップ', 'hip hop', 'genre', /ヒップホップ|ヒップ・ホップ|ラップ(?!トップ)|hip ?hop|(?<![A-Za-z])rap(?![A-Za-z])/i, SONG),
+  e('ダブステップ', 'dubstep, heavy wobble bass', 'genre', /ダブステップ|ダブステ|dubstep/i, SONG),
+  e('ハウス', 'house music, four-on-the-floor', 'genre', /ハウス|house/i, SONG),
+  e('テクノ', 'techno', 'genre', /テクノ|techno/i, SONG),
+  e('トランス', 'trance, euphoric synth', 'genre', /トランス|trance/i, SONG),
+  e('EDM', 'EDM, electronic dance music', 'genre', /EDM|ＥＤＭ|イーディーエム|エレクトロニックダンス|エレクトロ|electro/i, SONG),
+  e('ダンス', 'dance, EDM', 'genre', /ダンス|クラブ|ディスコ/i, SONG),
+  e('ジャズ', 'jazz', 'genre', /ジャズ|jazz/i, SONG),
+  e('ボサノバ', 'bossa nova', 'genre', /ボサノバ|ボサノヴァ/, SONG),
+  e('レゲエ', 'reggae', 'genre', /レゲエ|reggae/i, SONG),
+  e('ファンク', 'funk', 'genre', /ファンク|funk/i, SONG),
+  e('クラシック', 'classical, orchestral', 'genre', /クラシック|クラッシック|オーケストラ|classical/i, SONG),
+  e('演歌', 'enka', 'genre', /演歌/, SONG),
   e('フォーク', 'acoustic folk', 'genre', /フォーク|弾き語り/, SONG),
-  e('ローファイ', 'lo-fi', 'genre', /ローファイ|lofi|lo-fi/i, SONG),
+  e('ローファイ', 'lo-fi', 'genre', /ローファイ|ロウファイ|lofi|lo-fi/i, SONG),
   // the mood (songs and pictures)
   e('明るい', 'bright', 'mood', /明る|あかる|ハッピー/),
   e('楽しい', 'joyful', 'mood', /楽し|たのし|わくわく|ワクワク/),
@@ -149,6 +168,8 @@ export const SPELL_DICTIONARY: Entry[] = [
   e('ストリングス', 'strings', 'instrument', /ストリングス|弦/, SONG),
   e('バイオリン', 'violin', 'instrument', /バイオリン|ヴァイオリン/, SONG),
   e('シンセ', 'synthesizer', 'instrument', /シンセ/, SONG),
+  e('四つ打ち', 'four-on-the-floor kick', 'instrument', /四つ打ち|よつうち|4つ打ち|４つ打ち/, SONG),
+  e('808ベース', '808 bass', 'instrument', /808/, SONG),
   e('ウクレレ', 'ukulele', 'instrument', /ウクレレ/, SONG),
   e('サックス', 'saxophone', 'instrument', /サックス/, SONG),
   e('ベル', 'bells', 'instrument', /ベル|鈴/, SONG),
@@ -255,7 +276,35 @@ const ONE: SpellGroup[] = ['genre', 'tempo', 'voice', 'style', 'composition', 'c
 /** moods that do not go together */
 const OPPOSITE: Record<string, string[]> = { bright: ['dark', 'bittersweet'], dark: ['bright', 'joyful'], joyful: ['dark', 'bittersweet'], bittersweet: ['bright', 'joyful'], energetic: ['calm', 'mellow'], calm: ['energetic'], mellow: ['energetic'] };
 const ORDER: SpellGroup[] = ['purpose', 'source', 'world', 'hero', 'theme', 'wear', 'genre', 'event', 'style', 'mood', 'tempo', 'instrument', 'voice', 'rule', 'goal', 'level', 'color', 'light', 'composition', 'camera', 'transition', 'scenes', 'length', 'caption'];
-const INSTRUMENTS: Record<string, string[]> = { pop: ['ピアノ', 'ドラム'], rock: ['エレキギター', 'ドラム'], ballad: ['ピアノ', 'ストリングス'], 'hip hop': ['ドラム', 'ベース'], 'dance, EDM': ['シンセ', 'ドラム'], jazz: ['ピアノ', 'サックス'], 'acoustic folk': ['ギター'], 'lo-fi': ['ピアノ', 'ドラム'] };
+const INSTRUMENTS: Record<string, string[]> = {
+  pop: ['ピアノ', 'ドラム'],
+  rock: ['エレキギター', 'ドラム'],
+  ballad: ['ピアノ', 'ストリングス'],
+  'hip hop': ['ドラム', 'ベース'],
+  'dance, EDM': ['シンセ', 'ドラム'],
+  jazz: ['ピアノ', 'サックス'],
+  'acoustic folk': ['ギター'],
+  'lo-fi': ['ピアノ', 'ドラム'],
+  '1980s city pop': ['シンセ', 'ベース'],
+  'anime song, j-pop': ['エレキギター', 'ドラム'],
+  'vocaloid-style j-pop, fast synth lines': ['シンセ', 'ドラム'],
+  'k-pop': ['シンセ', 'ドラム'],
+  'heavy metal': ['エレキギター', 'ドラム'],
+  'punk rock': ['エレキギター', 'ドラム'],
+  'r&b, soul': ['ベース', 'ピアノ'],
+  'dubstep, heavy wobble bass': ['シンセ', '808ベース'],
+  'house music, four-on-the-floor': ['シンセ', '四つ打ち'],
+  techno: ['シンセ', '四つ打ち'],
+  'trance, euphoric synth': ['シンセ', '四つ打ち'],
+  'EDM, electronic dance music': ['シンセ', '四つ打ち'],
+  'bossa nova': ['ギター'],
+  reggae: ['ギター', 'ベース'],
+  funk: ['ベース', 'ドラム'],
+  'classical, orchestral': ['ストリングス', 'ピアノ'],
+  enka: ['ストリングス'],
+};
+/** R13 fix: genres whose sound has no acoustic instruments by default (a switch to them lets ピアノ / ギター go) */
+const ELECTRONIC = new Set(['EDM, electronic dance music', 'dance, EDM', 'house music, four-on-the-floor', 'techno', 'trance, euphoric synth', 'dubstep, heavy wobble bass']);
 /** what a kind's spell always has (the dictionary's ja), when the words did not say it */
 const DEFAULTS: Record<SpellKind, Partial<Record<SpellGroup, string>>> = {
   song: { genre: 'ポップ', mood: '明るい', voice: 'やさしい歌声' },
@@ -440,18 +489,33 @@ export function spellEdit(kind: SpellKind, tags: SpellTag[], said0: string): Spe
     for (const t of out.filter(pred)) removed.push(t);
     out = out.filter((t) => !pred(t));
   };
-  if (REMOVE.test(said)) {
-    const target = said.split(REMOVE)[0];
-    const n = named(kind, target);
-    const words = themes(n.rest);
-    take((t) => n.tags.some((x) => same(x, t)) || words.some((w) => t.ja.includes(w.ja) || w.ja.includes(t.ja)));
-    return { tags: out, added, removed };
+  const kept = keptOf(kind, said);
+  const isKept = (t: SpellTag) => kept.some((k) => same(k, t));
+  // R13 fix (client: 「プロンプトをピアノ系からEDM系にしてほしい」): 「AからBに」「A系からB系に」「AじゃなくてB」「AをやめてBに」
+  // — what A names goes, what B names comes in
+  const genre0 = out.find((t) => t.group === 'genre');
+  const sw = switchOf(said);
+  let add: SpellTag[];
+  if (sw) {
+    const from = named(kind, sw.from);
+    const fromWords = themes(from.rest);
+    take((t) => !isKept(t) && (from.tags.some((x) => same(x, t)) || fromWords.some((w) => t.ja === w.ja)));
+    const to = named(kind, sw.to);
+    add = to.tags.length ? to.tags : themes(to.rest).slice(0, 2);
+  } else {
+    if (REMOVE.test(said)) {
+      const target = said.split(REMOVE)[0];
+      const n = named(kind, target);
+      const words = themes(n.rest);
+      take((t) => n.tags.some((x) => same(x, t)) || words.some((w) => t.ja.includes(w.ja) || w.ja.includes(t.ja)));
+      return { tags: out, added, removed };
+    }
+    // a game: 「もっと難しく」 is the level one step up (not a word of its own)
+    const step = kind === 'game' ? levelStep(out, said) : null;
+    const n = named(kind, step ? said.replace(/もっと|とても|難し[いく]?|むずかし[いく]?|かんたんに|簡単に|やさしく|やさしめ|ハード|に|して/g, '、') : said);
+    add = [...(step ? [step] : []), ...n.tags.filter((t) => !step || t.group !== 'level')];
+    if (/足して|たして|加えて|くわえて|入れて|いれて|追加|も(ほしい|入れ|欲しい)/.test(said) || !add.length) for (const t of themes(n.rest)) add.push(t);
   }
-  // a game: 「もっと難しく」 is the level one step up (not a word of its own)
-  const step = kind === 'game' ? levelStep(out, said) : null;
-  const n = named(kind, step ? said.replace(/もっと|とても|難し[いく]?|むずかし[いく]?|かんたんに|簡単に|やさしく|やさしめ|ハード|に|して/g, '、') : said);
-  const add = [...(step ? [step] : []), ...n.tags.filter((t) => !step || t.group !== 'level')];
-  if (/足して|たして|加えて|くわえて|入れて|いれて|追加|も(ほしい|入れ|欲しい)/.test(said) || !add.length) for (const t of themes(n.rest)) add.push(t);
   for (const t of add) {
     if (out.some((o) => same(o, t))) continue;
     if (ONE.includes(t.group)) take((o) => o.group === t.group);
@@ -459,7 +523,46 @@ export function spellEdit(kind: SpellKind, tags: SpellTag[], said0: string): Spe
     out.push(t);
     added.push(t);
   }
-  return { tags: sortTags(out).slice(0, Math.min(16, SPELL_MAX_TAGS[kind] + 2)), added, removed };
+  // a song's genre switch: the old genre's own instruments go (an electronic genre lets the acoustic ones go too), the new
+  // genre's come in — the instruments the member keeps (「ピアノはそのままで」) or names stay
+  const genre1 = out.find((t) => t.group === 'genre');
+  if (kind === 'song' && genre1 && genre1 !== genre0 && added.includes(genre1)) {
+    const was = genre0 ? (INSTRUMENTS[genre0.en] ?? []) : [];
+    const next = INSTRUMENTS[genre1.en] ?? [];
+    const acoustic = ELECTRONIC.has(genre1.en) ? ['ピアノ', 'ギター', 'ストリングス', 'バイオリン', 'ウクレレ', 'サックス'] : [];
+    take((t) => t.group === 'instrument' && !isKept(t) && !add.some((a) => same(a, t)) && !next.includes(t.ja) && (was.includes(t.ja) || acoustic.includes(t.ja)));
+    for (const ja of next) {
+      const t = tagOf(byJa(ja));
+      if (out.some((o) => same(o, t))) continue;
+      out.push(t);
+      added.push(t);
+    }
+  }
+  // a tag both taken off and put back is neither
+  const back = removed.filter((r) => added.some((a) => same(a, r)));
+  return { tags: sortTags(out).slice(0, Math.min(16, SPELL_MAX_TAGS[kind] + 2)), added: added.filter((a) => !back.some((b) => same(a, b))), removed: removed.filter((r) => !back.includes(r)) };
+}
+
+/** 「AからBに」「A系からB系へ」「AじゃなくてB」「AをやめてBに」「AよりBがいい」: the two sides, or null */
+function switchOf(said: string): { from: string; to: string } | null {
+  const m = said.match(/^(.*?[^\s、。])(?:系|っぽい(?:の|感じ)?|風|のやつ|の感じ)?(?:から|じゃなくて|じゃなく|ではなく|をやめて|はやめて|やめて|より)[、\s　]*(.+?)$/);
+  if (!m) return null;
+  const from = m[1].replace(/^[、\s　]+/, '');
+  const to = m[2].replace(/(系|っぽく|っぽい|風)?(に|へ|で|が)?(して|したい|する|変えて|かえて|変更|チェンジ|お願い|おねがい|ほしい|欲しい|ください|くれる|ちょうだい|いい|にしたい)*(ほしい|欲しい|ください|な|ね|よ)*[。！!？?]*$/, '');
+  if (!from.trim() || !to.trim()) return null;
+  return { from, to };
+}
+
+/** 「ピアノはそのままで」「ピアノは残して」: the tags the member keeps through a change */
+function keptOf(kind: SpellKind, said: string): SpellTag[] {
+  const out: SpellTag[] = [];
+  for (const m of said.matchAll(/([^、。\s　]{1,16}?)(?:は|も)?(?:そのまま|残して|のこして|残す|キープ|入れたまま|いれたまま)/g)) out.push(...named(kind, m[1]).tags);
+  return out;
+}
+
+/** R13 fix: the words name a song genre (「EDM系にして」「ラップにして」): a change of the style spell, not of the lyrics */
+export function songGenreNamed(said: string): boolean {
+  return named('song', spellWordsOnly(said)).tags.some((t) => t.group === 'genre');
 }
 
 /** a tag taken off by tapping it */

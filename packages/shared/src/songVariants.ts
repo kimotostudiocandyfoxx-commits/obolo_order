@@ -19,6 +19,12 @@ export const SONG_LINES = {
   lyricsCopy: 'その歌詞は、もうある曲のものみたい。だから、その雰囲気で、新しい歌詞を書いてみたよ。',
   /** a change of the lyrics the writer could not make (the lyrics stay) */
   lyricsFail: 'ごめん、歌詞をうまく書き直せなかった。もう一回、言ってみて。',
+  /** R13 fix: the writer failed again right after a failure (not the same apology twice) */
+  lyricsFailAgain: 'いまは、歌詞を書き直す魔法が届かないみたい。このまま作るか、〇〇を△△にって言ってみて。',
+  /** R13 fix: 「やめて」「キャンセル」 while a spell waits for its yes — the spell falls away */
+  spellCancel: 'わかった、{what}はやめておくね。',
+  /** R13 fix: 「曲を作るのをやめて画像を作りたい」 — the spell falls away and the other kind starts */
+  spellSwitch: 'わかった、{what}はやめて、{next}にしよう。',
   /** words that cannot be sung */
   lyricsFlagged: 'その言葉は、歌にできないんだ。ほかの言葉にしてみよう。',
   /** a song finished: the free changes offered (no buttons) */
@@ -114,6 +120,42 @@ export const SONG_VARIANTS: Record<string, BatiVariantSet> = {
     'ごめんよ、歌詞をうまく書き直せなかった。もう一回、言ってみな。',
     'ごめん、歌詞をうまく書き直せなかった。もう一回、言って。',
     'ごめん、歌詞うまく書き直されへんかった。もう一回、言うてみて。',
+  ),
+  [SONG_LINES.lyricsFailAgain]: v(
+    'いまは、歌詞を書き直す魔法が届かないみたいデス。このまま作るか、〇〇を△△にって言ってみて。',
+    'いまは、歌詞を書き直す魔法が届かへんみたいや。このまま作るか、〇〇を△△にって言うてみて。',
+    'いまは、歌詞を書き直す魔法が届かないようだ。このまま作るか、〇〇を△△にと言ってくれ。',
+    'いまは、歌詞を書き直す魔法が届かないみたい〜。このまま作るか、〇〇を△△にって言ってみて。',
+    'いまは、歌詞を書き直す魔法が届かないみたいなの。このまま作るか、〇〇を△△にって言ってみて。',
+    'いまは、歌詞を書き直す魔法が届かないみたい！　このまま作るか、〇〇を△△にって言ってみて。',
+    'いまは、歌詞を書き直す魔法が届かないみたい〜。このまま作るか、〇〇を△△にって言ってみて。',
+    'いまは、歌詞を書き直す魔法が届かないみたいだね。このまま作るか、〇〇を△△にって言ってみな。',
+    'いまは、歌詞を書き直す魔法が届かないみたい。このまま作るか、〇〇を△△にって言って。',
+    'いまは、歌詞を書き直す魔法が届かへんみたい！　このまま作るか、〇〇を△△にって言うてみて。',
+  ),
+  [SONG_LINES.spellCancel]: v(
+    'わかりマシタ、{what}はやめておきマス。',
+    'わかった、{what}はやめとくわ。',
+    'わかった、{what}はやめておこう。',
+    'わかった〜、{what}はやめておくね。',
+    'わかった、{what}はやめておくね。',
+    'おっけー、{what}はやめとくね！',
+    'わかった〜、{what}はやめとくね〜。',
+    'わかったよ、{what}はやめておこうね。',
+    'わかった、{what}はやめておく。',
+    'わかった、{what}はやめとくで！',
+  ),
+  [SONG_LINES.spellSwitch]: v(
+    'わかりマシタ、{what}はやめて、{next}にしマショウ。',
+    'わかった、{what}はやめて、{next}にしよか。',
+    'わかった、{what}はやめて、{next}にしよう。',
+    'わかった〜、{what}はやめて、{next}にしよ〜。',
+    'わかった、{what}はやめて、{next}にしようね。',
+    'おっけー、{what}はやめて、{next}にしよ！',
+    'わかった〜、{what}はやめて、{next}にしよ〜。',
+    'わかったよ、{what}はやめて、{next}にしようか。',
+    'わかった、{what}はやめて、{next}にしよう。',
+    'わかった、{what}はやめて、{next}にしよ！',
   ),
   [SONG_LINES.lyricsFlagged]: v(
     'その言葉は、歌にできないんデス。ほかの言葉にしてみよう。',

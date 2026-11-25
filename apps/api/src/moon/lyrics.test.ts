@@ -35,6 +35,21 @@ describe('R13: POST /moon/lyrics', () => {
     expect(v.lyrics.blocks.some((b) => b.hints.includes('whispered'))).toBe(false);
     expect(w.calls).toHaveLength(0);
   });
+  it("R13 fix: the client's 「話のままでのところを靴のままでにしてほしい」 (はだしのままで) is replaced by rule, no writer", async () => {
+    const w = writer(() => Promise.reject(new Error('must not be asked')));
+    const v = await svc(w).lyrics({ tags, said: '話のままでのところを靴のままでにしてほしい', lyrics: base });
+    expect(v.how).toBe('edit');
+    const all = v.lyrics.blocks.flatMap((b) => b.lines);
+    expect(all.some((x) => x.startsWith('靴のままで'))).toBe(true);
+    expect(all.some((x) => x.includes('はだし'))).toBe(false);
+    expect(w.calls).toHaveLength(0);
+  });
+  it('R13 fix: 「サビを変えて」 / 「歌詞を変えて」 go to the writer (asked for new lines), which is told about misremembered phrases', async () => {
+    const w = writer(answer(base));
+    await svc(w).lyrics({ tags, said: 'サビを変えて', lyrics: base });
+    expect(w.calls).toHaveLength(1);
+    expect(w.calls[0]).toContain('サビを変えて');
+  });
   it('new words are the writer’s, with the lyrics as context; failing, the lyrics stay (kept); 2番 by rule', async () => {
     const brighter = { ...base, blocks: base.blocks.map((b) => (b.section === 'chorus' ? { ...b, lines: ['はじけて　夏のうた', 'わらって'] } : b)) };
     const w = writer(answer(brighter));

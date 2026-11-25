@@ -1903,7 +1903,8 @@ function TalkLog<U>({ top, bottom, units, keyOf, render, live, onReachTop }: { o
           if (end !== atEnd) setAtEnd(end);
         }}
         className="no-scrollbar pointer-events-auto absolute inset-x-0 z-[8] overflow-y-auto overscroll-contain px-4"
-        style={{ top, bottom: Math.max(0, bottom - SHADOW_ROOM), ['--relic-room' as string]: room ? `${Math.round(Math.max(150, room * 0.56))}px` : undefined, WebkitMaskImage: 'linear-gradient(to bottom, transparent 0, rgba(0,0,0,.25) 9%, #000 34%)', maskImage: 'linear-gradient(to bottom, transparent 0, rgba(0,0,0,.25) 9%, #000 34%)' }}
+        style={{ top, bottom: Math.max(0, bottom - SHADOW_ROOM), ['--relic-room' as string]: room ? `${Math.round(Math.max(150, room * 0.56))}px` : undefined, // R13 fix (client, iPad): a short log (a song's lyric sheet over the bowl) fades only its top edge, not a third of it
+          WebkitMaskImage: 'linear-gradient(to bottom, transparent 0, rgba(0,0,0,.25) max(8px, calc(9% - 12px)), #000 max(28px, calc(34% - 40px)))', maskImage: 'linear-gradient(to bottom, transparent 0, rgba(0,0,0,.25) max(8px, calc(9% - 12px)), #000 max(28px, calc(34% - 40px)))' }}
       >
         <div ref={inner} className="flex min-h-full flex-col justify-end gap-2.5 pt-[30%]" style={{ paddingBottom: 4 + SHADOW_ROOM }}>
           {units.map((u, k) => (

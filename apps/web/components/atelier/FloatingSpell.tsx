@@ -14,7 +14,7 @@ import type { FloatLyrics } from './LyricSheet';
  * `stage`), so it stays while the talk scrolls; the talk keeps a small record line of it (SpellRecord).
  */
 /** `id`: the spell from its first showing through its changes (a new making is a new one) */
-export type FloatSpell = { id: string; kind: string; look: TalismanLook; tags: SpellTag[]; removed: SpellTag[]; price: number; have: number | null; casting?: boolean; /** R12: where its talismans come out of at first ({bati}'s compass, the spell book) */ from?: 'compass' | 'book'; /** R13: a song's lyrics with metatags (the sheet under the compact style talismans) */ lyrics?: FloatLyrics };
+export type FloatSpell = { id: string; kind: string; look: TalismanLook; tags: SpellTag[]; removed: SpellTag[]; price: number; have: number | null; casting?: boolean; /** R12: where its talismans come out of at first ({bati}'s compass, the spell book) */ from?: 'compass' | 'book'; /** R13: a song's lyrics with metatags (the sheet under the compact style talismans) */ lyrics?: FloatLyrics; /** R13 fix: called off (「やめて」): it fades away */ leaving?: boolean };
 
 const seedOf = (s: string) => [...s].reduce((x, c) => (x * 31 + c.charCodeAt(0)) >>> 0, 7);
 /** a small steady tilt per tag (the same tag always hangs the same way) */
@@ -177,7 +177,14 @@ export function FloatingSpell({ spell, layout, cx, bottom, bowl, scale, onTap, f
     );
   };
   return (
-    <div className="pointer-events-none absolute inset-0" data-floating-spell={look} data-casting-spell={spell.casting ? '' : undefined} aria-label={`スペル：${spell.tags.map((t) => t.ja).join('・')}`}>
+    <div
+      className="pointer-events-none absolute inset-0"
+      data-floating-spell={look}
+      data-casting-spell={spell.casting ? '' : undefined}
+      data-leaving-spell={spell.leaving ? '' : undefined}
+      aria-label={`スペル：${spell.tags.map((t) => t.ja).join('・')}`}
+      style={spell.leaving ? { opacity: 0, transform: 'translateY(-26px)', filter: 'blur(5px) brightness(1.5)', transition: 'opacity 1s ease-in, transform 1.1s ease-in, filter 1s ease-in' } : undefined}
+    >
       <style>{LOOK_CSS + CSS}</style>
       {/* a faint mist of the look's light behind them all */}
       <span
