@@ -10079,6 +10079,45 @@
         "design/mv-art/out/home2-bg-saturn-close2.jpg"
       ],
       "prompt": "A NEW view in exactly the same soft kawaii pastel anime style and colours as the reference picture. Vertical phone wallpaper 9:16. Looking STRAIGHT DOWN from directly above onto one big glossy black vinyl record lying on soft pastel clouds: the record is a PERFECT CIRCLE seen flat (no perspective), centred, its diameter filling about 96% of the picture width, shining concentric grooves with soft pastel sparkles, a pastel rainbow-swirl label in the exact centre with a tiny spindle. Above and below the record: dreamy pastel clouds and a few stars. The groove area is empty. No tonearm, no characters, no text."
+    },
+    {
+      "id": "home3-bg-jupiter-atelier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter2.jpg"
+      ],
+      "prompt": "A NEW view in exactly the same painterly Japanese anime fantasy film art style and colours as the reference picture. Vertical phone wallpaper 9:16. Inside the cosy atelier hollowed out of the giant tree: curved warm wooden walls with the natural grain of the trunk, a few small round windows with soft green forest light, warm hanging lanterns and fairy lights, a little painter's easel and brushes in a corner at the bottom, moss and tiny flowers on the window sills. The big central wall area is plain smooth warm wood, EMPTY, ready for many framed artworks to be hung. Calm, magical, intimate. No characters, no text, no pictures on the wall."
+    },
+    {
+      "id": "home3-bg-mercury-beach",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/home3-bg-mercury.jpg"
+      ],
+      "prompt": "A NEW view in exactly the same bright summer Japanese anime art style and colours as the reference picture. Vertical phone wallpaper 9:16. On the white sandy beach of your own little island at golden sunset: the cosy white house with a red roof and palm trees in the back, the sparkling sea and the big setting sun on the horizon, warm orange-pink sky with soft clouds. The wide flat sand in the lower half is empty, ready for a row of speakers to stand along the shore. Nostalgic, warm. No people, no speakers, no text."
+    },
+    {
+      "id": "speaker3",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "A single cute retro speaker tower drawn in bright summer Japanese anime style, front view: a rounded cream-and-coral cabinet with soft glossy highlights, two round woofers stacked, and a large perfectly SQUARE flat empty panel on the upper front (plain light grey, nothing printed) where an album cover will be placed, little brass feet. Clean lines, cel shading. Centered, whole speaker in frame. Plain solid pure white background, no shadow, no text."
     }
   ],
   "redo": []
