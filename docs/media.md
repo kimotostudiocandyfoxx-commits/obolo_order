@@ -81,7 +81,7 @@ Cloud Run は1回のリクエストが 32MiB までなので、**8MB ずつに�
 3. **解約してよいか**：`GET /admin/media/r2/ready` が `ready: true`（Bunny にある生きた行が 0、どの列にも Bunny の URL が 0）。
 
 ### 動かし方（リリースの後）
-- 前もって：GitHub Actions の Secrets `R2_ACCESS_KEY_ID`・`R2_SECRET_ACCESS_KEY`、Variables `R2_ACCOUNT_ID`・`R2_BUCKET`・`R2_PUBLIC_BASE`（クライアント設定済み）。Deploy API が鍵を Secret Manager（`obolo-r2-access-key-id`・`obolo-r2-secret-access-key`）に書き、Cloud Run にはそこから渡す。**デプロイ用のサービスアカウント（obolo-deployer）に Secret Manager の権限が要る**（下）。権限がない・鍵がない時は、警告を出して Bunny のまま（デプロイは止まらない）。
+- 前もって：GitHub Actions の Secrets `R2_ACCESS_KEY_ID`・`R2_SECRET_ACCESS_KEY`、Variables `R2_ACCOUNT_ID`・`R2_BUCKET`・`R2_PUBLIC_BASE`（クライアント設定済み）。Deploy API が鍵を Secret Manager（`obolo-r2-access-key-id`・`obolo-r2-secret-access-key`）に書き、Cloud Run にはそこから渡す。**デプロイ用のサービスアカウント（obolo-deployer）に Secret Manager の権限が要る**（下）。鍵がない時は、警告を出して Bunny のまま（デプロイは止まらない）。**権限がまだない間**（依頼主 2026-11-25：Google Cloud のコンソールが今いる場所から開けない）は、GitHub の Secrets の鍵を Cloud Run の環境変数として直接渡す（ログでは伏せ字。見えるのは Cloud Run の設定を見られるプロジェクトの持ち主だけ）。権限ができたら、次のデプロイで自動的に Secret Manager に切りかわる。
 - リリースすると、新しいファイルは R2 へ（API の起動ログ `media storage: new files → R2 (Bunny kept for the files from before)`）。
 - 写す：Actions → **Media to R2** → `move`（30分ずつ。何度でも）。または Variable `R2_MIGRATE=true` で、API が動いている間 30 秒ごとに 1 回分（Cloud Run は `min-instances=0` なので、だれも使っていない時は止まる。急ぐ時は workflow で）。
 - 様子：Actions → **Media to R2** → `status`（`total / migrated / waiting / failed / missing / GB`、失敗の理由 20 件）。失敗したものは `retry` のあと `move`。
