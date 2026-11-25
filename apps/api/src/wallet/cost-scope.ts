@@ -43,6 +43,8 @@ export function featureOfPath(path: string): UsageFeature {
     [/^\/(buddy|moon)\/compass/, 'compass'],
     [/^\/moon\/spell/, 'spell'],
     [/^\/moon\/lyrics/, 'lyrics'],
+    // story 2026-11-25: a picture's title is booked as a song's name is (it comes with the lyrics)
+    [/^\/moon\/art-title/, 'lyrics'],
     [/^\/moon\/novel/, 'novel'],
     [/^\/buddy\/picture/, 'draw'],
     [/^\/buddy\/story/, 'story'],

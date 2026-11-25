@@ -1,7 +1,7 @@
 import { PgDialect } from 'drizzle-orm/pg-core';
 import { describe, expect, it } from 'vitest';
 import { flyingSince, PLANET_HOMES } from '@obolo/shared';
-import { aroundWhere, farWhere, ownWhere, personWhere, PlanetHomeService, storeOf } from './planet-home.service';
+import { aroundWhere, farWhere, ownWhere, personWhere, PlanetHomeService, storeOf, toWork } from './planet-home.service';
 
 const render = (q: Parameters<PgDialect['sqlToQuery']>[0]) => new PgDialect().sqlToQuery(q);
 const now = new Date('2026-11-23T12:00:00Z');
@@ -122,5 +122,20 @@ describe('PlanetHomeService', () => {
     expect(ok).toEqual([{ id: 'x', name: 'X', pic: null, dachi: false }]);
     await expect(svc([{ rows: [{ id: 'd' }] }]).unpush('me', 'd')).rejects.toThrow();
     await expect(svc([[{ onboarding: {} }], [{ onboarding: {} }], { rows: [{ id: 'd' }] }, [], [], { rows: [] }]).push('me', 'd', now)).resolves.toEqual([]);
+  });
+});
+
+describe('Jupiter (03): the art title and the wing cut in the feed', () => {
+  it("a Jupiter post's title is its own (none: '')", () => {
+    const q = render(storeOf('jupiter')!.title);
+    expect(q.sql).toBe(`COALESCE("jupiter_posts"."title", '')`);
+  });
+  it("author.wings: the maker's measured cut, only with their figure; none when unmeasured or not Jupiter", () => {
+    const base = { id: 'w', userId: 'u', flownAt: now, text: '夜の森', title: '月と海', url: 'u', thumb: null, seconds: null, name: 'U', pic: null };
+    expect(toWork({ ...base, figure: 'https://x/j.png', wings: '21,74' }, 'jupiter_post', 'dachi').author.wings).toEqual({ l: 21, r: 74 });
+    expect(toWork({ ...base, figure: 'https://x/j.png', wings: 'none' }, 'jupiter_post', 'dachi').author.wings).toBeNull();
+    expect(toWork({ ...base, figure: null, wings: '21,74' }, 'jupiter_post', 'dachi').author.wings).toBeNull();
+    expect('wings' in toWork({ ...base, figure: 'https://x/s.png' }, 'saturn_post', 'dachi').author).toBe(false);
+    expect(toWork(base, 'jupiter_post', 'own').title).toBe('月と海');
   });
 });

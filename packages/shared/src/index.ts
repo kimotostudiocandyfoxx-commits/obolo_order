@@ -52,4 +52,5 @@ export * from './access';
 export * from './storage';
 export * from './storageVariants';
 export * from './planetFigures';
+export * from './artTitle';
 export * from './planetWorks';

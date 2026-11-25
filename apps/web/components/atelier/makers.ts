@@ -1,4 +1,4 @@
-import { STORAGE_LINES, type GameTemplateId, type GameTier, CRAFT_LINES, KIND_HOME_PLANET, spellFrom, KORORIN_VOICE_STYLE, neoVoiceUrl, withTarget, lyricsLines, lyricsSections, type JobView, type MakeConfirm, type Me, type RefineTarget, type VideoParams, type WorkVersion, VIDEO_LINES, videoParams } from '@obolo/shared';
+import { STORAGE_LINES, artTitleFallback, type SpellTag, type GameTemplateId, type GameTier, CRAFT_LINES, KIND_HOME_PLANET, spellFrom, KORORIN_VOICE_STYLE, neoVoiceUrl, withTarget, lyricsLines, lyricsSections, type JobView, type MakeConfirm, type Me, type RefineTarget, type VideoParams, type WorkVersion, VIDEO_LINES, videoParams } from '@obolo/shared';
 import { demoStickerArt } from '@/lib/look';
 import { ApiError, getApi } from '@/lib/api';
 import type { AtelierKind } from '@/lib/atelier/unlock';
@@ -121,12 +121,14 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
         return { ...base, prompt: words, status: 'making', ref: { style }, started: { job, what: 'art', words: `${words}${style ?? ''}` } };
       }
       const r = await api.stickerArt(words, style, paid);
-      const w: Work = { ...base, prompt: words, image: r.url, ref: { style } };
+      // story 2026-11-25: {bati}'s one title from the spell (a redo keeps the title it has)
+      const title = prev?.kind === 'art' && prev.title ? prev.title : await artTitleFor(spell, words);
+      const w: Work = { ...base, prompt: words, image: r.url, title, ref: { style } };
       // into Bluena's Jupiter folder (the roots): a root is a photo, so the picture goes up once as one
       try {
         const blob = await fetch(r.url).then((x) => (x.ok ? x.blob() : Promise.reject(new Error(String(x.status)))));
         const ph = await api.uploadPhoto(blob);
-        const root = await api.addJupiterRoot({ mediaId: ph.id, ...(spell ? { spell } : {}) });
+        const root = await api.addJupiterRoot({ mediaId: ph.id, ...(spell ? { spell } : {}), title });
         return done({ ...w, ref: { ...w.ref, rootId: root.id, mediaId: ph.id } });
       } catch {
         return { ...w, note: 'ブルーナに、うまくしまえなかった' };
@@ -234,6 +236,14 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
   }
 }
 
+/** story 2026-11-25: {bati}'s one title for a picture (POST /moon/art-title; offline or failing: by the shared rule) */
+export async function artTitleFor(spell: SpellTag[] | undefined, words: string): Promise<string> {
+  const r = await getApi()
+    .artTitle({ tags: spell ?? [], said: words.slice(0, 300) })
+    .catch(() => null);
+  return r?.title || artTitleFallback(spell ?? [], words);
+}
+
 /** M-R253 §4: a watched job is done — the card it was waiting for, finished (the job host calls this, wherever you are) */
 export async function finishJob(w: Watched, job: JobView, live = getApi().mode === 'live'): Promise<Work> {
   const c = w.card;
@@ -261,11 +271,12 @@ export async function finishJob(w: Watched, job: JobView, live = getApi().mode =
   } else if (w.what === 'art') {
     // the review's stand-in picture, put into Bluena's Jupiter folder as the real one is
     const image = demoStickerArt(w.words);
-    made = { ...base, image };
+    const title = c.title || (await artTitleFor(c.spell, w.words));
+    made = { ...base, image, title };
     try {
       const api = getApi();
       const ph = await api.uploadPhoto(await fetch(image).then((x) => x.blob()));
-      const root = await api.addJupiterRoot({ mediaId: ph.id });
+      const root = await api.addJupiterRoot({ mediaId: ph.id, title });
       made = { ...made, ref: { ...made.ref, rootId: root.id, mediaId: ph.id } };
     } catch {
       /* the card only */

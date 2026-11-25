@@ -169,7 +169,10 @@ export function artTitleStyle(title: string, tags?: WorkTags | null): TitleStyle
   return ANY[h % ANY.length];
 }
 
-/** the art's title: its own (none on a Jupiter post yet: the first line of its words). Never 「〜のアート」 or a by (M-R310) */
+/**
+ * the art's title: its own (story 2026-11-25: {bati} proposes one when the art is painted, the member may change it; the
+ * feed's work.title), else — a work with none — the first line of its words. Never 「〜のアート」 or a by (M-R310)
+ */
 export function artTitleOf(w: { title?: string; text?: string }): string {
   const t = (w.title || '').trim();
   if (t) return t;

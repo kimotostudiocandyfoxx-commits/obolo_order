@@ -21,6 +21,7 @@ import { findAll, PLANET_NAME, workMarkRef, type Found } from '@/lib/finds/works
 import { choiceOf, detectOpen, pickOpen, type OpenAsk } from '@/lib/bluena/find';
 import { EDIT_EVENT, openInBluena, takeEdit } from '@/lib/bluena/edit';
 import { isStorageAsk, isStorageCancel, storageTierOf, STORAGE_LINES, type StorageTierPrice, type StorageView } from '@obolo/shared';
+import { ART_TITLE_LINES, artTitleTalk, type ArtTitleTalk } from '@obolo/shared';
 import { BATI_REST_HINT, type BatiRest, BLUENA_LINES, formatMana, LOOK_LOCKED_LINE, gameTierFor, gameMakeKind, matchGameTemplate, type GameTemplateId, type GameTier } from '@obolo/shared';
 import { daysUntil, isOpen, KINDS, lockLine, openKinds, openLessons, type AtelierKind, type Lesson } from '@/lib/atelier/unlock';
 import { historyOf, recentRequest } from './carry';
@@ -709,6 +710,33 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  /**
+   * story 2026-11-25: a picture's title in words, as a song's is — 「タイトルは〇〇にして」 sets it, 「ほかのタイトルにして」
+   * asks {bati} for another (the small writer, POST /moon/art-title); kept on its Jupiter root (and the posts flown from it)
+   */
+  const artTitleSend = (text: string): boolean => {
+    const t = artTitleTalk(text);
+    if (!t) return false;
+    const art = [...msgsRef.current].reverse().find((m): m is Extract<Msg, { who: 'work' }> => m.who === 'work' && m.work.kind === 'art' && m.work.status === 'ready')?.work;
+    if (!art) return false;
+    void retitle(art, t);
+    return true;
+  };
+  const retitle = async (w: Work, t: NonNullable<ArtTitleTalk>) => {
+    const card = cardOf(w.id) ?? w;
+    setBusy(true);
+    try {
+      const title = 'to' in t ? t.to : (await getApi().artTitle({ tags: card.spell ?? [], said: (card.prompt ?? '').slice(0, 300), before: card.title })).title;
+      if (card.ref?.rootId) await getApi().setJupiterRootTitle(card.ref.rootId, title);
+      put({ ...card, title });
+      sayT('to' in t ? ART_TITLE_LINES.changed : ART_TITLE_LINES.again, { title });
+    } catch (e) {
+      sayT(e instanceof ApiError && e.code === 'MODERATION' ? ART_TITLE_LINES.flagged : ART_TITLE_LINES.failed);
+    } finally {
+      setBusy(false);
+    }
+  };
+
   /** what is said once a card is made */
   const afterMade = (w: Work, prompt: string) => {
     if (story) {
@@ -730,6 +758,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       setMsgs((m) => [...m, { id: uid(), who: 'bati', text: tline(SONG_LINES.editAsk) + (inv ? tline(VOICE_SPELL_LINES.invite) : '') }]);
       setPending({ tweak: w });
     } else if (DONE[w.kind]) say(DONE[w.kind]);
+    // story 2026-11-25: a picture made — {bati}'s one title for it (kept already; words change it, no buttons)
+    if (!story && w.kind === 'art' && w.status === 'ready' && w.title) sayT(ART_TITLE_LINES.propose, { title: w.title });
     if (w.status === 'ready' && !story) void tipCheck();
     // R18: the room after it (80%: said once)
     if (w.status === 'ready' && !story) void storageNotice();
@@ -1653,6 +1683,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     // R16: 「ブルーナの〇〇流して」 said plainly as one of your works goes before a change of the work on the table
     if (!story && detectOpen(text)?.strong && openAsk(text)) return;
     if (p && 'after' in p && !story && craftAfter(p.after, text)) return;
+    // story 2026-11-25: words about the last picture's title (「タイトルは〇〇にして」「ほかのタイトルにして」)
+    if (!story && artTitleSend(text)) return;
     // R13: words about a finished song — a free change, one back, or (the studio's work) the spell
     if (!story && tweakSend(text, p && 'tweak' in p ? p.tweak : null)) return;
     // in a story step every message makes the day's kind again (a new card), unless it is a change of the last one

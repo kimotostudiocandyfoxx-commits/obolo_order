@@ -1,5 +1,7 @@
 import {
   SPELL_BOOK_MAX,
+  artTitleFallback,
+  cleanArtTitle,
   spellBookName,
   spellComplete,
   spellKey as spellKeyOf,
@@ -263,7 +265,7 @@ interface DemoState {
   deliveries?: DeliveryView[];
   /** Jupiter (パタパタ): roots, posts, branch names — this browser only */
   jroots?: (JupiterRootView & { owner: string })[];
-  jposts?: (Omit<JupiterPostView, 'author' | 'starredByMe' | 'replyCount' | 'repliers'> & { owner: string; starredBy: string[] })[];
+  jposts?: (Omit<JupiterPostView, 'author' | 'starredByMe' | 'replyCount' | 'repliers'> & { owner: string; starredBy: string[]; rootId?: string })[];
   jreplies?: { id: string; postId: string; owner: string; text: string; createdAt: string }[];
   jbranches?: Record<string, string[]>;
   /** Mercury / Mars posts (this browser only) */
@@ -1216,6 +1218,12 @@ export class DemoApi implements Api {
   }
   // R13: the review demo's lyrics — canned ones by the shared rules (the API's writer is a model); a change by rule, or the
   // demo's stand-in for new words (「サビをもっと明るく」「2番を足して」)
+  // story 2026-11-25: the review demo's art title — by the shared rule (the API's writer is a model)
+  async artTitle(body: Parameters<Api['artTitle']>[0]) {
+    await sleep(400);
+    const t = artTitleFallback(body.tags ?? [], body.said ?? '');
+    return { title: t === body.before ? `${t}のつづき`.slice(0, 24) : t, how: 'rule' as const };
+  }
   async moonLyrics(body: Parameters<Api['moonLyrics']>[0]): Promise<LyricsView> {
     await sleep(body.lyrics ? 700 : 1200);
     const own = ownLyricsOf(body.said);
@@ -2211,8 +2219,19 @@ export class DemoApi implements Api {
 
   async addJupiterRoot(body: Parameters<Api['addJupiterRoot']>[0]) {
     const viewer = this.uid();
-    const r = { id: uid(), kind: 'photo' as const, url: `idb:${body.mediaId}`, posterUrl: null, createdAt: now(), owner: viewer };
+    const r = { id: uid(), kind: 'photo' as const, url: `idb:${body.mediaId}`, posterUrl: null, title: cleanArtTitle(body.title) || null, createdAt: now(), owner: viewer };
     this.s.jroots = [r, ...(this.s.jroots ?? [])];
+    this.save();
+    const { owner: _o, ...view } = r;
+    return view;
+  }
+
+  async setJupiterRootTitle(id: string, title: string) {
+    const viewer = this.uid();
+    const r = (this.s.jroots ?? []).find((x) => x.id === id && x.owner === viewer);
+    if (!r) throw new ApiError(404, 'NOT_FOUND', 'not found');
+    r.title = cleanArtTitle(title) || null;
+    for (const p of this.s.jposts ?? []) if (p.rootId === id && p.owner === viewer) p.title = r.title;
     this.save();
     const { owner: _o, ...view } = r;
     return view;
@@ -2234,6 +2253,8 @@ export class DemoApi implements Api {
       kind: root.kind,
       url: root.url,
       posterUrl: root.posterUrl,
+      rootId: root.id,
+      title: root.title ?? null,
       text: body.text ?? '',
       filter: body.filter ?? 'none',
       branch: body.branch,

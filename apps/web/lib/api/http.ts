@@ -164,6 +164,9 @@ export class HttpApi implements Api {
   moonLyrics(body: Parameters<Api['moonLyrics']>[0]) {
     return this.req<Awaited<ReturnType<Api['moonLyrics']>>>('POST', '/moon/lyrics', body);
   }
+  artTitle(body: Parameters<Api['artTitle']>[0]) {
+    return this.req<Awaited<ReturnType<Api['artTitle']>>>('POST', '/moon/art-title', body);
+  }
   songTweak(id: string, body: Parameters<Api['songTweak']>[1]) {
     return this.req<Awaited<ReturnType<Api['songTweak']>>>('POST', `/compose/songs/${id}/tweak`, body);
   }
@@ -471,6 +474,9 @@ export class HttpApi implements Api {
   }
   addJupiterRoot(body: Parameters<Api['addJupiterRoot']>[0]) {
     return this.req<Awaited<ReturnType<Api['addJupiterRoot']>>>('POST', '/jupiter/roots', body);
+  }
+  setJupiterRootTitle(id: string, title: string) {
+    return this.req<Awaited<ReturnType<Api['setJupiterRootTitle']>>>('PATCH', `/jupiter/roots/${id}`, { title });
   }
   async removeJupiterRoot(id: string) {
     await this.req<void>('DELETE', `/jupiter/roots/${id}`);

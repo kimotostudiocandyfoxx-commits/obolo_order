@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, HttpCode, Inject, Param, ParseUUIDPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
-import { CreateJupiterPostBody, JupiterBranchBody, JupiterReplyBody, JupiterRootBody } from '@obolo/shared';
+import { Body, Controller, Delete, Get, HttpCode, Inject, Param, ParseUUIDPipe, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { CreateJupiterPostBody, JupiterBranchBody, JupiterReplyBody, JupiterRootBody, JupiterRootTitleBody } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
@@ -30,6 +30,13 @@ export class JupiterController {
   async addRoot(@UserId() userId: string, @Body() body: unknown) {
     await rateLimit(this.kv, `jupiter-root:${userId}`, 60, 600);
     return this.jupiter.addRoot(userId, parseBody(JupiterRootBody, body));
+  }
+
+  /** story 2026-11-25: the art's title changed by words in the Moon atelier */
+  @Patch('roots/:id')
+  async setRootTitle(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string, @Body() body: unknown) {
+    await rateLimit(this.kv, `jupiter-root-title:${userId}`, 30, 600);
+    return this.jupiter.setRootTitle(userId, id, parseBody(JupiterRootTitleBody, body).title);
   }
 
   @Delete('roots/:id')

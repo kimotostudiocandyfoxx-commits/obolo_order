@@ -105,7 +105,7 @@ export class FindsService {
           .where(and(eq(jupiterRoots.userId, userId), eq(jupiterRoots.kind, 'photo'), isNull(jupiterRoots.deletedAt)))
           .orderBy(desc(jupiterRoots.createdAt))
           .limit(LIMIT)
-          .then((rows) => rows.map((r) => this.w('jupiter_root', r.id, 'jupiter', '', r.createdAt, { image: r.url }))),
+          .then((rows) => rows.map((r) => this.w('jupiter_root', r.id, 'jupiter', r.title ?? '', r.createdAt, { image: r.url }))),
       );
     if (want('mercury'))
       jobs.push(

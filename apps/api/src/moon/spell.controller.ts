@@ -1,5 +1,5 @@
 import { Body, Controller, HttpCode, Inject, Post, UseGuards } from '@nestjs/common';
-import { IncantBody, LyricsBody, SpellBody } from '@obolo/shared';
+import { ArtTitleBody, IncantBody, LyricsBody, SpellBody } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
@@ -8,6 +8,7 @@ import { KV } from '../infra/tokens';
 import { SpellService } from './spell.service';
 import { LyricsService } from './lyrics.service';
 import { IncantService } from './incant.service';
+import { ArtTitleService } from './art-title.service';
 
 /** R11: the スペル (spell) {bati} lays out before a paid making — free (no mana); 30 a minute per member */
 @Controller('moon')
@@ -17,6 +18,7 @@ export class SpellController {
     private readonly spells: SpellService,
     private readonly lyricsWriter: LyricsService,
     private readonly incants: IncantService,
+    private readonly artTitles: ArtTitleService,
     @Inject(KV) private readonly kv: KvStore,
   ) {}
 
@@ -33,6 +35,14 @@ export class SpellController {
   async lyrics(@UserId() userId: string, @Body() body: unknown) {
     await rateLimit(this.kv, `moon-lyrics:${userId}`, 20, 60);
     return this.lyricsWriter.lyrics(parseBody(LyricsBody, body));
+  }
+
+  /** story 2026-11-25: {bati}'s one title for a picture's spell (as a song's name comes with its lyrics) — free; 20 a minute */
+  @Post('art-title')
+  @HttpCode(200)
+  async artTitle(@UserId() userId: string, @Body() body: unknown) {
+    await rateLimit(this.kv, `moon-art-title:${userId}`, 20, 60);
+    return this.artTitles.title(parseBody(ArtTitleBody, body));
   }
 
   /** R17: words to {bati} checked for the secret spell's passphrase (server only); anything else: { premium: false } */

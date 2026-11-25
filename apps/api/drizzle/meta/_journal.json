@@ -428,6 +428,13 @@
       "when": 1795620154406,
       "tag": "0060_saturn_plaza_pictures",
       "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1795621261475,
+      "tag": "0061_art_titles",
+      "breakpoints": true
     }
   ]
 }

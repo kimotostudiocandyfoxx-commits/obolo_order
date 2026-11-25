@@ -1,6 +1,7 @@
 import type { LinkPreview } from '@obolo/shared';
 import type { ContinentLandingView, ContinentSkyView, ContinentView, FavouriteSlots, PlanetPersonView, PlanetSongView } from '@obolo/shared';
 import type { IncantBody, IncantView } from '@obolo/shared';
+import type { ArtTitleBody, ArtTitleView } from '@obolo/shared';
 import type { LyricsBody, LyricsView, SongLyrics, SongTweakBody, SongTweakResult, SongVoiceBody, SongVoiceQuoteView, SongVoiceUseView, SongVoiceVersion } from '@obolo/shared';
 import type { BookView, CompassSpell, GameBrokenBody, GameBuildBody, GameView, MoonCompassBody, NovelChapterBody, SaveSpellBody, SaveSpellResult, SavedSpell } from '@obolo/shared';
 import type { ClipFile, ClipStartBody, ClipUploadStart, ChangeResult, HomeOshi, HomePlanet, PlanetHomeView, AddVersionBody, CreateMoonWorkBody, DemoJobBody, MakeConfirm, MakeKind, SpellBody, SpellKind, SpellTag, SpellView, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiHistoryPage, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView, MvEditBody, MvPicturesBody, MvRedrawBody } from '@obolo/shared';
@@ -164,6 +165,8 @@ export interface Api {
   incant(body: IncantBody): Promise<IncantView>;
   /** R13: a song's スペル入りの歌詞 (lyrics with metatag talismans) for its style spell, or changed by the words */
   moonLyrics(body: LyricsBody): Promise<LyricsView>;
+  /** story 2026-11-25: {bati}'s one title for a picture's spell (`before`: the title now, for another one) */
+  artTitle(body: Partial<ArtTitleBody>): Promise<ArtTitleView>;
   /** R13: a finished song changed for free (tempo, key, 2番カット …), or one back; `demo`: the review demo's card state */
   songTweak(id: string, body: SongTweakBody, demo?: { lyrics?: SongLyrics; seconds?: number }): Promise<SongTweakResult>;
   /** R18 (君の声にする魔法): the mana {bati} says for a finished song sung in your own voice (or why not) */
@@ -316,7 +319,10 @@ export interface Api {
   jupiterRoots(): Promise<JupiterRootView[]>;
   /** after POST /media/photo (Jupiter is photos only; videos go to Mars's 裏スタジオ) */
   /** planets 2-1: `spell` = the spell an atelier picture was painted with (its hidden tags fly with the post) */
-  addJupiterRoot(body: { mediaId: string; spell?: SpellTag[] }): Promise<JupiterRootView>;
+  /** story 2026-11-25: `title` = the art's title ({bati}'s proposal from the spell) */
+  addJupiterRoot(body: { mediaId: string; spell?: SpellTag[]; title?: string }): Promise<JupiterRootView>;
+  /** story 2026-11-25: the art's title changed by words (its flown posts too) */
+  setJupiterRootTitle(id: string, title: string): Promise<JupiterRootView>;
   removeJupiterRoot(id: string): Promise<void>;
   createJupiterPost(body: CreateJupiterPostBody): Promise<JupiterPostView>;
   starJupiterPost(id: string, on: boolean): Promise<{ starCount: number; starredByMe: boolean }>;

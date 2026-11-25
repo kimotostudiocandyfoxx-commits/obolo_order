@@ -42,6 +42,7 @@ import { SpellController } from './moon/spell.controller';
 import { SpellService } from './moon/spell.service';
 import { IncantService } from './moon/incant.service';
 import { LyricsService } from './moon/lyrics.service';
+import { ArtTitleService } from './moon/art-title.service';
 import { SpellToolsController } from './moon/spell-tools.controller';
 import { SpellBookService } from './moon/spell-book.service';
 import { MoonCompassService } from './moon/moon-compass.service';
@@ -218,6 +219,7 @@ import { StorageWorksService } from './storage/storage-works.service';
     SpellService,
     IncantService,
     LyricsService,
+    ArtTitleService,
     SpellBookService,
     MoonCompassService,
     NovelService,

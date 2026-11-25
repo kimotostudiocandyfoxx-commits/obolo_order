@@ -7,6 +7,7 @@ import { BATI_PERSONALITY_IDS } from './batiPersona';
 import { BATI_ROLES } from './batiMemory';
 import { MakeConfirm } from './makeConfirm';
 import { SpellTags } from './spell';
+import { ART_TITLE_MAX } from './artTitle';
 import { SongLyrics } from './lyrics';
 
 export const RequestCodeBody = z.object({
@@ -537,8 +538,14 @@ export const JupiterRootBody = z.object({
   mediaId: z.string().uuid(),
   /** planets 2-1: the spell a picture painted in the Moon atelier was made with (its style / colour / mood tags go with the post) */
   spell: SpellTags.optional(),
+  /** story 2026-11-25: the art's title ({bati}'s proposal from the spell, or the member's own) */
+  title: z.string().trim().max(ART_TITLE_MAX).optional(),
 });
 export type JupiterRootBody = z.infer<typeof JupiterRootBody>;
+
+/** story 2026-11-25: PATCH /jupiter/roots/:id — the art's title changed by words in the Moon atelier (its flown posts too) */
+export const JupiterRootTitleBody = z.object({ title: z.string().trim().min(1).max(ART_TITLE_MAX) });
+export type JupiterRootTitleBody = z.infer<typeof JupiterRootTitleBody>;
 
 export const JUPITER_FILTERS = ['none', 'warm', 'sepia', 'mono', 'soft'] as const;
 

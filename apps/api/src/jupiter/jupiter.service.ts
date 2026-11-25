@@ -3,6 +3,7 @@ import { LlmProvider, moderateText } from '@obolo/ai';
 import {
   JUPITER_DEFAULT_BRANCHES,
   artTags,
+  cleanArtTitle,
   flyingSince as sharedFlyingSince,
   splitFlying,
   type CreateJupiterPostBody,
@@ -53,7 +54,7 @@ export class JupiterService {
       .where(and(eq(jupiterRoots.userId, userId), isNull(jupiterRoots.deletedAt)))
       .orderBy(desc(jupiterRoots.createdAt))
       .limit(300);
-    return rows.map((r) => ({ id: r.id, kind: r.kind as 'photo' | 'video', url: r.url, posterUrl: r.posterUrl, createdAt: r.createdAt.toISOString() }));
+    return rows.map((r) => ({ id: r.id, kind: r.kind as 'photo' | 'video', url: r.url, posterUrl: r.posterUrl, title: r.title ?? null, createdAt: r.createdAt.toISOString() }));
   }
 
   /** A photo upload (POST /media/photo) goes into your roots. Videos live in Mars's 裏スタジオ. */
@@ -64,8 +65,36 @@ export class JupiterService {
       .where(and(eq(mediaObjects.id, body.mediaId), eq(mediaObjects.userId, userId), isNull(mediaObjects.deletedAt)));
     if (m?.kind === 'video') throw apiError(HttpStatus.BAD_REQUEST, 'VIDEO_GOES_TO_MARS', 'Videos are kept in the Mars backstage studio');
     if (!m || m.kind !== 'photo') throw apiError(HttpStatus.BAD_REQUEST, 'MEDIA_NOT_FOUND', 'Upload the photo first');
-    const [r] = await this.db.write.insert(jupiterRoots).values({ userId, mediaId: m.id, kind: 'photo', url: m.url, spellJson: body.spell ?? null }).returning();
-    return { id: r.id, kind: 'photo', url: r.url, posterUrl: null, createdAt: r.createdAt.toISOString() };
+    const title = await this.checkedTitle(body.title);
+    const [r] = await this.db.write.insert(jupiterRoots).values({ userId, mediaId: m.id, kind: 'photo', url: m.url, spellJson: body.spell ?? null, title }).returning();
+    return { id: r.id, kind: 'photo', url: r.url, posterUrl: null, title: r.title ?? null, createdAt: r.createdAt.toISOString() };
+  }
+
+  /** a title as kept (cleaned; null = none); one that breaks the rules is refused */
+  private async checkedTitle(t: string | null | undefined): Promise<string | null> {
+    const title = cleanArtTitle(t) || null;
+    if (title && (await moderateText(title, this.llm)).flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'MODERATION', 'This title breaks the community rules');
+    return title;
+  }
+
+  /**
+   * story 2026-11-25: the art's title changed by words in the Moon atelier — on the root and on every post flown from it
+   * (the title follows the art wherever it hangs)
+   */
+  async setRootTitle(userId: string, rootId: string, raw: string): Promise<JupiterRootView> {
+    const title = await this.checkedTitle(raw);
+    if (!title) throw apiError(HttpStatus.BAD_REQUEST, 'VALIDATION', 'A title is needed');
+    const [r] = await this.db.write
+      .update(jupiterRoots)
+      .set({ title, updatedAt: new Date() })
+      .where(and(eq(jupiterRoots.id, rootId), eq(jupiterRoots.userId, userId), isNull(jupiterRoots.deletedAt)))
+      .returning();
+    if (!r) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Not found');
+    await this.db.write
+      .update(jupiterPosts)
+      .set({ title, updatedAt: new Date() })
+      .where(and(eq(jupiterPosts.rootId, rootId), eq(jupiterPosts.userId, userId)));
+    return { id: r.id, kind: r.kind as 'photo' | 'video', url: r.url, posterUrl: r.posterUrl, title: r.title ?? null, createdAt: r.createdAt.toISOString() };
   }
 
   async removeRoot(userId: string, rootId: string): Promise<void> {
@@ -91,7 +120,7 @@ export class JupiterService {
     }
     const [p] = await this.db.write
       .insert(jupiterPosts)
-      .values({ userId, rootId: root.id, kind: root.kind, url: root.url, posterUrl: root.posterUrl, text: body.text, filter: body.filter, branch: body.branch })
+      .values({ userId, rootId: root.id, kind: root.kind, url: root.url, posterUrl: root.posterUrl, text: body.text, title: root.title ?? null, filter: body.filter, branch: body.branch })
       .returning();
     // planets 2-1: the hidden tags, from the spell the picture was painted with (a photo: none yet)
     await this.works?.tag('jupiter_post', p.id, { userId, planet: 'jupiter', tags: artTags(root.spellJson), words: p.text });
@@ -292,6 +321,7 @@ export class JupiterService {
       url: p.url,
       posterUrl: p.posterUrl,
       text: p.text,
+      title: p.title ?? null,
       filter: p.filter,
       branch: p.branch,
       starCount: p.starCount,

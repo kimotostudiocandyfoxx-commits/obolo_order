@@ -464,6 +464,8 @@ export const jupiterRoots = pgTable(
     posterUrl: text('poster_url'),
     /** planets 2-1: the spell the picture was painted with (its tags go with the post when it flies; null = a photo) */
     spellJson: jsonb('spell_json').$type<SpellTag[]>(),
+    /** story 2026-11-25: the art's title ({bati} proposes one from the spell; the member may change it by words; null = none) */
+    title: text('title'),
     ...timestamps,
   },
   (t) => [index('jupiter_roots_user_idx').on(t.userId, t.createdAt)],
@@ -482,6 +484,8 @@ export const jupiterPosts = pgTable(
     url: text('url').notNull(),
     posterUrl: text('poster_url'),
     text: text('text').notNull().default(''),
+    /** story 2026-11-25: the art's title, from its root (null = none: the home shows the first line of the words) */
+    title: text('title'),
     filter: text('filter').notNull().default('none'),
     branch: integer('branch').notNull().default(0),
     starCount: integer('star_count').notNull().default(0),

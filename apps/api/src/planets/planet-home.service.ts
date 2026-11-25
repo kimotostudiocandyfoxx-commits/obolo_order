@@ -76,7 +76,7 @@ export function storeOf(planet: HomePlanet): Store | null {
         userId: sql`${jupiterPosts.userId}`,
         flownAt: sql`${jupiterPosts.createdAt}`,
         text: sql`${jupiterPosts.text}`,
-        title: sql`''`,
+        title: sql`COALESCE(${jupiterPosts.title}, '')`,
         url: sql`${jupiterPosts.url}`,
         thumb: sql`${jupiterPosts.posterUrl}`,
         seconds: sql`NULL::real`,

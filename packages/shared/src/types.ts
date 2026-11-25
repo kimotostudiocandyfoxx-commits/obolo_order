@@ -573,6 +573,8 @@ export interface JupiterRootView {
   kind: 'photo' | 'video';
   url: string;
   posterUrl: string | null;
+  /** story 2026-11-25: the art's title (null: none) */
+  title?: string | null;
   createdAt: string;
 }
 
@@ -583,6 +585,8 @@ export interface JupiterPostView {
   url: string;
   posterUrl: string | null;
   text: string;
+  /** story 2026-11-25: the art's title, from its root (null: none) */
+  title?: string | null;
   filter: string;
   /** branch slot 0–3 on the owner's tree */
   branch: number;
