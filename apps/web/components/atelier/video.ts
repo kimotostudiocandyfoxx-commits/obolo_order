@@ -15,7 +15,6 @@ import {
   type VideoParams,
   type VideoSong,
 } from '@obolo/shared';
-import { getApi } from '@/lib/api';
 import type { CraftAsk } from './craft';
 import type { Work } from './work';
 
@@ -48,7 +47,8 @@ let chosen: VideoSong | null = null;
 /** the member's songs (newest first): the saved songs, or on the review page its own and the demo ones */
 export async function videoSongs(fresh = false): Promise<VideoSong[]> {
   if (songs && !fresh) return songs;
-  const api = getApi();
+  // loaded when used (the chat's small rules stay free of the API client)
+  const api = (await import('@/lib/api')).getApi();
   if (api.mode === 'live') {
     const saved = await api.savedSongs().catch(() => []);
     songs = saved.map((s) => ({ id: s.id, title: s.title || '曲' }));

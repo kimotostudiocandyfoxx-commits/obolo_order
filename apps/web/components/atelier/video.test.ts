@@ -52,6 +52,6 @@ describe('R13: 映像 in the Moon chat (pictures that move)', () => {
   it('what Bati says once it is made, and once it is changed', () => {
     const w: Work = { id: 'w', kind: 'video', prompt: '', status: 'ready' };
     expect(craftDoneLines(w)).toEqual([{ text: VIDEO_LINES.done }]);
-    expect(craftDoneLines({ ...w, versions: [{ at: '' }, { at: '' }] })).toEqual([{ text: VIDEO_LINES.edited }]);
+    expect(craftDoneLines({ ...w, versions: [{ prompt: '', at: '' }, { prompt: '', at: '' }] })).toEqual([{ text: VIDEO_LINES.edited }]);
   });
 });

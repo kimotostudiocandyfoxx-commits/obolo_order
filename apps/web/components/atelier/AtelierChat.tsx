@@ -766,7 +766,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     const it = detect(text, true, markNames());
     if (it.kind === 'find' || (it.kind === 'make' && it.what !== w.kind && it.what !== 'lookup')) return false;
     if (w.kind === 'video' && it.kind === 'make' && it.what === 'video' && wantsNew(text)) {
-      void videoStart('');
+      void videoStart(it.content);
       return true;
     }
     if (w.kind === 'video') return videoAfter(w, text);
