@@ -20,7 +20,8 @@ export interface BatiLineVoice {
 
 /** the line in this {bati}'s manner, before fill() (no voice → the line as written) */
 export function batiLine(text: string, v?: BatiLineVoice): string {
-  if (!v) return text;
+  // no {bati} yet (or none known): its 一人称 is 元気な子's own
+  if (!v) return text.replaceAll('{self}', 'ボク');
   // M-R225: a retired style is said as the nearest current one
   const p = normalizeBatiPersonality(v.personality);
   let said: string;

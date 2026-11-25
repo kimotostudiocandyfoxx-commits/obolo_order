@@ -139,7 +139,7 @@ describe('the planet sound player', () => {
     expect(s.clubBeat()).toBeNull();
     ctx.currentTime = 0.06;
     expect(s.clubBeat()).toBe(0);
-    ctx.currentTime = 0.05 + 60 / 124 + 0.001;
+    ctx.currentTime = 0.05 + 60 / 120 + 0.001; // the slowest club (120 BPM): one beat on whichever style was picked
     expect(s.clubBeat()).toBeGreaterThanOrEqual(1);
     sc.stop();
     expect(s.clubBeat()).toBeNull();

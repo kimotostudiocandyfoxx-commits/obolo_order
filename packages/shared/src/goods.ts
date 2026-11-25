@@ -100,7 +100,7 @@ export const GOODS_LINES = {
  * neither: the case keeps its neon face. {mana} = the art's price, {title} = the art's name.
  */
 export const GAME_COVER_LINES = {
-  offer: 'ケースの絵は、どうする？　自分のアートからえらんでもいいし、ボクが{mana}マナで描いてもいいよ。いらなければ、ネオンの顔のままにするね。',
+  offer: 'ケースの絵は、どうする？　自分のアートからえらんでもいいし、{self}が{mana}マナで描いてもいいよ。いらなければ、ネオンの顔のままにするね。',
   /** one of the member's arts on the case */
   picked: 'ケースに「{title}」をのせたよ！',
   /** {bati} paints one: the art's spell comes next */
