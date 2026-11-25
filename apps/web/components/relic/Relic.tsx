@@ -1,6 +1,7 @@
 'use client';
 
-import { Children, createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { Children, createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
+import { createPortal } from 'react-dom';
 import { clusterPerRow, clusterSpots, floatParams, relicSeed } from '@/lib/relic/layout';
 
 /**
@@ -211,13 +212,14 @@ const OpenCtx = createContext<((v: View) => void) | null>(null);
 export const useRelicOpen = () => useContext(OpenCtx) ?? (() => undefined);
 
 /** TalkScene's host of the view (absolute: it fills the talk) */
-export function RelicHost({ children }: { children: ReactNode }) {
+export function RelicHost({ children, target }: { children: ReactNode; /** the box the view fills (else the host's positioned parent) */ target?: RefObject<HTMLElement | null> }) {
   const [view, setView] = useState<View | null>(null);
   const open = useCallback((v: View) => setView(v), []);
+  const node = view && <RelicView view={view} onClose={() => setView(null)} />;
   return (
     <OpenCtx.Provider value={open}>
       {children}
-      {view && <RelicView view={view} onClose={() => setView(null)} />}
+      {node && (target?.current ? createPortal(node, target.current) : node)}
     </OpenCtx.Provider>
   );
 }

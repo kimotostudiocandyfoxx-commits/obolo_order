@@ -8,11 +8,14 @@ import { CHARACTER_AVATAR } from '@/lib/dachi/useDachiThreads';
 import { loadBluenaWorks, workCard, WORK_WORD, type BluenaWork } from '@/lib/dachi/works';
 import { HoldMic, Wave } from './HoldMic';
 import { playClip, readyClip, type Clip } from '@/lib/voice/webVoice';
-import { DACHI_PAGE, DACHI_TEXT_MAX, TALK_FIXED_FACE_KEY } from '@obolo/shared';
+import { DACHI_PAGE, DACHI_TEXT_MAX, linkDomain, TALK_FIXED_FACE_KEY, wordsAndLinks } from '@obolo/shared';
 import { DeviceButton } from '@/components/atelier/DeviceButton';
 import { GameById } from '@/components/atelier/GamePlay';
 import { BookById } from '@/components/atelier/BookRead';
-import { clipItem } from '@/components/atelier/BluenaClip';
+import { ClipRelic } from '@/components/relic/ClipRelics';
+import { PortalRelic } from '@/components/relic/PortalRelic';
+import { WorkRelic } from '@/components/relic/WorkRelic';
+import { groupRelics, itemIndexOf } from '@/lib/relic/layout';
 import { clipsChanged, useClipSend } from '@/lib/clip/useClip';
 import type { Work } from '@/components/atelier/work';
 import { TalkComposer } from '@/components/talk/TalkComposer';
@@ -231,22 +234,42 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
     // client 2026-11-24: you stand beside them, side by side, as in the story (no look yet: the talk cast's stand-in)
     { id: 'me', name: me?.displayName ?? '', look: selfLook(me) ?? castLook('user'), color: SELF_COLOR, tone: selfTone(me), self: true, avatar: me?.lookIcon },
   ];
+  // R12: what was sent floats as relics — a 📎 file, a work, the portal of each URL in the words (the words stay in the
+  // bubble); relics sent together by the same one float as one cluster (one item: the unread line counts in items)
+  const list = msgs ?? [];
+  const parts = list.map((m) => {
+    const who = m.fromMe ? 'me' : m.character && m.character !== kind ? m.character : 'them';
+    const links = m.kind === 'text' && m.text ? wordsAndLinks(m.text) : { words: m.text ?? '', urls: [] };
+    const relics: React.ReactNode[] =
+      m.kind === 'file' && m.file
+        ? [<ClipRelic key={m.id} file={m.file} />]
+        : m.kind === 'work' && m.work
+          ? [<WorkRelic key={m.id} id={m.id} card={m.work} mine={m.fromMe} full={<WorkCardView card={m.work} big mine={m.fromMe} />} />]
+          : links.urls.map((u, k) => <PortalRelic key={`${m.id}-${k}`} id={`${m.id}-${k}`} url={u} />);
+    const label = m.kind === 'file' && m.file ? `📎 ${m.file.name}` : m.kind === 'work' && m.work ? `✦ ${m.work.title || WORK_WORD[m.work.kind]}` : links.urls.length ? `🔗 ${linkDomain(links.urls[0])}` : undefined;
+    const words = m.kind === 'work' || m.kind === 'file' ? '' : m.kind === 'text' ? links.words : (m.text ?? '');
+    return { m, who, relics, label, words, relicOnly: relics.length > 0 && !words && m.kind !== 'voice' };
+  });
+  const groups = groupRelics(parts.map((p) => ({ who: p.who, at: Date.parse(p.m.createdAt) || 0, relicOnly: p.relicOnly })));
+  const itemAt = itemIndexOf(groups);
   // M-R239: the first line not heard yet (opening plays from the one before it)
-  const firstUnread = (msgs ?? []).findIndex((m) => !m.fromMe && m.read === false);
-  const unreadFrom = firstUnread >= 0 ? firstUnread : null;
-  const items: TalkItem[] = (msgs ?? []).map((m) => ({
-    id: m.id,
-    who: m.fromMe ? 'me' : m.character && m.character !== kind ? m.character : 'them',
-    text: m.kind === 'work' || m.kind === 'file' ? '' : (m.text ?? ''),
-    // M-R238: from the words (a character's line), else the sender's own face with it, else the rules
-    face: m.faces ? undefined : (m.face ?? undefined),
-    faces: m.faces,
-    voice: m.kind === 'voice' ? { url: m.audioUrl, seconds: m.seconds } : undefined,
-    mark: { kind: 'dachi_message' as const, id: m.id },
-    card: m.kind === 'work' && m.work ? { label: m.work.title || WORK_WORD[m.work.kind], thumb: <WorkCardView card={m.work} />, full: <WorkCardView card={m.work} big /> } : undefined,
-    // Bluena's 📎: a picture as a card (the whole screen on a tap), a film / a sound / a document right in the bubble
-    ...(m.kind === 'file' && m.file ? clipItem(m.file) : {}),
-  }));
+  const firstUnread = list.findIndex((m) => !m.fromMe && m.read === false);
+  const unreadFrom = firstUnread >= 0 ? itemAt[firstUnread] : null;
+  const items: TalkItem[] = groups.map((g) => {
+    const { m, who, words, label } = parts[g[0]];
+    const relics = g.flatMap((i) => parts[i].relics);
+    return {
+      id: m.id,
+      who,
+      text: words,
+      // M-R238: from the words (a character's line), else the sender's own face with it, else the rules
+      face: m.faces ? undefined : (m.face ?? undefined),
+      faces: m.faces,
+      voice: m.kind === 'voice' ? { url: m.audioUrl, seconds: m.seconds } : undefined,
+      mark: { kind: 'dachi_message' as const, id: m.id },
+      ...(relics.length ? { relics, relicLabel: g.length > 1 ? `${label}ほか${g.length - 1}つ` : label } : {}),
+    };
+  });
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col">

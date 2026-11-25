@@ -14,6 +14,7 @@ import type { Planet } from '@/lib/story/ambient';
 import { unlockAudio } from '@/lib/onboarding/audio';
 import { playClip, stopClip, type Clip } from '@/lib/voice/webVoice';
 import { OTS_BACK } from './SelfBack';
+import { RelicCluster, RelicHost } from '@/components/relic/Relic';
 
 const MUTE_KEY = 'obolo.talk.muted';
 /** the talk's own sound button is off (its choice is kept on this device) */
@@ -84,6 +85,13 @@ export type TalkItem = {
   chips?: { label: string; onPick: () => void; disabled?: boolean }[];
   /** under the words: the pages looked up, a map, a note */
   extra?: ReactNode;
+  /**
+   * R12: what was sent, as floating relics (components/relic): a 📎 file, a work, the portal of a pasted URL. They float
+   * on the sender's side under the words (no bubble at all when there are no words); several float as a cluster.
+   */
+  relics?: ReactNode[];
+  /** what the relics are, in words (the drawer's row of a line that has no words) */
+  relicLabel?: string;
   /** still being written (streaming) */
   live?: boolean;
   /** M-R236: where its ★ / mark is kept (a small ★ at the bubble's / コロリン's top right; a long press opens the ring) */
@@ -575,7 +583,7 @@ export function TalkScene({
   // before the first play starts (the very first paint), already only up to the line it starts from
   const pending = !seen.current && !loading && unreadFrom != null && unreadFrom >= 0 && unreadFrom < items.length ? Math.max(0, unreadFrom - 1) : null;
   const upTo = cursor ?? pending;
-  const said = (it: TalkItem) => !!(it.text || it.card || it.voice || it.chips?.length || it.extra);
+  const said = (it: TalkItem) => !!(it.text || it.card || it.voice || it.chips?.length || it.extra || it.relics?.length);
   const visible = (upTo == null ? items : items.slice(0, upTo + 1)).filter(said);
   // M-R244: a long utterance is shown as several bubbles in a row (the words unchanged; the cuts from the same call as
   // the faces, else every ~60 characters at a sentence end); while it is said, its bubbles come one by one
@@ -706,7 +714,7 @@ export function TalkScene({
   const pastRows: SpiralRow[] = drawer
     ? visible.map((it, k) => {
         const t = toneFor(byId.get(it.who));
-        return { id: it.id, at: new Date(Date.now() - (visible.length - k) * 60_000).toISOString(), color: t.line, title: talkPlain(it.text) || (it.voice ? '♪ 声' : (it.card?.label ?? '')), sub: it.name ?? byId.get(it.who)?.name };
+        return { id: it.id, at: new Date(Date.now() - (visible.length - k) * 60_000).toISOString(), color: t.line, title: talkPlain(it.text) || (it.voice ? '♪ 声' : (it.card?.label ?? it.relicLabel ?? '')), sub: it.name ?? byId.get(it.who)?.name };
       })
     : [];
   // <html data-sidetalk>: you stand in the row here (NeoSpeaking's big figure from below stays away)
@@ -1122,6 +1130,7 @@ export function TalkScene({
 
   return (
     <SkinCtx.Provider value={skin}>
+    <RelicHost target={wrap}>
     <div
       ref={wrap}
       className={`relative min-h-0 flex-1 touch-none select-none overflow-hidden text-[#f4f1ff] ${transparent ? '' : 'bg-[#070b24]'}`}
@@ -1381,7 +1390,7 @@ export function TalkScene({
             const it = u.item;
             const who = byId.get(it.who);
             const live = speech?.id === it.id && outNow != null;
-            const view: TalkItem = { ...it, text: u.text, ...(u.first ? {} : { name: undefined }), ...(u.last ? {} : { card: undefined, chips: undefined, extra: undefined, mark: undefined, voice: undefined }) };
+            const view: TalkItem = { ...it, text: u.text, ...(u.first ? {} : { name: undefined }), ...(u.last ? {} : { card: undefined, chips: undefined, extra: undefined, mark: undefined, voice: undefined, relics: undefined }) };
             return (
               <Bubble
                 item={view}
@@ -1414,7 +1423,7 @@ export function TalkScene({
           const who = byId.get(it.who);
           const live = speech?.id === it.id && outNow != null;
           // one utterance: its name over the first bubble, its card, choices, ★ on the last
-          const view: TalkItem = { ...it, text: u.text, ...(u.first ? {} : { name: undefined }), ...(u.last ? {} : { card: undefined, chips: undefined, extra: undefined, mark: undefined, voice: undefined }) };
+          const view: TalkItem = { ...it, text: u.text, ...(u.first ? {} : { name: undefined }), ...(u.last ? {} : { card: undefined, chips: undefined, extra: undefined, mark: undefined, voice: undefined, relics: undefined }) };
           return (
             <Bubble
               key={u.key}
@@ -1519,6 +1528,7 @@ export function TalkScene({
         </div>
       )}
     </div>
+    </RelicHost>
     </SkinCtx.Provider>
   );
 }
@@ -1672,6 +1682,20 @@ function Bubble({
           ? { borderStyle: 'dashed', boxShadow: '0 6px 16px rgba(4,8,30,.25)', opacity: 0.95 }
           : {},
   );
+  // R12: only relics (a file, a work, a lone URL): no bubble, they float on the sender's side
+  const relics = item.relics?.length ? <RelicCluster mine={mine}>{item.relics}</RelicCluster> : null;
+  if (relics && !item.text && !item.voice && !item.card && !item.extra && !item.chips?.length && !clamp) {
+    return (
+      <div className={`${passive ? 'pointer-events-none' : 'pointer-events-auto'} relative flex max-w-full flex-col ${mine ? 'items-end self-end' : center ? 'items-center self-center' : 'items-start self-start'}`} data-relic-line>
+        {named && (
+          <p className="mb-1 px-2 text-[10.5px] font-bold tracking-[0.12em] [text-shadow:0_1px_4px_#000]" style={{ color: tone.a }}>
+            {item.name ?? who?.name}
+          </p>
+        )}
+        {relics}
+      </div>
+    );
+  }
   const pad = shape === 'burst' ? 'px-[42px] py-[30px] text-[16px]' : shape === 'cloud' ? 'px-[22px] pb-4 pt-[15px] text-[15px]' : shape === 'whisper' ? 'px-[17px] pb-[13px] pt-3 text-[14px]' : 'px-[17px] pb-[13px] pt-3 text-[15px]';
   return (
     <div className={`${passive ? 'pointer-events-none' : 'pointer-events-auto'} relative flex min-h-0 flex-col ${shape === 'burst' ? 'mx-[-20px] max-w-[min(calc(100%+40px),330px)]' : 'max-w-[min(100%,380px)]'} ${mine ? 'items-end self-end' : center ? 'items-center self-center' : 'items-start self-start'} ${grow ? 'flex-1' : ''}`} style={{ animation: newest && !past && !entry ? 'talk-in .35s cubic-bezier(.3,1.4,.5,1) both' : undefined, opacity: newest ? (past ? 0.97 : 1) : 0.86 }}>
@@ -1740,6 +1764,7 @@ function Bubble({
           </>
         )}
       </div>
+      {relics && !clamp && <div className="mt-3 max-w-[calc(100vw-32px)]">{relics}</div>}
     </div>
   );
 }
