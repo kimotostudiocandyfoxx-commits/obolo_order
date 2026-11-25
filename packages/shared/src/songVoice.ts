@@ -97,7 +97,12 @@ export function voiceAskOf(said: string): 'own' | 'original' | 'other' | null {
 
 /** after the first invitation, at most once every this many finished songs (never twice in a row) */
 export const VOICE_INVITE_EVERY = 3;
-/** where the app keeps it (me.story `sys.${VOICE_INVITE_KEY}` = "<songs>:<song count at the last invitation>") */
+/** client 2026-11-25: at most this many invitations per member, ever (asking for the spell always works) */
+export const VOICE_INVITE_MAX = 3;
+/**
+ * where it is kept — on the member, server-side (me.story `sys.${VOICE_INVITE_KEY}` = "<songs>:<song count at the last
+ * invitation>:<invitations so far>"), so it holds across devices
+ */
 export const VOICE_INVITE_KEY = 'voice_invite';
 
 export interface VoiceInviteState {
@@ -105,25 +110,30 @@ export interface VoiceInviteState {
   songs: number;
   /** the count at the last invitation (null: never invited) */
   last: number | null;
+  /** invitations said so far (at most VOICE_INVITE_MAX) */
+  said: number;
 }
 export const parseVoiceInvite = (v: string | undefined | null): VoiceInviteState => {
-  const [a, b] = String(v ?? '').split(':');
+  const [a, b, c] = String(v ?? '').split(':');
   const songs = Math.max(0, Math.floor(Number(a)) || 0);
   const last = b === undefined || b === '' || !Number.isFinite(Number(b)) ? null : Math.max(0, Math.floor(Number(b)));
-  return { songs, last };
+  // an older value without the count: one invitation was said when there is a last one
+  const said = c === undefined || c === '' ? (last == null ? 0 : 1) : Math.max(0, Math.floor(Number(c)) || 0);
+  return { songs, last, said };
 };
-export const voiceInviteValue = (s: VoiceInviteState) => `${s.songs}:${s.last ?? ''}`;
+export const voiceInviteValue = (s: VoiceInviteState) => `${s.songs}:${s.last ?? ''}:${s.said}`;
 
 /**
  * A song just finished: does {bati} add 「君の声にする魔法も、唱えられるよ。」 to its line? Only with a registered voice
  * and media consent (canUseMedia: under 13 / 13–15 without a guardian's yes never), never for a song already in the
- * member's voice; the first finished song (once allowed), then at most once every VOICE_INVITE_EVERY songs. Returns the
+ * member's voice; the first finished song (once allowed), then at most once every VOICE_INVITE_EVERY songs, and never
+ * after VOICE_INVITE_MAX invitations in all (client 2026-11-25: it gets tiresome for members who make many). Returns the
  * state to keep (the song counted; the invitation, when said).
  */
 export function voiceInvite(st: VoiceInviteState, gate: { hasVoice: boolean; mediaOk: boolean; voiced?: boolean }): { invite: boolean; next: VoiceInviteState } {
   const songs = st.songs + 1;
   const allowed = gate.hasVoice && gate.mediaOk && !gate.voiced;
-  const due = st.last == null || songs - st.last >= VOICE_INVITE_EVERY;
+  const due = st.said < VOICE_INVITE_MAX && (st.last == null || songs - st.last >= VOICE_INVITE_EVERY);
   const invite = allowed && due;
-  return { invite, next: { songs, last: invite ? songs : st.last } };
+  return { invite, next: { songs, last: invite ? songs : st.last, said: st.said + (invite ? 1 : 0) } };
 }

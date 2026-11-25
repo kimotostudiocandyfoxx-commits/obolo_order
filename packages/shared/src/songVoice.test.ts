@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { MAKE_COST, MAKE_COST_ESTIMATE, SONG_VOICE_GPU_SEED, estimateJpy, quoteMana } from './manaPrice';
-import { parseVoiceInvite, songVoiceGpuSeconds, songVoiceKey, songVoiceQuote, voiceAskOf, voiceInvite, voiceInviteValue, VOICE_INVITE_EVERY, type VoiceInviteState } from './songVoice';
+import { parseVoiceInvite, songVoiceGpuSeconds, songVoiceKey, songVoiceQuote, voiceAskOf, voiceInvite, voiceInviteValue, VOICE_INVITE_EVERY, VOICE_INVITE_MAX, type VoiceInviteState } from './songVoice';
 
 const ok = { hasVoice: true, mediaOk: true };
 /** n finished songs in a row: which of them got the invitation (1-based) */
-function run(n: number, gate = ok, from: VoiceInviteState = { songs: 0, last: null }) {
+function run(n: number, gate = ok, from: VoiceInviteState = { songs: 0, last: null, said: 0 }) {
   let st = from;
   const said: number[] = [];
   for (let i = 0; i < n; i++) {
@@ -17,26 +17,34 @@ function run(n: number, gate = ok, from: VoiceInviteState = { songs: 0, last: nu
 
 describe('R18: 君の声にする魔法 — the invitation after a song', () => {
   it('the first finished song, then at most once every few songs — never twice in a row', () => {
-    const { said } = run(10);
+    const { said } = run(7);
     expect(said[0]).toBe(1);
-    expect(said).toEqual([1, 1 + VOICE_INVITE_EVERY, 1 + 2 * VOICE_INVITE_EVERY, 1 + 3 * VOICE_INVITE_EVERY]);
+    expect(said).toEqual([1, 1 + VOICE_INVITE_EVERY, 1 + 2 * VOICE_INVITE_EVERY]);
     for (let i = 1; i < said.length; i++) expect(said[i] - said[i - 1]).toBeGreaterThan(1);
+  });
+  it('at most VOICE_INVITE_MAX (3) times per member in all — then never again, however many songs', () => {
+    expect(VOICE_INVITE_MAX).toBe(3);
+    const { said, st } = run(60);
+    expect(said).toHaveLength(3);
+    expect(st).toMatchObject({ songs: 60, said: 3 });
+    // kept on the member (a string in me.story): another device reads the same count and stays quiet
+    expect(voiceInvite(parseVoiceInvite(voiceInviteValue(st)), ok).invite).toBe(false);
   });
   it('never without a registered voice or media consent (under 13 / 13–15 without a guardian: mediaOk false)', () => {
     expect(run(6, { hasVoice: false, mediaOk: true }).said).toEqual([]);
     expect(run(6, { hasVoice: true, mediaOk: false }).said).toEqual([]);
     // registered later: the next finished song is the first invitation
     const before = run(2, { hasVoice: false, mediaOk: true }).st;
-    expect(voiceInvite(before, ok)).toMatchObject({ invite: true, next: { songs: 3, last: 3 } });
+    expect(voiceInvite(before, ok)).toMatchObject({ invite: true, next: { songs: 3, last: 3, said: 1 } });
   });
   it('never for a song already in the member’s voice', () => {
-    expect(voiceInvite({ songs: 0, last: null }, { ...ok, voiced: true }).invite).toBe(false);
+    expect(voiceInvite({ songs: 0, last: null, said: 0 }, { ...ok, voiced: true }).invite).toBe(false);
   });
   it('kept as a short string (me.story)', () => {
-    const st = { songs: 7, last: 4 };
+    const st = { songs: 7, last: 4, said: 2 };
     expect(parseVoiceInvite(voiceInviteValue(st))).toEqual(st);
-    expect(parseVoiceInvite(undefined)).toEqual({ songs: 0, last: null });
-    expect(parseVoiceInvite('3:')).toEqual({ songs: 3, last: null });
+    expect(parseVoiceInvite(undefined)).toEqual({ songs: 0, last: null, said: 0 });
+    expect(parseVoiceInvite('3:')).toEqual({ songs: 3, last: null, said: 0 });
   });
 });
 
