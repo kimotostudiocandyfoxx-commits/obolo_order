@@ -141,6 +141,13 @@ for nm,k2 in [('home2-bg-saturn-close','bg2-saturn-close'),('home2-bg-saturn-clo
     if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A[k2]=uri(im,78)
 f=f'{O}/home2-bg-saturn-needle.jpg'
 if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A['bg2-saturn-needle']=uri(im,78)
+f=f'{O}/home2-bg-saturn-top.jpg'
+if os.path.exists(f):
+    from PIL import ImageDraw as _D3
+    im=Image.open(f).convert('RGB'); W_,H_=im.size; cx,cy,R=int(.5*W_),int(.494*H_),int(.73*W_)
+    big=Image.new('RGBA',(2*R,2*R),(0,0,0,0)); big.paste(im,(R-cx,R-cy)); mk=Image.new('L',(8*R,8*R),0); _D3.Draw(mk).ellipse((0,0,8*R-1,8*R-1),fill=255); big.putalpha(mk.resize((2*R,2*R),Image.LANCZOS))
+    big.thumbnail((900,900),Image.LANCZOS); A['rec-top']=uri(big,84); A['rectop-geo']='[0.5,0.494,0.73]'
+    im2=im.copy(); im2.thumbnail((720,1280)); A['bg2-saturn-top']=uri(im2,78)
 VD=os.environ.get('VOICE_DIR')
 if VD:
     for n in range(1,6):
