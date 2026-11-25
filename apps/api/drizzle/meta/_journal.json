@@ -421,6 +421,13 @@
       "when": 1795619840626,
       "tag": "0059_jupiter_continent_pictures",
       "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1795620154406,
+      "tag": "0060_saturn_plaza_pictures",
+      "breakpoints": true
     }
   ]
 }
