@@ -11203,6 +11203,48 @@
       ],
       "prompt": "Bright summer Japanese anime background art in exactly the same style and colours as the reference picture. Vertical phone wallpaper 9:16. Ground-level view of a gentle rainy seaside town: soft rain, hydrangeas, a small glass cafe with warm light, misty calm sea, relaxing mood. The lower two-thirds are open water, empty, for many small boats floating in front. No characters, no people, no boats, no text.",
       "always": false
+    },
+    {
+      "id": "sat6-bg",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute colourful Japanese anime background art in exactly the same style, palette and lighting as the reference picture (pastel neon club, glossy candy colours). Vertical phone wallpaper 9:16. A flat straight-on side view of a small cute night club stage, seen exactly from the front at eye level like a theatre backdrop, no perspective floor. Back wall with soft pastel neon lights, bokeh, a disco glow and Saturn-ring shaped neon decorations. On the right side at mid height stands a DJ booth seen from the front with a big glossy vinyl record turntable on top, the record clearly visible. The lower 30 percent of the picture is a plain dark flat area (no floor detail, no objects) for a separate ground. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "sat6-floor",
+      "w": 2048,
+      "h": 1152,
+      "size": [
+        1600,
+        900
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute colourful Japanese anime background art in exactly the same style, palette and lighting as the reference picture (pastel neon club, glossy candy colours). A wide horizontal strip of ground seen exactly from the side like a cross-section in a 2D platform game: a thick layer of many glossy colourful round candy-like pebbles (pink, mint, lavender, lemon, sky blue) packed together, the top edge perfectly straight and level across the whole width, filling the lower 45 percent of the picture. Above the ground everything is plain solid pure white. No characters, no text, no shadow on the white.",
+      "always": false
+    },
+    {
+      "id": "sat6-spk",
+      "w": 1024,
+      "h": 2048,
+      "size": [
+        640,
+        1280
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute colourful Japanese anime background art in exactly the same style, palette and lighting as the reference picture (pastel neon club, glossy candy colours). A single tall cute club speaker tower seen exactly from the front, stacked two glossy speaker cabinets with pastel neon trim and glowing rims, slim and tall, standing upright, the whole tower in frame from top to bottom with a small margin. Plain solid pure white background, no shadow, no text, no characters.",
+      "always": false
     }
   ],
   "redo": []
