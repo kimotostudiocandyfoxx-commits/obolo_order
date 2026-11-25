@@ -51,8 +51,24 @@ export const SONG_LINES = {
   editMissing: 'その部分は、この曲にはないみたい。',
   /** too many changes in a short time */
   editBusy: 'ちょっと変えすぎたかも。少し休んでから、また言ってね。',
+  /** R17: a change that needs the voice and the music apart (or the line times): our studio splits the song first */
+  editWait: 'ちょっと待ってね。歌と伴奏を、分けてくるね。',
 } as const;
-export const SONG_LINE_TEXTS: string[] = Object.values(SONG_LINES);
+
+/**
+ * R17 (client 2026-11-25): the secret spell — only after a member said its passphrase (never offered, never hinted).
+ * {bati} is a little surprised, the talismans glow gold; if it cannot be made, the mana comes back and {bati} offers the
+ * normal spell.
+ */
+export const PREMIUM_LINES = {
+  /** the passphrase heard */
+  known: 'その魔法、知ってるんだ…！',
+  /** the spell laid out in gold */
+  plan: 'じゃあ、とっておきのスペルで唱えるね。',
+  /** it could not be made: the mana is back, the normal spell offered */
+  failed: 'ごめん、その魔法はいま届かなかった…マナは戻したよ。いつものスペルで作ってみる？',
+} as const;
+export const SONG_LINE_TEXTS: string[] = [...Object.values(SONG_LINES), ...Object.values(PREMIUM_LINES)];
 
 const v = (teinei: string, kansai: string, cool: string, mellow: string, amae: string, gal: string, galfuwa: string, galane: string, galcool: string, galkansai: string): BatiVariantSet => ({ teinei, kansai, cool, mellow, amae, gal, galfuwa, galane, galcool, galkansai });
 
@@ -320,5 +336,53 @@ export const SONG_VARIANTS: Record<string, BatiVariantSet> = {
     'わかったよ、歌詞はこのままにしておくね。',
     'わかった、歌詞はこのまま。',
     'わかった、歌詞はこのままにしとくな！',
+  ),
+  [SONG_LINES.editWait]: v(
+    'ちょっと待ってくだサイ。歌と伴奏を、分けてきマス。',
+    'ちょっと待っててな。歌と伴奏、分けてくるわ。',
+    '少し待ってくれ。歌と伴奏を、分けてくる。',
+    'ちょっと待ってね〜。歌と伴奏を、分けてくるね〜。',
+    'ちょっと待っててね…。歌と伴奏を、分けてくるの。',
+    'ちょっと待ってて！　歌と伴奏、分けてくるね！',
+    'ちょっと待っててね〜！　歌と伴奏、分けてくるね〜。',
+    'ちょっと待っててね。歌と伴奏を、分けてくるよ。',
+    'ちょっと待って。歌と伴奏、分けてくる。',
+    'ちょっと待っててな！　歌と伴奏、分けてくるで！',
+  ),
+  [PREMIUM_LINES.known]: v(
+    'その魔法、知ってるんデスね…！',
+    'その魔法、知ってるんや…！',
+    'その魔法、知ってるのか…！',
+    'その魔法、知ってるんだ〜…！',
+    'その魔法、知ってるの…！？',
+    'えっ、その魔法知ってるんだ…！',
+    'えっ、その魔法知ってるんだ〜…！',
+    'へえ、その魔法、知ってるんだね…！',
+    'その魔法、知ってるんだ…。',
+    'えっ、その魔法知ってるんや…！',
+  ),
+  [PREMIUM_LINES.plan]: v(
+    'では、とっておきのスペルで唱えマス。',
+    'ほな、とっておきのスペルで唱えるで。',
+    'なら、とっておきのスペルで唱えよう。',
+    'じゃあ、とっておきのスペルで唱えるね〜。',
+    'じゃあ、とっておきのスペルで唱えるの。',
+    'じゃあ、とっておきのスペルで唱えるね！',
+    'じゃあ、とっておきのスペルで唱えるね〜！',
+    'じゃあ、とっておきのスペルで唱えてあげる。',
+    'じゃ、とっておきのスペルで唱える。',
+    'ほな、とっておきのスペルで唱えるな！',
+  ),
+  [PREMIUM_LINES.failed]: v(
+    'ごめんなサイ、その魔法はいま届きませんデシタ…マナは戻しマシタ。いつものスペルで作りマスカ？',
+    'ごめんな、その魔法いま届かへんかった…マナは戻したで。いつものスペルで作ってみる？',
+    'すまない、その魔法はいま届かなかった…マナは戻した。いつものスペルで作ってみるか？',
+    'ごめんね〜、その魔法はいま届かなかった…マナは戻したよ〜。いつものスペルで作ってみる？',
+    'ごめんね…その魔法、いま届かなかったの…マナは戻したよ。いつものスペルで作ってみる？',
+    'ごめん、その魔法いま届かなかった…マナは戻したよ！　いつものスペルで作ってみる？',
+    'ごめんね〜、その魔法いま届かなかった…マナは戻したよ〜。いつものスペルで作ってみる？',
+    'ごめんね、その魔法はいま届かなかったよ…マナは戻したよ。いつものスペルで作ってみようか？',
+    'ごめん、その魔法はいま届かなかった…マナは戻した。いつものスペルで作る？',
+    'ごめんな、その魔法いま届かへんかった…マナは戻したで！　いつものスペルで作ってみる？',
   ),
 };

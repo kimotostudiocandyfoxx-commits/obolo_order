@@ -456,6 +456,8 @@ export const FullSongBody = SingBody.omit({ melody: true, instrumentalUrl: true,
   lyrics: SongLyrics.optional(),
   /** a song with lyrics (R13) has more blocks than the older 6 sections (2番, 大サビ) */
   sections: SingBody.shape.sections.element.array().min(1).max(16),
+  /** R17: the grant the passphrase gave (POST /moon/incant): sung by the 上級魔法 engine, at its own price */
+  premium: z.string().uuid().optional(),
 });
 export type FullSongBody = z.infer<typeof FullSongBody>;
 

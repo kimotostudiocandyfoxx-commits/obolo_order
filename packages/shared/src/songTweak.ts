@@ -52,7 +52,9 @@ export type SongTweakBody = z.infer<typeof SongTweakBody>;
 export type SongPaidEdit = 'lyrics' | 'melody' | 'extend' | 'voice' | 'genre';
 export interface SongTweakResult {
   /** done: a new version; undone: one back; first: nothing to go back to; paid: needs the studio; none: not a change; missing: the part is not in the song */
-  status: 'done' | 'undone' | 'first' | 'paid' | 'none' | 'missing';
+  /** R17 wait: the song is being split on our GPU first (stems / line times) — poll `jobId`, then send the same words again */
+  status: 'done' | 'undone' | 'first' | 'paid' | 'none' | 'missing' | 'wait';
+  jobId?: string;
   /** what this change did, in {bati}'s words (「テンポを速く・2番をカット」) */
   what?: string;
   paid?: SongPaidEdit;
