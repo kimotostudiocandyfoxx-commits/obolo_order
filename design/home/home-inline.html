@@ -455,6 +455,7 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .pstrip button img{width:58px;height:58px;object-fit:contain;filter:drop-shadow(0 4px 8px rgba(0,0,0,.4))}
 .pstrip button.mid{opacity:1;transform:scale(1.12)}
 .pstrip .hint{position:absolute;left:0;right:0;bottom:6px;text-align:center;font:800 10px var(--f-body);color:rgba(255,255,255,.75);pointer-events:none}
+.phone{touch-action:none}
 .skybtn{position:absolute;left:14px;top:70px;z-index:6;display:inline-flex;align-items:center;gap:5px;padding:6px 12px 6px 9px;border-radius:999px;border:1px solid rgba(255,255,255,.55);background:rgba(20,30,60,.35);color:#fff;font:900 11px var(--f-body);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);cursor:pointer}
 .skybtn svg{width:14px;height:14px}
 .exp{position:absolute;inset:0;z-index:42;overflow:hidden;pointer-events:none;opacity:0;transition:opacity .35s}
@@ -635,7 +636,7 @@ function render(){
   const sky=$('sky');sky.innerHTML='';items=[];
   const isS=cur==='saturn'&&mode==='anime';$('tint').hidden=!isS;$('fg').hidden=!(isS&&A['sat-fg']);if(isS&&A['sat-fg'])$('fg').style.backgroundImage=`url(${A['sat-fg']})`;$('swatch').hidden=true;
   if(isS&&A['rec-mask']){$('tint').style.webkitMaskImage=$('tint').style.maskImage=`url(${A['rec-mask']})`}
-  $('skybtn').hidden=!(EXP[cur]&&A['exp-'+cur+'-map']);$('home').classList.remove('ghost');$('home').style.left='';$('home').style.top='';stopRoll();stopJup();stopMer();stopG5();if(isG5()){$('bg').style.backgroundImage=`url(${A['bg5-'+cur]})`;$('plate').hidden=true;rw.innerHTML='';$('home').classList.add('ghost');$('home').style.left=(G5[cur].home[0]*100)+'%';$('home').style.top=(G5[cur].home[1]*100)+'%';setupG5();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));setCta(false);return}
+  $('skybtn').hidden=true;if(EXP[cur]&&A['exp-'+cur+'-map']&&!window.__pinchHint){window.__pinchHint=1;setTimeout(()=>toast('✌️ 2本の指でつまむと、空から探せるよ'),900)}$('home').classList.remove('ghost');$('home').style.left='';$('home').style.top='';stopRoll();stopJup();stopMer();stopG5();if(isG5()){$('bg').style.backgroundImage=`url(${A['bg5-'+cur]})`;$('plate').hidden=true;rw.innerHTML='';$('home').classList.add('ghost');$('home').style.left=(G5[cur].home[0]*100)+'%';$('home').style.top=(G5[cur].home[1]*100)+'%';setupG5();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));setCta(false);return}
   if(cur==='mercury'&&mode==='anime'&&A['bg3-mercury']){$('bg').style.backgroundImage=`url(${A['bg3-mercury']})`;$('plate').hidden=true;rw.innerHTML='';$('home').classList.add('ghost');$('home').style.left=(MHOUSE[0]*100)+'%';$('home').style.top=(MHOUSE[1]*100)+'%';setupMer();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));return}
   if(cur==='jupiter'&&mode==='anime'&&A['bg3-jupiter']){$('bg').style.backgroundImage=`url(${A['bg3-jupiter']})`;$('plate').hidden=true;rw.innerHTML='';$('home').classList.add('ghost');$('home').style.left=(JTREE[0]*100)+'%';$('home').style.top=(JTREE[1]*100)+'%';setupJup();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));return}
   if(cur==='saturn'&&A['bg2-saturn-top']){const d=document.createElement('button');d.type='button';d.className='recdoor';d.setAttribute('aria-label','自分のレコードを開く');d.style.left='72%';d.style.top='52%';d.onclick=()=>openProf(ME);$('sky').appendChild(d);const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,ax=.6*W,ay=.505*H,bx=.99*W,by=.465*H,am=document.createElement('button');am.type='button';am.className='armdoor';am.setAttribute('aria-label','自分のレコードを開く');am.style.left=ax+'px';am.style.top=(ay-22)+'px';am.style.width=Math.hypot(bx-ax,by-ay)+'px';am.style.transform=`rotate(${Math.atan2(by-ay,bx-ax)}rad)`;am.onclick=()=>openProf(ME);$('sky').appendChild(am)}
@@ -799,6 +800,16 @@ function expOpen(){const c=EXP[cur];if(!c)return;if(typeof MV!=='undefined'&&MV)
   $('emap').style.backgroundImage=`url(${A['exp-'+cur+'-map']||''})`;$('emap').classList.remove('dive');$('emap').style.transform='';$('emap').style.opacity='';ex.querySelectorAll('.rg').forEach(e=>e.remove());
   c.regions.forEach(r=>{const b=document.createElement('button');b.type='button';b.className='rg';b.style.left=(r.x*100)+'%';b.style.top=(r.y*100)+'%';b.innerHTML=`<i></i><b>${r.n}</b>`;b.onclick=()=>expLand(r);ex.appendChild(b)});
   $('etitle').textContent=P[cur].name+'の海を空から';ex.className='exp on';requestAnimationFrame(()=>requestAnimationFrame(()=>ex.classList.add('map')));EX={pl:cur,boats:[],raf:0}}
+(function(){const pts=new Map();let d0=0,fired=false;
+  const dist=()=>{const a=[...pts.values()];return Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)};
+  document.addEventListener('pointerdown',ev=>{if(!ev.target.closest('#phone'))return;pts.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});if(pts.size===2){d0=dist();fired=false}},true);
+  document.addEventListener('pointermove',ev=>{if(!pts.has(ev.pointerId))return;pts.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});if(pts.size!==2||fired||!d0)return;const r=dist()/d0;
+    if(r<.72&&!EX&&EXP[cur]&&A['exp-'+cur+'-map']&&!PROF){fired=true;expOpen()}
+    else if(r>1.35&&EX&&!EX.region){fired=true;expClose()}},true);
+  const up=ev=>{pts.delete(ev.pointerId);if(pts.size<2)d0=0};document.addEventListener('pointerup',up,true);document.addEventListener('pointercancel',up,true);
+  // trackpad pinch on a computer arrives as ctrl+wheel
+  document.addEventListener('wheel',ev=>{if(!ev.ctrlKey||!ev.target.closest('#phone'))return;ev.preventDefault();if(ev.deltaY>4&&!EX&&EXP[cur]&&A['exp-'+cur+'-map']&&!PROF)expOpen();else if(ev.deltaY<-4&&EX&&!EX.region)expClose()},{passive:false});
+})();
 function expClose(){const ex=$('exp');expLeave();ex.className='exp';$('bg').style.transform='';setTimeout(()=>{$('bg').style.transition=''},900);EX=null}
 function expLeave(){if(!EX)return;cancelAnimationFrame(EX.raf);EX.boats.forEach(b=>b.e.remove());EX.boats=[];$('estage').innerHTML='';if(EX.open)EX.open.close();stopSong()}
 function expLand(r){const ex=$('exp'),c=EXP[EX.pl],em=$('emap');whoosh();em.style.transformOrigin=`${r.x*100}% ${r.y*100}%`;em.style.transform='scale(3.2)';em.classList.add('dive');
