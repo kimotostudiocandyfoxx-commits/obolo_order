@@ -859,6 +859,25 @@ export const workHides = pgTable(
   (t) => [uniqueIndex('work_hides_pair_idx').on(t.userId, t.kind, t.targetId)],
 );
 
+/**
+ * Planets 2-3 (M-R317): a person whose work the viewer reported. One way only: from the reporter's side that person's
+ * works and figure stop appearing on every planet (feeds, homes, continents, search, travel); the dachi / 推し relation
+ * is not touched (ending it is the reporter's own choice, the block of Earth).
+ */
+export const personHides = pgTable(
+  'person_hides',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    hiddenId: uuid('hidden_id')
+      .notNull()
+      .references(() => users.id),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex('person_hides_pair_idx').on(t.userId, t.hiddenId)],
+);
+
 /** Web Push: each device a member turned notifications on for (incoming calls, mail). */
 export const pushSubscriptions = pgTable(
   'push_subscriptions',

@@ -1,8 +1,13 @@
 import { PgDialect } from 'drizzle-orm/pg-core';
 import { describe, expect, it } from 'vitest';
 import { flyingSince, type ContinentRule, type WorkTags } from '@obolo/shared';
-import { continents, continentSeen, jupiterPosts, jupiterRoots, planetHomes, planetPosts, planetWorkMeta, songs, userBlocks, userReports, users, workHides } from '../db/schema';
-import { ContinentsService, continentWhere, ruleFilter } from './continents.service';
+import { continents, continentSeen, jupiterPosts, jupiterRoots, personHides, radioShows, planetHomes, planetPosts, planetWorkMeta, saturnPosts, songs, userBlocks, userReports, users, workHides } from '../db/schema';
+import { aroundWhere } from './planet-home.service';
+import { planetWorkScope } from '../common/child';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { workScore } from '@obolo/shared';
+import { ContinentsService, continentWhere, ruleFilter, toContinent } from './continents.service';
 import { farWhere, storeOf } from './planet-home.service';
 import { PlanetPostsService } from './planet-posts.service';
 import { PlanetWorksService, type WorkFacts } from './planet-works.service';
@@ -96,6 +101,30 @@ describe('2-1 a work is tagged the moment it is made', () => {
     await svc.tag('planet_post', 'p2', { ...facts, words: '死ね' });
     expect(writes[1].v).toMatchObject({ checkState: 'held', checkReason: 'harassment' });
   });
+
+  it('Saturn (M-R316): a voice kororin’s topic and moods come from its words, asked of the text model', async () => {
+    const { db, writes } = memDb(q());
+    const asked: string[] = [];
+    const llm = { name: 'gemini', chat: async (r: { system: string; history: { text: string }[] }) => (r.system.includes('topic') ? (asked.push(r.history[0].text), '{"topic":"恋バナ","moods":["ドキドキ","好きな人"]}') : 'OK') };
+    await new PlanetWorksService(db as never, llm as never).tag('saturn_post', 'k1', { userId: 'me', planet: 'saturn', tags: { main: null, moods: [] }, words: '好きな人と目が合った' });
+    expect(asked).toEqual(['好きな人と目が合った']);
+    expect(writes[0].v).toMatchObject({ kind: 'saturn_post', workId: 'k1', planet: 'saturn', main: '恋バナ', moodsJson: ['ドキドキ', '好きな人'], checkState: 'ok' });
+  });
+
+  it('Saturn: when the model fails the kororin is still kept (checked, no topic) — the backfill asks again and counts only what it now tags', async () => {
+    const { db, writes } = memDb(q([planetWorkMeta, [[{ id: 'k1' }, { id: 'k2' }]]], [planetPosts, [[]]], [jupiterPosts, [[]]], [saturnPosts, [[]]], [radioShows, [[]]]));
+    let up = false;
+    const llm = { name: 'gemini', chat: async (r: { system: string }) => (r.system.includes('topic') ? (up ? '{"topic":"朝","moods":["おはよう"]}' : Promise.reject(new Error('quota'))) : 'OK') };
+    const svc = new PlanetWorksService(db as never, llm as never);
+    await svc.tag('saturn_post', 'k0', { userId: 'me', planet: 'saturn', tags: { main: null, moods: [] }, words: 'おはよう' });
+    expect(writes[0].v).toMatchObject({ main: null, moodsJson: [], checkState: 'ok' });
+    // backfill: nothing missing in the stores; k1 / k2 have rows without a topic
+    (svc as unknown as Record<string, unknown>).facts = async (_k: string, id: string) => (id === 'k2' ? null : { userId: 'me', planet: 'saturn', tags: { main: null, moods: [] }, words: 'おはよう' });
+    up = true;
+    const done = await svc.backfill(10);
+    expect(done.saturn_post).toBe(1);
+    expect(writes.at(-1)).toMatchObject({ table: planetWorkMeta, v: { workId: 'k1', main: '朝', moodsJson: ['おはよう'] } });
+  });
 });
 
 // --- 2-2 visibility ------------------------------------------------------------------------------------------------
@@ -159,6 +188,25 @@ const WORKS = [
   work('mine', 'me', { main: 'EDM', moods: ['ダンス'], bpm: 128 }),
 ];
 
+describe('2-4 Saturn plazas (M-R316) and the operator continents (M-R317)', () => {
+  const seed = readFileSync(join(__dirname, '../../drizzle/0057_person_hides_saturn_plazas.sql'), 'utf8');
+  const rows = [...seed.matchAll(/\('saturn', '(\w+)', '([^']+)', '(\{[^']+\})'::jsonb/g)].map((m) => ({ key: m[1], name: m[2], rule: JSON.parse(m[3]) as ContinentRule }));
+  it('ten plazas on the rings, from the prototype, no maker named', () => {
+    expect(rows.map((r) => r.key)).toEqual(['chat', 'koi', 'oshi', 'school', 'night', 'game', 'warai', 'anime', 'asa', 'nemui']);
+    expect(rows.map((r) => r.name)).toContain('ねむねむ星');
+    expect(seed).not.toMatch(/creator_id"?\)? VALUES|タク'|ショウ'|ぽんず'|はるか'|みお'/);
+  });
+  it('a kororin tagged from its words drifts to its plaza (恋バナ + ドキドキ → 恋バナの部屋)', () => {
+    const tags: WorkTags = { main: '恋バナ', moods: ['ドキドキ'], bpm: null };
+    expect(rows.filter((r) => workScore(tags, r.rule) >= 2).map((r) => r.key)).toEqual(['koi']);
+  });
+  it('an operator continent never carries a maker’s name, even if one were joined', () => {
+    const base = { planet: 'saturn', key: 'game', name: 'ゲーム実況の島', ruleJson: { g: ['ゲーム'], m: [] }, tagsJson: [], skyUrl: null, landUrl: null, shoreUrl: null } as never as Parameters<typeof toContinent>[0];
+    expect(toContinent({ ...base, creatorId: null, creatorName: 'タク' }).creator).toBeNull();
+    expect(toContinent({ ...base, creatorId: 'u1', creatorName: 'ミナ' }).creator).toEqual({ id: 'u1', name: 'ミナ' });
+  });
+});
+
 describe('2-4 workScore decides where a work drifts', () => {
   const land = async (key: string) => {
     const { db } = memDb(q([continents, [MERCURY]], [users, [[{ onboarding: { birthYear: 1995 } }]]], [planetPosts, [WORKS]]), [{ rows: [{ id: 'oshi', dachi: false }] }]);
@@ -194,16 +242,28 @@ describe('2-4 workScore decides where a work drifts', () => {
 
 // --- 2-3 report --------------------------------------------------------------------------------------------------
 
-describe('2-3 a report is kept per work and the reporter stops seeing that person', () => {
-  it('report → user_reports (the work), the work hidden, the person blocked (user_blocks)', async () => {
+describe('2-3 a report is kept per work and the reporter stops seeing that person (one way, M-R317)', () => {
+  it('report → user_reports (the work), the work hidden, the person hidden for the reporter only — no block, no follow touched', async () => {
     const { db, writes } = memDb(q([planetPosts, [[{ u: 'stranger' }]]]));
-    const blocks: unknown[] = [];
-    const s = new WorkSafetyService(db as never, { block: async (...a: unknown[]) => void blocks.push(a) } as never);
+    const s = new WorkSafetyService(db as never);
     await s.report('me', 'planet_post', 'p1', { reason: 'mean' });
-    expect(writes.map((w) => w.table)).toEqual([userReports, workHides]);
+    expect(writes.map((w) => w.table)).toEqual([userReports, workHides, personHides]);
     expect(writes[0].v).toMatchObject({ reporterId: 'me', targetUserId: 'stranger', kind: 'planet-post', targetId: 'p1' });
     expect(writes[1].v).toEqual({ userId: 'me', kind: 'planet_post', targetId: 'p1' });
-    expect(blocks).toEqual([['me', 'stranger', true]]);
+    expect(writes[2].v).toEqual({ userId: 'me', hiddenId: 'stranger' });
+    expect(writes.some((w) => w.table === userBlocks || w.op === 'delete')).toBe(false);
+  });
+  it('the reported person is out of every planet place for the reporter: home (around, far), continents (landing, search counts), the old feeds', () => {
+    const one = /NOT EXISTS \(SELECT 1 FROM person_hides ph WHERE ph\.user_id = \$\d+ AND ph\.hidden_id = "(\w+)"\."user_id"\)/;
+    const since = flyingSince(new Date('2026-11-25T00:00:00Z'));
+    const s = storeOf('saturn')!;
+    for (const q1 of [aroundWhere(s, 'me', 'saturn_post', since), farWhere(s, 'me', 'saturn_post', since), continentWhere('me', 'saturn')!, planetWorkScope('me', saturnPosts.userId, 'saturn_post', saturnPosts.id)]) {
+      const r = render(q1);
+      expect(r.sql).toMatch(one);
+      expect(r.params).toContain('me');
+    }
+    // one way: only the reporter's own rows (ph.user_id = the viewer) are read, never the other side's
+    expect(render(continentWhere('me', 'jupiter')!).sql).not.toMatch(/ph\.hidden_id = \$/);
   });
   it('the blocked person’s works are out of every continent and the far scenery (both ways)', () => {
     expect(render(continentWhere('me', 'jupiter')!).sql).toMatch(/b\.blocker_id = \$\d+ AND b\.blocked_id = "jupiter_posts"\."user_id"\) OR \(b\.blocker_id = "jupiter_posts"\."user_id"/);
@@ -259,12 +319,13 @@ describe('2-5 the seen record and 〔旅〕', () => {
 });
 
 describe('2-5 ☆ a work into Bluena', () => {
-  it('someone else’s work (any kind) is kept as a link; not one’s own, not a blocked person’s', async () => {
-    const m = memDb(q([userBlocks, [[], [{ x: 'b' }]]]));
+  it('someone else’s work (any kind) is kept as a link; not one’s own, not a blocked person’s, not a reported one’s', async () => {
+    const m = memDb(q([userBlocks, [[], [{ x: 'b' }], []]], [personHides, [[], [{ x: 'me' }]]]));
     const svc = new PlanetWorksService(m.db as never, mockLlm);
     (svc as unknown as Record<string, unknown>).facts = async () => ({ userId: 'stranger', planet: 'jupiter', tags: { main: null, moods: [] }, words: '' });
     expect(await svc.save('me', 'jupiter_post', 'j1', true)).toEqual({ saved: true });
     expect(m.writes[0]).toMatchObject({ v: { userId: 'me', kind: 'jupiter_post', postId: 'j1' } });
+    await expect(svc.save('me', 'jupiter_post', 'j1', true)).rejects.toThrow();
     await expect(svc.save('me', 'jupiter_post', 'j1', true)).rejects.toThrow();
     await expect(svc.save('stranger', 'jupiter_post', 'j1', true)).rejects.toThrow();
     expect(await svc.save('me', 'jupiter_post', 'j1', false)).toEqual({ saved: false });

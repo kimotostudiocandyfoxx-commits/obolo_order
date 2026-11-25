@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
-import { LlmProvider, moderateText } from '@obolo/ai';
+import { LlmProvider, moderateText, voiceTopicTags } from '@obolo/ai';
 import {
   artTags,
   effectiveVisibility,
@@ -17,7 +17,7 @@ import {
 import { and, desc, eq, inArray, isNull, sql, type SQL } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
-import { bluenaSaves, jupiterPosts, jupiterRoots, planetPosts, planetWorkMeta, radioShows, saturnPosts, songs, userBlocks } from '../db/schema';
+import { bluenaSaves, jupiterPosts, jupiterRoots, personHides, planetPosts, planetWorkMeta, radioShows, saturnPosts, songs, userBlocks } from '../db/schema';
 import { LLM } from '../infra/tokens';
 
 type Meta = typeof planetWorkMeta.$inferSelect;
@@ -73,9 +73,22 @@ export class PlanetWorksService {
     return r.flagged ? { state: 'held', reason: r.categories.join(',') || 'other' } : { state: 'ok', reason: null };
   }
 
+  /**
+   * 2-1 Saturn (M-R316): a voice kororin's topic and moods come from its words (the post's text — typed, or what the
+   * speech-to-text heard before posting), asked of the ordinary cheap text model (LLM: the same Flash-Lite chain as the
+   * words check). Its cost is a small cost of the request it runs in (cost-scope: the poster's free feature, accrued like
+   * the words check); the admin backfill runs without a member, so there it is recorded only (the operator's).
+   * null = not known (the model failed): the work keeps no topic and the backfill asks again.
+   */
+  async tagsFor(kind: PlanetWorkKind, facts: WorkFacts): Promise<WorkTags> {
+    if (kind !== 'saturn_post' || facts.tags.main) return facts.tags;
+    return (await voiceTopicTags(facts.words, this.llm).catch(() => null)) ?? facts.tags;
+  }
+
   /** 2-1: the tags (and the check) of a work just made; never fails the making (logged and left to the backfill) */
-  async tag(kind: PlanetWorkKind, workId: string, facts: WorkFacts): Promise<void> {
+  async tag(kind: PlanetWorkKind, workId: string, facts0: WorkFacts): Promise<void> {
     try {
+      const facts = { ...facts0, tags: await this.tagsFor(kind, facts0) };
       const c = await this.check([facts.words, facts.tags.main ?? '', ...facts.tags.moods].join(' '));
       const now = new Date();
       await this.db.write
@@ -190,15 +203,20 @@ export class PlanetWorksService {
       .from(userBlocks)
       .where(sql`(${userBlocks.blockerId} = ${a} AND ${userBlocks.blockedId} = ${b}) OR (${userBlocks.blockerId} = ${b} AND ${userBlocks.blockedId} = ${a})`)
       .limit(1);
-    return r.length > 0;
+    if (r.length) return true;
+    // 2-3 (M-R317): a person the viewer reported is hidden for them (one way)
+    const h = await this.db.read.select({ x: personHides.userId }).from(personHides).where(and(eq(personHides.userId, a), eq(personHides.hiddenId, b))).limit(1);
+    return h.length > 0;
   }
 
   // --- backfill -----------------------------------------------------------------------------------------------------
 
   /**
    * 2-1 for the works made before tags existed: `limit` of each store at a time (oldest first) get their tags (a
-   * song's from its designJson, an art's from its root's spell when known) and the check. Their visibility stays the
-   * default (null).
+   * song's from its designJson, an art's from its root's spell when known, a voice kororin's from its words) and the
+   * check. Their visibility stays the default (null). Saturn also again: the kororins whose topic is not known yet (the
+   * model failed when they were made) — counted only when they get one now, so the repeat ends at 0 even while the model
+   * is down.
    */
   async backfill(limit = 200): Promise<Record<PlanetWorkKind, number>> {
     const missing = (kind: PlanetWorkKind, id: SQL) => sql`NOT EXISTS (SELECT 1 FROM planet_work_meta pm WHERE pm.kind = ${kind} AND pm.work_id = ${id})`;
@@ -225,6 +243,23 @@ export class PlanetWorksService {
         await this.tag(kind, id, f);
         done[kind]++;
       }
+    // 2-1 Saturn: the kororins tagged without a topic (the model failed then), asked again
+    const untopiced = (
+      await this.db.read
+        .select({ id: planetWorkMeta.workId })
+        .from(planetWorkMeta)
+        .where(and(eq(planetWorkMeta.kind, 'saturn_post'), isNull(planetWorkMeta.main)))
+        .orderBy(planetWorkMeta.createdAt)
+        .limit(limit)
+    ).map((r) => r.id);
+    for (const id of untopiced) {
+      const f = await this.facts('saturn_post', id);
+      if (!f) continue;
+      const tags = await this.tagsFor('saturn_post', f);
+      if (!tags.main) continue;
+      await this.tag('saturn_post', id, { ...f, tags });
+      done.saturn_post++;
+    }
     return done;
   }
 }

@@ -26,7 +26,7 @@ import { notChild, planetWorkScope, viewerSeesAuthor } from '../common/child';
 import { apiError } from '../common/errors';
 import { AppConfig, CONFIG } from '../config';
 import { Database } from '../db/db';
-import { bluenaSaves, mediaObjects, planetPosts, radioLives, radioMessages, radioShows, songs, userBlocks, userReports, users } from '../db/schema';
+import { bluenaSaves, mediaObjects, personHides, planetPosts, radioLives, radioMessages, radioShows, songs, userBlocks, userReports, users } from '../db/schema';
 import { LLM } from '../infra/tokens';
 import { activeMember } from '../users/tester';
 import { PlanetWorksService } from '../planets/planet-works.service';
@@ -77,7 +77,9 @@ export class RadioService {
       .select({ a: userBlocks.blockerId, b: userBlocks.blockedId })
       .from(userBlocks)
       .where(or(eq(userBlocks.blockerId, userId), eq(userBlocks.blockedId, userId)));
-    return new Set(rows.map((r) => (r.a === userId ? r.b : r.a)));
+    // planets 2-3 (M-R317): people this user reported are out of their sight too (one way: only this user's rows)
+    const hidden = (await this.db.read.select({ id: personHides.hiddenId }).from(personHides).where(eq(personHides.userId, userId))) ?? [];
+    return new Set([...rows.map((r) => (r.a === userId ? r.b : r.a)), ...hidden.map((h) => h.id)]);
   }
 
   private async people(ids: string[]): Promise<Map<string, CommsPerson>> {

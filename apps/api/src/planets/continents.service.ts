@@ -22,7 +22,7 @@ import {
   type WorkTags,
 } from '@obolo/shared';
 import { and, asc, eq, isNull, sql, type SQL } from 'drizzle-orm';
-import { notHidden } from '../common/child';
+import { notHidden, notPersonHidden } from '../common/child';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
 import { continents, continentSeen, planetHomes, planetWorkMeta, users } from '../db/schema';
@@ -83,7 +83,7 @@ export function continentWhere(viewerId: string, planet: HomePlanet): SQL | null
   const s = storeOf(planet);
   const kind = PLANET_HOMES[planet].store;
   if (!s || !kind) return null;
-  return sql`(${s.live} AND COALESCE(${planetWorkMeta.visibility}, ${PLANET_WORK_DEFAULT_VISIBILITY}) = 'public' AND ${planetWorkMeta.checkState} = 'ok' AND ${users.deletedAt} IS NULL AND ${users.suspendedAt} IS NULL AND (${s.userId} = ${viewerId} OR (NOT ${authorIsYoung(s.userId)} AND ${notHidden(viewerId, kind, s.id)} AND NOT ${blockedWith(viewerId, s.userId)})))`;
+  return sql`(${s.live} AND COALESCE(${planetWorkMeta.visibility}, ${PLANET_WORK_DEFAULT_VISIBILITY}) = 'public' AND ${planetWorkMeta.checkState} = 'ok' AND ${users.deletedAt} IS NULL AND ${users.suspendedAt} IS NULL AND (${s.userId} = ${viewerId} OR (NOT ${authorIsYoung(s.userId)} AND ${notHidden(viewerId, kind, s.id)} AND ${notPersonHidden(viewerId, s.userId)} AND NOT ${blockedWith(viewerId, s.userId)})))`;
 }
 
 /**

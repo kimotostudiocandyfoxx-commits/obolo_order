@@ -230,7 +230,7 @@ export class SaturnService {
       if (repostOf) await tx.update(saturnPosts).set({ repostCount: sql`${saturnPosts.repostCount} + 1` }).where(eq(saturnPosts.id, repostOf.id));
       return row;
     });
-    // planets 2-1: a kororin carries the same tag shape (its values come with Saturn's handoff)
+    // planets 2-1 (M-R316): a kororin's topic and moods, read from its words in tag() (never stops the post)
     if (!replyToId) await this.works?.tag('saturn_post', p.id, { userId, planet: 'saturn', tags: genericTags(null), words: p.text });
     return this.toView(p, author, false, repostOf);
   }

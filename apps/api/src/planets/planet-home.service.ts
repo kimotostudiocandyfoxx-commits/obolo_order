@@ -19,7 +19,7 @@ import {
   readTags,
 } from '@obolo/shared';
 import { and, eq, inArray, isNull, or, sql, type SQL } from 'drizzle-orm';
-import { dachiOf, notHidden, viewerIsYoung } from '../common/child';
+import { dachiOf, notHidden, notPersonHidden, viewerIsYoung } from '../common/child';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
 import { follows, jupiterPosts, planetHomes, planetPosts, planetWorkMeta, radioShows, saturnPosts, userBlocks, users } from '../db/schema';
@@ -122,14 +122,14 @@ export const ownWhere = (s: Store, viewerId: string): SQL => sql`(${s.live} AND 
 
 /** dachi always (within 88h); 推し only for a viewer who is not young, and never a young maker who is not a dachi */
 export const aroundWhere = (s: Store, viewerId: string, kind: PlanetWorkKind, since: Date): SQL =>
-  sql`(${s.live} AND ${s.flownAt} > ${since} AND ${s.userId} <> ${viewerId} AND (${s.userId} IN (${dachiOf(viewerId)}) OR (${s.userId} IN (${followsOf(viewerId)}) AND NOT ${viewerIsYoung(viewerId)} AND NOT ${authorIsYoung(s.userId)})) AND ${notHidden(viewerId, kind, s.id)} AND NOT ${blockedWith(viewerId, s.userId)})`;
+  sql`(${s.live} AND ${s.flownAt} > ${since} AND ${s.userId} <> ${viewerId} AND (${s.userId} IN (${dachiOf(viewerId)}) OR (${s.userId} IN (${followsOf(viewerId)}) AND NOT ${viewerIsYoung(viewerId)} AND NOT ${authorIsYoung(s.userId)})) AND ${notHidden(viewerId, kind, s.id)} AND ${notPersonHidden(viewerId, s.userId)} AND NOT ${blockedWith(viewerId, s.userId)})`;
 
 /**
  * strangers (not followed), for a viewer who is not young, never a young maker, within 88h — and (planets 2-2) only a
  * work that is public in effect: a dachi work never reaches a stranger
  */
 export const farWhere = (s: Store, viewerId: string, kind: PlanetWorkKind, since: Date): SQL =>
-  sql`(${s.live} AND ${s.flownAt} > ${since} AND ${s.userId} <> ${viewerId} AND ${s.userId} NOT IN (${followsOf(viewerId)}) AND NOT ${viewerIsYoung(viewerId)} AND NOT ${authorIsYoung(s.userId)} AND ${notHidden(viewerId, kind, s.id)} AND NOT ${blockedWith(viewerId, s.userId)} AND ${isPublicWork(kind, s.id)})`;
+  sql`(${s.live} AND ${s.flownAt} > ${since} AND ${s.userId} <> ${viewerId} AND ${s.userId} NOT IN (${followsOf(viewerId)}) AND NOT ${viewerIsYoung(viewerId)} AND NOT ${authorIsYoung(s.userId)} AND ${notHidden(viewerId, kind, s.id)} AND ${notPersonHidden(viewerId, s.userId)} AND NOT ${blockedWith(viewerId, s.userId)} AND ${isPublicWork(kind, s.id)})`;
 
 type Row = { id: string; userId: string; flownAt: Date | string; text: string | null; title: string | null; url: string | null; thumb: string | null; seconds: number | null; name: string; pic: string | null; chibi?: string | null; kPic?: number | null; figure?: string | null; ball?: string | null };
 

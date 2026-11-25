@@ -5,7 +5,7 @@
 
 ルールの本体は `packages/shared/src/planetWorks.ts`（純粋な関数。API と web で同じものを使う）。
 API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`・`continents.controller.ts`。
-表は migration `0056_planet_works.sql`。
+表は migration `0056_planet_works.sql`・`0057_person_hides_saturn_plazas.sql`。
 
 ## 2-1 作品のタグ（ユーザーには見せない）
 - 表 `planet_work_meta`（`kind` + `work_id` で1行。kind は `planet_post`・`jupiter_post`・`saturn_post`・`radio_show`）：`main`（主分類1つ）、`moods_json`（雰囲気、10まで）、`bpm`（曲だけ）。
@@ -13,8 +13,11 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 - 値はスペル・設定から自動：
   - 曲（水星）：`songs.designJson` の genre・mood・bpm（＋アトリエで作った曲は、はいと言ったスペル `designJson.spell` も入るようにした）→ `songTags()`。スタジオのジャンル（約50）は大陸の言葉（EDM／ヒップホップ／バラード／ロック／ローファイ／シティポップ／アニソン／ジャズ／J-POP）に寄せる。表にないジャンルはそのままの名前。
   - アート（木星）：根っこ（`jupiter_roots.spell_json`、アトリエが `POST /jupiter/roots` に `spell` を添える）のスペルの style が主分類、color・light・mood・theme が雰囲気 → `artTags()`。アニメ風→アニメ塗り など。写真（スペルなし）は空。
-  - MV・ラジオ・コロリン（と、これからのグッズ・物語・ゲーム）：同じ形の `genericTags()`。**値は 02 以降の文書で決まる**（今は空）。
-- 前からある作品：`POST /admin/planet-works-backfill?limit=200`（x-admin-token）。曲は designJson から、アートは根っこのスペルが分かる時だけ付く。0 件になるまで繰り返す。
+  - 声のコロリン（土星・M-R316）：**吹きこんだ言葉から自動**。言葉は投稿の `saturn_posts.text`（打った言葉、または投稿の前に `POST /voice/transcribe` で聞き取った言葉。投稿は必ず言葉を持つ）。`PlanetWorksService.tag()` が、言葉のチェックと同じ安いモデル（`LLM`＝Gemini Flash-Lite の列）に1回だけ聞く（`voiceTopicTags`、@obolo/ai。温度0・答えは小さな JSON）。話題（主分類）は 雑談／恋バナ／推し／学校／夜／ゲーム／お笑い／アニメ／朝／眠い のどれか（ほかは雑談）、雰囲気はゆるい・日常・ドキドキ・好きな人・アイドル・ライブ・部活・テスト・深夜・眠れない・対戦・実況・ボケ・ツッコミ・名シーン・マンガ・おはよう・元気・おやすみ・夜 から4つまで（`PLANET_VOICE_TOPICS`・`PLANET_VOICE_MOODS`、@obolo/shared）。モデルなし（mock）の時は言葉のルール（`voiceTagsOfWords`）。
+    - 原価：その投稿のリクエストの「小さな原価」（cost-scope：投稿した人・無料の機能。言葉のチェックと同じく、たまって1マナになったら引く。docs/マナの値段.md 3.）。管理の backfill の時は会員がいないので記録だけ（運営）。
+    - モデルが失敗しても投稿は止めない：話題なし（`main` null）で行を書く → backfill が聞き直す（今つけられた分だけ数えるので、モデルが落ちていても 0 で止まる）。
+  - MV・ラジオ（と、これからのグッズ・物語・ゲーム）：同じ形の `genericTags()`。**値は 02 以降の文書で決まる**（今は空）。
+- 前からある作品：`POST /admin/planet-works-backfill?limit=200`（x-admin-token）。曲は designJson から、アートは根っこのスペルが分かる時だけ付く、コロリンは言葉から（話題のまだない行も聞き直す）。0 件になるまで繰り返す。スペルのない前のアート・写真はタグなし（大陸には出ない、ダチのホームには出る：受け入れ済み）。
 
 ## 2-2 作品ごとの公開範囲
 - `dachi`（ダチ・推しのホームだけ）／`public`（知らない人の大陸にも流れ着く）。`planet_work_meta.visibility`、**null = 初期値に従う**。
@@ -25,15 +28,16 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 
 ## 2-3 作品単位の通報・非表示・自動チェック
 - 〔⋯〕「この人を表示しない」＝今の `POST /comms/block`（user_blocks）。
-- 〔⋯〕「通報する」＝今の `POST /planet-works/:kind/:id/report`。作品単位で `user_reports`（kind＋target_id）に入り、**その作品は本人に見えなくなり（work_hides）、その人もブロック**（comms の block をそのまま使う：フォローは両方向とも切れる）。
+- 〔⋯〕「通報する」＝今の `POST /planet-works/:kind/:id/report`。作品単位で `user_reports`（kind＋target_id）に入り、運営に届く。**その作品は本人に見えなくなり（work_hides）、通報した人の側から、その人の作品と姿が一方向に見えなくなる**（表 `person_hides`、M-R317）。ブロックはしない：ダチ・推しの関係は自動では変えない（切るのは本人が別に「この人を表示しない」で）。
+  - 効く所：ホームの around・far、大陸（降りる・検索の数）、前からの各惑星のフィード（`planetWorkScope`）、ラジオ、☆の保存（`common/child.ts notPersonHidden`）。旅は大陸だけを返すので作品は出ない。
 - 自動チェック：作品が作られた時に1回、言葉（題・ひとこと・タグ）を作る時と同じ `moderateText`（@obolo/ai）で見る。通らなければ `check_state = 'held'`・`check_reason` に理由（カテゴリ）。held の作品は public を選んでも dachi のまま。
 - **絵のチェックはまだない**（P-MOD-1）。アトリエで描いた絵は、チェックを通ったスペルから描かれる。アップロードした写真は見ていない。
 
 ## 2-4 大陸（データ）
 - 表 `continents`：planet、key、name、`creator_id`（null＝運営。M-R297 のユーザーの大陸はここに行を足すだけ）、`rule_json` `{g, m, bpm?}`、`tags_json`（さがす時の #タグ）、絵3枚 `sky_url`（空から見た島）・`land_url`（降りた景色）・`shore_url`（岸から見た景色）、`sort_order`。
 - 流れ着く判定（試作 `workScore`）：主分類が合えば +3、雰囲気1つごとに +2、bpm の範囲外なら −2（何か合った時だけ）。**2点以上で流れ着く**。1つの作品が複数の大陸に流れ着く。並びは点の高い順、同点はランダム（人気順にしない）。
-- 種：水星・木星の10ずつ（試作の CONT／RULE そのまま）。試作で「by Nagi」などとなっていた5つも、本当の会員ではないので運営の大陸として入れた。お気に入りの初期値は `sort_order` の先頭5つ（試作の運営の5つ）。
-- **まだない絵**：20大陸 × 3枚 ＝ 60枚（全部 null）。
+- 種：水星・木星・土星の10ずつ（試作の CONT／RULE そのまま。土星の広場は 0057、M-R316：おしゃべり広場・恋バナの部屋・推し語りステージ・放課後テラス・夜ふかしラウンジ・ゲーム実況の島・お笑い劇場・アニメ語りカフェ・おはよう広場・ねむねむ星）。試作で「by Nagi」などとなっていた5つずつも、本当の会員ではないので運営の大陸（`creator_id` null）。**運営の大陸は作った人の名前を送らない**（`creator: null`、M-R317）。お気に入りの初期値は `sort_order` の先頭5つ（試作の運営の5つ）。
+- **まだない絵**：30大陸 × 3枚 ＝ 90枚（全部 null）。
 
 ## 2-5 ユーザーごとの保存
 - お気に入りの大陸：`planet_homes.continent_favs_json`（5枠、null＝空き）。一度も選んでいなければ運営の5つ。消えた大陸の枠は空きになる。☆は空き枠へ、5つ埋まっていれば 409 `FULL`（枠を言えば入れかえ）。
@@ -56,13 +60,13 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 | `POST /planet-continents/:planet/:key/visit` | 降りたことを記録 |
 | `GET /planet-works/:kind/:id/visibility` ・ `PUT …/visibility {visibility}` | 公開範囲（持ち主だけ） |
 | `PUT /planet-works/:kind/:id/save {on}` ・ `GET /planet-works/saved` | ☆ ブルーナ |
-| `POST /planet-works/:kind/:id/report` ・ `…/hide` | 通報（＋非表示＋ブロック）・見えなくする（前から） |
+| `POST /planet-works/:kind/:id/report` ・ `…/hide` | 通報（＋作品の非表示＋その人を一方向に非表示）・見えなくする（前から） |
 | `POST /admin/planet-works-backfill?limit=` | 前の作品のタグ・チェック |
 | `GET /planet-home/:planet` | 前から。作品に `tags`、自分の作品に `visibility`・`heldReason` が付いた |
 
 ## まだのこと
 - 公開範囲の初期値（依頼主の答え待ち。今は dachi）。
-- 大陸の絵 60枚。
-- MV・ラジオ・グッズ・物語・ゲーム・コロリンのタグの値（02 以降）。
-- 木星のスタイル：スペルの style（水彩・油絵・クレヨン・絵本風・アニメ風・ドット絵・切り絵・えんぴつ画・立体）にゆめかわ・和モダン・レトロ・ポップがない。その大陸には雰囲気（パステル・和風・ポップ・あざやか）で流れ着く。
+- 大陸の絵 90枚。
+- MV・ラジオ・グッズ・物語・ゲームのタグの値（02 以降）。
+- 木星のスタイル：アートのスペルの style に **ゆめかわ・和モダン・レトロ・ポップ** を足した（`packages/shared/src/spell.ts`、スペルのモデルの案内 `packages/ai/src/prompts/spell.ts` も）。これからのアートはその広場に画風でも流れ着く。
 - 絵の自動チェック（P-MOD-1）。

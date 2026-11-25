@@ -38,4 +38,11 @@ export const notHidden = (viewerId: string, kind: WorkKind, idCol: AnyColumn | S
 
 /** what every planet's wide place applies to a work: no strangers for the young, no hidden works */
 export const planetWorkScope = (viewerId: string, authorCol: AnyColumn, kind: WorkKind, idCol: AnyColumn): SQL =>
-  sql`(${viewerSeesAuthor(viewerId, authorCol)} AND ${notHidden(viewerId, kind, idCol)})`;
+  sql`(${viewerSeesAuthor(viewerId, authorCol)} AND ${notHidden(viewerId, kind, idCol)} AND ${notPersonHidden(viewerId, authorCol)})`;
+
+/**
+ * Planets 2-3 (M-R317): leaves out every work (and so the figure) of a person the viewer reported — one way, from the
+ * reporter's side only (person_hides); the relation itself is untouched
+ */
+export const notPersonHidden = (viewerId: string, authorCol: AnyColumn | SQL): SQL =>
+  sql`NOT EXISTS (SELECT 1 FROM person_hides ph WHERE ph.user_id = ${viewerId} AND ph.hidden_id = ${authorCol})`;
