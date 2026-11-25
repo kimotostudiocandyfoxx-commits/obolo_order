@@ -10106,7 +10106,7 @@
       "refs": [
         "design/mv-art/out/home3-bg-mercury.jpg"
       ],
-      "prompt": "A NEW view in exactly the same bright summer Japanese anime art style and colours as the reference picture. Vertical phone wallpaper 9:16. On the white sandy beach of your own little island at golden sunset: the cosy white house with a red roof and palm trees in the back, the sparkling sea and the big setting sun on the horizon, warm orange-pink sky with soft clouds. The wide flat sand in the lower half is empty, ready for a row of speakers to stand along the shore. Nostalgic, warm. No people, no speakers, no text."
+      "prompt": "A NEW view in exactly the same bright summer Japanese anime art style and colours as the reference picture. Vertical phone wallpaper 9:16. Standing ON your own small island at golden sunset: right behind on the left, on the same white sand, the cosy white house with a red roof, a wooden porch with string lights and two palm trees — big and close, not far away. To the right the sparkling sea and the big setting sun on the horizon, warm orange-pink sky with soft clouds. The wide flat white sand across the lower half is empty, ready for a row of speakers to stand along it. Nostalgic, warm. No people, no speakers, no text."
     },
     {
       "id": "speaker3",
@@ -10120,5 +10120,7 @@
       "prompt": "A single cute retro speaker tower drawn in bright summer Japanese anime style, front view: a rounded cream-and-coral cabinet with soft glossy highlights, two round woofers stacked, and a large perfectly SQUARE flat empty panel on the upper front (plain light grey, nothing printed) where an album cover will be placed, little brass feet. Clean lines, cel shading. Centered, whole speaker in frame. Plain solid pure white background, no shadow, no text."
     }
   ],
-  "redo": []
+  "redo": [
+    "home3-bg-mercury-beach"
+  ]
 }

@@ -148,6 +148,16 @@ if os.path.exists(f):
     big=Image.new('RGBA',(2*R,2*R),(0,0,0,0)); big.paste(im,(R-cx,R-cy)); mk=Image.new('L',(8*R,8*R),0); _D3.Draw(mk).ellipse((0,0,8*R-1,8*R-1),fill=255); big.putalpha(mk.resize((2*R,2*R),Image.LANCZOS))
     big.thumbnail((900,900),Image.LANCZOS); A['rec-top']=uri(big,84); A['rectop-geo']='[0.5,0.494,0.73]'
     im2=im.copy(); im2.thumbnail((720,1280)); A['bg2-saturn-top']=uri(im2,78)
+for nm,k2 in [('home3-bg-jupiter-atelier','bg3-jupiter-atelier'),('home3-bg-mercury-beach','bg3-mercury-beach')]:
+    f=f'{O}/{nm}.jpg'
+    if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A[k2]=uri(im,78)
+f=f'{O}/speaker3.jpg'
+if os.path.exists(f):
+    o=unwhite(Image.open(f)); a_=np.asarray(Image.alpha_composite(Image.new('RGBA',o.size,(255,255,255,255)),o).convert('RGB')).astype(int)
+    g_=(np.abs(a_[...,0]-a_[...,1])<12)&(np.abs(a_[...,1]-a_[...,2])<12)&(a_.mean(2)>150)&(a_.mean(2)<235)
+    h_,w_=g_.shape; ys,xs=np.where(g_[:h_//2]);
+    if len(xs)>50: A['spk-panel']=_json.dumps([round(np.percentile(xs,3)/w_,3),round(np.percentile(ys,3)/h_,3),round((np.percentile(xs,97)-np.percentile(xs,3))/w_,3),round((np.percentile(ys,97)-np.percentile(ys,3))/h_,3)])
+    o.thumbnail((260,260),Image.LANCZOS); A['speaker3']=uri(o,86)
 VD=os.environ.get('VOICE_DIR')
 if VD:
     for n in range(1,6):

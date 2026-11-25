@@ -333,6 +333,19 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .prof.on{opacity:1;pointer-events:auto;transform:none}
 .prof .pbg{position:absolute;inset:0;background-size:cover;background-position:center}
 .prof .prec{position:absolute;border-radius:50%;touch-action:none;cursor:grab;background-size:100% 100%;will-change:transform}
+.prof .pgal{position:absolute;left:0;right:0;top:66px;bottom:118px;overflow-y:auto;padding:10px 18px 30px;display:grid;grid-template-columns:1fr 1fr;gap:22px 16px;align-content:start;scrollbar-width:none;z-index:2}
+.prof .pgal .fr{position:relative;aspect-ratio:1;background-size:cover;background-position:center;border:5px solid #c9a24a;outline:2px solid #6b4a16;box-shadow:0 10px 18px rgba(30,15,0,.5),inset 0 0 0 2px rgba(255,240,200,.5);cursor:pointer;transition:transform .2s}
+.prof .pgal .fr::before{content:"";position:absolute;left:50%;top:-16px;width:2px;height:14px;background:linear-gradient(#a08050,#5a3a10);transform:translateX(-50%)}
+.prof .pgal .fr::after{content:"";position:absolute;left:50%;top:-20px;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:#e8c46a;box-shadow:0 1px 2px rgba(0,0,0,.5)}
+.prof .pgal .fr:active{transform:scale(.96)}
+.prof .pbeach{position:absolute;left:0;right:0;bottom:118px;height:46%;overflow-x:auto;overflow-y:hidden;display:flex;align-items:flex-end;gap:6px;padding:0 24px 8px;scrollbar-width:none;z-index:2;scroll-snap-type:x mandatory}
+.prof .spk{position:relative;flex:0 0 auto;width:118px;height:118px;scroll-snap-align:center;cursor:pointer;transform-origin:50% 100%}
+.prof .spk img.s{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 8px 8px rgba(80,30,0,.35))}
+.prof .spk .cv{position:absolute;background-size:cover;background-position:center;border-radius:2px}
+.prof .spk.on{animation:spkbop .42s ease-in-out infinite alternate}
+@keyframes spkbop{from{transform:scale(1,1)}to{transform:scale(1.05,.95)}}
+.prof .spk .tt2{position:absolute;left:50%;top:100%;transform:translateX(-50%);font:800 9px var(--f-body);color:#fff;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.8)}
+.prof.pl-jupiter .prec,.prof.pl-mercury .prec{display:none}
 .prof .pball{position:absolute;width:44px;height:44px;margin:-22px;cursor:pointer;transition:opacity .25s}
 .prof .pball img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 5px rgba(20,0,40,.45));animation:pbob 2.6s ease-in-out infinite}
 @keyframes pbob{50%{transform:translateY(-3px)}}
@@ -430,7 +443,7 @@ button:focus-visible,.item:focus-visible,.home:focus-visible{outline:3px solid v
   <div class="fw" id="fw" aria-hidden="true"><div class="sky2"></div></div>
   <div class="fest" id="fest" aria-hidden="true"><div class="dusk"></div><div class="glow"></div></div>
   <div class="camfx" id="camfx" aria-hidden="true"></div>
-  <div class="prof" id="prof" aria-hidden="true"><div class="pbg" id="pbg"></div><div class="prec" id="prec"></div><div class="pstage" id="pstage"></div><div class="phead"><button class="pback" id="pback" type="button" aria-label="もどる">←</button><div class="pwho"><img id="pwimg" alt=""><span id="pwname"></span></div></div><div class="pdachi" id="pdachi"></div><div class="pswipe" id="pswipe" hidden>← スワイプで次のダチ →</div></div>
+  <div class="prof" id="prof" aria-hidden="true"><div class="pbg" id="pbg"></div><div class="prec" id="prec"></div><div class="pgal" id="pgal" hidden></div><div class="pbeach" id="pbeach" hidden></div><div class="pstage" id="pstage"></div><div class="phead"><button class="pback" id="pback" type="button" aria-label="もどる">←</button><div class="pwho"><img id="pwimg" alt=""><span id="pwname"></span></div></div><div class="pdachi" id="pdachi"></div><div class="pswipe" id="pswipe" hidden>← スワイプで次のダチ →</div></div>
   <div class="hv" id="hv" aria-hidden="true"><div class="hvbg" id="hvbg"></div><div class="hvfx" id="hvfx"></div><div class="vig"></div><div class="glow2"></div><div class="hvstage" id="hvstage"></div><div class="hvback" id="hvback"><img alt=""></div><div class="lb t"></div><div class="lb b"></div><div class="flash"></div></div>
   <div class="spinwrap" id="spinwrap"><div class="spinner"></div></div>
   <div class="sky" id="sky"></div>
@@ -655,18 +668,32 @@ const PLINES=['明日もがんばるZE','うまいラーメン見つけた','ね
 const PDACHI=['MIKIE⭐︎DRILL','KIMORIN⭐︎','MONBAN','たこ焼きブラザー','たこ焼きシスター'];
 let PROF=null;
 function korImg(n,i){const k4=K4N(n);return (k4&&A['kor4-'+k4])||A[KOR2[(i*5+n.length*3)%KN()]]||''}
-function openProf(name){if(SV)stopPlay();const pr=$('prof'),ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,G=JSON.parse(A['rectop-geo']||'[.5,.5,.48]');
-  $('pbg').style.backgroundImage=`url(${A['bg2-saturn-top']||''})`;const rc=$('prec');const D=G[2]*2*W;rc.style.width=rc.style.height=D+'px';rc.style.left=(G[0]*W-D/2)+'px';rc.style.top=(G[1]*H-D/2)+'px';rc.style.backgroundImage='none';
+const PICON={saturn:(n,i)=>korImg(n,i),jupiter:(n)=>A['chibi4-'+CHB(n)]||A['chibi-'+CHB(n)]||'',mercury:(n,i)=>{const k=K4N(n);return (k&&A['ship4-'+k])||A['ship3-'+((n.length)%4+1)]||''}};
+let PART=null;
+function openProf(name,pl){pl=pl||(cur==='jupiter'||cur==='mercury'?cur:'saturn');if(SV)stopPlay();if(typeof JV!=='undefined'&&JV)stopJ();if(typeof MV!=='undefined'&&MV)stopM();if(PART)PART.close();
+  const pr=$('prof');pr.className='prof pl-'+pl;$('pgal').hidden=pl!=='jupiter';$('pbeach').hidden=pl!=='mercury';
+  if(pl==='jupiter'){$('pbg').style.backgroundImage=`url(${A['bg3-jupiter-atelier']||A['bg3-jupiter']||''})`;const n=name===ME?10:5+name.length%4,g=$('pgal');g.innerHTML='';g.scrollTop=0;
+    for(let j=0;j<n;j++){const ai=(j*3+name.length)%5+1,f=document.createElement('div');f.className='fr';f.style.backgroundImage=`url(${A['jart-'+ai]||''})`;f.style.transform=`rotate(${((j*37)%7-3)*.5}deg)`;f.onclick=()=>profArt(name,ai);g.appendChild(f)}}
+  if(pl==='mercury'){$('pbg').style.backgroundImage=`url(${A['bg3-mercury-beach']||A['bg3-mercury']||''})`;const n=name===ME?8:4+name.length%3,bc=$('pbeach'),P=JSON.parse(A['spk-panel']||'[.27,.12,.46,.36]');bc.innerHTML='';bc.scrollLeft=0;
+    for(let j=0;j<n;j++){const ji=(j*2+name.length)%5+1,s=document.createElement('div');s.className='spk';s.style.width=s.style.height=(104+(j%3)*14)+'px';s.innerHTML=`<img class="s" alt="" src="${A['speaker3']||''}"><div class="cv" style="left:${P[0]*100}%;top:${P[1]*100}%;width:${P[2]*100}%;height:${P[3]*100}%;background-image:url(${A['jart-'+ji]||''})"></div><span class="tt2">${MSONG[ji-1]}</span>`;s.onclick=()=>profSong(name,ji,s);bc.appendChild(s)}}
+  openProfS(name,pl)}
+function openProfS(name,pl){const pr=$('prof'),ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,G=JSON.parse(A['rectop-geo']||'[.5,.5,.48]');
+  if(pl==='saturn')$('pbg').style.backgroundImage=`url(${A['bg2-saturn-top']||''})`;const rc=$('prec');const D=G[2]*2*W;rc.style.width=rc.style.height=D+'px';rc.style.left=(G[0]*W-D/2)+'px';rc.style.top=(G[1]*H-D/2)+'px';rc.style.backgroundImage='none';
   const mine=name===ME,n=mine?18:10+name.length%4;rc.innerHTML='';const balls=[];
   for(let j=0;j<n;j++){const f=n>1?j/(n-1):0,r=.17+(.32-.17)*f,a=j*.85+.3,b=document.createElement('div');b.className='pball'+(j===n-1?' new':'');
     b.style.left=(50+r*100*Math.cos(a))+'%';b.style.top=(50+r*100*Math.sin(a))+'%';b.style.width=b.style.height=(38+f*12)+'px';b.innerHTML=`<img alt="" src="${korImg(name,j)}">`;rc.appendChild(b);balls.push({b,j});
     b.addEventListener('pointerup',ev=>{if(PROF&&PROF.moved<6)pastPop(name,j,b)})}
-  $('pwimg').src=korImg(name,0);$('pwname').textContent=name;
+  $('pwimg').src=PICON[pl](name,0);$('pwname').textContent=name;
   const dl=$('pdachi');dl.innerHTML='';dl.hidden=!mine;$('pswipe').hidden=mine;
-  if(mine){dl.innerHTML='<span class="lab">ダチのレコード</span>'+PDACHI.map(d=>`<button type="button" data-n="${d}"><img alt="" src="${korImg(d,0)}">${d}</button>`).join('');dl.querySelectorAll('button').forEach(x=>x.onclick=()=>openProf(x.dataset.n))}
-  PROF={name,ang:PROF&&PROF.name===name?PROF.ang:0,vel:0,moved:0,balls};setRot();pr.classList.add('on');pr.setAttribute('aria-hidden','false');whoosh()}
+  if(mine){dl.innerHTML=`<span class="lab">${{saturn:'ダチのレコード',jupiter:'ダチのアトリエ',mercury:'ダチの島'}[pl]}</span>`+PDACHI.map(d=>`<button type="button" data-n="${d}"><img alt="" src="${PICON[pl](d,0)}">${d}</button>`).join('');dl.querySelectorAll('button').forEach(x=>x.onclick=()=>openProf(x.dataset.n,pl))}
+  PROF={name,pl,ang:PROF&&PROF.name===name?PROF.ang:0,vel:0,moved:0,balls};setRot();pr.classList.add('on');pr.setAttribute('aria-hidden','false');whoosh()}
+function profArt(name,ai){if(PART)return;const st=$('pstage');st.style.pointerEvents='auto';const art=openArt(st,{img:A['jart-'+ai]||'',title:JART[ai-1]});popSound();const tk='vtitle-'+ai;if(A[tk])playVoice(tk);
+  const t0=performance.now();PART={t0,close(){art.close();st.style.pointerEvents='none';PART=null}};st.onclick=()=>{if(PART&&performance.now()-PART.t0>300)PART.close()}}
+function profSong(name,ji,s){if(PART){const same=PART.s===s;PART.close();if(same)return}const st=$('pstage');s.classList.add('on');playSong('song-'+ji);const vn=vinyl(st,A['jart-'+ji]||'','50%','30%','62%');lyricsStart(st,'song-'+ji,'52%');
+  const kt=kinTitle(st,{top:'9%',label:'',noby:1,title:MSONG[ji-1],by:name,c:'#38c8ff',c2:'#bdf0ff',g:'rgba(56,200,255,.6)'});const tm=setTimeout(()=>{const k='stitle-'+ji;if(A[k])playVoice(k)},1400);
+  PART={s,close(){clearTimeout(tm);stopSong();vn.out();kt.out();s.classList.remove('on');PART=null}}}
 function setRot(){if(!PROF)return;$('prec').style.transform=`rotate(${PROF.ang}deg)`;PROF.balls.forEach(o=>o.b.style.transform=`rotate(${-PROF.ang}deg)`)}
-function closeProf(){$('prof').classList.remove('on');$('prof').setAttribute('aria-hidden','true');$('pstage').innerHTML='';PROF=null}
+function closeProf(){if(PART)PART.close();$('prof').classList.remove('on');$('prof').setAttribute('aria-hidden','true');$('pstage').innerHTML='';PROF=null}
 function pastPop(name,j,b){const st=$('pstage');if(st.childElementCount)return;popSound();b.style.opacity='0';
   const c=document.createElement('div');c.className='pchibi';c.innerHTML=`<img alt="" src="${A['chibi-'+CHB(name)]||''}">`;st.appendChild(c);
   const bb=document.createElement('div');bb.className='pbub';bb.textContent='「'+PLINES[(j+name.length)%PLINES.length]+'」';const vk='voice-'+String(j%5+1).padStart(2,'0');
@@ -677,8 +704,8 @@ function pastPop(name,j,b){const st=$('pstage');if(st.childElementCount)return;p
   document.addEventListener('pointermove',ev=>{if(!down||!PROF)return;const a=ang(ev);let d=a-lastA;if(d>180)d-=360;if(d<-180)d+=360;const now=performance.now();PROF.ang+=d;PROF.vel=d/Math.max(8,now-lastT)*16;lastA=a;lastT=now;PROF.moved=Math.max(PROF.moved,Math.hypot(ev.clientX-down.x,ev.clientY-down.y));setRot()});
   document.addEventListener('pointerup',()=>{if(!down||!PROF){down=null;return}down=null;const spin=()=>{if(!PROF)return;PROF.vel*=.95;PROF.ang+=PROF.vel;setRot();if(Math.abs(PROF.vel)>.05)raf4=requestAnimationFrame(spin)};raf4=requestAnimationFrame(spin)});
   // swipe left/right on a dachi's record (outside the record) to visit the next dachi
-  let sw=null;document.addEventListener('pointerdown',ev=>{if(PROF&&PROF.name!==ME&&ev.target.closest('#prof')&&!ev.target.closest('#prec,.phead'))sw={x:ev.clientX,y:ev.clientY}});
-  document.addEventListener('pointerup',ev=>{if(!sw||!PROF){sw=null;return}const dx=ev.clientX-sw.x,dy=ev.clientY-sw.y;sw=null;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)){const i=PDACHI.indexOf(PROF.name),nx=PDACHI[(i+(dx<0?1:-1)+PDACHI.length)%PDACHI.length];openProf(nx)}});
+  let sw=null;document.addEventListener('pointerdown',ev=>{if(PROF&&PROF.name!==ME&&ev.target.closest('#prof')&&!ev.target.closest('#prec,.phead,#pbeach,#pgal'))sw={x:ev.clientX,y:ev.clientY}});
+  document.addEventListener('pointerup',ev=>{if(!sw||!PROF){sw=null;return}const dx=ev.clientX-sw.x,dy=ev.clientY-sw.y;sw=null;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)){const i=PDACHI.indexOf(PROF.name),nx=PDACHI[(i+(dx<0?1:-1)+PDACHI.length)%PDACHI.length];openProf(nx,PROF.pl)}});
   document.addEventListener('click',ev=>{if(ev.target.closest('#pback'))closeProf();const by=ev.target.closest('.by2');if(by){ev.stopPropagation();openProf(by.textContent.replace(/^by\s*/,''))}},true);
 })();
 document.addEventListener('click',e=>{const b=e.target.closest('#tstyle button');if(!b)return;window.TST=b.dataset.t;document.querySelectorAll('#tstyle button').forEach(x=>x.setAttribute('aria-pressed',x===b))});
@@ -933,7 +960,7 @@ function stopPlay(){SPIN=false;if(SV){SV.t.forEach(clearTimeout);clearInterval(S
 $('switch').innerHTML=Object.entries(P).map(([k,c])=>`<button type="button" data-k="${k}">${c.name}</button>`).join('');
 $('mode').onclick=e=>{const m=e.target.dataset.m;if(m){mode=m;render()}};
 $('switch').onclick=e=>{const k=e.target.dataset.k;if(k){cur=k;render()}};
-$('home').onclick=enter;$('home').onkeydown=e=>{if(e.key==='Enter')enter()};$('cta').onclick=enter;
+$('home').onclick=()=>{if((cur==='jupiter'&&A['bg3-jupiter'])||(cur==='mercury'&&A['bg3-mercury']))openProf(ME,cur);else enter()};$('home').onkeydown=e=>{if(e.key==='Enter')enter()};$('cta').onclick=enter;
 $('inClose').onclick=closeAll;const RECS=[['黒','transparent'],['ピンク','#ff7ac8'],['ラベンダー','#9b7bff'],['ミント','#3fe0b8'],['ゴールド','#ffbf40'],['空色','#5cb8ff']];
 $('swatch').innerHTML='<small style="font:700 11px var(--f-body);opacity:.85">レコードの色</small>'+RECS.map(([n,c],i)=>`<button type="button" aria-label="${n}" aria-pressed="${i===0}" style="background:${c==='transparent'?'#111':c}" data-c="${c}"></button>`).join('');
 $('swatch').onclick=e=>{const c=e.target.dataset.c;if(!c)return;$('phone').style.setProperty('--rec',c);document.querySelectorAll('#swatch button').forEach(b=>b.setAttribute('aria-pressed',b===e.target))};
