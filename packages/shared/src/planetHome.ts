@@ -72,6 +72,21 @@ export interface PlanetHomeView {
   far: HomeWork[];
 }
 
+/**
+ * GET /planet-home/:planet/person/:id — one person's past works on a planet, for their profile (04 Saturn §3: their
+ * past kororins pile up on the 2D stage). Yourself: your own works. Someone else: only a dachi, or a 推し you may see
+ * (the same people and rules as `around`, without the 88 hours), not hidden, not blocked. Anyone else: no works and no
+ * person (nothing says whether they made any). Newest first, at most PERSON_WORKS_MAX.
+ */
+export interface PlanetPersonView {
+  planet: HomePlanet;
+  person: { id: string; name: string; figure: string | null; ball: string | null } | null;
+  rel: HomeRel | null;
+  works: HomeWork[];
+}
+/** how many past works a profile shows (the prototype piles 18 of your own kororins) */
+export const PERSON_WORKS_MAX = 24;
+
 /** M-R262: the record's colours (a screen-blended layer over the record, design/home/saturn-record-mask.png) */
 export const RECORD_COLOURS = [
   { id: 'black', name: '黒', color: null },

@@ -1,5 +1,5 @@
 import type { LinkPreview } from '@obolo/shared';
-import type { ContinentLandingView, ContinentSkyView, ContinentView, FavouriteSlots, PlanetSongView } from '@obolo/shared';
+import type { ContinentLandingView, ContinentSkyView, ContinentView, FavouriteSlots, PlanetPersonView, PlanetSongView } from '@obolo/shared';
 import type { IncantBody, IncantView } from '@obolo/shared';
 import type { LyricsBody, LyricsView, SongLyrics, SongTweakBody, SongTweakResult, SongVoiceBody, SongVoiceQuoteView, SongVoiceUseView, SongVoiceVersion } from '@obolo/shared';
 import type { BookView, CompassSpell, GameBrokenBody, GameBuildBody, GameView, MoonCompassBody, NovelChapterBody, SaveSpellBody, SaveSpellResult, SavedSpell } from '@obolo/shared';
@@ -489,6 +489,8 @@ export interface Api {
   savePlanetWork(kind: PlanetWorkKind, id: string, on: boolean): Promise<{ saved: boolean }>;
   /** M-R258 星のホーム: own forever / dachi and 推し 88 hours / a few strangers far (none under 15) */
   planetHome(planet: HomePlanet): Promise<PlanetHomeView>;
+  /** 04 §3: a person's past works on a planet for their profile (yourself, a dachi, a 推し you may see) */
+  planetPerson(planet: HomePlanet, id: string): Promise<PlanetPersonView>;
   /** opened now (the next visit sparkles what came after); answers the visit before */
   planetHomeVisit(planet: HomePlanet): Promise<{ lastVisitAt: string | null }>;
   /** 並べかえ: your own works in your place */

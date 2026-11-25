@@ -30,6 +30,12 @@ export class PlanetHomeController {
     return this.homes.feed(userId, planetOf(planet));
   }
 
+  /** 04 §3: a person's past works on this planet, for their profile (yourself, a dachi, or a 推し you may see) */
+  @Get('person/:id')
+  person(@UserId() userId: string, @Param('planet') planet: string, @Param('id', new ParseUUIDPipe()) id: string) {
+    return this.homes.person(userId, planetOf(planet), id);
+  }
+
   @Post('visit')
   @HttpCode(200)
   visit(@UserId() userId: string, @Param('planet') planet: string) {

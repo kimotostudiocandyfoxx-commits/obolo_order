@@ -1,7 +1,7 @@
 import { PgDialect } from 'drizzle-orm/pg-core';
 import { describe, expect, it } from 'vitest';
 import { flyingSince, PLANET_HOMES } from '@obolo/shared';
-import { aroundWhere, farWhere, ownWhere, PlanetHomeService, storeOf } from './planet-home.service';
+import { aroundWhere, farWhere, ownWhere, personWhere, PlanetHomeService, storeOf } from './planet-home.service';
 
 const render = (q: Parameters<PgDialect['sqlToQuery']>[0]) => new PgDialect().sqlToQuery(q);
 const now = new Date('2026-11-23T12:00:00Z');
@@ -37,6 +37,16 @@ describe('星のホーム feed SQL (M-R258 / M-R257)', () => {
     expect(q.sql).toContain('AND NOT EXISTS (SELECT 1 FROM users a');
     expect(q.sql).toContain('"jupiter_posts"."created_at" >');
   });
+  it('04 §3 a person: yourself = your own works; someone else = only one who reaches your home, without the 88 hours', () => {
+    expect(render(personWhere(saturn, 'me', 'saturn_post', 'me')).sql).toBe(render(ownWhere(saturn, 'me')).sql);
+    const q = render(personWhere(saturn, 'me', 'saturn_post', 'u2'));
+    expect(q.params).toContain('u2');
+    expect(q.sql).not.toContain('created_at" >');
+    expect(q.sql).toMatch(/JOIN follows g ON g\.follower_id = f\.followee_id/);
+    expect(q.sql).toContain('AND NOT EXISTS (SELECT 1 FROM users v WHERE v.id = $');
+    expect(q.sql).toContain('NOT EXISTS (SELECT 1 FROM work_hides h');
+    expect(q.sql).toContain('user_blocks b');
+  });
   it('every planet in the config has a store or answers empty; Mercury and Mars share planet_posts by planet', () => {
     for (const p of Object.keys(PLANET_HOMES) as (keyof typeof PLANET_HOMES)[]) expect(!!storeOf(p)).toBe(!!PLANET_HOMES[p].store);
     expect(render(ownWhere(storeOf('mars')!, 'me')).params).toContain('mars');
@@ -62,6 +72,15 @@ function fakeDb(answers: unknown[], writes: unknown[] = []) {
 const row = (id: string, userId: string, hoursAgo: number) => ({ id, userId, flownAt: new Date(now.getTime() - hoursAgo * 3600_000), text: 'こんにちは', title: '', url: 'u', thumb: null, seconds: 2, name: userId, pic: null });
 
 describe('PlanetHomeService', () => {
+  it('person: a dachi past kororins newest first with their ball; nobody reachable → no person at all', async () => {
+    const db = fakeDb([[{ ...row('p1', 'u2', 200), ball: 'ball.webp', figure: 'chibi.webp' }, row('p2', 'u2', 300)], { rows: [{ id: 'u2' }] }, []]);
+    const svc = new PlanetHomeService(db as never);
+    const v = await svc.person('me', 'saturn', 'u2');
+    expect(v.rel).toBe('dachi');
+    expect(v.works.map((w) => w.id)).toEqual(['p1', 'p2']);
+    expect(v.person).toEqual({ id: 'u2', name: 'u2', figure: 'chibi.webp', ball: 'ball.webp' });
+    expect(await svc.person('me', 'saturn', 'stranger')).toEqual({ planet: 'saturn', person: null, rel: null, works: [] });
+  });
   it('feed: own in your order then newest, dachi white / 推し pink, Saturn has no far scenery', async () => {
     const db = fakeDb([
       [{ id: 'me', name: 'ネオ', onboarding: { birthYear: 1999 } }],

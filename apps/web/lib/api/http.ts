@@ -862,6 +862,9 @@ export class HttpApi implements Api {
   planetHome(planet: Parameters<Api['planetHome']>[0]) {
     return this.req<Awaited<ReturnType<Api['planetHome']>>>('GET', `/planet-home/${planet}`);
   }
+  planetPerson(planet: Parameters<Api['planetPerson']>[0], id: string) {
+    return this.req<Awaited<ReturnType<Api['planetPerson']>>>('GET', `/planet-home/${planet}/person/${encodeURIComponent(id)}`);
+  }
   planetHomeVisit(planet: Parameters<Api['planetHomeVisit']>[0]) {
     return this.req<{ lastVisitAt: string | null }>('POST', `/planet-home/${planet}/visit`);
   }

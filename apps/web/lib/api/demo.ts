@@ -564,6 +564,9 @@ export class DemoApi implements Api {
   private notInDemo(): never {
     throw new ApiError(404, 'NOT_FOUND', 'Not in the demo');
   }
+  async planetPerson(_planet: HomePlanet, _id: string): Promise<never> {
+    return this.notInDemo();
+  }
   async planetSong(_id: string): Promise<never> {
     return this.notInDemo();
   }

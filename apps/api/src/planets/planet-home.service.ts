@@ -12,6 +12,8 @@ import {
   type HomeRel,
   type HomeWork,
   type PlanetHomeView,
+  type PlanetPersonView,
+  PERSON_WORKS_MAX,
   type PlanetWorkKind,
   isKororinPic,
   kororinOf,
@@ -120,9 +122,16 @@ export const blockedWith = (viewerId: string, col: SQL): SQL =>
 /** own works: no time limit at all (kept forever) */
 export const ownWhere = (s: Store, viewerId: string): SQL => sql`(${s.live} AND ${s.userId} = ${viewerId})`;
 
+/** who reaches the viewer's home: dachi always; 推し only for a viewer who is not young, and never a young maker who is not a dachi; not hidden, not blocked */
+const reachWhere = (s: Store, viewerId: string, kind: PlanetWorkKind): SQL =>
+  sql`${s.userId} <> ${viewerId} AND (${s.userId} IN (${dachiOf(viewerId)}) OR (${s.userId} IN (${followsOf(viewerId)}) AND NOT ${viewerIsYoung(viewerId)} AND NOT ${authorIsYoung(s.userId)})) AND ${notHidden(viewerId, kind, s.id)} AND ${notPersonHidden(viewerId, s.userId)} AND NOT ${blockedWith(viewerId, s.userId)}`;
+
 /** dachi always (within 88h); 推し only for a viewer who is not young, and never a young maker who is not a dachi */
-export const aroundWhere = (s: Store, viewerId: string, kind: PlanetWorkKind, since: Date): SQL =>
-  sql`(${s.live} AND ${s.flownAt} > ${since} AND ${s.userId} <> ${viewerId} AND (${s.userId} IN (${dachiOf(viewerId)}) OR (${s.userId} IN (${followsOf(viewerId)}) AND NOT ${viewerIsYoung(viewerId)} AND NOT ${authorIsYoung(s.userId)})) AND ${notHidden(viewerId, kind, s.id)} AND ${notPersonHidden(viewerId, s.userId)} AND NOT ${blockedWith(viewerId, s.userId)})`;
+export const aroundWhere = (s: Store, viewerId: string, kind: PlanetWorkKind, since: Date): SQL => sql`(${s.live} AND ${s.flownAt} > ${since} AND ${reachWhere(s, viewerId, kind)})`;
+
+/** 04 §3 a profile's past works: yourself → your own; someone else → only one who reaches your home (no 88 hours) */
+export const personWhere = (s: Store, viewerId: string, kind: PlanetWorkKind, personId: string): SQL =>
+  personId === viewerId ? ownWhere(s, viewerId) : sql`(${s.live} AND ${s.userId} = ${personId} AND ${reachWhere(s, viewerId, kind)})`;
 
 /**
  * strangers (not followed), for a viewer who is not young, never a young maker, within 88h — and (planets 2-2) only a
@@ -214,6 +223,22 @@ export class PlanetHomeService {
       around: around.map((r) => tagged(toWork(r, kind, dachi.has(r.userId) ? 'dachi' : 'oshi'))),
       far: far.map((r) => tagged(toWork(r, kind, 'stranger'))),
     };
+  }
+
+  /**
+   * 04 §3: one person's past works on this planet for their profile (newest first). Yourself: your own; a dachi or a
+   * 推し you may see: theirs, without the 88 hours; anyone else: nothing (no person either, so nothing is told).
+   */
+  async person(viewerId: string, planet: HomePlanet, personId: string): Promise<PlanetPersonView> {
+    const s = storeOf(planet);
+    const kind = PLANET_HOMES[planet].store;
+    if (!s || !kind) return { planet, person: null, rel: null, works: [] };
+    const rows = await this.rows(s, personWhere(s, viewerId, kind, personId), sql`${s.flownAt} DESC`, PERSON_WORKS_MAX, planet);
+    if (!rows.length) return { planet, person: null, rel: null, works: [] };
+    const rel: HomeRel = personId === viewerId ? 'own' : (await this.dachiIds(viewerId)).has(personId) ? 'dachi' : 'oshi';
+    const works = rows.map((r) => toWork(r, kind, rel));
+    const a = works[0].author;
+    return { planet, person: { id: a.id, name: a.name, figure: a.figure ?? null, ball: a.ball ?? null }, rel, works };
   }
 
   /** opened: remember when (the next visit sparkles what came after); returns the visit before */
