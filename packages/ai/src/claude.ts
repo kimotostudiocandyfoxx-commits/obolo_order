@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { meterClaude } from './meter';
 import type { ChatRequest, LlmProvider, SearchAnswer, WebSource } from './types';
 
 /** Bati's conversation model (client decision 2026-11-21, docs/工房とブルーナ_設計.md §14) — a fixed id, never an alias. */
@@ -58,6 +59,7 @@ export class ClaudeProvider implements LlmProvider {
 
   async chat(req: ChatRequest): Promise<string> {
     const res = await this.client.messages.create(this.params(req));
+    meterClaude(this.model, res.usage);
     return textOf(res);
   }
 
@@ -66,6 +68,7 @@ export class ClaudeProvider implements LlmProvider {
     const s = this.client.messages.stream(this.params(req));
     s.on('text', (piece) => onText(piece));
     const res = await s.finalMessage();
+    meterClaude(this.model, res.usage);
     return textOf(res);
   }
 
@@ -85,10 +88,12 @@ export class ClaudeProvider implements LlmProvider {
       ],
     };
     let res = await this.client.messages.create(params);
+    meterClaude(this.model, res.usage);
     let searches = res.usage?.server_tool_use?.web_search_requests ?? 0;
     if (res.stop_reason === 'pause_turn') {
       const first = res;
       res = await this.client.messages.create({ ...params, messages: [...base.messages, { role: 'assistant', content: first.content }] });
+      meterClaude(this.model, res.usage);
       searches += res.usage?.server_tool_use?.web_search_requests ?? 0;
       res = { ...res, content: [...first.content, ...res.content] };
     }

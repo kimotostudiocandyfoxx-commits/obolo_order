@@ -29,6 +29,8 @@ export const MANA_REASONS = [
   'expiry',
   'admin_adjust',
   'refund',
+  // client 2026-11-25: the small costs of the free features (chat, voice, spells…), taken a whole mana at a time
+  'usage',
 ] as const;
 export type ManaReason = (typeof MANA_REASONS)[number];
 

@@ -1,4 +1,5 @@
 import { GoogleGenAI } from '@google/genai';
+import { meterGemini, meterRunware } from './meter';
 
 /**
  * Image generation for the OBOLO NEO look (Day 3) and the newborn Bati (Day 4)
@@ -35,6 +36,7 @@ export class GeminiImageProvider implements ImageProvider {
       ],
       config: { responseModalities: ['IMAGE'] },
     });
+    meterGemini(this.model, res.usageMetadata);
     for (const part of res.candidates?.[0]?.content?.parts ?? []) {
       const d = part.inlineData;
       if (d?.data) return { data: Buffer.from(d.data, 'base64'), mime: d.mimeType || 'image/png' };
@@ -57,6 +59,8 @@ export class MockImageProvider implements ImageProvider {
  * Seedream 5.0 Pro on Runware (client decision 2026-10-25: the looks and the Bati are painted by Seedream —
  * the most beautiful in the side-by-side test, ~2–7 yen a picture). `refs` are handed as reference images.
  */
+const SEEDREAM_MODEL = 'bytedance:seedream@5.0-pro';
+
 export class SeedreamImageProvider implements ImageProvider {
   readonly name = 'seedream';
   // 1024, not 1536 (generation test 1, I: 54–179 s a look; the screen shows them at 720 at most), and at most twelve at
@@ -100,11 +104,14 @@ export class SeedreamImageProvider implements ImageProvider {
         body: JSON.stringify([{ taskType: 'getResponse', taskUUID }]),
         signal: AbortSignal.timeout(20_000),
       });
-      const j = (await res.json().catch(() => ({}))) as { data?: { taskUUID?: string; imageURL?: string; status?: string }[]; errors?: unknown[] };
+      const j = (await res.json().catch(() => ({}))) as { data?: { taskUUID?: string; imageURL?: string; status?: string; cost?: number }[]; errors?: unknown[] };
       if (j.errors?.length) throw new Error(`Seedream ${res.status} ${JSON.stringify(j.errors).slice(0, 200)}`);
       const d = (j.data ?? []).find((x) => x.taskUUID === taskUUID);
       if (d?.status === 'error') throw new Error(`Seedream ${JSON.stringify(d).slice(0, 200)}`);
-      if (d?.imageURL) return d.imageURL;
+      if (d?.imageURL) {
+        meterRunware(SEEDREAM_MODEL, [d]);
+        return d.imageURL;
+      }
     }
     throw new Error('Seedream: the picture did not come back in time');
   }
@@ -118,19 +125,21 @@ export class SeedreamImageProvider implements ImageProvider {
         {
           taskType: 'imageInference',
           taskUUID,
-          model: 'bytedance:seedream@5.0-pro',
+          model: SEEDREAM_MODEL,
           positivePrompt: prompt.slice(0, 3000),
           width: this.side,
           height: this.side,
           numberResults: 1,
           outputType: 'URL',
           outputFormat: 'JPG',
+          includeCost: true,
           ...(refs.length ? { referenceImages: refs.map((r) => `data:${r.mime};base64,${r.data.toString('base64')}`) } : {}),
         },
       ]),
       signal: AbortSignal.timeout(this.timeoutMs),
     });
-    const j = (await res.json().catch(() => ({}))) as { data?: { imageURL?: string; status?: string }[]; errors?: unknown[] };
+    const j = (await res.json().catch(() => ({}))) as { data?: { imageURL?: string; status?: string; cost?: number }[]; errors?: unknown[] };
+    if (j.data?.[0]?.imageURL) meterRunware(SEEDREAM_MODEL, [j.data[0]]);
     const processing = !j.errors?.length && j.data?.[0] && !j.data[0].imageURL;
     const url = j.data?.[0]?.imageURL ?? (processing ? await this.waitFor(taskUUID, until) : undefined);
     if ((!res.ok && !url) || j.errors?.length || !url) throw new Error(`Seedream ${res.status} ${JSON.stringify(j.errors ?? j).slice(0, 200)}`);

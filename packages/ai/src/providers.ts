@@ -1,5 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
 import { ClaudeProvider, LlmRefusalError, pickSources } from './claude';
+import { meterGemini, reportCost } from './meter';
 import { mockSongDesign } from './song';
 import { mockSongEdit } from './songEdit';
 import type { ChatRequest, LlmProvider, SearchAnswer } from './types';
@@ -47,6 +48,7 @@ export class GeminiProvider implements LlmProvider {
             ...(req.json ? { responseMimeType: 'application/json' } : {}),
           },
         });
+        meterGemini(model, res.usageMetadata);
         const text = res.text?.trim();
         if (!text) throw new Error(`Gemini (${model}) returned an empty response`);
         return text;
@@ -70,6 +72,7 @@ export class GeminiProvider implements LlmProvider {
           contents,
           config: { systemInstruction: system, temperature: req.temperature ?? 0.4, maxOutputTokens: req.maxOutputTokens ?? 800, tools: [{ googleSearch: {} }] },
         });
+        meterGemini(model, res.usageMetadata, res.candidates?.[0]?.groundingMetadata?.webSearchQueries?.length ? 1 : 0);
         const text = res.text?.trim();
         if (!text) throw new Error(`Gemini (${model}) returned an empty response`);
         const meta = res.candidates?.[0]?.groundingMetadata;
@@ -94,6 +97,7 @@ export class GeminiProvider implements LlmProvider {
           contents: [{ role: 'user', parts: [media, { text: prompt }] }],
           config: { temperature: 0.4, maxOutputTokens: 900, responseMimeType: 'application/json' },
         });
+        meterGemini(model, res.usageMetadata);
         const text = res.text?.trim();
         if (!text) throw new Error(`Gemini (${model}) returned an empty response`);
         return text;
@@ -122,6 +126,7 @@ export class GeminiProvider implements LlmProvider {
           ],
           config: { temperature: 0, maxOutputTokens: 600 },
         });
+        meterGemini(model, res.usageMetadata);
         return (res.text ?? '').trim();
       } catch (e) {
         lastErr = e;
@@ -152,7 +157,9 @@ export class OpenAiProvider implements LlmProvider {
       }),
     });
     if (!res.ok) throw new Error(`OpenAI error ${res.status}`);
-    const json = (await res.json()) as { choices?: { message?: { content?: string } }[] };
+    const json = (await res.json()) as { choices?: { message?: { content?: string } }[]; usage?: { prompt_tokens?: number; completion_tokens?: number } };
+    // the fallback only: priced like a mid model (no OpenAI table; never zero)
+    if (json.usage) reportCost({ provider: 'openai', model: this.model, usd: ((json.usage.prompt_tokens ?? 0) * 1 + (json.usage.completion_tokens ?? 0) * 4) / 1e6, units: { in: json.usage.prompt_tokens ?? 0, out: json.usage.completion_tokens ?? 0 }, exact: false });
     const text = json.choices?.[0]?.message?.content?.trim();
     if (!text) throw new Error('OpenAI returned an empty response');
     return text;
