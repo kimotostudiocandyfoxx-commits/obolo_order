@@ -23,6 +23,7 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .fg{position:absolute;inset:0;background-size:cover;background-position:center bottom;transform:scale(1.04);transition:transform 8s ease-out,filter .6s;z-index:7;pointer-events:none}
 .partying .fg{filter:brightness(.5) saturate(1.3)}
 .sky{position:absolute;inset:0}
+.ksh{position:absolute;left:0;top:0;border-radius:50%;background:radial-gradient(closest-side,rgba(20,0,40,.55),rgba(20,0,40,0));pointer-events:none;z-index:5}
 .sh,.bf,.g5f,.exp .eb{touch-action:none}
 .phone img{-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
 .exp .eb.dragging{z-index:3;filter:drop-shadow(0 12px 14px rgba(0,0,0,.35));cursor:grabbing}
@@ -673,7 +674,7 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 button:focus-visible,.item:focus-visible,.home:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 </style>
 <div class="switch" id="mode" role="toolbar" aria-label="絵のタッチ"><button type="button" data-m="anime" aria-pressed="true">アニメ版</button><button type="button" data-m="toy" aria-pressed="false">箱庭版</button></div>
-<div class="switch" id="satmode" role="toolbar" aria-label="土星の見せ方" hidden><button type="button" data-s="a">土星①レコード床</button><button type="button" data-s="b">②2D舞台</button><button type="button" data-s="c">③ぽよん</button></div>
+<div class="switch" id="satmode" role="toolbar" aria-label="土星の見せ方" hidden><button type="button" data-s="d">土星：今の版（真下に落ちる）</button><button type="button" data-s="e">奥行き版（床に沿って）</button></div>
 <div class="switch" id="switch" role="toolbar" aria-label="星を切りかえる"></div>
 
 <div class="phone" id="phone">
@@ -754,7 +755,7 @@ function render(){
   const rw=$('resWrap');rw.innerHTML='';
   if(mode==='anime')(RES[cur]||[]).forEach(([k,n,line,side])=>{const s=A['res-'+cur+'-'+k];if(!s)return;const e=document.createElement('div');e.className='res '+side;e.tabIndex=0;e.setAttribute('role','button');e.setAttribute('aria-label',n);e.innerHTML=`<img alt="" src="${s}">`;e.onclick=()=>toast(n+'「'+line+'」');rw.appendChild(e)});
   const sky=$('sky');sky.innerHTML='';items=[];
-  $('satmode').hidden=true;document.querySelectorAll('#satmode button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.s===SATMODE));
+  $('satmode').hidden=cur!=='saturn'||mode!=='anime';document.querySelectorAll('#satmode button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.s===SATMODE));
   const s7=cur==='saturn'&&S7();$('phone').classList.toggle('s7',s7);$('home').style.display=(s7||(cur==='saturn'&&SD()))?'none':'';if(s7)$('bg').style.backgroundImage=`url(${A['bg7-saturn']})`;
   const s6=cur==='saturn'&&S6();$('phone').classList.toggle('s6',s6);$('s6floor').hidden=$('s6spk').hidden=!s6;
   if(s6){$('bg').style.backgroundImage=`url(${A['bg6-saturn']})`;const fl=$('s6floor');fl.style.top=(S6G.floor*100)+'%';fl.style.backgroundImage=A['sat6-floor']?`url(${A['sat6-floor']})`:'linear-gradient(#ffb3d9,#b39cff)';fl.style.backgroundSize='auto '+Math.round($('phone').clientHeight*(1-S6G.floor)+18)+'px';fl.style.top=`calc(${S6G.floor*100}% - 18px)`;
@@ -820,7 +821,7 @@ function enter(){
 }
 const REC={cx:.481,cy:.702,rx:.574,ry:.1885};
 let SATMODE='d';
-const SD=()=>SATMODE==='d'&&mode==='anime';
+const SD=()=>(SATMODE==='d'||SATMODE==='e')&&mode==='anime',SE=()=>SATMODE==='e'&&mode==='anime';
 const S7=()=>SATMODE==='c'&&!!A['bg7-saturn']&&mode==='anime',S7G={rec:[.71,.46]};
 const S6=()=>SATMODE==='b'&&!!A['bg6-saturn']&&mode==='anime',S6G={floor:.7,spk:.15,rec:[.762,.427]};
 function s6Walls(){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,w=S6G.spk*W;return{L:w*.9,R:W-w*.9,F:S6G.floor*H}}let rolls=[],raf=0,heard=[],RECLBL=[.47,.69],SPIN=false,NEEDLE=[.6,.52],QUEUE=[],MAXB=window.KMAX||16,NB=0;
@@ -863,7 +864,7 @@ function setupRoll(){
   const base=[{n:ME,k:'mine'},...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'れい',k:'oshi'}];
   const total=window.KTOTAL||24,rest=base.slice(1),all=[base[0]];for(let i=1;i<total;i++)all.push(rest[(i-1)%rest.length]);
   const mb=(S7()||SD())?8:MAXB;QUEUE=all.slice(mb);rolls=[];all.slice(0,mb).forEach((o,i)=>rolls.push(makeBall(o,i,i)));
-  startSim();
+  if(SE())startSim3D();else startSim();
 }
 function makeBall(o,i,slot){{const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,SW=S6()?s6Walls():null,L=SW?SW.L:W*.04,Rw=SW?SW.R:W*.96;const R=S7()?32+((i*7)%3)*5:SD()?25+((i*7)%3)*4:22+((i*7)%3)*4,e=document.createElement('div');e.className='puni';e.tabIndex=0;e.setAttribute('role','button');e.setAttribute('aria-label',o.n+'のコロリン');
     e.style.width=e.style.height='0px';e.style.setProperty('--r',R+'px');e.firstElementChild;e.style.setProperty('--c',o.k==='mine'?'var(--mine)':o.k==='oshi'?'var(--oshi)':'var(--dachi)');
@@ -879,6 +880,43 @@ function makeBall(o,i,slot){{const ph=$('phone'),W=ph.clientWidth,H=ph.clientHei
     return r}}
 function recGeom(){const pr=$('phone').getBoundingClientRect(),br=$('bg').getBoundingClientRect(),s=Math.max(br.width/1080,br.height/1920),dw=1080*s,dh=1920*s,x0=br.left-pr.left+(br.width-dw)/2,y0=br.top-pr.top+br.height-dh;
   return{cx:x0+REC.cx*dw,cy:y0+REC.cy*dh,rx:REC.rx*dw,ry:REC.ry*dh}}
+/* depth version: the korolin stand on the record floor (an ellipse seen at an angle). Far = higher on screen and smaller, near = lower and bigger.
+   ground position (gx, gz) in the floor ellipse, h = height of a hop above the floor */
+function startSim3D(){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,G=recGeom(),sky=$('sky');
+  const SC=gz=>.58+.6*(gz+1)/2,toS=(gx,gz,h)=>{const s=SC(gz);return[G.cx+gx*G.rx,G.cy+gz*G.ry*.86-h*s,s]};
+  const toG=(x,y)=>[clamp((x-G.cx)/G.rx,-.95,.95),clamp((y-G.cy)/(G.ry*.86),-.92,.92)];
+  const inside=r=>{const lim=.9;let d=Math.hypot(r.gx,r.gz);if(d>lim){r.gx*=lim/d;r.gz*=lim/d;r.vgx*=-.4;r.vgz*=-.4}const sx=G.cx+r.gx*G.rx;if(sx<W*.05+r.R*.6){r.gx=(W*.05+r.R*.6-G.cx)/G.rx;r.vgx=Math.abs(r.vgx)*.4}if(sx>W*.95-r.R*.6){r.gx=(W*.95-r.R*.6-G.cx)/G.rx;r.vgx=-Math.abs(r.vgx)*.4}};
+  const init=r=>{if(r.gx!==undefined)return;r.gx=((r.i*61)%100)/100*1.2-.6;r.gz=((r.i*37)%100)/100*1.4-.7;r.h=H*.5+((r.i*53)%30)*6;r.vh=0;r.vgx=0;r.vgz=0;r.hopT=0;
+    const sh=document.createElement('div');sh.className='ksh';sky.insertBefore(sh,sky.firstChild);r.sh=sh};
+  let last=performance.now(),lastBeat=-1;
+  const step=now=>{const dt=Math.min(.033,(now-last)/1000);last=now;const ts=now/1000,live=rolls.filter(r=>!r.gone);
+    const spb=60/(window.BPM||124),beat=Math.floor(ts/spb);
+    for(const r of rolls){if(r.gone&&r.sh){r.sh.remove();r.sh=null}}
+    for(const r of live){init(r);
+      if(r.drag){const g=toG(r.x,r.y+r.R*.3);r.gx=g[0];r.gz=g[1];r.h=0;r.vh=0;r.thrown=1;continue}
+      if(r.thrown){r.thrown=0;r.vgx=clamp(r.vx/G.rx,-1.6,1.6);r.vgz=clamp(r.vy/(G.ry*.86)*.5,-1.6,1.6);r.vh=Math.min(500,Math.hypot(r.vx,r.vy)*.35)}
+      const onG=r.h<=0.5;
+      if(onG){r.h=0;
+        const beatHop=SPIN&&beat!==lastBeat&&(beat+r.i)%2===0;
+        if((ts>r.hopT&&r.hopT)||beatHop){const a=((r.i*97+Math.floor(ts*7))%360)*Math.PI/180,toC=Math.atan2(-r.gz,-r.gx),dir=Math.hypot(r.gx,r.gz)>.6?toC:a,sp=.28+((r.i*13)%4)*.07;
+          r.vgx=Math.cos(dir)*sp;r.vgz=Math.sin(dir)*sp*.8;r.vh=330+((r.i*37+Math.floor(ts*3))%5)*50;r.wv-=2.6;r.hopT=ts+1+((r.i*31+Math.floor(ts))%7)*.22}
+        else if(!r.hopT)r.hopT=ts+.4+(r.i%5)*.3;
+        if(r.vh<=0){r.vgx*=.6;r.vgz*=.6}}
+      r.vh-=1150*dt;r.h+=r.vh*dt;if(r.h<0){if(r.vh<-200)r.wv+=Math.min(4,-r.vh/300);r.h=0;r.vh=0}
+      r.gx+=r.vgx*dt;r.gz+=r.vgz*dt;inside(r)}
+    lastBeat=beat;
+    // keep apart on the floor (distance measured in screen size so near ones take more room)
+    for(let k=0;k<2;k++)for(let i=0;i<live.length;i++)for(let j=i+1;j<live.length;j++){const p=live[i],q=live[j];if(p.drag&&q.drag)continue;const sp=SC(p.gz),sq=SC(q.gz);
+      const dx=(q.gx-p.gx)*G.rx,dz=(q.gz-p.gz)*G.ry*2.4,d=Math.hypot(dx,dz)||1,m=(p.R*sp+q.R*sq)*.95;
+      if(d<m&&Math.abs(p.h-q.h)<(p.R+q.R)*.6){const o=(m-d)/2,nx=dx/d,nz=dz/d;if(!p.drag){p.gx-=nx*o/G.rx;p.gz-=nz*o/(G.ry*2.4)}if(!q.drag){q.gx+=nx*o/G.rx;q.gz+=nz*o/(G.ry*2.4)}}}
+    for(const r of live){for(let k=0;k<6;k++){const h=dt/6;r.wv+=(-560*r.ws-4.4*r.wv)*h;r.ws+=r.wv*h}
+      if(!r.drag){const P=toS(r.gx,r.gz,r.h);r.x=P[0];r.y=P[1]-r.R*P[2]*.7;r.ds=P[2]}else r.ds=SC(r.gz);
+      const s=Math.max(-.16,Math.min(.16,r.ws))+(r.h<1?Math.sin(ts*2.4+r.i)*.02:0);r.sx=1+s;r.sy=1-s;
+      r.e.style.transform=`translate3d(${r.x}px,${r.y}px,0)`;r.e.style.zIndex=String(6+Math.round((r.gz+1)*40));
+      r.e.firstElementChild.style.transform=`translate(-50%,-50%) scale(${r.ds*r.sx},${r.ds*r.sy})`;
+      if(r.sh){const g=toS(r.gx,r.gz,0),w=r.R*2*g[2]*(1-Math.min(.5,r.h/400));r.sh.style.transform=`translate3d(${g[0]-w/2}px,${g[1]-w*.12}px,0)`;r.sh.style.width=w+'px';r.sh.style.height=w*.24+'px';r.sh.style.opacity=String(.45*(1-Math.min(.7,r.h/300)))}}
+    raf=requestAnimationFrame(step)};
+  raf=requestAnimationFrame(step)}
 function startSim(){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,s6=S6(),s7=S7(),sd=SD(),SW=s6?s6Walls():null,L=s6?SW.L:s7?W*.02:W*.04,Rw=s6?SW.R:s7?W*.98:W*.96,G=recGeom(),TOP=H*.12;
   const fl=s7?(x=>H*.94):s6?(x=>SW.F+6):x=>{const u=Math.min(.985,Math.abs((x-G.cx)/(G.rx*.97)));return G.cy+G.ry*.8*Math.sqrt(1-u*u)};
   let lastBeat=-1;
@@ -929,7 +967,7 @@ function pop(r){
   setTimeout(()=>{if(QUEUE.length){const o=QUEUE.shift();rolls.push(makeBall(o,100+(NB++),-1))}},900);
   setTimeout(()=>{c.style.display='none';if(!QUEUE.length&&rolls.every(x=>x.gone)){const d=document.createElement('div');d.className='done';d.textContent='🎉 今日のコロリン、全部聞いたね！';sky.appendChild(d)}},3600);
 }
-function stopRoll(){cancelAnimationFrame(raf);rolls=[]}
+function stopRoll(){cancelAnimationFrame(raf);rolls.forEach(r=>{if(r.sh)r.sh.remove()});rolls=[]}
 /* ---- explore: fly up over the planet, pick a genre area, land, find new people to oshi ---- */
 const EXP={mercury:{regions:[{k:'edm',n:'EDM大陸',x:.25,y:.3,song:3},{k:'hiphop',n:'ヒップホップ王国',x:.73,y:.36,song:2},{k:'ballad',n:'バラード島',x:.22,y:.55,song:4},{k:'rock',n:'ロック火山',x:.73,y:.62,song:5},{k:'chill',n:'チルの環礁',x:.46,y:.75,song:1}],
   titles:{edm:['ネオンダイブ','光の洪水','BASS SKY'],hiphop:['路地裏フロウ','夕焼けサイファー','BOOM BAP'],ballad:['月のうた','灯台まで','やさしい夜'],rock:['マグマハート','火山ライブ','走れ'],chill:['ひるねの午後','ラグーン','ゆらゆら']}}};
