@@ -6,6 +6,7 @@ import { templateConfig } from '@/lib/planetTemplate/config';
 import { clamp, isDrag } from '@/lib/planetTemplate/layout';
 import type { Body } from '@/lib/planetTemplate/motion';
 import { PinchTracker, WheelPinch, type Pinch } from '@/lib/planetTemplate/pinch';
+import { soundScope, type SoundScope } from '@/lib/planetTemplate/sfx';
 import { countLine, SEARCH_PLACEHOLDER, SKY_ME, SKY_SLOTS, TRIP_SLOTS, type LandWork, type SkySource } from '@/lib/planetTemplate/sky';
 import { hitSlot, LAND_MAX, landMotionOf, landNameSize, SKY_PLANETS, type ShorePoint } from '@/lib/planetTemplate/skyPlanets';
 import type { SkyKit } from './skyKits';
@@ -23,6 +24,13 @@ const transformOf = (b: Body, k = 1) => `translate3d(${b.x.toFixed(1)}px,${b.y.t
 const UNTIL_DONE_MAX_MS = 6 * 60_000;
 /** a tapped work rolls up / fades before it is gone */
 const CLOSING_MS = 380;
+
+/** a component's sounds: its pending cues stop with it */
+function useScope(): SoundScope {
+  const [sc] = useState(soundScope);
+  useEffect(() => () => sc.stop(), [sc]);
+  return sc;
+}
 
 function once(key: string): boolean {
   try {
@@ -54,6 +62,11 @@ export function SkyExplore({ planet, source, kit, me, onClose, toast }: { planet
   const [busy, setBusy] = useState(false);
   const [dive, setDive] = useState<{ x: number; y: number } | null>(null);
   const root = useRef<HTMLDivElement>(null);
+  // the sky's sounds (expOpen / expLand / tripGo: whoosh; an island kept: chime); they stop when the sky closes
+  const snd = useScope();
+  useEffect(() => {
+    snd.cue(planet, 'skyOpen');
+  }, [snd, planet]);
 
   useEffect(() => {
     let live = true;
@@ -74,7 +87,9 @@ export function SkyExplore({ planet, source, kit, me, onClose, toast }: { planet
 
   const byKey = useMemo(() => new Map(continents.map((c) => [c.key, c])), [continents]);
   const prevTrip = useRef<ContinentView[] | null>(null);
-  const land = useCallback((c: ContinentView, from: 'map' | 'trip', pt: { x: number; y: number }) => {
+  const land = useCallback(
+    (c: ContinentView, from: 'map' | 'trip', pt: { x: number; y: number }) => {
+    snd.cue(planet, 'skyLand');
     setSearch(false);
     setSwap(null);
     setDive(pt);
@@ -82,15 +97,20 @@ export function SkyExplore({ planet, source, kit, me, onClose, toast }: { planet
       setDive(null);
       setScene({ kind: 'land', c, back: from });
     }, 650);
-  }, []);
+    },
+    [snd, planet],
+  );
   const back = useCallback(() => {
     if (scene.kind === 'land') setScene(scene.back === 'trip' && prevTrip.current ? { kind: 'trip', list: prevTrip.current } : { kind: 'map' });
     else if (swap) setSwap(null);
-    else if (scene.kind === 'trip') setScene({ kind: 'map' });
-    else onClose();
-  }, [scene, swap, onClose]);
+    else if (scene.kind === 'trip') {
+      snd.cue(planet, 'skyTripBack');
+      setScene({ kind: 'map' });
+    } else onClose();
+  }, [scene, swap, onClose, snd, planet]);
   const travel = async () => {
     if (busy) return;
+    snd.cue(planet, 'skyTrip');
     setBusy(true);
     setSwap(null);
     try {
@@ -119,6 +139,7 @@ export function SkyExplore({ planet, source, kit, me, onClose, toast }: { planet
     setFavs(r);
     setSwap(null);
     if (slot != null) setPopped(slot);
+    if (want) snd.cue(planet, 'skyKeep');
     if (!want) toast(`☆ ${c.name} をはずしたよ`);
     else if (old && old !== c.key) toast(`🔁 ${byKey.get(old)?.name ?? ''} → ${c.name}`);
     else toast(`☆ ${c.name} をじぶんの空に追加`);
@@ -413,6 +434,7 @@ function Landed({
   openRef: React.MutableRefObject<boolean>;
 }) {
   const sp = SKY_PLANETS[planet];
+  const snd = useScope();
   const motion = useMemo(() => landMotionOf(planet), [planet]);
   const root = useRef<HTMLDivElement>(null);
   const [riders, setRiders] = useState<Rider[]>([]);
@@ -508,7 +530,11 @@ function Landed({
     const alive = order.filter((r) => !goneRef.current.has(r.w.author.id));
     if (!alive.length) return setAuto(null);
     setAuto({ order: alive, n, phase: 'in' });
-    later(() => setAuto((a) => (a ? { ...a, phase: 'show' } : a)), 1800);
+    later(() => {
+      // autoNext: the stranger reaches the shore with a splash (bob)
+      if (c.pictures.shore) snd.cue(planet, 'skyArrive');
+      setAuto((a) => (a ? { ...a, phase: 'show' } : a));
+    }, 1800);
   };
   const leave = (a: Auto) => {
     setAuto({ ...a, phase: 'out' });
@@ -531,6 +557,8 @@ function Landed({
   }, [auto]);
   const startAuto = () => {
     const order = [...live].sort(() => Math.random() - 0.5);
+    // autoStart: the view turns to the shore (whoosh)
+    if (c.pictures.shore) snd.cue(planet, 'skyShore');
     setOpen(null);
     setAuto({ order, n: -1, phase: 'start' });
     later(() => visit(order, 0), 400);
@@ -763,6 +791,11 @@ function WorkOpen({
   const [menu, setMenu] = useState(false);
   const [hearts, setHearts] = useState(0);
   const [t0] = useState(() => performance.now());
+  // expShow's splash and the planet's own (Saturn's pop, Jupiter's chime, Neptune's chip); ☆ / ♡: chime
+  const snd = useScope();
+  useEffect(() => {
+    snd.cue(planet, 'skyShow');
+  }, [snd, planet]);
   return (
     <div className={`${x.estage} ${closing ? x.closing : ''}`} onClick={() => performance.now() - t0 > 300 && onClose()} data-testid="land-work" data-planet={planet}>
       {kit.opener({ w: w as HomeWork & LandWork, shore, closing, onEnd })}
@@ -780,6 +813,7 @@ function WorkOpen({
             if (saved || mine) return;
             if (await source.save(w, true).catch(() => false)) {
               setSaved(true);
+              snd.cue(planet, 'skyKeep');
               toast('⭐ ブルーナに保存したよ');
             }
           }}
@@ -798,6 +832,7 @@ function WorkOpen({
               if (oshi) return;
               await source.oshi(w.author.id, true).catch(() => undefined);
               setOshi(true);
+              snd.cue(planet, 'skyKeep');
               setHearts((n) => n + 1);
               toast(`💗 ${w.author.name} を推しにしたよ。これから${sp.home}にも来てくれるよ`);
             }}

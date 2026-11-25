@@ -15,6 +15,7 @@ import {
   VOICE_AFTER_POP_MS,
   type PileBall,
 } from '@/lib/planetTemplate/saturn';
+import { soundScope, trackMedia } from '@/lib/planetTemplate/sfx';
 import type { TemplateHooks } from '../PlanetTemplateHome';
 import type { PlayStageProps } from '../PlayView';
 import type { ProfilePerson } from '../Profile';
@@ -37,7 +38,8 @@ function playVoice(w: HomeWork | undefined): HTMLAudioElement | null {
   const url = w?.url;
   if (!url || url.startsWith('tts:')) return null;
   try {
-    const a = new Audio(url);
+    // tracked: ▶'s club music dips under it (M-R275)
+    const a = trackMedia(new Audio(url));
     a.play().catch(() => undefined);
     return a;
   } catch {
@@ -160,9 +162,17 @@ function Groove({ cfg, people, onEnd, openProfile }: PlayStageProps) {
     ended.current = false;
     const t0 = performance.now();
     let raf = 0;
+    // each kororin pops with the soap-bubble sound (popOrb's popSound)
+    const snd = soundScope();
+    const popped = new Set<number>();
     const tick = (now: number) => {
       const t = now - t0;
       setMs(t);
+      for (const r of rides.current)
+        if (!popped.has(r.k) && t >= ridePopMs(r)) {
+          popped.add(r.k);
+          snd.cue('saturn', 'groovePop');
+        }
       for (const r of rides.current)
         if (!voiced.current.has(r.k) && t >= ridePopMs(r) + VOICE_AFTER_POP_MS) {
           voiced.current.add(r.k);
@@ -180,6 +190,7 @@ function Groove({ cfg, people, onEnd, openProfile }: PlayStageProps) {
     const vs = voices.current;
     return () => {
       cancelAnimationFrame(raf);
+      snd.stop();
       vs.forEach((a) => a.pause());
     };
   }, [people]);
@@ -270,6 +281,8 @@ function Pile({ person, deps }: { person: ProfilePerson; deps: SaturnDeps }) {
   const [popped, setPopped] = useState<{ j: number; n: number } | null>(null);
   useEffect(() => {
     if (!popped) return;
+    // pastPop: the pop's sound, then the voice
+    soundScope().cue('saturn', 'profileWork');
     let voice: HTMLAudioElement | null = null;
     const v = setTimeout(() => (voice = playVoice(workOf(popped.j))), VOICE_AFTER_POP_MS);
     const done = setTimeout(() => setPopped(null), 2700);

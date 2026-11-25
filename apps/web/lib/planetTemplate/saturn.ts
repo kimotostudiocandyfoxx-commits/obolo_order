@@ -96,6 +96,22 @@ export function keepInside(st: FloorState, f: Floor): void {
   }
 }
 
+/**
+ * a beat of ▶'s club music (startSim3D's beatHop): every other kororin (by beat + its number) that is on the floor hops
+ * now, the hop it would take at its own time; its next own hop is counted from here. Returns whether it hopped.
+ */
+export function beatHop(st: FloorState, i: number, t: number, beat: number): boolean {
+  if (st.h > 0.5 || (beat + i) % 2 !== 0) return false;
+  const hp = hopOf(i, t, st.gx, st.gz);
+  st.h = 0;
+  st.vgx = Math.cos(hp.dir) * hp.along;
+  st.vgz = Math.sin(hp.dir) * hp.along * 0.8;
+  st.vh = hp.up;
+  st.wv -= 2.6;
+  st.hopT = t + hp.next;
+  return true;
+}
+
 /** one kororin's step on the floor (t: its own clock after this step) */
 export function floorStep(st: FloorState, i: number, t: number, dt: number, f: Floor): void {
   if (st.h <= 0.5) {
@@ -251,6 +267,9 @@ export function floorMotionOn(rec: FloorRec, max: number = HOME_MAX): FigureMoti
     b.size = depthScale(st.gz) * (st.R / RADIUS_BASE);
     b.z = 95;
     b.shadow = shadowOf(f, st);
+  },
+  beat(b, beat) {
+    if (b.floor) beatHop(b.floor, b.i, b.t, beat);
   },
   drop(b, W, H) {
     const st = b.floor;

@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { PathPoint, PlanetTemplateConfig } from '@/lib/planetTemplate/config';
 import type { HomePerson } from '@/lib/planetTemplate/people';
+import { soundScope } from '@/lib/planetTemplate/sfx';
+import { musicOf } from '@/lib/planetTemplate/sound';
 import { defaultOpener, type FigureSlot, type WorkOpener } from './WorkView';
 import s from './PlanetTemplate.module.css';
 
@@ -81,6 +83,12 @@ export function PlayView({
 
   useEffect(() => {
     const T = (f: () => void, ms: number) => timers.current.push(setTimeout(f, ms));
+    // the sounds (lib/planetTemplate/sound.ts cuesFor): ▶'s music (Saturn's club, Jupiter's festival), you jumping out,
+    // the view turning, each visitor and their work; all stop with the view (■ / the end)
+    const snd = soundScope();
+    const planet = cfg.planet;
+    snd.music(musicOf(planet));
+    if (dance) snd.cue(planet, 'playDance');
     const leave = (i: number) => {
       done.current = null;
       setPhase('out');
@@ -90,6 +98,7 @@ export function PlayView({
     };
     const one = (i: number) => {
       if (i >= people.length) return end.current(true);
+      snd.cue(planet, 'playVisit');
       setK(i);
       setPhase('in');
       setMoveMs(0);
@@ -100,6 +109,7 @@ export function PlayView({
         setAt(path.sit);
       }, 40);
       T(() => {
+        snd.cue(planet, 'playOpen');
         setPhase('open');
         if (path.front) {
           setMoveMs(450);
@@ -116,7 +126,13 @@ export function PlayView({
         } else T(() => leave(i), cfg.holdMs);
       }, path.arriveMs + 40);
     };
-    T(() => setOn(true), dance ? (dance.ms ?? DANCE_MS) : 16);
+    T(
+      () => {
+        setOn(true);
+        snd.cue(planet, 'playTurn');
+      },
+      dance ? (dance.ms ?? DANCE_MS) : 16,
+    );
     if (!stage) T(() => one(0), cfg.introMs);
     let fw: ReturnType<typeof setInterval> | null = null;
     if (cfg.play.fireworks) {
@@ -125,6 +141,7 @@ export function PlayView({
       fw = setInterval(() => {
         if (Math.random() > 0.8) return;
         const id = ++n;
+        snd.sfx('thump');
         setBursts((b) => [...b.slice(-3), { id, x: 0.15 + Math.random() * 0.7, y: 0.14 + Math.random() * 0.16, c: cols[Math.floor(Math.random() * cols.length)] }]);
         T(() => setBursts((b) => b.filter((x) => x.id !== id)), 1600);
       }, 1300);
@@ -134,6 +151,7 @@ export function PlayView({
       ts.forEach(clearTimeout);
       timers.current = [];
       if (fw) clearInterval(fw);
+      snd.stop();
     };
   }, [people, cfg, path, dance, stage]);
 

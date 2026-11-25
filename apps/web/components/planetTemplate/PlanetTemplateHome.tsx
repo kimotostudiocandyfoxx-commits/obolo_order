@@ -9,6 +9,7 @@ import { dancerOf, peopleOf, type HomePerson } from '@/lib/planetTemplate/people
 import { SAMPLE_OWN_FIGURE } from '@/lib/planetTemplate/sample';
 import { nameFont, shadesOf } from '@/lib/planetTemplate/saturn';
 import { PinchTracker, WheelPinch } from '@/lib/planetTemplate/pinch';
+import { armPlanetSound, clubBeat, soundScope } from '@/lib/planetTemplate/sfx';
 import { PlayView, type PlayStage } from './PlayView';
 import { Profile, type ProfileMiddleSlot, type ProfilePerson } from './Profile';
 import { Shades } from './saturn/Shades';
@@ -138,17 +139,33 @@ export function PlanetTemplateHome({ planet, view, me, hooks = {}, onSwitchPlane
   sizeRef.current = size;
   const busy = useRef(false);
   busy.current = !!opened || !!playing;
+  // the sounds (lib/planetTemplate/sfx.ts): armed while the home is open; all of them stop when it goes
+  const snd = useRef(soundScope());
+  useEffect(() => {
+    const off = armPlanetSound();
+    const sc = snd.current;
+    return () => {
+      sc.stop();
+      off();
+    };
+  }, []);
   useEffect(() => {
     let raf = 0;
     let last = performance.now();
+    let lastBeat: number | null = null;
     const step = (now: number) => {
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       const { W, H } = sizeRef.current;
+      // Saturn: while ▶'s club music plays, the kororins hop on its beat (every other one on each beat)
+      const beat = motion.beat ? clubBeat() : null;
+      const onBeat = beat != null && beat !== lastBeat ? beat : null;
+      lastBeat = beat;
       const live: Body[] = [];
       for (const [n, b] of mo.current) {
         if (!els.current.get(n)) continue;
         live.push(b);
+        if (!b.drag && onBeat != null) motion.beat?.(b, onBeat);
         if (!b.drag) motion.step(b, dt, W, H, busy.current && motion.kind !== 'floor' ? 0.6 : 1);
       }
       // what they do to each other (Saturn: push apart on the floor) and where they are drawn
@@ -192,6 +209,7 @@ export function PlanetTemplateHome({ planet, view, me, hooks = {}, onSwitchPlane
   const openPerson = useCallback((p: HomePerson, seatN: number | null) => {
     const work = p.works[0];
     const b = seatN != null ? mo.current.get(seatN) : null;
+    if (work) snd.current.cue(planet, 'tap');
     if (work)
       setOpened({
         person: p,
@@ -199,7 +217,7 @@ export function PlanetTemplateHome({ planet, view, me, hooks = {}, onSwitchPlane
         seatN,
         from: b ? { x: b.x, y: b.y, size: b.size, flip: b.flip } : null,
       });
-  }, []);
+  }, [planet]);
   const figureHandlers = (n: number, p: HomePerson) => ({
     onPointerDown: (e: React.PointerEvent<HTMLDivElement>) => {
       if (e.button > 0 || pinch.current.count >= 2) return;
@@ -351,11 +369,15 @@ export function PlanetTemplateHome({ planet, view, me, hooks = {}, onSwitchPlane
         works: p.works,
       })),
   ];
-  const openProfile = useCallback((id: string) => {
-    setPlaying(null);
-    setOpened(null);
-    setProfile(id);
-  }, []);
+  const openProfile = useCallback(
+    (id: string) => {
+      snd.current.cue(planet, 'profile');
+      setPlaying(null);
+      setOpened(null);
+      setProfile(id);
+    },
+    [planet],
+  );
   const playOrder = () => [...crowd.seats.map((x) => x.person), ...crowd.queue].filter((p) => p.rel !== 'own');
 
   const box = coverBox(size.W, size.H);
@@ -531,6 +553,7 @@ export function PlanetTemplateHome({ planet, view, me, hooks = {}, onSwitchPlane
               face: null,
               works: p.works,
             };
+            snd.current.cue(planet, 'profileWork');
             setOpened({ person, work: w, seatN: null, from: null });
           }}
         />

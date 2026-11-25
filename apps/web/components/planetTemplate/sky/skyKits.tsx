@@ -7,6 +7,7 @@ import { isFivePlanet } from '@/lib/planetTemplate/five';
 import { artTitleOf } from '@/lib/planetTemplate/jupiter';
 import { shipStandIn } from '@/lib/planetTemplate/mercury';
 import { figureOfAuthor } from '@/lib/planetTemplate/people';
+import { trackMedia } from '@/lib/planetTemplate/sfx';
 import type { LandWork, SkySource } from '@/lib/planetTemplate/sky';
 import { FiveViewer } from '../five/fiveHooks';
 import { ScrollArt, Wings } from '../jupiter/jupiterHooks';
@@ -50,7 +51,7 @@ function KororinOpen({ w, shore }: { w: HomeWork; shore: boolean }) {
     const b = setTimeout(() => {
       if (!url) return;
       try {
-        voice = new Audio(url);
+        voice = trackMedia(new Audio(url));
         voice.play().catch(() => undefined);
       } catch {
         voice = null;

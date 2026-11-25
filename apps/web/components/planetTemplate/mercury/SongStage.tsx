@@ -3,6 +3,7 @@
 import type { HomeWork, PlanetSongView, SongLyricLine, WorkTags } from '@obolo/shared';
 import { useEffect, useRef, useState } from 'react';
 import { DUCK, LETTER_GAP, letterKind, lyricAt, rampAt, SONG_START_MS, STAGE, TITLE_MS, titleStyle, titleVoiceInTime, type StagePlace } from '@/lib/planetTemplate/mercury';
+import { trackMedia } from '@/lib/planetTemplate/sfx';
 import m from './Mercury.module.css';
 
 /** load a title's font, only the letters it uses (Google Fonts `text=`), once */
@@ -146,7 +147,7 @@ export function SongStage({
   // the song itself (from the first tap the page may play sound)
   useEffect(() => {
     if (!started || !song?.url) return;
-    const a = new Audio(song.url);
+    const a = trackMedia(new Audio(song.url));
     a.loop = loop;
     a.preload = 'auto';
     audio.current = a;
@@ -170,7 +171,7 @@ export function SongStage({
   // ready when the title comes in
   useEffect(() => {
     if (!song?.titleVoice) return;
-    const v = new Audio(song.titleVoice);
+    const v = trackMedia(new Audio(song.titleVoice));
     v.preload = 'auto';
     voice.current = v;
     return () => {

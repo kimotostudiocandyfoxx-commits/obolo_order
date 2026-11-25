@@ -76,6 +76,8 @@ export interface FigureMotion {
   settle?(bodies: Body[], dt: number, W: number, H: number): void;
   /** while dragged (b.x / b.y follow the finger): its size and stacking there (Saturn: by depth) */
   drag?(b: Body, W: number, H: number): void;
+  /** a beat of the music on ▶ (Saturn's club: the kororins hop on it); none: the music does not move them */
+  beat?(b: Body, beat: number): void;
 }
 
 const body = (o: Partial<Body>): Body => ({
