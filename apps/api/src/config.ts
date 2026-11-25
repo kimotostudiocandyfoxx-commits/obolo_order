@@ -264,8 +264,8 @@ const Env = z.object({
   STORAGE_MEMBER_GB: z.coerce.number().min(0).default(5),
   STORAGE_FREE_GB: z.coerce.number().min(0).default(1),
   STORAGE_GB_MONTH_USD: z.coerce.number().min(0).default(0.015),
-  STORAGE_CLASS_A_PER_GB: z.coerce.number().min(0).default(100),
-  STORAGE_CLASS_B_PER_GB: z.coerce.number().min(0).default(1000),
+  STORAGE_CLASS_A_PER_GB: z.coerce.number().min(0).default(0),
+  STORAGE_CLASS_B_PER_GB: z.coerce.number().min(0).default(0),
   STORAGE_GRACE_DAYS: z.coerce.number().min(0).default(7),
   STORAGE_PRICE_MONTHS: z.coerce.number().min(0).default(12),
   /** a making's price follows its recorded costs (p90) once this many makings were recorded in the last 30 days */

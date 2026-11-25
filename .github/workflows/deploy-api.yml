@@ -212,8 +212,8 @@ jobs:
             STORAGE_MEMBER_GB=${{ vars.STORAGE_MEMBER_GB || '5' }}
             STORAGE_FREE_GB=${{ vars.STORAGE_FREE_GB || '1' }}
             STORAGE_GB_MONTH_USD=${{ vars.STORAGE_GB_MONTH_USD || '0.015' }}
-            STORAGE_CLASS_A_PER_GB=${{ vars.STORAGE_CLASS_A_PER_GB || '100' }}
-            STORAGE_CLASS_B_PER_GB=${{ vars.STORAGE_CLASS_B_PER_GB || '1000' }}
+            STORAGE_CLASS_A_PER_GB=${{ vars.STORAGE_CLASS_A_PER_GB || '0' }}
+            STORAGE_CLASS_B_PER_GB=${{ vars.STORAGE_CLASS_B_PER_GB || '0' }}
             STORAGE_GRACE_DAYS=${{ vars.STORAGE_GRACE_DAYS || '7' }}
             STORAGE_PRICE_MONTHS=${{ vars.STORAGE_PRICE_MONTHS || '12' }}
             MUSIC_URL=${{ vars.MUSIC_REGION && format('https://obolo-music-{0}.{1}.run.app', vars.GCP_PROJECT_NUMBER, vars.MUSIC_REGION) || '' }}

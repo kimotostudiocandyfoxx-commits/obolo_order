@@ -52,15 +52,15 @@ describe('R18: Bluena\'s room', () => {
   });
 });
 
-describe('R18: 保存の魔法 prices (R2 $0.015 / GB-month + operations, 160 JPY/USD, manaFor10)', () => {
+describe('R18: 保存の魔法 prices (R2 $0.015 / GB-month, 160 JPY/USD, manaFor10)', () => {
   it('each tier is manaFor10 of its monthly R2 cost', () => {
     for (const gb of [10, 30, 100]) expect(tierMana(gb)).toBe(manaFor10(tierUsd(gb) * 160));
-    // storage $0.15 + 100 Class A × $4.50/M + 1,000 Class B × $0.36/M per GB
-    expect(tierUsd(10)).toBeCloseTo(0.1581, 6);
+    // storage only (client 2026-11-25): $0.015 × 10 GB; operations are not priced by default
+    expect(tierUsd(10)).toBeCloseTo(0.15, 6);
     expect(tierPrices().map((t) => [t.gb, t.mana])).toEqual([
-      [10, 28.4],
-      [30, 85.1],
-      [100, 283.4],
+      [10, 26.9],
+      [30, 80.7],
+      [100, 268.9],
     ]);
     // the storage alone would be 26.9 / 80.7 / 268.9
     const storageOnly = { memberGb: 5, freeGb: 1, gbMonthUsd: 0.015, classAPerGb: 0, classBPerGb: 0, graceDays: 7 };

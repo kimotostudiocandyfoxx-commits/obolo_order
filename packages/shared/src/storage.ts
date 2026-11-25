@@ -46,7 +46,7 @@ export interface StorageRule {
   graceDays: number;
 }
 
-export const DEFAULT_STORAGE_RULE: StorageRule = { memberGb: 5, freeGb: 1, gbMonthUsd: DEFAULT_STORAGE_GB_MONTH_USD, classAPerGb: 100, classBPerGb: 1000, graceDays: 7 };
+export const DEFAULT_STORAGE_RULE: StorageRule = { memberGb: 5, freeGb: 1, gbMonthUsd: DEFAULT_STORAGE_GB_MONTH_USD, classAPerGb: 0, classBPerGb: 0, graceDays: 7 };
 
 /** the monthly R2 cost of one tier (USD): its GB stored for the month + the operations allowance */
 export function tierUsd(gb: number, rule: StorageRule = DEFAULT_STORAGE_RULE): number {
