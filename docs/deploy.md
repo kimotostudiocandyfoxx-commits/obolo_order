@@ -83,6 +83,8 @@ curl -fsSL https://raw.githubusercontent.com/kimotostudiocandyfoxx-commits/obolo
 | `WEB_ORIGIN` | 招待メールのリンク先（メール送信を入れたら） |
 | `AUTH_DEMO_SHOW_CODE` | 既定 `true`（ログインコードを画面に表示）。メール送信を設定したら `false` |
 | `BUNNY_STORAGE_ZONE` / `BUNNY_CDN_HOST` | Bunny を使う時（シークレット `obolo-bunny-storage-key` も本物に更新） |
+| `R2_ACCOUNT_ID` / `R2_BUCKET` / `R2_PUBLIC_BASE`（＋ Secrets `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY`） | Cloudflare R2（新しいファイルはここへ。[media.md](media.md)「Bunny から R2 へ」） |
+| `R2_MIGRATE` | `true` で Bunny のファイルを裏で R2 へ写す（Actions「Media to R2」でも） |
 
 </details>
 

@@ -1,10 +1,10 @@
 import { forwardRef, HttpStatus, Inject, Injectable, Logger, Optional } from '@nestjs/common';
-import { deleteObject, mediaKey, MediaKind, putObject } from '@obolo/media';
+import { mediaKey, MediaKind, rewriteUrl, urlPrefixes, writeBackend, type MediaBackend, type MediaBackends } from '@obolo/media';
 import { MEDIA_POLICY, VOICE_MAX_BYTES, VOICE_MIME_TYPES } from '@obolo/shared';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { and, eq, isNull, ne, sql } from 'drizzle-orm';
+import { and, eq, inArray, isNull, ne, sql } from 'drizzle-orm';
 import { AppConfig, CONFIG } from '../config';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
@@ -14,6 +14,7 @@ import type { ClipFile } from '@obolo/shared';
 import { probe, squareVideo, transcodePhoto, transcodeVideo, videoPoster } from './transcode';
 import { writeFile } from 'node:fs/promises';
 import { StorageService } from '../storage/storage.service';
+import { mediaBackends } from './backends';
 
 /**
  * Spec §5: the quota without the storage service (scripts, tests): 1 GB. R18: the real room is StorageService's —
@@ -30,10 +31,17 @@ export class MediaService {
     @Optional() @Inject(forwardRef(() => StorageService)) private readonly storage?: StorageService,
   ) {}
 
-  private get bunny() {
+  /** R2 (new files) and Bunny (the files from before) — docs/media.md */
+  private get backends(): MediaBackends {
+    return mediaBackends(this.cfg);
+  }
+
+  /** a file's URL as asked, and its R2 form when it is an old Bunny URL (a page loaded before the switch still sends it) */
+  private sameFile(url: string): string[] {
     const c = this.cfg;
-    if (!c.BUNNY_STORAGE_ZONE || !c.BUNNY_STORAGE_KEY || !c.BUNNY_CDN_HOST) return null;
-    return { zone: c.BUNNY_STORAGE_ZONE, accessKey: c.BUNNY_STORAGE_KEY, endpoint: c.BUNNY_STORAGE_ENDPOINT, cdnHost: c.BUNNY_CDN_HOST };
+    if (!c.BUNNY_CDN_HOST || !this.backends.r2 || !c.R2_PUBLIC_BASE) return [url];
+    const r2 = rewriteUrl(url, urlPrefixes({ cdnHost: c.BUNNY_CDN_HOST }, { publicBase: c.R2_PUBLIC_BASE }));
+    return r2 === url ? [url] : [url, r2];
   }
 
   async uploadVoice(userId: string, mimeHeader: string | undefined, body: unknown, requestOrigin: string) {
@@ -123,14 +131,14 @@ export class MediaService {
     }
     const id = opts.id ?? crypto.randomUUID();
     const key = mediaKey(kind, userId, mime, id);
-    const bunny = this.bunny;
+    const backend = writeBackend(this.backends);
     let url: string;
-    let storage: 'bunny' | 'db';
-    if (bunny) {
-      url = await putObject(bunny, key, data, mime);
-      storage = 'bunny';
+    let storage: 'r2' | 'bunny' | 'db';
+    if (backend) {
+      url = await backend.put(key, data, mime);
+      storage = backend.name;
     } else {
-      // Dev / preview fallback only (P-MEDIA-1). Production must always use Bunny.
+      // Dev / preview fallback only (P-MEDIA-1). Production always has R2 (or Bunny).
       url = `${(this.cfg.PUBLIC_API_URL ?? requestOrigin).replace(/\/$/, '')}/media/${id}`;
       storage = 'db';
     }
@@ -165,7 +173,7 @@ export class MediaService {
     const [m] = await this.db.write
       .select({ data: mediaObjects.data, url: mediaObjects.url })
       .from(mediaObjects)
-      .where(and(eq(mediaObjects.url, url), eq(mediaObjects.userId, userId), isNull(mediaObjects.deletedAt)));
+      .where(and(inArray(mediaObjects.url, this.sameFile(url)), eq(mediaObjects.userId, userId), isNull(mediaObjects.deletedAt)));
     if (!m) return null;
     if (m.data) return m.data;
     const res = await fetch(m.url, { signal: AbortSignal.timeout(120_000) });
@@ -208,20 +216,19 @@ export class MediaService {
     return m?.data ? m : null;
   }
 
-  /** Delete one of the user's files by its URL (an old mix after an edit): Bunny object, row, quota. */
+  /** Delete one of the user's files by its URL (an old mix after an edit): the stored object (R2 / Bunny), row, quota. */
   async removeByUrl(userId: string, url: string): Promise<void> {
     const [m] = await this.db.write
       .update(mediaObjects)
       .set({ deletedAt: new Date(), data: null })
-      .where(and(eq(mediaObjects.url, url), eq(mediaObjects.userId, userId), isNull(mediaObjects.deletedAt)))
-      .returning({ key: mediaObjects.key, storage: mediaObjects.storage, size: mediaObjects.sizeBytes });
+      .where(and(inArray(mediaObjects.url, this.sameFile(url)), eq(mediaObjects.userId, userId), isNull(mediaObjects.deletedAt)))
+      .returning({ key: mediaObjects.key, storage: mediaObjects.storage, moveState: mediaObjects.moveState, size: mediaObjects.sizeBytes });
     if (!m) return;
     await this.db.write
       .update(users)
       .set({ storageUsageBytes: sql`GREATEST(${users.storageUsageBytes} - ${m.size}, 0)` })
       .where(eq(users.id, userId));
-    const bunny = this.bunny;
-    if (m.storage === 'bunny' && bunny) await deleteObject(bunny, m.key).catch(() => undefined);
+    await Promise.all(holdersOf(this.backends, m.storage, m.moveState).map((b) => b.delete(m.key).catch(() => undefined)));
   }
 
   /** The bytes of one of the user's own generated audio files, found by its URL (e.g. an instrumental to sing over). */
@@ -229,7 +236,7 @@ export class MediaService {
     const [m] = await this.db.write
       .select({ data: mediaObjects.data, url: mediaObjects.url })
       .from(mediaObjects)
-      .where(and(eq(mediaObjects.url, url), eq(mediaObjects.userId, userId), eq(mediaObjects.kind, 'audio'), isNull(mediaObjects.deletedAt)));
+      .where(and(inArray(mediaObjects.url, this.sameFile(url)), eq(mediaObjects.userId, userId), eq(mediaObjects.kind, 'audio'), isNull(mediaObjects.deletedAt)));
     if (!m) return null;
     if (m.data) return m.data;
     const res = await fetch(m.url, { signal: AbortSignal.timeout(60_000) });
@@ -244,7 +251,7 @@ export class MediaService {
     const [m] = await this.db.write
       .select({ data: mediaObjects.data, url: mediaObjects.url })
       .from(mediaObjects)
-      .where(and(eq(mediaObjects.url, url), eq(mediaObjects.userId, userId), eq(mediaObjects.kind, 'video'), isNull(mediaObjects.deletedAt)));
+      .where(and(inArray(mediaObjects.url, this.sameFile(url)), eq(mediaObjects.userId, userId), eq(mediaObjects.kind, 'video'), isNull(mediaObjects.deletedAt)));
     if (!m) throw apiError(HttpStatus.NOT_FOUND, 'MEDIA_NOT_FOUND', 'Video not found');
     const bytes = m.data ?? (await fetch(m.url, { signal: AbortSignal.timeout(120_000) }).then(async (r) => (r.ok ? Buffer.from(await r.arrayBuffer()) : null)));
     if (!bytes) throw apiError(HttpStatus.BAD_GATEWAY, 'MEDIA_UNAVAILABLE', 'Could not read the video');
@@ -280,4 +287,16 @@ export class MediaService {
     if (!res.ok) return null;
     return { data: Buffer.from(await res.arrayBuffer()), mime: m.mime };
   }
+}
+
+/**
+ * Every backend that may hold a copy of a stored file, so a delete removes them all: its own one, plus R2 for a Bunny
+ * file (a copy may be there, even one a stopped copy left half-way), plus Bunny for an R2 file that was moved from it
+ * (its original stays until Bunny is cancelled). 'db' rows have none.
+ */
+export function holdersOf(b: MediaBackends, storage: string, moveState: string | null): MediaBackend[] {
+  const out: MediaBackend[] = [];
+  if (b.r2 && (storage === 'r2' || storage === 'bunny')) out.push(b.r2);
+  if (b.bunny && (storage === 'bunny' || (storage === 'r2' && moveState !== null))) out.push(b.bunny);
+  return out;
 }

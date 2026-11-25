@@ -1,19 +1,13 @@
 /**
- * @obolo/media — Bunny helpers (spec §7.1). ALL user media lives on Bunny (Storage + CDN / Stream).
- * Credentials are PLACEHOLDERS (P-MEDIA-1) supplied via env vars.
+ * @obolo/media — where user media is kept (spec §7.1; docs/media.md). New files go to Cloudflare R2 once it is
+ * configured (client decision 2026-11-25, `r2.ts`); the files from before stay on Bunny (`bunny.ts`) until they are
+ * copied over. `backend.ts` is one interface for both. Credentials come from env vars.
  */
 import { createHash, randomUUID } from 'node:crypto';
 
-export interface BunnyStorageConfig {
-  /** Storage zone name, e.g. "obolo-media" */
-  zone: string;
-  /** Storage zone password (AccessKey) */
-  accessKey: string;
-  /** Regional endpoint, e.g. "storage.bunnycdn.com" (Falkenstein) or "sg.storage.bunnycdn.com" */
-  endpoint: string;
-  /** Pull zone hostname that fronts the storage zone, e.g. "obolo.b-cdn.net" */
-  cdnHost: string;
-}
+export * from './bunny';
+export * from './r2';
+export * from './backend';
 
 export type MediaKind = 'voice' | 'image' | 'audio' | 'video-thumb' | 'avatar' | 'bati' | 'photo' | 'video' | 'poster' | 'show' | 'file';
 
@@ -47,37 +41,6 @@ export function extForMime(mime: string): string {
 export function mediaKey(kind: MediaKind, userId: string, mime: string, id: string = randomUUID()): string {
   const shard = createHash('sha1').update(userId).digest('hex').slice(0, 2);
   return `${kind}/${shard}/${userId}/${id}.${extForMime(mime)}`;
-}
-
-export function cdnUrl(cfg: Pick<BunnyStorageConfig, 'cdnHost'>, key: string): string {
-  return `https://${cfg.cdnHost}/${key}`;
-}
-
-/** Server-side upload to Bunny Storage (Bunny Storage has no presigned URLs, so the API proxies small files). */
-export async function putObject(cfg: BunnyStorageConfig, key: string, body: Uint8Array, contentType: string): Promise<string> {
-  const res = await fetch(`https://${cfg.endpoint}/${cfg.zone}/${key}`, {
-    method: 'PUT',
-    headers: { AccessKey: cfg.accessKey, 'content-type': contentType },
-    body,
-  });
-  if (!res.ok) throw new Error(`Bunny Storage upload failed: ${res.status} ${await res.text().catch(() => '')}`);
-  return cdnUrl(cfg, key);
-}
-
-/**
- * Read an object straight from Bunny Storage (with the zone's AccessKey, not through the public CDN): Bluena's private
- * files are served by the API this way, after it checked who is asking. `range` passes a byte range through.
- */
-export async function getObject(cfg: BunnyStorageConfig, key: string, range?: string): Promise<Response> {
-  return fetch(`https://${cfg.endpoint}/${cfg.zone}/${key}`, { headers: { AccessKey: cfg.accessKey, ...(range ? { range } : {}) } });
-}
-
-export async function deleteObject(cfg: BunnyStorageConfig, key: string): Promise<void> {
-  const res = await fetch(`https://${cfg.endpoint}/${cfg.zone}/${key}`, {
-    method: 'DELETE',
-    headers: { AccessKey: cfg.accessKey },
-  });
-  if (!res.ok && res.status !== 404) throw new Error(`Bunny Storage delete failed: ${res.status}`);
 }
 
 /**

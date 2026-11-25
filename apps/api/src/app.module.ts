@@ -5,6 +5,7 @@ import { AuthGuard } from './auth/auth.guard';
 import { AuthService } from './auth/auth.service';
 import { BillingController } from './billing/billing.controller';
 import { BillingService } from './billing/billing.service';
+import { AdminMediaR2Controller } from './admin/media-r2.controller';
 import { AdminReportsController } from './admin/reports.controller';
 import { CommsController } from './comms/comms.controller';
 import { PushController } from './push/push.controller';
@@ -54,6 +55,7 @@ import { MediaController } from './media/media.controller';
 import { FilesController } from './media/files.controller';
 import { FilesService } from './media/files.service';
 import { MediaService } from './media/media.service';
+import { R2MoveService } from './media/r2-move.service';
 import { SaturnController, SaturnPlazasController, SaturnUsersController } from './saturn/saturn.controller';
 import { PlazaService } from './saturn/plaza.service';
 import { JupiterController } from './jupiter/jupiter.controller';
@@ -128,6 +130,7 @@ import { StorageWorksService } from './storage/storage-works.service';
     ComposeController,
     VoiceController,
     CommsController,
+    AdminMediaR2Controller,
     AdminReportsController,
     PushController,
     MvController,
@@ -164,6 +167,8 @@ import { StorageWorksService } from './storage/storage-works.service';
     StoryService,
     MediaService,
     FilesService,
+    // Bunny → R2: the background copy (R2_MIGRATE) and its admin endpoints
+    R2MoveService,
     SaturnService,
     PlazaService,
     JupiterService,

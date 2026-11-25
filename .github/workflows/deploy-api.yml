@@ -52,6 +52,51 @@ jobs:
           docker push "$IMAGE"
           echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
 
+      # Cloudflare R2 (client 2026-11-25; docs/media.md): the GitHub secrets R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY are
+      # written to Secret Manager (obolo-r2-access-key-id / obolo-r2-secret-access-key: created when missing, a new version
+      # only when the value changed; values are never printed) and reach Cloud Run from there, like the other keys.
+      # R2_ACCOUNT_ID / R2_BUCKET / R2_PUBLIC_BASE are plain variables. Without them (or without the keys in Secret
+      # Manager) the API stays on Bunny. The deployer needs Secret Manager rights for this (docs/media.md).
+      - name: R2 keys
+        id: r2
+        env:
+          KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          KEY_SECRET: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          ACCOUNT: ${{ vars.R2_ACCOUNT_ID }}
+          BUCKET: ${{ vars.R2_BUCKET }}
+          BASE: ${{ vars.R2_PUBLIC_BASE }}
+        run: |
+          put() {
+            if ! gcloud secrets describe "$1" >/dev/null 2>&1; then
+              gcloud secrets create "$1" --replication-policy=automatic --quiet >/dev/null 2>&1 || return 1
+              echo "$1: created"
+            fi
+            if [ "$(gcloud secrets versions access latest --secret="$1" 2>/dev/null || true)" = "$(printf '%s' "$2")" ]; then
+              echo "$1: unchanged"
+              return 0
+            fi
+            printf '%s' "$2" | gcloud secrets versions add "$1" --data-file=- --quiet >/dev/null 2>&1 || return 1
+            echo "$1: new version"
+          }
+          if [ -z "$ACCOUNT" ] || [ -z "$BUCKET" ] || [ -z "$BASE" ]; then
+            echo "R2 variables not set: media stays on Bunny"
+            echo "on=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ -n "$KEY_ID" ] && [ -n "$KEY_SECRET" ]; then
+            if ! { put obolo-r2-access-key-id "$KEY_ID" && put obolo-r2-secret-access-key "$KEY_SECRET"; }; then
+              echo "::warning::Could not write the R2 keys to Secret Manager (the deployer needs Secret Manager rights, docs/media.md)"
+            fi
+          fi
+          if gcloud secrets versions describe latest --secret=obolo-r2-access-key-id >/dev/null 2>&1 && \
+             gcloud secrets versions describe latest --secret=obolo-r2-secret-access-key >/dev/null 2>&1; then
+            echo "R2: on (new files go to R2)"
+            echo "on=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::The R2 keys are not in Secret Manager: media stays on Bunny"
+            echo "on=false" >> "$GITHUB_OUTPUT"
+          fi
+
       # Stripe (the Eclipse payment, day 7) is switched on by the STRIPE_PUBLISHABLE_KEY variable, after
       # scripts/stripe-setup.sh stored the secret key. Without it the payment runs in demo mode.
       - name: Secrets
@@ -63,6 +108,11 @@ jobs:
             echo 'REDIS_URL=obolo-redis-url:latest'
             echo 'GEMINI_API_KEY=obolo-gemini-api-key:latest'
             echo 'BUNNY_STORAGE_KEY=obolo-bunny-storage-key:latest'
+            # Cloudflare R2 (the step "R2 keys" above)
+            if [ "${{ steps.r2.outputs.on }}" = "true" ]; then
+              echo 'R2_ACCESS_KEY_ID=obolo-r2-access-key-id:latest'
+              echo 'R2_SECRET_ACCESS_KEY=obolo-r2-secret-access-key:latest'
+            fi
             echo 'ADMIN_TOKEN=obolo-admin-token:latest'
             # the looks and the Bati are painted by Seedream (client decision 2026-10-25)
             echo 'LOOK_RUNWARE_KEY=obolo-seedream-api-key:latest'
@@ -160,6 +210,13 @@ jobs:
             BUNNY_STORAGE_ZONE=${{ vars.BUNNY_STORAGE_ZONE }}
             BUNNY_STORAGE_ENDPOINT=${{ vars.BUNNY_STORAGE_ENDPOINT || 'sg.storage.bunnycdn.com' }}
             BUNNY_CDN_HOST=${{ vars.BUNNY_CDN_HOST }}
+            # Cloudflare R2 (docs/media.md): new files go to R2 when these and the keys are there; R2_MIGRATE=true copies
+            # the Bunny files over in the background (also POST /admin/media/r2/move or the workflow "Media to R2")
+            R2_ACCOUNT_ID=${{ vars.R2_ACCOUNT_ID }}
+            R2_BUCKET=${{ vars.R2_BUCKET }}
+            R2_PUBLIC_BASE=${{ vars.R2_PUBLIC_BASE }}
+            R2_MIGRATE=${{ vars.R2_MIGRATE || 'false' }}
+            R2_MIGRATE_BATCH=${{ vars.R2_MIGRATE_BATCH || '25' }}
             STRIPE_PUBLISHABLE_KEY=${{ vars.STRIPE_PUBLISHABLE_KEY }}
             STRIPE_PRICE_ID=${{ vars.STRIPE_PRICE_ID }}
             ${{ secrets.STRIPE_SECRET_KEY != '' && format('STRIPE_SECRET_KEY={0}', secrets.STRIPE_SECRET_KEY) || 'STRIPE_KEY_SOURCE=secret-manager' }}

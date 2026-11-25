@@ -1,6 +1,6 @@
 import { HttpStatus, Inject, Injectable, Logger, Optional } from '@nestjs/common';
 import { moderateText, type LlmProvider } from '@obolo/ai';
-import { deleteObject, getObject, putObject } from '@obolo/media';
+import { backendOf, writeBackend, type MediaBackend } from '@obolo/media';
 import {
   CLIP_AUDIO_MAX_SECONDS,
   CLIP_BATI_LINES,
@@ -30,6 +30,7 @@ import { dachiMessages, follows, mediaObjects, userBlocks, users } from '../db/s
 import type { KvStore } from '../infra/kv';
 import { KV, LLM } from '../infra/tokens';
 import { clipView, docLooksRight, isHeif, metaOf, type ClipMeta } from './clip-view';
+import { mediaBackends } from './backends';
 import { MediaService } from './media.service';
 import { heicToJpeg, probe, probeAudio, transcodeAudio, transcodePhoto, transcodeVideo, videoPoster } from './transcode';
 
@@ -47,9 +48,9 @@ export const CLIP_LOOK_PROMPT =
 
 /**
  * Bluena's 📎 (client 2026-11-24): the member's own pictures, films, sounds and documents from their device. Stored like
- * every other upload (Bunny, else Postgres in dev; the 1 GB quota; re-encoded — docs/media.md) but private: the file
+ * every other upload (R2, else Bunny, else Postgres in dev; the room of R18; re-encoded — docs/media.md) but private: the file
  * row is kind 'file', it is never served by the public GET /media/:id, and GET /media/files/:id gives it only to its
- * owner and to the ダチ of a talk it was sent into (while still ダチ). The pieces of an upload wait in Bunny under
+ * owner and to the ダチ of a talk it was sent into (while still ダチ). The pieces of an upload wait in R2 (else Bunny) under
  * tmp/ (else a temp folder) until …/done.
  */
 @Injectable()
@@ -63,10 +64,12 @@ export class FilesService {
     @Optional() @Inject(LLM) private readonly llm?: LlmProvider,
   ) {}
 
-  private get bunny() {
-    const c = this.cfg;
-    if (!c.BUNNY_STORAGE_ZONE || !c.BUNNY_STORAGE_KEY || !c.BUNNY_CDN_HOST) return null;
-    return { zone: c.BUNNY_STORAGE_ZONE, accessKey: c.BUNNY_STORAGE_KEY, endpoint: c.BUNNY_STORAGE_ENDPOINT, cdnHost: c.BUNNY_CDN_HOST };
+  private get backends() {
+    return mediaBackends(this.cfg);
+  }
+  /** where upload pieces are kept: where new files go (R2, else Bunny), else a temp folder */
+  private get partStore(): MediaBackend | null {
+    return writeBackend(this.backends);
   }
 
   // ── small lookups (stubbed in tests) ──
@@ -82,22 +85,26 @@ export class FilesService {
   private partKey = (id: string, n: number) => `tmp/clip/${id}/${n}`;
   private partFile = (id: string, n: number) => join(tmpdir(), 'obolo-clip', id, String(n));
   protected async putPart(id: string, n: number, data: Buffer) {
-    const b = this.bunny;
-    if (b) return void (await putObject(b, this.partKey(id, n), data, 'application/octet-stream'));
+    const b = this.partStore;
+    if (b) return void (await b.put(this.partKey(id, n), data, 'application/octet-stream'));
     await mkdir(join(tmpdir(), 'obolo-clip', id), { recursive: true });
     await writeFile(this.partFile(id, n), data);
   }
   protected async readPart(id: string, n: number): Promise<Buffer | null> {
-    const b = this.bunny;
+    const b = this.partStore;
     if (b) {
-      const res = await getObject(b, this.partKey(id, n));
-      return res.ok ? Buffer.from(await res.arrayBuffer()) : null;
+      // a piece sent just before R2 was switched on may still wait in Bunny
+      for (const s of [b, ...(b.name === 'r2' && this.backends.bunny ? [this.backends.bunny] : [])]) {
+        const res = await s.get(this.partKey(id, n));
+        if (res.ok) return Buffer.from(await res.arrayBuffer());
+      }
+      return null;
     }
     return readFile(this.partFile(id, n)).catch(() => null);
   }
   protected async dropParts(id: string, parts: number) {
-    const b = this.bunny;
-    if (b) await Promise.all(Array.from({ length: parts }, (_, n) => deleteObject(b, this.partKey(id, n)).catch(() => undefined)));
+    const all = [this.backends.r2, this.backends.bunny].filter((x): x is MediaBackend => !!x);
+    if (all.length) await Promise.all(all.flatMap((b) => Array.from({ length: parts }, (_, n) => b.delete(this.partKey(id, n)).catch(() => undefined))));
     else await rm(join(tmpdir(), 'obolo-clip', id), { recursive: true, force: true });
   }
   protected async row(id: string): Promise<Row | null> {
@@ -277,12 +284,12 @@ export class FilesService {
     return r;
   }
 
-  /** the bytes of a file allowed by open(): from Postgres, else Bunny Storage (never the public CDN) */
+  /** the bytes of a file allowed by open(): from Postgres, else the storage that holds it, with its keys (never the public URL) */
   async bytes(r: Row, range?: string): Promise<{ status: number; body: Buffer | ReadableStream<Uint8Array> | null; length?: number; range?: string }> {
     if (r.data) return { status: 200, body: r.data, length: r.data.length };
-    const b = this.bunny;
+    const b = backendOf(this.backends, r.storage);
     if (!b) return { status: 404, body: null };
-    const res = await getObject(b, r.key, range);
+    const res = await b.get(r.key, range);
     if (!res.ok) return { status: res.status === 416 ? 416 : 502, body: null };
     return { status: res.status, body: res.body, length: Number(res.headers.get('content-length')) || undefined, range: res.headers.get('content-range') ?? undefined };
   }

@@ -1,0 +1,92 @@
+name: Media to R2
+
+# The move of the media from Bunny to Cloudflare R2 (client 2026-11-25; docs/media.md "Bunny から R2 へ"), from the
+# Actions tab. A one-off Cloud Run job with the API's own service account, so the admin token stays in Google Cloud
+# (as Mana FX and margins).
+#  - status: where new files go, total / migrated / failed / bytes, the latest failures
+#  - move:   POST /admin/media/r2/move again and again for up to `minutes` (copy in batches, then the switch)
+#  - retry:  the failed files back into the queue (then run move again)
+#  - ready:  may Bunny be cancelled? The run fails (red) until no file and no column points at Bunny
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'status / move / retry / ready'
+        default: 'status'
+        type: choice
+        options: [status, move, retry, ready]
+      minutes:
+        description: 'move: how long to keep going (minutes, ≤ 55)'
+        default: '30'
+
+env:
+  REGION: asia-northeast1
+  WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER || format('projects/{0}/locations/global/workloadIdentityPools/github/providers/github', vars.GCP_PROJECT_NUMBER) }}
+  DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA || format('obolo-deployer@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+  RUNTIME_SA: ${{ vars.GCP_RUNTIME_SA || format('obolo-api-runtime@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+
+jobs:
+  r2:
+    if: ${{ vars.GCP_PROJECT_ID != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Run
+        env:
+          ACTION: ${{ inputs.action }}
+          MINUTES: ${{ inputs.minutes }}
+        run: |
+          API="https://obolo-api-${{ vars.GCP_PROJECT_NUMBER }}.${REGION}.run.app"
+          MIN=$(python3 -c 'import os; m=os.environ.get("MINUTES","30").strip() or "30"; print(max(1, min(55, int(float(m)))))')
+          IMAGE=$(gcloud run services describe obolo-api --region "$REGION" --format='value(spec.template.spec.containers[0].image)')
+          cat > script.mjs <<'JS'
+          const h = { 'x-admin-token': process.env.ADMIN_TOKEN };
+          const api = process.env.API;
+          const call = async (method, path) => {
+            const r = await fetch(api + path, { method, headers: h });
+            return { status: r.status, j: await r.json().catch(() => null) };
+          };
+          const act = process.env.ACTION;
+          const until = Date.now() + Number(process.env.MIN) * 60_000;
+          if (act === 'move') {
+            for (;;) {
+              const { status, j } = await call('POST', '/admin/media/r2/move?n=100');
+              if (status !== 200) { console.log('MOVE ' + status + ' ' + JSON.stringify(j)); break; }
+              console.log('LINE ' + (j.busy ? 'busy (another instance is moving) ' : j.step + ' ') + j.line);
+              if (j.step === 'switch') console.log('SWITCH ' + JSON.stringify(j.result));
+              if (j.step === 'copy' && j.result.errors.length) console.log('ERRORS ' + JSON.stringify(j.result.errors.slice(0, 5)));
+              if (j.step === 'idle' || Date.now() > until) break;
+              await new Promise((r) => setTimeout(r, j.busy ? 30_000 : 5_000));
+            }
+          }
+          if (act === 'retry') console.log('RETRY ' + JSON.stringify((await call('POST', '/admin/media/r2/retry')).j));
+          const s = await call('GET', '/admin/media/r2');
+          console.log('STATUS ' + s.status + ' ' + JSON.stringify(s.j));
+          if (s.j && s.j.line) console.log('LINE ' + s.j.line);
+          if (act === 'ready' || act === 'move') {
+            const r = await call('GET', '/admin/media/r2/ready');
+            console.log('READY ' + JSON.stringify(r.j));
+            console.log(r.j && r.j.ready ? 'BUNNY_READY' : 'BUNNY_NOT_READY');
+          }
+          JS
+          SCRIPT=$(base64 -w0 script.mjs)
+          gcloud run jobs deploy obolo-media-r2 --region "$REGION" --image "$IMAGE" --service-account "$RUNTIME_SA" \
+            --set-secrets ADMIN_TOKEN=obolo-admin-token:latest \
+            --set-env-vars "^##^API=$API##ACTION=$ACTION##MIN=$MIN##SCRIPT_B64=$SCRIPT" \
+            --command node --args "^##^--input-type=module##-e##await import('data:text/javascript;base64,' + process.env.SCRIPT_B64)" \
+            --memory 512Mi --task-timeout $(( MIN * 60 + 300 )) --max-retries 0 --quiet
+          gcloud run jobs execute obolo-media-r2 --region "$REGION" --wait || true
+          EXEC=$(gcloud run jobs executions list --job obolo-media-r2 --region "$REGION" --limit 1 --format='value(metadata.name)')
+          sleep 20
+          gcloud logging read "resource.type=cloud_run_job AND resource.labels.job_name=obolo-media-r2 AND labels.\"run.googleapis.com/execution_name\"=\"$EXEC\"" \
+            --order=asc --limit=500 --format='value(textPayload)' | tee log.txt
+          grep -E '^(LINE|READY|SWITCH) ' log.txt | tail -20 | sed 's/^/    /' >> "$GITHUB_STEP_SUMMARY" || true
+          if [ "$ACTION" = "ready" ] && ! grep -q BUNNY_READY log.txt; then echo "::error::Bunny はまだ解約できません（上の READY の reasons）"; exit 1; fi

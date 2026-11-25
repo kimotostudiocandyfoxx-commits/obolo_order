@@ -298,6 +298,23 @@ const Env = z.object({
   BUNNY_STORAGE_KEY: secret(),
   BUNNY_STORAGE_ENDPOINT: z.string().default('sg.storage.bunnycdn.com'),
   BUNNY_CDN_HOST: secret(),
+  /**
+   * Cloudflare R2 (client decision 2026-11-25; docs/media.md). With all five set, new files go to R2 and their URLs are
+   * on R2_PUBLIC_BASE (https://media.obolo.life); otherwise the API stays on Bunny. The keys come from Secret Manager
+   * (obolo-r2-access-key-id / obolo-r2-secret-access-key), written there by deploy-api.yml from the GitHub secrets.
+   */
+  R2_ACCOUNT_ID: secret(),
+  R2_BUCKET: secret(),
+  R2_ACCESS_KEY_ID: secret(),
+  R2_SECRET_ACCESS_KEY: secret(),
+  R2_PUBLIC_BASE: secret(),
+  /** an S3 endpoint other than https://<R2_ACCOUNT_ID>.r2.cloudflarestorage.com (a local S3 in dev) */
+  R2_ENDPOINT: secret(),
+  /** copy the Bunny files to R2 in the background (small batches; also POST /admin/media/r2/move) */
+  R2_MIGRATE: bool(false),
+  /** files per batch, and seconds between batches */
+  R2_MIGRATE_BATCH: z.coerce.number().int().min(1).max(500).default(25),
+  R2_MIGRATE_EVERY_SEC: z.coerce.number().int().min(5).default(30),
   /** Public base URL of this API for dev-fallback media URLs. Unset = derived from the request host. */
   PUBLIC_API_URL: secret(),
 });

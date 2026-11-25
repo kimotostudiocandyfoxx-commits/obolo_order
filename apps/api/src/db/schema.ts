@@ -319,8 +319,9 @@ export const buddyMessages = pgTable(
 );
 
 /**
- * Every uploaded file. storage = 'bunny' in all real environments (spec decision: all media
- * on Bunny CDN). 'db' is a dev/preview-only fallback when Bunny credentials are absent (P-MEDIA-1).
+ * Every uploaded file. storage = which backend holds it: 'r2' (Cloudflare R2, every new file once R2 is configured —
+ * client decision 2026-11-25), 'bunny' (the files from before, until the copy to R2 switches them), 'db' (dev/preview
+ * fallback when no storage is configured, P-MEDIA-1). move_* = the copy from Bunny to R2 (docs/media.md).
  */
 export const mediaObjects = pgTable(
   'media_objects',
@@ -339,9 +340,14 @@ export const mediaObjects = pgTable(
     synthetic: integer('synthetic').notNull().default(0), // spec §6.3: synthetic audio flag
     /** Bluena's 📎 files (kind 'file'): { sub: photo|video|audio|file|poster, name, width, height, seconds, posterId, parent } */
     meta: jsonb('meta'),
+    /** the copy to R2 of a Bunny file: null = not yet, 'copied' (in R2, verified; switched at the end), 'missing' (not on Bunny), 'failed' */
+    moveState: text('move_state'),
+    moveTries: integer('move_tries').notNull().default(0),
+    moveError: text('move_error'),
+    movedAt: timestamp('moved_at', { withTimezone: true }),
     ...timestamps,
   },
-  (t) => [index('media_objects_user_idx').on(t.userId)],
+  (t) => [index('media_objects_user_idx').on(t.userId), index('media_objects_storage_idx').on(t.storage, t.id)],
 );
 
 export const saturnPosts = pgTable(
