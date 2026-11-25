@@ -1,0 +1,40 @@
+name: R2 check
+
+# Checks the Cloudflare R2 keys and media.obolo.life (client 2026-11-25): put, read through the
+# public domain with CORS, then delete a small test object. Run by hand.
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+      ENDPOINT: https://${{ vars.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+      BUCKET: ${{ vars.R2_BUCKET }}
+      PUBLIC: ${{ vars.R2_PUBLIC_BASE }}
+    steps:
+      - name: Settings present
+        run: |
+          for n in AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY BUCKET PUBLIC; do
+            [ -n "${!n}" ] && echo "$n: set" || { echo "$n: MISSING"; exit 1; }
+          done
+          [ -n "${{ vars.R2_ACCOUNT_ID }}" ] && echo "R2_ACCOUNT_ID: set (${#ENDPOINT} chars in endpoint)" || { echo "R2_ACCOUNT_ID: MISSING"; exit 1; }
+      - name: Put, read, delete
+        run: |
+          set -e
+          KEY="_check/$(date +%s).txt"
+          echo "obolo r2 check" > /tmp/check.txt
+          aws s3api put-object --endpoint-url "$ENDPOINT" --bucket "$BUCKET" --key "$KEY" --body /tmp/check.txt --content-type text/plain >/dev/null
+          echo "put: ok"
+          aws s3api head-object --endpoint-url "$ENDPOINT" --bucket "$BUCKET" --key "$KEY" >/dev/null && echo "head: ok"
+          sleep 3
+          echo "--- public read with CORS"
+          curl -sS -D - -o /tmp/got.txt -H "Origin: https://oboloorder-web.vercel.app" "$PUBLIC/$KEY" | grep -iE "^(HTTP|access-control|content-type|cf-cache)" || true
+          cmp /tmp/check.txt /tmp/got.txt && echo "public read: ok" || echo "public read: DIFFERENT"
+          echo "--- CORS preflight for PUT"
+          curl -sS -o /dev/null -D - -X OPTIONS -H "Origin: https://oboloorder-web.vercel.app" -H "Access-Control-Request-Method: PUT" "$ENDPOINT/$BUCKET/$KEY" | grep -iE "^(HTTP|access-control)" || true
+          aws s3api delete-object --endpoint-url "$ENDPOINT" --bucket "$BUCKET" --key "$KEY" >/dev/null && echo "delete: ok"
