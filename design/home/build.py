@@ -221,6 +221,12 @@ if SAT.startswith('home2-bg-saturn-cutea') and os.path.exists(RECMASK):
     fi=src.convert('RGBA'); fi.putalpha(al); fi.thumbnail((720,1280)); A['sat-fg']=uri(fi,82)
 # slim the inline page: big pictures are re-encoded smaller so every planet fits under the 16MB page limit
 DROP={'bg7-saturn','exp-mercury-map','rec-top','bg2-saturn-top'}
+# SKY_KEEP=saturn,jupiter,mercury : keep the sky pictures of these planets only (the prototype is split into two pages)
+_SK=os.environ.get('SKY_KEEP')
+if _SK:
+    _keep=set(_SK.split(','))
+    for k in list(A):
+        if (k.startswith('exp-') or k.startswith('isl-')) and k.split('-')[1] not in _keep: del A[k]
 for k in list(A):
     if k in DROP: del A[k]
 if not os.environ.get('EXTERN'):
@@ -229,9 +235,10 @@ if not os.environ.get('EXTERN'):
         if not (isinstance(v,str) and v.startswith('data:image/webp;base64,')) or len(v)<40000: continue
         im=Image.open(io.BytesIO(base64.b64decode(v[23:]))); im.load()
         w,h=im.size; big=max(w,h)
-        if big>1000: im=im.resize((round(w*960/big),round(h*960/big)),Image.LANCZOS)
+        cap=int(os.environ.get('SKY_MAX','960')) if k.startswith('exp-') else 960
+        if big>cap: im=im.resize((round(w*cap/big),round(h*cap/big)),Image.LANCZOS)
         elif big>360 and k.startswith('isl-'): im=im.resize((round(w*320/big),round(h*320/big)),Image.LANCZOS)
-        b=io.BytesIO(); im.save(b,'WEBP',quality=68 if im.mode=='RGB' else 74,method=6); nv='data:image/webp;base64,'+base64.b64encode(b.getvalue()).decode()
+        b=io.BytesIO(); im.save(b,'WEBP',quality=(int(os.environ.get('SKY_Q','68')) if k.startswith('exp-') else 68) if im.mode=='RGB' else 74,method=6); nv='data:image/webp;base64,'+base64.b64encode(b.getvalue()).decode()
         if len(nv)<len(v): A[k]=nv
 # EXTERN=1: pictures and sounds go to files next to the page (a/<key>.<ext>) instead of being inlined, so the page stays small
 if os.environ.get('EXTERN'):
