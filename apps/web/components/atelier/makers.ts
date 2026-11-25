@@ -382,7 +382,9 @@ export async function fly(w: Work, ctx: Ctx): Promise<void> {
   else if (w.kind === 'song' && r.songId) await api.createPlanetPost('mercury', { sourceId: r.songId, title: w.title ?? '', text: '' });
   else if (w.kind === 'song' && r.demoSong) ctx.mercury.release(r.demoSong.id);
   else if (w.kind === 'video' && r.backstageId) await api.createPlanetPost('mars', { sourceId: r.backstageId, title: w.title ?? '', text: '' });
-  else if (w.kind === 'radio' && r.showId) await api.publishRadioShow(r.showId, true);
+  else if (w.kind === 'video' && w.reel && api.mode !== 'live') {
+    // R13: the review page's video (canned frames, no server): flown in the talk only
+  } else if (w.kind === 'radio' && r.showId) await api.publishRadioShow(r.showId, true);
   else throw new ApiError(400, 'NOT_KEPT', 'not kept');
   if (LOCAL_KINDS.includes(w.kind) || r.demoSong) putShelf({ ...w, flown: true });
 }

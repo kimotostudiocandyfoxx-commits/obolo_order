@@ -765,8 +765,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   const craftAfter = (w: Work, text: string): boolean => {
     const it = detect(text, true, markNames());
     if (it.kind === 'find' || (it.kind === 'make' && it.what !== w.kind && it.what !== 'lookup')) return false;
-    if (w.kind === 'video' && it.kind === 'make' && it.what === 'video' && wantsNew(text)) {
-      void videoStart(it.content);
+    if (w.kind === 'video' && wantsNew(text) && !(it.kind === 'make' && it.what !== 'video')) {
+      void videoStart(text.replace(/新しく|あたらしく|別の|べつの|もう一つ|もうひとつ/g, '').replace(/^[、。\s]+/, ''));
       return true;
     }
     if (w.kind === 'video') return videoAfter(w, text);

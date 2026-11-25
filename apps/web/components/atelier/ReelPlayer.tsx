@@ -91,7 +91,7 @@ export function ReelPlayer({ reel, title }: { reel: VideoReel; title?: string })
         <img src={scene.url} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ transform: far, transformOrigin: '50% 45%' }} />
         {depth && scene.near && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={scene.near} alt="" className="absolute bottom-[6%] left-[22%] w-[56%] object-contain drop-shadow-[0_10px_18px_rgba(0,0,0,.45)]" style={{ transform: near }} />
+          <img src={scene.near} alt="" className="absolute bottom-[8%] left-[29%] w-[42%] object-contain drop-shadow-[0_10px_18px_rgba(0,0,0,.45)]" style={{ transform: near }} />
         )}
       </div>
       {dark > 0 && <div className="absolute inset-0 bg-black" style={{ opacity: dark }} />}
