@@ -1,0 +1,1408 @@
+{
+  "usd_jpy": 160,
+  "side": 1024,
+  "spent_usd": 2.67822,
+  "estimated_usd": 2.6091,
+  "stopped": null,
+  "looks": [
+    {
+      "id": "A-fox",
+      "ref": "art/review/saturn/gen-tests/look-photo1-1.jpg",
+      "about": "a real member look made by the app from photo p1 (hooded portrait, round sunglasses, fox ears)",
+      "pattern": "olive gold and teal with black accents, taken from her olive-gold hooded cloak, teal fox ears and long black hair",
+      "accessory": "her round black sunglasses",
+      "top": "two pointed teal fox ears with a bit of her black hair",
+      "all_models": true
+    },
+    {
+      "id": "B-rabbit",
+      "ref": "art/review/saturn/gen-tests/look-photo2-1.jpg",
+      "about": "a real member look made by the app from photo p2 (navy hood with gold trim, round sunglasses, rabbit ears)",
+      "pattern": "deep navy and gold with a little cream, taken from his navy hooded cloak with gold trim and gold lining",
+      "accessory": "his round black sunglasses",
+      "top": "two long rabbit ears from his hood",
+      "all_models": false
+    },
+    {
+      "id": "C-user",
+      "ref": "art/lab/runware-planet-avatar/refs/look-user.jpg",
+      "about": "the story's {neo} (design/home/chibi-ref/user.jpg on the story branch): the reference all story chibi/p5 art was drawn from",
+      "pattern": "black, white and silver taken from his black jacket and white shirt (a neat jacket-collar pattern)",
+      "accessory": "his round glasses",
+      "top": "a small tuft of his black hair",
+      "all_models": true
+    }
+  ],
+  "styles": [
+    {
+      "id": "saturn-chibi",
+      "planet": "Saturn",
+      "what": "2-heads chibi that jumps out of the popped ball (M-R262, 2D anime per M-R275)",
+      "source": "story design/mv-art-queue.json chibi2-user",
+      "style_refs": []
+    },
+    {
+      "id": "saturn-ball",
+      "planet": "Saturn",
+      "what": "the member's kororin ball in their own pattern (M-R279 proposal)",
+      "source": "story design/mv-art-queue.json kor4-user",
+      "style_refs": [
+        "kstyle"
+      ]
+    },
+    {
+      "id": "jupiter-butterfly",
+      "planet": "Jupiter",
+      "what": "kigurumi butterfly chibi hugging a scroll (M-R278/M-R279)",
+      "source": "story design/mv-art-queue.json chibi4-user",
+      "style_refs": [
+        "bstyle"
+      ]
+    },
+    {
+      "id": "mercury-ship",
+      "planet": "Mercury",
+      "what": "chibi riding their own music-note sailboat with a boombox (M-R280)",
+      "source": "story design/mv-art-queue.json ship4-user",
+      "style_refs": [
+        "bstyle"
+      ]
+    },
+    {
+      "id": "mars-ufo",
+      "planet": "Mars",
+      "what": "chibi riding a UFO in their colours (M-R293)",
+      "source": "story design/mv-art-queue.json p5-mars-user",
+      "style_refs": [
+        "bstyle"
+      ]
+    },
+    {
+      "id": "venus-dj",
+      "planet": "Venus",
+      "what": "chibi radio DJ at a tiny booth on a cloud (M-R293 addendum)",
+      "source": "story design/mv-art-queue.json p5-venus-user",
+      "style_refs": [
+        "bstyle"
+      ]
+    },
+    {
+      "id": "uranus-balloons",
+      "planet": "Uranus",
+      "what": "chibi hanging from balloons with a gift box (M-R293)",
+      "source": "story design/mv-art-queue.json p5-uranus-user",
+      "style_refs": [
+        "bstyle"
+      ]
+    },
+    {
+      "id": "pluto-book",
+      "planet": "Pluto",
+      "what": "chibi riding a flying book (M-R293)",
+      "source": "story design/mv-art-queue.json p5-pluto-user",
+      "style_refs": [
+        "bstyle"
+      ]
+    },
+    {
+      "id": "neptune-bubble",
+      "planet": "Neptune",
+      "what": "chibi in a bubble holding a game controller (M-R293)",
+      "source": "story design/mv-art-queue.json p5-neptune-user",
+      "style_refs": [
+        "bstyle"
+      ]
+    }
+  ],
+  "per_model": {
+    "flux2-klein-4b": {
+      "pictures": 27,
+      "total_usd": 0.0477,
+      "avg_usd": 0.00177,
+      "avg_jpy": 0.28
+    },
+    "flux2-klein-9b": {
+      "pictures": 27,
+      "total_usd": 0.09451,
+      "avg_usd": 0.0035,
+      "avg_jpy": 0.56
+    },
+    "seedream-5-flash": {
+      "pictures": 27,
+      "total_usd": 0.52002,
+      "avg_usd": 0.01926,
+      "avg_jpy": 3.08
+    },
+    "qwen-image-2-1-turbo": {
+      "pictures": 27,
+      "total_usd": 0.38159,
+      "avg_usd": 0.01413,
+      "avg_jpy": 2.26
+    },
+    "seedream-5-pro": {
+      "pictures": 18,
+      "total_usd": 1.00794,
+      "avg_usd": 0.056,
+      "avg_jpy": 8.96
+    },
+    "nano-banana-2-lite": {
+      "pictures": 18,
+      "total_usd": 0.62646,
+      "avg_usd": 0.0348,
+      "avg_jpy": 5.57
+    }
+  },
+  "cases": {
+    "saturn-chibi__A-fox": {
+      "style": "saturn-chibi",
+      "planet": "Saturn",
+      "look": "A-fox",
+      "refs": 1,
+      "prompt": "A super-deformed 2-heads-tall chibi of the character in the reference picture, drawn as a flat 2D Japanese anime illustration (like official chibi art in a popular TV anime or its character goods): a big round head and a tiny body, keeping the character's face, hairstyle, outfit, colours and signature items exactly recognisable. Clean confident lineart, anime cel shading with soft gradient shadows, big expressive anime eyes with sparkling highlights, soft blush, bright clear colours. Not 3D, not a figure, not a render. Jumping out joyfully with both arms up, a big happy smile, waving one hand. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "saturn-chibi__A-fox__flux2-klein-4b.jpg",
+          "cost_usd": 0.0021,
+          "refs_sent": 1,
+          "seconds": 3.3
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "saturn-chibi__A-fox__flux2-klein-9b.jpg",
+          "cost_usd": 0.00273,
+          "refs_sent": 1,
+          "seconds": 5.0
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "saturn-chibi__A-fox__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 1,
+          "seconds": 19.4
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "saturn-chibi__A-fox__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 1,
+          "seconds": 32.9
+        },
+        "seedream-5-pro": {
+          "model": "bytedance:seedream@5.0-pro",
+          "file": "saturn-chibi__A-fox__seedream-5-pro.jpg",
+          "cost_usd": 0.04815,
+          "refs_sent": 1,
+          "seconds": 30.9
+        },
+        "nano-banana-2-lite": {
+          "model": "google:nano-banana@2-lite",
+          "file": "saturn-chibi__A-fox__nano-banana-2-lite.jpg",
+          "cost_usd": 0.0339891,
+          "refs_sent": 1,
+          "seconds": 7.3
+        }
+      }
+    },
+    "saturn-chibi__B-rabbit": {
+      "style": "saturn-chibi",
+      "planet": "Saturn",
+      "look": "B-rabbit",
+      "refs": 1,
+      "prompt": "A super-deformed 2-heads-tall chibi of the character in the reference picture, drawn as a flat 2D Japanese anime illustration (like official chibi art in a popular TV anime or its character goods): a big round head and a tiny body, keeping the character's face, hairstyle, outfit, colours and signature items exactly recognisable. Clean confident lineart, anime cel shading with soft gradient shadows, big expressive anime eyes with sparkling highlights, soft blush, bright clear colours. Not 3D, not a figure, not a render. Jumping out joyfully with both arms up, a big happy smile, waving one hand. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "saturn-chibi__B-rabbit__flux2-klein-4b.jpg",
+          "cost_usd": 0.0021,
+          "refs_sent": 1,
+          "seconds": 4.7
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "saturn-chibi__B-rabbit__flux2-klein-9b.jpg",
+          "cost_usd": 0.00273,
+          "refs_sent": 1,
+          "seconds": 3.9
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "saturn-chibi__B-rabbit__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 1,
+          "seconds": 14.1
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "saturn-chibi__B-rabbit__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 1,
+          "seconds": 21.8
+        }
+      }
+    },
+    "saturn-chibi__C-user": {
+      "style": "saturn-chibi",
+      "planet": "Saturn",
+      "look": "C-user",
+      "refs": 1,
+      "prompt": "A super-deformed 2-heads-tall chibi of the character in the reference picture, drawn as a flat 2D Japanese anime illustration (like official chibi art in a popular TV anime or its character goods): a big round head and a tiny body, keeping the character's face, hairstyle, outfit, colours and signature items exactly recognisable. Clean confident lineart, anime cel shading with soft gradient shadows, big expressive anime eyes with sparkling highlights, soft blush, bright clear colours. Not 3D, not a figure, not a render. Jumping out joyfully with both arms up, a big happy smile, waving one hand. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "saturn-chibi__C-user__flux2-klein-4b.jpg",
+          "cost_usd": 0.0011,
+          "refs_sent": 1,
+          "seconds": 2.7
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "saturn-chibi__C-user__flux2-klein-9b.jpg",
+          "cost_usd": 0.00273,
+          "refs_sent": 1,
+          "seconds": 2.7
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "saturn-chibi__C-user__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 1,
+          "seconds": 16.0
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "saturn-chibi__C-user__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 1,
+          "seconds": 18.5
+        },
+        "seedream-5-pro": {
+          "model": "bytedance:seedream@5.0-pro",
+          "file": "saturn-chibi__C-user__seedream-5-pro.jpg",
+          "cost_usd": 0.04815,
+          "refs_sent": 1,
+          "seconds": 31.0
+        },
+        "nano-banana-2-lite": {
+          "model": "google:nano-banana@2-lite",
+          "file": "saturn-chibi__C-user__nano-banana-2-lite.jpg",
+          "cost_usd": 0.0339891,
+          "refs_sent": 1,
+          "seconds": 6.2
+        }
+      }
+    },
+    "saturn-ball__A-fox": {
+      "style": "saturn-ball",
+      "planet": "Saturn",
+      "look": "A-fox",
+      "refs": 2,
+      "prompt": "A round ball-shaped mascot (a perfect glossy sphere with no arms and no legs) in exactly the same style as the SECOND reference picture: soft cute anime mascot, glossy highlight top-left, and the same simple face — two tiny shiny black dot eyes, a small ω-shaped cat mouth and soft round pink blush. Its colour and surface pattern are designed from the character in the FIRST reference picture: olive gold and teal with black accents, taken from her olive-gold hooded cloak, teal fox ears and long black hair. Accessory: her round black sunglasses on the face. On top: two pointed teal fox ears with a bit of her black hair. It must still read as a round ball first. Front view, centered, filling about 80% of the frame. Plain solid pure white background, no shadow, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "saturn-ball__A-fox__flux2-klein-4b.jpg",
+          "cost_usd": 0.0021,
+          "refs_sent": 2,
+          "seconds": 5.3
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "saturn-ball__A-fox__flux2-klein-9b.jpg",
+          "cost_usd": 0.00403,
+          "refs_sent": 2,
+          "seconds": 11.3
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "saturn-ball__A-fox__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 2,
+          "seconds": 17.2
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "saturn-ball__A-fox__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 2,
+          "seconds": 14.7
+        },
+        "seedream-5-pro": {
+          "model": "bytedance:seedream@5.0-pro",
+          "file": "saturn-ball__A-fox__seedream-5-pro.jpg",
+          "cost_usd": 0.05136,
+          "refs_sent": 2,
+          "seconds": 92.4
+        },
+        "nano-banana-2-lite": {
+          "model": "google:nano-banana@2-lite",
+          "file": "saturn-ball__A-fox__nano-banana-2-lite.jpg",
+          "cost_usd": 0.0343257,
+          "refs_sent": 2,
+          "seconds": 7.4
+        }
+      }
+    },
+    "saturn-ball__B-rabbit": {
+      "style": "saturn-ball",
+      "planet": "Saturn",
+      "look": "B-rabbit",
+      "refs": 2,
+      "prompt": "A round ball-shaped mascot (a perfect glossy sphere with no arms and no legs) in exactly the same style as the SECOND reference picture: soft cute anime mascot, glossy highlight top-left, and the same simple face — two tiny shiny black dot eyes, a small ω-shaped cat mouth and soft round pink blush. Its colour and surface pattern are designed from the character in the FIRST reference picture: deep navy and gold with a little cream, taken from his navy hooded cloak with gold trim and gold lining. Accessory: his round black sunglasses on the face. On top: two long rabbit ears from his hood. It must still read as a round ball first. Front view, centered, filling about 80% of the frame. Plain solid pure white background, no shadow, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "saturn-ball__B-rabbit__flux2-klein-4b.jpg",
+          "cost_usd": 0.0021,
+          "refs_sent": 2,
+          "seconds": 3.7
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "saturn-ball__B-rabbit__flux2-klein-9b.jpg",
+          "cost_usd": 0.00403,
+          "refs_sent": 2,
+          "seconds": 4.7
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "saturn-ball__B-rabbit__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 2,
+          "seconds": 15.0
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "saturn-ball__B-rabbit__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 2,
+          "seconds": 16.1
+        }
+      }
+    },
+    "saturn-ball__C-user": {
+      "style": "saturn-ball",
+      "planet": "Saturn",
+      "look": "C-user",
+      "refs": 2,
+      "prompt": "A round ball-shaped mascot (a perfect glossy sphere with no arms and no legs) in exactly the same style as the SECOND reference picture: soft cute anime mascot, glossy highlight top-left, and the same simple face — two tiny shiny black dot eyes, a small ω-shaped cat mouth and soft round pink blush. Its colour and surface pattern are designed from the character in the FIRST reference picture: black, white and silver taken from his black jacket and white shirt (a neat jacket-collar pattern). Accessory: his round glasses on the face. On top: a small tuft of his black hair. It must still read as a round ball first. Front view, centered, filling about 80% of the frame. Plain solid pure white background, no shadow, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "saturn-ball__C-user__flux2-klein-4b.jpg",
+          "cost_usd": 0.0011,
+          "refs_sent": 2,
+          "seconds": 2.7
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "saturn-ball__C-user__flux2-klein-9b.jpg",
+          "cost_usd": 0.00273,
+          "refs_sent": 2,
+          "seconds": 4.8
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "saturn-ball__C-user__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 2,
+          "seconds": 17.9
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "saturn-ball__C-user__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 2,
+          "seconds": 15.4
+        },
+        "seedream-5-pro": {
+          "model": "bytedance:seedream@5.0-pro",
+          "file": "saturn-ball__C-user__seedream-5-pro.jpg",
+          "cost_usd": 0.05136,
+          "refs_sent": 2,
+          "seconds": 82.1
+        },
+        "nano-banana-2-lite": {
+          "model": "google:nano-banana@2-lite",
+          "file": "saturn-ball__C-user__nano-banana-2-lite.jpg",
+          "cost_usd": 0.034323,
+          "refs_sent": 2,
+          "seconds": 5.0
+        }
+      }
+    },
+    "jupiter-butterfly__A-fox": {
+      "style": "jupiter-butterfly",
+      "planet": "Jupiter",
+      "look": "A-fox",
+      "refs": 4,
+      "prompt": "Draw the character from the FIRST reference picture as a cute super-deformed chibi, in exactly the same art style as the other reference pictures (soft hand-drawn kawaii chibi illustration, gentle muted watercolour-like colouring, clean brown-black outlines, sticker-like): the character is dressed up as a butterfly — keep the character's face and identity recognisable, give it curly butterfly antennae on the head or hood, and butterfly wings growing from its back whose colours and patterns are designed from the character's outfit: olive gold and teal with black accents, taken from her olive-gold hooded cloak, teal fox ears and long black hair (no green). The chibi is flying gently and hugging a rolled-up old paper scroll with a red cord in both arms. Front view, centered, the whole character and both wings inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "jupiter-butterfly__A-fox__flux2-klein-4b.jpg",
+          "cost_usd": 0.0021,
+          "refs_sent": 4,
+          "seconds": 7.4
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "jupiter-butterfly__A-fox__flux2-klein-9b.jpg",
+          "cost_usd": 0.00403,
+          "refs_sent": 4,
+          "seconds": 10.4
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "jupiter-butterfly__A-fox__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 4,
+          "seconds": 18.7
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "jupiter-butterfly__A-fox__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 3,
+          "seconds": 26.4
+        },
+        "seedream-5-pro": {
+          "model": "bytedance:seedream@5.0-pro",
+          "file": "jupiter-butterfly__A-fox__seedream-5-pro.jpg",
+          "cost_usd": 0.05778,
+          "refs_sent": 4,
+          "seconds": 34.3
+        },
+        "nano-banana-2-lite": {
+          "model": "google:nano-banana@2-lite",
+          "file": "jupiter-butterfly__A-fox__nano-banana-2-lite.jpg",
+          "cost_usd": 0.0350046,
+          "refs_sent": 4,
+          "seconds": 9.6
+        }
+      }
+    },
+    "jupiter-butterfly__B-rabbit": {
+      "style": "jupiter-butterfly",
+      "planet": "Jupiter",
+      "look": "B-rabbit",
+      "refs": 4,
+      "prompt": "Draw the character from the FIRST reference picture as a cute super-deformed chibi, in exactly the same art style as the other reference pictures (soft hand-drawn kawaii chibi illustration, gentle muted watercolour-like colouring, clean brown-black outlines, sticker-like): the character is dressed up as a butterfly — keep the character's face and identity recognisable, give it curly butterfly antennae on the head or hood, and butterfly wings growing from its back whose colours and patterns are designed from the character's outfit: deep navy and gold with a little cream, taken from his navy hooded cloak with gold trim and gold lining (no green). The chibi is flying gently and hugging a rolled-up old paper scroll with a red cord in both arms. Front view, centered, the whole character and both wings inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "jupiter-butterfly__B-rabbit__flux2-klein-4b.jpg",
+          "cost_usd": 0.0021,
+          "refs_sent": 4,
+          "seconds": 4.9
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "jupiter-butterfly__B-rabbit__flux2-klein-9b.jpg",
+          "cost_usd": 0.00403,
+          "refs_sent": 4,
+          "seconds": 5.0
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "jupiter-butterfly__B-rabbit__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 4,
+          "seconds": 18.4
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "jupiter-butterfly__B-rabbit__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 3,
+          "seconds": 17.9
+        }
+      }
+    },
+    "jupiter-butterfly__C-user": {
+      "style": "jupiter-butterfly",
+      "planet": "Jupiter",
+      "look": "C-user",
+      "refs": 4,
+      "prompt": "Draw the character from the FIRST reference picture as a cute super-deformed chibi, in exactly the same art style as the other reference pictures (soft hand-drawn kawaii chibi illustration, gentle muted watercolour-like colouring, clean brown-black outlines, sticker-like): the character is dressed up as a butterfly — keep the character's face and identity recognisable, give it curly butterfly antennae on the head or hood, and butterfly wings growing from its back whose colours and patterns are designed from the character's outfit: black, white and silver taken from his black jacket and white shirt (a neat jacket-collar pattern) (no green). The chibi is flying gently and hugging a rolled-up old paper scroll with a red cord in both arms. Front view, centered, the whole character and both wings inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "jupiter-butterfly__C-user__flux2-klein-4b.jpg",
+          "cost_usd": 0.0011,
+          "refs_sent": 4,
+          "seconds": 5.3
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "jupiter-butterfly__C-user__flux2-klein-9b.jpg",
+          "cost_usd": 0.00273,
+          "refs_sent": 4,
+          "seconds": 5.4
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "jupiter-butterfly__C-user__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 4,
+          "seconds": 18.4
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "jupiter-butterfly__C-user__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 3,
+          "seconds": 23.4
+        },
+        "seedream-5-pro": {
+          "model": "bytedance:seedream@5.0-pro",
+          "file": "jupiter-butterfly__C-user__seedream-5-pro.jpg",
+          "cost_usd": 0.05778,
+          "refs_sent": 4,
+          "seconds": 34.1
+        },
+        "nano-banana-2-lite": {
+          "model": "google:nano-banana@2-lite",
+          "file": "jupiter-butterfly__C-user__nano-banana-2-lite.jpg",
+          "cost_usd": 0.0350037,
+          "refs_sent": 4,
+          "seconds": 8.4
+        }
+      }
+    },
+    "mercury-ship__A-fox": {
+      "style": "mercury-ship",
+      "planet": "Mercury",
+      "look": "A-fox",
+      "refs": 4,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a small cute sailboat seen from the side with a sail shaped like a music note. The boat's hull and sail colours and patterns are designed from the character: olive gold and teal with black accents, taken from her olive-gold hooded cloak, teal fox ears and long black hair. Riding in the boat is a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), happily carrying a big boombox speaker on its shoulder. No water, no sea. Centered, the whole boat and character inside the frame with a margin. Plain solid pure white background, no shadow, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "mercury-ship__A-fox__flux2-klein-4b.jpg",
+          "cost_usd": 0.0021,
+          "refs_sent": 4,
+          "seconds": 6.5
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "mercury-ship__A-fox__flux2-klein-9b.jpg",
+          "cost_usd": 0.00403,
+          "refs_sent": 4,
+          "seconds": 6.6
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "mercury-ship__A-fox__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 4,
+          "seconds": 17.8
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "mercury-ship__A-fox__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 3,
+          "seconds": 17.0
+        },
+        "seedream-5-pro": {
+          "model": "bytedance:seedream@5.0-pro",
+          "file": "mercury-ship__A-fox__seedream-5-pro.jpg",
+          "cost_usd": 0.05778,
+          "refs_sent": 4,
+          "seconds": 73.7
+        },
+        "nano-banana-2-lite": {
+          "model": "google:nano-banana@2-lite",
+          "file": "mercury-ship__A-fox__nano-banana-2-lite.jpg",
+          "cost_usd": 0.0349983,
+          "refs_sent": 4,
+          "seconds": 8.6
+        }
+      }
+    },
+    "mercury-ship__B-rabbit": {
+      "style": "mercury-ship",
+      "planet": "Mercury",
+      "look": "B-rabbit",
+      "refs": 4,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a small cute sailboat seen from the side with a sail shaped like a music note. The boat's hull and sail colours and patterns are designed from the character: deep navy and gold with a little cream, taken from his navy hooded cloak with gold trim and gold lining. Riding in the boat is a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), happily carrying a big boombox speaker on its shoulder. No water, no sea. Centered, the whole boat and character inside the frame with a margin. Plain solid pure white background, no shadow, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "mercury-ship__B-rabbit__flux2-klein-4b.jpg",
+          "cost_usd": 0.0021,
+          "refs_sent": 4,
+          "seconds": 4.8
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "mercury-ship__B-rabbit__flux2-klein-9b.jpg",
+          "cost_usd": 0.00403,
+          "refs_sent": 4,
+          "seconds": 5.6
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "mercury-ship__B-rabbit__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 4,
+          "seconds": 15.4
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "mercury-ship__B-rabbit__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 3,
+          "seconds": 18.4
+        }
+      }
+    },
+    "mercury-ship__C-user": {
+      "style": "mercury-ship",
+      "planet": "Mercury",
+      "look": "C-user",
+      "refs": 4,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a small cute sailboat seen from the side with a sail shaped like a music note. The boat's hull and sail colours and patterns are designed from the character: black, white and silver taken from his black jacket and white shirt (a neat jacket-collar pattern). Riding in the boat is a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), happily carrying a big boombox speaker on its shoulder. No water, no sea. Centered, the whole boat and character inside the frame with a margin. Plain solid pure white background, no shadow, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "mercury-ship__C-user__flux2-klein-4b.jpg",
+          "cost_usd": 0.0011,
+          "refs_sent": 4,
+          "seconds": 4.3
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "mercury-ship__C-user__flux2-klein-9b.jpg",
+          "cost_usd": 0.00273,
+          "refs_sent": 4,
+          "seconds": 4.8
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "mercury-ship__C-user__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 4,
+          "seconds": 16.9
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "mercury-ship__C-user__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 3,
+          "seconds": 15.0
+        },
+        "seedream-5-pro": {
+          "model": "bytedance:seedream@5.0-pro",
+          "file": "mercury-ship__C-user__seedream-5-pro.jpg",
+          "cost_usd": 0.05778,
+          "refs_sent": 4,
+          "seconds": 78.3
+        },
+        "nano-banana-2-lite": {
+          "model": "google:nano-banana@2-lite",
+          "file": "mercury-ship__C-user__nano-banana-2-lite.jpg",
+          "cost_usd": 0.0349971,
+          "refs_sent": 4,
+          "seconds": 8.4
+        }
+      }
+    },
+    "mars-ufo__A-fox": {
+      "style": "mars-ufo",
+      "planet": "Mars",
+      "look": "A-fox",
+      "refs": 4,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding a small cute round flying saucer UFO whose colours and patterns are designed from the character's outfit, a soft projector beam glowing under it. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "mars-ufo__A-fox__flux2-klein-4b.jpg",
+          "cost_usd": 0.0021,
+          "refs_sent": 4,
+          "seconds": 6.2
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "mars-ufo__A-fox__flux2-klein-9b.jpg",
+          "cost_usd": 0.00403,
+          "refs_sent": 4,
+          "seconds": 6.5
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "mars-ufo__A-fox__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 4,
+          "seconds": 16.4
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "mars-ufo__A-fox__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 3,
+          "seconds": 29.2
+        },
+        "seedream-5-pro": {
+          "model": "bytedance:seedream@5.0-pro",
+          "file": "mars-ufo__A-fox__seedream-5-pro.jpg",
+          "cost_usd": 0.05778,
+          "refs_sent": 4,
+          "seconds": 58.8
+        },
+        "nano-banana-2-lite": {
+          "model": "google:nano-banana@2-lite",
+          "file": "mars-ufo__A-fox__nano-banana-2-lite.jpg",
+          "cost_usd": 0.0349818,
+          "refs_sent": 4,
+          "seconds": 8.8
+        }
+      }
+    },
+    "mars-ufo__B-rabbit": {
+      "style": "mars-ufo",
+      "planet": "Mars",
+      "look": "B-rabbit",
+      "refs": 4,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding a small cute round flying saucer UFO whose colours and patterns are designed from the character's outfit, a soft projector beam glowing under it. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "mars-ufo__B-rabbit__flux2-klein-4b.jpg",
+          "cost_usd": 0.0021,
+          "refs_sent": 4,
+          "seconds": 3.8
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "mars-ufo__B-rabbit__flux2-klein-9b.jpg",
+          "cost_usd": 0.00403,
+          "refs_sent": 4,
+          "seconds": 5.7
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "mars-ufo__B-rabbit__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 4,
+          "seconds": 16.3
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "mars-ufo__B-rabbit__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 3,
+          "seconds": 18.6
+        }
+      }
+    },
+    "mars-ufo__C-user": {
+      "style": "mars-ufo",
+      "planet": "Mars",
+      "look": "C-user",
+      "refs": 4,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding a small cute round flying saucer UFO whose colours and patterns are designed from the character's outfit, a soft projector beam glowing under it. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "mars-ufo__C-user__flux2-klein-4b.jpg",
+          "cost_usd": 0.0011,
+          "refs_sent": 4,
+          "seconds": 5.6
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "mars-ufo__C-user__flux2-klein-9b.jpg",
+          "cost_usd": 0.00273,
+          "refs_sent": 4,
+          "seconds": 5.2
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "mars-ufo__C-user__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 4,
+          "seconds": 20.9
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "mars-ufo__C-user__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 3,
+          "seconds": 25.7
+        },
+        "seedream-5-pro": {
+          "model": "bytedance:seedream@5.0-pro",
+          "file": "mars-ufo__C-user__seedream-5-pro.jpg",
+          "cost_usd": 0.05778,
+          "refs_sent": 4,
+          "seconds": 84.3
+        },
+        "nano-banana-2-lite": {
+          "model": "google:nano-banana@2-lite",
+          "file": "mars-ufo__C-user__nano-banana-2-lite.jpg",
+          "cost_usd": 0.0349818,
+          "refs_sent": 4,
+          "seconds": 8.8
+        }
+      }
+    },
+    "venus-dj__A-fox": {
+      "style": "venus-dj",
+      "planet": "Venus",
+      "look": "A-fox",
+      "refs": 4,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), working as a radio DJ: sitting at a tiny cute radio DJ booth desk (with a little mixer and an ON AIR lamp) whose colours and patterns are designed from the character's outfit, wearing headphones and talking happily into a microphone on a desk arm that pops up in front, the whole little booth floating on a small fluffy cloud. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "venus-dj__A-fox__flux2-klein-4b.jpg",
+          "cost_usd": 0.0021,
+          "refs_sent": 4,
+          "seconds": 4.8
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "venus-dj__A-fox__flux2-klein-9b.jpg",
+          "cost_usd": 0.00403,
+          "refs_sent": 4,
+          "seconds": 5.6
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "venus-dj__A-fox__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 4,
+          "seconds": 17.8
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "venus-dj__A-fox__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 3,
+          "seconds": 20.2
+        },
+        "seedream-5-pro": {
+          "model": "bytedance:seedream@5.0-pro",
+          "file": "venus-dj__A-fox__seedream-5-pro.jpg",
+          "cost_usd": 0.05778,
+          "refs_sent": 4,
+          "seconds": 91.7
+        },
+        "nano-banana-2-lite": {
+          "model": "google:nano-banana@2-lite",
+          "file": "venus-dj__A-fox__nano-banana-2-lite.jpg",
+          "cost_usd": 0.0349935,
+          "refs_sent": 4,
+          "seconds": 9.1
+        }
+      }
+    },
+    "venus-dj__B-rabbit": {
+      "style": "venus-dj",
+      "planet": "Venus",
+      "look": "B-rabbit",
+      "refs": 4,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), working as a radio DJ: sitting at a tiny cute radio DJ booth desk (with a little mixer and an ON AIR lamp) whose colours and patterns are designed from the character's outfit, wearing headphones and talking happily into a microphone on a desk arm that pops up in front, the whole little booth floating on a small fluffy cloud. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "venus-dj__B-rabbit__flux2-klein-4b.jpg",
+          "cost_usd": 0.0021,
+          "refs_sent": 4,
+          "seconds": 6.1
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "venus-dj__B-rabbit__flux2-klein-9b.jpg",
+          "cost_usd": 0.00403,
+          "refs_sent": 4,
+          "seconds": 9.6
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "venus-dj__B-rabbit__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 4,
+          "seconds": 18.3
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "venus-dj__B-rabbit__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 3,
+          "seconds": 24.2
+        }
+      }
+    },
+    "venus-dj__C-user": {
+      "style": "venus-dj",
+      "planet": "Venus",
+      "look": "C-user",
+      "refs": 4,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), working as a radio DJ: sitting at a tiny cute radio DJ booth desk (with a little mixer and an ON AIR lamp) whose colours and patterns are designed from the character's outfit, wearing headphones and talking happily into a microphone on a desk arm that pops up in front, the whole little booth floating on a small fluffy cloud. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "venus-dj__C-user__flux2-klein-4b.jpg",
+          "cost_usd": 0.0011,
+          "refs_sent": 4,
+          "seconds": 5.8
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "venus-dj__C-user__flux2-klein-9b.jpg",
+          "cost_usd": 0.00273,
+          "refs_sent": 4,
+          "seconds": 4.0
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "venus-dj__C-user__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 4,
+          "seconds": 23.9
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "venus-dj__C-user__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 3,
+          "seconds": 19.3
+        },
+        "seedream-5-pro": {
+          "model": "bytedance:seedream@5.0-pro",
+          "file": "venus-dj__C-user__seedream-5-pro.jpg",
+          "cost_usd": 0.05778,
+          "refs_sent": 4,
+          "seconds": 102.6
+        },
+        "nano-banana-2-lite": {
+          "model": "google:nano-banana@2-lite",
+          "file": "venus-dj__C-user__nano-banana-2-lite.jpg",
+          "cost_usd": 0.0349935,
+          "refs_sent": 4,
+          "seconds": 6.9
+        }
+      }
+    },
+    "uranus-balloons__A-fox": {
+      "style": "uranus-balloons",
+      "planet": "Uranus",
+      "look": "A-fox",
+      "refs": 4,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), hanging from a bunch of balloons with a gift box whose colours and patterns are designed from the character's outfit. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "uranus-balloons__A-fox__flux2-klein-4b.jpg",
+          "cost_usd": 0.0021,
+          "refs_sent": 4,
+          "seconds": 9.1
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "uranus-balloons__A-fox__flux2-klein-9b.jpg",
+          "cost_usd": 0.00403,
+          "refs_sent": 4,
+          "seconds": 9.7
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "uranus-balloons__A-fox__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 4,
+          "seconds": 14.6
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "uranus-balloons__A-fox__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 3,
+          "seconds": 20.1
+        },
+        "seedream-5-pro": {
+          "model": "bytedance:seedream@5.0-pro",
+          "file": "uranus-balloons__A-fox__seedream-5-pro.jpg",
+          "cost_usd": 0.05778,
+          "refs_sent": 4,
+          "seconds": 68.3
+        },
+        "nano-banana-2-lite": {
+          "model": "google:nano-banana@2-lite",
+          "file": "uranus-balloons__A-fox__nano-banana-2-lite.jpg",
+          "cost_usd": 0.03498,
+          "refs_sent": 4,
+          "seconds": 21.5
+        }
+      }
+    },
+    "uranus-balloons__B-rabbit": {
+      "style": "uranus-balloons",
+      "planet": "Uranus",
+      "look": "B-rabbit",
+      "refs": 4,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), hanging from a bunch of balloons with a gift box whose colours and patterns are designed from the character's outfit. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "uranus-balloons__B-rabbit__flux2-klein-4b.jpg",
+          "cost_usd": 0.0021,
+          "refs_sent": 4,
+          "seconds": 7.4
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "uranus-balloons__B-rabbit__flux2-klein-9b.jpg",
+          "cost_usd": 0.00403,
+          "refs_sent": 4,
+          "seconds": 7.8
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "uranus-balloons__B-rabbit__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 4,
+          "seconds": 14.7
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "uranus-balloons__B-rabbit__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 3,
+          "seconds": 16.0
+        }
+      }
+    },
+    "uranus-balloons__C-user": {
+      "style": "uranus-balloons",
+      "planet": "Uranus",
+      "look": "C-user",
+      "refs": 4,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), hanging from a bunch of balloons with a gift box whose colours and patterns are designed from the character's outfit. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "uranus-balloons__C-user__flux2-klein-4b.jpg",
+          "cost_usd": 0.0011,
+          "refs_sent": 4,
+          "seconds": 5.3
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "uranus-balloons__C-user__flux2-klein-9b.jpg",
+          "cost_usd": 0.00273,
+          "refs_sent": 4,
+          "seconds": 6.8
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "uranus-balloons__C-user__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 4,
+          "seconds": 19.2
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "uranus-balloons__C-user__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 3,
+          "seconds": 18.1
+        },
+        "seedream-5-pro": {
+          "model": "bytedance:seedream@5.0-pro",
+          "file": "uranus-balloons__C-user__seedream-5-pro.jpg",
+          "cost_usd": 0.05778,
+          "refs_sent": 4,
+          "seconds": 81.8
+        },
+        "nano-banana-2-lite": {
+          "model": "google:nano-banana@2-lite",
+          "file": "uranus-balloons__C-user__nano-banana-2-lite.jpg",
+          "cost_usd": 0.03498,
+          "refs_sent": 4,
+          "seconds": 5.8
+        }
+      }
+    },
+    "pluto-book__A-fox": {
+      "style": "pluto-book",
+      "planet": "Pluto",
+      "look": "A-fox",
+      "refs": 4,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding on a big open flying book whose cover colours and patterns are designed from the character's outfit, little glowing letters floating. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "pluto-book__A-fox__flux2-klein-4b.jpg",
+          "cost_usd": 0.0021,
+          "refs_sent": 4,
+          "seconds": 7.5
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "pluto-book__A-fox__flux2-klein-9b.jpg",
+          "cost_usd": 0.00403,
+          "refs_sent": 4,
+          "seconds": 9.2
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "pluto-book__A-fox__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 4,
+          "seconds": 21.1
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "pluto-book__A-fox__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 3,
+          "seconds": 27.4
+        },
+        "seedream-5-pro": {
+          "model": "bytedance:seedream@5.0-pro",
+          "file": "pluto-book__A-fox__seedream-5-pro.jpg",
+          "cost_usd": 0.05778,
+          "refs_sent": 4,
+          "seconds": 82.8
+        },
+        "nano-banana-2-lite": {
+          "model": "google:nano-banana@2-lite",
+          "file": "pluto-book__A-fox__nano-banana-2-lite.jpg",
+          "cost_usd": 0.0349809,
+          "refs_sent": 4,
+          "seconds": 9.3
+        }
+      }
+    },
+    "pluto-book__B-rabbit": {
+      "style": "pluto-book",
+      "planet": "Pluto",
+      "look": "B-rabbit",
+      "refs": 4,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding on a big open flying book whose cover colours and patterns are designed from the character's outfit, little glowing letters floating. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "pluto-book__B-rabbit__flux2-klein-4b.jpg",
+          "cost_usd": 0.0021,
+          "refs_sent": 4,
+          "seconds": 9.8
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "pluto-book__B-rabbit__flux2-klein-9b.jpg",
+          "cost_usd": 0.00403,
+          "refs_sent": 4,
+          "seconds": 12.3
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "pluto-book__B-rabbit__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 4,
+          "seconds": 19.2
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "pluto-book__B-rabbit__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 3,
+          "seconds": 16.3
+        }
+      }
+    },
+    "pluto-book__C-user": {
+      "style": "pluto-book",
+      "planet": "Pluto",
+      "look": "C-user",
+      "refs": 4,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding on a big open flying book whose cover colours and patterns are designed from the character's outfit, little glowing letters floating. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "pluto-book__C-user__flux2-klein-4b.jpg",
+          "cost_usd": 0.0011,
+          "refs_sent": 4,
+          "seconds": 5.7
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "pluto-book__C-user__flux2-klein-9b.jpg",
+          "cost_usd": 0.00273,
+          "refs_sent": 4,
+          "seconds": 4.5
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "pluto-book__C-user__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 4,
+          "seconds": 19.5
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "pluto-book__C-user__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 3,
+          "seconds": 20.2
+        },
+        "seedream-5-pro": {
+          "model": "bytedance:seedream@5.0-pro",
+          "file": "pluto-book__C-user__seedream-5-pro.jpg",
+          "cost_usd": 0.05778,
+          "refs_sent": 4,
+          "seconds": 107.6
+        },
+        "nano-banana-2-lite": {
+          "model": "google:nano-banana@2-lite",
+          "file": "pluto-book__C-user__nano-banana-2-lite.jpg",
+          "cost_usd": 0.0349809,
+          "refs_sent": 4,
+          "seconds": 8.8
+        }
+      }
+    },
+    "neptune-bubble__A-fox": {
+      "style": "neptune-bubble",
+      "planet": "Neptune",
+      "look": "A-fox",
+      "refs": 4,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), floating inside a big transparent bubble holding a game controller whose colours and patterns are designed from the character's outfit. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "neptune-bubble__A-fox__flux2-klein-4b.jpg",
+          "cost_usd": 0.0021,
+          "refs_sent": 4,
+          "seconds": 5.2
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "neptune-bubble__A-fox__flux2-klein-9b.jpg",
+          "cost_usd": 0.00403,
+          "refs_sent": 4,
+          "seconds": 6.1
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "neptune-bubble__A-fox__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 4,
+          "seconds": 17.3
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "neptune-bubble__A-fox__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 3,
+          "seconds": 17.9
+        },
+        "seedream-5-pro": {
+          "model": "bytedance:seedream@5.0-pro",
+          "file": "neptune-bubble__A-fox__seedream-5-pro.jpg",
+          "cost_usd": 0.05778,
+          "refs_sent": 4,
+          "seconds": 83.7
+        },
+        "nano-banana-2-lite": {
+          "model": "google:nano-banana@2-lite",
+          "file": "neptune-bubble__A-fox__nano-banana-2-lite.jpg",
+          "cost_usd": 0.03498,
+          "refs_sent": 4,
+          "seconds": 13.3
+        }
+      }
+    },
+    "neptune-bubble__B-rabbit": {
+      "style": "neptune-bubble",
+      "planet": "Neptune",
+      "look": "B-rabbit",
+      "refs": 4,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), floating inside a big transparent bubble holding a game controller whose colours and patterns are designed from the character's outfit. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "neptune-bubble__B-rabbit__flux2-klein-4b.jpg",
+          "cost_usd": 0.0021,
+          "refs_sent": 4,
+          "seconds": 6.2
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "neptune-bubble__B-rabbit__flux2-klein-9b.jpg",
+          "cost_usd": 0.00403,
+          "refs_sent": 4,
+          "seconds": 7.4
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "neptune-bubble__B-rabbit__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 4,
+          "seconds": 15.0
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "neptune-bubble__B-rabbit__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 3,
+          "seconds": 15.1
+        }
+      }
+    },
+    "neptune-bubble__C-user": {
+      "style": "neptune-bubble",
+      "planet": "Neptune",
+      "look": "C-user",
+      "refs": 4,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), floating inside a big transparent bubble holding a game controller whose colours and patterns are designed from the character's outfit. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text.",
+      "models": {
+        "flux2-klein-4b": {
+          "model": "runware:400@4",
+          "file": "neptune-bubble__C-user__flux2-klein-4b.jpg",
+          "cost_usd": 0.0011,
+          "refs_sent": 4,
+          "seconds": 5.3
+        },
+        "flux2-klein-9b": {
+          "model": "runware:400@2",
+          "file": "neptune-bubble__C-user__flux2-klein-9b.jpg",
+          "cost_usd": 0.00273,
+          "refs_sent": 4,
+          "seconds": 7.5
+        },
+        "seedream-5-flash": {
+          "model": "bytedance:seedream@5.0-flash",
+          "file": "neptune-bubble__C-user__seedream-5-flash.jpg",
+          "cost_usd": 0.01926,
+          "refs_sent": 4,
+          "seconds": 17.8
+        },
+        "qwen-image-2-1-turbo": {
+          "model": "alibaba:qwen-image@2.1-turbo",
+          "file": "neptune-bubble__C-user__qwen-image-2-1-turbo.jpg",
+          "cost_usd": 0.014133,
+          "refs_sent": 3,
+          "seconds": 15.9
+        },
+        "seedream-5-pro": {
+          "model": "bytedance:seedream@5.0-pro",
+          "file": "neptune-bubble__C-user__seedream-5-pro.jpg",
+          "cost_usd": 0.05778,
+          "refs_sent": 4,
+          "seconds": 115.5
+        },
+        "nano-banana-2-lite": {
+          "model": "google:nano-banana@2-lite",
+          "file": "neptune-bubble__C-user__nano-banana-2-lite.jpg",
+          "cost_usd": 0.03498,
+          "refs_sent": 4,
+          "seconds": 9.3
+        }
+      }
+    }
+  }
+}
