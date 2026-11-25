@@ -3,6 +3,7 @@ import { anywhere, PLAY_HOLD_MS, PLAY_INTRO_MS, type AllowedArea } from './layou
 import { ALL_SEEN, JTREE, PORCH_HOLD_MS, PORCH_INTRO_MS, PORCH_PATH } from './jupiter';
 import { ALL_HEARD, HOME_SEA, MHOUSE, PIER_PATH, sailMotion, seaOnly, shipStandIn } from './mercury';
 import { driftMotion, type FigureMotion } from './motion';
+import { ALL_SEEN_FIVE, FIVE_HOLD_MS, FIVE_PLANETS, type FivePlanet } from './five';
 import { ALL_HEARD as KORORIN_ALL_HEARD, DROP_MS, firstVoiceMs, floorMotion, NEEDLE, TONEARM } from './saturn';
 
 /** a point of the play view (fractions of the screen) and the size there */
@@ -89,8 +90,20 @@ const art = (p: HomePlanet) => ({ home: `/planets/bg-${p}.webp`, view: `/planets
 /** the common play path (the template's default: the visitor flies down to you, the work opens, it flies off) */
 export const DEFAULT_PLAY_PATH: PlayPath = { from: { x: 0.4, y: 0.2, size: 0.3 }, sit: { x: 0.18, y: 0.86, size: 1 }, away: { x: 0.9, y: 0.15, size: 0.3 }, arriveMs: 900, leaveMs: 800 };
 
+/**
+ * 05 the five (Mars, Venus, Uranus, Pluto, Neptune): the common template as it is (JSLOT, drift), a work opens with the
+ * deep zoom (popG5's zoomart), ▶ you pop out of your place (playG5's popOut) and the works come one at a time — Mars's
+ * MV until it has played to the end (05: 曲の長さ), the others 5.2 s (05: 5〜7 秒)
+ */
+const fiveOwn = (p: FivePlanet): Partial<Omit<PlanetTemplateConfig, 'planet'>> => ({
+  openLook: { scale: 1.65, blur: 5, bright: 0.55 },
+  holdMs: FIVE_HOLD_MS,
+  play: { path: DEFAULT_PLAY_PATH, untilDone: p === 'mars', night: false, fireworks: false, fireflies: false, dance: { x: PLACE[p][0], y: PLACE[p][1] }, danceAs: 'dance', doneLine: ALL_SEEN_FIVE },
+});
+
 /** each planet's own numbers (the 02〜 documents) over the common template */
 const OWN: Partial<Record<HomePlanet, Partial<Omit<PlanetTemplateConfig, 'planet'>>>> = {
+  ...Object.fromEntries(FIVE_PLANETS.map((p) => [p, fiveOwn(p)])),
   // 03 木星: the butterflies drift on JSLOT (the template's own); an art opens with a deep zoom (zoomart); ▶ is the porch at night
   jupiter: {
     openLook: { scale: 1.65, blur: 5, bright: 0.55 },

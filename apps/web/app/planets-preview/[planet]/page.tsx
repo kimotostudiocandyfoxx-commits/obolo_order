@@ -1,6 +1,6 @@
 'use client';
 
-import { figureFor, isHomePlanet, type HomePlanet, type Me, type PlanetHomeView } from '@obolo/shared';
+import { demoGame, figureFor, isHomePlanet, spellFrom, type GameView, type HomePlanet, type HomeWork, type Me, type PlanetHomeView } from '@obolo/shared';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { PlanetTemplateHome, type TemplateMe } from '@/components/planetTemplate/PlanetTemplateHome';
@@ -17,6 +17,14 @@ const SAMPLE_DANCE = '/planets/sample/dance-user.webp';
 
 /** Saturn: the chibi out of your kororin (figureFor's chibi, else your chibi picture; the sample: the prototype's) */
 const chibiOf = (me: Me | null, sample: boolean) => figureFor(me?.planetFigures, 'saturn').url ?? me?.chibiPic ?? (sample ? '/planets/sample/chibi-user.webp' : null);
+
+/** 05 Neptune's sample: PRESS START plays the Moon's demo game made from the work's title (nothing is fetched) */
+const sampleGame = async (w: HomeWork): Promise<GameView> => {
+  const tags = spellFrom('game', w.title ?? '');
+  const g = demoGame(tags);
+  const at = new Date().toISOString();
+  return { id: w.id, title: w.title || g.title, howTo: g.howTo, tags, version: 0, code: g.code, home: 'neptune', createdAt: at, updatedAt: at };
+};
 
 /** your back in the view from your place: your look's own (GET /me lookBack), else the talk's stand-in */
 const backOf = (me: Me | null) => me?.lookBack ?? viewsOf('talk-user')?.back ?? '/planets/back.webp';
@@ -70,6 +78,8 @@ function Preview() {
             const v = await api.planetPerson(planet, p.id).catch(() => null);
             return v?.works.length ? v.works : p.works;
           },
+      // 05 Neptune: PRESS START plays the flown game (GET /moon/games/:id: its maker, or whoever its home reaches)
+      game: data.sample ? sampleGame : (w) => api.game(w.id).catch(() => null),
     });
   }, [data, planet]);
 

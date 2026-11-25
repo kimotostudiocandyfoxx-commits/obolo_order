@@ -1,4 +1,5 @@
 import { PLANET_HOMES, type HomePlanet, type HomeRel, type HomeWork, type PlanetHomeView } from '@obolo/shared';
+import { FIVE, isFivePlanet, sampleArtIndex, sampleOpening } from './five';
 import { SAMPLE_ARTS } from './jupiter';
 import { SAMPLE_SONGS, sampleSongUrl } from './mercury';
 
@@ -34,6 +35,23 @@ export function templateSample(planet: HomePlanet, now = Date.now()): PlanetHome
       const k = ((i * 2 + [...name].length) % 5) + 1;
       return { id: `mercury-s${i}`, kind, author: { id: rel === 'own' ? 'me' : `u-${name}`, name, pic: null, figure: fig }, rel, text: '', title: SAMPLE_SONGS[k - 1], url: sampleSongUrl(k), thumbUrl: `/planets/sample/art-${k}.webp`, flownAt: at(h), demo: true };
     }
+    if (isFivePlanet(planet)) {
+      // 05: the prototype's five works of each planet (G5[pl].titles) on its five pictures; Mars's MV plays the
+      // prototype's song over its picture, Pluto's book opens on the prototype's first lines
+      const k = sampleArtIndex(i, name);
+      return {
+        id: `${planet}-s${i}`,
+        kind,
+        author: { id: rel === 'own' ? 'me' : `u-${name}`, name, pic: null, figure: fig },
+        rel,
+        text: planet === 'pluto' ? sampleOpening(name) : planet === 'neptune' ? 'タップで遊べるよ' : '',
+        title: FIVE[planet].titles[k - 1],
+        url: planet === 'mars' ? sampleSongUrl(k) : null,
+        thumbUrl: `/planets/sample/art-${k}.webp`,
+        flownAt: at(h),
+        demo: true,
+      };
+    }
     return {
       id: `${planet}-s${i}`,
       kind,
@@ -55,10 +73,12 @@ export function templateSample(planet: HomePlanet, now = Date.now()): PlanetHome
     young: false,
     lastVisitAt: at(12),
     // Mercury: your eight records on the beach, and each friend's past songs (the prototype's profile)
-    own: Array.from({ length: planet === 'mercury' ? 8 : 4 }, (_, i) => work(100 + i, 'ミナト★', 'user', 'own', 30 + i * 40)),
+    // 05: ten of yours on the shelf, and 5–8 of each friend's (the prototype's openProf: ME 10, others 5 + name.length % 4)
+    own: Array.from({ length: planet === 'mercury' ? 8 : isFivePlanet(planet) ? 10 : 4 }, (_, i) => work(100 + i, 'ミナト★', 'user', 'own', 30 + i * 40)),
     around: [
       ...CAST.map(([n, p, r], i) => work(i, n, p, r, 1 + i * 3)),
       ...(planet === 'mercury' ? CAST.flatMap(([n, p, r], i) => Array.from({ length: 3 + ([...n].length % 3) }, (_, j) => work(20 + i * 10 + j, n, p, r, 40 + i * 3 + j))) : []),
+      ...(isFivePlanet(planet) ? CAST.flatMap(([n, p, r], i) => Array.from({ length: 4 + ([...n].length % 4) }, (_, j) => work(20 + i * 10 + j, n, p, r, 40 + i * 3 + j))) : []),
     ],
     far: [],
   };
