@@ -11399,6 +11399,454 @@
       ],
       "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture. Vertical phone wallpaper 9:16. A dreamy open-air pastel club floating in space: a soft starry lavender and pink sky full of bokeh lights, glowing Saturn-ring arcs sweeping across the sky (rings only, no planet ball), floating pastel neon shapes. At the right side, a little lower than the middle, a small floating DJ booth with a big glossy vinyl record turntable seen from the front. The rest of the picture is open airy space for round creatures floating around. No floor, no characters, no text.",
       "always": false
+    },
+    {
+      "id": "exp-jupiter-sea",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). Vertical phone wallpaper 9:16. A high aerial view looking straight down at an endless magical forest canopy, soft mist drifting between the tree tops, glowing fireflies, gentle light. Only tree tops, absolutely no clearings, no buildings, no objects, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-jupiter-me",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). A cosy personal clearing with a big old tree that has a little round door and a tree-house atelier, lanterns and flowers. Seen from high above at a gentle 3/4 aerial angle, like a game map piece: a single small round forest clearing island, a patch of meadow ringed by trees, floating alone, centered, the whole piece in frame with a wide margin. Plain solid pure white background outside the piece, no shadow, no text, no people.",
+      "always": false
+    },
+    {
+      "id": "isl-jupiter-watercolor",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). A watercolour clearing: easels with soft watercolour paintings, puddles of pastel paint, blooming flowers. Seen from high above at a gentle 3/4 aerial angle, like a game map piece: a single small round forest clearing island, a patch of meadow ringed by trees, floating alone, centered, the whole piece in frame with a wide margin. Plain solid pure white background outside the piece, no shadow, no text, no people.",
+      "always": false
+    },
+    {
+      "id": "isl-jupiter-anime",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). An anime-art clearing: big glowing canvases with bright cel-shaded colours, sparkles, cherry blossom trees. Seen from high above at a gentle 3/4 aerial angle, like a game map piece: a single small round forest clearing island, a patch of meadow ringed by trees, floating alone, centered, the whole piece in frame with a wide margin. Plain solid pure white background outside the piece, no shadow, no text, no people.",
+      "always": false
+    },
+    {
+      "id": "isl-jupiter-pixel",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). A pixel-art clearing: blocky voxel trees, a little pixel castle, glowing square fireflies. Seen from high above at a gentle 3/4 aerial angle, like a game map piece: a single small round forest clearing island, a patch of meadow ringed by trees, floating alone, centered, the whole piece in frame with a wide margin. Plain solid pure white background outside the piece, no shadow, no text, no people.",
+      "always": false
+    },
+    {
+      "id": "isl-jupiter-oil",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). An oil-painting clearing: golden autumn trees, a grand gilded frame standing in the meadow, warm light. Seen from high above at a gentle 3/4 aerial angle, like a game map piece: a single small round forest clearing island, a patch of meadow ringed by trees, floating alone, centered, the whole piece in frame with a wide margin. Plain solid pure white background outside the piece, no shadow, no text, no people.",
+      "always": false
+    },
+    {
+      "id": "isl-jupiter-yumekawa",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). A dreamy pastel clearing: candy-coloured trees, unicorn statues, floating hearts and clouds. Seen from high above at a gentle 3/4 aerial angle, like a game map piece: a single small round forest clearing island, a patch of meadow ringed by trees, floating alone, centered, the whole piece in frame with a wide margin. Plain solid pure white background outside the piece, no shadow, no text, no people.",
+      "always": false
+    },
+    {
+      "id": "isl-jupiter-cats",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). A cat clearing: many little cat statues and cat-shaped bushes, a cat house, cushions. Seen from high above at a gentle 3/4 aerial angle, like a game map piece: a single small round forest clearing island, a patch of meadow ringed by trees, floating alone, centered, the whole piece in frame with a wide margin. Plain solid pure white background outside the piece, no shadow, no text, no people.",
+      "always": false
+    },
+    {
+      "id": "isl-jupiter-nightview",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). A night-view hill clearing: a small hill with a bench and a telescope, city lights glow far below, stars. Seen from high above at a gentle 3/4 aerial angle, like a game map piece: a single small round forest clearing island, a patch of meadow ringed by trees, floating alone, centered, the whole piece in frame with a wide margin. Plain solid pure white background outside the piece, no shadow, no text, no people.",
+      "always": false
+    },
+    {
+      "id": "isl-jupiter-wamodern",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). A Japanese modern clearing: a small red torii, bamboo, a tatami pavilion, paper lanterns. Seen from high above at a gentle 3/4 aerial angle, like a game map piece: a single small round forest clearing island, a patch of meadow ringed by trees, floating alone, centered, the whole piece in frame with a wide margin. Plain solid pure white background outside the piece, no shadow, no text, no people.",
+      "always": false
+    },
+    {
+      "id": "isl-jupiter-retropop",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). A retro-pop clearing: bold 70s colours, checkerboard grass, giant flowers, a jukebox. Seen from high above at a gentle 3/4 aerial angle, like a game map piece: a single small round forest clearing island, a patch of meadow ringed by trees, floating alone, centered, the whole piece in frame with a wide margin. Plain solid pure white background outside the piece, no shadow, no text, no people.",
+      "always": false
+    },
+    {
+      "id": "isl-jupiter-mono",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). A monochrome clearing: black and white ink-painted trees, a single red flower, ink splashes. Seen from high above at a gentle 3/4 aerial angle, like a game map piece: a single small round forest clearing island, a patch of meadow ringed by trees, floating alone, centered, the whole piece in frame with a wide margin. Plain solid pure white background outside the piece, no shadow, no text, no people.",
+      "always": false
+    },
+    {
+      "id": "exp-jupiter-watercolor",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). Vertical phone wallpaper 9:16. Ground-level view of a soft watercolour forest glade with easels and pastel flowers. The middle and lower part of the picture is open air over the meadow, empty, for many small winged characters flying in front. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-jupiter-watercolor-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter-porch.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). Vertical phone wallpaper 9:16. The view from sitting at the edge of a soft watercolour forest glade with easels and pastel flowers, at dusk with fireflies: the foreground at the very bottom is the soft grass and roots at your feet, and in front of you the glade opens up with open air in the middle of the picture, empty, for winged characters flying towards you. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-jupiter-anime",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). Vertical phone wallpaper 9:16. Ground-level view of a sparkling anime-art forest glade with cherry blossom trees and glowing canvases. The middle and lower part of the picture is open air over the meadow, empty, for many small winged characters flying in front. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-jupiter-anime-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter-porch.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). Vertical phone wallpaper 9:16. The view from sitting at the edge of a sparkling anime-art forest glade with cherry blossom trees and glowing canvases, at dusk with fireflies: the foreground at the very bottom is the soft grass and roots at your feet, and in front of you the glade opens up with open air in the middle of the picture, empty, for winged characters flying towards you. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-jupiter-pixel",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). Vertical phone wallpaper 9:16. Ground-level view of a pixel-art style forest glade with blocky trees and a tiny pixel castle. The middle and lower part of the picture is open air over the meadow, empty, for many small winged characters flying in front. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-jupiter-pixel-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter-porch.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). Vertical phone wallpaper 9:16. The view from sitting at the edge of a pixel-art style forest glade with blocky trees and a tiny pixel castle, at dusk with fireflies: the foreground at the very bottom is the soft grass and roots at your feet, and in front of you the glade opens up with open air in the middle of the picture, empty, for winged characters flying towards you. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-jupiter-oil",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). Vertical phone wallpaper 9:16. Ground-level view of a golden autumn forest glade with a grand gilded frame standing in the meadow. The middle and lower part of the picture is open air over the meadow, empty, for many small winged characters flying in front. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-jupiter-oil-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter-porch.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). Vertical phone wallpaper 9:16. The view from sitting at the edge of a golden autumn forest glade with a grand gilded frame standing in the meadow, at dusk with fireflies: the foreground at the very bottom is the soft grass and roots at your feet, and in front of you the glade opens up with open air in the middle of the picture, empty, for winged characters flying towards you. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-jupiter-yumekawa",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). Vertical phone wallpaper 9:16. Ground-level view of a dreamy pastel candy forest glade with floating hearts. The middle and lower part of the picture is open air over the meadow, empty, for many small winged characters flying in front. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-jupiter-yumekawa-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter-porch.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). Vertical phone wallpaper 9:16. The view from sitting at the edge of a dreamy pastel candy forest glade with floating hearts, at dusk with fireflies: the foreground at the very bottom is the soft grass and roots at your feet, and in front of you the glade opens up with open air in the middle of the picture, empty, for winged characters flying towards you. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-jupiter-cats",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). Vertical phone wallpaper 9:16. Ground-level view of a forest glade full of cat statues and cat-shaped bushes. The middle and lower part of the picture is open air over the meadow, empty, for many small winged characters flying in front. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-jupiter-cats-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter-porch.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). Vertical phone wallpaper 9:16. The view from sitting at the edge of a forest glade full of cat statues and cat-shaped bushes, at dusk with fireflies: the foreground at the very bottom is the soft grass and roots at your feet, and in front of you the glade opens up with open air in the middle of the picture, empty, for winged characters flying towards you. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-jupiter-nightview",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). Vertical phone wallpaper 9:16. Ground-level view of a hilltop forest glade at night with a bench, city lights far below and stars. The middle and lower part of the picture is open air over the meadow, empty, for many small winged characters flying in front. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-jupiter-nightview-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter-porch.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). Vertical phone wallpaper 9:16. The view from sitting at the edge of a hilltop forest glade at night with a bench, city lights far below and stars, at dusk with fireflies: the foreground at the very bottom is the soft grass and roots at your feet, and in front of you the glade opens up with open air in the middle of the picture, empty, for winged characters flying towards you. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-jupiter-wamodern",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). Vertical phone wallpaper 9:16. Ground-level view of a Japanese forest glade with bamboo, a red torii and paper lanterns. The middle and lower part of the picture is open air over the meadow, empty, for many small winged characters flying in front. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-jupiter-wamodern-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter-porch.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). Vertical phone wallpaper 9:16. The view from sitting at the edge of a Japanese forest glade with bamboo, a red torii and paper lanterns, at dusk with fireflies: the foreground at the very bottom is the soft grass and roots at your feet, and in front of you the glade opens up with open air in the middle of the picture, empty, for winged characters flying towards you. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-jupiter-retropop",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). Vertical phone wallpaper 9:16. Ground-level view of a retro 70s pop forest glade with giant flowers and checkerboard grass. The middle and lower part of the picture is open air over the meadow, empty, for many small winged characters flying in front. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-jupiter-retropop-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter-porch.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). Vertical phone wallpaper 9:16. The view from sitting at the edge of a retro 70s pop forest glade with giant flowers and checkerboard grass, at dusk with fireflies: the foreground at the very bottom is the soft grass and roots at your feet, and in front of you the glade opens up with open air in the middle of the picture, empty, for winged characters flying towards you. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-jupiter-mono",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). Vertical phone wallpaper 9:16. Ground-level view of a monochrome ink-painted forest glade with one red flower. The middle and lower part of the picture is open air over the meadow, empty, for many small winged characters flying in front. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-jupiter-mono-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter-porch.jpg"
+      ],
+      "prompt": "Painterly Japanese anime background art in exactly the same style, brushwork and colours as the reference picture (lush magical forest, soft god rays, fireflies). Vertical phone wallpaper 9:16. The view from sitting at the edge of a monochrome ink-painted forest glade with one red flower, at dusk with fireflies: the foreground at the very bottom is the soft grass and roots at your feet, and in front of you the glade opens up with open air in the middle of the picture, empty, for winged characters flying towards you. No characters, no people, no text.",
+      "always": false
     }
   ],
   "redo": []
