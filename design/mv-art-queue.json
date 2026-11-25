@@ -11847,6 +11847,454 @@
       ],
       "prompt": "Painterly Japanese anime background art with the same soft brushwork and glow as the reference picture. Vertical phone wallpaper 9:16. The view from sitting at the edge of a forest glade painted in black and white ink wash, sumi-e style, with a single red flower as the only colour, misty: the foreground at the very bottom is soft grass and roots at your feet, and in front of you the glade opens up with open air in the middle of the picture, empty, for winged characters flying towards you. The sky has absolutely no planet, no moon, no swirling bands, no giant sphere: only soft clouds or stars. No characters, no people, no text.",
       "always": false
+    },
+    {
+      "id": "exp-saturn-sea",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). Vertical phone wallpaper 9:16. A high aerial view looking down on huge glowing pastel planetary rings sweeping across a dreamy starry space with soft clouds, sparkles. Only the rings and space, absolutely no islands, no objects, no planet ball, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-saturn-me",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). Your own cosy record plaza with a little DJ booth, fairy lights and cushions. Seen from high above at a gentle 3/4 aerial angle, like a game map piece: a single small round floating plaza shaped like a glossy vinyl record disc, floating alone, centered, the whole piece in frame with a wide margin. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "isl-saturn-chat",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). A chatty plaza with pastel benches, speech-bubble shaped balloons and a little fountain. Seen from high above at a gentle 3/4 aerial angle, like a game map piece: a single small round floating plaza shaped like a glossy vinyl record disc, floating alone, centered, the whole piece in frame with a wide margin. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "isl-saturn-koi",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). A romantic plaza with heart-shaped lanterns, pink roses and a small arch. Seen from high above at a gentle 3/4 aerial angle, like a game map piece: a single small round floating plaza shaped like a glossy vinyl record disc, floating alone, centered, the whole piece in frame with a wide margin. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "isl-saturn-oshi",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). A fan stage plaza with a tiny stage, penlight-coloured spotlights and banners. Seen from high above at a gentle 3/4 aerial angle, like a game map piece: a single small round floating plaza shaped like a glossy vinyl record disc, floating alone, centered, the whole piece in frame with a wide margin. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "isl-saturn-school",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). An after-school terrace plaza with a school desk, a basketball hoop and cherry blossoms. Seen from high above at a gentle 3/4 aerial angle, like a game map piece: a single small round floating plaza shaped like a glossy vinyl record disc, floating alone, centered, the whole piece in frame with a wide margin. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "isl-saturn-night",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). A late-night lounge plaza with a neon moon sign, sofas and starry lamps. Seen from high above at a gentle 3/4 aerial angle, like a game map piece: a single small round floating plaza shaped like a glossy vinyl record disc, floating alone, centered, the whole piece in frame with a wide margin. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "isl-saturn-game",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). A gaming plaza with giant game controllers, arcade cabinets and pixel lights. Seen from high above at a gentle 3/4 aerial angle, like a game map piece: a single small round floating plaza shaped like a glossy vinyl record disc, floating alone, centered, the whole piece in frame with a wide margin. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "isl-saturn-warai",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). A comedy theatre plaza with a small stage, a red curtain and a microphone stand. Seen from high above at a gentle 3/4 aerial angle, like a game map piece: a single small round floating plaza shaped like a glossy vinyl record disc, floating alone, centered, the whole piece in frame with a wide margin. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "isl-saturn-anime",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). An anime talk cafe plaza with a little cafe, posters and sakura trees. Seen from high above at a gentle 3/4 aerial angle, like a game map piece: a single small round floating plaza shaped like a glossy vinyl record disc, floating alone, centered, the whole piece in frame with a wide margin. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "isl-saturn-asa",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). A good-morning plaza with a sunrise, flowers, a breakfast table and birds. Seen from high above at a gentle 3/4 aerial angle, like a game map piece: a single small round floating plaza shaped like a glossy vinyl record disc, floating alone, centered, the whole piece in frame with a wide margin. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "isl-saturn-nemui",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). A sleepy plaza with big pillows, a crescent moon bed and floating sheep. Seen from high above at a gentle 3/4 aerial angle, like a game map piece: a single small round floating plaza shaped like a glossy vinyl record disc, floating alone, centered, the whole piece in frame with a wide margin. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-saturn-chat",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). Vertical phone wallpaper 9:16. Ground-level view of a chatty pastel plaza with benches, speech-bubble balloons and a little fountain, the floor is a giant glossy vinyl record. The middle and lower part of the picture is open space on the record floor, empty, for many little round creatures hopping around. No planet ball in the sky, only rings, stars and clouds. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-saturn-chat-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). Vertical phone wallpaper 9:16. The view from sitting at the edge of a chatty pastel plaza with benches, speech-bubble balloons and a little fountain, the floor is a giant glossy vinyl record: the foreground at the very bottom is the record's edge at your feet, and in front of you the plaza opens up with open space in the middle of the picture, empty, for little round creatures hopping towards you. No planet ball in the sky, only rings, stars and clouds. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-saturn-koi",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). Vertical phone wallpaper 9:16. Ground-level view of a romantic pastel plaza with heart-shaped lanterns, pink roses and an arch, the floor is a giant glossy vinyl record. The middle and lower part of the picture is open space on the record floor, empty, for many little round creatures hopping around. No planet ball in the sky, only rings, stars and clouds. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-saturn-koi-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). Vertical phone wallpaper 9:16. The view from sitting at the edge of a romantic pastel plaza with heart-shaped lanterns, pink roses and an arch, the floor is a giant glossy vinyl record: the foreground at the very bottom is the record's edge at your feet, and in front of you the plaza opens up with open space in the middle of the picture, empty, for little round creatures hopping towards you. No planet ball in the sky, only rings, stars and clouds. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-saturn-oshi",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). Vertical phone wallpaper 9:16. Ground-level view of a fan stage plaza with a tiny stage, penlight-coloured spotlights and banners, the floor is a giant glossy vinyl record. The middle and lower part of the picture is open space on the record floor, empty, for many little round creatures hopping around. No planet ball in the sky, only rings, stars and clouds. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-saturn-oshi-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). Vertical phone wallpaper 9:16. The view from sitting at the edge of a fan stage plaza with a tiny stage, penlight-coloured spotlights and banners, the floor is a giant glossy vinyl record: the foreground at the very bottom is the record's edge at your feet, and in front of you the plaza opens up with open space in the middle of the picture, empty, for little round creatures hopping towards you. No planet ball in the sky, only rings, stars and clouds. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-saturn-school",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). Vertical phone wallpaper 9:16. Ground-level view of an after-school terrace plaza with cherry blossoms, a basketball hoop and school desks, the floor is a giant glossy vinyl record. The middle and lower part of the picture is open space on the record floor, empty, for many little round creatures hopping around. No planet ball in the sky, only rings, stars and clouds. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-saturn-school-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). Vertical phone wallpaper 9:16. The view from sitting at the edge of an after-school terrace plaza with cherry blossoms, a basketball hoop and school desks, the floor is a giant glossy vinyl record: the foreground at the very bottom is the record's edge at your feet, and in front of you the plaza opens up with open space in the middle of the picture, empty, for little round creatures hopping towards you. No planet ball in the sky, only rings, stars and clouds. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-saturn-night",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). Vertical phone wallpaper 9:16. Ground-level view of a late-night neon lounge plaza with sofas, a neon moon sign and starry lamps, the floor is a giant glossy vinyl record. The middle and lower part of the picture is open space on the record floor, empty, for many little round creatures hopping around. No planet ball in the sky, only rings, stars and clouds. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-saturn-night-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). Vertical phone wallpaper 9:16. The view from sitting at the edge of a late-night neon lounge plaza with sofas, a neon moon sign and starry lamps, the floor is a giant glossy vinyl record: the foreground at the very bottom is the record's edge at your feet, and in front of you the plaza opens up with open space in the middle of the picture, empty, for little round creatures hopping towards you. No planet ball in the sky, only rings, stars and clouds. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-saturn-game",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). Vertical phone wallpaper 9:16. Ground-level view of a gaming plaza with arcade cabinets, giant game controllers and pixel lights, the floor is a giant glossy vinyl record. The middle and lower part of the picture is open space on the record floor, empty, for many little round creatures hopping around. No planet ball in the sky, only rings, stars and clouds. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-saturn-game-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). Vertical phone wallpaper 9:16. The view from sitting at the edge of a gaming plaza with arcade cabinets, giant game controllers and pixel lights, the floor is a giant glossy vinyl record: the foreground at the very bottom is the record's edge at your feet, and in front of you the plaza opens up with open space in the middle of the picture, empty, for little round creatures hopping towards you. No planet ball in the sky, only rings, stars and clouds. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-saturn-warai",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). Vertical phone wallpaper 9:16. Ground-level view of a comedy theatre plaza with a small stage, a red curtain and a microphone stand, the floor is a giant glossy vinyl record. The middle and lower part of the picture is open space on the record floor, empty, for many little round creatures hopping around. No planet ball in the sky, only rings, stars and clouds. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-saturn-warai-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). Vertical phone wallpaper 9:16. The view from sitting at the edge of a comedy theatre plaza with a small stage, a red curtain and a microphone stand, the floor is a giant glossy vinyl record: the foreground at the very bottom is the record's edge at your feet, and in front of you the plaza opens up with open space in the middle of the picture, empty, for little round creatures hopping towards you. No planet ball in the sky, only rings, stars and clouds. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-saturn-anime",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). Vertical phone wallpaper 9:16. Ground-level view of an anime talk cafe plaza with posters and sakura trees, the floor is a giant glossy vinyl record. The middle and lower part of the picture is open space on the record floor, empty, for many little round creatures hopping around. No planet ball in the sky, only rings, stars and clouds. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-saturn-anime-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). Vertical phone wallpaper 9:16. The view from sitting at the edge of an anime talk cafe plaza with posters and sakura trees, the floor is a giant glossy vinyl record: the foreground at the very bottom is the record's edge at your feet, and in front of you the plaza opens up with open space in the middle of the picture, empty, for little round creatures hopping towards you. No planet ball in the sky, only rings, stars and clouds. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-saturn-asa",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). Vertical phone wallpaper 9:16. Ground-level view of a good-morning plaza at sunrise with flowers, a breakfast table and birds, the floor is a giant glossy vinyl record. The middle and lower part of the picture is open space on the record floor, empty, for many little round creatures hopping around. No planet ball in the sky, only rings, stars and clouds. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-saturn-asa-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). Vertical phone wallpaper 9:16. The view from sitting at the edge of a good-morning plaza at sunrise with flowers, a breakfast table and birds, the floor is a giant glossy vinyl record: the foreground at the very bottom is the record's edge at your feet, and in front of you the plaza opens up with open space in the middle of the picture, empty, for little round creatures hopping towards you. No planet ball in the sky, only rings, stars and clouds. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-saturn-nemui",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). Vertical phone wallpaper 9:16. Ground-level view of a sleepy dreamy plaza with big pillows, a crescent moon bed and floating sheep, the floor is a giant glossy vinyl record. The middle and lower part of the picture is open space on the record floor, empty, for many little round creatures hopping around. No planet ball in the sky, only rings, stars and clouds. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-saturn-nemui-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea3.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). Vertical phone wallpaper 9:16. The view from sitting at the edge of a sleepy dreamy plaza with big pillows, a crescent moon bed and floating sheep, the floor is a giant glossy vinyl record: the foreground at the very bottom is the record's edge at your feet, and in front of you the plaza opens up with open space in the middle of the picture, empty, for little round creatures hopping towards you. No planet ball in the sky, only rings, stars and clouds. No characters, no people, no text.",
+      "always": false
     }
   ],
   "redo": []
