@@ -359,11 +359,21 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       if (floatingRef.current?.id !== fid) return;
       showLyrics(fid, got, null);
       const lead = got.declined === 'copy' ? SONG_LINES.lyricsCopy : got.declined === 'flagged' ? SONG_LINES.lyricsFlagged : got.how === 'own' ? SONG_LINES.lyricsOwn : SONG_LINES.songLyrics;
-      setMsgs((m) => [...m, ...(got.declined === 'flagged' ? [{ id: uid(), who: 'bati' as const, text: tline(lead) }] : []), { id: uid(), who: 'bati', text: tline(got.declined === 'flagged' ? SONG_LINES.songLyrics : lead), lyricsRec: got.lyrics }, { id: uid(), who: 'bati', text: tline(MOON_LINES.confirm) }]);
+      setMsgs((m) => [...m, ...(got.declined === 'flagged' ? [{ id: uid(), who: 'bati' as const, text: tline(lead) }] : []), { id: uid(), who: 'bati', text: tline(got.declined === 'flagged' ? SONG_LINES.songLyrics : lead), lyricsRec: got.lyrics }]);
+      // the question once the sheet is out (a yes said meanwhile already counts)
+      askLater(fid, 2600);
       return setPending({ plan: { ...ask, plan: { ...plan, lyrics: got.lyrics } } });
     }
     setMsgs((m) => [...m, { id: uid(), who: 'bati', text: tline(craft ? craftConfirmLine(kind, prev) : MOON_LINES.confirm) }]);
     setPending({ plan: ask });
+  };
+  /** R13: 「このスペルで作る？…」 a moment after the lyric sheet came out or changed (not when the spell is gone or cast) */
+  const askTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const askLater = (fid: string, ms: number) => {
+    if (askTimer.current) clearTimeout(askTimer.current);
+    askTimer.current = setTimeout(() => {
+      if (floatingRef.current?.id === fid && !floatingRef.current.casting) setMsgs((m) => [...m, { id: uid(), who: 'bati', text: tline(MOON_LINES.confirm) }]);
+    }, ms);
   };
   /** R13: the lyric sheet shown (or changed: `before` the lyrics it was) under the style talismans, now compact */
   const showLyrics = (fid: string, got: LyricsView, before: SongLyrics | null) =>
@@ -385,7 +395,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     const lead = got.declined === 'copy' ? SONG_LINES.lyricsCopy : got.declined === 'flagged' ? SONG_LINES.lyricsFlagged : got.how === 'kept' ? SONG_LINES.lyricsFail : got.how === 'own' ? SONG_LINES.lyricsOwn : SONG_LINES.lyricsChanged;
     if (got.declined === 'copy' && fid) showLyrics(fid, got, null);
     const id = uid();
-    setMsgs((m) => [...m.map((x) => (x.id === before.id && x.who === 'bati' && x.plan ? { ...x, plan: { ...x.plan, done: 'changed' as const } } : x)), { id, who: 'bati', text: tline(lead), ...(changed || got.declined === 'copy' ? { lyricsRec: got.lyrics } : {}) }, { id: uid(), who: 'bati', text: tline(MOON_LINES.confirm) }]);
+    setMsgs((m) => [...m.map((x) => (x.id === before.id && x.who === 'bati' && x.plan ? { ...x, plan: { ...x.plan, done: 'changed' as const } } : x)), { id, who: 'bati', text: tline(lead), ...(changed || got.declined === 'copy' ? { lyricsRec: got.lyrics } : {}) }]);
+    if (fid) askLater(fid, changed ? 2200 : 900);
     setPending({ plan: { ...before, id, plan: { ...before.plan, added: [], removed: [], lyrics: changed || got.declined === 'copy' ? got.lyrics : now } } });
   };
   /** the spell floating over the bowl (from its first showing through its changes, until it is cast) */

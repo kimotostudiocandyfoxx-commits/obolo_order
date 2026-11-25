@@ -33,6 +33,7 @@ export * from './clip';
 export * from './makeConfirm';
 export * from './spell';
 export * from './lyrics';
+export * from './songTweak';
 export * from './craft';
 export * from './craftDemo';
 export * from './links';

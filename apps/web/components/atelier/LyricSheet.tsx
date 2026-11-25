@@ -19,6 +19,7 @@ const seedOf = (s: string) => [...s].reduce((x, c) => (x * 31 + c.charCodeAt(0))
 
 const CSS = `
 @keyframes ls-in{0%{opacity:0;transform:translateY(16px) scale(.97);filter:blur(6px) brightness(1.6)}100%{opacity:1;transform:none;filter:none}}
+@keyframes ls-cast{0%{opacity:1;transform:none;filter:none}35%{opacity:1;filter:brightness(1.6)}100%{opacity:0;transform:translateY(60px) scale(.25,.1);filter:brightness(2.6) blur(3px)}}
 @keyframes ls-row{0%{opacity:0;transform:translateY(8px);filter:blur(3px)}100%{opacity:1;transform:none;filter:none}}
 @keyframes ls-glow{0%{background-color:rgba(160,235,255,0);text-shadow:0 0 1px #fff,0 0 4px #9becff,0 0 9px rgba(63,182,255,.6)}25%{background-color:rgba(160,235,255,.26);text-shadow:0 0 2px #fff,0 0 9px #c4f4ff,0 0 20px #3fb6ff,0 0 32px rgba(120,200,255,.9)}100%{background-color:rgba(160,235,255,.1);text-shadow:0 0 1px #fff,0 0 5px #9becff,0 0 12px rgba(63,182,255,.75)}}
 @keyframes ls-shimmer{0%{background-position:-120% 0}100%{background-position:220% 0}}
@@ -117,7 +118,7 @@ export function LyricSheet({ sheet, cx, top, width, height, casting, foot = 0 }:
     <div
       className="pointer-events-auto absolute"
       data-lyric-sheet
-      style={{ left: cx - width / 2, top, width, height, animation: 'ls-in 1.1s cubic-bezier(.25,.8,.3,1) both', opacity: casting ? 0 : 1, transform: casting ? 'translateY(40px) scale(.6)' : undefined, transition: 'opacity .7s ease-in .3s, transform .9s ease-in' }}
+      style={{ left: cx - width / 2, top, width, height, animation: casting ? 'ls-cast 1.25s cubic-bezier(.55,0,.75,.6) 250ms both' : 'ls-in 1.1s cubic-bezier(.25,.8,.3,1) both', transformOrigin: '50% 100%' }}
       aria-label={`スペル入りの歌詞：${lyrics.blocks.map((b, i) => `${labels[i]}${b.lines.length ? '、' + b.lines.join('、') : ''}`).join('。')}`}
     >
       <style>{LOOK_CSS + CSS}</style>
