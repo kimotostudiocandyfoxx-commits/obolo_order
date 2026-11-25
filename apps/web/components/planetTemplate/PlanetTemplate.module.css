@@ -1,0 +1,585 @@
+/* 惑星ホームの共通の型 (handoff 01 3章; prototype design/home/template.html .g5f / .hv / .prof / .dock.at) */
+
+.root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--color-space-950, #04050d);
+  color: #fff;
+  font-family: var(--font-sans);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.root img {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* the 9:16 picture, covering the screen (its own fractions place your place) */
+.stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-size: 100% 100%;
+  transition: transform 0.45s cubic-bezier(0.3, 0.9, 0.3, 1), filter 0.45s;
+}
+.dim .stage {
+  transform: translate(-50%, -50%) scale(1.12);
+  filter: blur(2.5px) brightness(0.7);
+}
+.place {
+  position: absolute;
+  width: 72px;
+  height: 72px;
+  margin: -36px 0 0 -36px;
+  border-radius: 50%;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.place::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  animation: ring 2.4s ease-out infinite;
+}
+
+/* 3-1 the figures */
+.fig {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 104px;
+  height: 120px;
+  margin: -52px 0 0 -52px;
+  z-index: 6;
+  cursor: pointer;
+  touch-action: none;
+  will-change: transform;
+  -webkit-tap-highlight-color: transparent;
+}
+.fig[data-row='0'] {
+  z-index: 5;
+  filter: saturate(0.85) brightness(0.92);
+}
+.fig[data-row='2'] {
+  z-index: 7;
+}
+.fig img.body {
+  width: 104px;
+  height: 104px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.35));
+  animation: bob 1.4s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+.fig .face {
+  position: absolute;
+  left: 34px;
+  top: 30px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.fig .nm {
+  position: absolute;
+  left: 50%;
+  top: 100px;
+  transform: translateX(-50%);
+  font: 900 9px var(--font-sans);
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+  pointer-events: none;
+}
+.fig[data-row='0'] .nm {
+  display: none;
+}
+.fig.dragging {
+  z-index: 9 !important;
+  filter: drop-shadow(0 12px 14px rgba(0, 0, 0, 0.35));
+  cursor: grabbing;
+}
+.dim .fig {
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+/* 3-4 the top bar */
+.top {
+  position: absolute;
+  left: 16px;
+  top: calc(14px + env(safe-area-inset-top, 0px));
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  touch-action: none;
+}
+.icon {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: grab;
+  touch-action: none;
+}
+.icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+}
+.name {
+  font: 900 22px 'M PLUS Rounded 1c', var(--font-sans);
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+}
+.dim .top {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+.stripShade {
+  position: absolute;
+  inset: 0;
+  z-index: 21;
+}
+.strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(62px + env(safe-area-inset-top, 0px));
+  z-index: 21;
+  height: 84px;
+  overflow: hidden;
+  background: linear-gradient(rgba(10, 6, 24, 0.55), rgba(10, 6, 24, 0.25));
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.strip::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 6px;
+  width: 64px;
+  height: 72px;
+  margin-left: -32px;
+  border-radius: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.75);
+  pointer-events: none;
+}
+.stripRow {
+  position: absolute;
+  left: 50%;
+  top: 6px;
+  display: flex;
+  will-change: transform;
+}
+.stripRow.settle {
+  transition: transform 0.25s ease-out;
+}
+.stripItem {
+  width: 64px;
+  height: 72px;
+  border: 0;
+  background: none;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font: 800 10px var(--font-sans);
+  opacity: 0.6;
+  cursor: pointer;
+}
+.stripItem img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  pointer-events: none;
+}
+.stripItem.mid {
+  opacity: 1;
+}
+
+/* 3-3 the play button: round, the planet's colour, no text */
+.play {
+  position: absolute;
+  left: 87%;
+  top: calc(7.5% + env(safe-area-inset-top, 0px));
+  z-index: 22;
+  width: 56px;
+  height: 56px;
+  margin: -28px 0 0 -28px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  background: radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.85) 0 9%, rgba(255, 255, 255, 0) 32%), var(--accent);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35), inset 0 -4px 8px rgba(0, 0, 0, 0.18);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.play::after {
+  content: '';
+  position: absolute;
+  inset: -9px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  animation: ring 2.2s ease-out infinite;
+  pointer-events: none;
+}
+.play svg {
+  width: 24px;
+  height: 24px;
+  fill: #fff;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+}
+.play.on {
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+}
+.play.on::after {
+  display: none;
+}
+.play.on svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* 3-3 the view from your place */
+.hv {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  container-type: size;
+  opacity: 0;
+  transition: opacity 0.6s;
+  pointer-events: none;
+}
+.hv.on {
+  opacity: 1;
+  pointer-events: auto;
+}
+.hvbg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center bottom;
+  transform: scale(1.18);
+  transition: transform 2.2s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.45s;
+}
+.hv.on .hvbg {
+  transform: scale(1);
+}
+.hv.zoom .hvbg {
+  transform: scale(1.35);
+  filter: blur(3px) brightness(0.55);
+}
+.vig {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 45% 45%, transparent 45%, rgba(0, 0, 10, 0.45));
+}
+/* your back: bottom right, only its left half on the screen */
+.back {
+  position: absolute;
+  right: -36%;
+  bottom: -6%;
+  width: 72%;
+  height: 52%;
+  z-index: 3;
+  filter: blur(3px) brightness(0.82);
+  transform: translateY(30%);
+  transition: transform 0.9s cubic-bezier(0.2, 1, 0.3, 1);
+  pointer-events: none;
+}
+.hv.on .back {
+  transform: none;
+}
+.back img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+}
+.visitor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 110px;
+  height: 110px;
+  margin: -55px 0 0 -55px;
+  z-index: 4;
+  transition: transform 0.9s cubic-bezier(0.25, 0.8, 0.3, 1), opacity 0.5s;
+  pointer-events: none;
+}
+.visitor img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.4));
+}
+.visitor .nm {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
+  font: 900 10px var(--font-sans);
+  white-space: nowrap;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+/* a work in front of you (the default opener) */
+.work {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: calc(96px + env(safe-area-inset-top, 0px)) 24px 0;
+  background: rgba(6, 4, 16, 0.45);
+  animation: fadein 0.3s ease-out both;
+}
+.work.inPlay {
+  background: none;
+  z-index: 5;
+}
+.workArt {
+  width: min(76vw, 300px);
+  aspect-ratio: 1;
+  border-radius: 14px;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5), 0 0 0 3px rgba(255, 255, 255, 0.85);
+}
+.workTitle {
+  margin-top: 14px;
+  font: 900 20px 'M PLUS Rounded 1c', var(--font-sans);
+  text-align: center;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+.workWords {
+  margin-top: 16px;
+  max-width: 300px;
+  padding: 14px 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #2a1630;
+  font: 900 18px var(--font-sans);
+  text-align: center;
+}
+.by {
+  margin-top: 8px;
+  border: 0;
+  background: none;
+  color: #fff;
+  font: 800 12px var(--font-sans);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+  padding: 2px 0;
+  cursor: pointer;
+}
+.whoFig {
+  position: absolute;
+  left: 6%;
+  bottom: 6%;
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.4));
+  pointer-events: none;
+}
+
+/* a work opened from the profile: above it */
+.over {
+  position: absolute;
+  inset: 0;
+  z-index: 45;
+}
+
+/* 3-5 the profile */
+.prof {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  overflow: hidden;
+  background: #1b1430 center / cover no-repeat;
+  animation: profin 0.5s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+}
+.profTop {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  padding: calc(12px + env(safe-area-inset-top, 0px)) 12px 10px;
+  background: linear-gradient(rgba(30, 10, 50, 0.55), transparent);
+}
+.profBack {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(30, 10, 50, 0.35);
+  color: #fff;
+  font: 900 18px var(--font-sans);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+}
+.profList {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  min-width: 0;
+}
+.profList button {
+  flex: 0 0 auto;
+  width: 54px;
+  border: 0;
+  background: none;
+  color: rgba(255, 255, 255, 0.85);
+  font: 700 9px var(--font-sans);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+}
+.profList img,
+.profList .blank {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: 50%;
+}
+.profList .blank {
+  background: rgba(255, 255, 255, 0.25);
+}
+.profList span {
+  max-width: 54px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.profList button.cur {
+  color: #fff;
+  font-weight: 900;
+}
+.profList button.cur img {
+  filter: drop-shadow(0 0 0 #fff) drop-shadow(0 0 6px #fff);
+}
+.profMid {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(92px + env(safe-area-inset-top, 0px));
+  bottom: 76px;
+  z-index: 2;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.profWho {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  padding: 0 14px;
+  height: 76px;
+  background: linear-gradient(transparent, rgba(30, 10, 50, 0.5));
+}
+.profWho img {
+  width: 124px;
+  height: 124px;
+  margin-bottom: -34px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.45));
+}
+.profWho span {
+  margin-bottom: 14px;
+  font: 900 18px var(--font-sans);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 10px 18px 30px;
+}
+.cell {
+  aspect-ratio: 1;
+  border-radius: 10px;
+  border: 0;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.85) center / cover no-repeat;
+  color: #2a1630;
+  font: 800 12px var(--font-sans);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+}
+.empty {
+  padding: 40px 24px;
+  text-align: center;
+  font: 700 13px var(--font-sans);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+@keyframes bob {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-4px);
+  }
+}
+@keyframes ring {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes profin {
+  from {
+    opacity: 0;
+    transform: scale(1.25);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fig img.body,
+  .place::before,
+  .play::after {
+    animation: none;
+  }
+}
