@@ -1,9 +1,10 @@
-# UI art — 2026-11-25T01:46:29.009Z
+# UI art — 2026-11-25T02:30:35.615Z
 
-Seedream 5.0 Pro / 5枚 / 約43円
+Seedream 5.0 Pro / 6枚 / 約52円
 
-- ✅ p5-neptune-brother
-- ✅ p5-neptune-kimorin
-- ✅ p5-neptune-mikie
-- ✅ p5-neptune-monban
-- ✅ p5-neptune-sister
+- ✅ p5-venus-brother
+- ✅ p5-venus-kimorin
+- ✅ p5-venus-mikie
+- ✅ p5-venus-monban
+- ✅ p5-venus-sister
+- ✅ p5-venus-user
