@@ -294,6 +294,8 @@ export interface BuddySource {
 export interface BuddyQuotaView {
   usedToday: number;
   freeDaily: number;
+  /** R18: {bati} is quiet now (no mana for a non-member / tired after a member's day): the chat shows a calm hint */
+  rest?: 'noMana' | 'tired' | null;
 }
 
 /** 〔🖼 絵で見る〕: a picture from a library whose pictures may be used, with where it came from (M-R140) */
@@ -327,6 +329,8 @@ export interface BuddyChatResponse {
   kind?: 'normal' | 'worry' | 'danger';
   /** R12 (`canMake` chats): the message asks to make a work of this kind — the app's making flow takes it over */
   make?: BuddyMakeKind;
+  /** R18: the reply is {bati}'s once-a-day line for why it goes quiet (access.ts batiRestLine); the chat closes after it */
+  rest?: 'noMana' | 'tired';
 }
 /** R12: the kinds the Moon atelier makes, as the reply's classification names them */
 export const BUDDY_MAKE_KINDS = ['art', 'song', 'video', 'novel', 'game', 'voice', 'radio'] as const;

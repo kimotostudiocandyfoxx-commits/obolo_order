@@ -297,6 +297,17 @@ describe('R9: KIMORIN⭐︎ answers in the ダチ talk (the chat provider mocked
     expect(l.calls[0].history.at(-1)).toEqual({ role: 'user', text: 'きょうは、なにをしてたの？' });
     expect(m.reply).toMatchObject({ kind: 'text', audioUrl: null, text: 'それは、私にもわかりません。' });
   });
+  it('R18: a non-member at 0 mana (voiced: false): the answer comes as text, no read-aloud is made', async () => {
+    const l = llm('はい。元気です。');
+    const w = world({ llm: l.provider });
+    w.people[A] = { journeyDay: 9, journeyCompletedAt: null, dachiAt: null, displayName: 'ネオ' };
+    const x = w.s as unknown as Record<string, unknown>;
+    const voiced: string[] = [];
+    x.kimorinVoice = async (_u: string, text: string) => (voiced.push(text), 'https://cdn/kimorin.mp3');
+    const m = await w.s.send(A, 'kimorin', { text: 'やあ' }, { reply: true, voiced: false });
+    expect(m.reply).toMatchObject({ kind: 'text', audioUrl: null, text: 'はい。元気です。' });
+    expect(voiced).toEqual([]);
+  });
   it('past the day\'s limit (reply: false), or a real ダチ thread: no answer', async () => {
     const l = llm('はい。');
     const w = world({ llm: l.provider });

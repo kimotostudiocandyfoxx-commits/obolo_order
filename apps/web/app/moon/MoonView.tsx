@@ -1,7 +1,7 @@
 'use client';
 
 import { callRequest, TALK_FIXED_FACE_KEY } from '@obolo/shared';
-import type { BuddyMessageView, BuddyPersona, BuddyProfileView, BuddyQuotaView } from '@obolo/shared';
+import { BATI_REST_HINT, type BuddyMessageView, type BuddyPersona, type BuddyProfileView, type BuddyQuotaView } from '@obolo/shared';
 import { DrawnPicture, PlaceMap, SourceChips, placeOf } from '@/components/chat/BuddyExtras';
 import { useCallback, useEffect, useState } from 'react';
 import { DemoBanner } from '@/components/DemoBanner';
@@ -133,6 +133,11 @@ function Chat() {
     } catch (err) {
       setMessages((cur) => cur.filter((x) => x.id !== tempId && x.id !== liveId));
       setStreamId(null);
+      // R18: {bati} said why it rests today — the composer shows the calm hint (not an error)
+      if (err instanceof ApiError && (err.code === 'BATI_NO_MANA' || err.code === 'BATI_TIRED')) {
+        setQuota((q) => ({ usedToday: q?.usedToday ?? 0, freeDaily: q?.freeDaily ?? 0, rest: err.code === 'BATI_NO_MANA' ? 'noMana' : 'tired' }));
+        return;
+      }
       setText(body);
       setNotice(err instanceof ApiError && err.code === 'BUDDY_QUOTA' ? m.moon.quotaReached : m.moon.unavailable);
     } finally {
@@ -219,6 +224,7 @@ function Chat() {
             initial={text}
             placeholder={m.moon.placeholder}
             disabled={sending}
+            hint={quota?.rest ? (locale === 'ja' ? BATI_REST_HINT[quota.rest] : quota.rest === 'noMana' ? 'Waiting for mana to well up. Your works and your ダチ are always open.' : 'Resting now. Let’s talk tomorrow.') : undefined}
             onState={setTalkState}
             onSend={(v) => void send(v)}
           />

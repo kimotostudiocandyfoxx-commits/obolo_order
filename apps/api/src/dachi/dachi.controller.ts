@@ -9,6 +9,7 @@ import { KV } from '../infra/tokens';
 import { DachiLinkService } from './dachi-link.service';
 import { DachiService } from './dachi.service';
 import { DachiVoiceService } from './dachi-voice.service';
+import { AccessService } from '../wallet/access.service';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 /** a thread: a dachi's user id, or a character's ('kimorin' | 'mikie') */
@@ -25,6 +26,7 @@ export class DachiController {
     private readonly links: DachiLinkService,
     private readonly voice: DachiVoiceService,
     @Inject(KV) private readonly kv: KvStore,
+    private readonly access: AccessService,
   ) {}
 
   @Get()
@@ -69,9 +71,13 @@ export class DachiController {
     const b = parseBody(SendDachiMessageBody, body);
     await rateLimit(this.kv, `dachi-voice:${userId}`, DACHI_SEND_PER_HOUR, 3600);
     await rateLimit(this.kv, `dachi-voice-day:${userId}`, DACHI_SEND_PER_DAY, 86400);
+    // R18: free for everyone, even at 0 mana (its costs are absorbed as marketing); a non-member's soft daily cap
+    await this.access.dachiSend(userId);
     // R9: KIMORIN⭐︎ answers, up to KIMORIN_REPLIES_PER_DAY a day (past it the message stands, unanswered)
     const reply = thread === 'kimorin' && (await this.kv.incr(`kimorin-day:${userId}:${Math.floor(Date.now() / 86_400_000)}`, 86_400)) <= KIMORIN_REPLIES_PER_DAY;
-    return this.voice.send(userId, thread, b, { reply, origin: `${req.protocol}://${req.get('host')}` });
+    // R18: KIMORIN⭐︎'s read-aloud falls back to text for a non-member at 0 mana (the words stay free)
+    const voiced = !(reply && (await this.access.outOfMana(userId)));
+    return this.voice.send(userId, thread, b, { reply, voiced, origin: `${req.protocol}://${req.get('host')}` });
   }
 
   @Post('threads/:id/read')

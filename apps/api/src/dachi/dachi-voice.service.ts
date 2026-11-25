@@ -293,7 +293,7 @@ export class DachiVoiceService {
     return { kind: 'text', text: words ?? '', fromMe };
   }
 
-  async send(userId: string, thread: string, body: SendDachiMessageBody, opts: { origin?: string; reply?: boolean } = {}): Promise<DachiMessageView> {
+  async send(userId: string, thread: string, body: SendDachiMessageBody, opts: { origin?: string; reply?: boolean; voiced?: boolean } = {}): Promise<DachiMessageView> {
     await this.mustReach(userId, thread);
     const character = isCharacterThread(thread) ? (thread as DachiCharacter) : null;
     const base: NewRow = { senderId: userId, recipientId: character ? null : thread, character };
@@ -333,7 +333,7 @@ export class DachiVoiceService {
     const view = this.toView(userId, m);
     // R9: KIMORIN⭐︎ answers (within the day's limit, decided by the caller); the message stands even when it cannot
     if (character === 'kimorin' && opts.reply) {
-      const reply = await this.kimorinAnswer(userId, body, m, opts.origin ?? '').catch((e: unknown) => (this.log.warn(`kimorin reply: ${String(e)}`), null));
+      const reply = await this.kimorinAnswer(userId, body, m, opts.origin ?? '', opts.voiced ?? true).catch((e: unknown) => (this.log.warn(`kimorin reply: ${String(e)}`), null));
       return { ...view, reply };
     }
     return view;
@@ -368,7 +368,7 @@ export class DachiVoiceService {
     return text ? { role: 'assistant', text } : null;
   }
 
-  private async kimorinAnswer(userId: string, body: SendDachiMessageBody, sent: Row, origin: string): Promise<DachiMessageView | null> {
+  private async kimorinAnswer(userId: string, body: SendDachiMessageBody, sent: Row, origin: string, voiced = true): Promise<DachiMessageView | null> {
     if (!this.llm) return null;
     let words = '';
     if ('text' in body) words = body.text;
@@ -382,7 +382,8 @@ export class DachiVoiceService {
     const name = (await this.journey(userId))?.displayName ?? '';
     const text = await kimorinReply(this.llm, { userName: name, history: [...past, { role: 'user', text: words }] });
     if (!text) return null;
-    const url = await this.kimorinVoice(userId, text, origin).catch((e: unknown) => (this.log.warn(`kimorin voice: ${String(e)}`), null));
+    // R18: text only (no read-aloud) for a non-member at 0 mana
+    const url = !voiced ? null : await this.kimorinVoice(userId, text, origin).catch((e: unknown) => (this.log.warn(`kimorin voice: ${String(e)}`), null));
     const row = await this.insertMessage({ senderId: null, recipientId: userId, character: 'kimorin', kind: url ? 'voice' : 'text', audioUrl: url, workJson: { text } });
     return this.toView(userId, row);
   }

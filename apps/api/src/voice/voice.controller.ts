@@ -9,6 +9,7 @@ import { KV } from '../infra/tokens';
 import { BatiVoiceService } from './bati-voice.service';
 import { LineVoiceService } from './line-voice.service';
 import { VoiceService } from './voice.service';
+import { AccessService } from '../wallet/access.service';
 
 /** Member voices (see VoiceService). */
 @Controller('voice')
@@ -19,6 +20,7 @@ export class VoiceController {
     private readonly lines: LineVoiceService,
     private readonly batiVoices: BatiVoiceService,
     @Inject(KV) private readonly kv: KvStore,
+    private readonly access: AccessService,
   ) {}
 
   /** whether the voice service (Fish Audio) is connected here — the 〔バティの声ためし〕 page asks first */
@@ -81,6 +83,8 @@ export class VoiceController {
   @HttpCode(200)
   async batiSays(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
     await rateLimit(this.kv, `voice-bati-says:${userId}`, 30, 60);
+    // R18: no voice (text only) for a non-member past the first journey at 0 mana
+    if (await this.access.outOfMana(userId)) return { url: null };
     return (await this.lines.batiSays(userId, parseBody(BatiSaysBody, body).text, `${req.protocol}://${req.get('host')}`)) ?? { url: null };
   }
 }

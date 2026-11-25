@@ -31,6 +31,8 @@ import { LedgerService } from './ledger.service';
 import { setPriceSource } from './price-book';
 
 const DAY = 86400_000;
+/** R18: the feature whose costs are never charged (the ダチ talk): an unrecovered marketing cost */
+export const MARKETING_FEATURE = 'dachi';
 
 /** one recorded cost (gen_costs) */
 export interface CostRow {
@@ -87,6 +89,8 @@ export interface MarginReport {
   prices: ManaPrices;
   makings: MarginRow[];
   usage: MarginRow & { features: { kind: string; costJpy: number }[]; absorbedAllTime: { mana: number; jpy: number } };
+  /** R18: the ダチ talk's recorded cost in the window (never charged: an unrecovered marketing cost) */
+  marketing: { kind: string; costJpy: number };
   /** the kinds whose margin was below the rule (with the price their recorded costs call for) */
   low: { kind: string; margin: number | null; currentMana: number | null; suggestedMana: number | null }[];
   /** report lines for the admin report / the log */
@@ -253,11 +257,20 @@ export class CostService implements OnModuleInit, OnModuleDestroy {
       exact: e.exact,
       units: e.units ?? null,
     });
+    // R18: the ダチ talk is free for everyone — its cost is recorded (kind 'dachi') and absorbed as marketing, never taken
+    if (!paid && kind === MARKETING_FEATURE) {
+      this.log.debug(`unrecovered marketing cost (dachi): ${ctx?.userId ?? '-'} ${e.provider} ¥${costJpy.toFixed(4)}`);
+      return;
+    }
     // a free feature's cost: added up and taken a whole mana at a time
     if (!paid && ctx?.userId) await this.accrue(ctx.userId, kind, costJpy);
   }
 
-  /** a small cost of a free feature (never blocks, never below 0: what the balance cannot cover is absorbed and logged) */
+  /**
+   * a small cost of a free feature (never below 0: what the balance cannot cover is absorbed and logged). R18: a
+   * non-member past the first journey is stopped before the call at 0 mana (AccessService), so what is absorbed here is
+   * a member's (covered by the ¥88), the first journey's, or a race at the last mana.
+   */
   async accrue(userId: string, feature: string, jpy: number): Promise<AccrualStep> {
     const step = await this.store.accrue(userId, feature, jpy, this.rule());
     if (step.absorbedMana > 0) this.log.warn(`unrecovered small cost: ${userId} ${feature} ${step.absorbedMana} mana (¥${step.absorbedJpy.toFixed(2)}) absorbed at 0 mana`);
@@ -300,7 +313,8 @@ export class CostService implements OnModuleInit, OnModuleDestroy {
       const jobs = d.jobs.filter((j) => j.kind === kind).map((j) => j.costJpy);
       makings.push(marginRow({ kind, count: ch?.count ?? jobs.length, chargedMana: ch?.mana ?? 0, costJpy, perJobCostsJpy: jobs, currentMana: isMakeKind(kind) ? prices[kind] : null }, rule));
     }
-    const free = d.costs.filter((c) => !c.paid);
+    const free = d.costs.filter((c) => !c.paid && c.kind !== MARKETING_FEATURE);
+    const marketingJpy = Math.round(d.costs.filter((c) => !c.paid && c.kind === MARKETING_FEATURE).reduce((a, c) => a + c.costJpy, 0) * 100) / 100;
     const usageRow = marginRow({ kind: 'usage', count: free.length, chargedMana: d.usageMana, costJpy: free.reduce((a, c) => a + c.costJpy, 0) }, rule);
     const features = Object.entries(free.reduce<Record<string, number>>((m, c) => ({ ...m, [c.kind]: (m[c.kind] ?? 0) + c.costJpy }), {}))
       .map(([kind, costJpy]) => ({ kind, costJpy: Math.round(costJpy * 100) / 100 }))
@@ -312,6 +326,7 @@ export class CostService implements OnModuleInit, OnModuleDestroy {
       ...makings.map((r) => `${r.kind}: ${r.count}回 ${r.chargedMana}マナ／原価 ¥${r.costJpy}（手数料込み ¥${r.costWithFeeJpy}）→ 取り分 ${pct(r.margin)}${r.low ? ` ⚠ 8%未満。いま ${r.currentMana ?? '—'} → 提案 ${r.suggestedMana ?? '—'} マナ` : ''}`),
       `つかったマナ（小さな原価）: ${usageRow.chargedMana}マナ／原価 ¥${usageRow.costJpy} → 取り分 ${pct(usageRow.margin)}${usageRow.low ? ' ⚠ 8%未満（0マナで吸収した分・まだ1マナにならない分を含む）' : ''}`,
       `吸収した小さな原価（これまで）: ${d.absorbed.mana}マナ（¥${d.absorbed.jpy.toFixed(2)}）`,
+      `ダチの原価（宣伝費として吸収・引かない）: ¥${marketingJpy.toFixed(2)}`,
     ];
     return {
       at: now.toISOString(),
@@ -321,6 +336,7 @@ export class CostService implements OnModuleInit, OnModuleDestroy {
       prices,
       makings,
       usage: { ...usageRow, features, absorbedAllTime: d.absorbed },
+      marketing: { kind: MARKETING_FEATURE, costJpy: marketingJpy },
       low,
       lines,
     };

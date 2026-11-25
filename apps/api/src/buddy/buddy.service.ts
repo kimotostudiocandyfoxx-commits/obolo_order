@@ -7,9 +7,15 @@ import {
   type BuddyMakeKind,
   BUDDY_OVERAGE_MANA,
   BUDDY_SUMMARY_EVERY,
+  BATI_REST_HINT,
+  batiChatGate,
+  batiRestLine,
+  type BatiRest,
+  type SpendState,
   BuddyChatResponse,
   BuddyMessageView,
   BuddyProfileView,
+  type BuddyQuotaView,
   BuddySource,
   Locale,
   Paged,
@@ -35,6 +41,7 @@ import { activeBati } from '../look/batis';
 import { BatiMemoryService, type RememberResult } from '../look/memory.service';
 import { MediaService } from '../media/media.service';
 import { LedgerService } from '../wallet/ledger.service';
+import { AccessService } from '../wallet/access.service';
 
 const toView = (m: typeof buddyMessages.$inferSelect): BuddyMessageView => ({
   id: m.id,
@@ -121,6 +128,8 @@ export class BuddyService implements OnModuleInit {
     private readonly media: MediaService,
     /** M-R222: the member's own 「覚えといて」 / 「〇〇って呼んで」 */
     @Optional() private readonly memory?: BatiMemoryService,
+    /** R18: who is stopped at 0 mana (non-members past the first journey) and members' daily ceiling */
+    @Optional() private readonly access?: AccessService,
   ) {
     this.caps = new BuddyExtrasCaps(kv, cfg);
   }
@@ -133,9 +142,46 @@ export class BuddyService implements OnModuleInit {
     return `buddy-q:${userId}:${quotaDay()}`;
   }
 
-  async getQuota(userId: string) {
+  /** R18: {bati}'s once-a-day line for going quiet was said today */
+  private restKey(userId: string, rest: BatiRest) {
+    return `bati-rest:${rest}:${userId}:${quotaDay()}`;
+  }
+
+  async getQuota(userId: string): Promise<BuddyQuotaView> {
     const used = Number((await this.kv.get(this.quotaKey(userId))) ?? 0);
-    return { usedToday: used, freeDaily: this.cfg.BUDDY_FREE_DAILY };
+    const st = await this.access?.state(userId).catch(() => null);
+    const daily = this.dailyOf(st);
+    // R18: the chat closes (a calm hint) once {bati} has said why today; before that the next message gets the line
+    const gate = st ? batiChatGate(st, used, this.cfg.BATI_DAILY_CAP_MEMBER) : { allow: true as const };
+    const rest = !gate.allow && (await this.kv.get(this.restKey(userId, gate.rest))) ? gate.rest : null;
+    return { usedToday: used, freeDaily: daily, rest };
+  }
+
+  /** a member's day is BATI_DAILY_CAP_MEMBER replies; everyone else's BUDDY_FREE_DAILY (as before) */
+  private dailyOf(st: SpendState | null | undefined) {
+    return st?.member ? this.cfg.BATI_DAILY_CAP_MEMBER : this.cfg.BUDDY_FREE_DAILY;
+  }
+
+  /**
+   * R18: {bati} goes quiet — no mana (a non-member past the first journey at 0) or tired (a member past the day's
+   * ceiling). The first message of the day gets {bati}'s line in its own style (no model call: nothing is spent), kept in
+   * the talk; after it, a calm refusal the chat shows as a hint under the mic / typing (BATI_NO_MANA / BATI_TIRED).
+   */
+  private async rest(userId: string, rest: BatiRest, text: string, user: typeof users.$inferSelect, locale: Locale, used: number, daily: number): Promise<BuddyChatResponse> {
+    const first = (await this.kv.incr(this.restKey(userId, rest), 2 * 86400)) === 1;
+    if (!first) {
+      throw rest === 'noMana'
+        ? apiError(HttpStatus.PAYMENT_REQUIRED, 'BATI_NO_MANA', BATI_REST_HINT.noMana)
+        : apiError(HttpStatus.TOO_MANY_REQUESTS, 'BATI_TIRED', BATI_REST_HINT.tired);
+    }
+    const line = batiRestLine(rest, activeBati(user)?.personality, locale);
+    const now = Date.now();
+    const [u, b] = await this.db.write.transaction(async (tx) => {
+      const [u] = await tx.insert(buddyMessages).values({ userId, role: 'user', text, createdAt: new Date(now) }).returning();
+      const [b] = await tx.insert(buddyMessages).values({ userId, role: 'buddy', text: line, provider: 'rest', extraJson: { face: 'sad' as TalkFace }, createdAt: new Date(now + 1) }).returning();
+      return [u, b];
+    });
+    return { userMessage: toView(u), reply: toView(b), quota: { usedToday: used, freeDaily: daily, rest }, kind: 'normal', rest };
   }
 
   private async ensureProfile(userId: string) {
@@ -202,15 +248,25 @@ export class BuddyService implements OnModuleInit {
     const [user] = await this.db.write.select().from(users).where(eq(users.id, userId));
     const [wallet] = await this.db.write.select().from(wallets).where(eq(wallets.userId, userId));
 
-    // --- Daily quota (spec §2.2), counted in Redis so it holds across all instances.
+    // --- R18: a non-member past the first journey at 0 mana: {bati} goes quiet (nothing is spent)
+    const st = await this.access?.state(userId).catch(() => null);
+    const locale0 = localeOverride ?? (user.locale as Locale);
+    const daily = this.dailyOf(st);
+    if (st && !batiChatGate(st, 0).allow) return this.rest(userId, 'noMana', text, user, locale0, Number((await this.kv.get(this.quotaKey(userId))) ?? 0), daily);
+
+    // --- Daily quota (spec §2.2), counted in Redis so it holds across all instances. R18: a member is never stopped at
+    // 0 mana (their ¥88 covers the small costs) — only {bati} tires past BATI_DAILY_CAP_MEMBER replies.
     const used = await this.kv.incr(this.quotaKey(userId), 2 * 86400);
-    const decision = buddyQuotaDecision({
-      usedToday: used - 1,
-      freeDaily: this.cfg.BUDDY_FREE_DAILY,
-      overageEnabled: this.cfg.BUDDY_OVERAGE_ENABLED,
-      overageCost: BUDDY_OVERAGE_MANA,
-      manaBalance: wallet?.manaBalance ?? 0,
-    });
+    if (st?.member && !batiChatGate(st, used - 1, this.cfg.BATI_DAILY_CAP_MEMBER).allow) return this.rest(userId, 'tired', text, user, locale0, used, daily);
+    const decision = st?.member
+      ? { allowed: true, chargeMana: 0 }
+      : buddyQuotaDecision({
+          usedToday: used - 1,
+          freeDaily: this.cfg.BUDDY_FREE_DAILY,
+          overageEnabled: this.cfg.BUDDY_OVERAGE_ENABLED,
+          overageCost: BUDDY_OVERAGE_MANA,
+          manaBalance: wallet?.manaBalance ?? 0,
+        });
     if (!decision.allowed) {
       throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'BUDDY_QUOTA', 'Daily Buddy message quota reached');
     }
@@ -343,7 +399,7 @@ export class BuddyService implements OnModuleInit {
     return {
       userMessage: toView(result.u),
       reply: toView(result.b),
-      quota: { usedToday: used, freeDaily: this.cfg.BUDDY_FREE_DAILY },
+      quota: { usedToday: used, freeDaily: daily },
       kind: replyKind,
       ...(make && replyKind === 'normal' ? { make } : {}),
     };

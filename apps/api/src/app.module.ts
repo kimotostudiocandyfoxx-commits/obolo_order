@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthController } from './auth/auth.controller';
 import { AuthGuard } from './auth/auth.guard';
 import { AuthService } from './auth/auth.service';
@@ -85,6 +86,7 @@ import { LedgerService } from './wallet/ledger.service';
 import { ManaAdminController } from './wallet/mana-admin.controller';
 import { ManaCheckService } from './wallet/mana-check.service';
 import { CostService } from './wallet/cost.service';
+import { AccessService, SpendGate } from './wallet/access.service';
 import { ManaPricesController } from './wallet/mana-prices.controller';
 import { WalletController } from './wallet/wallet.controller';
 
@@ -144,6 +146,9 @@ import { WalletController } from './wallet/wallet.controller';
     LedgerService,
     ManaCheckService,
     CostService,
+    AccessService,
+    // R18: the making-side requests of a non-member at 0 mana stop (after the guards: the member is known)
+    { provide: APP_INTERCEPTOR, useClass: SpendGate },
     BuddyService,
     PictureService,
     CompassService,

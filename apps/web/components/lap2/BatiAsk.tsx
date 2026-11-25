@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { VoiceField } from '@/components/onboarding/StoryExtras';
-import { getApi } from '@/lib/api';
+import { ApiError, getApi } from '@/lib/api';
+import { BATI_REST_HINT } from '@obolo/shared';
 
 /**
  * 〔💬 バティに聞く〕 (L2-MOON-S001): ask by voice, Bati looks it up and answers (the buddy chat, with its own
@@ -20,8 +21,10 @@ export function BatiAsk({ bati, onDone }: { bati: string; onDone: (a: Record<str
     try {
       const r = await getApi().buddyChat(q.trim(), 'ja');
       setAnswer(r.reply.text);
-    } catch {
-      setErr('いまは、うまく調べられなかった……。また聞いてね');
+    } catch (e) {
+      // R18: {bati} rests today (its line was said): the calm hint, not an error
+      const code = e instanceof ApiError ? e.code : '';
+      setErr(code === 'BATI_TIRED' ? BATI_REST_HINT.tired : code === 'BATI_NO_MANA' ? BATI_REST_HINT.noMana : 'いまは、うまく調べられなかった……。また聞いてね');
     }
     setBusy(false);
   };

@@ -471,9 +471,10 @@ export const MAKE_COST: Readonly<ManaPrices> = Object.freeze(manaPrices());
 
 /**
  * What the free features are recorded as (gen_costs.kind / the usage row's ref_type). Their cost is added up per member
- * and taken a whole mana at a time; they are never blocked at 0 mana.
+ * and taken a whole mana at a time (R18: a non-member past the first journey is stopped at 0 mana — access.ts). 'dachi'
+ * (the ダチ talk) is never taken: an unrecovered marketing cost.
  */
-export const USAGE_FEATURES = ['chat', 'search', 'draw', 'voice', 'spell', 'lyrics', 'compass', 'songEdit', 'videoEdit', 'novel', 'unfurl', 'listen', 'memory', 'look', 'story', 'other'] as const;
+export const USAGE_FEATURES = ['chat', 'search', 'draw', 'voice', 'spell', 'lyrics', 'compass', 'songEdit', 'videoEdit', 'novel', 'unfurl', 'listen', 'memory', 'look', 'story', 'dachi', 'other'] as const;
 export type UsageFeature = (typeof USAGE_FEATURES)[number];
 
 export interface AccrualStep {

@@ -21,7 +21,8 @@ export const DACHI_VOICE_MAX_SECONDS = 60;
 export const DACHI_TEXT_MAX = 300;
 /** PLACEHOLDER (P-DACHI-2): how many messages one person may send per hour / per day (all threads) */
 export const DACHI_SEND_PER_HOUR = 30;
-export const DACHI_SEND_PER_DAY = 120;
+/** R18: a hard ceiling against abuse for everyone (the soft caps are DACHI_DAILY_CAP_FREE for non-members, none for members) */
+export const DACHI_SEND_PER_DAY = 1000;
 
 /** The story characters who have a thread (no account behind them) */
 export const DACHI_CHARACTERS = ['kimorin', 'mikie'] as const;

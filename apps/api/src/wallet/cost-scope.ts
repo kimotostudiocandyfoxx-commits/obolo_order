@@ -52,6 +52,8 @@ export function featureOfPath(path: string): UsageFeature {
     [/^\/compose\//, 'songEdit'],
     [/^\/mars\//, 'videoEdit'],
     [/^\/links\/unfurl/, 'unfurl'],
+    // R18: the ダチ talk (moderation, KIMORIN⭐︎'s answers): never charged — an unrecovered marketing cost
+    [/^\/dachi\//, 'dachi'],
     [/^\/me\/(look|puni|butterfly|sticker|bati)/, 'look'],
   ];
   return rules.find(([re]) => re.test(p))?.[1] ?? 'other';

@@ -122,7 +122,7 @@ export class HttpApi implements Api {
         else if (event === 'done') return json as unknown as Awaited<ReturnType<Api['buddyChat']>>;
         else if (event === 'error') {
           if (json.code === 'NO_MANA') window.dispatchEvent(new Event('obolo:nomana'));
-          throw new ApiError(json.code === 'BUDDY_QUOTA' ? 429 : 503, json.code ?? 'BUDDY_UNAVAILABLE', 'Buddy error');
+          throw new ApiError(json.code === 'BUDDY_QUOTA' || json.code === 'BATI_TIRED' ? 429 : json.code === 'BATI_NO_MANA' ? 402 : 503, json.code ?? 'BUDDY_UNAVAILABLE', 'Buddy error');
         }
       }
     }

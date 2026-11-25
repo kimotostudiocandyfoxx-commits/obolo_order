@@ -20,7 +20,7 @@ import { markNames } from '@/lib/finds/marks';
 import { findAll, PLANET_NAME, workMarkRef, type Found } from '@/lib/finds/works';
 import { choiceOf, detectOpen, pickOpen, type OpenAsk } from '@/lib/bluena/find';
 import { EDIT_EVENT, openInBluena, takeEdit } from '@/lib/bluena/edit';
-import { BLUENA_LINES, formatMana, gameTierFor, gameMakeKind, matchGameTemplate, type GameTemplateId, type GameTier } from '@obolo/shared';
+import { BATI_REST_HINT, type BatiRest, BLUENA_LINES, formatMana, gameTierFor, gameMakeKind, matchGameTemplate, type GameTemplateId, type GameTier } from '@obolo/shared';
 import { daysUntil, isOpen, KINDS, lockLine, openKinds, openLessons, type AtelierKind, type Lesson } from '@/lib/atelier/unlock';
 import { historyOf, recentRequest } from './carry';
 import { usePartner } from '@/lib/partner';
@@ -168,6 +168,22 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   const [msgs, setMsgs] = useState<Msg[]>(() => (story ? (story.works ?? []).map((work) => ({ id: uid(), who: 'work' as const, work })) : freshMsgs(talk.id, talk.msgs)));
   const lines = cues(story?.lines);
   const [busy, setBusy] = useState(false);
+  /** R18: {bati} rests (a non-member out of mana / a member's long day): the composer shows a calm hint */
+  const [rest, setRest] = useState<BatiRest | null>(null);
+  useEffect(() => {
+    if (story) return;
+    const check = () =>
+      void getApi()
+        .buddyQuota()
+        .then((q) => setRest(q.rest ?? null))
+        .catch(() => undefined);
+    check();
+    // a gem bought, or the next day: the talk opens again
+    const onVis = () => document.visibilityState === 'visible' && check();
+    document.addEventListener('visibilitychange', onVis);
+    return () => document.removeEventListener('visibilitychange', onVis);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [story]);
   /** 〔星へ飛ばす〕: the work flying up for a moment (its kind) */
   const [launch, setLaunch] = useState<string | null>(null);
   const [pending, setPending] = useState<Pending>(null);
@@ -920,6 +936,11 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
         return;
       }
       setMsgs((m) => [...m, { id: uid(), who: 'bati', text: r.reply.text }]);
+      // R18: {bati}'s once-a-day line for resting — the talk closes after it
+      if (r.rest) {
+        setRest(r.rest);
+        return;
+      }
       const noPic = !!r.kind && r.kind !== 'normal';
       const drawn = r.reply.image?.url;
       if (drawn) setMsgs((m) => [...m, { id: uid(), who: 'bati', text: '', pic: { url: drawn } }]);
@@ -929,8 +950,10 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
           .catch(() => null);
         if (pic) setMsgs((m) => [...m, { id: uid(), who: 'bati', text: '', pic: { url: pic.url, title: pic.title, source: pic.source, pageUrl: pic.pageUrl } }]);
       }
-    } catch {
-      say('むむ…いまは、うまく答えられなかった。もう一回言ってみて');
+    } catch (e) {
+      // R18: {bati} already said why it rests today — no error, the composer shows the calm hint
+      if (e instanceof ApiError && (e.code === 'BATI_NO_MANA' || e.code === 'BATI_TIRED')) setRest(e.code === 'BATI_NO_MANA' ? 'noMana' : 'tired');
+      else say('むむ…いまは、うまく答えられなかった。もう一回言ってみて');
     } finally {
       setBusy(false);
     }
@@ -2207,6 +2230,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
             key={bar}
             placeholder={`${partner.name}に頼む`}
             disabled={busy}
+            hint={rest && !story ? BATI_REST_HINT[rest] : undefined}
             onState={setTalkState}
             side={onDevice && !story ? <DeviceButton onClick={onDevice} /> : undefined}
             onSend={(v) => {

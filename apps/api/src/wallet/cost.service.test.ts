@@ -130,6 +130,24 @@ describe('small costs of the free features', () => {
     expect(() => applyDelta(0, -1)).toThrow(LedgerError);
     s.onModuleDestroy();
   });
+  it('R18: the ダチ talk is recorded but never taken (even with mana): an unrecovered marketing cost in the report', async () => {
+    const debug = vi.spyOn(Logger.prototype, 'debug').mockImplementation(() => undefined);
+    const { s, store } = service();
+    store.balance.set('u2', 50);
+    // a moderation call of a ダチ text, many times over: more than a mana's worth
+    for (let i = 0; i < 400; i++) await s.recordNow({ provider: 'gemini', model: 'gemini-2.5-flash-lite', usd: 0.0036 / 160, exact: true }, { userId: 'u2', feature: 'dachi' });
+    expect(store.rows).toHaveLength(400);
+    expect(store.rows[0]).toMatchObject({ userId: 'u2', kind: 'dachi', paid: false });
+    expect(store.usage).toHaveLength(0);
+    expect(store.balance.get('u2')).toBe(50);
+    expect(debug.mock.calls.some(([m]) => String(m).includes('unrecovered marketing cost (dachi)'))).toBe(true);
+    store.data = { charged: [], costs: [{ kind: 'dachi', paid: false, costJpy: 1.44 }, { kind: 'chat', paid: false, costJpy: 2 }], jobs: [], usageMana: 2, absorbed: { mana: 0, jpy: 0 } };
+    const r = await s.report(1);
+    expect(r.marketing).toEqual({ kind: 'dachi', costJpy: 1.44 });
+    expect(r.usage.features).toEqual([{ kind: 'chat', costJpy: 2 }]);
+    expect(r.lines.some((l) => l.includes('ダチの原価') && l.includes('¥1.44'))).toBe(true);
+    s.onModuleDestroy();
+  });
   it('a cost with no member (story assets, admin) is recorded, not accrued', async () => {
     const { s, store } = service();
     await s.recordNow({ provider: 'gemini', model: 'gemini-2.5-flash', usd: 0.01, exact: true }, undefined);

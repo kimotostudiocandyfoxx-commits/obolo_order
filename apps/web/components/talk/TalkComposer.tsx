@@ -20,6 +20,7 @@ export function TalkComposer({
   initial = '',
   startTyping = false,
   onVoice,
+  hint,
 }: {
   onSend: (text: string) => void | Promise<void>;
   placeholder: string;
@@ -33,6 +34,8 @@ export function TalkComposer({
   startTyping?: boolean;
   /** the mic button beside the field goes back to the caller's own mic (the ダチ talk's held mic) instead of dictation */
   onVoice?: () => void;
+  /** R18: the talk is resting ({bati} has no mana / is tired): a calm hint where the mic and typing are (not an error) */
+  hint?: string;
 }) {
   const [text, setText] = useState(initial);
   const [typing, setTyping] = useState(startTyping);
@@ -51,6 +54,16 @@ export function TalkComposer({
     await onSend(t);
   };
   const trouble = micTrouble(mic.code);
+
+  if (hint)
+    return (
+      <div className="pb-safe flex flex-col items-center px-4 pb-[18px] pt-1" data-testid="composer-rest">
+        <div aria-disabled="true" className="grid h-[74px] w-[74px] place-items-center rounded-full text-[#070b24] opacity-30" style={{ background: 'radial-gradient(circle at 35% 30%,#ffffff,#cdd8ff 55%,#9fb2ff)' }}>
+          <MicGlyph className="h-[30px] w-[30px]" />
+        </div>
+        <p className="mt-2 max-w-sm text-center text-[12px] leading-relaxed text-[#cdd3f5]/80">{hint}</p>
+      </div>
+    );
 
   if (typing)
     return (
