@@ -1,6 +1,7 @@
 # Deploys gpu/music (Mercury instrumentals) to Cloud Run with an NVIDIA L4 GPU.
 # One-time setup: scripts/music-setup.sh (Cloud Shell), then the repository variable MUSIC_REGION.
-# Runs on pushes that touch gpu/music, or manually: Actions → Deploy Music GPU → Run workflow.
+# Release pin (like deploy-api.yml): a push deploys only on a [release] commit (scripts/release.sh), and only when gpu/music
+# changed since the previous release. Manually: Actions → Deploy Music GPU → Run workflow. RELEASE_GATE=off deploys every push.
 name: Deploy Music GPU
 
 on:
@@ -12,7 +13,7 @@ on:
         default: false
   push:
     branches: [main, claude/solar-system-home-planets-ew766y]
-    paths: ['gpu/music/**']
+    paths: ['gpu/music/**', 'RELEASE.md']
 
 concurrency:
   group: deploy-music
@@ -29,9 +30,34 @@ env:
   BUCKET: ${{ format('{0}-models-{1}', vars.GCP_PROJECT_ID, vars.MUSIC_REGION) }}
 
 jobs:
-  deploy:
+  gate:
     runs-on: ubuntu-latest
-    if: ${{ vars.GCP_PROJECT_ID != '' && vars.MUSIC_REGION != '' }}
+    outputs:
+      go: ${{ steps.g.outputs.go }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: g
+        env:
+          EVENT: ${{ github.event_name }}
+          GATE: ${{ vars.RELEASE_GATE }}
+          MSG: ${{ github.event.head_commit.message }}
+        run: |
+          go=false
+          if [ "$EVENT" != "push" ] || [ "$GATE" = "off" ]; then
+            go=true
+          elif printf '%s' "$MSG" | grep -q '\[release\]'; then
+            prev=$(git log --grep='\[release\]' --format=%H -2 | sed -n 2p)
+            if [ -z "$prev" ] || ! git diff --quiet "$prev" HEAD -- gpu/music; then go=true; fi
+          fi
+          echo "go=$go" >> "$GITHUB_OUTPUT"
+          echo "deploy music: $go"
+
+  deploy:
+    needs: gate
+    runs-on: ubuntu-latest
+    if: ${{ needs.gate.outputs.go == 'true' && vars.GCP_PROJECT_ID != '' && vars.MUSIC_REGION != '' }}
     permissions:
       contents: read
       id-token: write
