@@ -4,7 +4,7 @@ import { lyricsEdit, lyricsFallback, lyricsSecondVerse, lyricsStructure, ownLyri
 import { LLM, LYRICS_LLM } from '../infra/tokens';
 
 const sung = (l: SongLyrics) => l.blocks.flatMap((b) => b.lines).join('\n');
-const SECOND = /([2２二]番|二番目|セカンド)/;
+const SECOND = /([2-4２-４二三四]番|二番目|セカンド)/;
 const MORE = /足|たし|追加|入れ|いれ|ほしい|欲しい|作|つく|書いて|かいて/;
 
 /**

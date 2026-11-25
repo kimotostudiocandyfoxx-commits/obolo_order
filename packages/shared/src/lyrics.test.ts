@@ -197,3 +197,14 @@ describe('R13: bati’s song lines in every style', () => {
     }
   });
 });
+
+describe('R13: 3番 by rule', () => {
+  it('a third verse goes after the second chorus', async () => {
+    const { lyricsFallback: f, lyricsSecondVerse: more, lyricBlockLabels: labels, lyricsDemoEdit: demo } = await import('./lyrics');
+    const { spellFrom: sf } = await import('./spell');
+    const two = more(f(sf('song', '夏の海')));
+    const three = more(two);
+    expect(labels(three)).toEqual(['はじまり', 'Aメロ', 'サビ前', 'サビ', '2番Aメロ', '2番サビ前', '2番サビ', '3番Aメロ', '3番サビ前', '3番サビ', 'Cメロ', '大サビ', 'おわり']);
+    expect(demo(two, '3番を足して')?.blocks.filter((b) => b.section === 'verse')).toHaveLength(3);
+  });
+});

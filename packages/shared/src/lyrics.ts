@@ -497,17 +497,22 @@ export function lyricsEdit(l: SongLyrics, said: string): LyricsEdit | null {
   return null;
 }
 
-/** a second verse + chorus (2番) by rule when the model cannot write one: the chorus again, the verse lines again */
+/**
+ * one more 番 (2番, 3番 …) by rule when the model cannot write one: the first cycle's blocks (verse, pre-chorus, chorus)
+ * again, after the last chorus of the cycles (before the bridge / final chorus / outro); unchanged when there is no room
+ */
 export function lyricsSecondVerse(l: SongLyrics): SongLyrics {
-  const end = l.blocks[l.blocks.length - 1]?.section === 'outro' ? l.blocks.length - 1 : l.blocks.length;
   const firstVerse = l.blocks.findIndex((b) => b.section === 'verse');
   const firstChorus = l.blocks.findIndex((b) => b.section === 'chorus');
-  if (firstVerse < 0 || firstChorus < 0 || l.blocks.filter((b) => b.section === 'verse').length > 1) return l;
+  if (firstVerse < 0 || firstChorus < firstVerse) return l;
   const cycle = l.blocks.slice(firstVerse, firstChorus + 1).filter((b) => b.section !== 'intro');
   const total = l.blocks.reduce((a, b) => a + b.lines.length, 0) + cycle.reduce((a, b) => a + b.lines.length, 0);
   if (total > LYRIC_LINES_MAX || l.blocks.length + cycle.length > LYRIC_BLOCKS_MAX) return l;
-  const after = l.blocks.slice(firstChorus + 1, end);
-  return { ...l, blocks: [...l.blocks.slice(0, firstChorus + 1), ...cycle, ...after, ...l.blocks.slice(end)] };
+  let lastChorus = -1;
+  l.blocks.forEach((b, i) => {
+    if (b.section === 'chorus') lastChorus = i;
+  });
+  return { ...l, blocks: [...l.blocks.slice(0, lastChorus + 1), ...cycle, ...l.blocks.slice(lastChorus + 1)] };
 }
 
 /** what a change did, for the sheet's motion: new blocks / tags drop in, changed lines glow, removed ones fall away */
@@ -581,13 +586,13 @@ export function lyricsFallback(tags: SpellTag[]): SongLyrics {
 
 /** the review demo's stand-in for the model's lyric changes (「サビをもっと明るく」「2番を足して」) */
 export function lyricsDemoEdit(l: SongLyrics, said: string): SongLyrics | null {
-  if (/[0-9０-９二2]番/.test(said) && /足|たし|追加|入れ|ほしい|欲しい|つく|作/.test(said)) {
+  if (/[0-9０-９二三2-3]番/.test(said) && /足|たし|追加|入れ|ほしい|欲しい|つく|作/.test(said)) {
     const more = lyricsSecondVerse(l);
-    const firstVerse = l.blocks.find((b) => b.section === 'verse');
-    if (more === l || !firstVerse) return null;
+    if (more === l) return null;
+    const n = more.blocks.filter((b) => b.section === 'verse').length;
     let v = 0;
-    const second = ['あの日の約束　ポケットに', 'つよがりなんて　もういらない', 'ほどけた靴ひも　むすびなおして', 'もういちど　前を向く'];
-    return { ...more, blocks: more.blocks.map((b) => (b.section === 'verse' && ++v === 2 ? { ...b, lines: second.slice(0, Math.max(2, b.lines.length)) } : b)) };
+    const next = n === 2 ? ['あの日の約束　ポケットに', 'つよがりなんて　もういらない', 'ほどけた靴ひも　むすびなおして', 'もういちど　前を向く'] : ['夕やけの道　ならんだ影', 'ことばはいらない　わらいあう', 'ちいさな星が　ひとつ光って', 'あしたへ　つづいてく'];
+    return { ...more, blocks: more.blocks.map((b) => (b.section === 'verse' && ++v === n ? { ...b, lines: next.slice(0, Math.max(2, b.lines.length)) } : b)) };
   }
   const secs = sectionsNamed(said);
   const bright = /明る|あかる|元気|楽し|たのし|ハッピー|晴れ/.test(said);

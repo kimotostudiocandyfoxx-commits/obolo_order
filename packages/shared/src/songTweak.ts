@@ -105,7 +105,7 @@ export function parseTweak(said0: string): TweakParse {
   if (/声を?(変え|かえ)|別の声|ちがう声|違う声|(男|女)の(人の)?声に|ボクの声|わたしの声|自分の声/.test(said)) return { ops: [], paid: 'voice' };
   if (/メロディ|メロディー|曲調を?(変え|かえ)|ふしを/.test(said)) return { ops: [], paid: 'melody' };
   if (/ジャンル|ロックに|ジャズに|バラードに|ポップに|EDMに|ラップに|ヒップホップに|楽器を?(変え|かえ|足|たし)/.test(said)) return { ops: [], paid: 'genre' };
-  if (/歌詞|[「『].+[」』]に|(3|３|三)番|続き|つづき|(長く|のばして|伸ばして|延ばして)(して)?/.test(said) && !/秒|分/.test(said) && !CUT.test(said)) {
+  if ((/歌詞|[「『].+[」』]に|(3|３|三)番|[2-4２-４二三四]番を?(足|たし|追加|入れ|いれ|つけ|ほしい|欲しい)|続き|つづき|(長く|のばして|伸ばして|延ばして)(して)?/.test(said) && !/秒|分/.test(said) && !CUT.test(said))) {
     return { ops: [], paid: /歌詞|[「『]/.test(said) ? 'lyrics' : 'extend' };
   }
   const ops: SongTweakOp[] = [];

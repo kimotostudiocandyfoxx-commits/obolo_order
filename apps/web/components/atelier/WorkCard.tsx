@@ -539,6 +539,10 @@ function CardLyrics({ lyrics, note }: { lyrics: SongLyrics; note?: string }) {
   return (
     <div className="mt-1.5 max-h-[150px] overflow-y-auto rounded-lg bg-[rgba(70,150,230,.12)] px-2.5 py-1.5" style={{ boxShadow: 'inset 0 0 0 1px rgba(190,240,255,.22)', scrollbarWidth: 'thin' }} data-testid="card-lyrics">
       {note && <p className="mb-1 text-[10.5px] text-sky-100/70">♪ {note}</p>}
+      {/* the song's shape at a glance (a cut part is gone from it, a repeated one is there again) */}
+      <p className="mb-1.5 text-[10.5px] leading-snug tracking-[.03em] text-sky-100/80" data-testid="card-lyrics-shape">
+        {labels.join(' → ')}
+      </p>
       {lyrics.blocks.map((b, i) => (
         <div key={i} className="mb-1">
           <span className="mr-1 inline-block rounded-[3px] px-1.5 py-[1px] text-[10.5px] leading-tight text-sky-50" style={{ background: 'rgba(110,200,255,.24)', boxShadow: 'inset 0 0 0 1px rgba(210,248,255,.45)' }}>

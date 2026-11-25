@@ -323,8 +323,10 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     setBusy(true);
     // R13: 「歌詞はこれで：…」 — the style spell is from the words before the lyrics
     const own = twoPart && !before ? ownLyricsOf(said) : null;
+    // a song made before, changed in its lyrics (「3番を足して」「歌詞を変えて」): its style stays, its lyrics are changed
+    const lyricEdit = twoPart && !before && !!prev?.lyrics && !own && isLyricsTalk(said);
     const styleSaid = own ? said.slice(0, Math.max(0, said.indexOf(own))).replace(/(歌詞は(これ|こう|こちら)で|この歌詞で|歌詞)[\s:：、。]*$/, '').trim() : said;
-    const asked = before || craft ? styleSaid : prev ? `${prev.prompt}。${styleSaid}` : styleSaid;
+    const asked = before || craft ? styleSaid : prev ? (lyricEdit ? prev.prompt : `${prev.prompt}。${styleSaid}`) : styleSaid;
     // a game's change edits the spell it was cast with (「もっと難しく」); a chapter's spell is fresh from the words
     const was = before ? before.plan.tags : (kind === 'game' || kind === 'video') && prev?.spell?.length ? prev.spell : undefined;
     const v =
@@ -352,7 +354,11 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       // the style talismans come out first (「曲調のスペルはこんなんだね。」); meanwhile {bati} writes the lyrics
       const t0 = Date.now();
       const base = extra?.lyrics ?? prev?.lyrics;
-      const got: LyricsView = base
+      const got: LyricsView = lyricEdit && prev?.lyrics
+        ? await getApi()
+            .moonLyrics({ tags: plan.tags, said: said.slice(0, 1200), lyrics: prev.lyrics })
+            .catch((): LyricsView => ({ lyrics: prev.lyrics!, how: 'kept' }))
+        : base
         ? { lyrics: base, how: 'new' }
         : await getApi()
             .moonLyrics({ tags: plan.tags, said: (own ? `歌詞はこれで：${own}` : asked || plan.words || 'おまかせ').slice(0, 1200) })
@@ -361,11 +367,11 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       const wait = 1400 + plan.tags.length * 230 - (Date.now() - t0);
       if (wait > 0) await new Promise((r) => setTimeout(r, wait));
       if (floatingRef.current?.id !== fid) return;
-      showLyrics(fid, got, null);
-      const lead = got.declined === 'copy' ? SONG_LINES.lyricsCopy : got.declined === 'flagged' ? SONG_LINES.lyricsFlagged : got.how === 'own' ? SONG_LINES.lyricsOwn : SONG_LINES.songLyrics;
+      showLyrics(fid, got, lyricEdit && got.how === 'edit' ? prev!.lyrics! : null);
+      const lead = lyricEdit ? (got.how === 'edit' ? SONG_LINES.lyricsChanged : SONG_LINES.songLyrics) : got.declined === 'copy' ? SONG_LINES.lyricsCopy : got.declined === 'flagged' ? SONG_LINES.lyricsFlagged : got.how === 'own' ? SONG_LINES.lyricsOwn : SONG_LINES.songLyrics;
       setMsgs((m) => [...m, ...(got.declined === 'flagged' ? [{ id: uid(), who: 'bati' as const, text: tline(lead) }] : []), { id: uid(), who: 'bati', text: tline(got.declined === 'flagged' ? SONG_LINES.songLyrics : lead), lyricsRec: got.lyrics }]);
       // the question once the sheet is out (a yes said meanwhile already counts)
-      askLater(fid, 2600);
+      askLater(fid, 4200);
       return setPending({ plan: { ...ask, plan: { ...plan, lyrics: got.lyrics } } });
     }
     setMsgs((m) => [...m, { id: uid(), who: 'bati', text: tline(craft ? craftConfirmLine(kind, prev) : MOON_LINES.confirm) }]);
@@ -400,7 +406,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     if (got.declined === 'copy' && fid) showLyrics(fid, got, null);
     const id = uid();
     setMsgs((m) => [...m.map((x) => (x.id === before.id && x.who === 'bati' && x.plan ? { ...x, plan: { ...x.plan, done: 'changed' as const } } : x)), { id, who: 'bati', text: tline(lead), ...(changed || got.declined === 'copy' ? { lyricsRec: got.lyrics } : {}) }]);
-    if (fid) askLater(fid, changed ? 2200 : 900);
+    if (fid) askLater(fid, changed ? 3400 : 1200);
     setPending({ plan: { ...before, id, plan: { ...before.plan, added: [], removed: [], lyrics: changed || got.declined === 'copy' ? got.lyrics : now } } });
   };
   /** the spell floating over the bowl (from its first showing through its changes, until it is cast) */

@@ -32,6 +32,7 @@ describe('R13: free changes of a finished song — the words → ops', () => {
     expect(parseTweak('歌を戻して')).toEqual({ ops: [{ op: 'only', stem: 'both' }] });
     expect(parseTweak('歌詞を変えて').paid).toBe('lyrics');
     expect(parseTweak('3番を足して').paid).toBe('extend');
+    expect(parseTweak('2番を足して').paid).toBe('extend');
     expect(parseTweak('もっと長くして').paid).toBe('extend');
     expect(parseTweak('声を変えて').paid).toBe('voice');
     expect(parseTweak('メロディを変えて').paid).toBe('melody');
