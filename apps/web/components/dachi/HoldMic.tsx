@@ -129,7 +129,7 @@ export function HoldMic({
                 (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
                 setErr(null);
                 // R14: the member takes the turn — a voice still speaking stops (its words show whole)
-                bargeIn();
+                bargeIn({ mic: true });
                 r.press();
               }}
               onPointerUp={r.release}
@@ -153,7 +153,7 @@ export function HoldMic({
                 (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
                 setErr(null);
                 // R14: the member takes the turn — a voice still speaking stops (its words show whole)
-                bargeIn();
+                bargeIn({ mic: true });
                 r.press();
               }}
               onPointerUp={r.release}

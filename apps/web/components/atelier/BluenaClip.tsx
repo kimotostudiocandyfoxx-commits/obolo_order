@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { getApi } from '@/lib/api';
 import { usePartner } from '@/lib/partner';
 import { CLIP_ACCEPT, extOf, keptWhen, lengthWord, progressOf, readyFiles, rowProgress, rowsOf, rowSub, sheetWords, sizeWord, type ClipMode, type ClipRow } from '@/lib/clip/rows';
+import { ZoomImage } from './BluenaView';
 import { clipsChanged, clipUrl, sendClips, uploadClip, useClips, useClipUrl } from '@/lib/clip/useClip';
 
 /**
@@ -321,9 +322,11 @@ export function BluenaClip({ mode, onSent, onLine }: { mode: ClipMode; onSent?: 
 /**
  * Your 📎 files in Bluena's list (above the works, newest first): a tap opens one; 〔送る〕 in a talk sends it as it is.
  */
-export function ClipRows({ mode, onSent }: { mode: ClipMode; onSent?: () => void }) {
-  const list = useClips();
+export function ClipRows({ mode, onSent, only, q }: { mode: ClipMode; onSent?: () => void; /** R16: the 写真 chip */ only?: 'photo'; /** R16: the search box */ q?: string }) {
+  const all = useClips();
   const [open, setOpen] = useState<ClipFile | null>(null);
+  const words = (q ?? '').trim().toLowerCase();
+  const list = all?.filter((f) => (!only || f.kind === only) && (!words || f.name.toLowerCase().includes(words)));
   if (!list?.length) return null;
   return (
     <>
@@ -354,7 +357,7 @@ export function ClipRows({ mode, onSent }: { mode: ClipMode; onSent?: () => void
                 sendClips(mode, [f]);
                 onSent?.();
               }}
-              className={`${GO} shrink-0 px-3 py-1.5 text-[12px]`}
+              className="shrink-0 rounded-full border border-[rgba(210,220,255,.35)] bg-[rgba(10,14,44,.55)] px-2.5 py-1 text-[11px] font-bold text-[#dfe4ff]/90 backdrop-blur"
               data-testid="bluena-clip-send"
             >
               送る
@@ -366,7 +369,7 @@ export function ClipRows({ mode, onSent }: { mode: ClipMode; onSent?: () => void
         <li className="list-none">
           <div className="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-[rgba(7,11,36,.86)] px-4 backdrop-blur" onClick={() => setOpen(null)}>
             <div className="w-full max-w-md" onClick={(e) => e.stopPropagation()}>
-              <ClipView file={open} big />
+              {open.kind === 'photo' ? <ClipPhotoZoom f={open} /> : <ClipView file={open} big />}
             </div>
             <button className={`${PILL} mt-4 px-5 py-2 text-[13px] font-bold`}>とじる</button>
           </div>
@@ -374,6 +377,12 @@ export function ClipRows({ mode, onSent }: { mode: ClipMode; onSent?: () => void
       )}
     </>
   );
+}
+
+/** R16: a kept photo, big, pinched to zoom (as Bluena's viewer) */
+function ClipPhotoZoom({ f }: { f: ClipFile }) {
+  const url = useClipUrl(f.id);
+  return url ? <ZoomImage src={url} alt={f.name} /> : <ClipView file={f} big />;
 }
 
 /** open / save a document (a PDF opens in the browser's viewer; others download) */

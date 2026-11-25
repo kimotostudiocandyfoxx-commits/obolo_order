@@ -13,12 +13,29 @@ export type Speaking = { stop: (fadeMs?: number) => void };
 
 let speaking: Speaking | null = null;
 const listeners = new Set<() => void>();
+/** R16: who wants to know when a voice starts / stops (Bluena's music ducks under it) */
+const voiceListeners = new Set<(on: boolean) => void>();
+/** R16: who wants to know when the mic is pressed (one mic: Bluena's music pauses) */
+const micListeners = new Set<() => void>();
 
 /** the voice now playing (null: it ended) — webVoice keeps this up to date */
 export function setSpeaking(s: Speaking | null) {
+  const was = !!speaking;
   speaking = s;
+  if (was !== !!s) for (const fn of [...voiceListeners]) fn(!!s);
 }
 export const isSpeaking = () => !!speaking;
+
+/** R16: a voice started (true) / ended (false) */
+export function onVoice(fn: (on: boolean) => void): () => void {
+  voiceListeners.add(fn);
+  return () => void voiceListeners.delete(fn);
+}
+/** R16: the mic was pressed */
+export function onMic(fn: () => void): () => void {
+  micListeners.add(fn);
+  return () => void micListeners.delete(fn);
+}
 
 /** a talk that reveals lines / queues voices: what to do when the member takes the turn (returns: stop listening) */
 export function onBargeIn(fn: () => void): () => void {
@@ -29,11 +46,13 @@ export function onBargeIn(fn: () => void): () => void {
 /**
  * the member takes the turn: the voice fades out in BARGE_FADE_MS, every talk shows its line whole and drops the queued
  * voices. Safe to call when nothing plays (the talks still drop what was queued). The next voice plays as usual.
+ * R16: `mic` — the mic was pressed (not typing): Bluena's music pauses too (one mic).
  */
-export function bargeIn() {
+export function bargeIn(opts: { mic?: boolean } = {}) {
   const s = speaking;
-  speaking = null;
+  setSpeaking(null);
   s?.stop(BARGE_FADE_MS);
+  if (opts.mic) for (const fn of [...micListeners]) fn();
   for (const fn of [...listeners]) {
     try {
       fn();

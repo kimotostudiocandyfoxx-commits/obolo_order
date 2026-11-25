@@ -339,4 +339,4 @@ export function Drawer({ side, label, onClose, children }: { side: 'left' | 'rig
 }
 
 /** M-R258 §3: after 〔○○へ飛ばす〕 from Bluena, the planet home's line ({neo} = the member) */
-const flownLine = (kind: string, neo?: string | null) => (HOME_OF_WORK[kind] ? PLANET_HOMES[HOME_OF_WORK[kind]].flown.replace('{neo}', neo ?? 'あなた') : '星へ飛ばした');
+export const flownLine = (kind: string, neo?: string | null) => (HOME_OF_WORK[kind] ? PLANET_HOMES[HOME_OF_WORK[kind]].flown.replace('{neo}', neo ?? 'あなた') : '星へ飛ばした');

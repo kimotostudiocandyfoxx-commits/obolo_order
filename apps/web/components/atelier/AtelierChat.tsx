@@ -16,7 +16,10 @@ import { atelierMakeCost, CRAFT_LINES, VIDEO_LINES, KIND_HOME_PLANET, spellFrom,
 import { useMarkRing } from '@/components/finds/MarkRing';
 import { viewsOf } from '@/lib/story/views';
 import { markNames } from '@/lib/finds/marks';
-import { findAll, PLANET_NAME, workMarkRef } from '@/lib/finds/works';
+import { findAll, PLANET_NAME, workMarkRef, type Found } from '@/lib/finds/works';
+import { choiceOf, detectOpen, pickOpen, type OpenAsk } from '@/lib/bluena/find';
+import { EDIT_EVENT, openInBluena, takeEdit } from '@/lib/bluena/edit';
+import { BLUENA_LINES } from '@obolo/shared';
 import { daysUntil, isOpen, KINDS, lockLine, openKinds, openLessons, type AtelierKind, type Lesson } from '@/lib/atelier/unlock';
 import { historyOf, recentRequest } from './carry';
 import { usePartner } from '@/lib/partner';
@@ -269,7 +272,10 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       put(shell);
       try {
         const made = await make(kind, prompt, { ...ctx, lastSongId: lastSong.current }, prev, { ...opts, materials });
-        const { started, ...res } = made;
+        const { started, ...rest } = made;
+        // R16: the spell it was cast with stays on the work (Bluena's viewer shows its talismans)
+        const res: typeof rest = !rest.spell && opts.plan?.tags?.length ? { ...rest, spell: opts.plan.tags } : rest;
+        if (res.spell && !shell.spell) shell.spell = res.spell;
         if (started) {
           // §4: slow → {bati} says when to come back; the card counts down; the app's host finishes it
           const ms = msLeft(started.job);
@@ -855,7 +861,10 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
         if (r.status === 'first') sayT(SONG_LINES.editFirst);
         else if (r.status === 'missing') sayT(SONG_LINES.editMissing);
         else {
-          const next: Work = { ...card, ...(r.song ? { audio: r.song.url } : {}), ...(r.lyrics ? { lyrics: r.lyrics } : {}), tweak: { versions: r.versions, what: r.status === 'done' ? r.what : undefined, seconds: r.song?.seconds ?? card.tweak?.seconds, ...(sung ? { lyrics0: sung } : {}) } };
+          // R16: the version before is kept on the card (Bluena's viewer switches between them); one back drops the newest
+          const past = card.tweak?.past ?? [];
+          const before = r.status === 'done' ? [...past, { url: card.audio, what: card.tweak?.what, lyrics: card.lyrics }].slice(-8) : past.slice(0, -1);
+          const next: Work = { ...card, ...(r.song ? { audio: r.song.url } : {}), ...(r.lyrics ? { lyrics: r.lyrics } : {}), tweak: { versions: r.versions, what: r.status === 'done' ? r.what : undefined, seconds: r.song?.seconds ?? card.tweak?.seconds, ...(sung ? { lyrics0: sung } : {}), past: before } };
           putLast(next);
           if (r.status === 'done') sayT(SONG_LINES.editDone, { what: r.what ?? '' });
           else sayT(SONG_LINES.editUndo);
@@ -1237,6 +1246,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     setMsgs((m) => [...m, { id: uid(), who: 'me', text }]);
     const p = pending;
     setPending(null);
+    // R16: the answer to 「どれかな？」 (which of the works found to open)
+    if (!story && openChoices.current && openChosen(text)) return;
     // R12: {bati}'s compass and spell book (a link, their names, the answers to its questions, the offer)
     if (!story && toolSend(text, p)) return;
     // R13 fix: a spell still coming out (its lyrics being written) can be called off too
@@ -1286,6 +1297,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       const it = detect(text, false, markNames());
       if (!(it.kind === 'make' && it.what !== p.craft.kind && it.what !== 'lookup') && it.kind !== 'find') return void craftAsk(craftAnswer(p.craft, text));
     }
+    // R16: 「ブルーナの〇〇流して」 said plainly as one of your works goes before a change of the work on the table
+    if (!story && detectOpen(text)?.strong && openAsk(text)) return;
     if (p && 'after' in p && !story && craftAfter(p.after, text)) return;
     // R13: words about a finished song — a free change, one back, or (the studio's work) the spell
     if (!story && tweakSend(text, p && 'tweak' in p ? p.tweak : null)) return;
@@ -1298,6 +1311,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     }
     // M-R263: 「土星のレコード、ピンクにして」 — {bati} changes it (no buttons on the planets)
     if (!story && changeAsk(text)) return;
+    // R16: 「ブルーナの〇〇流して」 — one of your works opened in Bluena's viewer
+    if (!story && openAsk(text)) return;
     if (p && 'voiceAgain' in p) return void run('voice', text);
     if (p && 'use' in p) return void run(p.use, text, undefined, { materials: p.materials });
     // R12: the answer to {bati}'s question — unless it asks for another kind, or to make it (「魔法で作って欲しい」
@@ -1350,6 +1365,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   const chip = (label: string, from?: string) => {
     const k = (Object.keys(KIND_WORD) as AtelierKind[]).find((x) => KIND_WORD[x] === label);
     setMsgs((m) => [...m, { id: uid(), who: 'me', text: label }]);
+    // R16: which of the works found to open
+    if (!story && openChoices.current && openChosen(label)) return;
     if (!story && changeAsk(label, true)) return;
     // M-R253 §3: {bati}'s proposal of the material
     if (label === USE && proposal.current) {
@@ -1411,6 +1428,68 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     sayT(nextLine('welcome', MOON_LINES.welcome));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [welcome]);
+
+  // R16: 〔バティといじる〕 in Bluena's viewer — the work comes onto the table as the one being changed: its card at the
+  // end of the talk, {bati} asks 「どういじる？」, and the words after it change it as they would right after it was made
+  // (a song's free changes, a video re-rendered, a picture redone or a new spell, a book's next chapter, a game's tweak)
+  const takeToEdit = (w: Work) => {
+    const card: Work = { ...w, status: 'ready', saved: true, job: undefined };
+    putLast(card);
+    setPending(card.kind === 'song' ? { tweak: card } : { after: card });
+    sayT(BLUENA_LINES.editAsk, { title: (card.title || card.prompt || KIND_WORD[card.kind]).replace(/（MV）$/, '').slice(0, 24) });
+  };
+  const editRef = useRef(takeToEdit);
+  editRef.current = takeToEdit;
+  useEffect(() => {
+    if (story) return;
+    const go = () => {
+      const w = takeEdit();
+      if (w) editRef.current(w);
+    };
+    go();
+    window.addEventListener(EDIT_EVENT, go);
+    return () => window.removeEventListener(EDIT_EVENT, go);
+  }, [story]);
+
+  // R16: 「ブルーナの〇〇流して」「この前の〇〇の絵見せて」「〇〇の本読みたい」 — {bati} opens the nearest of your works in
+  // Bluena's viewer (a song plays, a book / a game opens); two about as near: which one (their titles as chips)
+  const openChoices = useRef<{ list: Found[]; a: OpenAsk } | null>(null);
+  const titleOf = (x: Found) => (x.title || x.work.title || x.work.prompt || KIND_WORD[x.work.kind]).slice(0, 30);
+  const openFound = (x: Found, a: OpenAsk) => {
+    const title = titleOf(x);
+    const play = x.work.kind === 'song' || x.work.kind === 'radio' || x.work.kind === 'voice';
+    sayT(play ? BLUENA_LINES.openPlay : BLUENA_LINES.openShow, { title });
+    openInBluena({ item: { key: `${x.kind}:${x.id}`, work: x.work, title, createdAt: x.createdAt, mark: { kind: x.kind, id: x.id } }, autoplay: play, autoOpen: a.verb === 'read' || a.verb === 'game' });
+  };
+  /** true: the words were taken (an open ask); a loose one with nothing near goes on as talk */
+  const openAsk = (text: string): boolean => {
+    const a = detectOpen(text);
+    if (!a) return false;
+    void (async () => {
+      setBusy(true);
+      const all = await findAll({}).catch(() => [] as Found[]);
+      setBusy(false);
+      const pick = pickOpen(all, a);
+      if ('hit' in pick) return openFound(pick.hit, a);
+      if ('choose' in pick) {
+        openChoices.current = { list: pick.choose, a };
+        return sayT(BLUENA_LINES.openWhich, {}, pick.choose.map(titleOf));
+      }
+      if (a.strong) return sayT(BLUENA_LINES.openNone);
+      void converse(text);
+    })();
+    return true;
+  };
+  /** the answer to 「どれかな？」 (a chip, or words) */
+  const openChosen = (said: string): boolean => {
+    const c = openChoices.current;
+    openChoices.current = null;
+    if (!c) return false;
+    const x = choiceOf(c.list, said);
+    if (!x) return false;
+    openFound(x, c.a);
+    return true;
+  };
 
   // M-R253 §3: a work dragged in from Bluena is material
   useEffect(() => {

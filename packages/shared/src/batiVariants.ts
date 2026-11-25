@@ -14,6 +14,7 @@ import { CRAFT_VARIANTS } from './craftVariants';
 import { TOOL_VARIANTS } from './toolVariants';
 import { SONG_VARIANTS } from './songVariants';
 import { VIDEO_VARIANTS } from './videoVariants';
+import { BLUENA_VARIANTS } from './bluenaVariants';
 
 export type BatiVariantSet = Record<Exclude<BatiOrdinaryPersonality, 'genki'>, string>;
 
@@ -26,6 +27,8 @@ export const BATI_VARIANTS: Record<string, BatiVariantSet> = {
   ...SONG_VARIANTS,
   // R13: videos as pictures that move (videoVariants.ts)
   ...VIDEO_VARIANTS,
+  // R16: Bluena's viewer — 〔バティといじる〕 and a work opened by words (bluenaVariants.ts)
+  ...BLUENA_VARIANTS,
   "……やぁ！": {
     teinei: "……こんにちは！",
     kansai: "……まいど！",

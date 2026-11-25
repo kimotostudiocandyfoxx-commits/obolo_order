@@ -10,7 +10,11 @@ import { DachiLinkCard } from '@/components/DachiLinkCard';
 import { GLASS } from '@/components/talk/TalkScene';
 import { useAuth } from '@/lib/auth';
 import { characterLook, PLACE_BG } from '@/lib/talk/looks';
-import { MoonShelf, WorkSheet } from './Drawers';
+import { MoonShelf } from './Drawers';
+import type { ViewItem } from './BluenaView';
+import { filterShelf, kindsPresent, madeWhen, rowActions, SHELF_WORD, type ShelfKind } from '@/lib/bluena/find';
+import { markOf } from '@/lib/finds/marks';
+import { useClips } from '@/lib/clip/useClip';
 import { DeviceButton } from './DeviceButton';
 import { BluenaClip, ClipRows } from './BluenaClip';
 import { DachiHistory } from './DachiHistory';
@@ -200,32 +204,44 @@ export function DachiTab({ threads, open, onOpen, onBack, banner, renderThread, 
 /**
  * R10 (client): Bluena is a device. Opened from the header's button over whatever is on screen (the Bati chat, the ダチ
  * hall or plain, a ダチ talk) — the place behind blurs; the works float as icons in a column with their short line
- * (what it is called, what it is and when it was made); a tap opens or plays it as Bluena does (WorkSheet). From a talk
- * each work has 〔送る〕: in a ダチ talk it goes to that friend as a work card, in the Bati chat to {bati} as material
- * (as when a work is dragged in). A tap outside or ✕ closes it. Your looks and {bati} are behind 〔姿とバティ〕.
+ * (what it is called, what it is and when it was made). A tap outside or ✕ closes it. Your looks and {bati} are behind
+ * 〔姿とバティ〕.
+ * R16 (client 2026-11-25): a tap on a work always opens it (BluenaView: listen / look / read / play, 〔バティといじる〕);
+ * 〔送る〕 is a small second button, only when Bluena was opened in a talk (in a ダチ talk to that friend as a work card,
+ * in the Bati chat to {bati} as material). At the top: the kinds you have (すべて・曲・絵・動画・本・ゲーム・写真), ★, and a
+ * search box (its title and its spell's words).
  */
-export function BluenaDevice({ onClose, onSend, sendTo }: { onClose: () => void; onSend?: (w: Work) => void; sendTo: 'bati' | 'dachi' }) {
+export function BluenaDevice({ onClose, onSend, sendTo, onView }: { onClose: () => void; onSend?: (w: Work) => void; sendTo: 'bati' | 'dachi'; /** R16: a work tapped — its viewer */ onView: (x: ViewItem) => void }) {
   const { me } = useAuth();
   const ctx = useAtelierCtx();
   const [found, setFound] = useState<Found[] | null>(null);
-  const [open, setOpen] = useState<Found | null>(null);
   const [line, setLine] = useState('');
-  const [n, setN] = useState(0);
   const [shelf, setShelf] = useState(false);
   // R10: starring lives here only (the works' ★, kept in item_marks as before), with its filter
   const [starOnly, setStarOnly] = useState(false);
+  const [kind, setKind] = useState<ShelfKind>('all');
+  const [q, setQ] = useState('');
+  const clips = useClips();
   const ring = useMarkRing();
-  useMarks();
+  const marks = useMarks();
   useEffect(() => {
     let live = true;
-    void findAll(starOnly ? { star: true } : {})
+    void findAll({})
       .then((x) => live && setFound(x))
       .catch(() => live && setFound([]));
     return () => {
       live = false;
     };
-  }, [n, starOnly]);
-  const send = onSend
+  }, []);
+  // the ★ shown now (a star given here counts at once)
+  const withStars = (found ?? []).map((x) => ({ ...x, stars: markOf(x.kind, x.id).stars }));
+  void marks;
+  const photos = (clips ?? []).filter((f) => f.kind === 'photo').length;
+  const kinds = kindsPresent(withStars, photos);
+  const shown = kind === 'photo' ? [] : filterShelf(withStars, { kind, star: starOnly, q });
+  const clipsShown = !starOnly && (kind === 'all' || kind === 'photo');
+  // R16: a tap views; 〔送る〕 only in a talk (lib/bluena/find rowActions)
+  const send = onSend && rowActions(!!onSend).send
     ? (w: Work) => {
         onSend(w);
         onClose();
@@ -235,7 +251,7 @@ export function BluenaDevice({ onClose, onSend, sendTo }: { onClose: () => void;
     <div className="absolute inset-0 z-[45] flex flex-col" data-testid="bluena-device" role="dialog" aria-label="ブルーナ">
       <style>{'@keyframes bluena-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}@keyframes bluena-in{from{opacity:0}to{opacity:1}}'}</style>
       {/* the place behind, blurred and dimmed; a tap outside closes */}
-      <button aria-label="とじる" onClick={onClose} className="absolute inset-0 cursor-default bg-[rgba(7,11,36,.45)] backdrop-blur-[8px]" style={{ animation: 'bluena-in .3s ease-out both', WebkitBackdropFilter: 'blur(8px)' }} />
+      <button aria-label="とじる" onClick={onClose} className="absolute inset-0 cursor-default bg-[rgba(7,11,36,.5)] backdrop-blur-[8px]" style={{ animation: 'bluena-in .3s ease-out both', WebkitBackdropFilter: 'blur(8px)' }} />
       <div className="pointer-events-none relative z-[1] flex min-h-0 flex-1 flex-col pt-safe" style={{ animation: 'bluena-in .3s ease-out both' }}>
         <header className="pointer-events-auto flex items-center gap-2.5 px-3.5 py-2.5">
           <span className="block h-[42px] w-[42px] overflow-hidden rounded-full border border-sky-200/40">
@@ -247,28 +263,48 @@ export function BluenaDevice({ onClose, onSend, sendTo }: { onClose: () => void;
             ✕
           </button>
         </header>
-        <div className="pointer-events-auto flex items-center justify-between px-4 pt-1">
-          <span className="text-[11px] text-sky-100/80 [text-shadow:0_1px_4px_#000]">{send ? (sendTo === 'dachi' ? '〔送る〕で、この会話に送れるよ' : '〔送る〕で、バティに材料をわたせるよ') : ''}</span>
-          <span className="flex items-center gap-1.5">
-            <button onClick={() => setStarOnly((v) => !v)} aria-pressed={starOnly} aria-label="お気に入りだけ" className={`h-7 min-w-7 rounded-full border px-2 text-[13px] ${starOnly ? 'border-amber-200/70 bg-amber-300/25' : 'border-[rgba(210,220,255,.3)] bg-[rgba(16,22,64,.6)]'}`} data-testid="bluena-star-filter">
-              <span className="text-amber-300">★</span>
-            </button>
-            <button onClick={() => setShelf(true)} className="rounded-full border border-[rgba(210,220,255,.3)] bg-[rgba(16,22,64,.6)] px-3 py-1 text-[12px] font-bold text-[#f4f1ff] backdrop-blur">
-              姿とバティ
-            </button>
-          </span>
+        {/* the search box, ★, 〔姿とバティ〕 */}
+        <div className="pointer-events-auto flex items-center gap-1.5 px-4">
+          <label className="flex h-9 min-w-0 flex-1 items-center gap-1.5 rounded-full border border-[rgba(210,220,255,.3)] bg-[rgba(16,22,64,.6)] px-3 backdrop-blur">
+            <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 text-sky-100/70" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden>
+              <circle cx="11" cy="11" r="6.5" />
+              <path d="m16 16 4 4" />
+            </svg>
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="なまえ・スペルでさがす" aria-label="さがす" className="min-w-0 flex-1 bg-transparent text-[14px] text-[#f4f1ff] outline-none placeholder:text-[#b9bde6]/60" data-testid="bluena-search" />
+            {q && (
+              <button onClick={() => setQ('')} aria-label="けす" className="text-[12px] text-sky-100/70">
+                ✕
+              </button>
+            )}
+          </label>
+          <button onClick={() => setStarOnly((v) => !v)} aria-pressed={starOnly} aria-label="お気に入りだけ" className={`h-9 min-w-9 shrink-0 rounded-full border px-2.5 text-[14px] ${starOnly ? 'border-amber-200/70 bg-amber-300/25' : 'border-[rgba(210,220,255,.3)] bg-[rgba(16,22,64,.6)]'}`} data-testid="bluena-star-filter">
+            <span className="text-amber-300">★</span>
+          </button>
+          <button onClick={() => setShelf(true)} className="h-9 shrink-0 rounded-full border border-[rgba(210,220,255,.3)] bg-[rgba(16,22,64,.6)] px-3 text-[12px] font-bold text-[#f4f1ff] backdrop-blur">
+            姿とバティ
+          </button>
         </div>
-        {line && <p className="pt-1 text-center text-[11px] text-sky-100/80 [text-shadow:0_1px_4px_#000]">{line}</p>}
-        <div className="no-scrollbar pointer-events-auto min-h-0 flex-1 overflow-y-auto px-4 pb-6 pt-2">
+        {/* the kinds you have */}
+        {kinds.length > 2 && (
+          <div className="no-scrollbar pointer-events-auto flex gap-1.5 overflow-x-auto px-4 pt-2" role="tablist" aria-label="しゅるい" data-testid="bluena-kinds">
+            {kinds.map((k) => (
+              <button key={k} role="tab" aria-selected={kind === k} onClick={() => setKind(k)} className={`shrink-0 rounded-full px-3.5 py-1.5 text-[12.5px] font-bold transition-colors ${kind === k ? 'bg-[rgba(223,230,255,.92)] text-[#070b24]' : 'border border-[rgba(210,220,255,.25)] bg-[rgba(10,14,44,.55)] text-[#dfe4ff]/85 backdrop-blur'}`}>
+                {SHELF_WORD[k]}
+              </button>
+            ))}
+          </div>
+        )}
+        <p className="min-h-[18px] px-4 pt-1.5 text-center text-[11px] text-sky-100/75 [text-shadow:0_1px_4px_#000]">{line || (send ? (sendTo === 'dachi' ? 'タップで見る・〔送る〕でこの会話に' : 'タップで見る・〔送る〕でバティに材料を') : 'タップで、見たり聴いたり')}</p>
+        <div className="no-scrollbar pointer-events-auto min-h-0 flex-1 overflow-y-auto px-4 pb-6 pt-1">
           {found === null && <p className="py-10 text-center text-xs text-white/60">…</p>}
-          {found?.length === 0 && <p className="py-10 text-center text-[13px] text-white/75 [text-shadow:0_1px_4px_#000]">まだ、なにもない</p>}
+          {found !== null && !shown.length && !(clipsShown && (clips?.length ?? 0) > 0) && <p className="py-10 text-center text-[13px] text-white/75 [text-shadow:0_1px_4px_#000]">{q || starOnly || kind !== 'all' ? 'みつからなかった' : 'まだ、なにもない'}</p>}
           <ul className="space-y-3.5">
             {/* 📎: pictures, films, sounds, files from this phone / iPad, first in the list; then the ones kept (BluenaClip) */}
-            <BluenaClip mode={send ? sendTo : 'keep'} onSent={onClose} onLine={setLine} />
-            {!starOnly && <ClipRows mode={send ? sendTo : 'keep'} onSent={onClose} />}
-            {found?.map((x, k) => (
+            {(kind === 'all' || kind === 'photo') && !q && <BluenaClip mode={send ? sendTo : 'keep'} onSent={onClose} onLine={setLine} />}
+            {clipsShown && <ClipRows mode={send ? sendTo : 'keep'} onSent={onClose} only={kind === 'photo' ? 'photo' : undefined} q={q} />}
+            {shown.map((x, k) => (
               <li key={`${x.kind}:${x.id}`} className="flex items-center gap-2">
-                <button onClick={() => setOpen(x)} className="flex min-w-0 flex-1 items-center gap-3 text-left" data-testid="bluena-work">
+                <button onClick={() => onView({ key: `${x.kind}:${x.id}`, work: x.work, title: x.title || x.work.title || x.work.prompt || KIND_WORD[x.work.kind], createdAt: x.createdAt, mark: { kind: x.kind, id: x.id } })} className="flex min-w-0 flex-1 items-center gap-3 text-left" data-testid="bluena-work">
                   <span className="relative block h-14 w-14 shrink-0 overflow-hidden rounded-full border-2 shadow-[0_6px_16px_rgba(0,0,0,.45)]" style={{ borderColor: PLANET_COLOR[x.planet], background: '#141b44', animation: `bluena-bob ${3.2 + (k % 3) * 0.5}s ease-in-out ${(k % 5) * 0.4}s infinite` }}>
                     {x.image && !x.image.startsWith('idb:') ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -288,7 +324,7 @@ export function BluenaDevice({ onClose, onSend, sendTo }: { onClose: () => void;
                 </button>
                 <StarButton kind={x.kind} id={x.id} onRing={(at) => ring.open(x.kind, x.id, at)} />
                 {send && (
-                  <button onClick={() => send(x.work)} className="shrink-0 rounded-full bg-[rgba(223,230,255,.92)] px-3 py-1.5 text-[12px] font-bold text-[#070b24] shadow-[0_4px_12px_rgba(0,0,0,.35)]" data-testid="bluena-send">
+                  <button onClick={() => send(x.work)} className="shrink-0 rounded-full border border-[rgba(210,220,255,.35)] bg-[rgba(10,14,44,.55)] px-2.5 py-1 text-[11px] font-bold text-[#dfe4ff]/90 backdrop-blur" data-testid="bluena-send">
                     送る
                   </button>
                 )}
@@ -298,11 +334,6 @@ export function BluenaDevice({ onClose, onSend, sendTo }: { onClose: () => void;
         </div>
       </div>
       {ring.node}
-      {open && (
-        <div className="relative z-[2]">
-          <WorkSheet found={open} ctx={ctx} onClose={() => setOpen(null)} onLine={setLine} onChanged={() => setN((v) => v + 1)} />
-        </div>
-      )}
       {shelf && (
         <div className="absolute inset-0 z-[30] flex flex-col bg-[rgba(8,12,36,.94)] px-4 pb-4 pt-3 backdrop-blur">
           <div className="flex items-center pb-2">
@@ -319,13 +350,9 @@ export function BluenaDevice({ onClose, onSend, sendTo }: { onClose: () => void;
   );
 }
 
-/** when a work was made: today → きょう 06:49, else 11/24 06:49 */
-export function madeWhen(iso: string, now = new Date()): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime()) || d.getTime() <= 0) return '';
-  const hm = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-  return d.toDateString() === now.toDateString() ? `きょう ${hm}` : `${d.getMonth() + 1}/${d.getDate()} ${hm}`;
-}
+/** when a work was made (R16: lib/bluena/find) */
+export { madeWhen };
+
 
 /** a ダチ's full figure (their look's standing picture; KIMORIN⭐︎'s sprite; else the talk cast's friend) */
 const standOf = (t: ThreadInfo) => t.stand || (t.id === 'kimorin' ? characterLook('kimorin')?.stand : t.id === 'mikie' ? characterLook('mikie')?.stand : undefined) || castLook('friend').stand;

@@ -7,6 +7,10 @@ import { useAuth } from '@/lib/auth';
 import { usePartner } from '@/lib/partner';
 import { BluenaDevice, DachiTab, MoonTabs, tabOf, type MoonTab } from './MoonTabs';
 import type { Work } from './work';
+import { BluenaView, type ViewItem } from './BluenaView';
+import { MiniPlayer } from './MiniPlayer';
+import { useAtelierCtx } from './ctx';
+import { editWithBati, VIEW_EVENT, type ViewAsk } from '@/lib/bluena/edit';
 import { hasBluena, Shell } from './Shell';
 import { dachiLinkOf, threadsInDrawer, type RenderThread, type ThreadInfo } from './threads';
 
@@ -53,6 +57,30 @@ export function MoonAtelier({ threads, renderThread }: { threads?: ThreadInfo[];
   const openDevice = bluena ? () => setDevice(true) : undefined;
   /** from a talk, each work can be sent: to the ダチ of the open talk, or to {bati} as material (the drag-a-work-in path) */
   const sendTo: ((w: Work) => void) | undefined = tab === 'dachi' ? (dachi ? (w) => window.dispatchEvent(new CustomEvent('obolo:dachi-send', { detail: { to: dachi, work: w } })) : undefined) : (w) => window.dispatchEvent(new CustomEvent('obolo:material', { detail: w }));
+  // R16: a work opened from Bluena (a tap, or {bati} asked 「〇〇流して」) — its viewer over everything; the ones opened are
+  // remembered so the corner player opens its song again
+  const [view, setView] = useState<ViewAsk | null>(null);
+  const viewed = useRef(new Map<string, ViewItem>());
+  const show = (a: ViewAsk) => {
+    viewed.current.set(a.item.key, a.item);
+    setView(a);
+  };
+  useEffect(() => {
+    const on = (e: Event) => {
+      const a = (e as CustomEvent<ViewAsk>).detail;
+      if (a?.item) show(a);
+    };
+    window.addEventListener(VIEW_EVENT, on);
+    return () => window.removeEventListener(VIEW_EVENT, on);
+  }, []);
+  const ctx = useAtelierCtx();
+  /** 〔バティといじる〕: to {bati}'s talk, the work on the table */
+  const edit = (w: Work) => {
+    setView(null);
+    setDevice(false);
+    if (tab !== 'bati') go('bati');
+    editWithBati(w);
+  };
 
   // the gate plays once per visit; reduced motion → straight in
   useEffect(() => {
@@ -93,7 +121,24 @@ export function MoonAtelier({ threads, renderThread }: { threads?: ThreadInfo[];
       </div>
       {tab === 'dachi' && <DachiTab threads={threadsInDrawer('dachi', { name: partner.name }, threads ?? [])} open={dachi} onOpen={openDachi} onBack={back} banner={banner} renderThread={renderThread} onDevice={openDevice} />}
       {/* R10: the Bluena device, over whatever is open (the place behind blurs); from a talk each work can be sent */}
-      {device && <BluenaDevice onClose={() => setDevice(false)} onSend={sendTo} sendTo={tab === 'dachi' ? 'dachi' : 'bati'} />}
+      {device && <BluenaDevice onClose={() => setDevice(false)} onSend={sendTo} sendTo={tab === 'dachi' ? 'dachi' : 'bati'} onView={(item) => show({ item })} />}
+      {/* R16: the song goes on in the corner when its viewer is closed */}
+      <MiniPlayer onOpen={(id) => {
+        const item = viewed.current.get(id.split('#')[0]);
+        if (item) show({ item });
+      }} />
+      {view && (
+        <BluenaView
+          key={view.item.key}
+          item={view.item}
+          ctx={ctx}
+          autoplay={view.autoplay}
+          autoOpen={view.autoOpen}
+          onClose={() => setView(null)}
+          onEdit={edit}
+          onSend={sendTo ? (w) => (sendTo(w), setView(null), setDevice(false)) : undefined}
+        />
+      )}
       {gate && <Gate onSkip={() => setGate(false)} />}
     </main>
   );

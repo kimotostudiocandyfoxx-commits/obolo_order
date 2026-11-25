@@ -115,7 +115,7 @@ export function TalkComposer({
         <button
           onClick={() => {
             // R14 (client 2026-11-25): the mic pressed while {bati} speaks — {bati} stops, its words show whole, you talk
-            if (!mic.listening) bargeIn();
+            if (!mic.listening) bargeIn({ mic: true });
             if (mic.supported) mic.toggle();
             else setTyping(true);
           }}

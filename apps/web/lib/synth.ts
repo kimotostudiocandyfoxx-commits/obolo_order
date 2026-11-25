@@ -53,9 +53,33 @@ class Engine {
     return !!this.ctx && this.ctx.state === 'running';
   }
 
-  play(p: SynthPreset, onLoop?: () => void) {
+  /** R16: Bluena's music holds the synth — told when anyone else starts it (one music at a time) */
+  private holder: (() => void) | null = null;
+  private level = 1;
+  claim(onTaken: (() => void) | null) {
+    this.holder = onTaken;
+  }
+  /** R16: the music turned down under a voice (1 = as it is) */
+  setLevel(x: number) {
+    this.level = Math.max(0.0001, x);
+    if (this.ctx && this.master && this.preset) {
+      const t = this.ctx.currentTime;
+      this.master.gain.cancelScheduledValues(t);
+      this.master.gain.setValueAtTime(Math.max(0.0001, this.master.gain.value), t);
+      this.master.gain.exponentialRampToValueAtTime(0.32 * this.level, t + 0.25);
+    }
+  }
+
+  play(p: SynthPreset, onLoop?: () => void, opts: { level?: number; mine?: boolean } = {}) {
     if (!this.unlock() || !this.ctx) return;
-    this.stop();
+    if (!opts.mine && this.holder) {
+      const h = this.holder;
+      this.holder = null;
+      h();
+    }
+    if (!opts.mine) this.level = 1;
+    else if (opts.level != null) this.level = Math.max(0.0001, opts.level);
+    this.halt();
     this.preset = p;
     this.onLoop = onLoop ?? null;
     this.step = 0;
@@ -69,11 +93,18 @@ class Engine {
     this.nextTime = this.ctx.currentTime + 0.05;
     this.master!.gain.cancelScheduledValues(this.ctx.currentTime);
     this.master!.gain.setValueAtTime(0.0001, this.ctx.currentTime);
-    this.master!.gain.exponentialRampToValueAtTime(0.32, this.ctx.currentTime + 0.4);
+    this.master!.gain.exponentialRampToValueAtTime(0.32 * this.level, this.ctx.currentTime + 0.4);
     this.timer = setInterval(() => this.schedule(), 25);
   }
 
-  stop() {
+  /** stops the sketch — R16: not while Bluena's music holds it (a card going away must not stop the music); `mine`: the music itself */
+  stop(mine = false) {
+    if (this.holder && !mine) return;
+    if (mine) this.holder = null;
+    this.halt();
+  }
+
+  private halt() {
     if (this.timer) clearInterval(this.timer);
     this.timer = null;
     this.preset = null;

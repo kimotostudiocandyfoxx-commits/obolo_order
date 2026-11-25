@@ -12,6 +12,7 @@ import { ThreadsDrawer } from './Drawers';
 import { talkWith, type Talk } from './shelf';
 import type { StoryMode } from './story';
 import { BATI_THREAD } from './threads';
+import { EDIT_EVENT } from '@/lib/bluena/edit';
 
 /**
  * Bluena is handed over on the morning of day 3 (D04-S002 sets d3.f_d04_bluena); before that there is no Bluena device at
@@ -47,6 +48,15 @@ export function Shell({ first, story, onBack, open, banner, onDevice }: { first:
     };
     window.addEventListener('obolo:openjob', go);
     return () => window.removeEventListener('obolo:openjob', go);
+  }, []);
+  // R16: 〔バティといじる〕 from Bluena — back to the talk now (a past day is read only), which takes the work
+  useEffect(() => {
+    const go = () => {
+      setPast(null);
+      setDrawer(null);
+    };
+    window.addEventListener(EDIT_EVENT, go);
+    return () => window.removeEventListener(EDIT_EVENT, go);
   }, []);
   const closePast = () => {
     setPast(null);
