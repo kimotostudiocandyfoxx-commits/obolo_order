@@ -485,7 +485,7 @@ export interface SongLyricLine {
 
 /**
  * GET /planet-works/planet_post/:id/song — what Mercury needs to play a song the Mercury way: the sound, the jacket
- * (printed over the whole picture disc), the title, the title read in its maker's voice (none yet: null) and the
+ * (printed over the whole picture disc), the title, the title read in its maker's own voice (null when they have no registered voice) and the
  * lyrics with their times (a song whose times cannot be had plays without lyrics: []).
  */
 export interface PlanetSongView {

@@ -2,7 +2,7 @@
 
 import type { HomeWork, PlanetSongView, SongLyricLine, WorkTags } from '@obolo/shared';
 import { useEffect, useRef, useState } from 'react';
-import { LETTER_GAP, letterKind, lyricAt, SONG_START_MS, STAGE, TITLE_MS, titleStyle, type StagePlace } from '@/lib/planetTemplate/mercury';
+import { LETTER_GAP, letterKind, lyricAt, SONG_START_MS, STAGE, TITLE_MS, titleStyle, titleVoiceInTime, type StagePlace } from '@/lib/planetTemplate/mercury';
 import m from './Mercury.module.css';
 
 /** load a title's font, only the letters it uses (Google Fonts `text=`), once */
@@ -123,11 +123,14 @@ export function SongStage({
   const [started, setStarted] = useState(startMs <= 0);
   const [titled, setTitled] = useState(titleMs <= 0);
   const audio = useRef<HTMLAudioElement | null>(null);
+  const voice = useRef<HTMLAudioElement | null>(null);
+  const opened = useRef(0);
   const ended = useRef(onEnd);
   ended.current = onEnd;
 
   useEffect(() => {
     let live = true;
+    opened.current = Date.now();
     load(work)
       .then((s) => live && setSong(s))
       .catch(() => live && setSong(null));
@@ -163,13 +166,25 @@ export function SongStage({
     const id = setTimeout(() => ended.current?.(), 6000);
     return () => clearTimeout(id);
   }, [started, song, loop]);
-  // the title read in its maker's voice (none yet: nothing)
+  // the title read in its maker's own voice (none when they have no registered voice): loaded with the song, so it is
+  // ready when the title comes in
   useEffect(() => {
-    if (!titled || !song?.titleVoice) return;
+    if (!song?.titleVoice) return;
     const v = new Audio(song.titleVoice);
+    v.preload = 'auto';
+    voice.current = v;
+    return () => {
+      v.pause();
+      v.src = '';
+      voice.current = null;
+    };
+  }, [song]);
+  // …and read with the title's entrance (2.2 s), over the song as it is; one that comes much later is left out
+  useEffect(() => {
+    const v = voice.current;
+    if (!titled || !v || !titleVoiceInTime(Date.now() - opened.current, titleMs)) return;
     v.play().catch(() => undefined);
-    return () => v.pause();
-  }, [titled, song]);
+  }, [titled, song, titleMs]);
 
   const title = song?.title || work.title || '';
   return (

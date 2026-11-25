@@ -224,6 +224,16 @@ export function storedUsd(bytes: number, months: number = DEFAULT_STORAGE_PRICE_
  */
 export const PICTURE_STORED_BYTES = 1.5 * MIB;
 export const SONG_STORED_BYTES = 6 * MIB;
+
+/**
+ * client 2026-11-25 (Mercury: the title read in the maker's voice): when a song is made by a member with a registered voice
+ * (their own Fish voice model), only its title is read in that voice and kept (SongTitleVoiceService). Part of the song's
+ * making (like everything painted for a profile look): the p90 title of 24 characters (≈ 72 UTF-8 bytes) on Fish
+ * ($15 / 1M bytes: $0.00108 ≈ ¥0.17) + its MP3 kept 12 months (≈ 3 s at 128 kbit/s ≈ 48 KB: ≈ ¥0.0001). Quoted for every
+ * song (a p90: the high side), taken only when the voice exists.
+ */
+export const TITLE_VOICE_CHARS = 24;
+export const TITLE_VOICE_STORED_BYTES = 48 * 1024;
 export const VIDEO_STORED_BYTES = 11.5 * MIB;
 
 const byPrefix = <T>(table: Record<string, T>, model: string, unknown: T): T => {
@@ -285,6 +295,8 @@ export function textUsd(model: string, tokens: { in: number; out: number }): num
 export function fishCostUsd(text: string): number {
   return (new TextEncoder().encode(text).length * FISH_USD_PER_MBYTE) / 1e6;
 }
+/** the song title read in the maker's voice (p90: TITLE_VOICE_CHARS Japanese characters on Fish) */
+export const titleVoiceUsd = () => fishCostUsd('あ'.repeat(TITLE_VOICE_CHARS));
 
 // ───────────────────────────── the makings and their quoted mana ─────────────────────────────
 
@@ -415,8 +427,9 @@ export function makeCostEstimates(s: MakeSetup = DEFAULT_MAKE_SETUP): Record<Mak
     // R17: sung on Runware (aceStepUsd for the seconds it is sung: 60 s delivered, 1.2× longer sung) + the 1.2× stretch
     // CPU + the song's design (Flash-Lite). The lyrics are written before the yes (their own small cost, 'lyrics'); our GPU
     // splits only for a change that needs it — that change's own small cost (songEdit), not the song's
-    song: { usd: aceStepUsd(SONG_QUOTE_SECONDS * SONG_QUOTE_TEMPO) + textUsd('gemini-flash-lite-latest', { in: 3_000, out: 1_500 }) + WORDS_USD, cpuSeconds: SONG_QUOTE_CPU_SECONDS, note: 'Runware ACE-Step 1.5 XL SFT（60秒の曲を1.2倍の72秒ぶん歌う、長さに比例）＋1.2倍速の処理 CPU＋曲の設計 Gemini Flash-Lite＋保存12か月（mp3・元の曲・分けた音 約6MB）', storedBytes: SONG_STORED_BYTES },
-    songPremium: { usd: RUNWARE_PRICES['minimax:music@2.6'] + 0.004, cpuSeconds: SONG_QUOTE_CPU_SECONDS, note: 'MiniMax Music 2.6 ×1 曲（$0.15）＋1.2倍速の処理 CPU＋設計・歌詞＋保存12か月', storedBytes: SONG_STORED_BYTES },
+    // client 2026-11-25: + the title read in the maker's own voice (Fish, TITLE_VOICE_CHARS; only when they have one)
+    song: { usd: aceStepUsd(SONG_QUOTE_SECONDS * SONG_QUOTE_TEMPO) + textUsd('gemini-flash-lite-latest', { in: 3_000, out: 1_500 }) + WORDS_USD + titleVoiceUsd(), cpuSeconds: SONG_QUOTE_CPU_SECONDS, note: 'Runware ACE-Step 1.5 XL SFT（60秒の曲を1.2倍の72秒ぶん歌う、長さに比例）＋1.2倍速の処理 CPU＋曲の設計 Gemini Flash-Lite＋曲名の読み上げ（自分の声 Fish）＋保存12か月（mp3・元の曲・分けた音 約6MB）', storedBytes: SONG_STORED_BYTES + TITLE_VOICE_STORED_BYTES },
+    songPremium: { usd: RUNWARE_PRICES['minimax:music@2.6'] + 0.004 + titleVoiceUsd(), cpuSeconds: SONG_QUOTE_CPU_SECONDS, note: 'MiniMax Music 2.6 ×1 曲（$0.15）＋1.2倍速の処理 CPU＋設計・歌詞＋曲名の読み上げ（自分の声 Fish）＋保存12か月', storedBytes: SONG_STORED_BYTES + TITLE_VOICE_STORED_BYTES },
     songVoice: { usd: 0, gpuSeconds: SONG_VOICE_GPU_SEED.cold + SONG_VOICE_GPU_SEED.split + SONG_VOICE_GPU_SEED.convert, cpuSeconds: SONG_VOICE_CPU_SECONDS, note: '君の声にする魔法：自社 GPU（起動＋分離＋Seed-VC）p90 160秒。分離ずみの曲は変換だけ（songVoiceQuote）＋保存12か月（君の声の歌と曲 約4MB）', storedBytes: 4 * MIB },
     mv: { usd: 12 * RUNWARE_PRICES['runware:400@4'] + 0.006, cpuSeconds: 240, note: 'FLUX.2 klein 4B ×12 場面＋演出 Gemini＋描画 CPU p90 240秒＋保存12か月（MP4・場面の絵 約13MB）', storedBytes: VIDEO_STORED_BYTES + 12 * 0.125 * MIB },
     story: { usd: textUsd('gemini-flash-lite-latest', { in: 2_500, out: 1_700 }) + WORDS_USD, note: 'お話 Gemini Flash-Lite（入力 約2,500・出力 約1,700トークン）＋言葉の確認', storedBytes: 16 * 1024 },
@@ -590,11 +603,14 @@ export const MAKE_COST: Readonly<ManaPrices> = Object.freeze(manaPrices());
  * look no one paid for — only where nobody can pay any more: the admin backfill for looks decided before the first look
  * was charged, and a look worn again whose figures were never made) is never taken either: absorbed like 'dachi'
  * (ABSORBED_FEATURES). The first look's figures are part of its profileLook price now (client 2026-11-25: nothing absorbed).
+ * 'titleVoice' (client 2026-11-25, Mercury): a song title read in its maker's voice outside a paid song's making — a song
+ * made without mana, a post that flies under another title, the admin backfill — is absorbed too (a paid song's is in its
+ * price: TITLE_VOICE_CHARS).
  */
-export const USAGE_FEATURES = ['chat', 'search', 'draw', 'voice', 'spell', 'lyrics', 'compass', 'songEdit', 'videoEdit', 'novel', 'unfurl', 'listen', 'memory', 'look', 'story', 'dachi', 'figures', 'other'] as const;
+export const USAGE_FEATURES = ['chat', 'search', 'draw', 'voice', 'spell', 'lyrics', 'compass', 'songEdit', 'videoEdit', 'novel', 'unfurl', 'listen', 'memory', 'look', 'story', 'dachi', 'figures', 'titleVoice', 'other'] as const;
 export type UsageFeature = (typeof USAGE_FEATURES)[number];
 /** the free costs the operator absorbs (recorded, never taken from the member) */
-export const ABSORBED_FEATURES: readonly string[] = ['dachi', 'figures'];
+export const ABSORBED_FEATURES: readonly string[] = ['dachi', 'figures', 'titleVoice'];
 
 export interface AccrualStep {
   /** mana to take now (a ledger row of this many, reason 'usage') */

@@ -107,6 +107,13 @@ export const SHIP_FRONT = { x: 0.5, y: 0.84, size: 2.15 } as const;
 /** after the tap: the song and the disc (ms) / the title and its reading (ms) */
 export const SONG_START_MS = 450;
 export const TITLE_MS = 2200;
+/**
+ * the title read in its maker's voice plays with the title's entrance (TITLE_MS), over the song as it is (the handoff asks
+ * no ducking); a reading that arrives later than this after the entrance is left out (it would be read under another line)
+ */
+export const TITLE_VOICE_LATE_MS = 1500;
+/** whether the title's reading may still play `sinceOpenMs` after the song was opened */
+export const titleVoiceInTime = (sinceOpenMs: number, titleMs: number = TITLE_MS) => sinceOpenMs <= Math.max(0, titleMs) + TITLE_VOICE_LATE_MS;
 
 /** where the picture disc, the lyrics and the title go (CSS top / width), by where the song is opened */
 export const STAGE = {

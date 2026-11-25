@@ -227,8 +227,8 @@ describe('R18: a making\'s price includes 12 months of storing what it made', ()
   it('bytes × months × the GB-month price', () => {
     expect(storedUsd(GIB, 12, 0.015)).toBeCloseTo(0.18, 9);
     expect(storedUsd(0)).toBe(0);
-    // a 60 s song: mp3 + original + stems ≈ 6 MB for 12 months
-    expect(storageJpyOf(MAKE_COST_ESTIMATE.song)).toBeCloseTo((6 / 1024) * 12 * 0.015 * 160, 9);
+    // a 60 s song: mp3 + original + stems ≈ 6 MB for 12 months (+ the title read in the maker's voice ≈ 48 KB)
+    expect(storageJpyOf(MAKE_COST_ESTIMATE.song)).toBeCloseTo(((6 * 1024 + 48) / 1024 / 1024) * 12 * 0.015 * 160, 9);
     // a video ≈ 13 MB
     expect(storageJpyOf(MAKE_COST_ESTIMATE.mv)).toBeGreaterThan(storageJpyOf(MAKE_COST_ESTIMATE.song));
   });

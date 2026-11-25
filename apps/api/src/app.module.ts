@@ -16,6 +16,8 @@ import { ComposeService } from './compose/compose.service';
 import { SongService } from './compose/song.service';
 import { SongTweakService } from './compose/song-tweak.service';
 import { SongVoiceService } from './compose/song-voice.service';
+import { SongTitleVoiceService } from './compose/song-title-voice.service';
+import { TitleVoiceBackfillController } from './compose/title-voice-backfill.controller';
 import { VoiceController } from './voice/voice.controller';
 import { LineVoiceService } from './voice/line-voice.service';
 import { VoiceService } from './voice/voice.service';
@@ -135,6 +137,7 @@ import { StorageWorksService } from './storage/storage-works.service';
     InvitesController,
     LookController,
     ChibiBackfillController,
+    TitleVoiceBackfillController,
     BillingController,
     ComposeController,
     VoiceController,
@@ -198,6 +201,7 @@ import { StorageWorksService } from './storage/storage-works.service';
     SongService,
     SongTweakService,
     SongVoiceService,
+    SongTitleVoiceService,
     VoiceService,
     LineVoiceService,
     BatiVoiceService,

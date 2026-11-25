@@ -22,6 +22,7 @@ import { LLM } from '../infra/tokens';
 import { MediaService } from '../media/media.service';
 import { notChild, planetWorkScope } from '../common/child';
 import { PlanetWorksService } from './planet-works.service';
+import { SongTitleVoiceService, titleKey, titleVoiceOf } from '../compose/song-title-voice.service';
 
 type PostRow = typeof planetPosts.$inferSelect;
 
@@ -44,6 +45,7 @@ export class PlanetPostsService {
     private readonly media: MediaService,
     @Inject(LLM) private readonly llm: LlmProvider,
     @Optional() private readonly works?: PlanetWorksService,
+    @Optional() private readonly titleVoice?: SongTitleVoiceService,
   ) {}
 
   async create(userId: string, planet: TimelinePlanet, body: CreatePlanetPostBody, origin: string): Promise<PlanetPostView> {
@@ -54,6 +56,7 @@ export class PlanetPostsService {
     let values: typeof planetPosts.$inferInsert;
     // planets 2-1: the hidden tags, from the song's settings (Mars: the generic shape until its handoff says)
     let tags = genericTags(null);
+    let song: typeof songs.$inferSelect | undefined;
     if (planet === 'mercury') {
       const [s] = await this.db.write
         .select()
@@ -62,6 +65,7 @@ export class PlanetPostsService {
       if (!s) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Song not found');
       values = { planet, userId, kind: 'song', sourceId: s.id, title: body.title || s.title, text: body.text, url: s.mixUrl, seconds: s.seconds };
       tags = songTags(s.designJson);
+      song = s;
     } else {
       const [v] = await this.db.write
         .select()
@@ -80,6 +84,9 @@ export class PlanetPostsService {
     }
     const [p] = await this.db.write.insert(planetPosts).values(values).returning();
     await this.works?.tag('planet_post', p.id, { userId, planet, tags, words: `${p.title} ${p.text}` });
+    // client 2026-11-25: a song flying under a title with no reading in the maker's voice yet (another title than the
+    // song's, or one made before the readings): read in the background (nothing when they have no voice)
+    if (song && p.title && !titleVoiceOf(song.designJson, p.title)) await this.titleVoice?.later(userId, song.id, origin, titleKey(p.title) === titleKey(song.title) ? undefined : p.title);
     const [author] = await this.db.write.select(authorCols).from(users).where(eq(users.id, userId));
     return this.toView(p, author, false, []);
   }

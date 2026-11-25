@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, Logger, Optional } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { applyMixEdit, type ChatTurn, type LlmProvider, moderateText, parseSingDirection, parseSongEdit, phraseText, singDirectionSystem, songEditSystem } from '@obolo/ai';
 import { lyricBlockKeys, lyricBlockLabels, lyricsPrompt, lyricsSheet, normalSongTask, phrasesAtTempo, premiumSongTask, repaintSongTask, SONG_DEFAULT_TEMPO, songGenSeconds, songSeconds, type MusicProvider, type RunwareAudioTask, type FullSongBody, type SingBody, type SingDirection, type SongEditBody, type SongEditCommand, type SongEditResult, type SongLyrics, type SongMix, type SongPhrase, type SongView, type SongVoiceVersion, type VoiceSlot } from '@obolo/shared';
@@ -16,6 +16,7 @@ import { canUseMedia } from '../voice/media-consent';
 import { audioSeconds, runwareAudio, type RunwareSong } from './runware-music';
 import { stretchSong } from './tweak';
 import type { TweakDesign } from './song-tweak.service';
+import { SongTitleVoiceService } from './song-title-voice.service';
 
 /** What is stored in songs.design_json. */
 interface StoredDesign {
@@ -152,7 +153,15 @@ export class SongService {
     private readonly db: Database,
     private readonly media: MediaService,
     private readonly voice: VoiceService,
+    /** client 2026-11-25: the title read in the maker's own voice (when they have one), queued once a song is made */
+    @Optional() private readonly titleVoice?: SongTitleVoiceService,
   ) {}
+
+  /** a song just made: its title read in the maker's voice, in the background (never fails the song) */
+  private async made(userId: string, row: SongRow, origin: string): Promise<SongView> {
+    await this.titleVoice?.later(userId, row.id, origin).catch(() => false);
+    return this.view(row);
+  }
 
   // --- create -----------------------------------------------------------------------------------
 
@@ -221,7 +230,7 @@ export class SongService {
       })
       .returning();
     this.log.log(`song ${row.id} ${userId} "${body.title}" ${phrases.length} lines ${out.seconds}s ${JSON.stringify(direction)}`);
-    return this.view(row);
+    return this.made(userId, row, origin);
   }
 
   /**
@@ -344,7 +353,7 @@ export class SongService {
       })
       .returning();
     this.log.log(`song ${row.id} ${userId} "${body.title}" sung on Runware (${got.model}${premium ? ', secret spell' : ''}) ${secs}s, delivered ${out.tempo}× ${out.seconds}s in ${Math.round(got.ms / 1000)}s, cost ${got.costUsd ?? '?'} USD`);
-    return this.view(row);
+    return this.made(userId, row, origin);
   }
 
   /** the song sung by our own GPU (ACE-Step + HTDemucs + Seed-VC in one go): MUSIC_PROVIDER 'gpu', or the fallback */
@@ -398,7 +407,7 @@ export class SongService {
     this.log.log(
       `song ${row.id} ${userId} "${body.title}" sung by the studio (${made.voiced ? 'member voice' : 'studio voice'}: ${made.voiceNote}), ${phrases.length} lines (${made.lines.length} timed) ${made.seconds}s`,
     );
-    return this.view(row);
+    return this.made(userId, row, origin);
   }
 
   /**

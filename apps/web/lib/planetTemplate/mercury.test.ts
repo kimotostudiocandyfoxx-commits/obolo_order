@@ -19,6 +19,8 @@ import {
   titleStyle,
   WRAP_PX,
   letterKind,
+  TITLE_MS,
+  titleVoiceInTime,
 } from './mercury';
 import { driftMotion } from './motion';
 import { peopleOf } from './people';
@@ -196,5 +198,17 @@ describe('the sample cast plays the prototype’s songs', () => {
       expect(w.title).toBeTruthy();
     }
     expect(v.own).toHaveLength(8);
+  });
+});
+
+describe('02 §2 the title read in its maker\'s voice', () => {
+  it('plays with the title (2.2 s) even when the song came a little after it, never long after', () => {
+    expect(TITLE_MS).toBe(2200);
+    expect(titleVoiceInTime(2200)).toBe(true);
+    expect(titleVoiceInTime(3600)).toBe(true);
+    expect(titleVoiceInTime(3800)).toBe(false);
+    // a stage that shows the title at once (titleMs 0)
+    expect(titleVoiceInTime(1000, 0)).toBe(true);
+    expect(titleVoiceInTime(1600, 0)).toBe(false);
   });
 });

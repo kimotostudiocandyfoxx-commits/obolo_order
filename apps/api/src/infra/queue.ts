@@ -9,7 +9,7 @@ import { createRedis } from './kv';
  * - "bullmq": pushes to Redis; `apps/api/dist/worker.js` (a separate Cloud Run service or
  *   GPU worker pool later) consumes it. Handlers are identical in both modes.
  */
-export type JobName = 'buddy.summarize' | 'jobs.run' | 'voice.line' | 'bati.paint' | 'bati.repaint' | 'bati.faces' | 'bati.lines' | 'talk.look' | 'voice.bati' | 'look.chibi' | 'look.figures';
+export type JobName = 'buddy.summarize' | 'jobs.run' | 'voice.line' | 'bati.paint' | 'bati.repaint' | 'bati.faces' | 'bati.lines' | 'talk.look' | 'voice.bati' | 'look.chibi' | 'look.figures' | 'song.title';
 
 export interface JobPayloads {
   'buddy.summarize': { userId: string };
@@ -36,6 +36,12 @@ export interface JobPayloads {
   'look.figures': { userId: string; origin: string; look?: string; paid?: { kind: 'profileLook'; job: string } };
   /** M-R246: {bati}'s voice model made from the egg recording (BatiVoiceService) */
   'voice.bati': { userId: string; url: string; text?: string };
+  /**
+   * client 2026-11-25 (Mercury): a song's title read in its maker's own voice and kept (SongTitleVoiceService). `text`: the
+   * title to read (the song's own when not given: a post may fly under another); `paid`: the paid song making it is part
+   * of (its costs are that making's), none = absorbed ('titleVoice')
+   */
+  'song.title': { userId: string; songId: string; origin: string; text?: string; paid?: { kind: 'song' | 'songPremium'; job?: string } };
   'voice.line': { userId: string; hash: string; origin: string; who: string; act?: string; text: string; spec: import('@obolo/shared').StoryVoiceSpec; brief: string; model: string; tempo: number; pace?: number };
 }
 

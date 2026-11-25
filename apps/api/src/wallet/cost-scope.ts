@@ -63,6 +63,9 @@ export function featureOfPath(path: string): UsageFeature {
 export function featureOfJob(name: string): UsageFeature {
   if (name === 'buddy.summarize') return 'memory';
   if (name === 'voice.line' || name === 'voice.bati') return 'voice';
+  // client 2026-11-25: a song title read in its maker's voice — a paid song's job tags it as that making
+  // (SongTitleVoiceService.make); the rest (a free song, another post title, the backfill) is absorbed
+  if (name === 'song.title') return 'titleVoice';
   // client 2026-11-25: the planet figures nobody can pay for any more (the admin backfill of looks confirmed before the
   // first look was charged) are absorbed (ABSORBED_FEATURES); the first look and every profile look change tag their job
   // as that profileLook making (PlanetFiguresService.make); so do the talk's pictures (LookService.talkLook)
