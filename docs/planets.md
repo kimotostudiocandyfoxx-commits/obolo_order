@@ -108,7 +108,7 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 - データ：
   - 火星＝`planet_posts`（mars、正方形の動画 `url`＋ポスター `thumbUrl`）、金星＝`radio_shows`（音 `url`・サムネ）— 前から。
   - **冥王星＝`books`、海王星＝`games`（ストアをつないだ）**。ホームに出るのは**飛ばした**本・ゲームだけ（`flown_at`、88時間は飛ばした時から）。`POST /moon/books/:id/fly`・`/moon/games/:id/fly` `{on}`（`on:false`＝月へもどす。ホームの〔外す〕も同じ）。本の `text`＝1章の書き出し、`thumbUrl`＝表紙。ゲームの `title`・`text`＝表の版の題・遊び方、コードは PRESS START の時に `GET /moon/games/:id`（作った人・送られたダチに加えて、**その星のホームに届く人**＝作った人・ダチ／推し（88時間なしで）・流れ着く人：`seesWork`）。本も同じく `GET /moon/books/:id`。
-  - **天王星＝まだストアなし**：グッズを作る所がまだ無い（月のアトリエにも無い）。ホームは見本だけ。タグの関数（`goodsTags`）は用意した。
+  - **天王星＝`goods`（2026-11-25 物語の部屋の答え）**：月のアトリエの「グッズ」で作る（下の「05 のつづき」）。ホームに出るのは飛ばしたグッズだけ（`flown_at`）。`text`＝種類（その見本で描く）、`thumbUrl`＝のせたアート。`GET /moon/goods/:id` は本・ゲームと同じ人が開ける。
 - タグ（2-1 の残り。作った瞬間に `PlanetWorksService.tag()`、`POST /admin/planet-works-backfill` で前の作品も）：
   - 火星 MV：`mvTags`＝その MV の曲の `songTags` の主分類と雰囲気（bpm は持たない）。投稿の 裏スタジオの動画 → MV（`mv_projects` の動画）→ 曲。MV でない動画はタグなし。
   - 金星 ラジオ：`radioTags`＝主分類は題名から土星の話題（言葉のルール `voiceTagsOfWords`、無ければ雑談）。雰囲気（話し方）は にぎやか・しっとり・ゆったり・深夜・朝・夜・音楽たっぷり・トーク から4つまで：題名の言葉、ループ（pulse にぎやか／ripple・still しっとり／drift ゆったり／stars 夜）、作った時刻（22〜4時 深夜、5〜9時 朝）、流した曲（3曲以上 音楽たっぷり、0 トーク）。
@@ -139,6 +139,17 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 - 土星：▶ のクラブの間、ホームのコロリンは拍に合わせて1つおきに跳ねる（`beatHop`、試作の startSim3D）。
 - 最初のタップまでは何も鳴らない（ページを開いただけでは鳴らない）。AudioContext はアプリ共通の1つ（`lib/onboarding/audio`：マナーモードで鳴らない）、惑星の音は親の音量 0.6 の下に効果音と音楽の2本。この端末の設定に従う：会話の〔声を消す〕（`obolo.talk.muted`）で全部消える、物語のミキサー（`obolo.story.mix` の se／bgm）で効果音と音楽の大きさ。ホーム・▶・空を閉じる（■）と、その音楽と待っている音は全部止まる。
 
+### 05 のつづき（物語の部屋の答え 2026-11-25）
+スクリーンショット：`docs/handoff/shots/uranus-home-goods*.jpg`・`atelier-goods*.jpg`・`neptune-game-cover*.jpg`・`atelier-game-cover-*.jpg`・`neptune-game-full.jpg`／`-closed.jpg`（390×844）。
+- **グッズ（月のアトリエ）**：「グッズを作りたい」→ {bati} が言葉で聞く（ボタンなし）：種類（トート／Tシャツ／ステッカー／アクスタ／マグカップ／缶バッジ、`goodsKindOf`）→ どのアート（自分の木星のアートを小さく並べる。絵の名前・「いちばん新しいの」・「2番目」・「おまかせ」、`pickArt`）。言葉に先に出ていればその質問はとばす。ブルーナから持ってきたアートはそれを使う。そろったらすぐ作る（**無料**：絵は描かない。確認のカードなし・0マナ、小さな原価だけ。1日 `GOODS_PER_DAY`＝30。`docs/マナの値段.md` 3.）。名前＝アートの題名＋種類（「夕焼けトート」、`goodsTitle`）。絵はアプリがコードでアートを見本に合成（`components/planetTemplate/five/GoodsMock.tsx`。カード・天王星のビューア・棚が同じ物）。スペルの札は出さない（描かないので唱える物がない）。
+  - 保存：`goods` 表（種類・元のアート `root_id`・`art_url`・題名・`flown_at`、migration `0062`）。作った時と飛ばした時に `goodsTags`。ブルーナの天王星のフォルダ・☆・消す（`DELETE /storage/works/goods/:id`）・ホームの〔外す〕・通報・見えなくするは他の作品と同じ。
+  - {bati} のせりふ（仮・全スタイル）：`packages/shared/src/goods.ts` の `GOODS_LINES`・`GOODS_VARIANTS`。
+- **〔星へ飛ばす〕**：グッズ（天王星）・本（冥王星）・ゲーム（海王星）も（`FLY_READY_KINDS`）。本は題名と1章（書き出し）がある時だけ（`canFly`）。飛んだ本は今のデータを読む（ホームの書き出し＝1章、開くと `GET /moon/books/:id` で全部の章）ので、あとで書いた章もそのまま見える。
+- **海王星の PRESS START**：全画面で遊べる（`GameFull`、プレビューで確認：390×800 の枠）。✕で閉じると星のホームにもどる（開いていたケースのまま）。
+- **金星の話題**：番組の題名を、土星のコロリンと同じ安いテキストモデルに聞く（`showTopicTags`、`@obolo/ai`、温度0・小さな JSON。原価はその要求の小さな原価）。答えが無い時（オフライン・失敗）は言葉のルールのまま。番組の説明・話した言葉はまだ保存していないので、題名だけ（`talk` に渡せば一緒に読む）。
+- **ゲームのケースの絵**：ゲームができたら（最初の版）{bati} が聞く：自分のアートから選ぶ／{bati} が描く（アートと同じ値段 `jacketArt`、アートのスペル・OK・引き落としそのまま。描いた絵はアートとしても残る）／「いらない」でネオンの顔のまま。あとで「ケースの絵を変えて」でもう一度。`games.cover_url`（`PUT /moon/games/:id/cover {rootId|null}`、自分のアートだけ）。海王星のケース・棚が見せる。せりふ（仮）：`GAME_COVER_LINES`。
+- **安全**：ダチ公開（dachi）の本・ゲーム・グッズは、流れ着いていない知らない人には開けない（`GET /moon/books|games|goods/:id` は 404）。Postgres を使うテスト `apps/api/src/craft/goods.test.ts`（`TEST_DATABASE_URL`、CI で設定）。
+
 ## API
 | | |
 |---|---|
@@ -156,13 +167,15 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 | `GET /planet-works/planet_post/:id/song` | 02 水星：曲を開く（音・ジャケット・曲名・歌詞と時間） |
 | `GET /planet-home/:planet` | 前から。作品に `tags`、自分の作品に `visibility`・`heldReason` が付いた |
 | `POST /moon/books/:id/fly` ・ `POST /moon/games/:id/fly` `{on}` | 05：本を冥王星へ・ゲームを海王星へ飛ばす（`on:false` で月へ） |
+| `POST /moon/goods` `{kind, rootId, title?}` ・ `GET /moon/goods` ・ `GET /moon/goods/:id` ・ `POST /moon/goods/:id/fly` `{on}` | グッズ：自分のアートで作る（無料）・一覧・開く・天王星へ飛ばす |
+| `PUT /moon/games/:id/cover` `{rootId \| null}` | ゲームのケースの絵（自分のアート、null でネオンの顔） |
 | `GET /moon/games/:id` ・ `GET /moon/books/:id` | 05：飛んだゲーム・本は、その星のホームに届く人も開ける |
 | `GET /planet-home/:planet/person/:id` | 04 土星：その人の過去の作品（プロフィールの2D舞台）。自分＝自分の作品、ダチ・見られる推し＝88時間なしで、ほかの人＝何も返さない（`person: null`）。新しい順・24まで |
 
 ## まだのこと
 - 公開範囲の初期値（依頼主の答え待ち。今は dachi）。
 - 大陸の絵：水星（0058）・木星（0059）・土星（0060）の90枚は全部入った。
-- 05：天王星のグッズのストア（作る所がまだ無い）。本・ゲームの〔星へ飛ばす〕をアトリエにつなぐこと（API はある。`FLY_READY_KINDS` はまだ変えていない）。
+- 05 のつづき：グッズ・ケースの絵の {bati} のせりふは仮（物語の部屋で確認）。金星の番組の説明・話した言葉は保存していない（話題は題名だけから）。おためしのデモでは、{bati} が描いたケースの絵は `idb:` のままなので海王星では出ない（本番は https）。
 - 木星（03）：題名の字体と出方を作る時に AI が選んで保存すること、題名の読み上げの声、題の提案と変更の{bati}のせりふ（仮）を物語の部屋で確認。羽の切れ目の自動測定は本番の姿の絵で見比べ（肌色の無い姿・顔が横を向いた姿は初期値になる）。
 - 木星のスタイル：アートのスペルの style に **ゆめかわ・和モダン・レトロ・ポップ** を足した（`packages/shared/src/spell.ts`、スペルのモデルの案内 `packages/ai/src/prompts/spell.ts` も）。これからのアートはその広場に画風でも流れ着く。
 - 絵の自動チェック（P-MOD-1）。
