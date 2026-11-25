@@ -10260,7 +10260,7 @@
         1920
       ],
       "always": false,
-      "prompt": "Retro 90s cel-anime meets vaporwave background art: a glowing neon sea on Neptune at night, deep blue and magenta, grid horizon, palm silhouettes, floating bubbles, chill and stylish. Vertical phone wallpaper 9:16. At the back right, ONE small wooden game hut on stilts over the water with a glowing arcade sign — clearly someone's own game hut. The lower two-thirds are open and empty for many small flying things in front. Do not show the planet Neptune itself in the sky. No characters, no people, no text, no letters."
+      "prompt": "Mysterious, beautiful deep-sea Japanese anime background art in a retro 90s cel-anime meets neon style: the deep ocean of Neptune, dark indigo and teal water, glowing bioluminescent jellyfish and plankton, soft god rays fading from far above, drifting bubbles, coral and glowing sea plants on the seabed. Vertical phone wallpaper 9:16. At the back right on the seabed, ONE small cosy game hut inside a big glowing transparent bubble dome, with a neon arcade sign — clearly someone's own game hut. The middle and front are open water, empty, for many floating bubbles. No characters, no text."
     },
     {
       "id": "home5-neptune-hv",
@@ -10271,7 +10271,7 @@
         1920
       ],
       "always": false,
-      "prompt": "Retro 90s cel-anime meets vaporwave background art: a glowing neon sea on Neptune at night, deep blue and magenta, grid horizon, palm silhouettes, floating bubbles, chill and stylish. Vertical phone wallpaper 9:16. The view from inside your game hut: a retro TV and game console on a low table at the bottom, a big window in the middle showing the neon sea and bubbles. Do not show the planet Neptune itself in the sky. No characters, no people, no text, no letters."
+      "prompt": "Mysterious, beautiful deep-sea Japanese anime background art in a retro 90s cel-anime meets neon style: the deep ocean of Neptune, dark indigo and teal water, glowing bioluminescent jellyfish and plankton, soft god rays fading from far above, drifting bubbles, coral and glowing sea plants on the seabed. Vertical phone wallpaper 9:16. The view from inside your bubble-dome game hut on the seabed: a retro TV and game console on a low table at the bottom, the curved glass of the bubble dome in the middle showing the glowing deep sea, jellyfish and bubbles outside. No characters, no text."
     },
     {
       "id": "home5-neptune-prof",
@@ -10282,7 +10282,7 @@
         1920
       ],
       "always": false,
-      "prompt": "Retro 90s cel-anime meets vaporwave background art: a glowing neon sea on Neptune at night, deep blue and magenta, grid horizon, palm silhouettes, floating bubbles, chill and stylish. Vertical phone wallpaper 9:16. Inside your game hut: walls with rows of empty display slots for game cartridges, an old arcade cabinet in the corner, neon strip lights. Do not show the planet Neptune itself in the sky. No characters, no people, no text, no letters."
+      "prompt": "Mysterious, beautiful deep-sea Japanese anime background art in a retro 90s cel-anime meets neon style: the deep ocean of Neptune, dark indigo and teal water, glowing bioluminescent jellyfish and plankton, soft god rays fading from far above, drifting bubbles, coral and glowing sea plants on the seabed. Vertical phone wallpaper 9:16. Inside your bubble-dome game hut on the seabed: curved walls lined with rows of empty glowing display slots for game cartridges, an old arcade cabinet in a corner, the deep sea glowing through the glass dome above. No characters, no text."
     },
     {
       "id": "p5-mars-user",
@@ -10793,7 +10793,99 @@
       ],
       "always": false,
       "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), floating inside a big transparent bubble holding a game controller whose colours and patterns are designed from the character's outfit. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "picon-saturn",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        384,
+        384
+      ],
+      "always": false,
+      "prompt": "A single cute stylised planet icon in a glossy Japanese anime illustration style: Saturn with soft pastel candy-striped rings, lavender and peach, soft gradients, a bright highlight and a tiny sparkle, clean outline. Centered, the whole planet in frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "picon-jupiter",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        384,
+        384
+      ],
+      "always": false,
+      "prompt": "A single cute stylised planet icon in a glossy Japanese anime illustration style: Jupiter with warm orange and cream swirling bands and a little red spot, soft gradients, a bright highlight and a tiny sparkle, clean outline. Centered, the whole planet in frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "picon-mercury",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        384,
+        384
+      ],
+      "always": false,
+      "prompt": "A single cute stylised planet icon in a glossy Japanese anime illustration style: Mercury, small and bright, sky blue and white with a sparkle, soft gradients, a bright highlight and a tiny sparkle, clean outline. Centered, the whole planet in frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "picon-mars",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        384,
+        384
+      ],
+      "always": false,
+      "prompt": "A single cute stylised planet icon in a glossy Japanese anime illustration style: Mars, rusty red-pink with a neon glow, soft gradients, a bright highlight and a tiny sparkle, clean outline. Centered, the whole planet in frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "picon-venus",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        384,
+        384
+      ],
+      "always": false,
+      "prompt": "A single cute stylised planet icon in a glossy Japanese anime illustration style: Venus, golden-pink with soft clouds, soft gradients, a bright highlight and a tiny sparkle, clean outline. Centered, the whole planet in frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "picon-uranus",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        384,
+        384
+      ],
+      "always": false,
+      "prompt": "A single cute stylised planet icon in a glossy Japanese anime illustration style: Uranus, aqua blue with thin pastel rings, tilted, soft gradients, a bright highlight and a tiny sparkle, clean outline. Centered, the whole planet in frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "picon-pluto",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        384,
+        384
+      ],
+      "always": false,
+      "prompt": "A single cute stylised planet icon in a glossy Japanese anime illustration style: Pluto, small icy violet with a pale heart shape, soft gradients, a bright highlight and a tiny sparkle, clean outline. Centered, the whole planet in frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "picon-neptune",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        384,
+        384
+      ],
+      "always": false,
+      "prompt": "A single cute stylised planet icon in a glossy Japanese anime illustration style: Neptune, deep blue with glowing aqua swirls, soft gradients, a bright highlight and a tiny sparkle, clean outline. Centered, the whole planet in frame with a margin. Plain solid pure white background, no shadow, no text."
     }
   ],
-  "redo": []
+  "redo": [
+    "home5-neptune-prof",
+    "home5-neptune-main",
+    "home5-neptune-hv"
+  ]
 }
