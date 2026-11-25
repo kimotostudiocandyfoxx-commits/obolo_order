@@ -132,6 +132,8 @@ export const SPELL_DICTIONARY: Entry[] = [
   e('やさしい', 'gentle', 'mood', /やさし|優し|ほっこり|あったか|温か/),
   e('暗い', 'dark', 'mood', /暗|くら(い|く|め)/),
   e('かっこいい', 'cool', 'mood', /かっこ|カッコ|クール/),
+  // R12 (client): 「光々しく舞い降りる」 (光々しい: a common slip for 神々しい)
+  e('神々しい', 'divine, radiant with holy light', 'mood', /神々し|こうごうし|光々し|後光/),
   e('夢みたい', 'dreamy', 'mood', /夢みたい|夢の中|幻想|ふしぎ|不思議/),
   e('静か', 'calm', 'mood', /静か|しずか|落ち着|おちつ/),
   // a song's tempo, instruments, voice
@@ -273,9 +275,21 @@ function named(kind: SpellKind, said: string): { tags: SpellTag[]; rest: string 
   return { tags, rest };
 }
 
-const KIND_WORDS = /曲|歌|うた|ソング|絵|イラスト|アート|映像|動画|MV|ムービー|姿|かっこう|格好|着せかえ|服|小説|物語|ものがたり|お話|おはなし|本|ゲーム|次の章|章/g;
-const ASKING = /(を|で|の|に)?(作って|つくって|描いて|かいて|作りたい|つくりたい|作る|つくる|お願い|おねがい|ください|して|ちょうだい|ほしい|にする|にして|足して|たして|加えて|入れて|いれて|外して|はずして|消して|抜いて|やめて|いらない|変えて|かえて)[！!。]*/g;
+const KIND_WORDS = /曲|歌|うた|ソング|音楽|おんがく|絵|イラスト|アート|画像|がぞう|写真|しゃしん|ピクチャ|映像|動画|どうが|ビデオ|MV|ムービー|姿|かっこう|格好|着せかえ|服|小説|物語|ものがたり|お話|おはなし|本|ゲーム|次の章|章/g;
+const ASKING = /(を|で|の|に)?(作って|つくって|描いて|かいて|作りたい|つくりたい|描きたい|作れる|つくれる|作る|つくる|生成して|お願い|おねがい|ください|して|ちょうだい|欲しい|ほしい|にする|にして|足して|たして|加えて|入れて|いれて|外して|はずして|消して|抜いて|やめて|いらない|変えて|かえて)(欲しい|ほしい|ください|くれる|くれない|ちょうだい|もらえる)?(なんだけど|んだけど|んですけど|だけど|けど|んだが|な|の|よ|ね)?[！!。]*/g;
 const FILLER = /^(もっと|ちょっと|すこし|少し|なんか|あと|それと|それから|も|は|が|を|の|で|に|と|な|感じ|かんじ|系|っぽい|みたいな?|して|する)+$/;
+/**
+ * R12 (client): the words around a request are not what it is about — greetings, 「魔法で」, the request verbs, 欲しい,
+ * politeness and the joints of the sentence (「ヤッホー画像を作って欲しいんだけど…」 → only 「空飛ぶクジラ…」 is left)
+ */
+const GREETING = /^(ヤッホー|やっほー|やっほ|ヤッホ|こんにちは|こんばんは|おはよう|ねえバティ|ねえ|ねぇ|ねー|あのね|あの|えっと|ええと|バティ)[、,！!\s　ー〜]*/;
+const BY_MAGIC = /(魔法|まほう|スペル)で(?=(作|つく|描|か|生成|お願い|おねがい))/g;
+/** a free word that is only request / filler (never a talisman) */
+const NOT_CONTENT = /^(魔法|まほう|スペル|欲しい|ほしい|ヤッホー|やっほー|やっほ|なんだけど|んだけど|だけど|けど|お願い|おねがい|ください|よろしく|です|ます|だよ|かな|ような|ように|よう|みたい|みたいな|感じ|かんじ|ね|よ|な|もの|やつ|なにか|何か|なんか|一つ|ひとつ|一枚|いちまい|新しい|あたらしい|新しく|あたらしく)$/;
+/** the words with the request taken off (kept: what it is about, the dictionary words) */
+export function spellWordsOnly(said: string): string {
+  return said.trim().replace(GREETING, '').replace(BY_MAGIC, '、');
+}
 
 /** the free words (what it is about) as tags: common ones from THEMES, others as they are (their English: the words) */
 function themes(rest: string): SpellTag[] {
@@ -283,8 +297,8 @@ function themes(rest: string): SpellTag[] {
     .replace(KIND_WORDS, '、')
     .replace(ASKING, '、')
     .split(/[、。,.!！?？\s　]+|(?<=[\p{sc=Han}\p{sc=Katakana}ー])(?:の|と|や|で|に|を|が|は|な)(?=.)|の(?=[\p{sc=Han}\p{sc=Katakana}])/u)
-    .map((c) => c.replace(/^(の|や|で|に|を|が|は|な)+|(の|と|や|で|に|を|が|は|な|も|感じ|っぽい|みたいな?|する|して|した)+$/g, '').trim())
-    .filter((c) => c && !FILLER.test(c));
+    .map((c) => c.replace(/^(の|や|で|に|を|が|は|な)+|(の|と|や|で|に|を|が|は|な|も|感じ|っぽい|みたいな?|する|して|した|ような|ように|よう|なんだけど|んだけど|だけど|けど)+$/g, '').trim())
+    .filter((c) => c && !FILLER.test(c) && !NOT_CONTENT.test(c));
   const out: SpellTag[] = [];
   for (const c of chunks) {
     const t = THEMES.find(([re]) => re.test(c));
@@ -301,7 +315,7 @@ const freeWords = (kind: SpellKind, rest: string) => (CRAFT.includes(kind) ? the
 
 /** a fresh spell for the words: the tags they name, what it is about, then the kind's own defaults */
 export function spellFrom(kind: SpellKind, said: string): SpellTag[] {
-  const n = named(kind, said);
+  const n = named(kind, spellWordsOnly(said));
   const tags = [...freeWords(kind, n.rest), ...n.tags];
   for (const [g, ja] of Object.entries(DEFAULTS[kind]) as [SpellGroup, string][]) if (!tags.some((t) => t.group === g)) tags.push(tagOf(byJa(ja)));
   if (kind === 'song') {
@@ -379,7 +393,8 @@ const REMOVE = /外して|はずして|消して|けして|なくして|抜い�
  * names on (「ピアノも足して」「もっと明るく」「ロックにして」 — a genre / tempo / touch replaces the one there, a mood takes
  * its opposite off); free words with 足して / 入れて become a tag of their own
  */
-export function spellEdit(kind: SpellKind, tags: SpellTag[], said: string): SpellView {
+export function spellEdit(kind: SpellKind, tags: SpellTag[], said0: string): SpellView {
+  const said = spellWordsOnly(said0);
   const removed: SpellTag[] = [];
   const added: SpellTag[] = [];
   let out = [...tags];

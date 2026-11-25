@@ -20,6 +20,7 @@ export function spellSystem(kind: SpellKind): string {
   return [
     `You write a generation spell (スペル) for ${WHAT[kind]} as short tags. Each tag is a JSON object {"ja": short Japanese label (max 8 characters, plain words a child can read), "en": the short English term a generator understands, "group": one of ${GROUPS[kind]}}.`,
     'You get the request in Japanese and the tags so far. Return ONLY a JSON object {"tags": [...]} with every tag so far (same ja; give each its best English) and at most 3 new tags that fit the request well.',
+    'New tags are content only — what it is about (subject, characters, place, action) and how it looks or sounds (style, mood, colour, light, composition, genre, tempo, instrument …). Never make a tag of the request itself: no greetings (ヤッホー), no request or politeness words (作って, 欲しい, お願い, ください, なんだけど), no kind words (画像, 絵, 曲, 動画), no 魔法 / スペル (that is how this world says "make it"), no particles or grammar.',
     'Never add anything sexual, violent, a real person or an existing work or brand.',
   ].join('\n');
 }
