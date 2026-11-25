@@ -10,7 +10,7 @@ import { BATI_COLOR, batiLook, characterLook, SELF_COLOR, selfLook, selfTone } f
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { batiLine, batiLineVoiceOf } from '@/lib/onboarding/batiLine';
-import { atelierMakeCost, CRAFT_LINES, KIND_HOME_PLANET, spellFrom, spellKey, type SpellTag, type SpellView, HOME_OF_WORK, PLANET_HOMES, TALK_BUBBLE_COLOUR, TALK_COLOR_KEY, type ChangeResult, type Me, changeableById, changeLines, changeRequest, etaMinutes, fillLine, homecomingSay, MOON_LINES, type RefineTarget, type WorkMaterial, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId, SPELL_TOOL_LINES, TOOL_STORY_LINES, bookMatch, findSpell, shouldSuggestBook, spellScore, spellFrom as spellFromWords, type CompassSpell, type SavedSpell, type SpellBookKind } from '@obolo/shared';
+import { atelierMakeCost, CRAFT_LINES, KIND_HOME_PLANET, spellFrom, spellKey, type SpellTag, type SpellView, HOME_OF_WORK, PLANET_HOMES, TALK_BUBBLE_COLOUR, TALK_COLOR_KEY, type ChangeResult, type Me, changeableById, changeLines, changeRequest, etaMinutes, fillLine, homecomingSay, MOON_LINES, type RefineTarget, type WorkMaterial, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId, SPELL_TOOL_LINES, bookMatch, findSpell, shouldSuggestBook, spellScore, spellBookName, type CompassSpell, type SavedSpell, type SpellBookKind } from '@obolo/shared';
 import { useMarkRing } from '@/components/finds/MarkRing';
 import { viewsOf } from '@/lib/story/views';
 import { markNames } from '@/lib/finds/marks';
@@ -670,7 +670,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       compassAway();
       return sayT(SPELL_TOOL_LINES.compassLocked, { d: daysUntil(kind, day) });
     }
-    showCompass('done', 1500);
+    showCompass('done', 2300);
     const words = r.tags.filter((t) => t.group === 'theme').map((t) => t.ja).join('、') || r.tags.map((t) => t.ja).join('、');
     void propose(kind, words, undefined, {}, undefined, { tags: r.tags, added: [], removed: [] }, { lead: [SPELL_TOOL_LINES.compassRead], from: 'compass' });
   };
@@ -686,7 +686,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       lastKept.current = r;
       if (r.already) return sayT(SPELL_TOOL_LINES.bookAlready, { spell: r.name });
       bookList.current = [r, ...(bookList.current ?? []).filter((x) => x.id !== r.id)];
-      setTool({ kind: 'book', mode: 'save', page: 0, spells: [], saving: { kind: c.kind, tags: c.tags, name: r.name }, key: Date.now() });
+      setTool({ kind: 'book', mode: 'save', page: 0, spells: (bookList.current ?? []).filter((x) => x.id !== r.id), saving: { kind: c.kind, tags: c.tags, name: r.name }, key: Date.now() });
       later(4600, () => setTool((t) => (t?.kind === 'book' && t.mode === 'save' ? null : t)));
       sayT(SPELL_TOOL_LINES.bookSaved, { spell: r.name });
     } catch (e) {
@@ -718,7 +718,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     if (!isOpen(kind, day)) return sayT(SPELL_TOOL_LINES.bookLocked, { spell: sp.name, d: daysUntil(kind, day) });
     const wasOpen = toolRef.current?.kind === 'book';
     if (!wasOpen) setTool({ kind: 'book', mode: 'open', page: 0, spells: [sp], key: Date.now() });
-    later(wasOpen ? 250 : 1300, bookAway);
+    // the book stays open while the talismans come out of it, then it closes
+    later(wasOpen ? 1300 : 1700, bookAway);
     void getApi().usedSpell(sp.id).catch(() => undefined);
     lastKept.current = sp;
     void propose(kind, sp.name, undefined, {}, undefined, { tags: sp.tags, added: [], removed: [] }, { lead: [SPELL_TOOL_LINES.bookUse, { spell: sp.name }], from: 'book' });
@@ -741,8 +742,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   };
   /** R12 (day 4, the story): the art just made — its spell goes into {bati}'s spell book (kept for real, not on the review page) */
   const introBook = (w: Work, prompt: string) => {
-    const tags = lastCast.current?.tags ?? spellFromWords('art', prompt || w.prompt || 'アート');
-    setTool({ kind: 'book', mode: 'save', page: 0, spells: [], saving: { kind: 'art', tags, name: '' }, key: Date.now() });
+    const tags = lastCast.current?.tags ?? spellFrom('art', prompt || w.prompt || 'アート');
+    setTool({ kind: 'book', mode: 'save', page: 0, spells: [], saving: { kind: 'art', tags, name: spellBookName('art', tags) }, key: Date.now() });
     later(4600, () => setTool((t) => (t?.kind === 'book' ? null : t)));
     line('book');
     if (!story?.test) void getApi().saveSpell({ kind: 'art', tags }).catch(() => undefined);
@@ -774,6 +775,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
         void compassRead({ url: a.url }, true);
         return true;
       case 'compassOpen':
+        // a spell waiting is put away: what the compass reads next is the new spell
+        setFloating(null);
         showCompass('open');
         sayT(SPELL_TOOL_LINES.compassOpen);
         setPending({ tool: 'compass' });

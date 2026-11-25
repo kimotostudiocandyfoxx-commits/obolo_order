@@ -162,28 +162,28 @@ const BOOK_CSS = `
 `;
 
 const PAPER: CSSProperties = { background: 'radial-gradient(ellipse at 50% 40%, #fbf1d6 0%, #f1e0b6 70%, #e2c88f 100%)', boxShadow: 'inset 0 0 18px rgba(120,80,20,.28)' };
+/** the pages under the open page (their edges at the outer side) */
+const EDGES = (side: 'l' | 'r') => (side === 'r' ? '1.5px 1.5px 0 #e8d3a2, 3px 3px 0 #d6bb80, 4.5px 4.5px 0 #c4a466, 6px 6px 10px rgba(0,0,0,.35)' : '-1.5px 1.5px 0 #e8d3a2, -3px 3px 0 #d6bb80, -4.5px 4.5px 0 #c4a466, -6px 6px 10px rgba(0,0,0,.35)');
 const COVER: CSSProperties = { background: 'radial-gradient(ellipse at 40% 35%, #34407e 0%, #1b2150 60%, #10143a 100%)', boxShadow: 'inset 0 0 0 2px #c99a42, inset 0 0 0 5px #1b2150, inset 0 0 0 6px rgba(240,200,110,.55), 0 8px 24px rgba(0,0,0,.55)' };
 
 /** one kept spell on a page: its name (ink), its talismans small in the look of its kind */
-function PageSpell({ s, look, fly, delay = 0 }: { s: { name: string; tags: SpellTag[] }; look: TalismanLook; fly?: { fx: number; fy: number }; delay?: number }) {
+function PageSpell({ s, look, fly, delay = 0, k = 1 }: { s: { name: string; tags: SpellTag[] }; look: TalismanLook; fly?: { fx: number; fy: number }; delay?: number; k?: number }) {
   useSpellFont(look);
   const tall = look === 'reifu';
   const shown = s.tags.slice(0, tall ? 5 : 4);
-  const k = tall ? 0.38 : 0.62;
+  // the talismans themselves, smaller (zoom keeps their layout: they wrap in rows on the page)
+  const zoom = (tall ? 0.46 : 0.66) * k;
   return (
-    <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-1 px-1" data-book-spell={s.name}>
-      <div className="flex max-w-full flex-wrap items-start justify-center" style={{ gap: tall ? 2 : 3, rowGap: tall ? 0 : 2 }}>
+    <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-0.5 px-0.5" data-book-spell={s.name}>
+      <div className="flex max-w-full flex-wrap items-start justify-center" style={{ zoom, gap: tall ? 4 : 5, rowGap: 4 }}>
         {shown.map((t, i) => (
-          <span key={t.en} className="relative block" style={{ width: tall ? 15 : undefined, height: tall ? 46 : 24, ...(fly ? { ['--fx' as string]: `${fly.fx}px`, ['--fy' as string]: `${fly.fy}px`, animation: `sb-fly .9s cubic-bezier(.3,.7,.3,1) ${delay + i * 130}ms both` } : {}) }}>
-            <span className="absolute left-1/2 top-0 block" style={{ transform: `translateX(-50%) scale(${k})`, transformOrigin: '50% 0' }}>
-              <Talisman look={look} tilt={((i * 7) % 5) - 2} tag={t} mode="still" delay={0} />
-            </span>
-            {!tall && <span className="invisible block whitespace-nowrap px-1 text-[9.5px]">{t.ja}</span>}
+          <span key={t.en} className="relative block" style={fly ? { ['--fx' as string]: `${fly.fx / zoom}px`, ['--fy' as string]: `${fly.fy / zoom}px`, animation: `sb-fly .9s cubic-bezier(.3,.7,.3,1) ${delay + i * 130}ms both` } : undefined}>
+            <Talisman look={look} tilt={((i * 7) % 5) - 2} tag={t} mode="still" delay={0} />
           </span>
         ))}
       </div>
-      <span className="max-w-full truncate text-center text-[12.5px] leading-tight" style={{ color: '#3b2408', fontFamily: '"Shippori Mincho", "Hiragino Mincho ProN", serif', fontWeight: 600, letterSpacing: '.04em', animation: fly ? `sb-ink .8s ease-out ${delay + shown.length * 130 + 300}ms both` : undefined }}>
-        『{s.name}』
+      <span className="max-w-full truncate text-center leading-tight" style={{ fontSize: 12.5 * Math.min(1, k + 0.1), color: '#3b2408', fontFamily: '"Shippori Mincho", "Hiragino Mincho ProN", serif', fontWeight: 600, letterSpacing: '.04em', animation: fly ? `sb-ink .8s ease-out ${delay + shown.length * 130 + 300}ms both` : undefined }}>
+        {s.name ? `『${s.name}』` : ''}
       </span>
     </div>
   );
@@ -219,13 +219,14 @@ export function SpellBookFloat({ mode, spells, page, saving, cx, top, w, onPage 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
   const shutting = mode === 'close' || shut;
-  const pageBox = (side: 'l' | 'r'): CSSProperties => ({ ...PAPER, position: 'absolute', top: 0, bottom: 0, width: half, left: side === 'l' ? 0 : half, borderRadius: side === 'l' ? '6px 2px 2px 6px' : '2px 6px 6px 2px' });
+  const pageBox = (side: 'l' | 'r'): CSSProperties => ({ ...PAPER, position: 'absolute', top: 0, bottom: 0, width: half, left: side === 'l' ? 0 : half, borderRadius: side === 'l' ? '6px 2px 2px 6px' : '2px 6px 6px 2px', boxShadow: `inset 0 0 18px rgba(120,80,20,.28), ${EDGES(side)}` });
+  const k = Math.min(1.15, Math.max(0.8, w / 360));
   const pageInner = (list: SavedSpell[], side: 'l' | 'r') => (
     <div className="absolute inset-0 flex flex-col px-2.5 py-3" style={{ backgroundImage: side === 'l' ? 'linear-gradient(90deg, transparent 88%, rgba(110,70,20,.22))' : 'linear-gradient(270deg, transparent 88%, rgba(110,70,20,.22))' }}>
       {list.map((s) => (
-        <PageSpell key={s.id} s={s} look={spellLookFor(s.kind)} />
+        <PageSpell key={s.id} s={s} look={spellLookFor(s.kind)} k={k} />
       ))}
-      {!list.length && side === 'l' && !spells.length && <span className="m-auto text-[12px]" style={{ color: 'rgba(80,50,15,.55)', fontFamily: '"Shippori Mincho", serif' }}>まだ、からっぽ</span>}
+      {!list.length && side === 'l' && !spells.length && mode === 'open' && <span className="m-auto text-[12px]" style={{ color: 'rgba(80,50,15,.55)', fontFamily: '"Shippori Mincho", serif' }}>まだ、からっぽ</span>}
     </div>
   );
   return (
@@ -236,26 +237,31 @@ export function SpellBookFloat({ mode, spells, page, saving, cx, top, w, onPage 
       <div className="absolute inset-x-0 top-0" style={{ height: h, animation: 'sb-bob 4.6s ease-in-out infinite', perspective: 1100 }}>
         <div className="absolute inset-0" style={{ ['--half' as string]: `${-half / 2}px`, animation: shutting ? 'sb-slide-shut .7s ease-in-out both' : 'sb-slide-open .7s ease-in-out .35s both', transformStyle: 'preserve-3d' }}>
           {/* the left page (the cover's inside) and the right page */}
-          <div style={{ ...pageBox('l'), opacity: 0.98 }}>{mode === 'save' ? null : pageInner(left, 'l')}</div>
+          <div style={{ ...pageBox('l'), opacity: 0.98 }}>{pageInner(mode === 'save' ? spells.slice(0, BOOK_PER_PAGE) : left, 'l')}</div>
           <div style={pageBox('r')} className="pointer-events-auto" onClick={() => onPage?.(1)}>
             {mode === 'save' && saving ? (
               <div className="absolute inset-0 flex flex-col px-2.5 py-3">
-                <PageSpell s={saving} look={spellLookFor(saving.kind)} fly={{ fx: 0, fy: -h * 0.9 }} delay={1150} />
+                <PageSpell s={saving} look={spellLookFor(saving.kind)} fly={{ fx: 0, fy: -h * 0.9 }} delay={1150} k={k * 1.2} />
               </div>
             ) : (
               pageInner(right, 'r')
             )}
           </div>
           <div className="pointer-events-auto absolute left-0 top-0 h-full" style={{ width: half }} onClick={() => onPage?.(-1)} />
+          {/* the ribbon (a bookmark hanging out under the pages) */}
+          <span aria-hidden className="absolute block" style={{ left: half + half * 0.62, top: h - 6, width: 9, height: 30, background: 'linear-gradient(90deg,#8e1b22,#c8333a,#8e1b22)', clipPath: 'polygon(0 0,100% 0,100% 100%,50% 78%,0 100%)', opacity: shutting ? 0 : 1, transition: 'opacity .3s' }} />
           {/* the spine */}
           <span aria-hidden className="absolute top-[-3px] block" style={{ left: half - 3, width: 6, height: h + 6, background: 'linear-gradient(90deg,#0d1236,#3a4688,#0d1236)', borderRadius: 3 }} />
           {/* the cover: closed over the right page, it turns to the left */}
           <div className="absolute top-[-3px]" style={{ left: half, width: half + 3, height: h + 6, transformOrigin: '0 50%', transformStyle: 'preserve-3d', animation: shutting ? 'sb-shut .75s ease-in-out both' : 'sb-open .9s cubic-bezier(.45,.05,.3,1) .35s both' }}>
             <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ ...COVER, borderRadius: '3px 8px 8px 3px', backfaceVisibility: 'hidden' }}>
               <CoverArt w={half} />
+              {(['tl', 'tr', 'bl', 'br'] as const).map((c) => (
+                <span key={c} aria-hidden className="absolute block" style={{ width: 16, height: 16, [c[0] === 't' ? 'top' : 'bottom']: 7, [c[1] === 'l' ? 'left' : 'right']: 7, borderColor: '#d9ab52', borderStyle: 'solid', borderWidth: `${c[0] === 't' ? 2 : 0}px ${c[1] === 'r' ? 2 : 0}px ${c[0] === 'b' ? 2 : 0}px ${c[1] === 'l' ? 2 : 0}px`, borderRadius: 2, opacity: 0.85 }} />
+              ))}
             </div>
             <div className="absolute inset-0" style={{ ...COVER, borderRadius: '8px 3px 3px 8px', transform: 'rotateY(180deg)', backfaceVisibility: 'hidden' }}>
-              <div className="absolute inset-[5px]" style={{ ...PAPER, borderRadius: 4 }}>{mode === 'save' ? null : pageInner(left, 'l')}</div>
+              <div className="absolute inset-[5px]" style={{ ...PAPER, borderRadius: 4 }}>{pageInner(mode === 'save' ? spells.slice(0, BOOK_PER_PAGE) : left, 'l')}</div>
             </div>
           </div>
           {/* a page turning */}
