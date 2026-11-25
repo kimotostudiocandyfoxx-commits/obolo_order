@@ -182,7 +182,7 @@ export function FloatingSpell({ spell, layout, cx, bottom, bowl, scale, onTap }:
       {manaH > 0 && (
         <div
           className="absolute flex -translate-x-1/2 items-baseline gap-4 whitespace-nowrap"
-          style={{ left: cx, top: bottom - manaH * scale + 2, fontSize: 13.5 * Math.max(scale, 0.85), color: g.ink, textShadow: g.shadow, fontFamily: face(look), letterSpacing: '.08em', animation: spell.casting ? 'none' : `fs-mana 1.2s ease-out ${300 + spell.tags.length * 230}ms both`, opacity: spell.casting ? 0 : 1, transition: 'opacity .35s ease-in' } as CSSProperties}
+          style={{ left: cx, top: bottom - manaH * scale + 2, fontSize: 13.5 * Math.max(scale, 0.85), color: g.ink, textShadow: `0 0 2px rgba(4,8,30,.95), 0 1px 3px rgba(4,8,30,.9), ${g.shadow}`, fontFamily: face(look), letterSpacing: '.08em', animation: spell.casting ? 'none' : `fs-mana 1.2s ease-out ${300 + spell.tags.length * 230}ms both`, opacity: spell.casting ? 0 : 1, transition: 'opacity .35s ease-in' } as CSSProperties}
           data-testid="spell-mana"
         >
           <span>
