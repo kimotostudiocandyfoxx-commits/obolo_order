@@ -77,6 +77,13 @@ import {
   lyricsEdit,
   lyricsDemoEdit,
   type LyricsView,
+  parseTweak,
+  resolveLength,
+  tweakLyrics,
+  tweakPlan,
+  tweakWhat,
+  type SongTweakOp,
+  type SongTweakResult,
   demoChapter,
   demoGame,
   isFinalChapter,
@@ -260,6 +267,8 @@ interface DemoState {
   moonWorks?: (MoonWorkView & { owner: string })[];
   /** R12: the spell book (each member's own) */
   spellBook?: (SavedSpell & { owner: string; key: string })[];
+  /** R13: the free changes of the demo's songs (each version's ops from the original) */
+  tweaks?: Record<string, unknown>;
   /** M-R253 §5: homecomings told (`owner|key`) */
   homeTold?: string[];
   /** R9 review shots: more ダチ for the Moon temple's hall and plain (no talk behind them) */
@@ -967,6 +976,32 @@ export class DemoApi implements Api {
   async moonSpell(body: Parameters<Api['moonSpell']>[0]) {
     await sleep(250);
     return body.tags?.length ? spellEdit(body.kind, body.tags, body.said) : { tags: body.answers?.length ? spellOfAnswers(body.kind, body.answers) : spellFrom(body.kind, body.said), added: [], removed: [] };
+  }
+  // R13: the review demo's free song changes — the same parsing and ops as the API (its sketch keeps playing as it is:
+  // no ffmpeg in the browser); the card's lyrics follow the cuts / repeats, and undo goes one back
+  async songTweak(id: string, body: Parameters<Api['songTweak']>[1], demo?: Parameters<Api['songTweak']>[2]): Promise<SongTweakResult> {
+    await sleep(900);
+    const all = (this.s.tweaks ?? {}) as Record<string, SongTweakOp[][]>;
+    const history = [...(all[id] ?? [])];
+    const now = history[history.length - 1] ?? [];
+    const lyricsNow = (ops: SongTweakOp[]) => (demo?.lyrics ? { lyrics: tweakLyrics(demo.lyrics, null, tweakPlan(ops)) } : {});
+    const p = body.undo ? { ops: [], undo: true } : body.ops ? { ops: body.ops } : parseTweak(body.said ?? '');
+    if (p.undo) {
+      if (!history.length) return { status: 'first', ops: now, versions: 1 };
+      history.pop();
+      this.s.tweaks = { ...all, [id]: history };
+      this.save();
+      const back = history[history.length - 1] ?? [];
+      return { status: 'undone', ops: back, versions: history.length + 1, ...lyricsNow(back) };
+    }
+    if (p.paid) return { status: 'paid', paid: p.paid, ops: now, versions: history.length + 1 };
+    const ops = resolveLength(p.ops, demo?.seconds ?? 120);
+    if (!ops.length) return { status: 'none', ops: now, versions: history.length + 1 };
+    const next = [...now, ...ops];
+    history.push(next);
+    this.s.tweaks = { ...all, [id]: history };
+    this.save();
+    return { status: 'done', what: tweakWhat(ops), ops: next, versions: history.length + 1, ...lyricsNow(next) };
   }
   // R13: the review demo's lyrics — canned ones by the shared rules (the API's writer is a model); a change by rule, or the
   // demo's stand-in for new words (「サビをもっと明るく」「2番を足して」)

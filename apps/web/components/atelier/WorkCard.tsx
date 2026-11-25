@@ -12,7 +12,7 @@ import { synth } from '@/lib/synth';
 import { BoothMixer } from '@/lib/venus/booth';
 import type { AtelierKind } from '@/lib/atelier/unlock';
 import { countdown, jobView, onJobs } from '@/lib/atelier/jobs';
-import type { RefineTarget, WorkMaterial } from '@obolo/shared';
+import { lyricBlockLabels, lyricHintLabel, type RefineTarget, type SongLyrics, type WorkMaterial } from '@obolo/shared';
 import { faceTo, FLIES, swipeTo, versionsOf, type Work } from './work';
 import { BookById, BookFace } from './BookRead';
 import { GameById, GameFace } from './GamePlay';
@@ -232,6 +232,7 @@ export function WorkCard({
         {!showMaking && shown.video && <video src={shown.video} poster={shown.poster ?? undefined} controls playsInline className="w-full rounded-xl bg-black" />}
         {!showMaking && aiming && aim === 'frame' && <Frames w={shown} target={target} onTarget={setTarget} />}
         {!showMaking && sound && w.kind === 'song' && <Wave w={shown} aiming={aiming && aim === 'range'} target={target} onTarget={setTarget} />}
+        {!showMaking && w.kind === 'song' && w.lyrics && <CardLyrics lyrics={w.lyrics} note={w.tweak?.what} />}
         {!showMaking && shown.text && (aiming && aim === 'span' ? <Phrases text={shown.text} target={target} onTarget={setTarget} /> : <p className="mt-1 whitespace-pre-line text-[14px] leading-relaxed text-white/90">{shown.text}</p>)}
         {!showMaking && shown.source && (
           <a href={shown.source.pageUrl} target="_blank" rel="noreferrer" className="mt-0.5 block text-[10px] text-amber-50/55 underline">
@@ -523,6 +524,36 @@ function RadioRecorder({ onDone, song: given }: { onDone: (blob: Blob, seconds: 
         </button>
       )}
       {err && <p className="text-[12px] text-rose-300">{err}</p>}
+    </div>
+  );
+}
+
+/**
+ * R13: a song's lyrics on its card, each block under its metatag label (〔Aメロ〕〔サビ〕〔2番サビ〕 …, the performance tags
+ * small after it) — after a free change the cut parts are gone and a repeated part is there again
+ */
+function CardLyrics({ lyrics, note }: { lyrics: SongLyrics; note?: string }) {
+  const labels = lyricBlockLabels(lyrics);
+  return (
+    <div className="mt-1.5 max-h-[150px] overflow-y-auto rounded-lg bg-[rgba(70,150,230,.12)] px-2.5 py-1.5" style={{ boxShadow: 'inset 0 0 0 1px rgba(190,240,255,.22)', scrollbarWidth: 'thin' }} data-testid="card-lyrics">
+      {note && <p className="mb-1 text-[10.5px] text-sky-100/70">♪ {note}</p>}
+      {lyrics.blocks.map((b, i) => (
+        <div key={i} className="mb-1">
+          <span className="mr-1 inline-block rounded-[3px] px-1.5 py-[1px] text-[10.5px] leading-tight text-sky-50" style={{ background: 'rgba(110,200,255,.24)', boxShadow: 'inset 0 0 0 1px rgba(210,248,255,.45)' }}>
+            {labels[i]}
+          </span>
+          {b.hints.map((h) => (
+            <span key={h} className="mr-1 inline-block rounded-[3px] px-1 py-[1px] text-[9.5px] leading-tight text-violet-50/90" style={{ background: 'rgba(170,140,255,.2)' }}>
+              {lyricHintLabel(h)}
+            </span>
+          ))}
+          {b.lines.map((l, j) => (
+            <p key={j} className="m-0 pl-1 text-[12.5px] leading-snug text-white/85">
+              {l}
+            </p>
+          ))}
+        </div>
+      ))}
     </div>
   );
 }

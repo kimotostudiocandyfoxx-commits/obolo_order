@@ -177,3 +177,23 @@ describe('R13: changing the lyrics by words', () => {
     expect(lyricsDiff(base, two).newBlocks).toEqual(expect.arrayContaining(['verse#2', 'chorus#2']));
   });
 });
+
+import { BATI_VARIANTS } from './batiVariants';
+import { SONG_LINE_TEXTS } from './songVariants';
+describe('R13: bati’s song lines in every style', () => {
+  it('every line has all its styles, with the same placeholders and sentences; ていねい writes デス／マス', () => {
+    const holes = (x: string) => [...x.matchAll(/\{[a-z]+\}/g)].map((m) => m[0]).filter((h) => h !== '{self}').sort();
+    const sentences = (x: string) => (x.match(/[^！？。!?]+[！？。!?]*/g) ?? [x]).length;
+    expect(SONG_LINE_TEXTS).toContain('曲調のスペルはこんなんだね。');
+    expect(SONG_LINE_TEXTS).toContain('そして、スペル入りの歌詞はこんな感じ。');
+    for (const line of SONG_LINE_TEXTS) {
+      const v = BATI_VARIANTS[line];
+      expect(v, line).toBeDefined();
+      for (const [k, s] of Object.entries(v)) {
+        expect(holes(s), `${k}: ${line}`).toEqual(holes(line));
+        expect(sentences(s), `${k}: ${s}`).toBe(sentences(line));
+        if (k === 'teinei') expect(s).not.toMatch(/(です|ます)(?![\p{sc=Han}])/u);
+      }
+    }
+  });
+});

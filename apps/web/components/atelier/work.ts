@@ -52,6 +52,8 @@ export type Work = {
   spell?: SpellTag[];
   /** R13: a song's lyrics with metatags (sung from them; its lyric sheet keeps the section labels) */
   lyrics?: SongLyrics;
+  /** R13: a song changed for free — how many versions there are, what the last change did, its length now */
+  tweak?: { versions: number; what?: string; seconds?: number };
   /** the planet it belongs to (KIND_HOME_PLANET), kept for the later 〔星へ飛ばす〕 of planets without a screen yet */
   home?: BluenaPlanet;
 };

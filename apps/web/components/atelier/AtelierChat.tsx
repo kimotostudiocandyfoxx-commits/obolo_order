@@ -37,7 +37,7 @@ import { DeviceButton } from './DeviceButton';
 import { ClipRelic } from '@/components/relic/ClipRelics';
 import { PortalRelic } from '@/components/relic/PortalRelic';
 import { CLUSTER_MAX } from '@/lib/relic/layout';
-import { linkDomain, wordsAndLinks, type ClipFile, isLyricsTalk, lyricsDiff, lyricsFallback, ownLyricsOf, songSpellKey, SONG_LINES, type LyricsView, type SongLyrics } from '@obolo/shared';
+import { linkDomain, wordsAndLinks, type ClipFile, isLyricsTalk, lyricsDiff, lyricsFallback, ownLyricsOf, parseTweak, songSpellKey, SONG_LINES, type LyricsView, type SongLyrics } from '@obolo/shared';
 
 /** R12: your line in the Bati chat — a file handed over floats as its relic; a URL in your words becomes a portal */
 function meItem(m: { id: string; text: string; file?: ClipFile | null }): TalkItem {
@@ -103,7 +103,7 @@ export function newTalk(me: Pick<Me, 'displayName' | 'bati'> | null | undefined,
 /** R11: a plan waiting for the member's yes (the message its card is on, what is made with it, its price) */
 type PlanAsk = { id: string; plan: Plan; prompt: string; prev?: Work; opts: MakeOpts; price: number };
 /** client 2026-11-25: {bati}'s questions for a book / a game (`craft`), and a book / a game just made (its next words change it: `after`) */
-type Pending = { kind: AtelierKind } | { radioName: string } | { voiceAgain: true } | { use: AtelierKind; materials: Work[] } | { plan: PlanAsk } | { craft: CraftAsk } | { after: Work } | { tool: ToolAsk; spell?: SavedSpell; forKind?: AtelierKind; content?: string } | null;
+type Pending = { kind: AtelierKind } | { radioName: string } | { tweak: Work } | { voiceAgain: true } | { use: AtelierKind; materials: Work[] } | { plan: PlanAsk } | { craft: CraftAsk } | { after: Work } | { tool: ToolAsk; spell?: SavedSpell; forKind?: AtelierKind; content?: string } | null;
 /** R12: {bati}'s tool out in the sky (the compass while it reads; the spell book open, or taking a spell in) */
 type ToolShow = { kind: 'compass'; phase: CompassPhase; leaving?: boolean; key: number } | { kind: 'book'; mode: BookMode; page: number; spells: SavedSpell[]; saving?: BookSaving; key: number } | null;
 
@@ -458,6 +458,10 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       // client 2026-11-25: a chapter / a game made — {bati} asks what next; the next words change it (or start a new one)
       for (const l of craftDoneLines(w)) sayT(l.text, l.vars);
       if (!w.book?.done) setPending({ after: w });
+    } else if (w.kind === 'song' && w.status === 'ready') {
+      // R13 (client): a song made — {bati} asks if it should be changed more (free: tempo, length, 2番カット …)
+      sayT(SONG_LINES.editAsk);
+      setPending({ tweak: w });
     } else if (DONE[w.kind]) say(DONE[w.kind]);
     if (w.status === 'ready' && !story) void tipCheck();
     // R12: a work of the spell just cast is done (a happy word about it may bring {bati}'s offer to keep the spell)
@@ -491,7 +495,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
           putLast(e.work);
           // ⑤ a slow one: {bati}'s word for coming back to it; a quick one: as any card
           if (e.w.toast && !story) sayT(nextLine('welcome', MOON_LINES.welcome));
-          if (!(e.w.toast && !story) || isCraftKind(e.work.kind)) afterRef.current(e.work, e.w.words);
+          if (!(e.w.toast && !story) || isCraftKind(e.work.kind) || (e.work.kind === 'song' && !story)) afterRef.current(e.work, e.w.words);
         } else if (e.kind === 'failed') {
           const before = e.w.card.versions?.length ? faceTo({ ...e.w.card, status: 'ready', job: undefined }, e.w.card.versions.length - 1) : { ...e.w.card, status: 'failed' as const, job: undefined, note: undefined };
           // a game that could not be made: the one before stays (its mana is back: the server gave it)
@@ -666,6 +670,59 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       .catch(() => null);
     setBusy(false);
     void propose(a.kind, said, undefined, {}, undefined, view ?? undefined);
+  };
+  /**
+   * R13 (client 2026-11-25): a finished song changed in words, for free — 「テンポ速くして2番カット」「サビをもう一回」
+   * 「30秒にして」「キーを上げて」「歌だけ大きく」「カラオケにして」「元に戻して」. The bowl glows a moment (a change is cast
+   * too), the card plays the new version, {bati} says what it did. What needs the studio (new words sung, a new melody,
+   * longer with new music, another voice / genre) → {bati} says so and lays out the song's spell (mana, the yes).
+   * true: the words were taken here.
+   */
+  const tweakSend = (text: string, asked: Work | null): boolean => {
+    const last = lastWork();
+    const w = asked ?? (last?.kind === 'song' && last.status === 'ready' ? last : null);
+    if (!w) return false;
+    const rule = parseTweak(text);
+    const it = detect(text, true, markNames());
+    const about = rule.undo || rule.ops.length > 0 || !!rule.paid;
+    // another making / a search is not about this song; unknown words only while {bati} has just asked
+    if (!about && (!asked || it.kind === 'make' || it.kind === 'makeAny' || it.kind === 'find')) return false;
+    if (rule.paid) {
+      sayT(SONG_LINES.editPaid);
+      void run('song', text, cardOf(w.id) ?? w);
+      return true;
+    }
+    void (async () => {
+      const card = cardOf(w.id) ?? w;
+      const id = card.ref?.songId ?? card.id;
+      setBusy(true);
+      if (!rule.undo) castNow(1400);
+      try {
+        const r = await getApi().songTweak(id, rule.undo ? { undo: true } : { said: text.slice(0, 200) }, { lyrics: card.lyrics, seconds: card.tweak?.seconds });
+        if (r.status === 'paid') {
+          sayT(SONG_LINES.editPaid);
+          return void run('song', text, card);
+        }
+        if (r.status === 'none') return void converse(text);
+        if (r.status === 'first') sayT(SONG_LINES.editFirst);
+        else if (r.status === 'missing') sayT(SONG_LINES.editMissing);
+        else {
+          const next: Work = { ...card, ...(r.song ? { audio: r.song.url } : {}), ...(r.lyrics ? { lyrics: r.lyrics } : {}), tweak: { versions: r.versions, what: r.status === 'done' ? r.what : undefined, seconds: r.song?.seconds ?? card.tweak?.seconds } };
+          putLast(next);
+          if (r.status === 'done') sayT(SONG_LINES.editDone, { what: r.what ?? '' });
+          else sayT(SONG_LINES.editUndo);
+          setPending({ tweak: next });
+          return;
+        }
+        setPending({ tweak: card });
+      } catch (e) {
+        sayT(e instanceof ApiError && e.status === 429 ? SONG_LINES.editBusy : SONG_LINES.editFail);
+        setPending({ tweak: card });
+      } finally {
+        setBusy(false);
+      }
+    })();
+    return true;
   };
   /** words after a book / a game: another kind asked for, or a new one of it — else a change (the next chapter, a tweak) */
   const craftAfter = (w: Work, text: string): boolean => {
@@ -1020,6 +1077,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       if (!(it.kind === 'make' && it.what !== p.craft.kind && it.what !== 'lookup') && it.kind !== 'find') return void craftAsk(craftAnswer(p.craft, text));
     }
     if (p && 'after' in p && !story && craftAfter(p.after, text)) return;
+    // R13: words about a finished song — a free change, one back, or (the studio's work) the spell
+    if (!story && tweakSend(text, p && 'tweak' in p ? p.tweak : null)) return;
     // in a story step every message makes the day's kind again (a new card), unless it is a change of the last one
     if (story?.mode === 'make' && first && !p) {
       const last = lastWork();
