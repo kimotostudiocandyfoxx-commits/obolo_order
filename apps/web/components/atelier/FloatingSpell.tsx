@@ -13,7 +13,7 @@ import { face, LOOK_CSS, Talisman, useSpellFont, type TalismanLook } from './spe
  * `stage`), so it stays while the talk scrolls; the talk keeps a small record line of it (SpellRecord).
  */
 /** `id`: the spell from its first showing through its changes (a new making is a new one) */
-export type FloatSpell = { id: string; kind: string; look: TalismanLook; tags: SpellTag[]; removed: SpellTag[]; price: number; have: number | null; casting?: boolean };
+export type FloatSpell = { id: string; kind: string; look: TalismanLook; tags: SpellTag[]; removed: SpellTag[]; price: number; have: number | null; casting?: boolean; /** R12: where its talismans come out of at first ({bati}'s compass, the spell book) */ from?: 'compass' | 'book' };
 
 const seedOf = (s: string) => [...s].reduce((x, c) => (x * 31 + c.charCodeAt(0)) >>> 0, 7);
 /** a small steady tilt per tag (the same tag always hangs the same way) */
@@ -88,6 +88,7 @@ const CSS = `
 @keyframes fs-wobble{0%,100%{transform:rotate(0)}20%{transform:rotate(-9deg) scale(1.05)}45%{transform:rotate(7deg)}70%{transform:rotate(-4deg)}85%{transform:rotate(2deg)}}
 @keyframes fs-aura{0%,100%{opacity:.7;transform:translate(-50%,-50%) scale(.95)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}}
 @keyframes fs-mist{0%,100%{opacity:.55;transform:translateX(-50%) scale(1)}50%{opacity:.8;transform:translateX(-50%) scale(1.05)}}
+@keyframes fs-emerge{0%{opacity:0;transform:translate(var(--fx),var(--fy)) scale(.12);filter:brightness(2.6) blur(2px)}30%{opacity:1}100%{opacity:1;transform:none;filter:none}}
 @keyframes fs-mana{from{opacity:0;filter:blur(4px)}to{opacity:1;filter:none}}
 @media (prefers-reduced-motion: reduce){[data-floating-spell] *{animation-iteration-count:1!important}}
 `;
@@ -96,20 +97,20 @@ const CSS = `
  * the spell in the air: `cx` = the bowl's centre line, `bottom` = just over the bowl's rim (the mana sits there, the
  * talismans above it), `bowl` = where they fly when it is cast, `scale` = shrunk to fit the room over the bowl
  */
-export function FloatingSpell({ spell, layout, cx, bottom, bowl, scale, onTap }: { spell: FloatSpell; layout: FloatLayout; cx: number; bottom: number; bowl: { x: number; y: number }; scale: number; onTap?: (t: SpellTag) => void }) {
+export function FloatingSpell({ spell, layout, cx, bottom, bowl, scale, onTap, from }: { spell: FloatSpell; layout: FloatLayout; cx: number; bottom: number; bowl: { x: number; y: number }; scale: number; onTap?: (t: SpellTag) => void; /** R12: the point (stage px) its first talismans come out of */ from?: { x: number; y: number } }) {
   const { look } = spell;
   useSpellFont(look);
   const g = GLOW[look];
   const manaH = spell.price > 0 ? MANA_H : 0;
   const top = bottom - (layout.height + manaH) * scale;
   // each talisman keeps the motion it came with (a change does not replay the others): its order of coming in
-  const born = useRef(new Map<string, { delay: number; spell: string }>());
+  const born = useRef(new Map<string, { delay: number; spell: string; first?: boolean }>());
   const last = useRef(new Map<string, { x: number; y: number; w: number; h: number }>());
   let k = 0;
   // (keyed by the spell, so a new spell starts afresh: all of them come in one by one; a change, only the new ones)
   const fresh = born.current.size === 0;
   for (const t of spell.tags)
-    if (!born.current.has(t.en)) born.current.set(t.en, { delay: fresh ? 250 + k++ * 230 : 150 + k++ * 180, spell: spell.id });
+    if (!born.current.has(t.en)) born.current.set(t.en, { delay: fresh ? 250 + k++ * 230 : 150 + k++ * 180, spell: spell.id, first: fresh });
   const [wob, setWob] = useState<Record<string, number>>({});
   const short = spell.have != null && spell.have < spell.price;
   const pos = (p: { x: number; y: number }) => ({ left: cx + p.x * scale, top: top + p.y * scale });
@@ -139,7 +140,13 @@ export function FloatingSpell({ spell, layout, cx, bottom, bowl, scale, onTap }:
         }}
         data-float-tag={t.ja}
       >
-        <div style={{ animation: gone ? undefined : `fs-in 1.3s cubic-bezier(.25,.8,.3,1) ${b.delay}ms both` }}>
+        <div
+          style={
+            from && !gone && b.first
+              ? { ['--fx' as string]: `${(from.x - q.left) / scale}px`, ['--fy' as string]: `${(from.y - q.top) / scale - p.h / 2}px`, animation: `fs-emerge 1.1s cubic-bezier(.25,.8,.3,1) ${b.delay}ms both` }
+              : { animation: gone ? undefined : `fs-in 1.3s cubic-bezier(.25,.8,.3,1) ${b.delay}ms both` }
+          }
+        >
           <div
             style={{
               ['--r0' as string]: `${((sd % 5) - 2) * 0.6}deg`,

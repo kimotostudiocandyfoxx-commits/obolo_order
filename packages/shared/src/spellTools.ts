@@ -321,5 +321,5 @@ export const SPELL_TOOL_LINE_TEXTS: string[] = Object.values(SPELL_TOOL_LINES);
 /** a no to {bati}'s question (しまう？ / 捨てていい？ / もとにする？) */
 export function isNo(text: string): boolean {
   const t = text.replace(/[\s、。！!？?〜ー~]/g, '');
-  return /^(いや|いいえ|ううん|うーん|やめ|だめ|ダメ|いらない|しまわない|捨てない|すてない|まだ|やっぱ(り)?いい|いいや|けっこう|結構|no|ノー|べつに|別に|新しく|あたらしく|ちがう|違う)/i.test(t);
+  return /^(いや|いいえ|ううん|うーん|やめ|だめ|ダメ|いらない|しまわない|捨てない|すてない|まだ|やっぱ(り)?(いい|やめ|いらない|捨てない|しまわない)|いいや|けっこう|結構|no|ノー|べつに|別に|新しく|あたらしく|ちがう|違う)/i.test(t);
 }

@@ -10,7 +10,7 @@ import { BATI_COLOR, batiLook, characterLook, SELF_COLOR, selfLook, selfTone } f
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { batiLine, batiLineVoiceOf } from '@/lib/onboarding/batiLine';
-import { atelierMakeCost, CRAFT_LINES, KIND_HOME_PLANET, spellFrom, spellKey, type SpellTag, type SpellView, HOME_OF_WORK, PLANET_HOMES, TALK_BUBBLE_COLOUR, TALK_COLOR_KEY, type ChangeResult, type Me, changeableById, changeLines, changeRequest, etaMinutes, fillLine, homecomingSay, MOON_LINES, type RefineTarget, type WorkMaterial, batiDaysLeftLine, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId } from '@obolo/shared';
+import { atelierMakeCost, CRAFT_LINES, KIND_HOME_PLANET, spellFrom, spellKey, type SpellTag, type SpellView, HOME_OF_WORK, PLANET_HOMES, TALK_BUBBLE_COLOUR, TALK_COLOR_KEY, type ChangeResult, type Me, changeableById, changeLines, changeRequest, etaMinutes, fillLine, homecomingSay, MOON_LINES, type RefineTarget, type WorkMaterial, batiDaysLeftLine, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId, SPELL_TOOL_LINES, TOOL_STORY_LINES, bookMatch, findSpell, shouldSuggestBook, spellScore, spellFrom as spellFromWords, type CompassSpell, type SavedSpell, type SpellBookKind } from '@obolo/shared';
 import { useMarkRing } from '@/components/finds/MarkRing';
 import { viewsOf } from '@/lib/story/views';
 import { markNames } from '@/lib/finds/marks';
@@ -41,6 +41,9 @@ import { isYes, planOf, spellKindOf, type Plan } from './plan';
 import { FloatingSpell, floatLayout, MANA_H, SpellRecord, type FloatSpell } from './FloatingSpell';
 import { spellLookFor } from './spellLooks';
 import { useGameBroken } from './GamePlay';
+import { BatiCompass, SpellBookFloat, BOOK_PER_PAGE, type BookMode, type BookSaving, type CompassPhase } from './BatiTools';
+import { bookAt, bookKindOf, compassAt, saveToolMemory, toolMemory, toolStep, type ToolAsk } from './tools';
+import { uploadClip } from '@/lib/clip/useClip';
 import { craftAnswer, craftBegin, craftConfirmLine, craftDoneLines, craftSpellKind, craftStartLine, isCraftKind, wantsNew, type CraftAsk } from './craft';
 
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
@@ -88,7 +91,9 @@ export function newTalk(me: Pick<Me, 'displayName' | 'bati'> | null | undefined,
 /** R11: a plan waiting for the member's yes (the message its card is on, what is made with it, its price) */
 type PlanAsk = { id: string; plan: Plan; prompt: string; prev?: Work; opts: MakeOpts; price: number };
 /** client 2026-11-25: {bati}'s questions for a book / a game (`craft`), and a book / a game just made (its next words change it: `after`) */
-type Pending = { kind: AtelierKind } | { radioName: string } | { voiceAgain: true } | { use: AtelierKind; materials: Work[] } | { plan: PlanAsk } | { craft: CraftAsk } | { after: Work } | null;
+type Pending = { kind: AtelierKind } | { radioName: string } | { voiceAgain: true } | { use: AtelierKind; materials: Work[] } | { plan: PlanAsk } | { craft: CraftAsk } | { after: Work } | { tool: ToolAsk; spell?: SavedSpell; forKind?: AtelierKind; content?: string } | null;
+/** R12: {bati}'s tool out in the sky (the compass while it reads; the spell book open, or taking a spell in) */
+type ToolShow = { kind: 'compass'; phase: CompassPhase; leaving?: boolean; key: number } | { kind: 'book'; mode: BookMode; page: number; spells: SavedSpell[]; saving?: BookSaving; key: number } | null;
 
 /** a fresh id for one yes (MakeConfirm.id: a UUID) */
 function yesId(): string {
@@ -292,7 +297,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
    * float in the sky over the bowl (FloatingSpell, the scene's `stage`); the talk keeps 「じゃあ、こういうスペルになるね。」
    * with a small record of it, and {bati}'s question 「このスペルで作る？　それとも、どこか変える？」
    */
-  const propose = async (kind: AtelierKind, said: string, prev: Work | undefined, opts: MakeOpts, before?: PlanAsk, view?: SpellView) => {
+  const propose = async (kind: AtelierKind, said: string, prev: Work | undefined, opts: MakeOpts, before?: PlanAsk, view?: SpellView, extra?: { lead?: [string, Record<string, string>?]; from?: 'compass' | 'book' }) => {
     // client 2026-11-25: a book's spell is free (no mana words), a game's tweak costs its own; a chapter has its own spell
     const craft = isCraftKind(kind);
     const cost = atelierMakeCost(kind, day, kind === 'game' && !!prev) ?? (craft ? { kind: 'game' as const, mana: 0 } : null);
@@ -312,9 +317,9 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     setBusy(false);
     const plan = planOf(kind, v);
     const id = uid();
-    const text = tline(before ? MOON_LINES.replan : MOON_LINES.plan);
+    const text = extra?.lead ? tline(extra.lead[0], extra.lead[1]) : tline(before ? MOON_LINES.replan : MOON_LINES.plan);
     setMsgs((m) => [...m, { id, who: 'bati', text, plan: { kind, tags: plan.tags, price: cost.mana, have } }, { id: uid(), who: 'bati', text: tline(craft ? craftConfirmLine(kind, prev) : MOON_LINES.confirm) }]);
-    setFloating((f) => ({ id: before && f ? f.id : id, kind, look: spellLookFor(kind), tags: plan.tags, removed: before ? plan.removed : [], price: cost.mana, have }));
+    setFloating((f) => ({ id: before && f ? f.id : id, kind, look: spellLookFor(kind), tags: plan.tags, removed: before ? plan.removed : [], price: cost.mana, have, from: extra?.from }));
     hinted.current.clear();
     // a redo is asked with the change's own words (the card's words carry over); a new one with the spell's
     setPending({ plan: { id, plan, prompt: craft ? (before ? `${before.prompt}、${said}` : said) : prev ? (before ? `${before.prompt}、${said}` : said) : plan.words, prev, opts, price: cost.mana } });
@@ -354,6 +359,9 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     castNow();
     castSpell();
     const sk = craftSpellKind(pa.plan.kind, pa.prev) ?? spellKindOf(pa.plan.kind);
+    // R12: the spell just cast (「しまっておいて」 keeps it; a happy word once its work is done may bring the offer)
+    const bk = bookKindOf(sk);
+    lastCast.current = bk ? { kind: bk, tags: pa.plan.tags, done: false } : lastCast.current;
     void start(pa.plan.kind, pa.prompt, pa.prev, { ...pa.opts, plan: pa.plan, confirm: { id: yesId(), price: pa.price, ...(sk ? { spell: spellKey(sk, pa.plan.tags) } : {}) } });
   };
 
@@ -363,6 +371,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       // the card sings (a kororin), then the script's own words after it
       if (line('sing', w.text ?? prompt) && w.audio) void toggleAudio(w.audio).catch(() => undefined);
       if (w.status === 'ready') line('saved');
+      // R12 (day 4): {bati} keeps the spell of the art just made in its spell book (shown once)
+      if (w.status === 'ready' && lines.book?.length) introBook(w, prompt);
       line('after');
       line('fix');
     } else if (isCraftKind(w.kind) && w.status === 'ready') {
@@ -371,6 +381,12 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       if (!w.book?.done) setPending({ after: w });
     } else if (DONE[w.kind]) say(DONE[w.kind]);
     if (w.status === 'ready' && !story) void tipCheck();
+    // R12: a work of the spell just cast is done (a happy word about it may bring {bati}'s offer to keep the spell)
+    if (w.status === 'ready' && !story && lastCast.current && !lastCast.current.done) {
+      lastCast.current = { ...lastCast.current, done: true };
+      const m = toolMemory();
+      saveToolMemory({ ...m, works: m.works + 1 });
+    }
   };
 
   const sayTRef = useRef(sayT);
@@ -423,11 +439,16 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     // a story step makes its kind whatever day the review page plays
     if (story) {
       setPending({ kind });
-      return line('open');
+      const opened = line('open');
+      // R12 (day 4): {bati} shows its compass for a moment
+      if (line('compass')) showCompass('open', 3800);
+      return opened;
     }
     if (!isOpen(kind, day)) return setMsgs((m) => [...m, { id: uid(), who: 'bati', text: batiDaysLeftLine(batiVoice?.personality ?? 'genki', daysUntil(kind, day)) }]);
     // client 2026-11-25: a book / a game starts with {bati}'s 2–4 short questions
     if (isCraftKind(kind)) return craftAsk(craftBegin(kind, content, isBare(content)));
+    // R12: a kept spell that fits the words — {bati} offers it now and then (「スペルブックの『…』をもとにする？」)
+    if (suggestFromBook(kind, content)) return;
     // R11: one that spends mana: {bati}'s question or plan first (run)
     if (atelierMakeCost(kind, day)) return void run(kind, content);
     if (isBare(content)) {
@@ -557,10 +578,298 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     return true;
   };
 
+
+  // ── R12 (client 2026-11-25): {bati}'s two tools — the compass (reads a spell from a photo / a YouTube link) and the
+  // spell book (keeps the spells liked). Never shown all the time: they float up over the bowl only while used. ──
+  const [tool, setTool] = useState<ToolShow>(null);
+  const toolRef = useRef(tool);
+  toolRef.current = tool;
+  const toolTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const later = (ms: number, f: () => void) => {
+    if (toolTimer.current) clearTimeout(toolTimer.current);
+    toolTimer.current = setTimeout(f, ms);
+  };
+  /** the spell just cast in this talk (its work done or not), and whether it is in the book */
+  const lastCast = useRef<{ kind: SpellBookKind; tags: SpellTag[]; done: boolean; kept?: SavedSpell } | null>(null);
+  const lastKept = useRef<SavedSpell | null>(null);
+  const bookList = useRef<SavedSpell[] | null>(null);
+  const loadBook = async (fresh = false) => {
+    if (!bookList.current || fresh) bookList.current = await getApi().spellBook().catch(() => bookList.current ?? []);
+    return bookList.current;
+  };
+  useEffect(() => {
+    if (story || !me) return;
+    void loadBook();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [me?.id, story]);
+  const showCompass = (phase: CompassPhase, awayIn?: number) => {
+    const key = toolRef.current?.kind === 'compass' ? toolRef.current.key : Date.now();
+    setTool({ kind: 'compass', phase, key });
+    if (awayIn) later(awayIn, () => compassAway());
+    else if (toolTimer.current) clearTimeout(toolTimer.current);
+  };
+  const compassAway = () => {
+    setTool((t) => (t?.kind === 'compass' ? { ...t, leaving: true } : t));
+    later(950, () => setTool((t) => (t?.kind === 'compass' ? null : t)));
+  };
+  const bookAway = () => {
+    setTool((t) => (t?.kind === 'book' ? { ...t, mode: 'close' } : t));
+    later(1250, () => setTool((t) => (t?.kind === 'book' ? null : t)));
+  };
+  /** the compass reads: the spell's talismans come out of it, and the usual 「このスペルで作る？」 */
+  const compassRead = async (body: { fileId?: string; url?: string; image?: { mime: string; data: string } }, sayReading: boolean) => {
+    showCompass('reading');
+    if (sayReading) sayT(SPELL_TOOL_LINES.compassReading);
+    setBusy(true);
+    let r: CompassSpell | null = null;
+    try {
+      r = await getApi().compassSpell(body);
+    } catch {
+      r = null;
+    }
+    setBusy(false);
+    if (!r) {
+      compassAway();
+      return sayT(SPELL_TOOL_LINES.compassFail);
+    }
+    const kind = r.kind as AtelierKind;
+    if (!isOpen(kind, day)) {
+      compassAway();
+      return sayT(SPELL_TOOL_LINES.compassLocked, { d: daysUntil(kind, day) });
+    }
+    showCompass('done', 1500);
+    const words = r.tags.filter((t) => t.group === 'theme').map((t) => t.ja).join('、') || r.tags.map((t) => t.ja).join('、');
+    void propose(kind, words, undefined, {}, undefined, { tags: r.tags, added: [], removed: [] }, { lead: [SPELL_TOOL_LINES.compassRead], from: 'compass' });
+  };
+  /** 「しまっておいて」 / a yes to {bati}'s offer: the spell just cast goes into the book (it floats up and takes it in) */
+  const keepCast = async (name?: string) => {
+    const c = lastCast.current;
+    if (!c) return sayT(SPELL_TOOL_LINES.bookNothing);
+    if (c.kept && !name) return sayT(SPELL_TOOL_LINES.bookAlready, { spell: c.kept.name });
+    setBusy(true);
+    try {
+      const r = await getApi().saveSpell({ kind: c.kind, tags: c.tags, ...(name ? { name } : {}) });
+      lastCast.current = { ...c, kept: r };
+      lastKept.current = r;
+      if (r.already) return sayT(SPELL_TOOL_LINES.bookAlready, { spell: r.name });
+      bookList.current = [r, ...(bookList.current ?? []).filter((x) => x.id !== r.id)];
+      setTool({ kind: 'book', mode: 'save', page: 0, spells: [], saving: { kind: c.kind, tags: c.tags, name: r.name }, key: Date.now() });
+      later(4600, () => setTool((t) => (t?.kind === 'book' && t.mode === 'save' ? null : t)));
+      sayT(SPELL_TOOL_LINES.bookSaved, { spell: r.name });
+    } catch (e) {
+      if (e instanceof ApiError && e.code === 'SPELL_BOOK_FULL') sayT(SPELL_TOOL_LINES.bookFull);
+      else say('いまは、うまくしまえなかった……。もう一回言ってみて');
+    } finally {
+      setBusy(false);
+    }
+  };
+  const openBook = async () => {
+    setBusy(true);
+    const spells = await loadBook(true);
+    setBusy(false);
+    setTool({ kind: 'book', mode: 'open', page: 0, spells, key: Date.now() });
+    if (toolTimer.current) clearTimeout(toolTimer.current);
+    sayT(spells.length ? SPELL_TOOL_LINES.bookOpen : SPELL_TOOL_LINES.bookEmpty);
+    if (!spells.length) later(3600, bookAway);
+  };
+  const turnPage = (step: 1 | -1) =>
+    setTool((t) => {
+      if (t?.kind !== 'book' || t.mode !== 'open') return t;
+      const spreads = Math.max(1, Math.ceil(t.spells.length / (BOOK_PER_PAGE * 2)));
+      const page = Math.max(0, Math.min(spreads - 1, t.page + step));
+      return page === t.page ? t : { ...t, page };
+    });
+  /** a kept spell brought back: it becomes the spell (its talismans come out of the book), then the usual question */
+  const useKept = (sp: SavedSpell) => {
+    const kind = sp.kind as AtelierKind;
+    if (!isOpen(kind, day)) return sayT(SPELL_TOOL_LINES.bookLocked, { spell: sp.name, d: daysUntil(kind, day) });
+    const wasOpen = toolRef.current?.kind === 'book';
+    if (!wasOpen) setTool({ kind: 'book', mode: 'open', page: 0, spells: [sp], key: Date.now() });
+    later(wasOpen ? 250 : 1300, bookAway);
+    void getApi().usedSpell(sp.id).catch(() => undefined);
+    lastKept.current = sp;
+    void propose(kind, sp.name, undefined, {}, undefined, { tags: sp.tags, added: [], removed: [] }, { lead: [SPELL_TOOL_LINES.bookUse, { spell: sp.name }], from: 'book' });
+  };
+  /** R12: a kind asked for, and a kept spell of that kind fits the words — {bati} asks (now and then) */
+  const suggestFromBook = (kind: AtelierKind, content: string): boolean => {
+    const sk = spellKindOf(kind);
+    if (story || !sk || isBare(content) || !bookList.current?.length) return false;
+    const m = toolMemory();
+    const asks = m.asks + 1;
+    const hit = bookMatch(sk, content, bookList.current);
+    if (!hit || !shouldSuggestBook({ ...m, asks })) {
+      saveToolMemory({ ...m, asks });
+      return false;
+    }
+    saveToolMemory({ ...m, asks, suggestedAt: asks });
+    sayT(SPELL_TOOL_LINES.bookSuggest, { spell: hit.name });
+    setPending({ tool: 'base', spell: hit, forKind: kind, content });
+    return true;
+  };
+  /** R12 (day 4, the story): the art just made — its spell goes into {bati}'s spell book (kept for real, not on the review page) */
+  const introBook = (w: Work, prompt: string) => {
+    const tags = lastCast.current?.tags ?? spellFromWords('art', prompt || w.prompt || 'アート');
+    setTool({ kind: 'book', mode: 'save', page: 0, spells: [], saving: { kind: 'art', tags, name: '' }, key: Date.now() });
+    later(4600, () => setTool((t) => (t?.kind === 'book' ? null : t)));
+    line('book');
+    if (!story?.test) void getApi().saveSpell({ kind: 'art', tags }).catch(() => undefined);
+  };
+  /** the words for the tools (true: done here) */
+  const toolSend = (text: string, p: Pending): boolean => {
+    const asked = p && 'tool' in p ? p.tool : null;
+    const a = toolStep(text, {
+      asked,
+      plan: !!(p && 'plan' in p),
+      bookOpen: toolRef.current?.kind === 'book' && toolRef.current.mode === 'open',
+      cast: !!lastCast.current,
+      castDone: !!lastCast.current?.done,
+      kept: !!lastCast.current?.kept,
+      mem: toolMemory(),
+    });
+    // the spell waiting for its yes stays (the book's words go before it); a new spell replaces it
+    const keepPlan = () => p && 'plan' in p && setPending(p);
+    if (!a) {
+      if (asked === 'compass') compassAway();
+      return false;
+    }
+    switch (a.do) {
+      case 'compassLink':
+        if (!isOpen('song', day)) {
+          sayT(SPELL_TOOL_LINES.compassLocked, { d: daysUntil('song', day) });
+          return true;
+        }
+        void compassRead({ url: a.url }, true);
+        return true;
+      case 'compassOpen':
+        showCompass('open');
+        sayT(SPELL_TOOL_LINES.compassOpen);
+        setPending({ tool: 'compass' });
+        return true;
+      case 'bookOpen':
+        keepPlan();
+        void openBook();
+        return true;
+      case 'bookClose':
+        bookAway();
+        if (a.quiet) return false;
+        keepPlan();
+        sayT(SPELL_TOOL_LINES.bookClosed);
+        return true;
+      case 'page':
+        keepPlan();
+        turnPage(a.step);
+        return true;
+      case 'save':
+        keepPlan();
+        void keepCast();
+        return true;
+      case 'rename': {
+        keepPlan();
+        const k = lastKept.current;
+        if (!k) {
+          if (lastCast.current) void keepCast(a.name);
+          else sayT(SPELL_TOOL_LINES.bookNoName);
+          return true;
+        }
+        void getApi()
+          .renameSpell(k.id, a.name)
+          .then((r) => {
+            lastKept.current = r;
+            bookList.current = (bookList.current ?? []).map((x) => (x.id === r.id ? r : x));
+            if (lastCast.current?.kept?.id === r.id) lastCast.current = { ...lastCast.current, kept: r };
+            setTool((t) => (t?.kind === 'book' ? { ...t, spells: t.spells.map((x) => (x.id === r.id ? r : x)) } : t));
+            sayT(SPELL_TOOL_LINES.bookRenamed, { spell: r.name });
+          })
+          .catch(() => sayT(SPELL_TOOL_LINES.bookNotFound));
+        return true;
+      }
+      case 'discard': {
+        keepPlan();
+        const f = findSpell(a.query, bookList.current ?? []);
+        if (!f.spell) {
+          if (f.close.length) sayT(SPELL_TOOL_LINES.bookWhich, { list: f.close.map((x) => `『${x.name}』`).join('と') });
+          else sayT(SPELL_TOOL_LINES.bookNotFound);
+          return true;
+        }
+        sayT(SPELL_TOOL_LINES.bookDropAsk, { spell: f.spell.name });
+        setPending({ tool: 'drop', spell: f.spell });
+        return true;
+      }
+      case 'use': {
+        const f = findSpell(a.query, bookList.current ?? []);
+        // a plain 「〇〇使って」 (the book not open, no スペルブック) is the book's only when it names a kept spell well
+        if (!a.named && !(f.spell && spellScore(a.query, f.spell) >= 0.9)) return false;
+        if (!f.spell) {
+          keepPlan();
+          if (f.close.length) sayT(SPELL_TOOL_LINES.bookWhich, { list: f.close.map((x) => `『${x.name}』`).join('と') });
+          else sayT(SPELL_TOOL_LINES.bookNotFound);
+          return true;
+        }
+        useKept(f.spell);
+        return true;
+      }
+      case 'offer': {
+        const m = toolMemory();
+        saveToolMemory({ ...m, offeredAt: m.works });
+        sayT(SPELL_TOOL_LINES.bookAsk);
+        setPending({ tool: 'save' });
+        return true;
+      }
+      case 'yes':
+        if (a.to === 'save') void keepCast();
+        else if (a.to === 'drop' && p && 'tool' in p && p.spell) {
+          const sp = p.spell;
+          void getApi()
+            .dropSpell(sp.id)
+            .then(() => {
+              bookList.current = (bookList.current ?? []).filter((x) => x.id !== sp.id);
+              if (lastKept.current?.id === sp.id) lastKept.current = null;
+              if (lastCast.current?.kept?.id === sp.id) lastCast.current = { ...lastCast.current, kept: undefined };
+              setTool((t) => (t?.kind === 'book' ? { ...t, spells: t.spells.filter((x) => x.id !== sp.id) } : t));
+              sayT(SPELL_TOOL_LINES.bookDropped, { spell: sp.name });
+            })
+            .catch(() => sayT(SPELL_TOOL_LINES.bookNotFound));
+        } else if (a.to === 'base' && p && 'tool' in p && p.spell) useKept(p.spell);
+        return true;
+      case 'no':
+        if (a.to === 'save') sayT(SPELL_TOOL_LINES.bookKeepNot);
+        else if (a.to === 'drop') sayT(SPELL_TOOL_LINES.bookDropNot);
+        else if (a.to === 'base' && p && 'tool' in p && p.forKind) {
+          // a fresh spell for the words, as asked
+          void run(p.forKind, p.content ?? '');
+        }
+        return true;
+    }
+  };
+  // R12: an image pasted in the talk is handed to {bati} like a 📎 photo (kept in Bluena, read with the compass)
+  useEffect(() => {
+    if (story) return;
+    const onPaste = (e: ClipboardEvent) => {
+      const f = [...(e.clipboardData?.files ?? [])].find((x) => x.type.startsWith('image/'));
+      if (!f || !isOpen('art', day)) return;
+      e.preventDefault();
+      void (async () => {
+        showCompass('reading');
+        const file = await uploadClip(new File([f], f.name || 'image.png', { type: f.type }), () => undefined).catch(() => null);
+        if (!file) {
+          compassAway();
+          return sayT(SPELL_TOOL_LINES.compassFail);
+        }
+        setMsgs((m) => [...m, { id: uid(), who: 'me', text: '', file }]);
+        void compassRead({ fileId: file.id }, false);
+      })();
+    };
+    window.addEventListener('paste', onPaste);
+    return () => window.removeEventListener('paste', onPaste);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [day, story]);
+
   const send = (text: string) => {
     setMsgs((m) => [...m, { id: uid(), who: 'me', text }]);
     const p = pending;
     setPending(null);
+    // R12: {bati}'s compass and spell book (a link, their names, the answers to its questions, the offer)
+    if (!story && toolSend(text, p)) return;
     // R11: the plan waiting for a yes — a yes starts it, any other words change it
     if (p && 'plan' in p) {
       if (isYes(text)) return void accept(p.plan);
@@ -706,6 +1015,14 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   // Bluena's 📎: files from the device handed to {bati} — shown on your side; a picture is looked at, the rest answered
   useClipSend('bati', (files) => {
     setMsgs((m) => [...m, ...files.map((file) => ({ id: uid(), who: 'me' as const, text: '', file }))]);
+    // R12: a photo handed to {bati} — it brings out its compass and reads the photo's spell
+    const photo = files.find((f) => f.kind === 'photo');
+    if (photo && !story && isOpen('art', day)) {
+      setPending(null);
+      void compassRead({ fileId: photo.id }, false);
+      if (files.length > 1) say(`${files.length}こ、うけとったよ。ブルーナにも、しまってあるからね`);
+      return;
+    }
     void (async () => {
       const first = files.find((f) => f.kind === 'photo') ?? files[0];
       const r = await getApi()
@@ -1054,15 +1371,35 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
         placeFx={(m) => <BowlFx state={bowl} at={m.at} scale={m.scale} reduced={reducedMotion} />}
         // client 2026-11-25: the spell's talismans in the sky over the bowl (the talk ends above them)
         stage={
-          floating
+          floating || tool
             ? (m) => {
+                const bb = m.at(TEMPLE_PLATE.bowl.u, TEMPLE_PLATE.bowl.v);
+                const bot = bb.y - TEMPLE_PLATE.bowl.w * m.scale * 0.13;
+                const cp = compassAt(bb, bot, m.scale, m.top + 110);
+                const bk = bookAt(m.w, bot, m.top + 96);
+                const toolNode =
+                  tool?.kind === 'compass' ? (
+                    <BatiCompass key={tool.key} phase={tool.phase} leaving={tool.leaving} cx={cp.x} cy={cp.y} size={cp.size} />
+                  ) : tool?.kind === 'book' ? (
+                    <SpellBookFloat key={tool.key} mode={tool.mode} spells={tool.spells} page={tool.page} saving={tool.saving} cx={bb.x} top={bk.top} w={bk.w} onPage={(step) => turnPage(step)} />
+                  ) : null;
+                if (!floating) return { top: tool?.kind === 'book' ? bk.top : cp.y - cp.size / 2, node: toolNode };
                 const b = m.at(TEMPLE_PLATE.bowl.u, TEMPLE_PLATE.bowl.v);
                 const bottom = b.y - TEMPLE_PLATE.bowl.w * m.scale * 0.13;
                 const layout = floatLayout(floating.look, floating.tags, m.w);
                 const need = layout.height + (floating.price > 0 ? MANA_H : 0);
                 // room for at least a short line of the talk above them
                 const scale = Math.max(0.6, Math.min(1, (bottom - (m.top + 110)) / need));
-                return { top: bottom - need * scale, node: <FloatingSpell key={floating.id} spell={floating} layout={layout} cx={b.x} bottom={bottom} bowl={b} scale={scale} onTap={tapTag} /> };
+                const from = floating.from === 'compass' ? { x: cp.x, y: cp.y } : floating.from === 'book' ? { x: bb.x, y: bk.top + bk.h / 2 } : undefined;
+                return {
+                  top: Math.min(bottom - need * scale, tool?.kind === 'book' ? bk.top : bottom),
+                  node: (
+                    <>
+                      {toolNode}
+                      <FloatingSpell key={floating.id} spell={floating} layout={layout} cx={b.x} bottom={bottom} bowl={b} scale={scale} onTap={tapTag} from={from} />
+                    </>
+                  ),
+                };
               }
             : undefined
         }

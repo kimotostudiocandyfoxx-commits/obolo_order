@@ -1,5 +1,5 @@
 import type { LinkPreview } from '@obolo/shared';
-import type { BookView, GameBrokenBody, GameBuildBody, GameView, NovelChapterBody } from '@obolo/shared';
+import type { BookView, CompassSpell, GameBrokenBody, GameBuildBody, GameView, MoonCompassBody, NovelChapterBody, SaveSpellBody, SaveSpellResult, SavedSpell } from '@obolo/shared';
 import type { ClipFile, ClipStartBody, ClipUploadStart, ChangeResult, HomeOshi, HomePlanet, PlanetHomeView, AddVersionBody, CreateMoonWorkBody, DemoJobBody, MakeConfirm, MakeKind, SpellBody, SpellKind, SpellTag, SpellView, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiHistoryPage, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
 import type {
   MembersDay,
@@ -151,6 +151,14 @@ export interface Api {
   demoJob(body: DemoJobBody & { pay?: { kind: MakeKind; confirm: MakeConfirm; spell?: { kind: SpellKind; tags: SpellTag[] } } }): Promise<JobView>;
   /** R11: the spell (スペル) {bati} lays out for a paid making — fresh for the words, or changed by them */
   moonSpell(body: SpellBody): Promise<SpellView>;
+  /** R12: {bati}'s コンパス — a photo of yours (a 📎 file), a pasted image or a YouTube link read into a spell */
+  compassSpell(body: MoonCompassBody): Promise<CompassSpell>;
+  /** R12: {bati}'s スペルブック — the spells you keep (newest first), keep one, rename, used, throw away */
+  spellBook(): Promise<SavedSpell[]>;
+  saveSpell(body: SaveSpellBody): Promise<SaveSpellResult>;
+  renameSpell(id: string, name: string): Promise<SavedSpell>;
+  usedSpell(id: string): Promise<SavedSpell>;
+  dropSpell(id: string): Promise<{ ok: true }>;
   /** client 2026-11-25 (本): a new book from its spell, or the next chapter from a chapter spell (free; capped a day) */
   novelChapter(body: NovelChapterBody): Promise<BookView>;
   books(): Promise<BookView[]>;

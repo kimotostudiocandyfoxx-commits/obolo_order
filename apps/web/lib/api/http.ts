@@ -155,6 +155,24 @@ export class HttpApi implements Api {
   moonSpell(body: Parameters<Api['moonSpell']>[0]) {
     return this.req<Awaited<ReturnType<Api['moonSpell']>>>('POST', '/moon/spell', body);
   }
+  compassSpell(body: Parameters<Api['compassSpell']>[0]) {
+    return this.req<Awaited<ReturnType<Api['compassSpell']>>>('POST', '/moon/compass', body);
+  }
+  spellBook() {
+    return this.req<Awaited<ReturnType<Api['spellBook']>>>('GET', '/moon/spellbook');
+  }
+  saveSpell(body: Parameters<Api['saveSpell']>[0]) {
+    return this.req<Awaited<ReturnType<Api['saveSpell']>>>('POST', '/moon/spellbook', body);
+  }
+  renameSpell(id: string, name: string) {
+    return this.req<Awaited<ReturnType<Api['renameSpell']>>>('PATCH', `/moon/spellbook/${encodeURIComponent(id)}`, { name });
+  }
+  usedSpell(id: string) {
+    return this.req<Awaited<ReturnType<Api['usedSpell']>>>('POST', `/moon/spellbook/${encodeURIComponent(id)}/used`, {});
+  }
+  dropSpell(id: string) {
+    return this.req<Awaited<ReturnType<Api['dropSpell']>>>('DELETE', `/moon/spellbook/${encodeURIComponent(id)}`);
+  }
   novelChapter(body: Parameters<Api['novelChapter']>[0]) {
     return this.req<Awaited<ReturnType<Api['novelChapter']>>>('POST', '/moon/novel/chapter', body);
   }

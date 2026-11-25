@@ -1,4 +1,12 @@
 import {
+  SPELL_BOOK_MAX,
+  spellBookName,
+  spellComplete,
+  spellKey as spellKeyOf,
+  spellNameClean,
+  spellNameUnique,
+  type CompassSpell,
+  type SavedSpell,
   addVersion as addMoonVersionTo,
   dropVersion as dropMoonVersionOf,
   hiddenRefs,
@@ -242,6 +250,8 @@ interface DemoState {
   chapterDays?: Record<string, number>;
   /** M-R253: the Moon atelier's works (tries inside one work) */
   moonWorks?: (MoonWorkView & { owner: string })[];
+  /** R12: the spell book (each member's own) */
+  spellBook?: (SavedSpell & { owner: string; key: string })[];
   /** M-R253 §5: homecomings told (`owner|key`) */
   homeTold?: string[];
   /** R9 review shots: more ダチ for the Moon temple's hall and plain (no talk behind them) */
@@ -946,6 +956,85 @@ export class DemoApi implements Api {
   async moonSpell(body: Parameters<Api['moonSpell']>[0]) {
     await sleep(250);
     return body.tags?.length ? spellEdit(body.kind, body.tags, body.said) : { tags: body.answers?.length ? spellOfAnswers(body.kind, body.answers) : spellFrom(body.kind, body.said), added: [], removed: [] };
+  }
+
+  // R12: the compass's canned reads in the demo (a photo / an image: a watercolour seaside at dusk; a link: a night-drive
+  // city pop) — the review shots; the real ones are the API's model
+  async compassSpell(body: Parameters<Api['compassSpell']>[0]): Promise<CompassSpell> {
+    await sleep(body.url ? 2600 : 2000);
+    if (body.url)
+      return {
+        kind: 'song',
+        via: 'video',
+        tags: spellComplete('song', [
+          { ja: '夜のドライブ', en: 'a night drive through the city', group: 'theme' },
+          { ja: 'シティポップ', en: '1980s city pop', group: 'genre' },
+          { ja: 'しっとり', en: 'mellow', group: 'mood' },
+          { ja: 'ふつうの速さ', en: 'mid tempo', group: 'tempo' },
+          { ja: 'シンセ', en: 'synthesizer', group: 'instrument' },
+          { ja: 'ベース', en: 'bass', group: 'instrument' },
+          { ja: 'やさしい歌声', en: 'soft vocals', group: 'voice' },
+        ]),
+      };
+    return {
+      kind: 'art',
+      via: 'image',
+      tags: spellComplete('art', [
+        { ja: '夕暮れの海辺', en: 'a seaside at dusk', group: 'theme' },
+        { ja: '水彩', en: 'watercolor', group: 'style' },
+        { ja: 'なつかしい', en: 'nostalgic', group: 'mood' },
+        { ja: 'やわらかい色', en: 'soft pastel colors', group: 'color' },
+        { ja: '夕焼け', en: 'sunset light', group: 'light' },
+        { ja: '遠くから', en: 'wide view', group: 'composition' },
+      ]),
+    };
+  }
+  private myBook() {
+    const me = this.uid();
+    return (this.s.spellBook ?? []).filter((x) => x.owner === me);
+  }
+  private bookView({ owner: _o, key: _k, ...x }: SavedSpell & { owner: string; key: string }): SavedSpell {
+    return x;
+  }
+  async spellBook() {
+    await sleep(150);
+    return this.myBook().map((x) => this.bookView(x));
+  }
+  async saveSpell(body: Parameters<Api['saveSpell']>[0]) {
+    await sleep(200);
+    const key = spellKeyOf(body.kind, body.tags);
+    const mine = this.myBook();
+    const same = mine.find((x) => x.key === key);
+    if (same) return { ...this.bookView(same), already: true };
+    if (mine.length >= SPELL_BOOK_MAX) throw new ApiError(409, 'SPELL_BOOK_FULL', 'The spell book is full');
+    const name = spellNameUnique(body.name ? spellNameClean(body.name) : spellBookName(body.kind, body.tags), mine.map((x) => x.name));
+    const row = { id: uid(), owner: this.uid(), key, kind: body.kind, name, tags: body.tags, createdAt: new Date().toISOString(), usedAt: null };
+    this.s.spellBook = [row, ...(this.s.spellBook ?? [])];
+    this.save();
+    return this.bookView(row);
+  }
+  private bookRow(id: string) {
+    const r = this.myBook().find((x) => x.id === id);
+    if (!r) throw new ApiError(404, 'SPELL_NOT_FOUND', 'Spell not found');
+    return r;
+  }
+  async renameSpell(id: string, name: string) {
+    const r = this.bookRow(id);
+    r.name = spellNameUnique(spellNameClean(name) || r.name, this.myBook().filter((x) => x.id !== id).map((x) => x.name));
+    this.save();
+    return this.bookView(r);
+  }
+  async usedSpell(id: string) {
+    const r = this.bookRow(id);
+    r.usedAt = new Date().toISOString();
+    this.save();
+    return this.bookView(r);
+  }
+  async dropSpell(id: string) {
+    this.bookRow(id);
+    this.s.spellBook = (this.s.spellBook ?? []).filter((x) => x.id !== id);
+    this.save();
+    return { ok: true as const };
   }
 
   async demoJob(body: Parameters<Api['demoJob']>[0] & { lateBy?: number }): Promise<JobView> {

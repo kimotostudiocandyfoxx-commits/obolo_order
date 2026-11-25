@@ -31,7 +31,7 @@ export type StoryMode = {
 };
 
 /** the moments a script line is said at, inside the chat */
-export type Cue = 'open' | 'react' | 'spell' | 'fail' | 'saved' | 'sing' | 'after' | 'fix' | 'again' | 'refine';
+export type Cue = 'open' | 'react' | 'spell' | 'fail' | 'saved' | 'sing' | 'after' | 'fix' | 'again' | 'refine' | 'compass' | 'book';
 
 /**
  * Which moment a line belongs to. The step's lines are the script's lines for every way the scene can go (a picked
@@ -41,6 +41,9 @@ export type Cue = 'open' | 'react' | 'spell' | 'fail' | 'saved' | 'sing' | 'afte
 export function cueOf(l: ScriptLine): Cue | null {
   const t = l.text;
   if (l.who === 'コロリン') return 'sing';
+  // R12 (day 4): {bati} shows its compass as the talk opens, and keeps the art's spell in its spell book once it is made
+  if (/コンパス/.test(t)) return 'compass';
+  if (/スペルブック/.test(t)) return 'book';
   if (/——ここに/.test(t)) return 'spell';
   if (/焦げ|凍っ|ぶれちゃ|光らなく/.test(t)) return 'fail';
   if (/しまったよ/.test(t)) return 'saved';

@@ -88,6 +88,8 @@ export const DAY4: Step[] = [
     kind: 'art', // 〔きのうのつぶやきのカード〕／新しく話す → 写真を添える／{bati}が描く／字だけ → one card (〔もう一回（1回だけ）〕)
     lines: [
       { t: 'say', who: 'バティ', text: 'じゃあ、話してみて！' },
+      // R12 (client 2026-11-25): {bati}'s compass is shown as the art's talk opens (it floats up over the bowl a moment)
+      { t: 'say', who: 'バティ', text: 'そうだ、好きな絵の写真があったら、見せてね。ボクのコンパスで、どんなスペルか読めるんだ！' },
       { t: 'say', who: 'バティ', text: 'どんなアートにする？　写真を使う？　ボクが描く？　字だけでもいいよ！' },
       { t: 'say', who: 'バティ', text: 'どんな絵にする？　色とか、タッチとか、できるだけ、くわしく教えて！' },
       { t: 'say', who: 'バティ', text: 'じゃあ、言葉に合うのを、ボクが選ぶね！' },
@@ -97,6 +99,8 @@ export const DAY4: Step[] = [
       { t: 'say', who: 'バティ', text: '魔法陣、ちょっと焦げちゃった……。言葉は残ってるよ。もう1回やる？　字だけにする？' },
       { t: 'say', who: 'OBOLON', text: '、、、字だけのアートも、ある。' },
       { t: 'say', who: 'バティ', text: 'Bluenaに、しまったよ！' },
+      // R12: the art's spell goes into {bati}'s spell book (it opens over the bowl, takes the talismans in, closes)
+      { t: 'say', who: 'バティ', text: 'いまのスペルは、スペルブックにしまっておくね。また使いたくなったら、「スペルブック出して」って言ってね！' },
       { t: 'say', who: 'バティ', text: 'わかった！　直してみるね！' },
     ],
   },
