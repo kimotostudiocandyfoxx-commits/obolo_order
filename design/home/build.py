@@ -171,7 +171,7 @@ for k in ['saturn','jupiter','mercury','mars','venus','uranus','pluto','neptune'
 for nm in ['me','edm','hiphop','ballad','rock','chill','citypop','anison','jazz','matsuri','rain']:
     f=f'{O}/isl-mercury-{nm}.jpg'
     if os.path.exists(f): o=unwhite(Image.open(f)); bb=o.getbbox(); o=o.crop(bb) if bb else o; o.thumbnail((380,380),Image.LANCZOS); A[f'isl-mercury-{nm}']=uri(o,84)
-for nm in ['map','sea','edm','hiphop','ballad','rock','chill','citypop','anison','jazz','matsuri','rain']:
+for nm in ['map','sea','edm','hiphop','ballad','rock','chill','citypop','anison','jazz','matsuri','rain']+[k+'-pier' for k in ['edm','hiphop','ballad','rock','chill','citypop','anison','jazz','matsuri','rain']]:
     f=f'{O}/exp-mercury-{nm}.jpg'
     if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A[f'exp-mercury-{nm}']=uri(im,76)
 VD=os.environ.get('VOICE_DIR')
@@ -184,6 +184,8 @@ if VD:
         f=f'{VD}/title-{n}.mp3'
         if os.path.exists(f): A[f'vtitle-{n}']='data:audio/mpeg;base64,'+base64.b64encode(open(f,'rb').read()).decode()
 # Saturn side-view stage (M-R300): flat backdrop + level pebble ground + speaker walls
+f=f'{O}/sat7-bg.jpg'
+if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A['bg7-saturn']=uri(im,78)
 f=f'{O}/sat6-bg.jpg'
 if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A['bg6-saturn']=uri(im,78)
 f=f'{O}/sat6-floor.jpg'
