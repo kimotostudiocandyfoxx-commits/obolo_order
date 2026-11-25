@@ -1,7 +1,7 @@
 import type { LinkPreview } from '@obolo/shared';
 import type { LyricsBody, LyricsView, SongLyrics, SongTweakBody, SongTweakResult } from '@obolo/shared';
 import type { BookView, CompassSpell, GameBrokenBody, GameBuildBody, GameView, MoonCompassBody, NovelChapterBody, SaveSpellBody, SaveSpellResult, SavedSpell } from '@obolo/shared';
-import type { ClipFile, ClipStartBody, ClipUploadStart, ChangeResult, HomeOshi, HomePlanet, PlanetHomeView, AddVersionBody, CreateMoonWorkBody, DemoJobBody, MakeConfirm, MakeKind, SpellBody, SpellKind, SpellTag, SpellView, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiHistoryPage, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
+import type { ClipFile, ClipStartBody, ClipUploadStart, ChangeResult, HomeOshi, HomePlanet, PlanetHomeView, AddVersionBody, CreateMoonWorkBody, DemoJobBody, MakeConfirm, MakeKind, SpellBody, SpellKind, SpellTag, SpellView, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiHistoryPage, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView, MvEditBody, MvPicturesBody, MvRedrawBody } from '@obolo/shared';
 import type {
   MembersDay,
   BuddyChatResponse,
@@ -361,6 +361,12 @@ export interface Api {
   mvLyrics(id: string): Promise<JobView>;
   /** story MV: painted from the song and the profile picture; `mood` may be empty (Bati decides) — a background job */
   mvStory(id: string, mood: string, from?: 'atelier', paid?: Paid): Promise<JobView>;
+  /** R13: a video of your own pictures (nothing painted), with the yes — a background job */
+  mvPictures(id: string, body: MvPicturesBody): Promise<JobView>;
+  /** R13: a free change of how it moves (re-rendered from the kept pictures) — a background job */
+  mvEdit(id: string, body: MvEditBody): Promise<JobView>;
+  /** R13: scenes painted again from a small spell, with the yes — a background job */
+  mvRedraw(id: string, body: MvRedrawBody): Promise<JobView>;
   /** `egg`: the egg chosen on the altar (M-R215: 'moon' = 女の子寄り, 'sun' = 男の子寄り); the personality is decided from the food (M-R217) — SEED_REASK: OBOLON asks again */
   batiEgg(food: string, egg?: BatiEggKind): Promise<Me>;
   /** M-R218: the grown egg hatched in the Moon temple from its seed (the 2nd: a sound, the 3rd: a word); EGG_NOT_READY / BATI_FULL / SEED_REASK */

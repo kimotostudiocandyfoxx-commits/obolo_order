@@ -3,11 +3,11 @@ import type { LlmProvider } from '@obolo/ai';
 import { isSpellWord, SPELL_MAX_TAGS, spellEdit, spellFrom, spellNormalize, spellOfAnswers, type SpellBody, type SpellKind, type SpellTag, type SpellView } from '@obolo/shared';
 import { LLM } from '../infra/tokens';
 
-const WHAT: Record<SpellKind, string> = { song: 'a song', art: 'a picture', video: 'a music video', look: "the member's own look", bati: "the buddy's outfit", novel: 'a serial novel for teenagers (its world, hero, tone, length)', chapter: "the next chapter of a novel (what happens, its mood, a new character)", game: 'a tiny HTML5 canvas game (its genre, hero, rules, goal, difficulty, look)' };
+const WHAT: Record<SpellKind, string> = { song: 'a song', art: 'a picture', video: 'a video made of still pictures that move (a camera over each picture, never a generated film)', look: "the member's own look", bati: "the buddy's outfit", novel: 'a serial novel for teenagers (its world, hero, tone, length)', chapter: "the next chapter of a novel (what happens, its mood, a new character)", game: 'a tiny HTML5 canvas game (its genre, hero, rules, goal, difficulty, look)' };
 const GROUPS: Record<SpellKind, string> = {
   song: 'theme, genre, mood, tempo, instrument, voice',
   art: 'theme, style, mood, color, light, composition',
-  video: 'theme, style, mood, light, camera',
+  video: 'theme, style, mood, color, light, camera',
   look: 'theme, wear, style, color',
   bati: 'theme, wear, style, color',
   novel: 'world, hero, genre, mood, length, theme',

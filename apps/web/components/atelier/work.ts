@@ -2,6 +2,7 @@ import type { AtelierKind } from '@/lib/atelier/unlock';
 import { FLY_READY_KINDS, KIND_HOME_PLANET, type BluenaPlanet, type BookView, type GameView, type SpellTag, type SongLyrics } from '@obolo/shared';
 import type { ClipFile, RefineTarget, WorkMaterial, WorkOrigin } from '@obolo/shared';
 import type { MadeSong } from '@/lib/mercury/compose';
+import type { VideoReel } from './video';
 
 /**
  * One thing made in the Moon atelier's chat (M-R210/M-R211): it shows as a card in the talk and is put into Bluena
@@ -26,7 +27,7 @@ export type Work = {
   poster?: string | null;
   source?: { title: string; source: string; pageUrl: string };
   note?: string;
-  ref?: { /** client 2026-11-25: a book's / a game's id on the server */ bookId?: string; gameId?: string; postId?: string; rootId?: string; /** the root's photo (an MV's still, M-R253 §3) */ mediaId?: string; songId?: string; backstageId?: string; showId?: string; demoSong?: MadeSong; style?: string; /** a stand-in made on the review page (makers.ts makeTest) */ test?: boolean };
+  ref?: { /** client 2026-11-25: a book's / a game's id on the server */ bookId?: string; gameId?: string; postId?: string; rootId?: string; /** the root's photo (an MV's still, M-R253 §3) */ mediaId?: string; songId?: string; backstageId?: string; /** R13: the video's project on the server (its free changes go there) */ mvId?: string; showId?: string; demoSong?: MadeSong; style?: string; /** a stand-in made on the review page (makers.ts makeTest) */ test?: boolean };
   flown?: boolean;
   worn?: boolean;
   /** put into Bluena (the card's edge flashes once) */
@@ -50,6 +51,8 @@ export type Work = {
   game?: GameView;
   /** the spell it was last cast with (a book's / a game's change edits it) */
   spell?: SpellTag[];
+  /** R13: what a video is made of (its pictures and how they move): its words after it change this, for free */
+  reel?: VideoReel;
   /** R13: a song's lyrics with metatags (sung from them; its lyric sheet keeps the section labels) */
   lyrics?: SongLyrics;
   /** R13: a song changed for free — how many versions there are, what the last change did, its length now */
@@ -59,9 +62,9 @@ export type Work = {
 };
 
 /** one try of a work */
-export type Version = Pick<Work, 'prompt' | 'title' | 'text' | 'image' | 'candidates' | 'pick' | 'audio' | 'video' | 'poster' | 'source' | 'note' | 'ref'> & { target?: RefineTarget; at: string };
+export type Version = Pick<Work, 'prompt' | 'title' | 'text' | 'image' | 'candidates' | 'pick' | 'audio' | 'video' | 'poster' | 'source' | 'note' | 'ref' | 'reel'> & { target?: RefineTarget; at: string };
 
-const FACE_KEYS = ['prompt', 'title', 'text', 'image', 'candidates', 'pick', 'audio', 'video', 'poster', 'source', 'note', 'ref'] as const;
+const FACE_KEYS = ['prompt', 'title', 'text', 'image', 'candidates', 'pick', 'audio', 'video', 'poster', 'source', 'note', 'ref', 'reel'] as const;
 
 /** the face's fields as a try */
 export function versionOf(w: Work, target?: RefineTarget): Version {

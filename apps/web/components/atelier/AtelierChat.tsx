@@ -10,7 +10,7 @@ import { BATI_COLOR, batiLook, characterLook, SELF_COLOR, selfLook, selfTone } f
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { batiLine, batiLineVoiceOf } from '@/lib/onboarding/batiLine';
-import { atelierMakeCost, CRAFT_LINES, KIND_HOME_PLANET, spellFrom, spellKey, type SpellTag, type SpellView, HOME_OF_WORK, PLANET_HOMES, TALK_BUBBLE_COLOUR, TALK_COLOR_KEY, type ChangeResult, type Me, changeableById, changeLines, changeRequest, etaMinutes, fillLine, homecomingSay, MOON_LINES, type RefineTarget, type WorkMaterial, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId, SPELL_TOOL_LINES, bookMatch, findSpell, shouldSuggestBook, spellScore, spellBookName, type CompassSpell, type SavedSpell, type SpellBookKind } from '@obolo/shared';
+import { atelierMakeCost, CRAFT_LINES, VIDEO_LINES, KIND_HOME_PLANET, spellFrom, spellKey, type SpellTag, type SpellView, HOME_OF_WORK, PLANET_HOMES, TALK_BUBBLE_COLOUR, TALK_COLOR_KEY, type ChangeResult, type Me, changeableById, changeLines, changeRequest, etaMinutes, fillLine, homecomingSay, MOON_LINES, type RefineTarget, type WorkMaterial, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId, SPELL_TOOL_LINES, bookMatch, findSpell, shouldSuggestBook, spellScore, spellBookName, type CompassSpell, type SavedSpell, type SpellBookKind } from '@obolo/shared';
 import { useMarkRing } from '@/components/finds/MarkRing';
 import { viewsOf } from '@/lib/story/views';
 import { markNames } from '@/lib/finds/marks';
@@ -57,6 +57,7 @@ import { BatiCompass, SpellBookFloat, BOOK_PER_PAGE, type BookMode, type BookSav
 import { bookAt, bookKindOf, compassAt, saveToolMemory, toolMemory, toolStep, type ToolAsk } from './tools';
 import { uploadClip } from '@/lib/clip/useClip';
 import { craftAnswer, craftBegin, craftConfirmLine, craftDoneLines, craftSpellKind, craftStartLine, isCraftKind, wantsNew, type CraftAsk } from './craft';
+import { fixVideoSpell, videoBegin, videoChange, videoPrice, videoQuestionVars } from './video';
 
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 const TAUGHT_KEY = 'obolo.atelier.taught';
@@ -325,7 +326,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     const styleSaid = own ? said.slice(0, Math.max(0, said.indexOf(own))).replace(/(歌詞は(これ|こう|こちら)で|この歌詞で|歌詞)[\s:：、。]*$/, '').trim() : said;
     const asked = before || craft ? styleSaid : prev ? `${prev.prompt}。${styleSaid}` : styleSaid;
     // a game's change edits the spell it was cast with (「もっと難しく」); a chapter's spell is fresh from the words
-    const was = before ? before.plan.tags : kind === 'game' && prev?.spell?.length ? prev.spell : undefined;
+    const was = before ? before.plan.tags : (kind === 'game' || kind === 'video') && prev?.spell?.length ? prev.spell : undefined;
     const v =
       view ??
       (await getApi()
@@ -333,17 +334,20 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
         .catch((): SpellView => (before ? { tags: before.plan.tags, added: [], removed: [] } : { tags: spellFrom(sk, asked || 'おまかせ'), added: [], removed: [] })));
     const [have] = await Promise.all([manaNow()]);
     setBusy(false);
-    const plan0 = planOf(kind, v);
+    // R13: a video's spell has exactly one song talisman (picked by its name); its price follows what it is for
+    const vv = kind === 'video' ? fixVideoSpell(v, said) : v;
+    const plan0 = planOf(kind, vv);
+    const price = kind === 'video' ? videoPrice(vv.tags, opts.redraw) : cost.mana;
     // R13: the lyrics carry over a change of the style talismans; a fresh song gets them written for its style
     const plan: Plan = twoPart && before?.plan.lyrics ? { ...plan0, lyrics: before.plan.lyrics } : plan0;
     const id = uid();
     const text = extra?.lead ? tline(extra.lead[0], extra.lead[1]) : tline(before ? MOON_LINES.replan : twoPart ? SONG_LINES.songPlan : MOON_LINES.plan);
     const fid = before && floatingRef.current ? floatingRef.current.id : id;
-    setMsgs((m) => [...m, { id, who: 'bati', text, plan: { kind, tags: plan.tags, price: cost.mana, have } }]);
-    setFloating((f) => ({ id: fid, kind, look: spellLookFor(kind), tags: plan.tags, removed: before ? plan.removed : [], price: cost.mana, have, from: extra?.from, lyrics: twoPart && before && f?.lyrics ? f.lyrics : undefined }));
+    setMsgs((m) => [...m, { id, who: 'bati', text, plan: { kind, tags: plan.tags, price, have } }]);
+    setFloating((f) => ({ id: fid, kind, look: spellLookFor(kind), tags: plan.tags, removed: before ? plan.removed : [], price, have, from: extra?.from, lyrics: twoPart && before && f?.lyrics ? f.lyrics : undefined }));
     hinted.current.clear();
     // a redo is asked with the change's own words (the card's words carry over); a new one with the spell's
-    const ask: PlanAsk = { id, plan, prompt: craft ? (before ? `${before.prompt}、${said}` : said) : prev ? (before ? `${before.prompt}、${styleSaid}` : styleSaid) : plan.words, prev, opts, price: cost.mana };
+    const ask: PlanAsk = { id, plan, prompt: craft ? (before ? `${before.prompt}、${said}` : said) : prev ? (before ? `${before.prompt}、${styleSaid}` : styleSaid) : plan.words, prev, opts, price };
     if (twoPart && !plan.lyrics) {
       // the style talismans come out first (「曲調のスペルはこんなんだね。」); meanwhile {bati} writes the lyrics
       const t0 = Date.now();
@@ -499,9 +503,10 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
         } else if (e.kind === 'failed') {
           const before = e.w.card.versions?.length ? faceTo({ ...e.w.card, status: 'ready', job: undefined }, e.w.card.versions.length - 1) : { ...e.w.card, status: 'failed' as const, job: undefined, note: undefined };
           // a game that could not be made: the one before stays (its mana is back: the server gave it)
-          put(isCraftKind(e.w.card.kind) ? { ...e.w.card, status: e.w.card.game ? 'ready' : 'failed', job: undefined } : before);
-          // ④ two failures in a row: the re-try stops
-          sayT(isCraftKind(e.w.card.kind) ? CRAFT_LINES.gameBroken : MOON_LINES.stop);
+          const game = isCraftKind(e.w.card.kind) && e.w.card.kind !== 'video';
+          put(game ? { ...e.w.card, status: e.w.card.game ? 'ready' : 'failed', job: undefined } : before);
+          // ④ two failures in a row: the re-try stops (R13: a video's mana is back)
+          sayT(game ? CRAFT_LINES.gameBroken : e.w.card.kind === 'video' ? VIDEO_LINES.failed : MOON_LINES.stop);
         }
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -535,6 +540,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       if (r && r.what === kind && r.content) content = r.content;
     }
     // client 2026-11-25: a book / a game starts with {bati}'s 2–4 short questions
+    if (kind === 'video' && !story) return void videoStart(content);
     if (isCraftKind(kind)) return craftAsk(craftBegin(kind, content, isBare(content)));
     // R12: a kept spell that fits the words — {bati} offers it now and then (「スペルブックの『…』をもとにする？」)
     if (suggestFromBook(kind, content)) return;
@@ -661,7 +667,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   const craftAsk = async (a: CraftAsk) => {
     if (a.left.length) {
       setPending({ craft: a });
-      return sayT(a.left[0].text);
+      return sayT(a.left[0].text, a.kind === 'video' ? videoQuestionVars() : {});
     }
     const said = a.answers.map((x) => x.said).join('。').slice(0, 200) || 'おまかせ';
     setBusy(true);
@@ -722,12 +728,48 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
         setBusy(false);
       }
     })();
+  /** R13: a video starts with {bati}'s few questions (what it is for, which of your songs, how the pictures move) */
+  const videoStart = async (content: string) => {
+    setBusy(true);
+    const a = await videoBegin(content, isBare(content)).catch(() => null);
+    setBusy(false);
+    if (!a) return sayT(VIDEO_LINES.noSong);
+    return craftAsk(a);
+  };
+  /**
+   * R13: words after a video — how it moves (camera, pace, fades, lyrics, order, a scene cut, length, the part of the
+   * song, colours) is re-rendered for free from the same pictures; a scene to paint again is a small spell; anything
+   * else is a new spell for it
+   */
+  const videoAfter = (w: Work, text: string): boolean => {
+    const card = cardOf(w.id) ?? w;
+    const r = videoChange(card, text);
+    if (!r) {
+      void run('video', text, card);
+      return true;
+    }
+    if (r.kind === 'free') {
+      sayT(VIDEO_LINES.rerender);
+      void start('video', text, card, { edit: { params: r.params, order: r.order } });
+      return true;
+    }
+    if (!r.scenes.length) {
+      setPending({ after: card });
+      sayT(VIDEO_LINES.whichScene);
+      return true;
+    }
+    void propose('video', text, card, { redraw: r.scenes }, undefined, undefined, { lead: [VIDEO_LINES.redraw] });
     return true;
   };
   /** words after a book / a game: another kind asked for, or a new one of it — else a change (the next chapter, a tweak) */
   const craftAfter = (w: Work, text: string): boolean => {
     const it = detect(text, true, markNames());
     if (it.kind === 'find' || (it.kind === 'make' && it.what !== w.kind && it.what !== 'lookup')) return false;
+    if (w.kind === 'video' && it.kind === 'make' && it.what === 'video' && wantsNew(text)) {
+      void videoStart('');
+      return true;
+    }
+    if (w.kind === 'video') return videoAfter(w, text);
     if (it.kind === 'make' && it.what === w.kind && wantsNew(text)) {
       void craftAsk(craftBegin(w.kind as 'novel' | 'game', '', true));
       return true;
@@ -1129,6 +1171,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
         return say('もう一回、つぶやきを言ってみて');
       }
       if (last.kind === 'radio') return say('カードの〔やり直し〕で、録り直せるよ');
+      if (last.kind === 'video' && !story && videoAfter(last, text)) return;
       return void run(last.kind, it.content, last);
     }
     if (it.kind === 'ask') return say('どれにする？', it.options.map((k) => KIND_WORD[k]));

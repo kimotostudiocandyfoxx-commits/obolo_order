@@ -589,6 +589,15 @@ export class HttpApi implements Api {
   mvStory(id: string, mood: string, from?: 'atelier', paid?: Paid) {
     return this.req<Awaited<ReturnType<Api['mvStory']>>>('POST', `/mars/mv/${id}/story`, { mood, from, ...(paid?.confirm ? { confirm: paid.confirm, ...(paid.spell ? { spell: paid.spell } : {}) } : {}) });
   }
+  mvPictures(id: string, body: Parameters<Api['mvPictures']>[1]) {
+    return this.req<Awaited<ReturnType<Api['mvPictures']>>>('POST', `/mars/mv/${id}/pictures`, body);
+  }
+  mvEdit(id: string, body: Parameters<Api['mvEdit']>[1]) {
+    return this.req<Awaited<ReturnType<Api['mvEdit']>>>('POST', `/mars/mv/${id}/edit`, body);
+  }
+  mvRedraw(id: string, body: Parameters<Api['mvRedraw']>[1]) {
+    return this.req<Awaited<ReturnType<Api['mvRedraw']>>>('POST', `/mars/mv/${id}/redraw`, body);
+  }
   mvLyrics(id: string) {
     return this.req<Awaited<ReturnType<Api['mvLyrics']>>>('POST', `/mars/mv/${id}/lyrics`);
   }

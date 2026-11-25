@@ -2245,6 +2245,16 @@ export class DemoApi implements Api {
   async mvStory(): Promise<never> {
     throw new ApiError(501, 'DEMO', 'demo');
   }
+  // R13: the review page's video is made by the stand-in job (canned frames moved in the card: makers.ts)
+  async mvPictures(): Promise<never> {
+    throw new ApiError(501, 'DEMO', 'demo');
+  }
+  async mvEdit(): Promise<never> {
+    throw new ApiError(501, 'DEMO', 'demo');
+  }
+  async mvRedraw(): Promise<never> {
+    throw new ApiError(501, 'DEMO', 'demo');
+  }
   async mvLyrics(): Promise<never> {
     throw new ApiError(501, 'DEMO', 'demo');
   }

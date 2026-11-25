@@ -1,5 +1,6 @@
 'use client';
 
+import { ReelPlayer } from './ReelPlayer';
 import { useEffect, useRef, useState } from 'react';
 import { StarButton } from '@/components/finds/MarkRing';
 import { workMarkRef } from '@/lib/finds/works';
@@ -230,6 +231,7 @@ export function WorkCard({
           </div>
         )}
         {!showMaking && shown.video && <video src={shown.video} poster={shown.poster ?? undefined} controls playsInline className="w-full rounded-xl bg-black" />}
+        {!showMaking && !shown.video && shown.reel && <ReelPlayer reel={shown.reel} title={shown.title?.replace(/（MV）$/, '')} />}
         {!showMaking && aiming && aim === 'frame' && <Frames w={shown} target={target} onTarget={setTarget} />}
         {!showMaking && sound && w.kind === 'song' && <Wave w={shown} aiming={aiming && aim === 'range'} target={target} onTarget={setTarget} />}
         {!showMaking && w.kind === 'song' && w.lyrics && <CardLyrics lyrics={w.lyrics} note={w.tweak?.what} />}

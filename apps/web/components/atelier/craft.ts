@@ -1,6 +1,7 @@
 import { CRAFT_LINES, isCraftKind, MOON_LINES, questionsFor, spellNamedGroups, type CraftKind, type CraftQuestion, type SpellAnswer, type SpellKind } from '@obolo/shared';
 import type { AtelierKind } from '@/lib/atelier/unlock';
 import type { Work } from './work';
+import { videoAnswered, videoDoneLine } from './video';
 
 /**
  * Client 2026-11-25 — 本 and ゲーム in the Moon chat: 「会話で始めて、スペルで決めて、会話で直す」. These are the chat's
@@ -19,6 +20,8 @@ export function craftBegin(kind: CraftKind, content: string, bare: boolean): Cra
 /** one answer in: the next question, or (none left) the answers to distil into the spell */
 export function craftAnswer(a: CraftAsk, text: string): CraftAsk {
   const [q, ...left] = a.left;
+  // R13: the song question of a video: the song is picked by its name (its talisman shows it)
+  if (a.kind === 'video') videoAnswered(q?.group, text);
   return { ...a, answers: [...a.answers, { group: q?.group, said: text.slice(0, 200) }], left };
 }
 
@@ -37,6 +40,7 @@ export const craftStartLine = (kind: AtelierKind) => (kind === 'novel' ? CRAFT_L
 /** what {bati} says once a book's chapter / a game is made (the talk then waits for the next words: a change) */
 export function craftDoneLines(w: Work): { text: string; vars?: Record<string, number> }[] {
   if (w.kind === 'game') return [{ text: CRAFT_LINES.gameDone }];
+  if (w.kind === 'video') return [{ text: videoDoneLine(w) }];
   const n = w.book?.chapters.length ?? 1;
   if (w.book?.done) return [{ text: CRAFT_LINES.bookEnd }];
   return [...(n === 1 ? [{ text: CRAFT_LINES.bookKept }] : []), { text: CRAFT_LINES.chapterDone, vars: { n } }];

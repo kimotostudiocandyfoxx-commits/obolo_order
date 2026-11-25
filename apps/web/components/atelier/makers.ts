@@ -1,4 +1,4 @@
-import { CRAFT_LINES, KIND_HOME_PLANET, spellFrom, KORORIN_VOICE_STYLE, neoVoiceUrl, withTarget, lyricsLines, lyricsSections, type JobView, type MakeConfirm, type Me, type RefineTarget, type WorkVersion } from '@obolo/shared';
+import { CRAFT_LINES, KIND_HOME_PLANET, spellFrom, KORORIN_VOICE_STYLE, neoVoiceUrl, withTarget, lyricsLines, lyricsSections, type JobView, type MakeConfirm, type Me, type RefineTarget, type VideoParams, type WorkVersion, VIDEO_LINES, videoParams } from '@obolo/shared';
 import { demoStickerArt } from '@/lib/look';
 import { ApiError, getApi } from '@/lib/api';
 import type { AtelierKind } from '@/lib/atelier/unlock';
@@ -9,6 +9,7 @@ import { dropShelf, LOCAL_KINDS, patchTalkWork, putShelf } from './shelf';
 import { stack, uid, type Version, type Work } from './work';
 import { bookCoverUrl, bookSub } from './BookRead';
 import { spellKindOf, type Plan } from './plan';
+import { demoEdited, demoRedrawn, demoReel, type VideoReel } from './video';
 
 /**
  * The generation calls behind the atelier's cards (M-R210): the same ones the old per-kind screens used — the look's
@@ -44,10 +45,14 @@ export type MakeOpts = {
   confirm?: MakeConfirm;
   /** R11: the plan said yes to (its genre / mood go into the making) */
   plan?: Plan;
+  /** R13: a video's free change (how its pictures move): re-rendered from the kept pictures, no mana */
+  edit?: { params: VideoParams; order: number[] };
+  /** R13: a video's scenes to paint again (in its own order), from the small spell said yes to */
+  redraw?: number[];
 };
 
 /** the review page's stand-in times (M-R253 §4): a 2-minute one (said up front) and a 20-second one (waited in place) */
-export const DEMO_SECONDS: Partial<Record<AtelierKind, number>> = { song: 120, video: 120, art: 20 };
+export const DEMO_SECONDS: Partial<Record<AtelierKind | 'videoEdit', number>> = { song: 120, video: 120, art: 20, videoEdit: 12 };
 
 /** §3: what a material gives the next work — its words (a kororin's, a song's title), its picture, its song */
 export function materialWords(ms: Work[] = []): string {
@@ -70,7 +75,7 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
   const sk = spellKindOf(kind);
   const paid = { confirm: opts.confirm, spell };
   const lyrics = kind === 'song' && opts.confirm ? opts.plan?.lyrics : undefined;
-  const pay = (m: 'song' | 'jacketArt' | 'mv') => (opts.confirm ? { kind: m, confirm: opts.confirm, spell: spell && sk ? { kind: sk, tags: spell, ...(lyrics ? { lyrics } : {}) } : undefined } : undefined);
+  const pay = (m: 'song' | 'jacketArt' | 'mv' | 'mvPictures' | 'mvRedraw') => (opts.confirm ? { kind: m, confirm: opts.confirm, spell: spell && sk ? { kind: sk, tags: spell, ...(lyrics ? { lyrics } : {}) } : undefined } : undefined);
   const base: Work = { id: uid(), kind, prompt, status: 'ready' };
   const done = (w: Work): Work => {
     const out = { ...w, saved: true };
@@ -153,23 +158,52 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
       return { ...base, prompt: words, status: 'making', title, ...(lyrics ? { lyrics } : {}), started: { job, what: 'song', words, extra: { comment: d.comment, songTitle: title } } };
     }
     case 'video': {
+      // R13 (docs/動画の作り方.md): pictures that move — painted scenes or your own pictures, never a generated film
       const words = prev?.kind === 'video' ? `${prev.prompt}。${said}` : said;
-      // §3: a picture made before is the MV's still; a song made before is what it plays on
+      const mvId = prev?.ref?.mvId;
+      const home = KIND_HOME_PLANET.video;
+      // a free change of how it moves (no mana): the same pictures, re-rendered
+      if (opts.edit && prev?.reel) {
+        if (!ctx.live) {
+          const job = await api.demoJob({ seconds: DEMO_SECONDS.videoEdit!, failTimes: 0 });
+          return { ...base, prompt: prev.prompt, status: 'making', started: { job, what: 'video', words: prev.prompt, extra: { reel: demoEdited(prev.reel as VideoReel, opts.edit), songTitle: prev.title?.replace(/（MV）$/, '') } } };
+        }
+        if (!mvId) throw new ApiError(400, 'NO_CUT', 'not kept');
+        const job = await api.mvEdit(mvId, { params: opts.edit.params, order: opts.edit.order, from: 'atelier' });
+        return { ...base, prompt: prev.prompt, status: 'making', ref: prev.ref, spell: prev.spell, home, started: { job, what: 'video', words: prev.prompt } };
+      }
+      const tags = opts.plan?.tags;
+      // scenes painted again from the small spell said yes to
+      if (opts.redraw?.length && prev?.reel && tags && opts.confirm) {
+        if (!ctx.live) {
+          const job = await api.demoJob({ seconds: DEMO_SECONDS.video!, failTimes: 0, pay: pay('mvRedraw') });
+          return { ...base, prompt: prev.prompt, status: 'making', started: { job, what: 'video', words: prev.prompt, extra: { reel: demoRedrawn(prev.reel as VideoReel, opts.redraw), songTitle: prev.title?.replace(/（MV）$/, '') } } };
+        }
+        if (!mvId) throw new ApiError(400, 'NO_CUT', 'not kept');
+        const job = await api.mvRedraw(mvId, { scenes: opts.redraw, spell: tags, confirm: opts.confirm, from: 'atelier' });
+        return { ...base, prompt: prev.prompt, status: 'making', ref: prev.ref, spell: prev.spell, home, started: { job, what: 'video', words: prev.prompt } };
+      }
+      const params = tags ? videoParams(tags) : null;
+      const own = params?.purpose === 'pictures';
+      // §3: a picture made before is a picture of it; a song made before is what it plays on
       const art = mats.find((m) => m.kind === 'art' && m.image);
       const songMat = mats.find((m) => m.kind === 'song');
+      const songName = tags?.find((t) => t.group === 'source')?.ja ?? songMat?.title;
       if (!ctx.live) {
-        const job = await api.demoJob({ seconds: DEMO_SECONDS.video!, failTimes: 0, pay: pay('mv') });
-        return { ...base, prompt: words, status: 'making', started: { job, what: 'video', words, extra: { still: art?.image ?? null, songTitle: songMat?.title } } };
+        // the review page: a stand-in job, then a canned storyboard moved in the card
+        const job = await api.demoJob({ seconds: DEMO_SECONDS.video!, failTimes: 0, pay: pay(own ? 'mvPictures' : 'mv') });
+        return { ...base, prompt: words, status: 'making', spell: tags, home, started: { job, what: 'video', words, extra: { still: art?.image ?? null, songTitle: songName, reel: tags ? demoReel(tags) : undefined } } };
       }
-      const songId = songMat?.ref?.songId ?? ctx.lastSongId ?? (await api.savedSongs())[0]?.id;
-      if (!songId) return { ...base, status: 'failed', note: '映像は曲にのせて作るよ。先に曲を作ろう' };
+      const songId = params?.songId ?? songMat?.ref?.songId ?? ctx.lastSongId ?? (await api.savedSongs())[0]?.id;
+      if (!songId) return { ...base, status: 'failed', note: VIDEO_LINES.noSong };
       const mv = await api.mvCreate(songId);
-      if (art) {
-        const mediaId = art.ref?.mediaId ?? (await fetch(art.image!).then((x) => x.blob()).then((b) => api.uploadPhoto(b)).then((x) => x.id).catch(() => null));
+      // your own pictures: the works brought in (else the server takes the newest in Bluena)
+      for (const m of (own ? mats.filter((x) => x.image) : art ? [art] : []).slice(0, 12)) {
+        const mediaId = m.ref?.mediaId ?? (await fetch(m.image!).then((x) => x.blob()).then((b) => api.uploadPhoto(b)).then((x) => x.id).catch(() => null));
         if (mediaId) await api.mvAddMaterial(mv.id, { mediaId, kind: 'photo' }).catch(() => undefined);
       }
-      const job = await api.mvStory(mv.id, words, 'atelier', paid);
-      return { ...base, prompt: words, status: 'making', started: { job, what: 'video', words } };
+      const job = own && tags && opts.confirm ? await api.mvPictures(mv.id, { spell: tags, confirm: opts.confirm, from: 'atelier' }) : await api.mvStory(mv.id, words, 'atelier', paid);
+      return { ...base, prompt: words, status: 'making', ref: { mvId: mv.id }, spell: tags, home, started: { job, what: 'video', words } };
     }
     case 'radio':
       // a recorded show: the card records it (your songs + your voice), then it is kept
@@ -208,9 +242,13 @@ export async function finishJob(w: Watched, job: JobView, live = getApi().mode =
     }
   } else if (w.what === 'video') {
     const p = job.result?.mv;
+    // R13: the video and what it is made of (its later words change how it moves, for free)
+    const reel = p?.cut ? ({ ...p.cut, seconds: p.seconds ?? 30 } as VideoReel) : w.extra?.reel;
     made = p
-      ? { ...base, title: `${p.songTitle}（MV）`.slice(0, 40), text: p.note ?? undefined, video: p.videoUrl ?? undefined, poster: p.posterUrl, ref: { backstageId: p.backstageId ?? undefined } }
-      : { ...base, title: `${w.extra?.songTitle ?? 'MV'}（MV・おためし）`.slice(0, 40), image: w.extra?.still ?? demoStickerArt(w.words.slice(0, 60)), note: 'おためしでは映像は作らず、場面の絵を置いています' };
+      ? { ...base, title: `${p.songTitle}（MV）`.slice(0, 40), text: p.note ?? undefined, video: p.videoUrl ?? undefined, poster: p.posterUrl, image: undefined, note: undefined, reel, ref: { backstageId: p.backstageId ?? undefined, mvId: p.id }, home: KIND_HOME_PLANET.video }
+      : reel
+        ? { ...base, title: `${w.extra?.songTitle ?? 'MV'}（MV）`.slice(0, 40), reel, poster: reel.scenes[reel.order[0] ?? 0]?.url ?? null, image: undefined, video: undefined, note: undefined, home: KIND_HOME_PLANET.video }
+        : { ...base, title: `${w.extra?.songTitle ?? 'MV'}（MV・おためし）`.slice(0, 40), image: w.extra?.still ?? demoStickerArt(w.words.slice(0, 60)), note: 'おためしでは映像は作らず、場面の絵を置いています' };
   } else if (w.what === 'art') {
     // the review's stand-in picture, put into Bluena's Jupiter folder as the real one is
     const image = demoStickerArt(w.words);
