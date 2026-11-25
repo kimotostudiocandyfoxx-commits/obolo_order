@@ -1,4 +1,5 @@
 import type { LinkPreview } from '@obolo/shared';
+import type { IncantBody, IncantView } from '@obolo/shared';
 import type { LyricsBody, LyricsView, SongLyrics, SongTweakBody, SongTweakResult } from '@obolo/shared';
 import type { BookView, CompassSpell, GameBrokenBody, GameBuildBody, GameView, MoonCompassBody, NovelChapterBody, SaveSpellBody, SaveSpellResult, SavedSpell } from '@obolo/shared';
 import type { ClipFile, ClipStartBody, ClipUploadStart, ChangeResult, HomeOshi, HomePlanet, PlanetHomeView, AddVersionBody, CreateMoonWorkBody, DemoJobBody, MakeConfirm, MakeKind, SpellBody, SpellKind, SpellTag, SpellView, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiHistoryPage, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView, MvEditBody, MvPicturesBody, MvRedrawBody } from '@obolo/shared';
@@ -158,6 +159,8 @@ export interface Api {
   demoJob(body: DemoJobBody & { pay?: { kind: MakeKind; confirm: MakeConfirm; spell?: { kind: SpellKind; tags: SpellTag[]; lyrics?: SongLyrics } } }): Promise<JobView>;
   /** R11: the spell (スペル) {bati} lays out for a paid making — fresh for the words, or changed by them */
   moonSpell(body: SpellBody): Promise<SpellView>;
+  /** R17: words to {bati} checked on the server (members only get anything but { premium: false }) */
+  incant(body: IncantBody): Promise<IncantView>;
   /** R13: a song's スペル入りの歌詞 (lyrics with metatag talismans) for its style spell, or changed by the words */
   moonLyrics(body: LyricsBody): Promise<LyricsView>;
   /** R13: a finished song changed for free (tempo, key, 2番カット …), or one back; `demo`: the review demo's card state */

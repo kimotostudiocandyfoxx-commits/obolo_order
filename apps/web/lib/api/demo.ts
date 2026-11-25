@@ -183,6 +183,18 @@ import { getBlob, putBlob } from './idb';
 import { demoUnfurl } from './demoUnfurl';
 import { tokenStore } from './token';
 import { ApiError, type Api, type Paid } from './types';
+import { incantNorm, premiumRequest, type IncantView } from '@obolo/shared';
+
+/** R17: the passphrase's digests and lengths (its normalized forms) — the demo's only knowledge of it */
+const DEMO_INCANT: [number, string][] = [
+  [5, '218b7f342652e633b8f02740e8f50c67daf14a87d7d56433de4bc690839c293e'],
+  [10, '0a7e5ad78be6204f084aa1c0a857fda6481eb78bbfc23d6095733caecb778891'],
+  [10, '37cffe718f6a1e1b10c40a91d88f068661b40ebebb5c22d28565adf073c3dde8'],
+];
+async function sha256Hex(s: string): Promise<string> {
+  const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, '0')).join('');
+}
 
 /** Demo ひろば: name, landmark, people already there (the demo has no other members). */
 const DEMO_PLAZAS: [string, string, number][] = [
@@ -984,6 +996,23 @@ export class DemoApi implements Api {
     // R14: the same genre table as the API's rules (psytrance comes out as psytrance); a correction is a spell made again
     if (body.tags?.length) return { ...spellEdit(body.kind, body.tags, body.said), how: 'rules' as const, ...(spellCorrection(body.said) ? { respelled: true } : {}) };
     return { tags: body.answers?.length ? spellOfAnswers(body.kind, body.answers) : spellFrom(body.kind, body.said), added: [], removed: [], how: 'rules' as const };
+  }
+  /**
+   * R17: the review demo's stand-in for the server's passphrase check — the demo knows only the passphrase's digests
+   * (SHA-256 of its normalized forms), never its words, so the page's code does not give it away; a member only.
+   */
+  async incant(body: Parameters<Api['incant']>[0]): Promise<IncantView> {
+    const me = await this.me();
+    if (!isActiveMember(me)) return { premium: false };
+    const s = incantNorm(body.said);
+    for (const [n, digest] of DEMO_INCANT) {
+      for (let i = 0; i + n <= s.length; i++) {
+        const w = s.slice(i, i + n);
+        if ((await sha256Hex(w)) !== digest) continue;
+        return { premium: true, grant: crypto.randomUUID(), price: MAKE_COST.songPremium, request: premiumRequest(body.said, [w]) ?? '' };
+      }
+    }
+    return { premium: false };
   }
   // R13: the review demo's free song changes — the same parsing and ops as the API (its sketch keeps playing as it is:
   // no ffmpeg in the browser); the card's lyrics follow the cuts / repeats, and undo goes one back

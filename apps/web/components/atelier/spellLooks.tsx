@@ -143,6 +143,7 @@ export const LOOK_CSS = `
 @keyframes hk-bob{0%{transform:translateY(-2px) rotate(var(--tilt))}100%{transform:translateY(2.5px) rotate(calc(var(--tilt) * -1))}}
 @keyframes hk-away{0%{opacity:1;filter:none;transform:rotate(var(--tilt))}35%{opacity:1;filter:brightness(2.2) blur(1px)}100%{opacity:0;filter:brightness(3.2) blur(8px);transform:translateY(-30px) scale(1.2)}}
 @keyframes hk-glow{0%,100%{filter:drop-shadow(0 0 4px rgba(110,215,255,.75)) drop-shadow(0 0 12px rgba(60,160,255,.4))}50%{filter:drop-shadow(0 0 7px rgba(150,230,255,.95)) drop-shadow(0 0 18px rgba(60,160,255,.55))}}
+@keyframes hk-glow-gold{0%,100%{filter:drop-shadow(0 0 4px rgba(255,214,110,.85)) drop-shadow(0 0 12px rgba(255,170,40,.45))}50%{filter:drop-shadow(0 0 8px rgba(255,232,150,1)) drop-shadow(0 0 20px rgba(255,170,40,.6))}}
 @keyframes hk-breathe{0%,100%{box-shadow:0 0 10px rgba(90,205,255,.5),0 0 22px rgba(60,160,255,.2),inset 0 0 12px rgba(190,245,255,.45)}50%{box-shadow:0 0 16px rgba(120,220,255,.75),0 0 30px rgba(60,160,255,.35),inset 0 0 14px rgba(210,250,255,.6)}}
 @keyframes hk-ripple{0%{transform:translate(-50%,-50%) scale(.6);opacity:.55}100%{transform:translate(-50%,-50%) scale(1.6);opacity:0}}
 /* E 呪符: stamped on, the circle turns, peeled off */
@@ -158,6 +159,8 @@ export interface TalismanProps {
   mode: Mode;
   delay: number;
   onDrop?: () => void;
+  /** R17: the secret spell — D 光符 lit gold */
+  gold?: boolean;
 }
 
 function Drop({ ja, onDrop, className, style }: { ja: string; onDrop: () => void; className: string; style?: CSSProperties }) {
@@ -327,36 +330,42 @@ function Rune({ tag, mode, delay, onDrop, tilt }: TalismanProps & { tilt: number
 }
 
 /* ───────────────────────── D 光符 ───────────────────────── */
-function Hikari({ tag, mode, delay, onDrop, tilt }: TalismanProps & { tilt: number }) {
+/** D 光符's light: the bowl's water blue, or (R17, the secret spell) gold */
+const HIKARI_LIGHT = {
+  blue: { glow: 'hk-glow', wash: 'rgba(200,245,255,.22)', paper: 'linear-gradient(180deg, rgba(110,200,255,.24), rgba(40,120,220,.16) 55%, rgba(110,200,255,.26))', edge: 'inset 0 0 7px rgba(200,245,255,.55), inset 0 0 0 1px rgba(210,248,255,.6)', dot: 'radial-gradient(circle, #fff 0 30%, #9ff0ff 55%, transparent 72%)', dotGlow: '0 0 6px #6fe0ff', ink: '#f8feff', inkShadow: '0 0 1px #fff, 0 0 4px #9becff, 0 0 10px #3fb6ff, 0 0 16px rgba(40,140,255,.55)', mote: '#7fe3ff' },
+  gold: { glow: 'hk-glow-gold', wash: 'rgba(255,240,190,.3)', paper: 'linear-gradient(180deg, rgba(255,210,110,.34), rgba(220,150,30,.24) 55%, rgba(255,214,120,.36))', edge: 'inset 0 0 7px rgba(255,236,180,.65), inset 0 0 0 1px rgba(255,226,150,.8)', dot: 'radial-gradient(circle, #fff 0 30%, #ffe08a 55%, transparent 72%)', dotGlow: '0 0 6px #ffc94a', ink: '#fffaf0', inkShadow: '0 0 1px #fff, 0 0 4px #ffe39a, 0 0 10px #ffb52e, 0 0 16px rgba(255,150,20,.6)', mote: '#ffd36a' },
+};
+function Hikari({ tag, mode, delay, onDrop, tilt, gold }: TalismanProps & { tilt: number }) {
   const seed = seedOf(tag.ja);
+  const L = HIKARI_LIGHT[gold ? 'gold' : 'blue'];
   const t = (tilt * 0.4).toFixed(1);
   const bob = `hk-bob ${2.6 + (seed % 7) * 0.22}s ease-in-out ${(seed % 11) * -300}ms infinite alternate`;
   const anim = mode === 'drop' ? `hk-in 1s cubic-bezier(.2,.8,.3,1) ${delay}ms both, ${bob}` : mode === 'fall' ? `hk-away 1.05s ease-in ${delay}ms forwards, ta-gone ${1050 + delay}ms linear forwards` : `ta-fade .5s ease-out ${delay}ms both, ${bob}`;
   return (
     <span className="relative inline-block px-[1px] py-[3px]" style={{ ['--tilt' as string]: `${t}deg`, animation: anim }} data-fuda={mode} aria-label={tag.ja}>
-      <span className="block" style={{ animation: `hk-glow ${3.4 + (seed % 5) * 0.3}s ease-in-out ${(seed % 7) * -400}ms infinite` }}>
+      <span className="block" style={{ animation: `${L.glow} ${3.4 + (seed % 5) * 0.3}s ease-in-out ${(seed % 7) * -400}ms infinite` }} data-gold={gold ? '' : undefined}>
         <span
           className="relative flex h-[32px] items-center gap-[3px] pl-[6px] pr-[5px]"
           style={{
             clipPath: ragged(seed, { tb: 0.8, lr: 2.2, n: 6, m: 7 }),
-            background: `radial-gradient(ellipse 60% 80% at 50% 50%, rgba(200,245,255,.22), transparent 80%), ${FIBRE_C}, linear-gradient(180deg, rgba(110,200,255,.24), rgba(40,120,220,.16) 55%, rgba(110,200,255,.26))`,
+            background: `radial-gradient(ellipse 60% 80% at 50% 50%, ${L.wash}, transparent 80%), ${FIBRE_C}, ${L.paper}`,
             backgroundBlendMode: 'normal, normal, normal',
-            boxShadow: 'inset 0 0 7px rgba(200,245,255,.55), inset 0 0 0 1px rgba(210,248,255,.6)',
+            boxShadow: L.edge,
             backdropFilter: 'blur(2px)',
             WebkitBackdropFilter: 'blur(2px)',
           }}
         >
           {/* a drop of the bowl's water, lit */}
-          <span aria-hidden className="block h-[7px] w-[7px] shrink-0 rounded-full" style={{ background: 'radial-gradient(circle, #fff 0 30%, #9ff0ff 55%, transparent 72%)', boxShadow: '0 0 6px #6fe0ff, 0 0 0 1.5px rgba(190,245,255,.0)' }} />
-          <span className="relative whitespace-nowrap pt-[1px] text-[15.5px] leading-none tracking-[.04em]" style={{ fontFamily: face('hikari'), color: '#f8feff', textShadow: '0 0 1px #fff, 0 0 4px #9becff, 0 0 10px #3fb6ff, 0 0 16px rgba(40,140,255,.55)' }}>
+          <span aria-hidden className="block h-[7px] w-[7px] shrink-0 rounded-full" style={{ background: L.dot, boxShadow: L.dotGlow }} />
+          <span className="relative whitespace-nowrap pt-[1px] text-[15.5px] leading-none tracking-[.04em]" style={{ fontFamily: face('hikari'), color: L.ink, textShadow: L.inkShadow }}>
             {tag.ja}
           </span>
           {onDrop && mode !== 'fall' && <Drop ja={tag.ja} onDrop={onDrop} className="relative h-[13px] w-[13px] text-[7.5px]" style={{ color: '#e8fbff', boxShadow: 'inset 0 0 0 1px rgba(220,250,255,.6)', textShadow: '0 0 4px #7fdcff' }} />}
         </span>
       </span>
       {/* motes of light around it */}
-      <span aria-hidden className="pointer-events-none absolute block h-[3px] w-[3px] rounded-full bg-white" style={{ top: 0, right: `${10 + (seed % 30)}%`, boxShadow: '0 0 5px 1px #7fe3ff', animation: `tf-twinkle ${2.2 + (seed % 4) * 0.4}s ease-in-out ${(seed % 9) * -250}ms infinite` }} />
-      {seed % 3 !== 0 && <span aria-hidden className="pointer-events-none absolute block h-[2px] w-[2px] rounded-full bg-white" style={{ bottom: 1, left: `${15 + (seed % 40)}%`, boxShadow: '0 0 4px 1px #7fe3ff', animation: `tf-twinkle ${2.8 + (seed % 3) * 0.5}s ease-in-out ${(seed % 7) * -350}ms infinite` }} />}
+      <span aria-hidden className="pointer-events-none absolute block h-[3px] w-[3px] rounded-full bg-white" style={{ top: 0, right: `${10 + (seed % 30)}%`, boxShadow: `0 0 5px 1px ${L.mote}`, animation: `tf-twinkle ${2.2 + (seed % 4) * 0.4}s ease-in-out ${(seed % 9) * -250}ms infinite` }} />
+      {seed % 3 !== 0 && <span aria-hidden className="pointer-events-none absolute block h-[2px] w-[2px] rounded-full bg-white" style={{ bottom: 1, left: `${15 + (seed % 40)}%`, boxShadow: `0 0 4px 1px ${L.mote}`, animation: `tf-twinkle ${2.8 + (seed % 3) * 0.5}s ease-in-out ${(seed % 7) * -350}ms infinite` }} />}
     </span>
   );
 }

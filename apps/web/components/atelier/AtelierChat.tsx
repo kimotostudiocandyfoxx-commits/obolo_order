@@ -44,7 +44,7 @@ import { DeviceButton } from './DeviceButton';
 import { ClipRelic } from '@/components/relic/ClipRelics';
 import { PortalRelic } from '@/components/relic/PortalRelic';
 import { CLUSTER_MAX } from '@/lib/relic/layout';
-import { talkPlain, linkDomain, wordsAndLinks, type ClipFile, isLyricsTalk, lyricsDiff, lyricsEdit, lyricsFallback, lyricsSecondVerse, ownLyricsOf, parseTweak, songSpellKey, SONG_LINES, type LyricsView, type SongLyrics } from '@obolo/shared';
+import { talkPlain, linkDomain, wordsAndLinks, type ClipFile, isLyricsTalk, lyricsDiff, lyricsEdit, lyricsFallback, lyricsSecondVerse, ownLyricsOf, parseTweak, songSpellKey, SONG_LINES, PREMIUM_LINES, isActiveMember, type IncantView, type LyricsView, type SongLyrics } from '@obolo/shared';
 
 /** R12: your line in the Bati chat — a file handed over floats as its relic; a URL in your words becomes a portal */
 function meItem(m: { id: string; text: string; file?: ClipFile | null }): TalkItem {
@@ -349,7 +349,10 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
    * float in the sky over the bowl (FloatingSpell, the scene's `stage`); the talk keeps 「じゃあ、こういうスペルになるね。」
    * with a small record of it, and {bati}'s question 「このスペルで作る？　それとも、どこか変える？」
    */
-  const propose = async (kind: AtelierKind, said: string, prev: Work | undefined, opts: MakeOpts, before?: PlanAsk, view?: SpellView, extra?: { lead?: [string, Record<string, string>?]; from?: 'compass' | 'book'; lyrics?: SongLyrics }) => {
+  const propose = async (kind: AtelierKind, said: string, prev: Work | undefined, opts: MakeOpts, before?: PlanAsk, view?: SpellView, extra?: { lead?: [string, Record<string, string>?]; from?: 'compass' | 'book'; lyrics?: SongLyrics; /** R17: the secret spell (its grant and price) */ premium?: MakeOpts['premium'] }) => {
+    // R17: the secret spell stays through the spell's changes (gold talismans, its own price); a new making is normal again
+    const prem = kind === 'song' ? (extra?.premium ?? opts.premium ?? before?.opts.premium) : undefined;
+    if (prem) opts = { ...opts, premium: prem };
     // client 2026-11-25: a book's spell is free (no mana words), a game's tweak costs its own; a chapter has its own spell
     const craft = isCraftKind(kind);
     // client 2026-11-25: the live price (re-read at most once a minute) — the card shows it, the yes carries it
@@ -391,7 +394,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     // R13: a video's spell has exactly one song talisman (picked by its name); its price follows what it is for
     const vv = kind === 'video' ? fixVideoSpell(v, said) : v;
     const plan0 = planOf(kind, vv);
-    const price = kind === 'video' ? videoPrice(vv.tags, opts.redraw, manaPricesNow()) : cost.mana;
+    const price = prem ? prem.price : kind === 'video' ? videoPrice(vv.tags, opts.redraw, manaPricesNow()) : cost.mana;
     // R13: the lyrics carry over a change of the style talismans; a fresh song gets them written for its style
     const plan: Plan = twoPart && before?.plan.lyrics ? { ...plan0, lyrics: before.plan.lyrics } : plan0;
     const id = uid();
@@ -399,7 +402,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     const text = extra?.lead ? tline(extra.lead[0], extra.lead[1]) : before && v.respelled && kind === 'song' && genreNow ? tline(SONG_LINES.styleRespell, { genre: genreNow }) : tline(before ? MOON_LINES.replan : twoPart ? SONG_LINES.songPlan : MOON_LINES.plan);
     const fid = before && floatingRef.current ? floatingRef.current.id : id;
     setMsgs((m) => [...m, { id, who: 'bati', text, plan: { kind, tags: plan.tags, price, have } }]);
-    setFloating((f) => ({ id: fid, kind, look: spellLookFor(kind), tags: plan.tags, removed: before ? plan.removed : [], price, have, from: extra?.from, lyrics: twoPart && before && f?.lyrics ? f.lyrics : undefined }));
+    setFloating((f) => ({ id: fid, kind, look: spellLookFor(kind), tags: plan.tags, removed: before ? plan.removed : [], price, have, from: extra?.from, lyrics: twoPart && before && f?.lyrics ? f.lyrics : undefined, ...(prem ? { gold: true } : {}) }));
     hinted.current.clear();
     // a redo is asked with the change's own words (the card's words carry over); a new one with the spell's
     const ask: PlanAsk = { id, plan, prompt: craft ? (before ? `${before.prompt}、${said}` : said) : prev ? (before ? `${before.prompt}、${styleSaid}` : styleSaid) : plan.words, prev, opts, price };
@@ -601,6 +604,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   sayTRef.current = sayT;
   const afterRef = useRef(afterMade);
   afterRef.current = afterMade;
+  const proposeRef = useRef(propose);
+  proposeRef.current = propose;
   // M-R253 §4: the app's job host says how this talk's slow cards are doing
   useEffect(
     () =>
@@ -631,6 +636,11 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
           // a redo: the try before stays; a game: the one before (its mana is back: the server gave it); R16: the failed card says so
           put({ ...(e.work ?? failedCard(e.w.card, e.job)), id: e.w.card.id });
           if (said) return;
+          // R17: the secret spell could not be made — its mana is back; {bati} offers the normal spell (laid out, with its price)
+          if (e.w.card.premium) {
+            sayT(PREMIUM_LINES.failed);
+            return void proposeRef.current('song', e.w.card.prompt, undefined, {}, undefined, e.w.card.spell?.length ? { tags: e.w.card.spell, added: [], removed: [] } : undefined, { lead: [MOON_LINES.plan], ...(e.w.card.lyrics ? { lyrics: e.w.card.lyrics } : {}) });
+          }
           // ④ two failures in a row: the re-try stops (R13: a video's mana is back)
           sayT(failedLine(e.w.card.kind));
         }
@@ -846,7 +856,9 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     const about = rule.undo || rule.ops.length > 0 || !!rule.paid;
     // another making / a search is not about this song; unknown words only while {bati} has just asked
     if (!about && (!asked || it.kind === 'make' || it.kind === 'makeAny' || it.kind === 'find')) return false;
-    if (rule.paid) {
+    // R17: 「自分の声で歌って」 on a song from the new studio is free (our studio sings it in your voice): asked of the server
+    const ownVoice = rule.paid === 'voice' && /自分の声|わたしの声|私の声|ボクの声|僕の声|ぼくの声|俺の声|おれの声/.test(text);
+    if (rule.paid && !ownVoice) {
       sayT(SONG_LINES.editPaid);
       void run('song', text, cardOf(w.id) ?? w);
       return true;
@@ -859,7 +871,21 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       try {
         // (the demo works from the lyrics as sung; the API keeps them itself)
         const sung = card.tweak?.lyrics0 ?? card.lyrics;
-        const r = await getApi().songTweak(id, rule.undo ? { undo: true } : { said: text.slice(0, 200) }, { lyrics: sung, seconds: card.tweak?.seconds });
+        const ask = () => getApi().songTweak(id, rule.undo ? { undo: true } : { said: text.slice(0, 200) }, { lyrics: sung, seconds: card.tweak?.seconds });
+        let r = await ask();
+        // R17: the song is split on our studio first (the voice and the music apart, the line times) — once, then the words again
+        if (r.status === 'wait' && r.jobId) {
+          sayT(SONG_LINES.editWait);
+          const until = Date.now() + 12 * 60_000;
+          for (;;) {
+            await new Promise((ok) => setTimeout(ok, 4000));
+            const j = await getApi().getJob(r.jobId).catch(() => null);
+            if (j?.status === 'done') break;
+            if (j?.status === 'failed' || Date.now() > until) throw new Error('split');
+          }
+          r = await ask();
+          if (r.status === 'wait') throw new Error('split');
+        }
         if (r.status === 'paid') {
           sayT(SONG_LINES.editPaid);
           return void run('song', text, card);
@@ -1253,6 +1279,31 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     setMsgs((m) => [...m, { id: uid(), who: 'me', text }]);
     const p = pending;
     setPending(null);
+    // R17: a member's words go by the server first (only it knows the secret spell's passphrase); anyone else, or any
+    // other words, go on as always — a short wait at most, never a sign of it
+    if (!story && isActiveMember(me) && text.trim().length >= 2) {
+      void Promise.race([getApi().incant({ said: text.slice(0, 400) }), new Promise<IncantView>((r) => setTimeout(() => r({ premium: false }), 2500))])
+        .catch((): IncantView => ({ premium: false }))
+        .then((r) => (r.premium ? premiumSpell(r, p) : sendOn(text, p)));
+      return;
+    }
+    sendOn(text, p);
+  };
+  /**
+   * R17 (client 2026-11-25): the passphrase heard — {bati} is a little surprised, and the song's spell is laid out again in
+   * gold (the talismans glow gold; the mana is the secret spell's). The words after the passphrase are the request; none:
+   * the song spell waiting (its talismans and lyrics kept), else the last song asked for.
+   */
+  const premiumSpell = (r: Extract<IncantView, { premium: true }>, p: Pending) => {
+    sayT(PREMIUM_LINES.known);
+    const premium = { grant: r.grant, price: r.price };
+    const waiting = p && 'plan' in p && p.plan.plan.kind === 'song' ? p.plan : null;
+    if (waiting && !r.request) return void propose('song', '', waiting.prev, waiting.opts, waiting, { tags: waiting.plan.tags, added: [], removed: [] }, { lead: [PREMIUM_LINES.plan], premium });
+    const last = lastWork();
+    const prev = last?.kind === 'song' && last.status === 'ready' && !r.request ? last : undefined;
+    void propose('song', r.request || (prev ? '' : 'おまかせ'), prev, {}, undefined, undefined, { lead: [PREMIUM_LINES.plan], premium, ...(prev?.lyrics ? { lyrics: prev.lyrics } : {}) });
+  };
+  const sendOn = (text: string, p: Pending) => {
     // R16: the answer to 「どれかな？」 (which of the works found to open)
     if (!story && openChoices.current && openChosen(text)) return;
     // R12: {bati}'s compass and spell book (a link, their names, the answers to its questions, the offer)

@@ -50,6 +50,8 @@ export type MakeOpts = {
   edit?: { params: VideoParams; order: number[] };
   /** R13: a video's scenes to paint again (in its own order), from the small spell said yes to */
   redraw?: number[];
+  /** R17: the secret spell's grant (only after a member said its passphrase; the server checks it) and its price */
+  premium?: { grant: string; price: number };
 };
 
 /** the review page's stand-in times (M-R253 §4): a 2-minute one (said up front) and a 20-second one (waited in place) */
@@ -76,7 +78,7 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
   const sk = spellKindOf(kind);
   const paid = { confirm: opts.confirm, spell };
   const lyrics = kind === 'song' && opts.confirm ? opts.plan?.lyrics : undefined;
-  const pay = (m: 'song' | 'jacketArt' | 'mv' | 'mvPictures' | 'mvRedraw') => (opts.confirm ? { kind: m, confirm: opts.confirm, spell: spell && sk ? { kind: sk, tags: spell, ...(lyrics ? { lyrics } : {}) } : undefined } : undefined);
+  const pay = (m: 'song' | 'songPremium' | 'jacketArt' | 'mv' | 'mvPictures' | 'mvRedraw') => (opts.confirm ? { kind: m, confirm: opts.confirm, spell: spell && sk ? { kind: sk, tags: spell, ...(lyrics ? { lyrics } : {}) } : undefined } : undefined);
   const base: Work = { id: uid(), kind, prompt, status: 'ready' };
   const done = (w: Work): Work => {
     const out = { ...w, saved: true };
@@ -133,8 +135,8 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
       const words = prev?.kind === 'song' ? `${prev.prompt}。${asked}` : asked;
       if (!ctx.live) {
         // the review page: a 2-minute stand-in job, then the offline sketch (finishJob)
-        const job = await api.demoJob({ seconds: DEMO_SECONDS.song!, failTimes: 0, pay: pay('song') });
-        return { ...base, prompt: words, status: 'making', ...(lyrics ? { lyrics, title: lyrics.title } : {}), started: { job, what: 'song', words, extra: { ...(opts.plan?.genre ? { genre: opts.plan.genre } : {}), ...(lyrics?.title ? { songTitle: lyrics.title } : {}) } } };
+        const job = await api.demoJob({ seconds: DEMO_SECONDS.song!, failTimes: 0, pay: pay(opts.premium ? 'songPremium' : 'song') });
+        return { ...base, prompt: words, status: 'making', ...(opts.premium ? { premium: true, spell } : {}), ...(lyrics ? { lyrics, title: lyrics.title } : {}), started: { job, what: 'song', words, extra: { ...(opts.plan?.genre ? { genre: opts.plan.genre } : {}), ...(lyrics?.title ? { songTitle: lyrics.title } : {}) } } };
       }
       // R13: the design (tempo, key, chords) goes with the lyrics said yes to; the song is sung from exactly those
       const sung = lyrics ? `\n歌詞：\n${lyricsLines(lyrics).map((l) => l.text).join('\n')}` : '';
@@ -154,9 +156,10 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
         seconds: Math.max(10, Math.min(180, d.seconds)),
         from: 'atelier',
         ...(opts.confirm ? { confirm: opts.confirm, ...(spell ? { spell } : {}) } : {}),
+        ...(opts.premium ? { premium: opts.premium.grant } : {}),
       });
       const title = lyrics?.title || sketch.title;
-      return { ...base, prompt: words, status: 'making', title, ...(lyrics ? { lyrics } : {}), started: { job, what: 'song', words, extra: { comment: d.comment, songTitle: title } } };
+      return { ...base, prompt: words, status: 'making', title, ...(opts.premium ? { premium: true, spell } : {}), ...(lyrics ? { lyrics } : {}), started: { job, what: 'song', words, extra: { comment: d.comment, songTitle: title } } };
     }
     case 'video': {
       // R13 (docs/動画の作り方.md): pictures that move — painted scenes or your own pictures, never a generated film

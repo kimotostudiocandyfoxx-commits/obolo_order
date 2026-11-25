@@ -158,6 +158,9 @@ export class HttpApi implements Api {
   moonSpell(body: Parameters<Api['moonSpell']>[0]) {
     return this.req<Awaited<ReturnType<Api['moonSpell']>>>('POST', '/moon/spell', body);
   }
+  incant(body: Parameters<Api['incant']>[0]) {
+    return this.req<Awaited<ReturnType<Api['incant']>>>('POST', '/moon/incant', body);
+  }
   moonLyrics(body: Parameters<Api['moonLyrics']>[0]) {
     return this.req<Awaited<ReturnType<Api['moonLyrics']>>>('POST', '/moon/lyrics', body);
   }

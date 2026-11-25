@@ -53,6 +53,8 @@ export type Work = {
   game?: GameView;
   /** the spell it was last cast with (a book's / a game's change edits it) */
   spell?: SpellTag[];
+  /** R17: made with the secret spell (its failure says so, and offers the normal spell) */
+  premium?: boolean;
   /** R13: what a video is made of (its pictures and how they move): its words after it change this, for free */
   reel?: VideoReel;
   /** R13: a song's lyrics with metatags (sung from them; its lyric sheet keeps the section labels) */

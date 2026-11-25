@@ -14,7 +14,7 @@ import type { FloatLyrics } from './LyricSheet';
  * `stage`), so it stays while the talk scrolls; the talk keeps a small record line of it (SpellRecord).
  */
 /** `id`: the spell from its first showing through its changes (a new making is a new one) */
-export type FloatSpell = { id: string; kind: string; look: TalismanLook; tags: SpellTag[]; removed: SpellTag[]; price: number; have: number | null; casting?: boolean; /** R12: where its talismans come out of at first ({bati}'s compass, the spell book) */ from?: 'compass' | 'book'; /** R13: a song's lyrics with metatags (the sheet under the compact style talismans) */ lyrics?: FloatLyrics; /** R13 fix: called off (「やめて」): it fades away */ leaving?: boolean };
+export type FloatSpell = { id: string; kind: string; look: TalismanLook; tags: SpellTag[]; removed: SpellTag[]; price: number; have: number | null; casting?: boolean; /** R12: where its talismans come out of at first ({bati}'s compass, the spell book) */ from?: 'compass' | 'book'; /** R13: a song's lyrics with metatags (the sheet under the compact style talismans) */ lyrics?: FloatLyrics; /** R13 fix: called off (「やめて」): it fades away */ leaving?: boolean; /** R17: the secret spell — the talismans glow gold, the mana says so */ gold?: boolean };
 
 const seedOf = (s: string) => [...s].reduce((x, c) => (x * 31 + c.charCodeAt(0)) >>> 0, 7);
 /** a small steady tilt per tag (the same tag always hangs the same way) */
@@ -45,6 +45,9 @@ const GLOW: Record<TalismanLook, { aura: string; ink: string; shadow: string; nu
   hikari: { aura: 'rgba(110,215,255,.32)', ink: '#e8fbff', shadow: '0 0 6px #7fe3ff, 0 0 14px rgba(60,170,255,.7)', num: '#f4feff' },
   jufu: { aura: 'rgba(255,70,30,.3)', ink: '#ffd8cc', shadow: '0 0 6px rgba(255,70,30,.9), 0 0 14px rgba(200,20,0,.5)', num: '#ff7a55' },
 };
+
+/** R17: the secret spell's light */
+const GOLD_GLOW = { aura: 'rgba(255,200,80,.36)', ink: '#fff3d0', shadow: '0 0 6px rgba(255,200,80,.9), 0 0 14px rgba(255,160,30,.55)', num: '#ffe08a' };
 
 export type FloatLayout = { at: Map<string, { x: number; y: number; w: number; h: number; row: number }>; width: number; height: number };
 /**
@@ -101,7 +104,8 @@ const CSS = `
 export function FloatingSpell({ spell, layout, cx, bottom, bowl, scale, onTap, from, manaTop }: { spell: FloatSpell; layout: FloatLayout; cx: number; bottom: number; bowl: { x: number; y: number }; scale: number; onTap?: (t: SpellTag) => void; /** R12: the point (stage px) its first talismans come out of */ from?: { x: number; y: number }; /** R13: the mana words at their own place (under a song's lyric sheet); the talismans end at `bottom` */ manaTop?: number }) {
   const { look } = spell;
   useSpellFont(look);
-  const g = GLOW[look];
+  // R17: the secret spell glows gold (D 光符 in gold)
+  const g = spell.gold ? GOLD_GLOW : GLOW[look];
   const manaH = spell.price > 0 ? MANA_H : 0;
   const top = bottom - (layout.height + (manaTop != null ? 0 : manaH)) * scale;
   // each talisman keeps the motion it came with (a change does not replay the others): its order of coming in
@@ -169,7 +173,7 @@ export function FloatingSpell({ spell, layout, cx, bottom, bowl, scale, onTap, f
                 onTap?.(t);
               }}
             >
-              <Talisman look={look} tilt={tiltOf(t.ja)} tag={t} mode={gone ? 'fall' : 'drop'} delay={gone ? i * 120 : b.delay} />
+              <Talisman look={look} tilt={tiltOf(t.ja)} tag={t} mode={gone ? 'fall' : 'drop'} delay={gone ? i * 120 : b.delay} gold={spell.gold} />
             </span>
           </div>
         </div>
@@ -180,6 +184,7 @@ export function FloatingSpell({ spell, layout, cx, bottom, bowl, scale, onTap, f
     <div
       className="pointer-events-none absolute inset-0"
       data-floating-spell={look}
+      data-gold-spell={spell.gold ? '' : undefined}
       data-casting-spell={spell.casting ? '' : undefined}
       data-leaving-spell={spell.leaving ? '' : undefined}
       aria-label={`スペル：${spell.tags.map((t) => t.ja).join('・')}`}
@@ -201,7 +206,7 @@ export function FloatingSpell({ spell, layout, cx, bottom, bowl, scale, onTap, f
           data-testid="spell-mana"
         >
           <span>
-            使うマナ <b style={{ fontSize: '1.45em', color: g.num, fontWeight: 400 }}>{spell.price}</b>
+            {spell.gold ? '上級魔法・' : ''}使うマナ <b style={{ fontSize: '1.45em', color: g.num, fontWeight: 400 }}>{spell.price}</b>
           </span>
           {spell.have != null && <span style={short ? { color: '#ffb4a0' } : { opacity: 0.8 }}>いま {spell.have}マナ</span>}
         </div>
