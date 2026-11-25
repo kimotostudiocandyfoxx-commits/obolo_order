@@ -570,16 +570,19 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 @keyframes pbob{from{transform:translateY(0) rotate(-2deg)}to{transform:translateY(-6px) rotate(2deg)}}
 .exp.pier.show .eland{filter:brightness(.72);transform:none}
 .exp .eland.fade{transition:opacity .35s;opacity:0!important}
-.auth{position:absolute;left:50%;transform:translateX(-50%);z-index:16;display:flex;align-items:center;gap:9px;padding:6px 14px 6px 6px;border-radius:999px;background:rgba(10,20,40,.5);border:1px solid rgba(255,255,255,.35);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);max-width:88%;pointer-events:none}
-.auth img{width:38px;height:38px;border-radius:50%;object-fit:cover;background:#fff;border:2px solid #fff;flex:none}
-.auth b{display:block;font:900 14px var(--f-body);color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.auth small{display:block;font:700 10px var(--f-body);color:rgba(255,255,255,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.acts{position:absolute;left:50%;bottom:6%;transform:translateX(-50%);z-index:16;display:flex;gap:10px;pointer-events:auto}
-.acts button{position:static!important;transform:none!important;opacity:1!important;padding:12px 18px;border-radius:999px;border:0;font:900 14px var(--f-body);cursor:pointer;white-space:nowrap;box-shadow:0 10px 24px rgba(0,0,0,.3)}
-.acts .favb{background:linear-gradient(135deg,#7fc8ff,#8a7dff);color:#fff}
-.acts .favb.done{background:#fff;color:#6a6cff}
-.acts .oshib{background:linear-gradient(135deg,#ff6fb5,#ff9a6b);color:#fff}
-.acts .oshib.done{background:#fff;color:#ff4f9a}
+.auth{position:absolute;left:50%;transform:translateX(-50%);z-index:16;display:flex;align-items:center;gap:8px;max-width:86%;pointer-events:none}
+.auth img{width:58px;height:58px;object-fit:contain;flex:none;filter:drop-shadow(0 4px 6px rgba(0,0,0,.45))}
+.auth b{display:block;font:800 17px/1.1 'Zen Maru Gothic',var(--f-body);letter-spacing:.06em;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 2px 10px rgba(0,0,0,.65),0 0 2px rgba(0,0,0,.5)}
+.auth b::before{content:"";display:block;width:22px;height:2px;margin-bottom:5px;border-radius:2px;background:rgba(255,255,255,.85)}
+.acts{position:absolute;left:50%;bottom:6%;transform:translateX(-50%);z-index:16;display:flex;gap:22px;pointer-events:auto}
+.acts button{position:static!important;transform:none!important;opacity:1!important;width:56px;height:56px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.55);background:rgba(255,255,255,.16);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 8px 22px rgba(0,0,0,.28);cursor:pointer;display:grid;place-items:center;transition:transform .15s}
+.acts button:active{transform:scale(.9)!important}
+.acts .oshib,.acts .favb,.acts .oshib.done,.acts .favb.done{width:56px!important;height:56px!important;padding:0!important;border-radius:50%!important;background:rgba(255,255,255,.16)!important;border:1px solid rgba(255,255,255,.55)!important;color:#fff!important}
+.acts svg{width:28px;height:28px;fill:none;stroke:#fff;stroke-width:2;stroke-linejoin:round;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
+.acts .favb.done svg{fill:#ffd84a;stroke:#ffd84a}
+.acts .oshib.done svg{fill:#ff5fa8;stroke:#ff5fa8}
+.acts button.pop svg{animation:actpop .45s cubic-bezier(.2,1.8,.4,1)}
+@keyframes actpop{0%{transform:scale(.6)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
 .exp{position:absolute;inset:0;z-index:42;overflow:hidden;pointer-events:none;opacity:0;transition:opacity .35s}
 .exp.on{opacity:1;pointer-events:auto}
 .exp{background:#0b3a66}
@@ -765,7 +768,7 @@ function render(){
   const rw=$('resWrap');rw.innerHTML='';
   if(mode==='anime')(RES[cur]||[]).forEach(([k,n,line,side])=>{const s=A['res-'+cur+'-'+k];if(!s)return;const e=document.createElement('div');e.className='res '+side;e.tabIndex=0;e.setAttribute('role','button');e.setAttribute('aria-label',n);e.innerHTML=`<img alt="" src="${s}">`;e.onclick=()=>toast(n+'「'+line+'」');rw.appendChild(e)});
   const sky=$('sky');sky.innerHTML='';items=[];
-  $('satmode').hidden=cur!=='saturn'||mode!=='anime';document.querySelectorAll('#satmode button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.s===SATMODE));
+  $('satmode').hidden=true;document.querySelectorAll('#satmode button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.s===SATMODE));
   const s7=cur==='saturn'&&S7();$('phone').classList.toggle('s7',s7);$('home').style.display=(s7||(cur==='saturn'&&SD()))?'none':'';if(s7)$('bg').style.backgroundImage=`url(${A['bg7-saturn']})`;
   const s6=cur==='saturn'&&S6();$('phone').classList.toggle('s6',s6);$('s6floor').hidden=$('s6spk').hidden=!s6;
   if(s6){$('bg').style.backgroundImage=`url(${A['bg6-saturn']})`;const fl=$('s6floor');fl.style.top=(S6G.floor*100)+'%';fl.style.backgroundImage=A['sat6-floor']?`url(${A['sat6-floor']})`:'linear-gradient(#ffb3d9,#b39cff)';fl.style.backgroundSize='auto '+Math.round($('phone').clientHeight*(1-S6G.floor)+18)+'px';fl.style.top=`calc(${S6G.floor*100}% - 18px)`;
@@ -830,7 +833,7 @@ function enter(){
   $('inside').classList.add('on');
 }
 const REC={cx:.481,cy:.702,rx:.574,ry:.1885};
-let SATMODE='d';
+let SATMODE='e';
 const SD=()=>(SATMODE==='d'||SATMODE==='e')&&mode==='anime',SE=()=>SATMODE==='e'&&mode==='anime';
 const S7=()=>SATMODE==='c'&&!!A['bg7-saturn']&&mode==='anime',S7G={rec:[.71,.46]};
 const S6=()=>SATMODE==='b'&&!!A['bg6-saturn']&&mode==='anime',S6G={floor:.7,spk:.15,rec:[.762,.427]};
@@ -1163,12 +1166,12 @@ function repMenu(b,st,anchor){const old=st.querySelector('.repmenu');if(old){old
     if(EX.auto){clearTimeout(EX.auto.tm);if(EX.auto.v){EX.auto.v.remove();EX.auto.v=null}autoNext()}else if(EX.open){EX.open.close();st.style.pointerEvents='none'}}}
 function expShow(b,o){o=o||{};if(EX.open)return;const ex=$('exp'),st=$('estage');b.e.classList.add('held');ex.classList.add('show');splash();const r=EX.region;
   const V=SKYV[EX.pl],sv=V.show(b,st,o),dur=sv.dur;
-  const who=document.createElement('div');who.className='auth';who.style.top=sv.whoTop||'60%';const mine=b.w&&b.w.mine;who.innerHTML='<img alt=""><div><b></b><small></small></div>';who.querySelector('img').src=mine?(PICON[EX.pl]?PICON[EX.pl](ME,0):korImg(ME,0)):korImg(b.n,0);who.querySelector('b').textContent=mine?ME+'（じぶん）':b.n;who.querySelector('small').textContent=b.w?V.tag(b.w):'';st.appendChild(who);
+  const who=document.createElement('div');who.className='auth';who.style.top=sv.whoTop||'60%';const mine=b.w&&b.w.mine;who.innerHTML='<img alt=""><b></b>';const ri=b.e.querySelector('img');who.querySelector('img').src=ri?ri.src:'';who.querySelector('b').textContent=mine?ME:b.n;st.appendChild(who);
   const acts=document.createElement('div');acts.className='acts';st.appendChild(acts);const wk=EX.pl+':'+b.title+':'+b.n;
-  const fb=document.createElement('button');fb.type='button';fb.className='favb'+(BLUENA.has(wk)?' done':'');fb.textContent=BLUENA.has(wk)?'★ 保存ずみ':'☆ お気に入り';acts.appendChild(fb);
-  fb.onclick=ev=>{ev.stopPropagation();if(BLUENA.has(wk))return;BLUENA.add(wk);try{localStorage.setItem('obolo-bluena',JSON.stringify([...BLUENA]))}catch(e){}fb.classList.add('done');fb.textContent='★ 保存ずみ';chime();toast('⭐ ブルーナに保存したよ')};
-  const ob=document.createElement('button');ob.type='button';if(b.w&&b.w.mine)ob.style.display='none';ob.className='oshib'+(oshi.has(b.n)?' done':'');ob.textContent=oshi.has(b.n)?'♡ 推してる':'♡ 推す';acts.appendChild(ob);
-  ob.onclick=ev=>{ev.stopPropagation();if(oshi.has(b.n))return;oshi.add(b.n);ob.classList.add('done');ob.textContent='♡ 推してる';chime();
+  const fb=document.createElement('button');fb.type='button';fb.className='favb'+(BLUENA.has(wk)?' done':'');fb.setAttribute('aria-label','お気に入り（ブルーナに保存）');fb.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2l2.6 5.5 6 .8-4.4 4.1 1.1 5.9L12 16.6l-5.3 2.9 1.1-5.9L3.4 9.5l6-.8z"/></svg>';acts.appendChild(fb);
+  fb.onclick=ev=>{ev.stopPropagation();if(BLUENA.has(wk))return;BLUENA.add(wk);try{localStorage.setItem('obolo-bluena',JSON.stringify([...BLUENA]))}catch(e){}fb.classList.add('done','pop');chime();toast('⭐ ブルーナに保存したよ')};
+  const ob=document.createElement('button');ob.type='button';if(b.w&&b.w.mine)ob.style.display='none';ob.className='oshib'+(oshi.has(b.n)?' done':'');ob.setAttribute('aria-label','推す');ob.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3s-7.6-4.6-7.6-10.2A4.3 4.3 0 0 1 12 7.4a4.3 4.3 0 0 1 7.6 2.7c0 5.6-7.6 10.2-7.6 10.2z"/></svg>';acts.appendChild(ob);
+  ob.onclick=ev=>{ev.stopPropagation();if(oshi.has(b.n))return;oshi.add(b.n);ob.classList.add('done','pop');chime();
     for(let k=0;k<12;k++){const h=document.createElement('i');h.className='heartp';h.textContent='💗';h.style.left='50%';h.style.top='88%';h.style.setProperty('--dx',(Math.random()*160-80)+'px');h.style.setProperty('--dy',(-60-Math.random()*120)+'px');st.appendChild(h);setTimeout(()=>h.remove(),1000)}
     toast('💗 '+b.n+' を推しにしたよ。これから'+(EX.pl==='jupiter'?'きみの森':'きみの島')+'にも来てくれるよ')};
   const rb=document.createElement('button');rb.type='button';rb.className='repb';rb.setAttribute('aria-label','通報・非表示');rb.textContent='⋯';st.appendChild(rb);rb.onclick=ev=>{ev.stopPropagation();repMenu(b,st)};
