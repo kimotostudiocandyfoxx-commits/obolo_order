@@ -12295,6 +12295,2246 @@
       ],
       "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture (dreamy pastel sky, glossy candy colours, vinyl records, soft sparkles). Vertical phone wallpaper 9:16. The view from sitting at the edge of a sleepy dreamy plaza with big pillows, a crescent moon bed and floating sheep, the floor is a giant glossy vinyl record: the foreground at the very bottom is the record's edge at your feet, and in front of you the plaza opens up with open space in the middle of the picture, empty, for little round creatures hopping towards you. No planet ball in the sky, only rings, stars and clouds. No characters, no people, no text.",
       "always": false
+    },
+    {
+      "id": "exp-mars-sea",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-main.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). Vertical phone wallpaper 9:16. A high aerial drone view looking straight down at a vast neon city at night: glowing streets, rooftops, light trails, rain reflections, no single building standing out. Only the city texture, no separate blocks, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-mars-me",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-main.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). Your own little movie theater block with a glowing marquee: a small city block floating alone like a game map piece, seen from high above at a gentle 3/4 angle, with neon lights. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "isl-mars-edm",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-main.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). A neon dance district with laser lights and giant speakers: a small city block floating alone like a game map piece, seen from high above at a gentle 3/4 angle, with neon lights. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-mars-edm",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-main.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). Vertical phone wallpaper 9:16. Ground-level view of a neon dance club street. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-mars-edm-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-hv.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). Vertical phone wallpaper 9:16. The view of a neon dance club street, the street seen from a rooftop edge: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-mars-hiphop",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-main.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). A street district with graffiti walls and a basketball court: a small city block floating alone like a game map piece, seen from high above at a gentle 3/4 angle, with neon lights. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-mars-hiphop",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-main.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). Vertical phone wallpaper 9:16. Ground-level view of a graffiti street with a basketball court. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-mars-hiphop-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-hv.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). Vertical phone wallpaper 9:16. The view of a graffiti street with a basketball court, the street seen from a rooftop edge: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-mars-ballad",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-main.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). A romantic quiet street with a fountain plaza and soft lamps: a small city block floating alone like a game map piece, seen from high above at a gentle 3/4 angle, with neon lights. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-mars-ballad",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-main.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). Vertical phone wallpaper 9:16. Ground-level view of a quiet romantic fountain plaza at night. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-mars-ballad-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-hv.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). Vertical phone wallpaper 9:16. The view of a quiet romantic fountain plaza at night, the street seen from a rooftop edge: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-mars-rock",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-main.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). A live-house street with amps and band posters: a small city block floating alone like a game map piece, seen from high above at a gentle 3/4 angle, with neon lights. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-mars-rock",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-main.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). Vertical phone wallpaper 9:16. Ground-level view of a live-house street with band posters and amps. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-mars-rock-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-hv.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). Vertical phone wallpaper 9:16. The view of a live-house street with band posters and amps, the street seen from a rooftop edge: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-mars-chill",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-main.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). A lo-fi alley with tiny cafes and plants: a small city block floating alone like a game map piece, seen from high above at a gentle 3/4 angle, with neon lights. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-mars-chill",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-main.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). Vertical phone wallpaper 9:16. Ground-level view of a cosy lo-fi alley with tiny cafes. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-mars-chill-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-hv.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). Vertical phone wallpaper 9:16. The view of a cosy lo-fi alley with tiny cafes, the street seen from a rooftop edge: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-mars-citypop",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-main.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). A city-pop highway block with retro cars and pink neon: a small city block floating alone like a game map piece, seen from high above at a gentle 3/4 angle, with neon lights. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-mars-citypop",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-main.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). Vertical phone wallpaper 9:16. Ground-level view of a retro city-pop highway with pink neon. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-mars-citypop-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-hv.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). Vertical phone wallpaper 9:16. The view of a retro city-pop highway with pink neon, the street seen from a rooftop edge: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-mars-anison",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-main.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). An anime theater block with big anime billboards: a small city block floating alone like a game map piece, seen from high above at a gentle 3/4 angle, with neon lights. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-mars-anison",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-main.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). Vertical phone wallpaper 9:16. Ground-level view of a street of big anime billboards and a theater. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-mars-anison-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-hv.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). Vertical phone wallpaper 9:16. The view of a street of big anime billboards and a theater, the street seen from a rooftop edge: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-mars-jazz",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-main.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). A jazz bar street with warm signs: a small city block floating alone like a game map piece, seen from high above at a gentle 3/4 angle, with neon lights. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-mars-jazz",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-main.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). Vertical phone wallpaper 9:16. Ground-level view of a warm jazz bar street. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-mars-jazz-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-hv.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). Vertical phone wallpaper 9:16. The view of a warm jazz bar street, the street seen from a rooftop edge: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-mars-matsuri",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-main.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). A summer festival shopping street with paper lanterns: a small city block floating alone like a game map piece, seen from high above at a gentle 3/4 angle, with neon lights. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-mars-matsuri",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-main.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). Vertical phone wallpaper 9:16. Ground-level view of a festival shopping street with paper lanterns. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-mars-matsuri-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-hv.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). Vertical phone wallpaper 9:16. The view of a festival shopping street with paper lanterns, the street seen from a rooftop edge: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-mars-rain",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-main.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). A rainy alley with umbrellas and puddles reflecting neon: a small city block floating alone like a game map piece, seen from high above at a gentle 3/4 angle, with neon lights. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-mars-rain",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-main.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). Vertical phone wallpaper 9:16. Ground-level view of a rainy neon alley with umbrellas. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-mars-rain-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-mars-hv.jpg"
+      ],
+      "prompt": "Neon cyberpunk Japanese anime background art in exactly the same style and colours as the reference picture (rainy neon city at night, reflections). Vertical phone wallpaper 9:16. The view of a rainy neon alley with umbrellas, the street seen from a rooftop edge: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-venus-sea",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-main.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). Vertical phone wallpaper 9:16. A high aerial view looking straight down at an endless sea of soft fluffy sunset clouds, warm pastel colours. Only clouds, no islands, no objects, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-venus-me",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-main.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). Your own cosy cloud with a little radio booth and fairy lights: a small fluffy cloud island floating alone like a game map piece, seen from high above at a gentle 3/4 angle, with a tiny radio broadcast booth on it. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "isl-venus-chat",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-main.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). A chatty cloud with benches and speech-bubble balloons: a small fluffy cloud island floating alone like a game map piece, seen from high above at a gentle 3/4 angle, with a tiny radio broadcast booth on it. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-venus-chat",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-main.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). Vertical phone wallpaper 9:16. Ground-level view of a chatty cloud studio with benches. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-venus-chat-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-hv.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). Vertical phone wallpaper 9:16. The view of a chatty cloud studio with benches, the clouds seen from the edge of the broadcast booth: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-venus-koi",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-main.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). A romantic cloud with heart lanterns and roses: a small fluffy cloud island floating alone like a game map piece, seen from high above at a gentle 3/4 angle, with a tiny radio broadcast booth on it. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-venus-koi",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-main.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). Vertical phone wallpaper 9:16. Ground-level view of a romantic cloud studio with heart lanterns. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-venus-koi-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-hv.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). Vertical phone wallpaper 9:16. The view of a romantic cloud studio with heart lanterns, the clouds seen from the edge of the broadcast booth: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-venus-oshi",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-main.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). A fan cloud with a tiny stage and penlights: a small fluffy cloud island floating alone like a game map piece, seen from high above at a gentle 3/4 angle, with a tiny radio broadcast booth on it. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-venus-oshi",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-main.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). Vertical phone wallpaper 9:16. Ground-level view of a fan talk cloud stage with penlights. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-venus-oshi-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-hv.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). Vertical phone wallpaper 9:16. The view of a fan talk cloud stage with penlights, the clouds seen from the edge of the broadcast booth: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-venus-school",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-main.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). An after-school cloud with a school desk and cherry blossoms: a small fluffy cloud island floating alone like a game map piece, seen from high above at a gentle 3/4 angle, with a tiny radio broadcast booth on it. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-venus-school",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-main.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). Vertical phone wallpaper 9:16. Ground-level view of a after-school cloud studio with cherry blossoms. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-venus-school-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-hv.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). Vertical phone wallpaper 9:16. The view of a after-school cloud studio with cherry blossoms, the clouds seen from the edge of the broadcast booth: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-venus-night",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-main.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). A late-night cloud with a neon moon and sofas: a small fluffy cloud island floating alone like a game map piece, seen from high above at a gentle 3/4 angle, with a tiny radio broadcast booth on it. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-venus-night",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-main.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). Vertical phone wallpaper 9:16. Ground-level view of a late-night cloud lounge with a neon moon. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-venus-night-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-hv.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). Vertical phone wallpaper 9:16. The view of a late-night cloud lounge with a neon moon, the clouds seen from the edge of the broadcast booth: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-venus-game",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-main.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). A gaming cloud with arcade cabinets: a small fluffy cloud island floating alone like a game map piece, seen from high above at a gentle 3/4 angle, with a tiny radio broadcast booth on it. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-venus-game",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-main.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). Vertical phone wallpaper 9:16. Ground-level view of a gaming cloud studio with arcade cabinets. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-venus-game-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-hv.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). Vertical phone wallpaper 9:16. The view of a gaming cloud studio with arcade cabinets, the clouds seen from the edge of the broadcast booth: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-venus-warai",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-main.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). A comedy cloud with a small red-curtain stage: a small fluffy cloud island floating alone like a game map piece, seen from high above at a gentle 3/4 angle, with a tiny radio broadcast booth on it. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-venus-warai",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-main.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). Vertical phone wallpaper 9:16. Ground-level view of a comedy cloud stage with a red curtain. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-venus-warai-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-hv.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). Vertical phone wallpaper 9:16. The view of a comedy cloud stage with a red curtain, the clouds seen from the edge of the broadcast booth: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-venus-anime",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-main.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). An anime talk cloud with posters and sakura: a small fluffy cloud island floating alone like a game map piece, seen from high above at a gentle 3/4 angle, with a tiny radio broadcast booth on it. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-venus-anime",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-main.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). Vertical phone wallpaper 9:16. Ground-level view of a anime talk cloud studio with posters. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-venus-anime-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-hv.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). Vertical phone wallpaper 9:16. The view of a anime talk cloud studio with posters, the clouds seen from the edge of the broadcast booth: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-venus-asa",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-main.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). A morning cloud with sunrise and a breakfast table: a small fluffy cloud island floating alone like a game map piece, seen from high above at a gentle 3/4 angle, with a tiny radio broadcast booth on it. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-venus-asa",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-main.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). Vertical phone wallpaper 9:16. Ground-level view of a sunrise cloud studio with breakfast. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-venus-asa-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-hv.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). Vertical phone wallpaper 9:16. The view of a sunrise cloud studio with breakfast, the clouds seen from the edge of the broadcast booth: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-venus-nemui",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-main.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). A sleepy cloud with big pillows and floating sheep: a small fluffy cloud island floating alone like a game map piece, seen from high above at a gentle 3/4 angle, with a tiny radio broadcast booth on it. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-venus-nemui",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-main.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). Vertical phone wallpaper 9:16. Ground-level view of a sleepy cloud with pillows and sheep. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-venus-nemui-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-venus-hv.jpg"
+      ],
+      "prompt": "Lo-fi dreamy Japanese anime background art in exactly the same style and colours as the reference picture (soft sunset clouds, warm pastel light). Vertical phone wallpaper 9:16. The view of a sleepy cloud with pillows and sheep, the clouds seen from the edge of the broadcast booth: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-uranus-sea",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-main.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). Vertical phone wallpaper 9:16. A high aerial view looking down at a dreamy pastel sky full of glossy bubbles, rings and sparkles. Only sky, no shops, no islands, no objects, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-uranus-me",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-main.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). Your own cute shop with a striped awning and balloons: a small floating pastel shop island like a game map piece, seen from high above at a gentle 3/4 angle, a cute little shop with an awning. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "isl-uranus-tote",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-main.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). A tote bag shop with bags hanging outside: a small floating pastel shop island like a game map piece, seen from high above at a gentle 3/4 angle, a cute little shop with an awning. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-uranus-tote",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-main.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). Vertical phone wallpaper 9:16. Ground-level view of a tote bag shop. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-uranus-tote-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-hv.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). Vertical phone wallpaper 9:16. The view of a tote bag shop, the floating shops seen from your shop counter: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-uranus-tee",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-main.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). A T-shirt shop with shirts on lines: a small floating pastel shop island like a game map piece, seen from high above at a gentle 3/4 angle, a cute little shop with an awning. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-uranus-tee",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-main.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). Vertical phone wallpaper 9:16. Ground-level view of a T-shirt shop. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-uranus-tee-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-hv.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). Vertical phone wallpaper 9:16. The view of a T-shirt shop, the floating shops seen from your shop counter: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-uranus-sticker",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-main.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). A sticker shop covered in stickers: a small floating pastel shop island like a game map piece, seen from high above at a gentle 3/4 angle, a cute little shop with an awning. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-uranus-sticker",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-main.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). Vertical phone wallpaper 9:16. Ground-level view of a sticker shop. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-uranus-sticker-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-hv.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). Vertical phone wallpaper 9:16. The view of a sticker shop, the floating shops seen from your shop counter: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-uranus-acst",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-main.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). An acrylic stand figure shop with glass shelves: a small floating pastel shop island like a game map piece, seen from high above at a gentle 3/4 angle, a cute little shop with an awning. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-uranus-acst",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-main.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). Vertical phone wallpaper 9:16. Ground-level view of a acrylic figure shop. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-uranus-acst-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-hv.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). Vertical phone wallpaper 9:16. The view of a acrylic figure shop, the floating shops seen from your shop counter: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-uranus-mug",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-main.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). A mug cafe shop with stacked mugs: a small floating pastel shop island like a game map piece, seen from high above at a gentle 3/4 angle, a cute little shop with an awning. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-uranus-mug",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-main.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). Vertical phone wallpaper 9:16. Ground-level view of a mug shop. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-uranus-mug-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-hv.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). Vertical phone wallpaper 9:16. The view of a mug shop, the floating shops seen from your shop counter: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-uranus-yume",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-main.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). A dreamy pastel goods shop with unicorns and hearts: a small floating pastel shop island like a game map piece, seen from high above at a gentle 3/4 angle, a cute little shop with an awning. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-uranus-yume",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-main.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). Vertical phone wallpaper 9:16. Ground-level view of a dreamy pastel goods shop. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-uranus-yume-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-hv.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). Vertical phone wallpaper 9:16. The view of a dreamy pastel goods shop, the floating shops seen from your shop counter: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-uranus-retro",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-main.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). A retro pop shop with checkerboard floor and jukebox: a small floating pastel shop island like a game map piece, seen from high above at a gentle 3/4 angle, a cute little shop with an awning. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-uranus-retro",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-main.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). Vertical phone wallpaper 9:16. Ground-level view of a retro pop goods shop. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-uranus-retro-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-hv.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). Vertical phone wallpaper 9:16. The view of a retro pop goods shop, the floating shops seen from your shop counter: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-uranus-wa",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-main.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). A Japanese modern goods shop with noren curtains and lanterns: a small floating pastel shop island like a game map piece, seen from high above at a gentle 3/4 angle, a cute little shop with an awning. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-uranus-wa",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-main.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). Vertical phone wallpaper 9:16. Ground-level view of a Japanese modern goods shop. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-uranus-wa-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-hv.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). Vertical phone wallpaper 9:16. The view of a Japanese modern goods shop, the floating shops seen from your shop counter: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-uranus-neko",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-main.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). A cat goods shop with cat-shaped signs: a small floating pastel shop island like a game map piece, seen from high above at a gentle 3/4 angle, a cute little shop with an awning. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-uranus-neko",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-main.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). Vertical phone wallpaper 9:16. Ground-level view of a cat goods shop. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-uranus-neko-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-hv.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). Vertical phone wallpaper 9:16. The view of a cat goods shop, the floating shops seen from your shop counter: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-uranus-mono",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-main.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). A black and white select shop, minimal and chic: a small floating pastel shop island like a game map piece, seen from high above at a gentle 3/4 angle, a cute little shop with an awning. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-uranus-mono",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-main.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). Vertical phone wallpaper 9:16. Ground-level view of a monochrome select shop. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-uranus-mono-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-uranus-hv.jpg"
+      ],
+      "prompt": "Y2K pastel pop Japanese anime background art in exactly the same style and colours as the reference picture (candy colours, glossy shapes, bubbles). Vertical phone wallpaper 9:16. The view of a monochrome select shop, the floating shops seen from your shop counter: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-pluto-sea",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-main.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). Vertical phone wallpaper 9:16. A high aerial view looking straight down at an endless dark starry night with drifting mist and tiny floating candles. Only night and mist, no buildings, no objects, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-pluto-me",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-main.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). Your own cosy library room with tall bookshelves and a reading chair: a small floating library room like a game map piece, seen from high above at a gentle 3/4 angle, bookshelves and a reading lamp on a floating stone platform. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "isl-pluto-fantasy",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-main.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). A fantasy tower library with glowing magic books: a small floating library room like a game map piece, seen from high above at a gentle 3/4 angle, bookshelves and a reading lamp on a floating stone platform. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-pluto-fantasy",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-main.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). Vertical phone wallpaper 9:16. Ground-level view of a fantasy tower library. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-pluto-fantasy-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-hv.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). Vertical phone wallpaper 9:16. The view of a fantasy tower library, the floating library seen from your reading desk: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-pluto-love",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-main.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). A romantic garden library with roses and a bench: a small floating library room like a game map piece, seen from high above at a gentle 3/4 angle, bookshelves and a reading lamp on a floating stone platform. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-pluto-love",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-main.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). Vertical phone wallpaper 9:16. Ground-level view of a rose garden library. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-pluto-love-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-hv.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). Vertical phone wallpaper 9:16. The view of a rose garden library, the floating library seen from your reading desk: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-pluto-horror",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-main.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). A spooky underground archive with cobwebs and candles: a small floating library room like a game map piece, seen from high above at a gentle 3/4 angle, bookshelves and a reading lamp on a floating stone platform. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-pluto-horror",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-main.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). Vertical phone wallpaper 9:16. Ground-level view of a spooky underground archive. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-pluto-horror-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-hv.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). Vertical phone wallpaper 9:16. The view of a spooky underground archive, the floating library seen from your reading desk: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-pluto-daily",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-main.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). A sunny window-side reading nook: a small floating library room like a game map piece, seen from high above at a gentle 3/4 angle, bookshelves and a reading lamp on a floating stone platform. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-pluto-daily",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-main.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). Vertical phone wallpaper 9:16. Ground-level view of a sunny window reading nook. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-pluto-daily-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-hv.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). Vertical phone wallpaper 9:16. The view of a sunny window reading nook, the floating library seen from your reading desk: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-pluto-sf",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-main.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). A sci-fi observatory library with a telescope and star maps: a small floating library room like a game map piece, seen from high above at a gentle 3/4 angle, bookshelves and a reading lamp on a floating stone platform. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-pluto-sf",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-main.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). Vertical phone wallpaper 9:16. Ground-level view of a sci-fi observatory library. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-pluto-sf-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-hv.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). Vertical phone wallpaper 9:16. The view of a sci-fi observatory library, the floating library seen from your reading desk: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-pluto-mystery",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-main.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). A mystery maze library with hidden doors: a small floating library room like a game map piece, seen from high above at a gentle 3/4 angle, bookshelves and a reading lamp on a floating stone platform. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-pluto-mystery",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-main.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). Vertical phone wallpaper 9:16. Ground-level view of a mystery maze library. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-pluto-mystery-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-hv.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). Vertical phone wallpaper 9:16. The view of a mystery maze library, the floating library seen from your reading desk: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-pluto-tears",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-main.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). A small quiet room of touching books with a rainy window: a small floating library room like a game map piece, seen from high above at a gentle 3/4 angle, bookshelves and a reading lamp on a floating stone platform. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-pluto-tears",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-main.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). Vertical phone wallpaper 9:16. Ground-level view of a quiet room with a rainy window. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-pluto-tears-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-hv.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). Vertical phone wallpaper 9:16. The view of a quiet room with a rainy window, the floating library seen from your reading desk: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-pluto-laugh",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-main.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). A cheerful salon of funny books with colourful cushions: a small floating library room like a game map piece, seen from high above at a gentle 3/4 angle, bookshelves and a reading lamp on a floating stone platform. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-pluto-laugh",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-main.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). Vertical phone wallpaper 9:16. Ground-level view of a cheerful book salon. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-pluto-laugh-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-hv.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). Vertical phone wallpaper 9:16. The view of a cheerful book salon, the floating library seen from your reading desk: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-pluto-short",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-main.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). A tiny library box of short stories, like a jewel box: a small floating library room like a game map piece, seen from high above at a gentle 3/4 angle, bookshelves and a reading lamp on a floating stone platform. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-pluto-short",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-main.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). Vertical phone wallpaper 9:16. Ground-level view of a tiny jewel-box library. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-pluto-short-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-hv.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). Vertical phone wallpaper 9:16. The view of a tiny jewel-box library, the floating library seen from your reading desk: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-pluto-adventure",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-main.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). A library ship of adventure books with sails: a small floating library room like a game map piece, seen from high above at a gentle 3/4 angle, bookshelves and a reading lamp on a floating stone platform. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-pluto-adventure",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-main.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). Vertical phone wallpaper 9:16. Ground-level view of a library ship with sails. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-pluto-adventure-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-pluto-hv.jpg"
+      ],
+      "prompt": "Gothic fairy-tale Japanese anime background art in exactly the same style and colours as the reference picture (moonlit snowy night, purple and gold, candles). Vertical phone wallpaper 9:16. The view of a library ship with sails, the floating library seen from your reading desk: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-neptune-sea",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-main.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). Vertical phone wallpaper 9:16. A view looking down into the deep sea from above: glowing blue water, light rays, drifting bubbles and jellyfish, the sea floor far below. Only water, no domes, no objects, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-neptune-me",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-main.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). Your own bubble dome with a cosy game hut inside: a small glass bubble dome sitting on a patch of sea floor like a game map piece, seen from above at a gentle 3/4 angle, a tiny game arcade inside. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "isl-neptune-action",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-main.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). An action game dome with a tiny obstacle course: a small glass bubble dome sitting on a patch of sea floor like a game map piece, seen from above at a gentle 3/4 angle, a tiny game arcade inside. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-neptune-action",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-main.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). Vertical phone wallpaper 9:16. Ground-level view of a action game dome. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-neptune-action-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-hv.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). Vertical phone wallpaper 9:16. The view of a action game dome, inside the bubble dome looking out at the sea: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-neptune-puzzle",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-main.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). A puzzle game dome with giant puzzle blocks: a small glass bubble dome sitting on a patch of sea floor like a game map piece, seen from above at a gentle 3/4 angle, a tiny game arcade inside. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-neptune-puzzle",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-main.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). Vertical phone wallpaper 9:16. Ground-level view of a puzzle game dome. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-neptune-puzzle-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-hv.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). Vertical phone wallpaper 9:16. The view of a puzzle game dome, inside the bubble dome looking out at the sea: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-neptune-race",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-main.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). A racing game dome with a tiny race track: a small glass bubble dome sitting on a patch of sea floor like a game map piece, seen from above at a gentle 3/4 angle, a tiny game arcade inside. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-neptune-race",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-main.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). Vertical phone wallpaper 9:16. Ground-level view of a racing game dome. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-neptune-race-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-hv.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). Vertical phone wallpaper 9:16. The view of a racing game dome, inside the bubble dome looking out at the sea: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-neptune-rhythm",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-main.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). A rhythm game dome with glowing dance pads: a small glass bubble dome sitting on a patch of sea floor like a game map piece, seen from above at a gentle 3/4 angle, a tiny game arcade inside. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-neptune-rhythm",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-main.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). Vertical phone wallpaper 9:16. Ground-level view of a rhythm game dome. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-neptune-rhythm-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-hv.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). Vertical phone wallpaper 9:16. The view of a rhythm game dome, inside the bubble dome looking out at the sea: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-neptune-shoot",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-main.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). A shooting game dome with star targets: a small glass bubble dome sitting on a patch of sea floor like a game map piece, seen from above at a gentle 3/4 angle, a tiny game arcade inside. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-neptune-shoot",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-main.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). Vertical phone wallpaper 9:16. Ground-level view of a shooting game dome. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-neptune-shoot-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-hv.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). Vertical phone wallpaper 9:16. The view of a shooting game dome, inside the bubble dome looking out at the sea: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-neptune-quiz",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-main.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). A quiz game dome with a quiz show stage: a small glass bubble dome sitting on a patch of sea floor like a game map piece, seen from above at a gentle 3/4 angle, a tiny game arcade inside. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-neptune-quiz",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-main.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). Vertical phone wallpaper 9:16. Ground-level view of a quiz show dome. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-neptune-quiz-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-hv.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). Vertical phone wallpaper 9:16. The view of a quiz show dome, inside the bubble dome looking out at the sea: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-neptune-party",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-main.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). A party game dome with sofas and big screens: a small glass bubble dome sitting on a patch of sea floor like a game map piece, seen from above at a gentle 3/4 angle, a tiny game arcade inside. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-neptune-party",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-main.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). Vertical phone wallpaper 9:16. Ground-level view of a party game dome. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-neptune-party-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-hv.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). Vertical phone wallpaper 9:16. The view of a party game dome, inside the bubble dome looking out at the sea: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-neptune-solo",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-main.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). A quiet solo game dome with one comfy chair: a small glass bubble dome sitting on a patch of sea floor like a game map piece, seen from above at a gentle 3/4 angle, a tiny game arcade inside. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-neptune-solo",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-main.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). Vertical phone wallpaper 9:16. Ground-level view of a solo game dome. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-neptune-solo-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-hv.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). Vertical phone wallpaper 9:16. The view of a solo game dome, inside the bubble dome looking out at the sea: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-neptune-quick",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-main.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). A quick-play arcade dome with small cabinets: a small glass bubble dome sitting on a patch of sea floor like a game map piece, seen from above at a gentle 3/4 angle, a tiny game arcade inside. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-neptune-quick",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-main.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). Vertical phone wallpaper 9:16. Ground-level view of a quick-play arcade dome. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-neptune-quick-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-hv.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). Vertical phone wallpaper 9:16. The view of a quick-play arcade dome, inside the bubble dome looking out at the sea: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "isl-neptune-retro",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-main.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). A retro game dome with pixel cabinets: a small glass bubble dome sitting on a patch of sea floor like a game map piece, seen from above at a gentle 3/4 angle, a tiny game arcade inside. The whole piece in frame with a wide margin, centered. Plain solid pure white background outside the piece, no shadow, no text, no people, no characters.",
+      "always": false
+    },
+    {
+      "id": "exp-neptune-retro",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-main.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). Vertical phone wallpaper 9:16. Ground-level view of a retro game dome. The middle and lower part of the picture is open space, empty, for many small characters floating around in front. No planet in the sky. No characters, no people, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-neptune-retro-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home5-neptune-hv.jpg"
+      ],
+      "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). Vertical phone wallpaper 9:16. The view of a retro game dome, inside the bubble dome looking out at the sea: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
+      "always": false
     }
   ],
   "redo": []
