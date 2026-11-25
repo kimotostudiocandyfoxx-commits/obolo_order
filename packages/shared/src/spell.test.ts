@@ -27,8 +27,9 @@ describe('R11: the spell (スペル) as wooden tags', () => {
     t = r.tags;
     r = spellEdit('song', t, 'ロックにして');
     // R13 fix: a genre switch brings its own instruments (the old genre's piano goes; strings, added by the member, stay)
-    expect(ja(r.added)).toEqual(['ロック', 'エレキギター']);
-    expect(ja(r.removed)).toEqual(['ポップ', 'ピアノ']);
+    // R14: and its own voice (rock: 力強い歌声 for pop's やさしい歌声)
+    expect(ja(r.added)).toEqual(['ロック', 'エレキギター', '力強い歌声']);
+    expect(ja(r.removed)).toEqual(['ポップ', 'ピアノ', 'やさしい歌声']);
     expect(ja(r.tags)).toContain('ストリングス');
     t = r.tags;
     r = spellEdit('song', t, 'もっと暗く');

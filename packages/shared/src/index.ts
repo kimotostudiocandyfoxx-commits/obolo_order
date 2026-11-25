@@ -32,6 +32,7 @@ export * from './talkTone';
 export * from './clip';
 export * from './makeConfirm';
 export * from './spell';
+export * from './songGenres';
 export * from './lyrics';
 export * from './songTweak';
 export * from './craft';
