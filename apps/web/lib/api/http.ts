@@ -289,6 +289,9 @@ export class HttpApi implements Api {
   async dropClip(id: string) {
     await this.req<unknown>('DELETE', `/media/files/${encodeURIComponent(id)}`);
   }
+  unfurl(url: string) {
+    return this.req<Awaited<ReturnType<Api['unfurl']>>>('POST', '/links/unfurl', { url });
+  }
   lookClip(id: string) {
     return this.req<Awaited<ReturnType<Api['lookClip']>>>('POST', `/media/files/${encodeURIComponent(id)}/look`, {});
   }
@@ -366,6 +369,9 @@ export class HttpApi implements Api {
   }
   testerUnlockAll() {
     return this.req<Me>('POST', '/me/tester/unlock-all');
+  }
+  testerMana() {
+    return this.req<Me>('POST', '/me/tester/mana');
   }
   testerJump(day: number | MembersDay) {
     return this.req<Me>('POST', '/me/tester/jump', { day });

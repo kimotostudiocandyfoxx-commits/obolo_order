@@ -150,11 +150,13 @@ import {
   clipParts,
   clipType,
   type ClipFile,
+  type LinkPreview,
 } from '@obolo/shared';
 import { demoEggOf, demoBatiEgg, demoBatiForget, demoBatiMemory, demoBatiNew, demoBatiRole, demoBatiSpeech, demoBatiSwitch, demoBatiSync } from './demoBati';
 import { demoBati, demoFromReference, demoNeoLooks, demoRefine, demoStickerArt } from '@/lib/look';
 import { castLook } from '@/lib/talk/demoLooks';
 import { getBlob, putBlob } from './idb';
+import { demoUnfurl } from './demoUnfurl';
 import { tokenStore } from './token';
 import { ApiError, type Api, type Paid } from './types';
 
@@ -1081,6 +1083,11 @@ export class DemoApi implements Api {
     this.s.clips = (this.s.clips ?? []).filter((f) => f.id !== id);
     this.save();
   }
+  /** R12 in the demo: canned previews (no fetch from the browser); a few known places, else just the domain */
+  async unfurl(url: string): Promise<LinkPreview> {
+    await sleep(350);
+    return demoUnfurl(url);
+  }
   async lookClip(id: string) {
     const f = (this.s.clips ?? []).find((x) => x.id === id);
     await sleep(500);
@@ -1399,6 +1406,9 @@ export class DemoApi implements Api {
 
   // the tester entrance is the real server's only (its allowlist): the demo has no testers
   async testerUnlockAll(): Promise<Me> {
+    throw new ApiError(403, 'NOT_TESTER', 'Testers only');
+  }
+  async testerMana(): Promise<Me> {
     throw new ApiError(403, 'NOT_TESTER', 'Testers only');
   }
   async testerJump(_day: number | MembersDay): Promise<Me> {

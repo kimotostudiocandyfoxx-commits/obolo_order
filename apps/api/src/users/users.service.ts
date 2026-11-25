@@ -1,4 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
 import {
   EMPTY_ATELIER,
   JOURNEY_DONE,
@@ -26,7 +27,7 @@ import { and, eq, isNull, ne } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { canUseMedia } from '../voice/media-consent';
 import { Database } from '../db/db';
-import { users } from '../db/schema';
+import { users, wallets } from '../db/schema';
 import { LedgerService } from '../wallet/ledger.service';
 import { activeBati, batiSummaries, batiViewExtra, lookHistory } from '../look/batis';
 import { talkLookOf } from '../look/talk';
@@ -117,6 +118,8 @@ export function toMe(u: typeof users.$inferSelect): Me {
   };
 }
 
+const TESTER_MANA_CAP = 8888;
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -130,6 +133,18 @@ export class UsersService {
     await this.db.write.transaction((tx) =>
       this.ledger.applyMana(tx, { userId, delta: MONTHLY_GRANT_MANA, reason: 'monthly_grant', idempotencyKey: `monthly:${userId}:${month}` }),
     );
+  }
+
+  /**
+   * 〔マナ +88〕 on the tester panel: 88 more mana (reason demo_grant), refused once the wallet holds 8,888 or more so a
+   * stuck finger cannot pile it up. Testers only (TesterService guards).
+   */
+  async addTesterMana(userId: string) {
+    await this.db.write.transaction(async (tx) => {
+      const [w] = await tx.select({ bal: wallets.manaBalance }).from(wallets).where(eq(wallets.userId, userId)).limit(1);
+      if (w && w.bal >= TESTER_MANA_CAP) throw apiError(HttpStatus.CONFLICT, 'TESTER_MANA_CAP', 'Enough mana already');
+      await this.ledger.applyMana(tx, { userId, delta: MONTHLY_GRANT_MANA, reason: 'demo_grant', idempotencyKey: `tester:${userId}:${randomUUID()}` });
+    });
   }
 
   /**

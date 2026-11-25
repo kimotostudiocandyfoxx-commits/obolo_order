@@ -1,3 +1,4 @@
+import type { LinkPreview } from '@obolo/shared';
 import type { BookView, GameBrokenBody, GameBuildBody, GameView, NovelChapterBody } from '@obolo/shared';
 import type { ClipFile, ClipStartBody, ClipUploadStart, ChangeResult, HomeOshi, HomePlanet, PlanetHomeView, AddVersionBody, CreateMoonWorkBody, DemoJobBody, MakeConfirm, MakeKind, SpellBody, SpellKind, SpellTag, SpellView, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiHistoryPage, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
 import type {
@@ -187,6 +188,8 @@ export interface Api {
   dropClip(id: string): Promise<void>;
   /** a 📎 file handed to {bati}: a picture is looked at; the line {bati} says */
   lookClip(id: string): Promise<{ line: string; looked: boolean }>;
+  /** R12: a pasted link's preview for its portal in the talk (cached on the server; pictures as data: URLs) */
+  unfurl(url: string): Promise<LinkPreview>;
   /** Video → 720p / ~1.5 Mbps MP4 trimmed to `maxSeconds`, plus a poster image. */
   uploadVideo(blob: Blob, maxSeconds: number): Promise<UploadedVideo>;
   /** `plaza`: only the voices dropped in that ひろば (みんな map) */
@@ -218,6 +221,7 @@ export interface Api {
   jumpJourney(day: number | MembersDay): Promise<Me>;
   /** The tester entrance (Me.tester only; 403 otherwise): open everything — every Moon atelier kind, {bati}, Bluena, the ダチ. */
   testerUnlockAll(): Promise<Me>;
+  testerMana(): Promise<Me>;
   /** The tester entrance: a journey day 1–8 or a members' day from its start, no wait. */
   testerJump(day: number | MembersDay): Promise<Me>;
   /** The tester entrance: the next day now (the wait skipped). */

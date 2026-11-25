@@ -81,7 +81,17 @@ export class TesterService {
     // the operator day-jump to "the journey done" (keeps an order already made, and the members' days' progress)
     await this.users.jumpJourney(userId, JOURNEY_DONE);
     if (!(await this.user(userId)).orderedAt) await this.users.markOrdered(userId, { subscriptionStatus: 'demo' });
+    // a member's 88 mana for this month (one key per month, so pressing again does not add more; 〔マナ +88〕 does)
+    await this.users.grantMonth(userId).catch((e) => this.log.warn(`tester month grant failed: ${String(e)}`));
     await this.dachiVoice.markDachi(userId).catch((e) => this.log.warn(`tester dachi failed: ${String(e)}`));
+    return this.users.getMe(userId);
+  }
+
+  /** 〔マナ +88〕: 88 more mana to try paid makings (refused at 8,888 or more) */
+  async mana(userId: string): Promise<Me> {
+    await this.guard(userId);
+    this.note(userId, 'mana');
+    await this.users.addTesterMana(userId);
     return this.users.getMe(userId);
   }
 

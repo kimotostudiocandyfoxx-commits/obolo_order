@@ -67,13 +67,13 @@ export function TesterBar() {
   if (!me || !tester) return null;
 
   /** one action: the server first, then this device's story progress, then the top (the day starts from there) */
-  const run = async (label: string, call: () => Promise<Me>, after: 'home' | 'stay', clear: 'story' | 'all') => {
+  const run = async (label: string, call: () => Promise<Me>, after: 'home' | 'stay', clear: 'story' | 'all' | 'none') => {
     setBusy(true);
     setMsg(null);
     try {
       const u = await call();
       setMe(u);
-      forget(clear === 'all' ? (k) => !KEEP_ON_RESET.some((r) => r.test(k)) : (k) => STORY_KEYS.some((r) => r.test(k)));
+      if (clear !== 'none') forget(clear === 'all' ? (k) => !KEEP_ON_RESET.some((r) => r.test(k)) : (k) => STORY_KEYS.some((r) => r.test(k)));
       setMsg(`${label}：いま ${where(u)}`);
       if (after === 'home') window.location.assign('/');
     } catch (e) {
@@ -109,7 +109,11 @@ export function TesterBar() {
           <button disabled={busy} onClick={() => run('全部ひらいた', () => api.testerUnlockAll(), 'stay', 'story')} className={`${btn} mt-2 w-full bg-amber-400 font-bold text-black`}>
             全部ひらく
           </button>
-          <p className="mt-1 text-[10px] leading-relaxed text-white/45">月の工房の全部・バティ・ブルーナ・ダチが使える状態にします（会員にもなります。請求なし）</p>
+          <p className="mt-1 text-[10px] leading-relaxed text-white/45">月の工房の全部・バティ・ブルーナ・ダチが使える状態にします（会員になり、今月の88マナも入ります。請求なし）</p>
+
+          <button disabled={busy} onClick={() => run('88マナ入れた', () => api.testerMana(), 'stay', 'none')} className={`${btn} mt-2 w-full bg-white/10 font-bold`}>
+            マナ +88
+          </button>
 
           <p className="mt-3 text-[11px] text-white/60">その日の最初へ（待ちなし）</p>
           <div className="mt-1 flex flex-wrap gap-1.5">

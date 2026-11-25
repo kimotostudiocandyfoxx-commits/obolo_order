@@ -23,6 +23,13 @@ export class TesterController {
     return this.tester.unlockAll(userId, origin(req));
   }
 
+  /** 〔マナ +88〕 */
+  @Post('mana')
+  @HttpCode(200)
+  mana(@UserId() userId: string) {
+    return this.tester.mana(userId);
+  }
+
   /** 〔N日目〕 / 〔会員N〕: { day: 1..8 | 'm1' | 'm2' | 'm3' } */
   @Post('jump')
   @HttpCode(200)
