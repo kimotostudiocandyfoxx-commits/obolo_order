@@ -11245,6 +11245,160 @@
       ],
       "prompt": "Cute colourful Japanese anime background art in exactly the same style, palette and lighting as the reference picture (pastel neon club, glossy candy colours). A single tall cute club speaker tower seen exactly from the front, stacked two glossy speaker cabinets with pastel neon trim and glowing rims, slim and tall, standing upright, the whole tower in frame from top to bottom with a small margin. Plain solid pure white background, no shadow, no text, no characters.",
       "always": false
+    },
+    {
+      "id": "exp-mercury-edm-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-mercury-pier.jpg"
+      ],
+      "prompt": "Bright Japanese anime background art in exactly the same style and colours as the reference picture. Vertical phone wallpaper 9:16. The view from standing on the shore of an EDM festival island at night: neon speaker towers and laser beams behind you on the sand. The foreground at the very bottom is the island's own edge (sand or a wooden pier), and in front of you is a wide open calm sea stretching to the horizon, the middle of the picture is open water, empty, for boats sailing towards you. No characters, no people, no boats, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-mercury-hiphop-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-mercury-pier.jpg"
+      ],
+      "prompt": "Bright Japanese anime background art in exactly the same style and colours as the reference picture. Vertical phone wallpaper 9:16. The view from standing on the shore of a hip-hop harbour city at golden hour: graffiti on the pier railing and boomboxes. The foreground at the very bottom is the island's own edge (sand or a wooden pier), and in front of you is a wide open calm sea stretching to the horizon, the middle of the picture is open water, empty, for boats sailing towards you. No characters, no people, no boats, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-mercury-ballad-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-mercury-pier.jpg"
+      ],
+      "prompt": "Bright Japanese anime background art in exactly the same style and colours as the reference picture. Vertical phone wallpaper 9:16. The view from standing on the shore of a gentle moonlit ballad island: soft grass, flowers and a white lighthouse at the edge, huge moon. The foreground at the very bottom is the island's own edge (sand or a wooden pier), and in front of you is a wide open calm sea stretching to the horizon, the middle of the picture is open water, empty, for boats sailing towards you. No characters, no people, no boats, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-mercury-rock-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-mercury-pier.jpg"
+      ],
+      "prompt": "Bright Japanese anime background art in exactly the same style and colours as the reference picture. Vertical phone wallpaper 9:16. The view from standing on the shore of a rock volcano island: black sand, glowing lava rocks and stage lights at the edge, fiery sky. The foreground at the very bottom is the island's own edge (sand or a wooden pier), and in front of you is a wide open calm sea stretching to the horizon, the middle of the picture is open water, empty, for boats sailing towards you. No characters, no people, no boats, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-mercury-chill-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-mercury-pier.jpg"
+      ],
+      "prompt": "Bright Japanese anime background art in exactly the same style and colours as the reference picture. Vertical phone wallpaper 9:16. The view from standing on the shore of a chill lo-fi lagoon in the afternoon: palm trees, a hammock and soft pastel clouds. The foreground at the very bottom is the island's own edge (sand or a wooden pier), and in front of you is a wide open calm sea stretching to the horizon, the middle of the picture is open water, empty, for boats sailing towards you. No characters, no people, no boats, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-mercury-citypop-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-mercury-pier.jpg"
+      ],
+      "prompt": "Bright Japanese anime background art in exactly the same style and colours as the reference picture. Vertical phone wallpaper 9:16. The view from standing on the shore of a city-pop seaside bay at dusk: a pastel promenade railing, retro street lamps, pink sunset. The foreground at the very bottom is the island's own edge (sand or a wooden pier), and in front of you is a wide open calm sea stretching to the horizon, the middle of the picture is open water, empty, for boats sailing towards you. No characters, no people, no boats, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-mercury-anison-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-mercury-pier.jpg"
+      ],
+      "prompt": "Bright Japanese anime background art in exactly the same style and colours as the reference picture. Vertical phone wallpaper 9:16. The view from standing on the shore of a festive anime-song island: colourful banners and penlight-coloured lights along the pier. The foreground at the very bottom is the island's own edge (sand or a wooden pier), and in front of you is a wide open calm sea stretching to the horizon, the middle of the picture is open water, empty, for boats sailing towards you. No characters, no people, no boats, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-mercury-jazz-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-mercury-pier.jpg"
+      ],
+      "prompt": "Bright Japanese anime background art in exactly the same style and colours as the reference picture. Vertical phone wallpaper 9:16. The view from standing on the shore of a cosy jazz cove at night: warm lamps on a wooden deck, a starry deep blue sky. The foreground at the very bottom is the island's own edge (sand or a wooden pier), and in front of you is a wide open calm sea stretching to the horizon, the middle of the picture is open water, empty, for boats sailing towards you. No characters, no people, no boats, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-mercury-matsuri-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-mercury-pier.jpg"
+      ],
+      "prompt": "Bright Japanese anime background art in exactly the same style and colours as the reference picture. Vertical phone wallpaper 9:16. The view from standing on the shore of a Japanese summer festival beach at night: paper lanterns along the pier, fireworks over the sea. The foreground at the very bottom is the island's own edge (sand or a wooden pier), and in front of you is a wide open calm sea stretching to the horizon, the middle of the picture is open water, empty, for boats sailing towards you. No characters, no people, no boats, no text.",
+      "always": false
+    },
+    {
+      "id": "exp-mercury-rain-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/home3-bg-mercury-pier.jpg"
+      ],
+      "prompt": "Bright Japanese anime background art in exactly the same style and colours as the reference picture. Vertical phone wallpaper 9:16. The view from standing on the shore of a gentle rainy seaside: soft rain, hydrangeas on the shore, misty calm sea. The foreground at the very bottom is the island's own edge (sand or a wooden pier), and in front of you is a wide open calm sea stretching to the horizon, the middle of the picture is open water, empty, for boats sailing towards you. No characters, no people, no boats, no text.",
+      "always": false
+    },
+    {
+      "id": "sat7-bg",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "refs": [
+        "design/mv-art/out/sat6-bg.jpg"
+      ],
+      "prompt": "Cute pastel Japanese anime background art in exactly the same style, palette and lighting as the reference picture. Vertical phone wallpaper 9:16. A dreamy open-air pastel club floating in space: a soft starry lavender and pink sky full of bokeh lights, glowing Saturn-ring arcs sweeping across the sky (rings only, no planet ball), floating pastel neon shapes. At the right side, a little lower than the middle, a small floating DJ booth with a big glossy vinyl record turntable seen from the front. The rest of the picture is open airy space for round creatures floating around. No floor, no characters, no text.",
+      "always": false
     }
   ],
   "redo": []
