@@ -1,4 +1,5 @@
 import { PLANET_HOMES, type HomePlanet, type HomeRel, type HomeWork, type PlanetHomeView } from '@obolo/shared';
+import { SAMPLE_ARTS } from './jupiter';
 import { SAMPLE_SONGS, sampleSongUrl } from './mercury';
 
 /**
@@ -39,7 +40,8 @@ export function templateSample(planet: HomePlanet, now = Date.now()): PlanetHome
       author: { id: rel === 'own' ? 'me' : `u-${name}`, name, pic: null, figure: planet === 'saturn' ? null : fig, ball: planet === 'saturn' ? fig : null },
       rel,
       text: WORDS[i % WORDS.length],
-      title: planet === 'saturn' ? undefined : `${name}の${cfg.work}`,
+      // 03 Jupiter: the prototype's five arts and their titles (never 「〜のアート」, M-R310)
+      title: planet === 'saturn' ? undefined : planet === 'jupiter' ? SAMPLE_ARTS[i % 5] : `${name}の${cfg.work}`,
       url: planet === 'jupiter' ? art : null,
       thumbUrl: planet === 'saturn' ? null : art,
       flownAt: at(h),

@@ -447,6 +447,38 @@
   box-shadow: 0 0 6px 2px var(--c);
   animation: fwp 1.5s cubic-bezier(0.1, 0.7, 0.3, 1) forwards;
 }
+/* Jupiter's porch at night: fireflies drifting and blinking (the prototype's .ff2) */
+.flies {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.flies i {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #fff6a0;
+  box-shadow: 0 0 8px 3px rgba(255, 240, 120, 0.8);
+  animation:
+    ffly var(--d, 5s) ease-in-out infinite alternate,
+    fblink var(--b, 1.6s) ease-in-out infinite alternate;
+}
+@keyframes ffly {
+  to {
+    transform: translate(var(--fx, 30px), var(--fy, -40px));
+  }
+}
+@keyframes fblink {
+  from {
+    opacity: 0.15;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* a ship coming to your pier (the prototype's .vis: 150 × 134) */
 .visitor.front {
   width: 150px;
@@ -751,6 +783,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .wake,
+  .flies i,
   .visitor.bobbing img,
   .fig img.body,
   .place::before,

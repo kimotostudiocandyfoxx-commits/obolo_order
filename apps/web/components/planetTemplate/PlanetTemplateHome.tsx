@@ -10,7 +10,7 @@ import { pinchOf } from '@/lib/planetTemplate/sky';
 import { PlayView } from './PlayView';
 import { Profile, type ProfileMiddleSlot, type ProfilePerson } from './Profile';
 import { TopBar } from './TopBar';
-import { defaultOpener, type WorkOpener } from './WorkView';
+import { defaultOpener, type FigureSlot, type WorkOpener } from './WorkView';
 import s from './PlanetTemplate.module.css';
 
 /** you, on this planet: your name, your riding figure (figureFor), your back (GET /me lookBack, or the stand-in) and you dancing */
@@ -34,6 +34,8 @@ export interface TemplateHooks {
   opener?: WorkOpener;
   /** 3-5 the profile's middle */
   profileMiddle?: ProfileMiddleSlot;
+  /** 3-1 how a figure with its own picture is drawn on the home and in ▶ (Jupiter: only the wings flap, 03 §1) */
+  figure?: FigureSlot;
   /** 3-2 / 3-3 numbers: where a figure may stay, ▶'s intro delay, how long a work stays (templateConfig) */
   config?: Partial<Omit<PlanetTemplateConfig, 'planet'>>;
   /** the sky (pinch in on the home; Mercury first, M-R295): drawn over the home while open */
@@ -316,7 +318,7 @@ export function PlanetTemplateHome({
             {...figureHandlers(st.n, st.person)}
           >
             {motion.kind === 'sail' && <i className={s.wake} />}
-            <img className={s.body} src={picOf(st.person)} alt="" draggable={false} />
+            {hooks.figure && (st.person.figure || cfg.standIn) ? hooks.figure({ src: picOf(st.person), i: st.n }) : <img className={s.body} src={picOf(st.person)} alt="" draggable={false} />}
             {!st.person.figure && !cfg.standIn && st.person.face && <img className={s.face} src={st.person.face} alt="" draggable={false} />}
             <span className={s.nm}>{st.person.name}</span>
           </div>
@@ -341,8 +343,9 @@ export function PlanetTemplateHome({
           cfg={cfg}
           people={playing}
           back={me.back}
-          dancer={me.dance ?? null}
+          dancer={(cfg.play.danceAs === 'figure' ? me.figure : me.dance) ?? null}
           opener={opener}
+          figure={hooks.figure}
           onEnd={(finished) => {
             setPlaying(null);
             if (finished && cfg.play.doneLine) toast(cfg.play.doneLine);

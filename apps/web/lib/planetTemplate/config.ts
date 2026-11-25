@@ -1,5 +1,6 @@
 import { PLANET_HOMES, type HomePlanet } from '@obolo/shared';
 import { anywhere, PLAY_HOLD_MS, PLAY_INTRO_MS, type AllowedArea } from './layout';
+import { ALL_SEEN, JTREE, PORCH_HOLD_MS, PORCH_INTRO_MS, PORCH_PATH } from './jupiter';
 import { ALL_HEARD, HOME_SEA, MHOUSE, PIER_PATH, sailMotion, seaOnly, shipStandIn } from './mercury';
 import { driftMotion, type FigureMotion } from './motion';
 
@@ -52,8 +53,12 @@ export interface PlanetTemplateConfig {
     /** the view at night, fireworks over it (Mercury's pier, 02 §3) */
     night: boolean;
     fireworks: boolean;
+    /** fireflies over the view (Jupiter's porch, 03 §3) */
+    fireflies: boolean;
     /** you dance out of your place first (fractions of the screen), then the view turns */
     dance: { x: number; y: number } | null;
+    /** who comes out: your dancing picture (Mercury) or your figure on this planet (Jupiter: your butterfly) */
+    danceAs: 'dance' | 'figure';
     /** said when every work has been seen (null: nothing) */
     doneLine: string | null;
   };
@@ -80,13 +85,20 @@ export const DEFAULT_PLAY_PATH: PlayPath = { from: { x: 0.4, y: 0.2, size: 0.3 }
 
 /** each planet's own numbers (the 02〜 documents) over the common template */
 const OWN: Partial<Record<HomePlanet, Partial<Omit<PlanetTemplateConfig, 'planet'>>>> = {
+  // 03 木星: the butterflies drift on JSLOT (the template's own); an art opens with a deep zoom (zoomart); ▶ is the porch at night
+  jupiter: {
+    openLook: { scale: 1.65, blur: 5, bright: 0.55 },
+    introMs: PORCH_INTRO_MS,
+    holdMs: PORCH_HOLD_MS,
+    play: { path: PORCH_PATH, untilDone: false, night: true, fireworks: false, fireflies: true, dance: JTREE, danceAs: 'figure', doneLine: ALL_SEEN },
+  },
   // 02 水星: seven ships on the sea lanes (MSLOT), on the sea only; a song opens with a deep zoom; ▶ is the pier at night
   mercury: {
     motion: sailMotion(HOME_SEA),
     allowed: seaOnly(HOME_SEA),
     standIn: shipStandIn,
     openLook: { scale: 1.65, blur: 5, bright: 0.55 },
-    play: { path: PIER_PATH, untilDone: true, night: true, fireworks: true, dance: MHOUSE, doneLine: ALL_HEARD },
+    play: { path: PIER_PATH, untilDone: true, night: true, fireworks: true, fireflies: false, dance: MHOUSE, danceAs: 'dance', doneLine: ALL_HEARD },
     sky: { sea: '/planets/continents/mercury/sea.webp', me: '/planets/continents/mercury/me.webp' },
   },
 };
@@ -106,7 +118,7 @@ export function templateConfig(planet: HomePlanet, over: Partial<Omit<PlanetTemp
     openLook: { scale: 1.12, blur: 2.5, bright: 0.7 },
     introMs: planet === 'saturn' ? 2300 : PLAY_INTRO_MS,
     holdMs: planet === 'mars' ? PLAY_HOLD_MS.long : PLAY_HOLD_MS.default,
-    play: { path: DEFAULT_PLAY_PATH, untilDone: false, night: false, fireworks: false, dance: null, doneLine: null },
+    play: { path: DEFAULT_PLAY_PATH, untilDone: false, night: false, fireworks: false, fireflies: false, dance: null, danceAs: 'dance', doneLine: null },
     sky: null,
     ...OWN[planet],
     ...over,

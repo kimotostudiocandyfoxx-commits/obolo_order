@@ -1,0 +1,388 @@
+/* 木星 (handoff 03; prototype design/home/template.html .wg / .flyc / .scroll .kk / .ot / .whotag / .pgal) */
+
+/* §1 a butterfly: the same picture cut in three — left wing, right wing, and the body drawn over both (WG) */
+.wg {
+  position: relative;
+  width: 104px;
+  height: 104px;
+  filter: drop-shadow(0 0 6px rgba(255, 250, 210, 0.55)) drop-shadow(0 8px 10px rgba(0, 0, 0, 0.3));
+  animation: bodybob 0.6s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+.fill {
+  width: 100%;
+  height: 100%;
+}
+.wg img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+.wl,
+.wr {
+  animation: wflap var(--fl, 0.3s) ease-in-out infinite alternate;
+}
+@keyframes wflap {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0.3);
+  }
+}
+@keyframes bodybob {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-3px);
+  }
+}
+
+/* §2 an art open: over the home (the home zooms and dims behind it: config.openLook) */
+.open {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  container-type: size;
+  overflow: hidden;
+}
+.open.clear {
+  background: rgba(20, 12, 4, 0.45);
+}
+.inPlay {
+  pointer-events: none;
+}
+
+/* the butterfly tapped: to the bottom left while its art is open, then off to your tree */
+.fly {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 104px;
+  height: 104px;
+  margin: -52px 0 0 -52px;
+  z-index: 15;
+  transition:
+    transform 0.35s cubic-bezier(0.3, 0.9, 0.3, 1),
+    opacity 0.3s;
+  pointer-events: none;
+}
+.fly.gone {
+  transition:
+    transform 0.4s ease-in,
+    opacity 0.4s;
+  opacity: 0;
+}
+.who {
+  position: absolute;
+  z-index: 16;
+  transform: translateX(-50%);
+  font: 800 10px var(--font-sans);
+  white-space: nowrap;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  opacity: 0.9;
+  pointer-events: none;
+  animation: fadein 0.25s both;
+}
+
+/* the hanging scroll: unrolls top to bottom; its square paper is the art, 95% of the screen wide */
+.layer {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  pointer-events: none;
+}
+.layer.shake {
+  animation: cshake 0.5s;
+}
+.scroll {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.55));
+}
+.kk {
+  position: relative;
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 0.55s cubic-bezier(0.3, 0.8, 0.3, 1);
+}
+.scroll.on .kk {
+  clip-path: inset(-6% -6% -6% -6%);
+}
+.scroll.closing .kk {
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 0.22s ease-in;
+}
+.kk > img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.art {
+  position: absolute;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  box-shadow:
+    inset 0 0 0 1px rgba(80, 50, 20, 0.35),
+    inset 0 0 18px rgba(80, 50, 20, 0.18);
+}
+/* the bottom of the art darkens a little so the title reads */
+.art::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 42%;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.45));
+  opacity: 0;
+  transition: opacity 0.5s 0.3s;
+}
+.scroll.on .art::after {
+  opacity: 1;
+}
+.cam_push .kk {
+  animation: cpush 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.cam_slam .kk {
+  animation: cslam 0.45s cubic-bezier(0.3, 1.6, 0.4, 1);
+}
+.cam_shake .kk {
+  animation:
+    cpush 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+    cshake 0.5s 0.35s;
+}
+.cam_drift .kk {
+  animation: cdrift 1.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.cam_whip .kk {
+  animation: cwhip 0.42s cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+/* the title, laid over the art (M-R288): the art's own font and entrance; kanji a little bigger, hiragana smaller */
+.ot {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  bottom: 7%;
+  padding: 0 4%;
+  text-align: center;
+  font-weight: 900;
+  font-size: clamp(30px, 10vw, 46px);
+  line-height: 1.05;
+  letter-spacing: 0.03em;
+  color: #fff;
+  word-break: keep-all;
+  pointer-events: none;
+}
+.ot span {
+  display: inline-block;
+  opacity: 0;
+  -webkit-text-stroke: 1.5px rgba(20, 10, 0, 0.55);
+  paint-order: stroke fill;
+  text-shadow:
+    0 3px 0 rgba(0, 0, 0, 0.35),
+    0 0 22px rgba(0, 0, 0, 0.45),
+    0 0 2px #000;
+}
+.ot .kj {
+  font-size: 1.14em;
+}
+.ot .hr {
+  font-size: 0.8em;
+}
+.ot .lt {
+  font-size: 0.92em;
+}
+.a_pop span {
+  transform: translateY(22px) scale(0.4) rotate(-8deg);
+  transition:
+    opacity 0.25s,
+    transform 0.5s cubic-bezier(0.2, 1.8, 0.4, 1);
+}
+.a_float span {
+  transform: translateY(16px);
+  filter: blur(10px);
+  transition:
+    opacity 0.8s,
+    transform 1s cubic-bezier(0.2, 0.8, 0.2, 1),
+    filter 1s;
+}
+.a_slam span {
+  transform: scale(3) translateY(-10px);
+  transition:
+    opacity 0.1s,
+    transform 0.3s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.a_glitch span {
+  transform: translateX(var(--gx)) skewX(-14deg);
+  transition:
+    opacity 0.05s,
+    transform 0.2s steps(3);
+}
+.a_brush {
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 1.2s cubic-bezier(0.6, 0.1, 0.2, 1) 0.2s;
+}
+.a_brush span {
+  opacity: 1;
+}
+.ot.on span {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+.a_brush.on {
+  clip-path: inset(-30% -5% -30% 0);
+}
+.a_slam.on {
+  animation: kshake 0.35s 0.6s;
+}
+
+/* §4 the atelier: the person's arts in gold frames on the wall, two columns, a little crooked */
+.gal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px 16px;
+  align-content: start;
+  padding: 26px 18px 30px;
+}
+.fr {
+  position: relative;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 5px solid #c9a24a;
+  outline: 2px solid #6b4a16;
+  background: #2a1a08 center / cover no-repeat;
+  box-shadow:
+    0 10px 18px rgba(30, 15, 0, 0.5),
+    inset 0 0 0 2px rgba(255, 240, 200, 0.5);
+  cursor: pointer;
+  transition: transform 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+/* its string and nail */
+.fr::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -16px;
+  width: 2px;
+  height: 14px;
+  background: linear-gradient(#a08050, #5a3a10);
+  transform: translateX(-50%);
+}
+.fr::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -20px;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  border-radius: 50%;
+  background: #e8c46a;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.fr:active {
+  scale: 0.96;
+}
+.fr.on {
+  border-color: #f3d27a;
+}
+.none {
+  padding: 40px 24px;
+  text-align: center;
+  font: 700 13px var(--font-sans);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+@keyframes cpush {
+  from {
+    transform: scale(0.82);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes cslam {
+  0% {
+    transform: scale(1.35);
+  }
+  60% {
+    transform: scale(0.96);
+  }
+  100% {
+    transform: none;
+  }
+}
+@keyframes cshake {
+  15% {
+    transform: translate(-6px, 3px) rotate(-0.6deg);
+  }
+  30% {
+    transform: translate(6px, -3px) rotate(0.6deg);
+  }
+  45% {
+    transform: translate(-4px, 2px);
+  }
+  60% {
+    transform: translate(4px, -1px);
+  }
+  80% {
+    transform: translate(-2px, 1px);
+  }
+}
+@keyframes cdrift {
+  from {
+    transform: scale(1.12) rotate(-2.5deg);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes cwhip {
+  from {
+    transform: translateX(70%) skewX(-8deg);
+    filter: blur(6px);
+  }
+  to {
+    transform: none;
+    filter: none;
+  }
+}
+@keyframes kshake {
+  20% {
+    transform: translate(-4px, 2px);
+  }
+  40% {
+    transform: translate(4px, -2px);
+  }
+  60% {
+    transform: translate(-3px, 1px);
+  }
+  80% {
+    transform: translate(2px, 0);
+  }
+}
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wg,
+  .wl,
+  .wr,
+  .kk,
+  .layer.shake {
+    animation: none;
+  }
+}

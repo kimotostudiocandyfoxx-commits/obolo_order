@@ -6,7 +6,7 @@ import { LETTER_GAP, letterKind, lyricAt, SONG_START_MS, STAGE, TITLE_MS, titleS
 import m from './Mercury.module.css';
 
 /** load a title's font, only the letters it uses (Google Fonts `text=`), once */
-function useTitleFont(family: string, title: string) {
+export function useTitleFont(family: string, title: string) {
   useEffect(() => {
     if (typeof document === 'undefined' || !title) return;
     const href = `https://fonts.googleapis.com/css2?family=${family}&text=${encodeURIComponent(title)}&display=swap`;

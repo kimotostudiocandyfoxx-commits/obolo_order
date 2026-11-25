@@ -3,10 +3,24 @@
 import { useEffect, useRef, useState } from 'react';
 import type { PathPoint, PlanetTemplateConfig } from '@/lib/planetTemplate/config';
 import type { HomePerson } from '@/lib/planetTemplate/people';
-import { defaultOpener, type WorkOpener } from './WorkView';
+import { defaultOpener, type FigureSlot, type WorkOpener } from './WorkView';
 import s from './PlanetTemplate.module.css';
 
 type Phase = 'in' | 'open' | 'out';
+
+/** fireflies over the view at night (Jupiter's porch, playJ's .ff2): each drifts and blinks at its own pace */
+function Fireflies({ n = 18 }: { n?: number }) {
+  const [dots] = useState(() =>
+    Array.from({ length: n }, () => ({ l: Math.random() * 100, t: 10 + Math.random() * 80, d: 4 + Math.random() * 4, b: 1 + Math.random() * 1.4, fx: Math.random() * 60 - 30, fy: Math.random() * -60 })),
+  );
+  return (
+    <div className={s.flies} aria-hidden data-testid="fireflies">
+      {dots.map((f, j) => (
+        <i key={j} style={{ left: `${f.l}%`, top: `${f.t}%`, ['--d' as string]: `${f.d}s`, ['--b' as string]: `${f.b}s`, ['--fx' as string]: `${f.fx}px`, ['--fy' as string]: `${f.fy}px` }} />
+      ))}
+    </div>
+  );
+}
 /** you dance out of your place for this long before the view turns (the prototype's playM: 0.9 s) */
 const DANCE_MS = 900;
 /** a work the planet shows until it is done never stays longer than this (a song that never ends) */
@@ -26,6 +40,7 @@ export function PlayView({
   back,
   dancer,
   opener = defaultOpener,
+  figure,
   onEnd,
   openProfile,
 }: {
@@ -35,6 +50,8 @@ export function PlayView({
   /** you, dancing out of your place (Mercury); null: the view turns at once */
   dancer?: string | null;
   opener?: WorkOpener;
+  /** the planet's way of drawing a figure (Jupiter: flapping wings); none: the picture */
+  figure?: FigureSlot;
   onEnd: (finished: boolean) => void;
   openProfile: (id: string) => void;
 }) {
@@ -123,6 +140,7 @@ export function PlayView({
         <div className={s.hvbg} style={{ backgroundImage: `url(${cfg.art.view})` }} />
         <div className={s.vig} />
         {cfg.play.night && <div className={s.glow} />}
+        {cfg.play.fireflies && <Fireflies />}
         {bursts.map((b) => (
           <div key={b.id} className={s.burst} style={{ left: `${b.x * 100}%`, top: `${b.y * 100}%`, ['--c' as string]: b.c }}>
             {Array.from({ length: 24 }, (_, j) => (
@@ -141,7 +159,7 @@ export function PlayView({
             className={`${s.visitor} ${phase === 'open' ? s.bobbing : ''} ${path.front ? s.front : ''}`}
             style={{ transform: `translate3d(${at.x * 100}cqw, ${at.y * 100}cqh, 0) scale(${at.size})`, opacity: phase === 'out' ? 0 : 1, transitionDuration: `${moveMs}ms, ${phase === 'out' ? 1000 : 500}ms` }}
           >
-            <img src={fig} alt="" draggable={false} />
+            {figure && (p.figure || cfg.standIn) ? figure({ src: fig, i: k, fill: true }) : <img src={fig} alt="" draggable={false} />}
             {phase !== 'open' && <span className={s.nm}>{p.name}</span>}
           </div>
         )}

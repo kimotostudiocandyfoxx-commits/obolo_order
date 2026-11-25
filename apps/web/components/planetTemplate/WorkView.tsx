@@ -22,6 +22,9 @@ export interface OpenWork {
   onDone?: () => void;
   openProfile: (personId: string) => void;
 }
+/** per planet: how a floating figure is drawn (`src`: its picture; `i`: its running number; `fill`: fill its box). Jupiter: wings that flap (03 §1) */
+export type FigureSlot = (o: { src: string; i: number; fill?: boolean }) => ReactNode;
+
 /** 3-2 per planet: how a work opens (02〜: the scroll on Jupiter, the CD and lyrics on Mercury, the kororin popping on Saturn …) */
 export type WorkOpener = (o: OpenWork) => ReactNode;
 
