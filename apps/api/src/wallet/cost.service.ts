@@ -11,7 +11,9 @@ import {
   makeCostEstimates as costTableOf,
   marginRow,
   percentile,
+  SONG_VOICE_GPU_MODELS,
   type AccrualStep,
+  type SongVoiceSeconds,
   type CostRates,
   type MakeKind,
   type ManaPrices,
@@ -70,6 +72,8 @@ export interface CostStore {
   saveEstimate(kind: MakeKind, costJpy: number, samples: number): Promise<void>;
   /** the per-making costs of the last `days` days (yen, one number per making) */
   jobCosts(kind: MakeKind, since: Date): Promise<number[]>;
+  /** R18: the recorded GPU seconds of one part of our GPU's work (gen_costs.model), one number per job */
+  gpuSeconds?(model: string, since: Date): Promise<number[]>;
   /** add a small cost to the member's waiting yen and take whole mana (one transaction with the wallet locked) */
   accrue(userId: string, feature: string, addJpy: number, rule: PriceRule): Promise<AccrualStep>;
   report(since: Date): Promise<ReportData>;
@@ -104,6 +108,7 @@ export class CostService implements OnModuleInit, OnModuleDestroy {
   protected store: CostStore;
   private fxCache: { at: number; pick: ReturnType<typeof fxFor> } | null = null;
   private priceCache: { at: number; prices: ManaPrices } | null = null;
+  private voiceCache: { at: number; p90: Partial<SongVoiceSeconds> } | null = null;
   private warnedMonth: string | null = null;
   private timer: ReturnType<typeof setInterval> | null = null;
   private first: ReturnType<typeof setTimeout> | null = null;
@@ -190,6 +195,24 @@ export class CostService implements OnModuleInit, OnModuleDestroy {
     const month = new Date(now.getTime() - 30 * DAY);
     const set = this.cfg.COST_REFINE_SINCE ? new Date(this.cfg.COST_REFINE_SINCE) : null;
     return set && Number.isFinite(set.getTime()) && set > month ? set : month;
+  }
+
+  /**
+   * R18 (君の声にする魔法): the p90 of our GPU's recorded seconds per part (waking up, the split, the conversion) over 30
+   * days, for the parts with enough recordings (COST_REFINE_MIN_SAMPLES) — the voice spell's quote uses them instead of
+   * the seeds (songVoiceQuote).
+   */
+  async voiceSeconds(now = new Date()): Promise<Partial<SongVoiceSeconds>> {
+    if (this.voiceCache && Date.now() - this.voiceCache.at < 10 * 60_000) return this.voiceCache.p90;
+    const since = this.refineSince(now);
+    const p90: Partial<SongVoiceSeconds> = {};
+    if (this.store.gpuSeconds)
+      for (const [part, model] of Object.entries(SONG_VOICE_GPU_MODELS) as [keyof SongVoiceSeconds, string][]) {
+        const xs = await this.store.gpuSeconds(model, since).catch(() => [] as number[]);
+        if (xs.length >= this.cfg.COST_REFINE_MIN_SAMPLES) p90[part] = percentile(xs, 0.9);
+      }
+    this.voiceCache = { at: Date.now(), p90 };
+    return p90;
   }
 
   /** the yen of one reported cost */
@@ -374,6 +397,15 @@ export class PgCostStore implements CostStore {
       .where(and(eq(genCosts.kind, kind), eq(genCosts.paid, true), isNotNull(genCosts.job), gte(genCosts.createdAt, since)))
       .groupBy(genCosts.job);
     return rows.map((r) => Number(r.c));
+  }
+
+  async gpuSeconds(model: string, since: Date) {
+    const rows = await this.db.read
+      .select({ s: sql<number>`sum(${genCosts.seconds})` })
+      .from(genCosts)
+      .where(and(eq(genCosts.provider, 'gpu'), eq(genCosts.model, model), gte(genCosts.createdAt, since)))
+      .groupBy(sql`coalesce(${genCosts.job}, ${genCosts.id}::text)`);
+    return rows.map((r) => Number(r.s)).filter((x) => x > 0);
   }
 
   async accrue(userId: string, feature: string, addJpy: number, rule: PriceRule): Promise<AccrualStep> {

@@ -188,7 +188,7 @@ import { getBlob, putBlob } from './idb';
 import { demoUnfurl } from './demoUnfurl';
 import { tokenStore } from './token';
 import { ApiError, type Api, type Paid } from './types';
-import { incantNorm, premiumRequest, type IncantView } from '@obolo/shared';
+import { incantNorm, premiumRequest, songVoiceKey, songVoiceQuote, type IncantView, type SongVoiceQuoteView, type SongVoiceUseView, type SongVoiceVersion } from '@obolo/shared';
 
 /** R17: the passphrase's digests and lengths (its normalized forms) — the demo's only knowledge of it */
 const DEMO_INCANT: [number, string][] = [
@@ -275,7 +275,9 @@ interface DemoState {
   /** M-R253 §4: the review's stand-in jobs (they only take their time; `lateBy` s more than said, the first `failTimes` fail) */
   /** R11: the yeses already charged (MakeConfirm's ledger key → the stand-in job it started, '' for none) */
   paidYes?: Record<string, string>;
-  djobs?: Record<string, { owner: string; seconds: number; lateBy: number; failTimes: number; start: number; attempts: number; eta: number; late: boolean; retrying: boolean; createdAt: string; done?: boolean; /** a game being built (its result is the game) */ game?: { gameId?: string; tags: SpellTag[]; madeId?: string; kind?: MakeKind; price?: number; template?: GameTemplateId } }>;
+  djobs?: Record<string, { owner: string; seconds: number; lateBy: number; failTimes: number; start: number; attempts: number; eta: number; late: boolean; retrying: boolean; createdAt: string; done?: boolean; /** a game being built (its result is the game) */ game?: { gameId?: string; tags: SpellTag[]; madeId?: string; kind?: MakeKind; price?: number; template?: GameTemplateId }; /** R18: 君の声にする魔法 for this song */ voiceSong?: string }>;
+  /** R18: the demo's songs sung in the member's voice (the version in use) */
+  songVoices?: Record<string, { using: SongVoiceVersion }>;
   /** client 2026-11-25: the demo's books and games (canned chapters / the canned game, no model) */
   books?: (BookView & { owner: string })[];
   games?: (GameView & { owner: string; versions: { tags: SpellTag[]; code: string; title: string; howTo: string }[]; /** R17: each version's making and price */ kinds?: MakeKind[]; prices?: number[] })[];
@@ -880,7 +882,7 @@ export class DemoApi implements Api {
     const j = this.s.djobs?.[id];
     if (!j || j.owner !== this.uid()) throw new ApiError(404, 'NOT_FOUND', 'Job not found');
     const now = Date.now();
-    const view = (status: JobView['status']): JobView => ({ id, kind: j.game ? 'game' : 'demo', status, stage: j.retrying ? 'retrying' : 'waiting', result: status === 'done' ? (j.game ? { game: this.gameOf(j.game.madeId!) } : { demo: { seconds: j.seconds } }) : null, errorCode: null, error: null, createdAt: j.createdAt, etaAt: new Date(j.eta).toISOString(), startedAt: new Date(j.start).toISOString(), attempts: j.attempts, late: j.late, retrying: j.retrying });
+    const view = (status: JobView['status']): JobView => ({ id, kind: j.game ? 'game' : j.voiceSong ? 'song-voice' : 'demo', status, stage: j.retrying ? 'retrying' : 'waiting', result: status === 'done' ? (j.game ? { game: this.gameOf(j.game.madeId!) } : { demo: { seconds: j.seconds } }) : null, errorCode: null, error: null, createdAt: j.createdAt, etaAt: new Date(j.eta).toISOString(), startedAt: new Date(j.start).toISOString(), attempts: j.attempts, late: j.late, retrying: j.retrying });
     if (j.done) return view('done');
     if (now - j.start < (j.seconds + j.lateBy) * 1000) {
       const l = lateEta(j.eta, now);
@@ -895,6 +897,7 @@ export class DemoApi implements Api {
       return view('running');
     }
     j.done = true;
+    if (j.voiceSong) this.s.songVoices = { ...(this.s.songVoices ?? {}), [j.voiceSong]: { using: 'own' } };
     if (j.game && !j.game.madeId) j.game.madeId = this.buildDemoGame(j.owner, j.game.tags, j.game.gameId, j.game);
     this.save();
     return view('done');
@@ -983,6 +986,46 @@ export class DemoApi implements Api {
     this.s.djobs = { ...(this.s.djobs ?? {}), [id]: { owner: this.uid(), seconds, lateBy: 0, failTimes: 0, start: t, attempts: 1, eta: t + seconds * 1000, late: false, retrying: false, createdAt: new Date(t).toISOString(), game: { gameId: body.gameId, tags: body.tags, kind, price: body.confirm.price, ...(tier === 'trial' && body.template ? { template: body.template } : {}) } } };
     this.save();
     return this.getJob(id);
+  }
+  // R18: 君の声にする魔法 in the demo — the same gates and price rule as the API (a demo song counts as never split); the
+  // conversion is a short stand-in job (the demo has no GPU: the card keeps its audio)
+  async songVoiceQuote(id: string): Promise<SongVoiceQuoteView> {
+    await sleep(500);
+    const u = this.s.users[this.uid()] as unknown as { voices?: { selfSings?: boolean }; consent?: { media?: boolean; guardian?: boolean } | null; birthYear?: number | null };
+    // the consent rules as the API's canUseMedia (under 13 never, 13–15 only with a guardian's yes)
+    if (!mediaAllowed({ birthYear: u.birthYear ?? null, consent: !!u.consent, guardian: !!u.consent?.guardian, media: u.consent?.media !== false })) return { status: 'noConsent' };
+    if (!u.voices?.selfSings) return { status: 'noVoice' };
+    const has = this.s.songVoices?.[id];
+    if (has) return { status: 'has', using: has.using };
+    return { status: 'quote', price: songVoiceQuote({ split: true }).mana, spell: songVoiceKey(id, true), split: true };
+  }
+  async songVoice(id: string, body: Parameters<Api['songVoice']>[1]): Promise<JobView> {
+    const price = songVoiceQuote({ split: true }).mana;
+    const w = this.s.wallets[this.uid()];
+    const key = confirmKey(this.uid(), 'songVoice', body.confirm);
+    const d = decideCharge({ kind: 'songVoice', price, confirm: body.confirm, required: true, spell: songVoiceKey(id, true), balance: w?.mana ?? 0, applied: key in (this.s.paidYes ?? {}) });
+    if ('error' in d) {
+      if (d.error === 'NO_MANA') window.dispatchEvent(new Event('obolo:nomana'));
+      throw new ApiError(d.error === 'NO_MANA' ? 402 : 409, d.error, CHARGE_ERROR_WORDS[d.error]);
+    }
+    if (d.do === 'repeat') return this.getJob(this.s.paidYes![key]);
+    w.mana -= d.amount;
+    w.lastActivity = now();
+    w.entries.push({ id: uid(), delta: -d.amount, reason: 'generation', createdAt: now() });
+    const jid = uid();
+    const t = Date.now();
+    this.s.paidYes = { ...(this.s.paidYes ?? {}), [key]: jid };
+    this.s.djobs = { ...(this.s.djobs ?? {}), [jid]: { owner: this.uid(), seconds: 8, lateBy: 0, failTimes: 0, start: t, attempts: 1, eta: t + 8000, late: false, retrying: false, createdAt: new Date(t).toISOString(), voiceSong: id } };
+    this.save();
+    return this.getJob(jid);
+  }
+  async songVoiceUse(id: string, use: SongVoiceVersion, demo?: { url?: string }): Promise<SongVoiceUseView> {
+    await sleep(600);
+    const has = this.s.songVoices?.[id];
+    const using: SongVoiceVersion = has && use === 'own' ? 'own' : 'original';
+    if (has) this.s.songVoices = { ...this.s.songVoices, [id]: { using } };
+    this.save();
+    return { using, song: { url: demo?.url ?? '', seconds: 0 }, versions: has ? ['original', 'own'] : ['original'] };
   }
   async game(id: string): Promise<GameView> {
     return this.gameOf(id);

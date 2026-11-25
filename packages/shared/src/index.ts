@@ -36,6 +36,7 @@ export * from './spell';
 export * from './songGenres';
 export * from './lyrics';
 export * from './songTweak';
+export * from './songVoice';
 export * from './craft';
 export * from './craftDemo';
 export * from './links';

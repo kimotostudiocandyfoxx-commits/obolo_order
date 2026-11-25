@@ -13,6 +13,7 @@ import { ComposeController } from './compose/compose.controller';
 import { ComposeService } from './compose/compose.service';
 import { SongService } from './compose/song.service';
 import { SongTweakService } from './compose/song-tweak.service';
+import { SongVoiceService } from './compose/song-voice.service';
 import { VoiceController } from './voice/voice.controller';
 import { LineVoiceService } from './voice/line-voice.service';
 import { VoiceService } from './voice/voice.service';
@@ -164,6 +165,7 @@ import { WalletController } from './wallet/wallet.controller';
     ComposeService,
     SongService,
     SongTweakService,
+    SongVoiceService,
     VoiceService,
     LineVoiceService,
     BatiVoiceService,

@@ -8,7 +8,8 @@ import type { GameView } from './craft';
  * it, polls GET /jobs/:id, and gets a push when it is done.
  */
 /** R17: 'song-split' — a finished song split on our GPU (vocal / instrumental, line times; the member's voice) when a change first needs it */
-export type JobKind = 'song' | 'mv-story' | 'mv-lyrics' | 'demo' | 'game' | 'mv-edit' | 'song-split';
+/** R18: 'song-voice' — 君の声にする魔法 (paid): split when never split, then sung in the member's own voice */
+export type JobKind = 'song' | 'mv-story' | 'mv-lyrics' | 'demo' | 'game' | 'mv-edit' | 'song-split' | 'song-voice';
 
 /** M-R253 §4: a review stand-in job (no AI): it takes `seconds`, the first `failTimes` tries fail (to show the re-try) */
 export const DemoJobBody = z.object({ seconds: z.number().int().min(3).max(240), failTimes: z.number().int().min(0).max(2).default(0) });

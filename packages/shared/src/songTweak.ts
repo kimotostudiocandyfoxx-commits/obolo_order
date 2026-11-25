@@ -53,7 +53,9 @@ export type SongPaidEdit = 'lyrics' | 'melody' | 'extend' | 'voice' | 'genre';
 export interface SongTweakResult {
   /** done: a new version; undone: one back; first: nothing to go back to; paid: needs the studio; none: not a change; missing: the part is not in the song */
   /** R17 wait: the song is being split on our GPU first (stems / line times) — poll `jobId`, then send the same words again */
-  status: 'done' | 'undone' | 'first' | 'paid' | 'none' | 'missing' | 'wait';
+  /** R18 voice: words about the song's voice (songVoice.ts) — 'own' is 君の声にする魔法 (its price, a yes), 'original' a free switch, 'other' never */
+  status: 'done' | 'undone' | 'first' | 'paid' | 'none' | 'missing' | 'wait' | 'voice';
+  voice?: 'own' | 'original' | 'other';
   jobId?: string;
   /** what this change did, in {bati}'s words (「テンポを速く・2番をカット」) */
   what?: string;

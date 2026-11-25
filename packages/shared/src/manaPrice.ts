@@ -265,7 +265,7 @@ export function fishCostUsd(text: string): number {
  * Flash-class model; game / gameTweak = the member's own request on the cheap chain (GAME_MODEL_CHEAP); gamePro /
  * gameTweakPro = the full chain (GAME_MODEL_FULL) — a request that needs it, or a tweak the cheap chain could not make.
  */
-export const MAKE_KINDS = ['look', 'kororinDesign', 'jacketArt', 'song', 'songPremium', 'mv', 'story', 'game', 'gameTweak', 'mvPictures', 'mvRedraw', 'gameTrial', 'gamePro', 'gameTweakPro'] as const;
+export const MAKE_KINDS = ['look', 'kororinDesign', 'jacketArt', 'song', 'songPremium', 'songVoice', 'mv', 'story', 'game', 'gameTweak', 'mvPictures', 'mvRedraw', 'gameTrial', 'gamePro', 'gameTweakPro'] as const;
 export type MakeKind = (typeof MAKE_KINDS)[number];
 export const isMakeKind = (k: string): k is MakeKind => (MAKE_KINDS as readonly string[]).includes(k);
 /** the game makings (each keeps its version on the game; each is refunded the same way) */
@@ -281,6 +281,15 @@ export interface CostEstimate {
   /** where the number comes from (docs/マナの値段.md) */
   note: string;
 }
+
+/**
+ * R18 (client 2026-11-25, 君の声にする魔法): our GPU's seconds for one song sung again in the member's own voice — the
+ * seed p90 of each part until recorded ones replace it (songVoice.ts): the GPU waking up, the split (HTDemucs + Whisper,
+ * only when the song was never split) and the conversion (Seed-VC).
+ */
+export const SONG_VOICE_GPU_SEED = { cold: 40, split: 45, convert: 75 } as const;
+/** the API's own seconds around it (the stems fetched, stored, the mix) */
+export const SONG_VOICE_CPU_SECONDS = 10;
 
 /**
  * R17 (client 2026-11-25: cheaper wherever the quality allows — the art is Japanese-anime-like): which model paints each
@@ -352,6 +361,7 @@ export function makeCostEstimates(s: MakeSetup = DEFAULT_MAKE_SETUP): Record<Mak
     // splits only for a change that needs it — that change's own small cost (songEdit), not the song's
     song: { usd: aceStepUsd(SONG_QUOTE_SECONDS * SONG_QUOTE_TEMPO) + textUsd('gemini-flash-lite-latest', { in: 3_000, out: 1_500 }) + WORDS_USD, cpuSeconds: SONG_QUOTE_CPU_SECONDS, note: 'Runware ACE-Step 1.5 XL SFT（60秒の曲を1.2倍の72秒ぶん歌う、長さに比例）＋1.2倍速の処理 CPU＋曲の設計 Gemini Flash-Lite' },
     songPremium: { usd: RUNWARE_PRICES['minimax:music@2.6'] + 0.004, cpuSeconds: SONG_QUOTE_CPU_SECONDS, note: 'MiniMax Music 2.6 ×1 曲（$0.15）＋1.2倍速の処理 CPU＋設計・歌詞' },
+    songVoice: { usd: 0, gpuSeconds: SONG_VOICE_GPU_SEED.cold + SONG_VOICE_GPU_SEED.split + SONG_VOICE_GPU_SEED.convert, cpuSeconds: SONG_VOICE_CPU_SECONDS, note: '君の声にする魔法：自社 GPU（起動＋分離＋Seed-VC）p90 160秒。分離ずみの曲は変換だけ（songVoiceQuote）' },
     mv: { usd: 12 * RUNWARE_PRICES['runware:400@4'] + 0.006, cpuSeconds: 240, note: 'FLUX.2 klein 4B ×12 場面＋演出 Gemini＋描画 CPU p90 240秒' },
     story: { usd: textUsd('gemini-flash-lite-latest', { in: 2_500, out: 1_700 }) + WORDS_USD, note: 'お話 Gemini Flash-Lite（入力 約2,500・出力 約1,700トークン）＋言葉の確認' },
     gameTrial: { usd: textUsd(s.gameTrialModel, GAME_TOKENS.trial) + WORDS_USD, note: `型のゲーム ${short(s.gameTrialModel)}（型の値だけ：入力 約3千・出力 約1,500トークン）` },
@@ -412,6 +422,7 @@ export function usageLineOf(refType: string | null | undefined): UsageLine {
       return 'usage:art';
     case 'song':
     case 'songPremium':
+    case 'songVoice':
       return 'usage:song';
     case 'mv':
     case 'mvPictures':

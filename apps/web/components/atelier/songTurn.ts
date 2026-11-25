@@ -36,3 +36,15 @@ export async function songStyleChange(api: SpellApi, o: { tags: SpellTag[]; said
   const view = await api.moonSpell({ kind: 'song', said: o.said.slice(0, 200), tags: o.tags, ...(o.history?.length ? { history: o.history } : {}) }).catch((): SpellView => spellEdit('song', o.tags, o.said));
   return { view, restyle: restyleGenre(o.tags, view.tags, !!o.lyrics) };
 }
+
+/**
+ * R18: the answer to 「君の声にする魔法は、◯マナだよ。唱える？」 — yes (唱えて, OK, お願い …), no (やめておく, また今度 …),
+ * or neither (other words: the question is dropped and the words go on as any other).
+ */
+export function voiceSpellAnswer(text: string, yes: (t: string) => boolean): 'yes' | 'no' | null {
+  const t = text.replace(/[、。,.!！?？〜~\s　♪]/g, '');
+  if (!t) return null;
+  if (/やめ|いらない|いらん|いいえ|ううん|ノー|^no$|今度|こんど|やっぱ|しない|唱えない|となえない|高い|たかい|まだいい|けっこう|結構/i.test(t)) return 'no';
+  if (/唱えて|となえて|唱える|となえる|唱えよう|となえよう|かけて|お願い|おねがい|やって/.test(t) || yes(text)) return 'yes';
+  return null;
+}

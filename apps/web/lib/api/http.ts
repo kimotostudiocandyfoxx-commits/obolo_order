@@ -167,6 +167,15 @@ export class HttpApi implements Api {
   songTweak(id: string, body: Parameters<Api['songTweak']>[1]) {
     return this.req<Awaited<ReturnType<Api['songTweak']>>>('POST', `/compose/songs/${id}/tweak`, body);
   }
+  songVoiceQuote(id: string) {
+    return this.req<Awaited<ReturnType<Api['songVoiceQuote']>>>('POST', `/compose/songs/${id}/voice/quote`, {});
+  }
+  songVoice(id: string, body: Parameters<Api['songVoice']>[1]) {
+    return this.req<Awaited<ReturnType<Api['songVoice']>>>('POST', `/compose/songs/${id}/voice`, body);
+  }
+  songVoiceUse(id: string, use: Parameters<Api['songVoiceUse']>[1]) {
+    return this.req<Awaited<ReturnType<Api['songVoiceUse']>>>('POST', `/compose/songs/${id}/voice/use`, { use });
+  }
   compassSpell(body: Parameters<Api['compassSpell']>[0]) {
     return this.req<Awaited<ReturnType<Api['compassSpell']>>>('POST', '/moon/compass', body);
   }

@@ -509,6 +509,8 @@ export interface SongView {
   savedAt: string | null;
   /** the song's latest finished MV (Mars), for the Venus VJ — only in the saved-songs list */
   mvUrl?: string | null;
+  /** R18 (君の声にする魔法): the versions kept (the original voice and the member's) and the one heard now */
+  voice?: { using: 'original' | 'own'; versions: ('original' | 'own')[] };
 }
 
 export type SongEditAction = 'VOLUME_TEMPO_EDIT' | 'LYRICS_EDIT' | 'VOICE_REPLACE' | 'TIMING_EDIT' | 'GENRE_EDIT' | 'SONG_EXTEND' | 'CHAT';

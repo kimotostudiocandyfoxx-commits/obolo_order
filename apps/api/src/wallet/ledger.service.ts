@@ -176,10 +176,10 @@ export class LedgerService {
    * Moon atelier) nothing is charged without it (428 CONFIRM_REQUIRED) or at another price (409 PRICE_CHANGED); the same
    * yes again is no new charge (`repeat`: the caller hands back what the first one started, never a second making).
    */
-  async charge(db: Database, userId: string, kind: MakeKind, refId?: string, opts: { confirm?: MakeConfirm; required?: boolean; /** spellKey of the spell the request carries */ spell?: string | null } = {}): Promise<{ refund: () => Promise<void>; repeat: boolean }> {
+  async charge(db: Database, userId: string, kind: MakeKind, refId?: string, opts: { confirm?: MakeConfirm; required?: boolean; /** spellKey of the spell the request carries */ spell?: string | null; /** R18: a making quoted per work (the voice spell: its GPU seconds) — the server's own quote, never the client's */ price?: number } = {}): Promise<{ refund: () => Promise<void>; repeat: boolean }> {
     // client 2026-11-25: the live price (manaFor of the making's estimated cost at this month's FX) — the same list the
     // confirm card showed; a yes to another price is refused (PRICE_CHANGED), never charged at a new one
-    const price = await this.priceOf(kind);
+    const price = opts.price ?? (await this.priceOf(kind));
     const key = opts.confirm ? confirmKey(userId, kind, opts.confirm) : `make:${kind}:${userId}:${randomUUID()}`;
     let repeat = false;
     let amount = 0;

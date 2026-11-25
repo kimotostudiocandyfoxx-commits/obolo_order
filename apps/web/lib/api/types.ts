@@ -1,6 +1,6 @@
 import type { LinkPreview } from '@obolo/shared';
 import type { IncantBody, IncantView } from '@obolo/shared';
-import type { LyricsBody, LyricsView, SongLyrics, SongTweakBody, SongTweakResult } from '@obolo/shared';
+import type { LyricsBody, LyricsView, SongLyrics, SongTweakBody, SongTweakResult, SongVoiceBody, SongVoiceQuoteView, SongVoiceUseView, SongVoiceVersion } from '@obolo/shared';
 import type { BookView, CompassSpell, GameBrokenBody, GameBuildBody, GameView, MoonCompassBody, NovelChapterBody, SaveSpellBody, SaveSpellResult, SavedSpell } from '@obolo/shared';
 import type { ClipFile, ClipStartBody, ClipUploadStart, ChangeResult, HomeOshi, HomePlanet, PlanetHomeView, AddVersionBody, CreateMoonWorkBody, DemoJobBody, MakeConfirm, MakeKind, SpellBody, SpellKind, SpellTag, SpellView, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiHistoryPage, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView, MvEditBody, MvPicturesBody, MvRedrawBody } from '@obolo/shared';
 import type {
@@ -165,6 +165,12 @@ export interface Api {
   moonLyrics(body: LyricsBody): Promise<LyricsView>;
   /** R13: a finished song changed for free (tempo, key, 2番カット …), or one back; `demo`: the review demo's card state */
   songTweak(id: string, body: SongTweakBody, demo?: { lyrics?: SongLyrics; seconds?: number }): Promise<SongTweakResult>;
+  /** R18 (君の声にする魔法): the mana {bati} says for a finished song sung in your own voice (or why not) */
+  songVoiceQuote(id: string): Promise<SongVoiceQuoteView>;
+  /** R18: the yes — charged once at that quote; a job (poll getJob), the mana back if it fails */
+  songVoice(id: string, body: SongVoiceBody): Promise<JobView>;
+  /** R18: the original voice or 君の声 — a free switch; `demo`: the review demo's card audio */
+  songVoiceUse(id: string, use: SongVoiceVersion, demo?: { url?: string }): Promise<SongVoiceUseView>;
   /** R12: {bati}'s コンパス — a photo of yours (a 📎 file), a pasted image or a YouTube link read into a spell */
   compassSpell(body: MoonCompassBody): Promise<CompassSpell>;
   /** R12: {bati}'s スペルブック — the spells you keep (newest first), keep one, rename, used, throw away */

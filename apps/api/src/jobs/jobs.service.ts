@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus, Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { meterSeconds } from '@obolo/ai';
 import { batiSay, estimateEtaMs, fillLine, lateEta, MOON_LINES, shouldRetry, type DemoJobBody, type EtaKind, type FullSongBody, type JobKind, type JobView, type MakeConfirm, type MakeKind, type MvEditBody, type SpellTag } from '@obolo/shared';
 import { and, count, desc, eq, inArray, isNotNull } from 'drizzle-orm';
 import { apiError } from '../common/errors';
@@ -29,13 +30,15 @@ type Inputs = {
   game: GameJobInput;
   /** R17: a finished song split on our GPU (stems, line times; `voice`: sung in the member's voice too) — when a change first needs it */
   'song-split': { songId: string; origin: string; voice?: boolean };
+  /** R18: 君の声にする魔法 — charged with `confirm` (its own quote); split first when never split; the mana back on a failure */
+  'song-voice': { songId: string; origin: string; confirm: MakeConfirm };
 };
 
 /** what a job's free costs are filed under (its paid making comes from the charge's scope) */
-const FEATURE_OF: Record<JobKind, CostCtx['feature']> = { song: 'songEdit', 'mv-story': 'videoEdit', 'mv-edit': 'videoEdit', 'mv-lyrics': 'videoEdit', demo: 'other', game: 'other', 'song-split': 'songEdit' };
+const FEATURE_OF: Record<JobKind, CostCtx['feature']> = { song: 'songEdit', 'mv-story': 'videoEdit', 'mv-edit': 'videoEdit', 'mv-lyrics': 'videoEdit', demo: 'other', game: 'other', 'song-split': 'songEdit', 'song-voice': 'songEdit' };
 
 /** what each job is timed as (M-R253 §4) */
-export const ETA_OF: Record<JobKind, EtaKind> = { song: 'song', 'mv-story': 'mv', 'mv-lyrics': 'mv', demo: 'demo', game: 'game', 'mv-edit': 'mvEdit', 'song-split': 'mvEdit' };
+export const ETA_OF: Record<JobKind, EtaKind> = { song: 'song', 'mv-story': 'mv', 'mv-lyrics': 'mv', demo: 'demo', game: 'game', 'mv-edit': 'mvEdit', 'song-split': 'mvEdit', 'song-voice': 'mvEdit' };
 type Patch = Partial<typeof jobs.$inferInsert>;
 
 /** A job running longer than this was lost (its instance went away): the member may try again. */
@@ -206,6 +209,8 @@ export class JobsService implements OnModuleInit {
       if (row.kind === 'song') await this.refundSong(row.userId, row.inputJson as unknown as Inputs['song']);
       // R13: so does a video (painted or moved) and a scene painted again
       if (row.kind === 'mv-story' || row.kind === 'mv-edit') await this.refundVideo(row.userId, row.inputJson as unknown as Inputs['mv-edit']);
+      // R18: so does the voice spell (its own quote: the very mana charged comes back)
+      if (row.kind === 'song-voice') await this.refundVoice(row.userId, row.inputJson as unknown as Inputs['song-voice']);
       await this.notify(row, false);
     }
   }
@@ -239,6 +244,28 @@ export class JobsService implements OnModuleInit {
             await this.stage(row.id, 'warming');
             await new Promise((r) => setTimeout(r, 15_000));
           }
+        }
+      }
+      case 'song-voice': {
+        const input = row.inputJson as unknown as Inputs['song-voice'];
+        const until = Date.now() + WARM_WAIT_MS;
+        // our GPU waking up is part of the spell's cost (its recorded seconds refine the quote: music:cold)
+        let cold = 0;
+        try {
+          for (;;) {
+            try {
+              await this.stage(row.id, 'voicing');
+              return { song: await this.songs.voiceSwap(row.userId, input.songId, input.origin) };
+            } catch (e) {
+              if (errorOf(e).code !== 'MUSIC_WARMING' || Date.now() > until) throw e;
+              await this.stage(row.id, 'warming');
+              const t = Date.now();
+              await this.warmWait();
+              cold += (Date.now() - t) / 1000;
+            }
+          }
+        } finally {
+          if (cold > 0) meterSeconds('gpu', 'music:cold', cold);
         }
       }
       case 'mv-story': {
@@ -285,6 +312,20 @@ export class JobsService implements OnModuleInit {
     });
   }
 
+  /** the wait for the GPU studio to wake up (tests: none) */
+  protected warmWait(): Promise<void> {
+    return new Promise((r) => setTimeout(r, 15_000));
+  }
+
+  /** R18: the voice spell that could not be made gives its mana back (once per yes) */
+  protected async refundVoice(userId: string, input: { confirm?: MakeConfirm; songId: string }): Promise<number> {
+    if (!input.confirm) return 0;
+    return this.ledger.refundYes(this.db, userId, 'songVoice', input.confirm, input.songId).catch((e) => {
+      this.log.error(`voice spell refund failed for ${userId}: ${String(e)}`);
+      return 0;
+    });
+  }
+
   /** a paid video job that could not be made gives its mana back (once per yes) */
   protected async refundVideo(userId: string, input: { confirm?: MakeConfirm; pay?: MakeKind; mvId: string }): Promise<number> {
     if (!input.confirm || !input.pay) return 0;
@@ -316,7 +357,7 @@ export class JobsService implements OnModuleInit {
    */
   private async notify(row: Row, ok: boolean, result?: Record<string, unknown> | null) {
     // R17: a split is a short wait in the talk (the change follows it), not a work of its own
-    if (row.kind === 'song-split') return;
+    if (row.kind === 'song-split' || row.kind === 'song-voice') return;
     const input = row.inputJson as { from?: string; body?: { from?: string; title?: string } };
     const atelier = input.from === 'atelier' || input.body?.from === 'atelier' || row.kind === 'demo';
     const url = atelier ? `/moon/atelier?job=${row.id}` : row.kind === 'song' ? '/mercury' : '/mars';

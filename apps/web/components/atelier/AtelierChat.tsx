@@ -7,7 +7,7 @@ import { batiVoiceUrl, speakable } from '@/lib/atelier/batiSpeak';
 import { loadManaPrices, manaPricesNow } from '@/lib/manaPrices';
 import { canPlay, loadClip, playClip, readyClip, VOICE_WAIT_MS } from '@/lib/voice/webVoice';
 import { BARGE_FADE_MS, onBargeIn } from '@/lib/voice/barge';
-import { restyleAnswer, songStyleChange } from './songTurn';
+import { restyleAnswer, songStyleChange, voiceSpellAnswer } from './songTurn';
 import { logVoice } from '@/lib/voice/voiceLog';
 import { BATI_COLOR, batiLook, characterLook, SELF_COLOR, selfLook, selfTone } from '@/lib/talk/looks';
 import { ApiError, getApi } from '@/lib/api';
@@ -44,7 +44,7 @@ import { DeviceButton } from './DeviceButton';
 import { ClipRelic } from '@/components/relic/ClipRelics';
 import { PortalRelic } from '@/components/relic/PortalRelic';
 import { CLUSTER_MAX } from '@/lib/relic/layout';
-import { talkPlain, linkDomain, wordsAndLinks, type ClipFile, isLyricsTalk, lyricsDiff, lyricsEdit, lyricsFallback, lyricsSecondVerse, ownLyricsOf, parseTweak, songSpellKey, SONG_LINES, PREMIUM_LINES, isActiveMember, type IncantView, type LyricsView, type SongLyrics } from '@obolo/shared';
+import { talkPlain, linkDomain, wordsAndLinks, type ClipFile, isLyricsTalk, lyricsDiff, lyricsEdit, lyricsFallback, lyricsSecondVerse, ownLyricsOf, parseTweak, songSpellKey, SONG_LINES, PREMIUM_LINES, isActiveMember, type IncantView, type LyricsView, type SongLyrics, VOICE_SPELL_LINES, VOICE_INVITE_KEY, parseVoiceInvite, voiceAskOf, voiceInvite, voiceInviteValue, CHARGE_ERROR_WORDS, type SongVoiceVersion } from '@obolo/shared';
 
 /** R12: your line in the Bati chat — a file handed over floats as its relic; a URL in your words becomes a portal */
 function meItem(m: { id: string; text: string; file?: ClipFile | null }): TalkItem {
@@ -125,9 +125,14 @@ type PlanAsk = {
   writing?: boolean;
 };
 /** client 2026-11-25: {bati}'s questions for a book / a game (`craft`), and a book / a game just made (its next words change it: `after`) */
-type Pending = { kind: AtelierKind } | { gameTrial: { said: string } } | { radioName: string } | { tweak: Work } | { voiceAgain: true } | { use: AtelierKind; materials: Work[] } | { plan: PlanAsk } | { craft: CraftAsk } | { after: Work } | { tool: ToolAsk; spell?: SavedSpell; forKind?: AtelierKind; content?: string } | null;
+/** R18: 君の声にする魔法 asked — {bati} said its mana and waits for the yes (the quote's price and spell key go with the yes) */
+type VoiceAsk = { card: Work; price: number; spell: string };
+type Pending = { kind: AtelierKind } | { gameTrial: { said: string } } | { radioName: string } | { tweak: Work } | { voiceSpell: VoiceAsk } | { voiceAgain: true } | { use: AtelierKind; materials: Work[] } | { plan: PlanAsk } | { craft: CraftAsk } | { after: Work } | { tool: ToolAsk; spell?: SavedSpell; forKind?: AtelierKind; content?: string } | null;
 /** R12: {bati}'s tool out in the sky (the compass while it reads; the spell book open, or taking a spell in) */
 type ToolShow = { kind: 'compass'; phase: CompassPhase; leaving?: boolean; key: number } | { kind: 'book'; mode: BookMode; page: number; spells: SavedSpell[]; saving?: BookSaving; key: number } | null;
+
+/** R18: the chip under {bati}'s 「まず君の声を登録してね」 (opens the voice registration) */
+const VOICE_REGISTER = '声の登録';
 
 /** a fresh id for one yes (MakeConfirm.id: a UUID) */
 function yesId(): string {
@@ -606,8 +611,10 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       for (const l of craftDoneLines(w)) sayT(l.text, l.vars);
       if (!w.book?.done) setPending({ after: w });
     } else if (w.kind === 'song' && w.status === 'ready') {
-      // R13 (client): a song made — {bati} asks if it should be changed more (free: tempo, length, 2番カット …)
-      sayT(SONG_LINES.editAsk);
+      // R13 (client): a song made — {bati} asks if it should be changed more (free: tempo, length, 2番カット …); R18: now
+      // and then (the first song, then at most once every few, never twice in a row) 君の声にする魔法 too — no price
+      const inv = voiceInviteNow(w);
+      setMsgs((m) => [...m, { id: uid(), who: 'bati', text: tline(SONG_LINES.editAsk) + (inv ? tline(VOICE_SPELL_LINES.invite) : '') }]);
       setPending({ tweak: w });
     } else if (DONE[w.kind]) say(DONE[w.kind]);
     if (w.status === 'ready' && !story) void tipCheck();
@@ -616,6 +623,98 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       lastCast.current = { ...lastCast.current, done: true };
       const m = toolMemory();
       saveToolMemory({ ...m, works: m.works + 1 });
+    }
+  };
+
+  /**
+   * R18: the invitation's turn (voiceInvite): only with a registered voice and the consent rules (mediaOk), never for a
+   * song already in the member's voice; the count is kept on the member (me.story) so it holds across devices.
+   */
+  const voiceInviteNow = (w: Work): boolean => {
+    if (story || !me) return false;
+    const st = parseVoiceInvite(me.story?.[`sys.${VOICE_INVITE_KEY}`]);
+    const r = voiceInvite(st, { hasVoice: !!me.voices?.selfSings, mediaOk: !!me.mediaOk, voiced: w.voice?.using === 'own' });
+    void getApi()
+      .saveSysStory({ [VOICE_INVITE_KEY]: voiceInviteValue(r.next) })
+      .then(setMe)
+      .catch(() => undefined);
+    return r.invite;
+  };
+  /** R18: the song card's id on the server */
+  const songIdOf = (card: Work) => card.ref?.songId ?? card.id;
+  /** R18: the card heard in the other voice (a free switch; the changes so far are made again from that voice's stems) */
+  const switchVoice = async (w: Work, use: SongVoiceVersion, quiet = false) => {
+    const card = cardOf(w.id) ?? w;
+    setBusy(true);
+    try {
+      const r = await getApi().songVoiceUse(songIdOf(card), use, { url: card.audio });
+      const next: Work = { ...card, ...(r.song.url ? { audio: r.song.url } : {}), voice: { using: r.using, versions: r.versions } };
+      put(next);
+      if (!quiet) sayT(r.using === 'own' ? VOICE_SPELL_LINES.toOwn : VOICE_SPELL_LINES.toOriginal);
+      setPending({ tweak: next });
+      return next;
+    } catch {
+      if (!quiet) sayT(SONG_LINES.editFail);
+      return card;
+    } finally {
+      setBusy(false);
+    }
+  };
+  /**
+   * R18 (client 2026-11-25): words about a finished song's voice — 「自分の声にして」「君の声にする魔法」: {bati} says the
+   * mana and asks (no voice yet: how to register it, nothing charged); 「元の声で」「自分の声で」 once both are there: a
+   * free switch; another person's / a famous voice: kindly no.
+   */
+  const voiceWords = async (w: Work, ask: 'own' | 'original' | 'other') => {
+    const card = cardOf(w.id) ?? w;
+    if (ask === 'other') return sayT(VOICE_SPELL_LINES.other);
+    if (ask === 'original') return void (card.voice?.using === 'own' ? switchVoice(card, 'original') : sayT(VOICE_SPELL_LINES.isOriginal));
+    if (card.voice?.versions.includes('own')) return void (card.voice.using === 'own' ? sayT(VOICE_SPELL_LINES.done) : switchVoice(card, 'own'));
+    setBusy(true);
+    const q = await getApi()
+      .songVoiceQuote(songIdOf(card))
+      .catch(() => null);
+    setBusy(false);
+    if (!q || q.status === 'off' || q.status === 'noConsent') return sayT(VOICE_SPELL_LINES.noConsent);
+    if (q.status === 'noVoice') return sayT(VOICE_SPELL_LINES.noVoice, {}, [VOICE_REGISTER]);
+    if (q.status === 'has') return void switchVoice(card, 'own');
+    setPending({ voiceSpell: { card, price: q.price, spell: q.spell } });
+    sayT(VOICE_SPELL_LINES.price, { n: q.price });
+  };
+  /** R18: the yes — charged at the quote said (once per yes), the job (split when never split, then the conversion) */
+  const castVoice = async (v: VoiceAsk) => {
+    setPending(null);
+    const have = await manaNow();
+    if (have != null && have < v.price) {
+      sayT(MOON_LINES.noMana, { short: v.price - have });
+      window.dispatchEvent(new CustomEvent('obolo:nomana', { detail: { plain: true } }));
+      return;
+    }
+    sayT(VOICE_SPELL_LINES.start);
+    castNow(2400);
+    castSpell();
+    const card = cardOf(v.card.id) ?? v.card;
+    const id = songIdOf(card);
+    setBusy(true);
+    try {
+      const job = await getApi().songVoice(id, { confirm: { id: yesId(), price: v.price, spell: v.spell } });
+      const until = Date.now() + 15 * 60_000;
+      for (let j = job; j.status !== 'done'; ) {
+        if (j.status === 'failed' || Date.now() > until) throw new Error('voice');
+        await new Promise((ok) => setTimeout(ok, 3000));
+        j = await getApi().getJob(job.id);
+      }
+      const next = await switchVoice(card, 'own', true);
+      putLast(next);
+      sayT(VOICE_SPELL_LINES.done);
+    } catch (e) {
+      if (e instanceof ApiError && e.code === 'NO_MANA') sayT(CHARGE_ERROR_WORDS.NO_MANA);
+      else if (e instanceof ApiError && e.status === 409 && e.code !== 'ALREADY_STARTED') sayT(CHARGE_ERROR_WORDS.PRICE_CHANGED);
+      // a job that failed for good gave its mana back (the server's refund)
+      else sayT(VOICE_SPELL_LINES.failed);
+      setPending({ tweak: card });
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -889,14 +988,18 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     const last = lastWork();
     const w = asked ?? (last?.kind === 'song' && last.status === 'ready' ? last : null);
     if (!w) return false;
+    // R18: the song's voice (君の声にする魔法, the free switch, never another person's voice)
+    const va = voiceAskOf(text);
+    if (va) {
+      void voiceWords(w, va);
+      return true;
+    }
     const rule = parseTweak(text);
     const it = detect(text, true, markNames());
     const about = rule.undo || rule.ops.length > 0 || !!rule.paid;
     // another making / a search is not about this song; unknown words only while {bati} has just asked
     if (!about && (!asked || it.kind === 'make' || it.kind === 'makeAny' || it.kind === 'find')) return false;
-    // R17: 「自分の声で歌って」 on a song from the new studio is free (our studio sings it in your voice): asked of the server
-    const ownVoice = rule.paid === 'voice' && /自分の声|わたしの声|私の声|ボクの声|僕の声|ぼくの声|俺の声|おれの声/.test(text);
-    if (rule.paid && !ownVoice) {
+    if (rule.paid) {
       sayT(SONG_LINES.editPaid);
       void run('song', text, cardOf(w.id) ?? w);
       return true;
@@ -929,6 +1032,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
           return void run('song', text, card);
         }
         if (r.status === 'none') return void converse(text);
+        if (r.status === 'voice' && r.voice) return void voiceWords(card, r.voice);
         if (r.status === 'first') sayT(SONG_LINES.editFirst);
         else if (r.status === 'missing') sayT(SONG_LINES.editMissing);
         else {
@@ -1352,6 +1456,16 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       const turn = spellPendingTurn(text, fl.kind as AtelierKind);
       if (turn) return dropSpell(fl.kind as AtelierKind, null, turn);
     }
+    // R18: 「君の声にする魔法は、◯マナだよ。唱える？」 — yes casts it, no drops it, other words go on as any other
+    if (!story && p && 'voiceSpell' in p) {
+      const a = voiceSpellAnswer(text, isYes);
+      if (a === 'yes') return void castVoice(p.voiceSpell);
+      if (a === 'no') {
+        setPending({ tweak: p.voiceSpell.card });
+        return sayT(VOICE_SPELL_LINES.cancel);
+      }
+      return sendOn(text, { tweak: p.voiceSpell.card });
+    }
     // R11: the plan waiting for a yes — a yes starts it, any other words change it
     if (p && 'plan' in p) {
       // R13 fix: 「やめて」「曲を作るのをやめて画像を作りたい」 — the spell goes (before any reading as a change of it)
@@ -1473,6 +1587,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   };
 
   const chip = (label: string, from?: string) => {
+    // R18: 「声の登録」 — the voice registration (the member's own recording)
+    if (label === VOICE_REGISTER) return void (window.location.href = '/voice');
     const k = (Object.keys(KIND_WORD) as AtelierKind[]).find((x) => KIND_WORD[x] === label);
     setMsgs((m) => [...m, { id: uid(), who: 'me', text: label }]);
     // R16: which of the works found to open
@@ -1984,6 +2100,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       onDropTry={(i) => void dropIt(w, i)}
       onAsk={(text, target) => askAt(w, text, target)}
       onMaterial={openMaterial}
+      onVoice={(use) => void switchVoice(w, use)}
       songUrl={(() => {
         const sm = w.materials?.find((x) => x.kind === 'song' && x.audio);
         return sm ? { url: sm.audio!, title: sm.title } : undefined;

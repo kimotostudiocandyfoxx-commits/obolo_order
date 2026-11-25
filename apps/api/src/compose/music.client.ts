@@ -156,6 +156,40 @@ async function songOnGpu(baseUrl: string, body: FullSongBody & { prompt: string;
 }
 
 /**
+ * R18 (君の声にする魔法): POST /voice — a split song's studio vocal sung in the member's own voice (Seed-VC) and mixed with
+ * its instrumental. Only the conversion runs on our GPU (the stems are the ones kept): its seconds are this spell's cost.
+ */
+export type VoiceBody = { vocals: Buffer; instrumental: Buffer; voice: Buffer; similarity?: number };
+export type VoicedSong = { seconds: number; vocals: Buffer; mix: Buffer; voiceNote: string };
+export function voiceSong(baseUrl: string, body: VoiceBody): Promise<VoicedSong> {
+  return timed('gpu', 'music:voice', () => voiceOnGpu(baseUrl, body));
+}
+async function voiceOnGpu(baseUrl: string, body: VoiceBody): Promise<VoicedSong> {
+  const url = baseUrl.replace(/\/$/, '');
+  const token = await idToken(url);
+  let res: Response;
+  try {
+    res = await fetch(`${url}/voice`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}) },
+      body: JSON.stringify({ vocals: body.vocals.toString('base64'), instrumental: body.instrumental.toString('base64'), voice: body.voice.toString('base64'), similarity: body.similarity ?? 0.7 }),
+      signal: AbortSignal.timeout(600_000),
+    });
+  } catch (e) {
+    log.warn(`music service unreachable: ${String(e)}`);
+    throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'MUSIC_WARMING', 'The music studio is starting up');
+  }
+  if (res.status === 503 || res.status === 429) throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'MUSIC_WARMING', 'The music studio is starting up');
+  if (!res.ok) {
+    const text = (await res.text().catch(() => '')).slice(0, 200);
+    log.warn(`music service voice ${res.status}: ${text}`);
+    throw apiError(HttpStatus.BAD_GATEWAY, 'MUSIC_FAILED', `The song could not be sung in the voice (${res.status}): ${text}`);
+  }
+  const j = (await res.json()) as { seconds: number; vocals: string; mix: string; voiceNote?: string };
+  return { seconds: Number(j.seconds) || 0, vocals: Buffer.from(j.vocals, 'base64'), mix: Buffer.from(j.mix, 'base64'), voiceNote: String(j.voiceNote ?? '') };
+}
+
+/**
  * R17: POST /split — a song made elsewhere (Runware) split on our GPU (HTDemucs), its lyric lines timed (Whisper on the
  * vocal, matched to the lyrics) and, with a recording, sung in the member's voice (Seed-VC). No song is generated: it
  * is called lazily, only when a change first needs the stems / the times or the member's voice. AAC stems back.

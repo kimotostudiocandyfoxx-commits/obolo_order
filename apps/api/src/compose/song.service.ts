@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { applyMixEdit, type ChatTurn, type LlmProvider, moderateText, parseSingDirection, parseSongEdit, phraseText, singDirectionSystem, songEditSystem } from '@obolo/ai';
-import { lyricBlockKeys, lyricBlockLabels, lyricsPrompt, lyricsSheet, normalSongTask, phrasesAtTempo, premiumSongTask, repaintSongTask, SONG_DEFAULT_TEMPO, songGenSeconds, songSeconds, type MusicProvider, type RunwareAudioTask, type FullSongBody, type SingBody, type SingDirection, type SongEditBody, type SongEditCommand, type SongEditResult, type SongLyrics, type SongMix, type SongPhrase, type SongView, type VoiceSlot } from '@obolo/shared';
+import { lyricBlockKeys, lyricBlockLabels, lyricsPrompt, lyricsSheet, normalSongTask, phrasesAtTempo, premiumSongTask, repaintSongTask, SONG_DEFAULT_TEMPO, songGenSeconds, songSeconds, type MusicProvider, type RunwareAudioTask, type FullSongBody, type SingBody, type SingDirection, type SongEditBody, type SongEditCommand, type SongEditResult, type SongLyrics, type SongMix, type SongPhrase, type SongView, type SongVoiceVersion, type VoiceSlot } from '@obolo/shared';
 import { and, desc, eq, isNotNull, isNull, sql } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { AppConfig, CONFIG } from '../config';
@@ -11,7 +11,8 @@ import { LLM } from '../infra/tokens';
 import { MediaService } from '../media/media.service';
 import { VoiceService } from '../voice/voice.service';
 import { guideWav, mixStems, preparePhrase, renderSong } from './mix';
-import { generateInstrumental, generateSong, splitSong, type MadeSong } from './music.client';
+import { generateInstrumental, generateSong, splitSong, voiceSong, type MadeSong } from './music.client';
+import { canUseMedia } from '../voice/media-consent';
 import { audioSeconds, runwareAudio, type RunwareSong } from './runware-music';
 import { stretchSong } from './tweak';
 import type { TweakDesign } from './song-tweak.service';
@@ -446,8 +447,73 @@ export class SongService {
     return this.view(nr);
   }
 
+  /**
+   * R18 (君の声にする魔法): what the voice spell needs for this song — 'ready' (and whether it must be split first: no
+   * stems yet), 'has' (already in the member's voice: only a switch), 'noConsent' (canUseMedia: the age / consent rules),
+   * 'noVoice' (no registered recording), 'off' (no studio, or a song that is not one take).
+   */
+  async voiceState(userId: string, id: string): Promise<{ status: 'ready'; split: boolean } | { status: 'has'; using: SongVoiceVersion } | { status: 'noVoice' | 'noConsent' | 'off' }> {
+    const row = await this.owned(userId, id);
+    const d = row.designJson as unknown as StoredDesign & TweakDesign;
+    const u = await this.member(userId);
+    if (!canUseMedia(u)) return { status: 'noConsent' };
+    if (!u?.voiceSelfUrl) return { status: 'noVoice' };
+    if (d.own) return { status: 'has', using: d.sung ?? 'original' };
+    if (d.engine === 'acestep' && d.voiced) return { status: 'has', using: 'own' };
+    if (!this.cfg.MUSIC_URL || (d.engine !== 'runware' && d.engine !== 'acestep') || (d.engine === 'acestep' && !d.vocalsUrl)) return { status: 'off' };
+    return { status: 'ready', split: !d.vocalsUrl };
+  }
+
+  /**
+   * R18: the paid voice spell's work (the song-voice job) — split on our GPU when it never was (the stems are kept for
+   * the free changes too), then only the studio's vocal converted to the member's voice (POST /voice) and mixed. Both
+   * versions stay: the original and `own`. A song with no changes yet is heard in the member's voice at once; one with
+   * changes is switched by POST …/voice/use (the changes made again from the new stems).
+   */
+  async voiceSwap(userId: string, id: string, origin: string): Promise<SongView> {
+    const st = await this.voiceState(userId, id);
+    if (st.status === 'has') return this.get(userId, id);
+    if (st.status !== 'ready') throw apiError(HttpStatus.CONFLICT, 'VOICE_UNAVAILABLE', 'The voice spell cannot be cast on this song');
+    if (st.split) await this.split(userId, id, origin);
+    const row = await this.owned(userId, id);
+    const d = row.designJson as unknown as StoredDesign & TweakDesign;
+    const studio = d.guideUrl ?? d.vocalsUrl;
+    const ref = await this.voiceSample(userId);
+    const [vocals, instrumental] = await Promise.all([studio ? this.media.audioByUrl(userId, studio) : null, row.instrumentalUrl ? this.media.audioByUrl(userId, row.instrumentalUrl) : null]);
+    if (!vocals || !instrumental) throw apiError(HttpStatus.NOT_FOUND, 'INSTRUMENTAL_NOT_FOUND', 'A part of the song is missing');
+    if (!ref) throw apiError(HttpStatus.CONFLICT, 'VOICE_UNAVAILABLE', 'No voice recording');
+    const made = await this.gpuVoice({ vocals, instrumental, voice: ref });
+    const [vocM, mixM] = await Promise.all([this.media.storeAudio(userId, 'audio/mp4', made.vocals, origin), this.media.storeAudio(userId, 'audio/mp4', made.mix, origin)]);
+    const seconds = made.seconds || d.original?.seconds || row.seconds || d.seconds;
+    // R17: the conversion is of the take as sung (1.0×): what the member hears is made `tempo` faster after it
+    const phrases = d.original?.phrases ?? (row.phrasesJson as unknown as SongPhrase[]);
+    const tempo = d.tempo ?? 1;
+    const fast = tempo !== 1 ? await this.deliver(userId, origin, { url: mixM.url, data: made.mix, seconds, phrases }, tempo) : null;
+    const first = fast && fast.tempo !== 1 ? { mixUrl: fast.mixUrl, seconds: fast.seconds, phrases: fast.phrases } : undefined;
+    const shown = first ?? { mixUrl: mixM.url, seconds, phrases };
+    const untouched = !d.tweaks?.length;
+    const design: StoredDesign & TweakDesign = { ...d, own: { vocalsUrl: vocM.url, mixUrl: mixM.url, seconds, at: new Date().toISOString(), ...(first ? { first } : {}) }, ...(untouched ? { sung: 'own' as const } : {}) };
+    const [nr] = await this.db.write
+      .update(songs)
+      .set({ designJson: design as unknown as Record<string, unknown>, ...(untouched ? { mixUrl: shown.mixUrl, seconds: shown.seconds, phrasesJson: shown.phrases as unknown as Record<string, unknown>[] } : {}), updatedAt: new Date() })
+      .where(eq(songs.id, row.id))
+      .returning();
+    this.log.log(`song ${row.id} ${userId}: sung in the member's voice (${made.voiceNote})${st.split ? ', split first' : ''}`);
+    return this.view(nr);
+  }
+
+  /** the member's row (the voice and the consent rules) */
+  protected async member(userId: string) {
+    const [u] = await this.db.read.select().from(users).where(eq(users.id, userId));
+    return u;
+  }
+  /** R18: our GPU's conversion (POST /voice; its seconds recorded as music:voice) */
+  protected gpuVoice(body: Parameters<typeof voiceSong>[1]) {
+    return voiceSong(this.cfg.MUSIC_URL!, body);
+  }
+
   /** The member's own voice recording (Seed-VC reference), if they registered after 2026-10-09. */
-  private async voiceSample(userId: string): Promise<Buffer | null> {
+  protected async voiceSample(userId: string): Promise<Buffer | null> {
     const [u] = await this.db.read.select({ url: users.voiceSelfUrl }).from(users).where(eq(users.id, userId));
     return u?.url ? await this.media.audioByUrl(userId, u.url) : null;
   }
@@ -494,7 +560,7 @@ export class SongService {
 
   // --- edit -------------------------------------------------------------------------------------
 
-  private async owned(userId: string, id: string): Promise<SongRow> {
+  protected async owned(userId: string, id: string): Promise<SongRow> {
     const [row] = await this.db.write
       .select()
       .from(songs)
@@ -907,6 +973,8 @@ export class SongService {
       direction: row.directionJson as unknown as SingDirection,
       seconds: row.seconds,
       savedAt: row.savedAt ? row.savedAt.toISOString() : null,
+      // R18: both voices kept (the original and 君の声): the card's switch
+      ...((d as StoredDesign & TweakDesign).own ? { voice: { using: (d as StoredDesign & TweakDesign).sung ?? 'original', versions: ['original', 'own'] as SongVoiceVersion[] } } : {}),
     };
   }
 }

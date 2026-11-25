@@ -878,6 +878,61 @@ def split(r: SplitReq):
         raise HTTPException(500, f"split failed: {e!r}"[:400]) from e
 
 
+class VoiceReq(BaseModel):
+    """R18 (君の声にする魔法): a song already split — its studio vocal sung again in the member's own voice (Seed-VC), and
+    mixed with its instrumental. No split, no Whisper: the API sends the stems it keeps (only the conversion is paid)."""
+
+    vocals: str = Field(max_length=16_000_000)
+    instrumental: str = Field(max_length=16_000_000)
+    voice: str = Field(max_length=3_000_000)
+    similarity: float = Field(0.7, ge=0, le=1)
+    voiceSteps: int = Field(30, ge=10, le=100)
+    voicePrep: str = "clean"
+    voiceLift: float = Field(0.0, ge=0, le=12)
+
+
+@app.post("/voice")
+def voice(r: VoiceReq):
+    """R18: the member's voice on a split song's vocal (Seed-VC) + the mix. 422 when the voice could not be made."""
+    import base64
+
+    if state["error"]:
+        raise HTTPException(500, f"model failed to load: {state['error'][:300]}")
+    t0 = time.time()
+    try:
+        with gen_lock, tempfile.TemporaryDirectory() as d:
+            paths = {}
+            for k in ("vocals", "instrumental"):
+                raw = os.path.join(d, f"{k}_in")
+                with open(raw, "wb") as f:
+                    f.write(base64.b64decode(getattr(r, k)))
+                wav = os.path.join(d, f"{k}.wav")
+                subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", raw, "-ar", "48000", "-ac", "2", wav], check=True)
+                paths[k] = wav
+            seconds = len(read_audio(paths["instrumental"])[0]) / 44100
+            voiced, how = to_voice(paths["vocals"], r.voice, d, r.similarity, r.voiceSteps, r.voicePrep, r.voiceLift)
+            if not voiced:
+                # still waking up: the API waits and asks again (its cold start is counted)
+                raise HTTPException(503 if "not ready" in how else 422, f"no voice: {how}"[:300])
+            mix = os.path.join(d, "mix.wav")
+            mix_stems(paths["instrumental"], voiced, mix, seconds)
+            t1 = time.time()
+            print(f"voice: {seconds:.0f}s converted in {t1 - t0:.1f}s ({how})", flush=True)
+            return {
+                "seconds": round(seconds, 1),
+                "vocals": base64.b64encode(file_m4a(voiced)).decode(),
+                "mix": base64.b64encode(file_m4a(mix)).decode(),
+                "voiced": True,
+                "voiceNote": how,
+                "timings": {"voice": round(t1 - t0, 1)},
+            }
+    except HTTPException:
+        raise
+    except Exception as e:  # noqa: BLE001
+        traceback.print_exc()
+        raise HTTPException(500, f"voice failed: {e!r}"[:400]) from e
+
+
 def sung_score(vocals: str, r: "SongReq") -> tuple[float, str]:
     """How much of the lyrics a take really sang: Whisper's hearing vs the lyrics (0–1, -1 if unknown)."""
     import difflib

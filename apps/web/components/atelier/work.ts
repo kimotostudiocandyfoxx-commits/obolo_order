@@ -62,6 +62,8 @@ export type Work = {
   lyrics?: SongLyrics;
   /** R13: a song changed for free — how many versions there are, what the last change did, its length now */
   tweak?: { versions: number; what?: string; seconds?: number; /** the lyrics as sung (before any cut / repeat) */ lyrics0?: SongLyrics; /** R16: the versions before this one (Bluena's viewer switches between them) */ past?: { url?: string; what?: string; lyrics?: SongLyrics }[] };
+  /** R18 (君の声にする魔法): a song kept in two voices — the original and the member's own; `using` is the one heard */
+  voice?: { using: 'original' | 'own'; versions: ('original' | 'own')[] };
   /** the planet it belongs to (KIND_HOME_PLANET), kept for the later 〔星へ飛ばす〕 of planets without a screen yet */
   home?: BluenaPlanet;
 };

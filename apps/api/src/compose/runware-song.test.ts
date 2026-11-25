@@ -138,7 +138,7 @@ function tweaks() {
     save: async (_u: string, _id: string, v: { mixUrl: string; seconds: number; phrases: SongPhrase[]; design: TweakDesign }) => Object.assign(row, { mixUrl: v.mixUrl, seconds: v.seconds, phrasesJson: v.phrases, designJson: v.design }),
     render: async (_u: string, o: { instrumentalUrl: string; plan: { stem: string }; total: number }) => (renders.push(o), { data: Buffer.from('x'), seconds: o.total }),
     store: async () => 'https://cdn/v.m4a',
-    startSplit: async (_u: string, _id: string, _o: string, voice = false) => (splits.push({ voice }), 'job-split'),
+    startSplit: async () => (splits.push({ voice: false }), 'job-split'),
   });
   return { s, row, renders, splits };
 }
@@ -168,14 +168,10 @@ describe('R17: our GPU is woken only for a change that needs the stems / the tim
     expect(splits).toHaveLength(0);
     expect(renders[0]).toMatchObject({ instrumentalUrl: 'https://cdn/inst.m4a', plan: { stem: 'instrumental' } });
   });
-  it('「自分の声で歌って」: the split with the member’s voice (Seed-VC), once', async () => {
-    const { s, row, splits } = tweaks();
-    expect(await s.tweak('u1', 's1', { said: '自分の声で歌って' }, 'http://x')).toMatchObject({ status: 'wait' });
-    expect(splits).toEqual([{ voice: true }]);
-    Object.assign(row, { designJson: { ...(row.designJson as TweakDesign), vocalsUrl: 'v', voiced: true, voiceTried: true } });
-    expect(await s.tweak('u1', 's1', { said: '自分の声で歌って' }, 'http://x')).toMatchObject({ status: 'done' });
-    Object.assign(row, { designJson: { ...(row.designJson as TweakDesign), voiced: false } });
-    expect(await s.tweak('u1', 's1', { said: '自分の声で歌って' }, 'http://x')).toMatchObject({ status: 'paid', paid: 'voice' });
+  it('R18: 「自分の声で歌って」 is 君の声にする魔法 now (a price and a yes), never a free split with the voice', async () => {
+    const { s, splits } = tweaks();
+    expect(await s.tweak('u1', 's1', { said: '自分の声で歌って' }, 'http://x')).toMatchObject({ status: 'voice', voice: 'own' });
+    expect(splits).toHaveLength(0);
   });
 });
 

@@ -99,6 +99,7 @@ export function WorkCard({
   onAsk,
   onMaterial,
   songUrl,
+  onVoice,
 }: {
   w: Work;
   busy: boolean;
@@ -121,6 +122,8 @@ export function WorkCard({
   onMaterial?: (m: WorkMaterial) => void;
   /** §3: the song a show is recorded over (a material) */
   songUrl?: { url: string; title: string };
+  /** R18: the song's voice switched (the original / 君の声) — free */
+  onVoice?: (use: 'original' | 'own') => void;
 }) {
   const vs = isCraftWork(w) ? [] : versionsOf(w);
   const making = w.status === 'making';
@@ -236,6 +239,7 @@ export function WorkCard({
         {!showMaking && !shown.video && shown.reel && <ReelPlayer reel={shown.reel} title={shown.title?.replace(/（MV）$/, '')} />}
         {!showMaking && aiming && aim === 'frame' && <Frames w={shown} target={target} onTarget={setTarget} />}
         {!showMaking && sound && w.kind === 'song' && <Wave w={shown} aiming={aiming && aim === 'range'} target={target} onTarget={setTarget} />}
+        {!showMaking && w.kind === 'song' && w.voice && w.voice.versions.length > 1 && <VoiceToggle using={w.voice.using} busy={busy} onVoice={onVoice} />}
         {!showMaking && w.kind === 'song' && w.lyrics && <CardLyrics lyrics={w.lyrics} note={w.tweak?.what} />}
         {!showMaking && shown.text && (aiming && aim === 'span' ? <Phrases text={shown.text} target={target} onTarget={setTarget} /> : <p className="mt-1 whitespace-pre-line text-[14px] leading-relaxed text-white/90">{shown.text}</p>)}
         {!showMaking && shown.source && (
@@ -613,6 +617,34 @@ function Failed({ w }: { w: Work }) {
       <p className="text-[13px] font-bold tracking-[0.08em] text-amber-50">{head}</p>
       {!!rest.join('').trim() && <p className="text-[12px] text-amber-100/80">{rest.join('。')}</p>}
       <p className="text-[11px] text-amber-100/55">もう一回、頼んでみてね</p>
+    </div>
+  );
+}
+
+/**
+ * R18 (君の声にする魔法): a song kept in two voices — a small switch between the original voice and the member's own
+ * (a version switch, free; the free changes apply to both).
+ */
+export function VoiceToggle({ using, busy, onVoice }: { using: 'original' | 'own'; busy?: boolean; onVoice?: (use: 'original' | 'own') => void }) {
+  const opt = (v: 'original' | 'own', label: string) => (
+    <button
+      type="button"
+      onClick={() => v !== using && onVoice?.(v)}
+      disabled={busy || !onVoice}
+      aria-pressed={using === v}
+      data-voice={v}
+      className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold transition-colors ${using === v ? 'bg-amber-200 text-slate-950' : 'text-amber-100/70'}`}
+    >
+      {label}
+    </button>
+  );
+  return (
+    <div className="mt-1.5 flex items-center gap-1.5" data-testid="voice-toggle">
+      <span className="text-[10px] text-amber-100/55">歌声</span>
+      <div role="group" aria-label="歌声" className="flex rounded-full border border-amber-200/30 bg-black/25 p-0.5">
+        {opt('original', '元の声')}
+        {opt('own', '君の声')}
+      </div>
     </div>
   );
 }

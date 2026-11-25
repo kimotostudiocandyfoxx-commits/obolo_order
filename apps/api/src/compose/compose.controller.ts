@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, Inject, Param, ParseUUIDPipe, Post, Req, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
-import { ComposeChatBody, ComposeDesignBody, InstrumentalBody, SingBody, SongEditBody, FullSongBody, lyricsSections, songSpellKey, spellPrompt, SongTweakBody, SONG_TWEAKS_PER_HOUR } from '@obolo/shared';
+import { ComposeChatBody, ComposeDesignBody, InstrumentalBody, SingBody, SongEditBody, FullSongBody, lyricsSections, songSpellKey, spellPrompt, SongTweakBody, SONG_TWEAKS_PER_HOUR, SongVoiceBody, SongVoiceUseBody } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
@@ -10,6 +10,7 @@ import { ComposeService } from './compose.service';
 import { JobsService } from '../jobs/jobs.service';
 import { SongService } from './song.service';
 import { SongTweakService } from './song-tweak.service';
+import { SongVoiceService } from './song-voice.service';
 import { Database } from '../db/db';
 import { LedgerService } from '../wallet/ledger.service';
 import { startConfirmed } from '../wallet/confirmed';
@@ -30,6 +31,7 @@ export class ComposeController {
     private readonly db: Database,
     @Inject(KV) private readonly kv: KvStore,
     private readonly incants: IncantService,
+    private readonly voices: SongVoiceService,
   ) {}
 
   @Post('chat')
@@ -132,6 +134,35 @@ export class ComposeController {
     const b = parseBody(SongTweakBody, body);
     if (!b.undo) await rateLimit(this.kv, `compose-tweak:${userId}`, SONG_TWEAKS_PER_HOUR, 3600);
     return this.tweaks.tweak(userId, id, b, `${req.protocol}://${req.get('host')}`);
+  }
+
+  /**
+   * R18 (君の声にする魔法): what {bati} answers to 「自分の声にして」 — the mana (the price rule of the GPU seconds; a song
+   * already split only pays the conversion), or why not (no registered voice, the consent rules), or 'has' (a switch).
+   */
+  @Post('songs/:id/voice/quote')
+  @HttpCode(200)
+  async voiceQuote(@UserId() userId: string, @Param('id', ParseUUIDPipe) id: string) {
+    await rateLimit(this.kv, `compose-voice-q:${userId}`, 30, 3600);
+    return this.voices.quote(userId, id);
+  }
+
+  /** R18: the yes — charged once per yes at that quote, then the job (split when never split, then the conversion) */
+  @Post('songs/:id/voice')
+  @HttpCode(202)
+  async voice(@UserId() userId: string, @Param('id', ParseUUIDPipe) id: string, @Body() body: unknown, @Req() req: Request) {
+    const b = parseBody(SongVoiceBody, body);
+    await rateLimit(this.kv, `compose-voice:${userId}`, 10, 86400);
+    return this.voices.start(userId, id, b, `${req.protocol}://${req.get('host')}`);
+  }
+
+  /** R18: the original voice or 君の声 — a free version switch (the changes so far made again from that voice's stems) */
+  @Post('songs/:id/voice/use')
+  @HttpCode(200)
+  async voiceUse(@UserId() userId: string, @Param('id', ParseUUIDPipe) id: string, @Body() body: unknown, @Req() req: Request) {
+    const b = parseBody(SongVoiceUseBody, body);
+    await rateLimit(this.kv, `compose-tweak:${userId}`, SONG_TWEAKS_PER_HOUR, 3600);
+    return this.tweaks.useVoice(userId, id, b.use, `${req.protocol}://${req.get('host')}`);
   }
 
   /** 保存する (the client also buries it in the island). */
