@@ -12,6 +12,8 @@ export class ManaPricesController {
 
   @Get('prices')
   async prices(): Promise<{ prices: ManaPrices }> {
-    return { prices: await this.costs.prices() };
+    // R17: the secret spell is not in the public list (its price comes only with a member's passphrase: POST /moon/incant)
+    const { songPremium: _hidden, ...open } = await this.costs.prices();
+    return { prices: open as ManaPrices };
   }
 }

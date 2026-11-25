@@ -72,8 +72,9 @@ describe('R17: the secret spell on Runware (MiniMax Music 2.6)', () => {
     expect(t.positivePrompt).toContain('vocal harmonies');
   });
   it('the passphrase: 「上級魔法で」 anywhere, light variants, the rest is the request', () => {
-    const w = premiumWords(undefined);
-    expect(w).toEqual(['上級魔法で']);
+    // (the real passphrase lives on the server only; these are its shape)
+    const w = premiumWords(undefined, ['上級魔法で', 'じょうきゅうまほうで']);
+    expect(w).toEqual(['上級魔法で', 'じょうきゅうまほうで']);
     expect(saidPremiumWords('上級魔法で、夏の曲を唱えて', w)).toBe(true);
     expect(saidPremiumWords('じょうきゅうまほうで おねがい', w)).toBe(true);
     expect(saidPremiumWords('上級 魔法で！', w)).toBe(true);
@@ -84,7 +85,8 @@ describe('R17: the secret spell on Runware (MiniMax Music 2.6)', () => {
     expect(premiumRequest('上級魔法で作って', w)).toBe('');
     expect(premiumRequest('じょうきゅうまほうで、海のバラード', w)).toBe('海のバラード');
     expect(premiumRequest('海のバラード', w)).toBeNull();
-    expect(premiumWords('ひみつの歌, とっておき')).toEqual(['ひみつの歌', 'とっておき']);
+    expect(premiumWords('ひみつの歌, とっておき', w)).toEqual(['ひみつの歌', 'とっておき']);
+    expect(premiumWords('', w)).toBe(w);
   });
 });
 

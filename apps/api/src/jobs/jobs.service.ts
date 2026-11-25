@@ -32,7 +32,7 @@ type Inputs = {
 };
 
 /** what a job's free costs are filed under (its paid making comes from the charge's scope) */
-const FEATURE_OF: Record<JobKind, CostCtx['feature']> = { song: 'songEdit', 'mv-story': 'videoEdit', 'mv-edit': 'videoEdit', 'mv-lyrics': 'videoEdit', demo: 'other', game: 'other' };
+const FEATURE_OF: Record<JobKind, CostCtx['feature']> = { song: 'songEdit', 'mv-story': 'videoEdit', 'mv-edit': 'videoEdit', 'mv-lyrics': 'videoEdit', demo: 'other', game: 'other', 'song-split': 'songEdit' };
 
 /** what each job is timed as (M-R253 §4) */
 export const ETA_OF: Record<JobKind, EtaKind> = { song: 'song', 'mv-story': 'mv', 'mv-lyrics': 'mv', demo: 'demo', game: 'game', 'mv-edit': 'mvEdit', 'song-split': 'mvEdit' };

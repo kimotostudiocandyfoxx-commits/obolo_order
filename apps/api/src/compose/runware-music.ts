@@ -1,4 +1,5 @@
 import { HttpStatus, Logger } from '@nestjs/common';
+import { meterRunware } from '@obolo/ai';
 import { RUNWARE_URL, type RunwareAudioTask } from '@obolo/shared';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -64,6 +65,8 @@ export async function runwareAudio(key: string, task: RunwareAudioTask, deps: Ru
   if (!res.ok) throw failed(`download ${res.status}`);
   const data = Buffer.from(await res.arrayBuffer());
   const costUsd = typeof got?.cost === 'number' ? got.cost : null;
+  // the per-making cost record (docs/マナの値段.md): Runware's own cost of this song
+  meterRunware(task.model, [{ cost: costUsd }]);
   const ms = Date.now() - t0;
   log.log(`${task.model} ${task.taskUUID}: ${Math.round(data.length / 1024)} KB in ${Math.round(ms / 1000)}s, cost ${costUsd ?? '?'} USD`);
   return { data, audioUrl, costUsd, taskUUID: task.taskUUID, model: task.model, ms };

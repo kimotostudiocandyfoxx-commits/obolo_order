@@ -222,49 +222,41 @@ export type IncantBody = z.infer<typeof IncantBody>;
 export type IncantView = { premium: false } | { premium: true; grant: string; price: number; /** the words after the passphrase ('' = none) */ request: string };
 
 /**
- * the passphrase (client 2026-11-25: 「上級魔法で」, word of mouth only — never in the story): a message that has it
- * (「上級魔法で、夏の曲を唱えて」「上級魔法でお願い」「じょうきゅうまほうで」) is the secret spell, the rest the request.
- * PREMIUM_SPELL_WORDS overrides it (comma-separated).
+ * The passphrase itself is only on the server (the API's PREMIUM_SPELL_WORDS and its default — never in the web's code,
+ * never in the story: word of mouth only). A message that has it anywhere is the secret spell; the rest is the request.
  */
-export const PREMIUM_WORDS_DEFAULT = ['上級魔法で'];
 
-/** how a passphrase may also be written (its reading in hiragana / katakana) */
-const READINGS: Record<string, string[]> = { 上級魔法: ['じょうきゅうまほう', 'ジョウキュウマホウ'] };
-
-/** the words as compared: width, spaces, punctuation and 「」 do not matter */
+/** the words as compared: width, case, spaces and punctuation do not matter */
 export function incantNorm(s: string): string {
-  let t = s
+  return s
     .normalize('NFKC')
     .toLowerCase()
     .replace(/[\s、。，．,.!?！？「」『』"'`〜~…・-]/g, '');
-  for (const [k, rs] of Object.entries(READINGS)) for (const r of rs) t = t.split(r.toLowerCase()).join(k);
-  return t;
 }
 
 /**
- * the request said with the passphrase (what is left once it is taken out: 「上級魔法で、夏の曲を唱えて」→「夏の曲を唱えて」);
- * '' when only the passphrase (and a word like お願い) was said; null when it was not said
+ * the request said with the passphrase (what is left once it is taken out: 「<passphrase>、夏の曲を唱えて」→「夏の曲を唱えて」);
+ * '' when only the passphrase (and a word like お願い / 作って) was said; null when it was not said
  */
 export function premiumRequest(said: string, words: string[]): string | null {
   if (!saidPremiumWords(said, words)) return null;
   let rest = said.normalize('NFKC');
-  for (const [k, rs] of Object.entries(READINGS)) for (const r of rs) rest = rest.split(r).join(k);
   for (const w of words) {
-    const re = new RegExp([...w.normalize('NFKC')].map((c) => c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('[\\s、。,.!?！？「」『』…・]*'));
+    const re = new RegExp([...w.normalize('NFKC').replace(/\s+/g, '')].map((c) => c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('[\\s、。,.!?！？「」『』…・]*'), 'i');
     rest = rest.replace(re, ' ');
   }
   rest = rest.replace(/^[\s、。,.!?！？「」『』…・]+|[\s、。,.!?！？「」『』…・]+$/g, '').trim();
   return /^(お願い|おねがい|頼む|たのむ|作って|つくって|唱えて|となえて|して|ね|よ)?(します|ね|よ|！)*$/.test(rest) ? '' : rest;
 }
 
-/** the passphrases from the setting ('' / unset: the default) */
-export function premiumWords(setting: string | undefined | null): string[] {
+/** the passphrases from the setting (comma-, | - or 、-separated); unset / empty: `defaults` */
+export function premiumWords(setting: string | undefined | null, defaults: string[] = []): string[] {
   const list = (setting ?? '')
     // commas (as asked), or | and 、 (a deploy's env list splits on commas)
     .split(/[,|、，]/)
     .map((w) => w.trim())
     .filter(Boolean);
-  return list.length ? list : PREMIUM_WORDS_DEFAULT;
+  return list.length ? list : defaults;
 }
 
 /** whether the member's words carry one of the passphrases (anywhere in what they said) */

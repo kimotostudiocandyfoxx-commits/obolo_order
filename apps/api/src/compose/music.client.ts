@@ -160,10 +160,11 @@ async function songOnGpu(baseUrl: string, body: FullSongBody & { prompt: string;
  * vocal, matched to the lyrics) and, with a recording, sung in the member's voice (Seed-VC). No song is generated: it
  * is called lazily, only when a change first needs the stems / the times or the member's voice. AAC stems back.
  */
-export async function splitSong(
-  baseUrl: string,
-  body: { audio: Buffer; lyrics: { section: string; text: string }[]; sheet?: string; language?: string; voice?: Buffer | null; similarity?: number },
-): Promise<MadeSong> {
+export type SplitBody = { audio: Buffer; lyrics: { section: string; text: string }[]; sheet?: string; language?: string; voice?: Buffer | null; similarity?: number };
+export function splitSong(baseUrl: string, body: SplitBody): Promise<MadeSong> {
+  return timed('gpu', 'music:split', () => splitOnGpu(baseUrl, body));
+}
+async function splitOnGpu(baseUrl: string, body: SplitBody): Promise<MadeSong> {
   const url = baseUrl.replace(/\/$/, '');
   const token = await idToken(url);
   let res: Response;
