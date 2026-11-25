@@ -157,7 +157,7 @@ if os.path.exists(f):
     g_=(np.abs(a_[...,0]-a_[...,1])<12)&(np.abs(a_[...,1]-a_[...,2])<12)&(a_.mean(2)>150)&(a_.mean(2)<235)
     h_,w_=g_.shape; ys,xs=np.where(g_[:h_//2]);
     if len(xs)>50: A['spk-panel']=_json.dumps([round(np.percentile(xs,3)/w_,3),round(np.percentile(ys,3)/h_,3),round((np.percentile(xs,97)-np.percentile(xs,3))/w_,3),round((np.percentile(ys,97)-np.percentile(ys,3))/h_,3)])
-    o.thumbnail((260,260),Image.LANCZOS); A['speaker3']=uri(o,86)
+    o.thumbnail((260,260),Image.LANCZOS); A['speaker3']=uri(o,86); A['spk-ar']=str(round(o.width/o.height,4))
 VD=os.environ.get('VOICE_DIR')
 if VD:
     for n in range(1,6):
