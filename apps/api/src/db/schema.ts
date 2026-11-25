@@ -231,7 +231,7 @@ export const usageAccruals = pgTable('usage_accruals', {
 });
 
 /**
- * R18 (docs/マナの値段.md 13.): a member's 保存の魔法 — the tier bought (+GB a month), the last month paid (YYYY-MM,
+ * R18 (docs/マナの値段.md 13.): a member's ふくろの魔法 — the tier bought (+GB a month), the last month paid (YYYY-MM,
  * Japan), 「やめて」 (ends at the month's end), the grace when the renewal found too little mana, when it last lapsed, and
  * which of {bati}'s notices were said (80%, the grace, the lapse).
  */

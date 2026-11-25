@@ -128,7 +128,7 @@ type PlanAsk = {
 /** client 2026-11-25: {bati}'s questions for a book / a game (`craft`), and a book / a game just made (its next words change it: `after`) */
 /** R18: 君の声にする魔法 asked — {bati} said its mana and waits for the yes (the quote's price and spell key go with the yes) */
 type VoiceAsk = { card: Work; price: number; spell: string };
-/** R18: 保存の魔法 — which size (the tiers said), then the yes to its price */
+/** R18: ふくろの魔法 — which size (the tiers said), then the yes to its price */
 type StorageAsk = { tiers: StorageTierPrice[]; plan: StorageView['plan']; gb?: number; price?: number };
 type Pending = { storage: StorageAsk } | { kind: AtelierKind } | { gameTrial: { said: string } } | { radioName: string } | { tweak: Work } | { voiceSpell: VoiceAsk } | { voiceAgain: true } | { use: AtelierKind; materials: Work[] } | { plan: PlanAsk } | { craft: CraftAsk } | { after: Work } | { tool: ToolAsk; spell?: SavedSpell; forKind?: AtelierKind; content?: string } | null;
 /** R12: {bati}'s tool out in the sky (the compass while it reads; the spell book open, or taking a spell in) */
@@ -615,8 +615,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     void start(pa.plan.kind, pa.prompt, pa.prev, { ...pa.opts, plan: pa.plan, confirm: { id: yesId(), price: pa.price, ...(key ? { spell: key } : {}) } });
   };
 
-  // ── R18 (client 2026-11-25): Bluena's room and 保存の魔法 — all in words, no buttons ──
-  /** {bati}'s notice said once: 80% (「ブルーナがいっぱいになってきたよ。」), the renewal's grace, the lapse */
+  // ── R18 (client 2026-11-25): Bluena's room (in 袋, 1袋 = 1GB) and ふくろの魔法 — all in words, no buttons ──
+  /** {bati}'s notice said once: 80% (「ブルーナの袋がいっぱいになってきたよ。…」), the renewal's grace, the lapse */
   const storageNotice = async () => {
     if (story) return;
     const v = await getApi()
@@ -630,7 +630,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       .storageTold(v.say)
       .catch(() => undefined);
   };
-  /** 「保存の魔法」「ブルーナを広げて」: the tiers and their mana in one sentence; a size said with it goes to its price */
+  /** 「ふくろの魔法」「袋をふやして」 (or the old 「保存の魔法」): the tiers and their mana in one sentence; a size said with it goes to its price */
   const storageExplain = async (text: string) => {
     setBusy(true);
     const v = await getApi()
@@ -649,8 +649,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   const storagePrice = (ask: StorageAsk, gb: number) => {
     const price = ask.tiers.find((t) => t.gb === gb)?.mana;
     if (price == null) return sayT(STORAGE_LINES.which);
-    if (ask.plan?.gb === gb && !ask.plan.cancelled && !ask.plan.graceUntil) return sayT(STORAGE_LINES.already, { gb });
-    sayT(STORAGE_LINES.confirm, { gb, price: formatMana(price) });
+    if (ask.plan?.gb === gb && !ask.plan.cancelled && !ask.plan.graceUntil) return sayT(STORAGE_LINES.already, { bags: gb });
+    sayT(STORAGE_LINES.confirm, { bags: gb, price: formatMana(price) });
     setPending({ storage: { ...ask, gb, price } });
   };
   /** the yes: a full month charged (once per yes), the room bigger at once */
@@ -665,7 +665,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     try {
       const r = await getApi().expandStorage(gb, { id: yesId(), price });
       castNow(1800);
-      sayT(r.status === 'already' ? STORAGE_LINES.already : STORAGE_LINES.done, { gb });
+      sayT(r.status === 'already' ? STORAGE_LINES.already : STORAGE_LINES.done, { bags: gb });
       window.dispatchEvent(new Event('obolo:storage'));
     } catch (e) {
       if (e instanceof ApiError && e.code === 'NO_MANA') sayT(CHARGE_ERROR_WORDS.NO_MANA);
@@ -675,7 +675,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       setBusy(false);
     }
   };
-  /** 「保存の魔法をやめて」: it ends at the month's end */
+  /** 「ふくろの魔法をやめて」: it ends at the month's end */
   const storageCancel = async () => {
     const r = await getApi()
       .cancelStorage()
@@ -684,7 +684,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     sayT(r.cancelled ? STORAGE_LINES.cancel : STORAGE_LINES.cancelNone);
     window.dispatchEvent(new Event('obolo:storage'));
   };
-  /** the words while 保存の魔法 waits (true: taken here) */
+  /** the words while ふくろの魔法 waits (true: taken here) */
   const storageAnswer = (text: string, a: StorageAsk): boolean => {
     const gb = storageTierOf(text);
     if (a.gb && a.price != null) {
@@ -1570,7 +1570,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   const sendOn = (text: string, p: Pending) => {
     // R16: the answer to 「どれかな？」 (which of the works found to open)
     if (!story && openChoices.current && openChosen(text)) return;
-    // R18: 保存の魔法 — the size / the yes while it waits; 「保存の魔法をやめて」; 「保存の魔法」「ブルーナを広げて」
+    // R18: ふくろの魔法 — the size / the yes while it waits; 「ふくろの魔法をやめて」; 「ふくろの魔法」「袋をふやして」
     if (!story && p && 'storage' in p && storageAnswer(text, p.storage)) return;
     if (!story && isStorageCancel(text)) return void storageCancel();
     if (!story && isStorageAsk(text)) return void storageExplain(text);

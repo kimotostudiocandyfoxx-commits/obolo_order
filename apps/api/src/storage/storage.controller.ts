@@ -5,7 +5,7 @@ import { parseBody } from '../common/validate';
 import { StorageWorksService } from './storage-works.service';
 import { StorageService } from './storage.service';
 
-/** R18: Bluena's room and 保存の魔法 (docs/マナの値段.md 13.) */
+/** R18: Bluena's room and ふくろの魔法 (docs/マナの値段.md 13.) */
 @Controller('storage')
 @UseGuards(AuthGuard)
 export class StorageController {
@@ -26,7 +26,7 @@ export class StorageController {
     return this.storage.expand(userId, parseBody(StorageExpandBody, body));
   }
 
-  /** 「保存の魔法をやめて」: ends at the month's end */
+  /** 「ふくろの魔法をやめて」: ends at the month's end */
   @Post('cancel')
   cancel(@UserId() userId: string) {
     return this.storage.cancel(userId);

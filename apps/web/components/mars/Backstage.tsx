@@ -52,7 +52,7 @@ export function Backstage({ onPublish }: { onPublish?: () => void } = {}) {
         setList((cur) => [kept, ...(cur ?? [])]);
       }
     } catch (e) {
-      setMsg(e instanceof ApiError && e.code === 'BAD_VIDEO' ? 'この動画は読みこめなかった…' : e instanceof ApiError && e.code === 'STORAGE_FULL' ? '保存できる容量がいっぱいです' : 'しまえなかった…もう一度');
+      setMsg(e instanceof ApiError && e.code === 'BAD_VIDEO' ? 'この動画は読みこめなかった…' : e instanceof ApiError && e.code === 'STORAGE_FULL' ? 'ブルーナの袋がいっぱいです' : 'しまえなかった…もう一度');
     } finally {
       setBusy(false);
     }

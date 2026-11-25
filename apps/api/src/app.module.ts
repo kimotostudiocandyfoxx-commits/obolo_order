@@ -157,7 +157,7 @@ import { StorageWorksService } from './storage/storage-works.service';
     AccessService,
     // R18: the making-side requests of a non-member at 0 mana stop (after the guards: the member is known)
     { provide: APP_INTERCEPTOR, useClass: SpendGate },
-    // R18: Bluena's room (保存の魔法); a full Bluena stops the making-side writes
+    // R18: Bluena's room (ふくろの魔法); a full Bluena stops the making-side writes
     StorageService,
     StorageWorksService,
     { provide: APP_INTERCEPTOR, useClass: StorageGate },

@@ -3,22 +3,26 @@ import { MakeConfirm } from './makeConfirm';
 import { DEFAULT_PRICE_RULE, DEFAULT_STORAGE_GB_MONTH_USD, DEFAULT_USD_JPY, fxMonth, GIB, manaFor10, type PriceRule } from './manaPrice';
 
 /**
- * R18 (client 2026-11-25, docs/マナの値段.md 13. / docs/media.md): Bluena's room and 保存の魔法.
+ * R18 (client 2026-11-25, docs/マナの値段.md 13. / docs/media.md): Bluena's room and ふくろの魔法.
  *
- *  - Included: an Obolo Order member 5 GB (STORAGE_MEMBER_GB), everyone else 1 GB (STORAGE_FREE_GB). Everything the
+ *  - In the world of the app the room is counted in 袋 (ふくろ): 1袋 = 1GB (client 2026-11-25, docs/DECISIONS.md). No
+ *    user-facing word says 「GB」「容量」 or 「保存の魔法」 (the old name, still heard as a synonym). The code, the config
+ *    (STORAGE_*), the columns (…_gb) and the routes keep GB: 1 GB there is 1袋 on the screen.
+ *  - Included: an Obolo Order member 5袋 (STORAGE_MEMBER_GB), everyone else 1袋 (STORAGE_FREE_GB). Everything the
  *    member owns that we store counts: uploads, the works made and every file of theirs (versions, stems, voice
  *    versions, posters …: media_objects), and the text of books and games.
- *  - 保存の魔法 (asked for in words with {bati}): +10 / +30 / +100 GB a month, paid in mana — a full month on the yes,
+ *  - ふくろの魔法 (asked for in words with {bati}): +10 / +30 / +100袋 a month, paid in mana — a full month on the yes,
  *    then at the start of each month. Its price is the price rule (manaFor10) of the tier's monthly Cloudflare R2 cost:
  *    storage at STORAGE_GB_MONTH_USD (R2 $0.015 / GB-month; egress free) plus an allowance of R2 operations.
  *  - Mana short at the renewal: the files stay, 7 days of grace ({bati} says so once), then the tier lapses. Nothing is
  *    ever deleted automatically; over the quota, new uploads and makings stop until the member is under it again.
- *  - 「保存の魔法をやめて」: it ends at the month's end (the next renewal lapses instead of charging).
- *  - {bati} says once at 80% 「ブルーナがいっぱいになってきたよ。」; at 100% making / uploading stop with
- *    「ブルーナがいっぱいだよ。いらないものを消すか、保存の魔法で広げてね。」 (every style: STORAGE_VARIANTS).
+ *  - 「ふくろの魔法をやめて」 (or the old 「保存の魔法をやめて」): it ends at the month's end (the next renewal lapses).
+ *  - {bati} says once at 80% 「ブルーナの袋がいっぱいになってきたよ。…」; at 100% making / uploading stop with
+ *    「ブルーナの袋がいっぱいだよ。いらないものを消すか、ふくろの魔法で袋をふやしてね。」 (every style: STORAGE_VARIANTS).
+ *  - The bar under Bluena's header is a row of small bags (bagBar), filled as the room is used — no numbers.
  */
 
-/** the expansion tiers (GB a month) */
+/** the expansion tiers (GB a month; on the screen 1 GB = 1袋) */
 export const STORAGE_TIERS = [10, 30, 100] as const;
 export type StorageTier = (typeof STORAGE_TIERS)[number];
 export const isStorageTier = (n: unknown): n is StorageTier => (STORAGE_TIERS as readonly unknown[]).includes(n);
@@ -87,15 +91,77 @@ export function hasRoom(usedBytes: number, quota: number, addBytes = 0): boolean
   return addBytes > 0 ? usedBytes + addBytes <= quota : usedBytes < quota;
 }
 
-/** a size as the calm bar shows it: 「2.1GB」「5GB」, under 1 GB 「120MB」 */
+/** a size for the dev team (logs, admin): 「2.1GB」「5GB」, under 1 GB 「120MB」 — never shown in the world (it says 袋) */
 export function formatBytes(bytes: number): string {
   const b = Math.max(0, bytes);
   if (b < GIB) return `${Math.max(b > 0 ? 1 : 0, Math.round(b / 1024 ** 2))}MB`;
   const gb = Math.round((b / GIB) * 10) / 10;
   return `${Number.isInteger(gb) ? gb.toFixed(0) : gb.toFixed(1)}GB`;
 }
-/** 「ブルーナ：2.1GB / 5GB」 */
-export const storageBarText = (usedBytes: number, quota: number) => `ブルーナ：${formatBytes(usedBytes)} / ${formatBytes(quota)}`;
+
+// ───────────────────────────── the bag bar (1袋 = 1GB) ─────────────────────────────
+
+/** 1袋 = 1GB (client 2026-11-25) */
+export const BAG_BYTES = GIB;
+/** the bags a size makes (fractional) */
+export const bagsOf = (bytes: number) => Math.max(0, bytes) / BAG_BYTES;
+/** a room of up to this many bags shows one icon a bag; a bigger one shows big bags of BIG_BAG, then the rest one by one */
+export const BIG_BAG = 10;
+/** at most this many icons in the row (phone width) */
+export const BAG_ICONS_MAX = 16;
+
+/** one icon of the row: how many bags it holds (1, or a big bag of 10) and how full it is (0–1) */
+export interface BagIcon {
+  size: number;
+  fill: number;
+  big: boolean;
+}
+export interface BagBar {
+  /** the room in bags (5 for a member, 15 with +10 …) */
+  bags: number;
+  /** the bags used (fractional, at most `bags`) */
+  used: number;
+  icons: BagIcon[];
+  /** for screen readers: 「ふくろ 5つのうち、2つぶんくらい」 */
+  label: string;
+}
+
+/** the icons' sizes: one a bag up to BIG_BAG; above, big bags of BIG_BAG then the rest one by one (15 → 10 + five 1s) */
+export function bagSizes(bags: number): number[] {
+  const n = Math.max(1, Math.round(bags));
+  if (n <= BIG_BAG) return Array<number>(n).fill(1);
+  const big = Math.floor(n / BIG_BAG);
+  const rest = n - big * BIG_BAG;
+  if (big + rest <= BAG_ICONS_MAX) return [...Array<number>(big).fill(BIG_BAG), ...Array<number>(rest).fill(1)];
+  // a room bigger than today's config allows: equal big bags, never more than BAG_ICONS_MAX icons
+  const each = Math.ceil(n / BAG_ICONS_MAX);
+  const out: number[] = [];
+  for (let left = n; left > 0; left -= each) out.push(Math.min(each, left));
+  return out;
+}
+
+const count = (n: number) => (n <= 10 ? `${n}つ` : `${n}こ`);
+/** the row of bags for a use and a room: filled from the left, in proportion to the use */
+export function bagBar(usedBytes: number, quota: number): BagBar {
+  const bags = Math.max(1, Math.round(bagsOf(quota)));
+  const used = Math.min(bags, bagsOf(usedBytes));
+  let start = 0;
+  const icons = bagSizes(bags).map((size) => {
+    const fill = Math.min(1, Math.max(0, (used - start) / size));
+    start += size;
+    return { size, fill, big: size > 1 };
+  });
+  const r = Math.min(bags, Math.round(used));
+  const label =
+    usedBytes <= 0
+      ? `ふくろ ${count(bags)}、まだからっぽ`
+      : usedBytes >= quota
+        ? `ふくろ ${count(bags)}、ぜんぶいっぱい`
+        : r < 1
+          ? `ふくろ ${count(bags)}のうち、すこしだけ`
+          : `ふくろ ${count(bags)}のうち、${count(r)}ぶんくらい`;
+  return { bags, used, icons, label };
+}
 
 // ───────────────────────────── the plan (one row a member) ─────────────────────────────
 
@@ -104,7 +170,7 @@ export interface StoragePlanState {
   tierGb: number | null;
   /** the last month (YYYY-MM, Japan) it was paid for */
   paidMonth: string | null;
-  /** 「保存の魔法をやめて」: ends at the month's end */
+  /** 「ふくろの魔法をやめて」: ends at the month's end */
   cancelled: boolean;
   /** the renewal found too little mana: the tier stays until then */
   graceUntil: Date | null;
@@ -192,20 +258,29 @@ export function storageWrite(method: string, path: string): boolean {
 
 const half = (s: string) => s.replace(/[０-９]/g, (d) => String.fromCharCode(d.charCodeAt(0) - 0xfee0)).replace(/[Ａ-Ｚａ-ｚ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0));
 
-/** 「保存の魔法をやめて」「ブルーナを広げるのやめて」 */
+/** 「ふくろの魔法をやめて」「袋をふやすのやめて」; the old 「保存の魔法をやめて」「ブルーナを広げるのやめて」 still heard */
 export function isStorageCancel(text: string): boolean {
   const t = half(text).replace(/\s+/g, '');
-  return /(保存|ほぞん)の(魔法|まほう).{0,6}(やめ|止め|解約|おわり|終わり|キャンセル|とめ|いらない)/.test(t) || /ブルーナ.{0,4}(広げ|ひろげ).{0,6}(やめ|止め|いらない)/.test(t);
+  return (
+    /(ふくろ|袋|保存|ほぞん)の(魔法|まほう).{0,6}(やめ|止め|解約|おわり|終わり|キャンセル|とめ|いらない)/.test(t) ||
+    /(袋|ふくろ).{0,4}(ふや|増や).{0,6}(やめ|止め|いらない)/.test(t) ||
+    /ブルーナ.{0,4}(広げ|ひろげ).{0,6}(やめ|止め|いらない)/.test(t)
+  );
 }
 
-/** 「保存の魔法」「ブルーナを広げて」「ブルーナを大きくして」「容量を増やして」 */
+/** 「ふくろの魔法」「袋をふやして」「ふくろを増やす」; the old 「保存の魔法」「ブルーナを広げて」「容量を増やして」 still heard */
 export function isStorageAsk(text: string): boolean {
   const t = half(text).replace(/\s+/g, '');
   if (isStorageCancel(t)) return false;
-  return /(保存|ほぞん)の(魔法|まほう)/.test(t) || /ブルーナ.{0,3}(広げ|ひろげ|大きく|おおきく|増や|ふや)/.test(t) || /(容量|ようりょう).{0,3}(増や|ふや|広げ|ひろげ|足り|たり)/.test(t);
+  return (
+    /(ふくろ|袋|保存|ほぞん)の(魔法|まほう)/.test(t) ||
+    /(袋|ふくろ).{0,3}(増や|ふや|足り|たり)/.test(t) ||
+    /ブルーナ.{0,3}(広げ|ひろげ|大きく|おおきく|増や|ふや)/.test(t) ||
+    /(容量|ようりょう).{0,3}(増や|ふや|広げ|ひろげ|足り|たり)/.test(t)
+  );
 }
 
-/** the tier said: 「10GB」「30ギガ」「百」「いちばん大きいの」 (null: none said) */
+/** the tier said: 「10袋」「じゅう袋」「百袋」「いちばん大きいの」, the old 「30GB」「十ギガ」 (null: none said) */
 export function storageTierOf(text: string): StorageTier | null {
   const t = half(text).replace(/\s+/g, '').toLowerCase();
   const n = t.match(/(\d{1,4})/);

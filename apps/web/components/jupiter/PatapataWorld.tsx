@@ -278,7 +278,7 @@ export function PatapataWorld({ events, overlay, topInset = 0, live = false }: {
         added.push(liveRoot(await getApi().addJupiterRoot({ mediaId: ph.id })));
       }
     } catch (e) {
-      say(e instanceof ApiError && e.code === 'BAD_IMAGE' ? 'この写真は読みこめなかった…' : e instanceof ApiError && e.code === 'STORAGE_FULL' ? '保存できる容量がいっぱいです' : 'うまく入れられなかった…もう一度');
+      say(e instanceof ApiError && e.code === 'BAD_IMAGE' ? 'この写真は読みこめなかった…' : e instanceof ApiError && e.code === 'STORAGE_FULL' ? 'ブルーナの袋がいっぱいです' : 'うまく入れられなかった…もう一度');
     } finally {
       setUploading(false);
     }

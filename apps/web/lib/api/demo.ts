@@ -294,7 +294,7 @@ interface DemoState {
   songVoices?: Record<string, { using: SongVoiceVersion }>;
   /** client 2026-11-25: the demo's books and games (canned chapters / the canned game, no model) */
   books?: (BookView & { owner: string })[];
-  /** R18: the demo's 保存の魔法 (a tier, the month paid, 「やめて」) and the notices said */
+  /** R18: the demo's ふくろの魔法 (a tier, the month paid, 「やめて」) and the notices said */
   storagePlans?: Record<string, { gb: number | null; paidMonth: string | null; cancelled: boolean; told?: { near?: boolean } }>;
   games?: (GameView & { owner: string; versions: { tags: SpellTag[]; code: string; title: string; howTo: string }[]; /** R17: each version's making and price */ kinds?: MakeKind[]; prices?: number[] })[];
   /** chapters written per member and day */

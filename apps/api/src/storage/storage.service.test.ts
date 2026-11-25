@@ -120,7 +120,7 @@ describe('R18: the room (member / non-member / expanded)', () => {
   });
 });
 
-describe('R18: 保存の魔法 — purchase, renewal, grace, lapse, cancel', () => {
+describe('R18: ふくろの魔法 — purchase, renewal, grace, lapse, cancel', () => {
   it('a yes charges a full month at the price said, once', async () => {
     const { s, store } = service();
     const r = await s.expand('u1', { gb: 10, confirm: yes(p10) }, NOV);
@@ -185,7 +185,7 @@ describe('R18: 保存の魔法 — purchase, renewal, grace, lapse, cancel', () 
     expect(store.row).toMatchObject({ paidMonth: '2026-12', graceUntil: null, tierGb: 10 });
   });
 
-  it('「保存の魔法をやめて」: the month stays, the next month lapses without a charge', async () => {
+  it('「ふくろの魔法をやめて」: the month stays, the next month lapses without a charge', async () => {
     const { s, store } = service();
     expect((await s.cancel('u1', NOV)).cancelled).toBe(false);
     await s.expand('u1', { gb: 30, confirm: yes(PRICES[1].mana) }, NOV);

@@ -1,15 +1,17 @@
 'use client';
 
-import { storageBarText, type StorageView } from '@obolo/shared';
+import { bagBar, type StorageView } from '@obolo/shared';
 import { useEffect, useState } from 'react';
 import { getApi } from '@/lib/api';
+import { BagRow } from './BagRow';
 
-/** R18: Bluena's room changed (a 保存の魔法, a work thrown away) — the bar reads it again */
+/** R18: Bluena's room changed (a ふくろの魔法, a work thrown away) — the bar reads it again */
 export const STORAGE_EVENT = 'obolo:storage';
 
 /**
- * R18 (client 2026-11-25): Bluena's room, calm and small under its header — 「ブルーナ：2.1GB / 5GB」 and a thin line.
- * No warning colours, no numbers about people; at 100% the line is only a little brighter (Bati says the rest).
+ * R18 (client 2026-11-25): Bluena's room, calm and small under its header — a row of bags (1袋 = 1GB: 5 for a member,
+ * 1 for everyone else, more with ふくろの魔法), filled as it is used. No numbers, no 「GB」, no warning colours; at
+ * 80% and more the bags are only a little brighter (Bati says the rest).
  */
 export function StorageBar({ className = '' }: { className?: string }) {
   const [v, setV] = useState<StorageView | null>(null);
@@ -28,13 +30,9 @@ export function StorageBar({ className = '' }: { className?: string }) {
     };
   }, []);
   if (!v || !(v.quotaBytes > 0)) return null;
-  const share = Math.min(1, v.usedBytes / v.quotaBytes);
   return (
-    <div className={`pointer-events-none mx-auto w-full max-w-[260px] ${className}`} data-testid="bluena-storage" aria-label={storageBarText(v.usedBytes, v.quotaBytes)}>
-      <p className="text-center text-[10.5px] tracking-[0.04em] text-sky-100/70 [text-shadow:0_1px_4px_#000]">{storageBarText(v.usedBytes, v.quotaBytes)}</p>
-      <span className="mt-0.5 block h-[3px] w-full overflow-hidden rounded-full bg-white/10">
-        <span className="block h-full rounded-full bg-sky-200/60" style={{ width: `${Math.max(1.5, share * 100)}%`, opacity: v.level === 'ok' ? 0.75 : 1 }} />
-      </span>
+    <div className={`pointer-events-none mx-auto w-full max-w-[260px] ${className}`} data-testid="bluena-storage">
+      <BagRow bar={bagBar(v.usedBytes, v.quotaBytes)} bright={v.level !== 'ok'} />
     </div>
   );
 }

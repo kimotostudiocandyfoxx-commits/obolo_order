@@ -30,7 +30,7 @@ export const BATI_VARIANTS: Record<string, BatiVariantSet> = {
   ...VIDEO_VARIANTS,
   // R16: Bluena's viewer — 〔バティといじる〕 and a work opened by words (bluenaVariants.ts)
   ...BLUENA_VARIANTS,
-  // R18: Bluena's room and 保存の魔法 (storageVariants.ts)
+  // R18: Bluena's room and ふくろの魔法 (storageVariants.ts)
   ...STORAGE_VARIANTS,
   "……やぁ！": {
     teinei: "……こんにちは！",

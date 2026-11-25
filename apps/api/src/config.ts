@@ -258,7 +258,7 @@ const Env = z.object({
   CPU_SECOND_JPY: z.coerce.number().min(0).default(0.01),
   /**
    * R18 (docs/マナの値段.md 13.): Bluena's room — included for a member / everyone else (GB), the storage price (Cloudflare
-   * R2, USD per GB-month; egress free), the R2 operations a 保存の魔法 tier's price allows per GB a month, the grace when the
+   * R2, USD per GB-month; egress free), the R2 operations a ふくろの魔法 tier's price allows per GB a month, the grace when the
    * renewal finds too little mana, and the months of storage a making's price includes
    */
   STORAGE_MEMBER_GB: z.coerce.number().min(0).default(5),

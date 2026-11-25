@@ -269,7 +269,7 @@ export function BluenaDevice({ onClose, onSend, sendTo, onView }: { onClose: () 
             ✕
           </button>
         </header>
-        {/* R18: the room, calm and small (「ブルーナ：2.1GB / 5GB」) */}
+        {/* R18: the room, calm and small (a row of bags, 1袋 = 1GB; no numbers) */}
         <StorageBar className="-mt-1.5 mb-1.5 px-4" />
         {/* the search box, ★, 〔姿とバティ〕 */}
         <div className="pointer-events-auto flex items-center gap-1.5 px-4">

@@ -64,10 +64,10 @@ export interface StorageStore {
 export const storageFull = () => apiError(HttpStatus.PAYLOAD_TOO_LARGE, 'STORAGE_QUOTA', STORAGE_LINES.full);
 
 /**
- * R18 (client 2026-11-25, docs/マナの値段.md 13., docs/media.md): Bluena's room and 保存の魔法.
+ * R18 (client 2026-11-25, docs/マナの値段.md 13., docs/media.md): Bluena's room and ふくろの魔法.
  *  - the room: STORAGE_MEMBER_GB for a member, STORAGE_FREE_GB for everyone else, + the tier in effect; every stored
  *    file of the member and the text of their books / games count (used());
- *  - 保存の魔法: a tier bought with a yes (a full month, at the price {bati} said), renewed at the start of each month by
+ *  - ふくろの魔法: a tier bought with a yes (a full month, at the price {bati} said), renewed at the start of each month by
  *    the daily run (and when the member looks), 7 days of grace when the mana is short, then the tier lapses — no file
  *    is ever deleted; 「やめて」 ends it at the month's end;
  *  - over the room, new files and makings stop (STORAGE_QUOTA) until the member is under it;
@@ -202,7 +202,7 @@ export class StorageService implements OnModuleInit, OnModuleDestroy {
     return { status: r, view: await this.status(userId, now) };
   }
 
-  /** POST /storage/cancel: 「保存の魔法をやめて」 — the tier stays to the month's end, then lapses (no charge) */
+  /** POST /storage/cancel: 「ふくろの魔法をやめて」 — the tier stays to the month's end, then lapses (no charge) */
   async cancel(userId: string, now = new Date()): Promise<{ cancelled: boolean; view: StorageView }> {
     const plan = await this.store.plan(userId);
     if (!plan?.tierGb) return { cancelled: false, view: await this.status(userId, now) };

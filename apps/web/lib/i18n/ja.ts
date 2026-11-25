@@ -156,7 +156,7 @@ const ja = {
       'usage:video': 'つかったマナ（動画）',
       'usage:game': 'つかったマナ（ゲーム）',
       'usage:story': 'つかったマナ（お話）',
-      storage: '保存の魔法',
+      storage: 'ふくろの魔法',
       refund: '返金',
     } as Record<string, string>,
   },
