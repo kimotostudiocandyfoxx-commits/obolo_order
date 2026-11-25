@@ -115,6 +115,17 @@ describe.skipIf(!url)('on Postgres: goods, a game case, and a dachi work never o
     expect(await code(s.games.play(ids.stranger, w.game))).toBe('NOT_FOUND');
   });
 
+  it('item 2: a flown book is read live — a chapter written after it flew is there for the dachi, its home row is not a copy', async () => {
+    const s = svcs();
+    const b = await s.novels.chapter(ids.maker, { tags: spellFrom('novel', '魔法の森の猫') });
+    await s.novels.fly(ids.maker, b.id);
+    expect((await s.novels.read(ids.dachi, b.id)).chapters).toHaveLength(1);
+    await s.novels.chapter(ids.maker, { bookId: b.id, tags: spellFrom('chapter', '新しい仲間') });
+    expect((await s.novels.read(ids.dachi, b.id)).chapters).toHaveLength(2);
+    const home = await new PlanetHomeService(db).feed(ids.dachi, 'pluto');
+    expect(home.around.find((x) => x.id === b.id)).toMatchObject({ title: b.title });
+  });
+
   it('item 6: not flown (kept on the Moon) — only the maker; the dachi too gets 404', async () => {
     const s = svcs();
     const [b] = await db.write.insert(books).values({ userId: ids.maker, title: '月の本', spellJson: [], chaptersJson: [] }).returning();

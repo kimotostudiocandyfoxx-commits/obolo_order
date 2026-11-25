@@ -1,7 +1,7 @@
 import { HOME_PLANETS } from '@obolo/shared';
 import { describe, expect, it } from 'vitest';
 import { templateConfig } from './config';
-import { ALL_SEEN_FIVE, bookOpening, caseFace, FIVE, FIVE_HOLD_MS, FIVE_PLANETS, fiveTitleOf, fiveTitleStyle, FIVE_TITLE_DEFAULT, isAudioUrl, isFivePlanet, sampleArtIndex, SHELF_ASPECT, waveBars } from './five';
+import { ALL_SEEN_FIVE, bookOpening, caseFace, FIVE, FIVE_HOLD_MS, FIVE_PLANETS, fiveTitleOf, fiveTitleStyle, FIVE_TITLE_DEFAULT, goodsKindOfWork, isAudioUrl, isFivePlanet, sampleArtIndex, SHELF_ASPECT, waveBars } from './five';
 import { peopleOf } from './people';
 import { templateSample } from './sample';
 
@@ -68,5 +68,16 @@ describe('05 the five planets on the common template', () => {
     expect(mars.url).toMatch(/song-\d\.mp3$/);
     expect(mars.thumbUrl).toBe(`/planets/sample/art-${sampleArtIndex(0, 'MIKIE⭐︎DRILL')}.webp`);
     expect(templateSample('pluto').around[0].text).toContain('むかしむかし、MIKIE⭐︎DRILLが');
+  });
+  it('story 2026-11-25 Uranus: each goods item on its own kind (its words, else its main tag, else a tote); the sample shows all six', () => {
+    expect(goodsKindOfWork({ text: 'マグカップ' })).toBe('マグカップ');
+    expect(goodsKindOfWork({ text: '', tags: { main: '缶バッジ', moods: [], bpm: null } })).toBe('缶バッジ');
+    expect(goodsKindOfWork({ text: 'なにか' })).toBe('トート');
+    const kinds = new Set(templateSample('uranus').around.map((w) => goodsKindOfWork(w)));
+    expect(kinds.size).toBe(6);
+    // Neptune's sample: some cases with a member's art, some with the neon face
+    const cases = templateSample('neptune').around;
+    expect(cases.some((w) => w.thumbUrl)).toBe(true);
+    expect(cases.some((w) => !w.thumbUrl)).toBe(true);
   });
 });

@@ -154,7 +154,8 @@ export function WorkCard({
   const showMaking = making && page === vs.length;
 
   // §2: pointing
-  const aim = onAsk ? aimOf(shown) : null;
+  // story 2026-11-25: a goods item is not painted (nothing to point at and change: its kind and art are said in words)
+  const aim = onAsk && w.kind !== 'goods' ? aimOf(shown) : null;
   const [aiming, setAiming] = useState(false);
   const [target, setTarget] = useState<RefineTarget | null>(null);
   const [words, setWords] = useState('');
@@ -582,7 +583,12 @@ export function WorkThumb({ w }: { w: Work }) {
   const pic = w.image ?? w.poster ?? w.candidates?.[0]?.url;
   return (
     <span className="flex items-center gap-2 bg-[rgba(16,11,26,0.7)] p-1.5" data-testid="work-thumb">
-      {pic && !pic.startsWith('idb:') ? (
+      {w.kind === 'goods' && w.status === 'ready' && pic ? (
+        // story 2026-11-25: a goods item small on its own kind
+        <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-visible">
+          <GoodsMock kind={w.goods?.kind ?? 'トート'} art={pic} width={50} />
+        </span>
+      ) : pic && !pic.startsWith('idb:') ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={pic} alt="" className="h-14 w-14 shrink-0 rounded-lg object-cover" />
       ) : (

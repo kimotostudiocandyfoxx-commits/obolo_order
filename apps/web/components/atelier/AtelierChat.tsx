@@ -1372,6 +1372,11 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   };
   /** words after a book / a game: another kind asked for, or a new one of it — else a change (the next chapter, a tweak) */
   const craftAfter = (w: Work, text: string): boolean => {
+    // story 2026-11-25: 「ケースの絵を変えて」 — the case's picture again (before 絵 is read as a new art)
+    if (w.kind === 'game' && /ケース|カバー|パッケージ/.test(text)) {
+      void coverOffer(cardOf(w.id) ?? w);
+      return true;
+    }
     const it = detect(text, true, markNames());
     if (it.kind === 'find' || (it.kind === 'make' && it.what !== w.kind && it.what !== 'lookup')) return false;
     if (w.kind === 'video' && wantsNew(text) && !(it.kind === 'make' && it.what !== 'video')) {
@@ -1379,11 +1384,6 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       return true;
     }
     if (w.kind === 'video') return videoAfter(w, text);
-    // story 2026-11-25: 「ケースの絵を変えて」 — the case's picture again
-    if (w.kind === 'game' && /ケース|カバー|パッケージ/.test(text)) {
-      void coverOffer(cardOf(w.id) ?? w);
-      return true;
-    }
     if (it.kind === 'make' && it.what === w.kind && wantsNew(text)) {
       void craftAsk(craftBegin(w.kind as 'novel' | 'game', '', true));
       return true;

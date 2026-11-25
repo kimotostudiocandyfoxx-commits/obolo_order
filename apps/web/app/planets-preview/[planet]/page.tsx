@@ -55,7 +55,8 @@ function Preview() {
       const me = await api.me().catch(() => null);
       if (forced) return sample(me);
       const view = await api.planetHome(planet).catch(() => null);
-      if (!view || !view.live || !view.around.length) return sample(me);
+      // story 2026-11-25: your own flown works alone are real too (a member's first goods / books / games)
+      if (!view || !view.live || (!view.around.length && !view.own.length)) return sample(me);
       return { view, me: { name: me?.displayName || view.owner.name, figure: ownFigure(me?.planetFigures, planet), back: backOf(me), dance: me?.chibiPic ?? null, chibi: chibiOf(me, false) }, sample: false };
     })().then((d) => live && setData(d));
     return () => {
