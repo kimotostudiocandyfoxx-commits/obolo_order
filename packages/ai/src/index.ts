@@ -14,3 +14,4 @@ export * from './songEdit';
 export * from './batiPersona';
 export * from './talkBeats';
 export * from './kimorin';
+export * from './task';

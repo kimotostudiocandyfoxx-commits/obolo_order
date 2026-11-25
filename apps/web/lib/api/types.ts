@@ -1,3 +1,4 @@
+import type { BookView, GameBrokenBody, GameBuildBody, GameView, NovelChapterBody } from '@obolo/shared';
 import type { ClipFile, ClipStartBody, ClipUploadStart, ChangeResult, HomeOshi, HomePlanet, PlanetHomeView, AddVersionBody, CreateMoonWorkBody, DemoJobBody, MakeConfirm, MakeKind, SpellBody, SpellKind, SpellTag, SpellView, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiHistoryPage, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
 import type {
   MembersDay,
@@ -149,6 +150,17 @@ export interface Api {
   demoJob(body: DemoJobBody & { pay?: { kind: MakeKind; confirm: MakeConfirm; spell?: { kind: SpellKind; tags: SpellTag[] } } }): Promise<JobView>;
   /** R11: the spell (スペル) {bati} lays out for a paid making — fresh for the words, or changed by them */
   moonSpell(body: SpellBody): Promise<SpellView>;
+  /** client 2026-11-25 (本): a new book from its spell, or the next chapter from a chapter spell (free; capped a day) */
+  novelChapter(body: NovelChapterBody): Promise<BookView>;
+  books(): Promise<BookView[]>;
+  /** your own book, or one a ダチ sent you */
+  book(id: string): Promise<BookView>;
+  /** client 2026-11-25 (ゲーム): a game built / tweaked with the yes (a background job; its result is the game) */
+  gameBuild(body: GameBuildBody): Promise<JobView>;
+  /** your own game, or one a ダチ sent you (played in the sandbox) */
+  game(id: string): Promise<GameView>;
+  /** the version did not run in the sandbox: its mana back (soon after it was built, a few a day) */
+  gameBroken(id: string, body: GameBrokenBody): Promise<{ refunded: number }>;
   /** M-R253: the Moon atelier's works — tries inside one work, the face, material, where it was made */
   moonWorks(ids?: string[]): Promise<MoonWorkView[]>;
   createMoonWork(body: CreateMoonWorkBody): Promise<MoonWorkView>;

@@ -80,6 +80,15 @@ const Env = z.object({
   ANTHROPIC_API_KEY: secret(),
   /** a fixed model id (never an alias); default claude-haiku-5-5 */
   ANTHROPIC_MODEL: z.string().optional(),
+  /**
+   * client 2026-11-25: the models a book's chapters and a game's code are written with — a chain of provider:model
+   * (packages/ai task.ts; gemini / claude / openai), the next tried on a timeout or quota. Claude later = change these.
+   */
+  NOVEL_MODEL: z.string().default('gemini:gemini-2.5-flash,gemini:gemini-flash-latest'),
+  GAME_MODEL: z.string().default('gemini:gemini-2.5-pro,gemini:gemini-2.5-flash'),
+  /** a step of GAME_MODEL that takes longer than this gives way to the next (ms) */
+  GAME_MODEL_TIMEOUT_MS: z.coerce.number().min(10_000).max(600_000).default(150_000),
+  NOVEL_MODEL_TIMEOUT_MS: z.coerce.number().min(5_000).max(300_000).default(60_000),
 
   /** Stripe (the Eclipse day 7, ¥88/month). Without the secret key the payment runs in demo mode
    *  (no charge) — once it is set, POST /me/order is refused and only a paid Checkout counts. */

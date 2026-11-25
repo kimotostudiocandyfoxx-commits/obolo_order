@@ -14,7 +14,7 @@ import { getApi } from '@/lib/api';
 export type Watched = {
   jobId: string;
   /** what the finished job makes */
-  what: 'song' | 'video' | 'art' | 'voice' | 'demo';
+  what: 'song' | 'video' | 'art' | 'voice' | 'demo' | 'game';
   /** the card (its id is the work's; a redo keeps the work's id) */
   card: Work;
   talkId?: string;

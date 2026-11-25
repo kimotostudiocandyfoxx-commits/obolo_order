@@ -22,7 +22,7 @@ export type Plan = {
 
 const GENRE: Record<string, Genre> = { pop: 'pop', rock: 'rock', ballad: 'ballad', 'hip hop': 'hiphop', 'dance, EDM': 'edm' };
 /** the kinds whose making is a spell */
-export const spellKindOf = (kind: AtelierKind): SpellKind | null => (kind === 'song' || kind === 'art' || kind === 'video' || kind === 'look' || kind === 'bati' ? kind : null);
+export const spellKindOf = (kind: AtelierKind): SpellKind | null => (kind === 'song' || kind === 'art' || kind === 'video' || kind === 'look' || kind === 'bati' || kind === 'novel' || kind === 'game' ? kind : null);
 
 /** the plan for a spell as it is now */
 export function planOf(kind: AtelierKind, v: SpellView): Plan {

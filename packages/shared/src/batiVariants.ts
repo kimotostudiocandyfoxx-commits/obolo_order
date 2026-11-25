@@ -10,10 +10,13 @@
  * (「……{neo}！　よろしくね！」 and the role question), and the first {bati}'s answer to a wish that can not be (M-R230). The rare styles get theirs rewritten once at birth instead.
  */
 import type { BatiOrdinaryPersonality } from './batiPersona';
+import { CRAFT_VARIANTS } from './craftVariants';
 
 export type BatiVariantSet = Record<Exclude<BatiOrdinaryPersonality, 'genki'>, string>;
 
 export const BATI_VARIANTS: Record<string, BatiVariantSet> = {
+  // client 2026-11-25: the book and game lines (craftVariants.ts)
+  ...CRAFT_VARIANTS,
   "……やぁ！": {
     teinei: "……こんにちは！",
     kansai: "……まいど！",

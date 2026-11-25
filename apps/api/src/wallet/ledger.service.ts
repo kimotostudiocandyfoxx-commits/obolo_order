@@ -86,6 +86,28 @@ export class LedgerService {
     return tail;
   }
 
+  /** the delta of the ledger row with this idempotency key (none: undefined) */
+  protected async deltaOf(tx: Tx, key: string): Promise<number | undefined> {
+    const [row] = await tx.select({ delta: manaLedger.delta }).from(manaLedger).where(eq(manaLedger.idempotencyKey, key)).limit(1);
+    return row?.delta;
+  }
+
+  /**
+   * Client 2026-11-25 (ゲーム): the mana of one yes given back later (a background game build that failed, a game that
+   * does not run): only if that yes was charged, and only once (the refund row has its own idempotency key). Returns the
+   * mana given back (0: nothing to give back).
+   */
+  async refundYes(db: Database, userId: string, kind: MakeKind, confirm: MakeConfirm, refId?: string): Promise<number> {
+    const key = confirmKey(userId, kind, confirm);
+    return db.write.transaction(async (tx) => {
+      const charged = await this.deltaOf(tx, key);
+      if (charged == null || charged >= 0) return 0;
+      if ((await this.deltaOf(tx, `${key}:refund`)) != null) return 0;
+      await this.applyMana(tx, { userId, delta: -charged, reason: 'refund', idempotencyKey: `${key}:refund`, refType: kind, refId });
+      return -charged;
+    });
+  }
+
   /** the member's balance, the wallet row locked for this transaction (serialises a double tap) */
   protected async lockedBalance(tx: Tx, userId: string): Promise<number> {
     const [wallet] = await tx.select().from(wallets).where(eq(wallets.userId, userId)).for('update');

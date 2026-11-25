@@ -10,7 +10,7 @@ import { BATI_COLOR, batiLook, characterLook, SELF_COLOR, selfLook, selfTone } f
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { batiLine, batiLineVoiceOf } from '@/lib/onboarding/batiLine';
-import { atelierMakeCost, spellFrom, spellKey, type SpellTag, type SpellView, HOME_OF_WORK, PLANET_HOMES, TALK_BUBBLE_COLOUR, TALK_COLOR_KEY, type ChangeResult, type Me, changeableById, changeLines, changeRequest, etaMinutes, fillLine, homecomingSay, MOON_LINES, type RefineTarget, type WorkMaterial, batiDaysLeftLine, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId } from '@obolo/shared';
+import { atelierMakeCost, CRAFT_LINES, KIND_HOME_PLANET, spellFrom, spellKey, type SpellTag, type SpellView, HOME_OF_WORK, PLANET_HOMES, TALK_BUBBLE_COLOUR, TALK_COLOR_KEY, type ChangeResult, type Me, changeableById, changeLines, changeRequest, etaMinutes, fillLine, homecomingSay, MOON_LINES, type RefineTarget, type WorkMaterial, batiDaysLeftLine, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId } from '@obolo/shared';
 import { useMarkRing } from '@/components/finds/MarkRing';
 import { viewsOf } from '@/lib/story/views';
 import { markNames } from '@/lib/finds/marks';
@@ -40,11 +40,14 @@ import { faceTo, FLIES, uid, versionsOf, type Msg, type Work } from './work';
 import { isYes, planOf, spellKindOf, type Plan } from './plan';
 import { FloatingSpell, floatLayout, MANA_H, SpellRecord, type FloatSpell } from './FloatingSpell';
 import { spellLookFor } from './spellLooks';
+import { useGameBroken } from './GamePlay';
+import { craftAnswer, craftBegin, craftConfirmLine, craftDoneLines, craftSpellKind, craftStartLine, isCraftKind, wantsNew, type CraftAsk } from './craft';
 
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 const TAUGHT_KEY = 'obolo.atelier.taught';
-const PLANET_OF = { voice: 'saturn', art: 'jupiter', song: 'mercury', video: 'mars', radio: 'venus' } as Record<string, string>;
-const PLANET_WORD = { voice: '土星', art: '木星', song: '水星', video: '火星', radio: '金星' } as Record<string, string>;
+// client 2026-11-25: each kind's home planet from the one shared map
+const PLANET_OF = KIND_HOME_PLANET as Record<string, string>;
+const PLANET_WORD = Object.fromEntries(Object.entries(KIND_HOME_PLANET).map(([k, p]) => [k, PLANET_NAME[p]])) as Record<string, string>;
 const LESSON_OF: Partial<Record<AtelierKind, Lesson>> = { voice: 'voice', art: 'art', song: 'song', video: 'video', radio: 'radio' };
 // PLACEHOLDER (P-ATELIER-5): {bati}'s line when the words were not understood (iPad feedback: no longer the opening)
 const HELLO = 'なにをする？ ことばで頼んでね';
@@ -84,7 +87,8 @@ export function newTalk(me: Pick<Me, 'displayName' | 'bati'> | null | undefined,
 
 /** R11: a plan waiting for the member's yes (the message its card is on, what is made with it, its price) */
 type PlanAsk = { id: string; plan: Plan; prompt: string; prev?: Work; opts: MakeOpts; price: number };
-type Pending = { kind: AtelierKind } | { radioName: string } | { voiceAgain: true } | { use: AtelierKind; materials: Work[] } | { plan: PlanAsk } | null;
+/** client 2026-11-25: {bati}'s questions for a book / a game (`craft`), and a book / a game just made (its next words change it: `after`) */
+type Pending = { kind: AtelierKind } | { radioName: string } | { voiceAgain: true } | { use: AtelierKind; materials: Work[] } | { plan: PlanAsk } | { craft: CraftAsk } | { after: Work } | null;
 
 /** a fresh id for one yes (MakeConfirm.id: a UUID) */
 function yesId(): string {
@@ -270,8 +274,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
    * under them) and asks; a yes in words (「OK」「いいよ」「作って」) casts it, other words change it — no buttons.
    */
   const run = (kind: AtelierKind, prompt: string, prev?: Work, opts: MakeOpts = {}) => {
-    const cost = story?.test ? null : atelierMakeCost(kind, day);
-    if (!cost || opts.confirm) return start(kind, prompt, prev, opts);
+    const cost = story?.test ? null : atelierMakeCost(kind, day, kind === 'game' && !!prev);
+    if ((!cost && !(isCraftKind(kind) && !story)) || opts.confirm) return start(kind, prompt, prev, opts);
     if (!prev && !opts.materials?.length && isBare(prompt)) {
       setPending({ kind });
       return sayT(MOON_LINES.ask[kind as keyof typeof MOON_LINES.ask] ?? ASK[kind]);
@@ -289,27 +293,31 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
    * with a small record of it, and {bati}'s question 「このスペルで作る？　それとも、どこか変える？」
    */
   const propose = async (kind: AtelierKind, said: string, prev: Work | undefined, opts: MakeOpts, before?: PlanAsk, view?: SpellView) => {
-    const cost = atelierMakeCost(kind, day);
-    const sk = spellKindOf(kind);
+    // client 2026-11-25: a book's spell is free (no mana words), a game's tweak costs its own; a chapter has its own spell
+    const craft = isCraftKind(kind);
+    const cost = atelierMakeCost(kind, day, kind === 'game' && !!prev) ?? (craft ? { kind: 'game' as const, mana: 0 } : null);
+    const sk = craftSpellKind(kind, prev) ?? spellKindOf(kind);
     if (!cost || !sk) return start(kind, said, prev, opts);
     if (before) setMsgs((m) => m.map((x) => (x.id === before.id && x.who === 'bati' && x.plan ? { ...x, plan: { ...x.plan, done: 'changed' as const } } : x)));
     setBusy(true);
-    const asked = before ? said : prev ? `${prev.prompt}。${said}` : said;
+    const asked = before || craft ? said : prev ? `${prev.prompt}。${said}` : said;
+    // a game's change edits the spell it was cast with (「もっと難しく」); a chapter's spell is fresh from the words
+    const was = before ? before.plan.tags : kind === 'game' && prev?.spell?.length ? prev.spell : undefined;
     const v =
       view ??
       (await getApi()
-        .moonSpell({ kind: sk, said: asked.slice(0, 200), ...(before ? { tags: before.plan.tags } : {}) })
+        .moonSpell({ kind: sk, said: asked.slice(0, 200) || 'おまかせ', ...(was ? { tags: was } : {}) })
         .catch((): SpellView => (before ? { tags: before.plan.tags, added: [], removed: [] } : { tags: spellFrom(sk, asked), added: [], removed: [] })));
     const [have] = await Promise.all([manaNow()]);
     setBusy(false);
     const plan = planOf(kind, v);
     const id = uid();
     const text = tline(before ? MOON_LINES.replan : MOON_LINES.plan);
-    setMsgs((m) => [...m, { id, who: 'bati', text, plan: { kind, tags: plan.tags, price: cost.mana, have } }, { id: uid(), who: 'bati', text: tline(MOON_LINES.confirm) }]);
+    setMsgs((m) => [...m, { id, who: 'bati', text, plan: { kind, tags: plan.tags, price: cost.mana, have } }, { id: uid(), who: 'bati', text: tline(craft ? craftConfirmLine(kind, prev) : MOON_LINES.confirm) }]);
     setFloating((f) => ({ id: before && f ? f.id : id, kind, look: spellLookFor(kind), tags: plan.tags, removed: before ? plan.removed : [], price: cost.mana, have }));
     hinted.current.clear();
     // a redo is asked with the change's own words (the card's words carry over); a new one with the spell's
-    setPending({ plan: { id, plan, prompt: prev ? (before ? `${before.prompt}、${said}` : said) : plan.words, prev, opts, price: cost.mana } });
+    setPending({ plan: { id, plan, prompt: craft ? (before ? `${before.prompt}、${said}` : said) : prev ? (before ? `${before.prompt}、${said}` : said) : plan.words, prev, opts, price: cost.mana } });
   };
   /** the spell floating over the bowl (from its first showing through its changes, until it is cast) */
   const [floating, setFloating] = useState<FloatSpell | null>(null);
@@ -342,10 +350,10 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       window.dispatchEvent(new CustomEvent('obolo:nomana', { detail: { plain: true } }));
       return;
     }
-    sayT(MOON_LINES.start);
+    sayT(isCraftKind(pa.plan.kind) ? craftStartLine(pa.plan.kind) : MOON_LINES.start);
     castNow();
     castSpell();
-    const sk = spellKindOf(pa.plan.kind);
+    const sk = craftSpellKind(pa.plan.kind, pa.prev) ?? spellKindOf(pa.plan.kind);
     void start(pa.plan.kind, pa.prompt, pa.prev, { ...pa.opts, plan: pa.plan, confirm: { id: yesId(), price: pa.price, ...(sk ? { spell: spellKey(sk, pa.plan.tags) } : {}) } });
   };
 
@@ -357,6 +365,10 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       if (w.status === 'ready') line('saved');
       line('after');
       line('fix');
+    } else if (isCraftKind(w.kind) && w.status === 'ready') {
+      // client 2026-11-25: a chapter / a game made — {bati} asks what next; the next words change it (or start a new one)
+      for (const l of craftDoneLines(w)) sayT(l.text, l.vars);
+      if (!w.book?.done) setPending({ after: w });
     } else if (DONE[w.kind]) say(DONE[w.kind]);
     if (w.status === 'ready' && !story) void tipCheck();
   };
@@ -384,17 +396,27 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
           putLast(e.work);
           // ⑤ a slow one: {bati}'s word for coming back to it; a quick one: as any card
           if (e.w.toast && !story) sayT(nextLine('welcome', MOON_LINES.welcome));
-          else afterRef.current(e.work, e.w.words);
+          if (!(e.w.toast && !story) || isCraftKind(e.work.kind)) afterRef.current(e.work, e.w.words);
         } else if (e.kind === 'failed') {
           const before = e.w.card.versions?.length ? faceTo({ ...e.w.card, status: 'ready', job: undefined }, e.w.card.versions.length - 1) : { ...e.w.card, status: 'failed' as const, job: undefined, note: undefined };
-          put(before);
+          // a game that could not be made: the one before stays (its mana is back: the server gave it)
+          put(isCraftKind(e.w.card.kind) ? { ...e.w.card, status: e.w.card.game ? 'ready' : 'failed', job: undefined } : before);
           // ④ two failures in a row: the re-try stops
-          sayT(MOON_LINES.stop);
+          sayT(isCraftKind(e.w.card.kind) ? CRAFT_LINES.gameBroken : MOON_LINES.stop);
         }
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
+
+  // client 2026-11-25: the maker's game did not run in its sandbox → {bati} says so, and its mana goes back
+  useGameBroken((d) => {
+    if (story) return;
+    void getApi()
+      .gameBroken(d.gameId, { version: d.version, reason: d.reason })
+      .then((r) => sayTRef.current(r.refunded ? CRAFT_LINES.gameBroken : CRAFT_LINES.failed))
+      .catch(() => sayTRef.current(CRAFT_LINES.failed));
+  });
 
   /** a kind asked for (by words or a chip): locked → the day it opens; only its name → what should it be */
   const ask = (kind: AtelierKind, content: string) => {
@@ -404,6 +426,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       return line('open');
     }
     if (!isOpen(kind, day)) return setMsgs((m) => [...m, { id: uid(), who: 'bati', text: batiDaysLeftLine(batiVoice?.personality ?? 'genki', daysUntil(kind, day)) }]);
+    // client 2026-11-25: a book / a game starts with {bati}'s 2–4 short questions
+    if (isCraftKind(kind)) return craftAsk(craftBegin(kind, content, isBare(content)));
     // R11: one that spends mana: {bati}'s question or plan first (run)
     if (atelierMakeCost(kind, day)) return void run(kind, content);
     if (isBare(content)) {
@@ -504,6 +528,35 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     }
   };
 
+  /**
+   * client 2026-11-25 (本・ゲーム): {bati}'s next question (no buttons; the examples are in the sentence), or — the answers
+   * in — the spell distilled from them (its talismans float over the bowl; 「このスペルで作る？　それとも、どこか変える？」)
+   */
+  const craftAsk = async (a: CraftAsk) => {
+    if (a.left.length) {
+      setPending({ craft: a });
+      return sayT(a.left[0].text);
+    }
+    const said = a.answers.map((x) => x.said).join('。').slice(0, 200) || 'おまかせ';
+    setBusy(true);
+    const view = await getApi()
+      .moonSpell({ kind: a.kind, said, answers: a.answers })
+      .catch(() => null);
+    setBusy(false);
+    void propose(a.kind, said, undefined, {}, undefined, view ?? undefined);
+  };
+  /** words after a book / a game: another kind asked for, or a new one of it — else a change (the next chapter, a tweak) */
+  const craftAfter = (w: Work, text: string): boolean => {
+    const it = detect(text, true, markNames());
+    if (it.kind === 'find' || (it.kind === 'make' && it.what !== w.kind && it.what !== 'lookup')) return false;
+    if (it.kind === 'make' && it.what === w.kind && wantsNew(text)) {
+      void craftAsk(craftBegin(w.kind as 'novel' | 'game', '', true));
+      return true;
+    }
+    void run(w.kind, text, cardOf(w.id) ?? w);
+    return true;
+  };
+
   const send = (text: string) => {
     setMsgs((m) => [...m, { id: uid(), who: 'me', text }]);
     const p = pending;
@@ -518,6 +571,12 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       const w = msgs.find((m): m is Extract<Msg, { who: 'work' }> => m.who === 'work' && m.work.id === p.radioName)?.work;
       if (h && w) return void recorded({ ...w, title: text.slice(0, 40) }, h.blob, h.seconds);
     }
+    // client 2026-11-25: an answer to {bati}'s question for a book / a game (unless another kind is asked for)
+    if (p && 'craft' in p) {
+      const it = detect(text, false, markNames());
+      if (!(it.kind === 'make' && it.what !== p.craft.kind && it.what !== 'lookup') && it.kind !== 'find') return void craftAsk(craftAnswer(p.craft, text));
+    }
+    if (p && 'after' in p && !story && craftAfter(p.after, text)) return;
     // in a story step every message makes the day's kind again (a new card), unless it is a change of the last one
     if (story?.mode === 'make' && first && !p) {
       const last = lastWork();

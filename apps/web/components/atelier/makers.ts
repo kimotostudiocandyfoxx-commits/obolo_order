@@ -1,4 +1,4 @@
-import { KORORIN_VOICE_STYLE, neoVoiceUrl, withTarget, type JobView, type MakeConfirm, type Me, type RefineTarget, type WorkVersion } from '@obolo/shared';
+import { CRAFT_LINES, KIND_HOME_PLANET, spellFrom, KORORIN_VOICE_STYLE, neoVoiceUrl, withTarget, type JobView, type MakeConfirm, type Me, type RefineTarget, type WorkVersion } from '@obolo/shared';
 import { demoStickerArt } from '@/lib/look';
 import { ApiError, getApi } from '@/lib/api';
 import type { AtelierKind } from '@/lib/atelier/unlock';
@@ -7,6 +7,7 @@ import { workMarkRef } from '@/lib/finds/works';
 import { makeSong, pickGenre, songFromDesign, type MadeSong } from '@/lib/mercury/compose';
 import { dropShelf, LOCAL_KINDS, patchTalkWork, putShelf } from './shelf';
 import { stack, uid, type Version, type Work } from './work';
+import { bookCoverUrl, bookSub } from './BookRead';
 import { spellKindOf, type Plan } from './plan';
 
 /**
@@ -168,6 +169,20 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
     case 'radio':
       // a recorded show: the card records it (your songs + your voice), then it is kept
       return { ...base, status: 'record', title: (prompt || `${ctx.me?.displayName ?? ''}のラジオ`).slice(0, 40) };
+    case 'novel': {
+      // client 2026-11-25: a new book from its spell, or the next chapter (its own small spell) — free, written at once
+      const bookId = prev?.kind === 'novel' ? prev.ref?.bookId : undefined;
+      const tags = opts.plan?.tags ?? spellFrom(bookId ? 'chapter' : 'novel', said);
+      const b = await withTimeout(api.novelChapter({ bookId, tags, said: said.slice(0, 200) }), 120_000);
+      return { ...base, prompt: said, title: b.title, book: b, image: b.cover ?? bookCoverUrl(b.title, bookSub(b)), ref: { bookId: b.id }, spell: bookId ? prev?.spell : tags, home: KIND_HOME_PLANET.novel, saved: true };
+    }
+    case 'game': {
+      // client 2026-11-25: built in the background with the yes (12, then 3 a tweak); the job host finishes the card
+      const tags = opts.plan?.tags ?? spellFrom('game', said);
+      if (!opts.confirm) throw new ApiError(428, 'CONFIRM_REQUIRED', 'まだ、OKをもらってないよ。');
+      const job = await api.gameBuild({ gameId: prev?.kind === 'game' ? prev.ref?.gameId : undefined, tags, said: said.slice(0, 200), confirm: opts.confirm });
+      return { ...base, prompt: said, status: 'making', ref: prev?.ref, spell: tags, home: KIND_HOME_PLANET.game, started: { job, what: 'game', words: said } };
+    }
   }
 }
 
@@ -203,6 +218,10 @@ export async function finishJob(w: Watched, job: JobView, live = getApi().mode =
     } catch {
       /* the card only */
     }
+  } else if (w.what === 'game') {
+    const g = job.result?.game ?? (c.ref?.gameId ? await getApi().game(c.ref.gameId) : null);
+    if (!g) throw new Error('no game');
+    made = { ...base, title: g.title, game: g, ref: { gameId: g.id }, spell: g.tags, home: KIND_HOME_PLANET.game };
   } else made = base;
   const out = await keep(c.versions?.length ? c : undefined, { ...made, saved: true }, c.target);
   patchTalkWork(w.talkId, out);
@@ -234,6 +253,8 @@ const PLANET_KINDS: AtelierKind[] = ['voice', 'art', 'song', 'video', 'radio'];
  * the tries belong together (Bluena lists the face only). Device kinds are kept on the shelf with their tries.
  */
 export async function keep(base: Work | undefined, made: Work, target?: RefineTarget): Promise<Work> {
+  // client 2026-11-25: a book grows chapter by chapter and a game keeps its versions on the server: one face, no tries
+  if (made.kind === 'novel' || made.kind === 'game') return { ...made, id: base?.id ?? made.id, origin: base?.origin ?? made.origin, versions: undefined, active: undefined, job: undefined, target: undefined, saved: true };
   let w = stack(base, made, target);
   if (w.status !== 'ready' || w.ref?.test) return w;
   if (PLANET_KINDS.includes(w.kind)) {
@@ -352,5 +373,8 @@ export function failLine(e: unknown): string {
   if (code === 'NO_MANA' && e instanceof ApiError) return e.message;
   if (code === 'STORAGE_FULL') return 'ブルーナが、いっぱいみたい';
   if (code === 'DEMO') return 'これは、ここ（おためし）では作れないんだ';
+  if (code === 'CHAPTER_LIMIT') return CRAFT_LINES.chapterLimit;
+  if (code === 'BOOK_FULL') return CRAFT_LINES.bookFull;
+  if (code === 'NOVEL_FAILED' || code === 'VALIDATION') return CRAFT_LINES.failed;
   return 'うまくいかなかった。もう一回やってみよう';
 }

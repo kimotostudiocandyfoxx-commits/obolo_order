@@ -10,6 +10,8 @@ import { HoldMic, Wave } from './HoldMic';
 import { playClip, readyClip, type Clip } from '@/lib/voice/webVoice';
 import { DACHI_PAGE, DACHI_TEXT_MAX, TALK_FIXED_FACE_KEY } from '@obolo/shared';
 import { DeviceButton } from '@/components/atelier/DeviceButton';
+import { GameById } from '@/components/atelier/GamePlay';
+import { BookById } from '@/components/atelier/BookRead';
 import { clipItem } from '@/components/atelier/BluenaClip';
 import { clipsChanged, useClipSend } from '@/lib/clip/useClip';
 import type { Work } from '@/components/atelier/work';
@@ -362,6 +364,9 @@ function VoicePlay({ url, seconds, light }: { url: string | null; seconds: numbe
   );
 }
 
+const loadGame = (id: string) => getApi().game(id);
+const loadBook = (id: string) => getApi().book(id);
+
 /** a Bluena work sent as a card */
 function WorkCardView({ card, mine, big }: { card: DachiWorkCard; mine?: boolean; big?: boolean }) {
   const sound = card.kind === 'song' || card.kind === 'kororin' || card.kind === 'radio';
@@ -381,6 +386,10 @@ function WorkCardView({ card, mine, big }: { card: DachiWorkCard; mine?: boolean
             ▶ 見る
           </a>
         )}
+        {/* client 2026-11-25: a book is read, a game played (in the same sandbox) — opened big */}
+        {big && card.kind === 'game' && card.refId && <GameById id={card.refId} own={!!mine} load={loadGame} />}
+        {big && card.kind === 'book' && card.refId && <BookById id={card.refId} load={loadBook} />}
+        {!big && (card.kind === 'game' || card.kind === 'book') && card.refId && <p className="text-[11px] text-amber-100/70">{card.kind === 'game' ? '押して、遊ぶ' : '押して、読む'}</p>}
       </div>
     </div>
   );

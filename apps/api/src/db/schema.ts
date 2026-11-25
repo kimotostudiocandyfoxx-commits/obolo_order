@@ -8,7 +8,7 @@
  * planet tables carry created_at / updated_at / deleted_at (soft delete).
  */
 import { sql } from 'drizzle-orm';
-import type { AtelierLayout, BuddySource, PuniLook, TalkBeat, TalkFace, TalkMotion, WorkMaterial, WorkOrigin, WorkVersion } from '@obolo/shared';
+import type { AtelierLayout, BuddySource, ChapterView, PuniLook, SpellTag, TalkBeat, TalkFace, TalkMotion, WorkMaterial, WorkOrigin, WorkVersion } from '@obolo/shared';
 import {
   bigint,
   boolean,
@@ -935,6 +935,52 @@ export const moonWorks = pgTable(
     ...timestamps,
   },
   (t) => [index('moon_works_user_idx').on(t.userId, t.createdAt)],
+);
+
+/**
+ * Client 2026-11-25 (本): a book written chapter by chapter in the Moon atelier — its spell, its chapters (each with its
+ * own small spell), a painted cover when there is one. `home_planet` is where it will fly once that planet has its
+ * screen (KIND_HOME_PLANET: Pluto); `flown_at` stays empty until then.
+ */
+export const books = pgTable(
+  'books',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    title: text('title').notNull(),
+    spellJson: jsonb('spell_json').$type<SpellTag[]>().notNull(),
+    chaptersJson: jsonb('chapters_json').$type<(ChapterView & { summary: string })[]>().notNull().default([]),
+    coverUrl: text('cover_url'),
+    done: boolean('done').notNull().default(false),
+    homePlanet: text('home_planet').notNull().default('pluto'),
+    flownAt: timestamp('flown_at', { withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [index('books_user_idx').on(t.userId, t.createdAt)],
+);
+
+/**
+ * Client 2026-11-25 (ゲーム): a small game made in the Moon atelier — its versions (the code of each build / tweak, the
+ * spell it was cast with, the yes it was paid with), the face. Played in a sandbox in the app. Home: Neptune.
+ */
+export type GameVersionRow = { code: string; title: string; howTo: string; tags: SpellTag[]; at: string; confirmId: string; kind: 'game' | 'gameTweak'; broken?: boolean };
+export const games = pgTable(
+  'games',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    title: text('title').notNull(),
+    versionsJson: jsonb('versions_json').$type<GameVersionRow[]>().notNull().default([]),
+    active: integer('active').notNull().default(0),
+    homePlanet: text('home_planet').notNull().default('neptune'),
+    flownAt: timestamp('flown_at', { withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [index('games_user_idx').on(t.userId, t.createdAt)],
 );
 
 /** M-R253 §5: a flown work that came home and was told about ({bati}'s report is said once) */

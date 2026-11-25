@@ -1,4 +1,5 @@
 import type { PlanetWorkKind } from './flying';
+import { FLY_READY_KINDS, KIND_HOME_PLANET } from './finds';
 
 /**
  * 星のホーム: the one per-planet config (M-R258 §2 table; Saturn M-R257; Uranus / Pluto / Neptune M-R188・M-R189・M-R191).
@@ -285,4 +286,4 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
 };
 
 /** the planet whose home a work kind flies to (Moon atelier / Bluena 〔○○へ飛ばす〕) */
-export const HOME_OF_WORK: Record<string, HomePlanet> = { voice: 'saturn', art: 'jupiter', song: 'mercury', video: 'mars', radio: 'venus' };
+export const HOME_OF_WORK: Record<string, HomePlanet> = Object.fromEntries(FLY_READY_KINDS.map((k) => [k, KIND_HOME_PLANET[k]]));

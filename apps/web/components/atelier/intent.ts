@@ -16,6 +16,9 @@ const WORDS: [AtelierKind, RegExp][] = [
   ['song', /曲|歌|うた/],
   ['video', /映像|MV|ＭＶ|ムービー|動画/i],
   ['radio', /ラジオ|番組/],
+  // client 2026-11-25: a book (a story chapter by chapter) and a small game
+  ['novel', /小説|物語|ものがたり|お話(を|に|が|、|。|！|$)|おはなし(を|に|が|、|。|$)|(?<!日|見|絵)本(を|に|が|、|。|！|$)|ブック/],
+  ['game', /ゲーム/],
 ];
 
 const REFINE = /もっと|やり直|やりなお|ちがう|違う|変えて|かえて|にして|っぽく|明るく|暗く|元気に|静かに|かわいく|かっこよく|足して|入れて/;
@@ -89,6 +92,8 @@ export const KIND_WORD: Record<AtelierKind, string> = {
   song: '曲',
   video: '映像（MV）',
   radio: 'ラジオ番組',
+  novel: '本',
+  game: 'ゲーム',
 };
 
 /** the request names only the kind (「アートを作って」): {bati} asks what it should be */
@@ -113,6 +118,8 @@ export const ASK: Record<AtelierKind, string> = {
   song: 'どんな曲にする？ 歌にしたいことを話して',
   video: 'どんな映像にする？',
   radio: '番組の名前は？',
+  novel: 'どんなお話にする？',
+  game: 'どんなゲームにする？',
 };
 export const DONE: Record<AtelierKind, string> = {
   look: 'どう？ 気に入ったら〔これにする〕。「もっと…」で、まだ変えられるよ',
@@ -124,6 +131,9 @@ export const DONE: Record<AtelierKind, string> = {
   song: 'できたよ。聴いてみて。ブルーナにしまったよ',
   video: 'できたよ。ブルーナにしまったよ',
   radio: '準備できたよ。〔録る〕を押して、話してね',
+  // (books and games say CRAFT_LINES after they are made)
+  novel: '',
+  game: '',
 };
 
 /**

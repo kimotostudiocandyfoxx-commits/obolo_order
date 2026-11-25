@@ -155,6 +155,24 @@ export class HttpApi implements Api {
   moonSpell(body: Parameters<Api['moonSpell']>[0]) {
     return this.req<Awaited<ReturnType<Api['moonSpell']>>>('POST', '/moon/spell', body);
   }
+  novelChapter(body: Parameters<Api['novelChapter']>[0]) {
+    return this.req<Awaited<ReturnType<Api['novelChapter']>>>('POST', '/moon/novel/chapter', body);
+  }
+  books() {
+    return this.req<Awaited<ReturnType<Api['books']>>>('GET', '/moon/books');
+  }
+  book(id: string) {
+    return this.req<Awaited<ReturnType<Api['book']>>>('GET', `/moon/books/${id}`);
+  }
+  gameBuild(body: Parameters<Api['gameBuild']>[0]) {
+    return this.req<Awaited<ReturnType<Api['gameBuild']>>>('POST', '/moon/game', body);
+  }
+  game(id: string) {
+    return this.req<Awaited<ReturnType<Api['game']>>>('GET', `/moon/games/${id}`);
+  }
+  gameBroken(id: string, body: Parameters<Api['gameBroken']>[1]) {
+    return this.req<Awaited<ReturnType<Api['gameBroken']>>>('POST', `/moon/games/${id}/broken`, body);
+  }
   demoJob({ pay: _pay, ...body }: Parameters<Api['demoJob']>[0]) {
     return this.req<Awaited<ReturnType<Api['demoJob']>>>('POST', '/jobs/demo', body);
   }

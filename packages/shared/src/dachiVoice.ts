@@ -184,7 +184,7 @@ export function dachiZones<T extends { recent?: number; lastAt?: string | null }
 }
 
 /** A Bluena work sent as a card: 〔ダチへ〕's delivery shape, with Bluena's folders' kinds too (art, video, radio) */
-export const DACHI_WORK_KINDS = [...DELIVERY_KINDS, 'art', 'video', 'radio'] as const;
+export const DACHI_WORK_KINDS = [...DELIVERY_KINDS, 'art', 'video', 'radio', 'game'] as const;
 export type DachiWorkKind = (typeof DACHI_WORK_KINDS)[number];
 export const DachiWorkCard = z.object({
   kind: z.enum(DACHI_WORK_KINDS),

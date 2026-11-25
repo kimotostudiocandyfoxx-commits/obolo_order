@@ -19,7 +19,7 @@ import {
 } from '@obolo/shared';
 import { and, desc, eq, isNotNull, isNull, sql, type SQL } from 'drizzle-orm';
 import { Database } from '../db/db';
-import { buddyMessages, itemMarks, jupiterRoots, marsBackstage, radioShows, saturnPosts, songs, users } from '../db/schema';
+import { books, buddyMessages, games, itemMarks, jupiterRoots, marsBackstage, radioShows, saturnPosts, songs, users } from '../db/schema';
 import { DachiVoiceService } from '../dachi/dachi-voice.service';
 import { MoonWorksService } from '../moon/moon-works.service';
 
@@ -138,7 +138,27 @@ export class FindsService {
           .limit(LIMIT)
           .then((rows) => rows.map((r) => this.w('radio_show', r.id, 'venus', r.title, r.createdAt, { audio: r.audioUrl, image: r.thumbUrl, flown: r.status === 'public' }))),
       );
-    // グッズ・物語・ゲーム: nothing is made there yet
+    // client 2026-11-25: books (Pluto) and games (Neptune) made on the Moon; グッズ: nothing is made there yet
+    if (want('pluto'))
+      jobs.push(
+        this.db.read
+          .select()
+          .from(books)
+          .where(and(eq(books.userId, userId), isNull(books.deletedAt), q ? sql`(${books.title} ILIKE ${q} OR ${books.chaptersJson}::text ILIKE ${q})` : undefined))
+          .orderBy(desc(books.createdAt))
+          .limit(LIMIT)
+          .then((rows) => rows.map((r) => this.w('book', r.id, 'pluto', r.title, r.createdAt, { image: r.coverUrl, flown: !!r.flownAt }))),
+      );
+    if (want('neptune'))
+      jobs.push(
+        this.db.read
+          .select()
+          .from(games)
+          .where(and(eq(games.userId, userId), isNull(games.deletedAt), ilike(games.title)))
+          .orderBy(desc(games.createdAt))
+          .limit(LIMIT)
+          .then((rows) => rows.map((r) => this.w('game', r.id, 'neptune', r.title, r.createdAt, { flown: !!r.flownAt }))),
+      );
     const empty = { hidden: new Set<string>(), faces: new Map() } as Awaited<ReturnType<MoonWorksService['index']>>;
     const [lists, marks, moon] = await Promise.all([Promise.all(jobs), this.markMap(userId), this.moon?.index(userId).catch(() => empty) ?? empty]);
     return lists

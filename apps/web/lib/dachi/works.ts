@@ -44,21 +44,23 @@ export const WORK_WORD: Record<DachiWorkCard['kind'], string> = {
   art: 'アート',
   video: '映像',
   radio: 'ラジオ',
+  game: 'ゲーム',
 };
 
 /**
  * R10: a work from the Bluena device (〔送る〕 in a ダチ talk) as a card: its kind in the card's words, its title or words,
  * the sound / picture / film where it is on the web, its own id where it has one.
  */
-const CARD_KIND: Record<string, DachiWorkCard['kind']> = { voice: 'kororin', art: 'art', song: 'song', video: 'mv', radio: 'radio', look: 'art', bati: 'art', image: 'art', lookup: 'art' };
+const CARD_KIND: Record<string, DachiWorkCard['kind']> = { voice: 'kororin', art: 'art', song: 'song', video: 'mv', radio: 'radio', look: 'art', bati: 'art', image: 'art', lookup: 'art', novel: 'book', game: 'game' };
 export function workCard(w: { kind: string; title?: string; text?: string; prompt?: string; audio?: string | null; video?: string | null; image?: string | null; poster?: string | null; ref?: Record<string, unknown> }): DachiWorkCard {
   const ref = w.ref ?? {};
-  const id = [ref.postId, ref.rootId, ref.songId, ref.backstageId, ref.showId].find((x): x is string => typeof x === 'string');
+  // client 2026-11-25: a book / a game goes by its id (the ダチ reads / plays it from the server, in the same sandbox)
+  const id = [ref.bookId, ref.gameId, ref.postId, ref.rootId, ref.songId, ref.backstageId, ref.showId].find((x): x is string => typeof x === 'string');
   return {
     kind: CARD_KIND[w.kind] ?? 'art',
     title: (w.title ?? '').slice(0, 60),
     text: (w.text ?? (w.title ? '' : w.prompt) ?? '').slice(0, 200),
-    url: web(w.video ?? w.audio ?? w.image),
+    url: w.kind === 'novel' || w.kind === 'game' ? undefined : web(w.video ?? w.audio ?? w.image),
     posterUrl: web(w.poster ?? (w.video ? w.image : undefined)),
     refId: id ? uuid(id) : undefined,
   };

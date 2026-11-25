@@ -61,6 +61,16 @@ import {
   spellEdit,
   spellFrom,
   spellKey,
+  spellOfAnswers,
+  demoChapter,
+  demoGame,
+  isFinalChapter,
+  NOVEL_CHAPTERS_PER_DAY,
+  NOVEL_MAX_CHAPTERS,
+  KIND_HOME_PLANET,
+  type BookView,
+  type GameView,
+  type SpellTag,
   type SpellKind,
   decideCharge,
   type MakeConfirm,
@@ -222,7 +232,12 @@ interface DemoState {
   /** M-R253 §4: the review's stand-in jobs (they only take their time; `lateBy` s more than said, the first `failTimes` fail) */
   /** R11: the yeses already charged (MakeConfirm's ledger key → the stand-in job it started, '' for none) */
   paidYes?: Record<string, string>;
-  djobs?: Record<string, { owner: string; seconds: number; lateBy: number; failTimes: number; start: number; attempts: number; eta: number; late: boolean; retrying: boolean; createdAt: string; done?: boolean }>;
+  djobs?: Record<string, { owner: string; seconds: number; lateBy: number; failTimes: number; start: number; attempts: number; eta: number; late: boolean; retrying: boolean; createdAt: string; done?: boolean; /** a game being built (its result is the game) */ game?: { gameId?: string; tags: SpellTag[]; madeId?: string } }>;
+  /** client 2026-11-25: the demo's books and games (canned chapters / the canned game, no model) */
+  books?: (BookView & { owner: string })[];
+  games?: (GameView & { owner: string; versions: { tags: SpellTag[]; code: string; title: string; howTo: string }[] })[];
+  /** chapters written per member and day */
+  chapterDays?: Record<string, number>;
   /** M-R253: the Moon atelier's works (tries inside one work) */
   moonWorks?: (MoonWorkView & { owner: string })[];
   /** M-R253 §5: homecomings told (`owner|key`) */
@@ -378,6 +393,9 @@ export class DemoApi implements Api {
     if (want('jupiter')) for (const r of (await this.jupiterRoots()).filter((x) => x.kind === 'photo')) out.push(w({ kind: 'jupiter_root', id: r.id, planet: 'jupiter', title: '', image: r.url, createdAt: r.createdAt }));
     if (want('mars')) for (const v of await this.marsBackstage()) out.push(w({ kind: 'mars_backstage', id: v.id, planet: 'mars', title: v.title, video: v.url, image: v.posterUrl, createdAt: v.createdAt }));
     if (want('venus')) for (const r of await this.myRadioShows()) out.push(w({ kind: 'radio_show', id: r.id, planet: 'venus', title: r.title, audio: r.audioUrl, image: r.thumbUrl, createdAt: r.createdAt, flown: r.status === 'public' }));
+    // client 2026-11-25: books (Pluto) and games (Neptune)
+    if (want('pluto')) for (const b of (this.s.books ?? []).filter((x) => x.owner === me)) out.push(w({ kind: 'book', id: b.id, planet: 'pluto', title: b.title, image: b.cover, createdAt: b.createdAt }));
+    if (want('neptune')) for (const g of (this.s.games ?? []).filter((x) => x.owner === me)) out.push(w({ kind: 'game', id: g.id, planet: 'neptune', title: g.title, createdAt: g.createdAt }));
     const q = f.q?.trim().toLowerCase();
     // M-R253 §1: a work's other tries are inside it, not listed
     const moon = await this.moonWorks();
@@ -807,7 +825,7 @@ export class DemoApi implements Api {
     const j = this.s.djobs?.[id];
     if (!j || j.owner !== this.uid()) throw new ApiError(404, 'NOT_FOUND', 'Job not found');
     const now = Date.now();
-    const view = (status: JobView['status']): JobView => ({ id, kind: 'demo', status, stage: j.retrying ? 'retrying' : 'waiting', result: status === 'done' ? { demo: { seconds: j.seconds } } : null, errorCode: null, error: null, createdAt: j.createdAt, etaAt: new Date(j.eta).toISOString(), startedAt: new Date(j.start).toISOString(), attempts: j.attempts, late: j.late, retrying: j.retrying });
+    const view = (status: JobView['status']): JobView => ({ id, kind: j.game ? 'game' : 'demo', status, stage: j.retrying ? 'retrying' : 'waiting', result: status === 'done' ? (j.game ? { game: this.gameOf(j.game.madeId!) } : { demo: { seconds: j.seconds } }) : null, errorCode: null, error: null, createdAt: j.createdAt, etaAt: new Date(j.eta).toISOString(), startedAt: new Date(j.start).toISOString(), attempts: j.attempts, late: j.late, retrying: j.retrying });
     if (j.done) return view('done');
     if (now - j.start < (j.seconds + j.lateBy) * 1000) {
       const l = lateEta(j.eta, now);
@@ -822,8 +840,97 @@ export class DemoApi implements Api {
       return view('running');
     }
     j.done = true;
+    if (j.game && !j.game.madeId) j.game.madeId = this.buildDemoGame(j.owner, j.game.tags, j.game.gameId);
     this.save();
     return view('done');
+  }
+
+  // client 2026-11-25: books and games in the demo — the canned chapters and the canned game (no model)
+  private gameOf(id: string): GameView {
+    const g = (this.s.games ?? []).find((x) => x.id === id);
+    if (!g) throw new ApiError(404, 'NOT_FOUND', 'Game not found');
+    const { owner: _o, versions: _v, ...view } = g;
+    return view;
+  }
+  private buildDemoGame(owner: string, tags: SpellTag[], gameId?: string): string {
+    const made = demoGame(tags);
+    const at = now();
+    const list = (this.s.games ??= []);
+    const old = gameId ? list.find((x) => x.id === gameId && x.owner === owner) : undefined;
+    if (old) {
+      old.versions = [...old.versions, { ...made, tags }].slice(-8);
+      Object.assign(old, { ...made, tags, version: old.versions.length - 1, updatedAt: at });
+      return old.id;
+    }
+    const id = uid();
+    list.unshift({ id, owner, ...made, tags, version: 0, home: KIND_HOME_PLANET.game, createdAt: at, updatedAt: at, versions: [{ ...made, tags }] });
+    return id;
+  }
+  async novelChapter(body: Parameters<Api['novelChapter']>[0]): Promise<BookView> {
+    const me = this.uid();
+    const day = `${me}|${new Date().toDateString()}`;
+    const n0 = (this.s.chapterDays ?? {})[day] ?? 0;
+    if (n0 >= NOVEL_CHAPTERS_PER_DAY) throw new ApiError(429, 'CHAPTER_LIMIT', '今日は、もうたくさん書いたね');
+    const list = (this.s.books ??= []);
+    const book = body.bookId ? list.find((b) => b.id === body.bookId && b.owner === me) : undefined;
+    if (body.bookId && !book) throw new ApiError(404, 'NOT_FOUND', 'Book not found');
+    if (book && (book.done || book.chapters.length >= NOVEL_MAX_CHAPTERS)) throw new ApiError(409, 'BOOK_FULL', 'この本は、もういっぱい');
+    // the pen takes a moment (the bowl glows meanwhile)
+    await sleep(2600);
+    this.s.chapterDays = { ...(this.s.chapterDays ?? {}), [day]: n0 + 1 };
+    const tags = book ? book.tags : body.tags;
+    const n = (book?.chapters.length ?? 0) + 1;
+    const final = !!book && isFinalChapter(body.tags);
+    const c = demoChapter(tags, n, final);
+    const at = now();
+    const ch = { n, title: c.title, text: c.text, tags: body.tags, at };
+    let out: BookView & { owner: string };
+    if (book) {
+      Object.assign(book, { chapters: [...book.chapters, ch], done: final, updatedAt: at });
+      out = book;
+    } else {
+      out = { id: uid(), owner: me, title: c.bookTitle, tags, cover: null, chapters: [ch], done: false, home: KIND_HOME_PLANET.novel, createdAt: at, updatedAt: at };
+      list.unshift(out);
+    }
+    this.save();
+    const { owner: _o, ...view } = out;
+    return structuredClone(view);
+  }
+  async books(): Promise<BookView[]> {
+    const me = this.uid();
+    return (this.s.books ?? []).filter((b) => b.owner === me).map(({ owner: _o, ...b }) => b);
+  }
+  async book(id: string): Promise<BookView> {
+    const b = (this.s.books ?? []).find((x) => x.id === id);
+    if (!b) throw new ApiError(404, 'NOT_FOUND', 'Book not found');
+    const { owner: _o, ...view } = b;
+    return view;
+  }
+  async gameBuild(body: Parameters<Api['gameBuild']>[0]): Promise<JobView> {
+    const kind = body.gameId ? 'gameTweak' : 'game';
+    const key = this.charge(kind, { confirm: body.confirm, spell: body.tags }, true, 'game');
+    if (key && this.s.paidYes?.[key]) return this.getJob(this.s.paidYes[key]);
+    const id = uid();
+    if (key) this.s.paidYes = { ...(this.s.paidYes ?? {}), [key]: id };
+    const t = Date.now();
+    // a stand-in for the model's time: long enough for {bati}'s 「このトークに戻ってきてね」
+    const seconds = body.gameId ? 34 : 40;
+    this.s.djobs = { ...(this.s.djobs ?? {}), [id]: { owner: this.uid(), seconds, lateBy: 0, failTimes: 0, start: t, attempts: 1, eta: t + seconds * 1000, late: false, retrying: false, createdAt: new Date(t).toISOString(), game: { gameId: body.gameId, tags: body.tags } } };
+    this.save();
+    return this.getJob(id);
+  }
+  async game(id: string): Promise<GameView> {
+    return this.gameOf(id);
+  }
+  async gameBroken(id: string, body: Parameters<Api['gameBroken']>[1]): Promise<{ refunded: number }> {
+    const g = (this.s.games ?? []).find((x) => x.id === id && x.owner === this.uid());
+    if (!g || body.version !== g.version) return { refunded: 0 };
+    const amount = MAKE_COST[g.version ? 'gameTweak' : 'game'];
+    const w = this.s.wallets[this.uid()];
+    w.mana += amount;
+    w.entries.push({ id: uid(), delta: amount, reason: 'refund', createdAt: now() });
+    this.save();
+    return { refunded: amount };
   }
 
   async activeJobs() {
@@ -836,7 +943,7 @@ export class DemoApi implements Api {
   // R11: the spell by the shared rules (the API's model only adds English for free words)
   async moonSpell(body: Parameters<Api['moonSpell']>[0]) {
     await sleep(250);
-    return body.tags?.length ? spellEdit(body.kind, body.tags, body.said) : { tags: spellFrom(body.kind, body.said), added: [], removed: [] };
+    return body.tags?.length ? spellEdit(body.kind, body.tags, body.said) : { tags: body.answers?.length ? spellOfAnswers(body.kind, body.answers) : spellFrom(body.kind, body.said), added: [], removed: [] };
   }
 
   async demoJob(body: Parameters<Api['demoJob']>[0] & { lateBy?: number }): Promise<JobView> {

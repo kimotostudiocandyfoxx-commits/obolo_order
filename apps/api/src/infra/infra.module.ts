@@ -1,11 +1,11 @@
 import { Global, Inject, Logger, Module, OnApplicationShutdown } from '@nestjs/common';
-import { createBuddyLlm, createImageProvider, createLookImageProvider, createLlm, LlmProvider } from '@obolo/ai';
+import { createBuddyLlm, createImageProvider, createLookImageProvider, createLlm, createTaskLlm, LlmProvider } from '@obolo/ai';
 import { AppConfig, CONFIG, loadConfig } from '../config';
 import { Database } from '../db/db';
 import { createEmailSender } from './email';
 import { createKv, KvStore } from './kv';
 import { BullQueue, CloudTasksQueue, InlineQueue, JobQueue } from './queue';
-import { BUDDY_LLM, EMAIL, IMAGES, KV, LLM, LOOK_IMAGES, QUEUE } from './tokens';
+import { BUDDY_LLM, EMAIL, GAME_LLM, IMAGES, KV, LLM, LOOK_IMAGES, NOVEL_LLM, QUEUE } from './tokens';
 
 @Global()
 @Module({
@@ -75,8 +75,29 @@ import { BUDDY_LLM, EMAIL, IMAGES, KV, LLM, LOOK_IMAGES, QUEUE } from './tokens'
         return llm;
       },
     },
+    // client 2026-11-25: a book's chapters and a game's code, each on its own model chain (NOVEL_MODEL / GAME_MODEL)
+    {
+      provide: NOVEL_LLM,
+      inject: [CONFIG],
+      useFactory: (c: AppConfig): LlmProvider => {
+        const log = new Logger('LLM');
+        const llm = createTaskLlm(c.NOVEL_MODEL, { geminiApiKey: c.GEMINI_API_KEY, anthropicApiKey: c.ANTHROPIC_API_KEY, openaiApiKey: c.OPENAI_API_KEY }, { timeoutMs: c.NOVEL_MODEL_TIMEOUT_MS, onError: (p, e) => log.warn(`novel: ${p} failed, next: ${String(e)}`) });
+        log.log(`novel chain: ${llm.name}`);
+        return llm;
+      },
+    },
+    {
+      provide: GAME_LLM,
+      inject: [CONFIG],
+      useFactory: (c: AppConfig): LlmProvider => {
+        const log = new Logger('LLM');
+        const llm = createTaskLlm(c.GAME_MODEL, { geminiApiKey: c.GEMINI_API_KEY, anthropicApiKey: c.ANTHROPIC_API_KEY, openaiApiKey: c.OPENAI_API_KEY }, { timeoutMs: c.GAME_MODEL_TIMEOUT_MS, onError: (p, e) => log.warn(`game: ${p} failed, next: ${String(e)}`) });
+        log.log(`game chain: ${llm.name}`);
+        return llm;
+      },
+    },
   ],
-  exports: [CONFIG, Database, KV, QUEUE, EMAIL, LLM, BUDDY_LLM, IMAGES, LOOK_IMAGES],
+  exports: [CONFIG, Database, KV, QUEUE, EMAIL, LLM, BUDDY_LLM, NOVEL_LLM, GAME_LLM, IMAGES, LOOK_IMAGES],
 })
 export class InfraModule implements OnApplicationShutdown {
   constructor(

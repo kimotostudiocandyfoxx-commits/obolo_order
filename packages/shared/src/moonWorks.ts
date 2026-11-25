@@ -19,7 +19,7 @@ import { BATI_VARIANTS, type BatiVariantSet } from './batiVariants';
 // --- 1. versions ------------------------------------------------------------------------------------------------
 
 /** what the Moon atelier makes (the web's AtelierKind) */
-export const MOON_WORK_KINDS = ['look', 'bati', 'lookup', 'image', 'voice', 'art', 'song', 'video', 'radio'] as const;
+export const MOON_WORK_KINDS = ['look', 'bati', 'lookup', 'image', 'voice', 'art', 'song', 'video', 'radio', 'novel', 'game'] as const;
 export type MoonWorkKind = (typeof MOON_WORK_KINDS)[number];
 /** tries kept in one work (the oldest goes first when there are more) */
 export const MAX_VERSIONS = 12;
@@ -173,10 +173,10 @@ export function withTarget(prompt: string, t?: RefineTarget | null): string {
 // --- 4. how long it takes -----------------------------------------------------------------------------------------
 
 /** what is timed: the generations people wait for (demo = the review page's stand-in jobs) */
-export const ETA_KINDS = ['song', 'mv', 'radio', 'art', 'voice', 'look', 'demo'] as const;
+export const ETA_KINDS = ['song', 'mv', 'radio', 'art', 'voice', 'look', 'demo', 'game'] as const;
 export type EtaKind = (typeof ETA_KINDS)[number];
 /** the table the estimate starts from (ms); recent real times pull it toward what it takes now */
-export const ETA_BASE_MS: Record<EtaKind, number> = { song: 240_000, mv: 210_000, radio: 20_000, art: 18_000, voice: 6_000, look: 15_000, demo: 20_000 };
+export const ETA_BASE_MS: Record<EtaKind, number> = { song: 240_000, mv: 210_000, radio: 20_000, art: 18_000, voice: 6_000, look: 15_000, demo: 20_000, game: 60_000 };
 /** at or under this, {bati} says no time: you wait in place */
 export const QUICK_MS = 30_000;
 /** when it will be late, {bati} says so first and gives this much more */

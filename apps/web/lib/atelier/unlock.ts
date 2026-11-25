@@ -5,7 +5,8 @@ import { JOURNEY_DONE } from '@obolo/shared';
  *   2 your look (プロフィールの姿) · {bati}'s dress-up / 変身 · lookups (調べもの) · showing pictures ·
  *   3 コロリン · 4 アート · 5 曲 · 6 映像 (MV) · 7 金星のラジオ (a recorded show).
  * After the journey (journeyDay ≥ JOURNEY_DONE) everything is open. A member who joined early is on the same day
- * schedule (only journeyDay counts). グッズ・本・ゲーム are the members' later planets: not made here yet.
+ * schedule (only journeyDay counts). Client 2026-11-25: 本 (novel) and ゲーム open after the journey (JOURNEY_DONE),
+ * with the members' later planets they belong to (Pluto, Neptune); グッズ is not made here yet.
  */
 export const UNLOCK_DAY = {
   look: 2,
@@ -17,6 +18,8 @@ export const UNLOCK_DAY = {
   song: 5,
   video: 6,
   radio: 7,
+  novel: JOURNEY_DONE,
+  game: JOURNEY_DONE,
 } as const;
 
 export type AtelierKind = keyof typeof UNLOCK_DAY;

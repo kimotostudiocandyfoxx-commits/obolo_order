@@ -1,12 +1,13 @@
 import { z } from 'zod';
 import type { MvProjectView } from './mv';
 import type { SongView } from './types';
+import type { GameView } from './craft';
 
 /**
  * Long work done in the background (2026-10-09: 受付 → 順番に処理 → できたら通知): the app starts
  * it, polls GET /jobs/:id, and gets a push when it is done.
  */
-export type JobKind = 'song' | 'mv-story' | 'mv-lyrics' | 'demo';
+export type JobKind = 'song' | 'mv-story' | 'mv-lyrics' | 'demo' | 'game';
 
 /** M-R253 §4: a review stand-in job (no AI): it takes `seconds`, the first `failTimes` tries fail (to show the re-try) */
 export const DemoJobBody = z.object({ seconds: z.number().int().min(3).max(240), failTimes: z.number().int().min(0).max(2).default(0) });
@@ -18,7 +19,7 @@ export interface JobView {
   status: 'queued' | 'running' | 'done' | 'failed';
   /** where the work is: warming (the GPU studio wakes up) | singing | painting | lyrics */
   stage: string | null;
-  result: { song?: SongView; mv?: MvProjectView; demo?: { seconds: number } } | null;
+  result: { song?: SongView; mv?: MvProjectView; demo?: { seconds: number }; /** client 2026-11-25: a game built (its face) */ game?: GameView } | null;
   errorCode: string | null;
   error: string | null;
   createdAt: string;

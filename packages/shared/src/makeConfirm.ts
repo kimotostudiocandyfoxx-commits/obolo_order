@@ -21,9 +21,10 @@ export type MakeConfirm = z.infer<typeof MakeConfirm>;
  * What a making in the Moon atelier costs (MAKE_COST), or null when it is free. Free: the kororin (a voice), the radio
  * show, lookups, pictures found. The look and {bati}'s dress-up are free during the first journey (the API's rule).
  */
-export function atelierMakeCost(kind: string, journeyDay: number | null | undefined): { kind: MakeKind; mana: number } | null {
+export function atelierMakeCost(kind: string, journeyDay: number | null | undefined, /** a game recast / tweaked (not its first build) */ recast = false): { kind: MakeKind; mana: number } | null {
   const done = (journeyDay ?? JOURNEY_DONE) >= JOURNEY_DONE;
-  const k: MakeKind | null = kind === 'song' ? 'song' : kind === 'art' ? 'jacketArt' : kind === 'video' ? 'mv' : (kind === 'look' || kind === 'bati') && done ? 'look' : null;
+  // client 2026-11-25: a game spends mana (its first build, then each tweak); a book's chapters are free ('novel': null)
+  const k: MakeKind | null = kind === 'song' ? 'song' : kind === 'art' ? 'jacketArt' : kind === 'video' ? 'mv' : kind === 'game' ? (recast ? 'gameTweak' : 'game') : (kind === 'look' || kind === 'bati') && done ? 'look' : null;
   return k ? { kind: k, mana: MAKE_COST[k] } : null;
 }
 

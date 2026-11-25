@@ -1,15 +1,18 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import type { LlmProvider } from '@obolo/ai';
-import { spellEdit, spellFrom, spellNormalize, type SpellBody, type SpellKind, type SpellTag, type SpellView } from '@obolo/shared';
+import { SPELL_MAX_TAGS, spellEdit, spellFrom, spellNormalize, spellOfAnswers, type SpellBody, type SpellKind, type SpellTag, type SpellView } from '@obolo/shared';
 import { LLM } from '../infra/tokens';
 
-const WHAT: Record<SpellKind, string> = { song: 'a song', art: 'a picture', video: 'a music video', look: "the member's own look", bati: "the buddy's outfit" };
+const WHAT: Record<SpellKind, string> = { song: 'a song', art: 'a picture', video: 'a music video', look: "the member's own look", bati: "the buddy's outfit", novel: 'a serial novel for teenagers (its world, hero, tone, length)', chapter: "the next chapter of a novel (what happens, its mood, a new character)", game: 'a tiny HTML5 canvas game (its genre, hero, rules, goal, difficulty, look)' };
 const GROUPS: Record<SpellKind, string> = {
   song: 'theme, genre, mood, tempo, instrument, voice',
   art: 'theme, style, mood, color, light, composition',
   video: 'theme, style, mood, light, camera',
   look: 'theme, wear, style, color',
   bati: 'theme, wear, style, color',
+  novel: 'world, hero, genre, mood, length, theme',
+  chapter: 'event, mood, hero, theme',
+  game: 'genre, hero, rule, goal, level, color, style, theme',
 };
 
 /** the model's part of a spell: English for the free words, and a few more tags that fit (the rules' tags stay) */
@@ -32,7 +35,7 @@ export class SpellService {
   constructor(@Inject(LLM) private readonly llm: LlmProvider) {}
 
   async spell(b: SpellBody): Promise<SpellView> {
-    const base: SpellView = b.tags?.length ? spellEdit(b.kind, b.tags, b.said) : { tags: spellFrom(b.kind, b.said), added: [], removed: [] };
+    const base: SpellView = b.tags?.length ? spellEdit(b.kind, b.tags, b.said) : { tags: b.answers?.length ? spellOfAnswers(b.kind, b.answers) : spellFrom(b.kind, b.said), added: [], removed: [] };
     // an edit that only took tags off needs nothing more
     const free = base.tags.filter((t) => t.en === t.ja || /[^\x20-\x7e]/.test(t.en));
     if (b.tags?.length && !free.length) return base;
@@ -59,5 +62,8 @@ export function mergeSpell(kind: SpellKind, base: SpellView, pairs: unknown, ext
   };
   const tags = base.tags.map(english);
   const more = extras ? got.filter((g) => !tags.some((t) => t.ja === g.ja || t.en.toLowerCase() === g.en.toLowerCase() || (t.group === g.group && ['genre', 'tempo', 'voice', 'style', 'composition', 'camera'].includes(g.group)))).slice(0, 3) : [];
-  return { tags: [...tags, ...more].slice(0, 16), added: [...base.added.map(english), ...more], removed: base.removed };
+  // a book's / a game's spell stays at its few talismans (SPELL_MAX_TAGS): no extras past it
+  const room = Math.max(0, SPELL_MAX_TAGS[kind] - tags.length);
+  const extra = more.slice(0, room);
+  return { tags: [...tags, ...extra].slice(0, 16), added: [...base.added.map(english), ...extra], removed: base.removed };
 }

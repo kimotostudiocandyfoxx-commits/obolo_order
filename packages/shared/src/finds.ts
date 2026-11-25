@@ -22,7 +22,7 @@ export const MAX_STARS = 3;
  * radio show); utterances: buddy_messages, dachi_messages; `local` = something kept on the device only (the atelier's
  * looks / pictures / its {bati} talk, the demo's songs) — its id is the device's own.
  */
-export const MARKED_KINDS = ['saturn_post', 'jupiter_root', 'song', 'mars_backstage', 'radio_show', 'buddy_message', 'dachi_message', 'local'] as const;
+export const MARKED_KINDS = ['saturn_post', 'jupiter_root', 'song', 'mars_backstage', 'radio_show', 'buddy_message', 'dachi_message', 'local', 'book', 'game'] as const;
 export type MarkedKind = (typeof MARKED_KINDS)[number];
 
 export interface ItemMarkView {
@@ -55,6 +55,19 @@ export const nextStars = (n: number) => (Math.max(0, Math.min(MAX_STARS, n | 0))
 /** Bluena's eight planets, in the orbit's order (M-R237 §2), and what each keeps */
 export const BLUENA_PLANETS = ['saturn', 'jupiter', 'mercury', 'mars', 'venus', 'uranus', 'pluto', 'neptune'] as const;
 export type BluenaPlanet = (typeof BLUENA_PLANETS)[number];
+
+/**
+ * Client 2026-11-25: the one map of each Moon-made kind to its home planet (works later fly to / are linked with it once
+ * each planet's screen is settled). kororin ('voice') → Saturn, picture → Jupiter, song → Mercury, MV → Mars,
+ * radio → Venus, goods → Uranus, book ('novel' / 'book') → Pluto, game → Neptune. Bluena's folders, the atelier's
+ * 〔星へ飛ばす〕 and the works' records read it from here. Only the kinds in FLY_READY_KINDS can be flown today.
+ */
+export const KIND_HOME_PLANET = { voice: 'saturn', art: 'jupiter', song: 'mercury', video: 'mars', radio: 'venus', goods: 'uranus', novel: 'pluto', book: 'pluto', game: 'neptune' } as const satisfies Record<string, BluenaPlanet>;
+export type HomedKind = keyof typeof KIND_HOME_PLANET;
+export const homePlanetOf = (kind: string): BluenaPlanet | null => (KIND_HOME_PLANET as Record<string, BluenaPlanet>)[kind] ?? null;
+/** the kinds whose planet has its screen and its 〔星へ飛ばす〕 now (the others keep their home planet as data only) */
+export const FLY_READY_KINDS = ['voice', 'art', 'song', 'video', 'radio'] as const;
+export const canFlyHome = (kind: string): boolean => (FLY_READY_KINDS as readonly string[]).includes(kind);
 
 /** a work as Bluena's list shows it (newest first) */
 export interface FoundWork {

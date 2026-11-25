@@ -9,16 +9,26 @@ import { z } from 'zod';
  * The common tags are a fixed dictionary (stable labels); free words become tags of their own (the API's model writes
  * their English; without it the words themselves stand in).
  */
-export const SPELL_KINDS = ['song', 'art', 'video', 'look', 'bati'] as const;
+export const SPELL_KINDS = ['song', 'art', 'video', 'look', 'bati', 'novel', 'chapter', 'game'] as const;
 export type SpellKind = (typeof SPELL_KINDS)[number];
-export const SPELL_GROUPS = ['theme', 'genre', 'mood', 'tempo', 'instrument', 'voice', 'style', 'color', 'light', 'composition', 'camera', 'wear'] as const;
+/**
+ * novel / chapter / game (client 2026-11-25, 「会話で始めて、スペルで決めて、会話で直す」): a book's world, hero and length;
+ * a chapter's event; a game's rule, goal and level
+ */
+export const SPELL_GROUPS = ['theme', 'genre', 'mood', 'tempo', 'instrument', 'voice', 'style', 'color', 'light', 'composition', 'camera', 'wear', 'world', 'hero', 'length', 'event', 'rule', 'goal', 'level'] as const;
 export type SpellGroup = (typeof SPELL_GROUPS)[number];
 
 export const SpellTag = z.object({ ja: z.string().trim().min(1).max(16), en: z.string().trim().min(1).max(80), group: z.enum(SPELL_GROUPS) });
 export type SpellTag = z.infer<typeof SpellTag>;
 export const SpellTags = z.array(SpellTag).min(1).max(16);
 /** POST /moon/spell: a spell for the words (none yet), or the spell changed by the words */
-export const SpellBody = z.object({ kind: z.enum(SPELL_KINDS), said: z.string().trim().min(1).max(200), tags: z.array(SpellTag).max(16).optional() });
+export const SpellBody = z.object({
+  kind: z.enum(SPELL_KINDS),
+  said: z.string().trim().min(1).max(200),
+  tags: z.array(SpellTag).max(16).optional(),
+  /** client 2026-11-25: a book's / a game's answers to {bati}'s questions (a fresh spell from them: spellOfAnswers) */
+  answers: z.array(z.object({ group: z.enum(SPELL_GROUPS).optional(), said: z.string().trim().max(200) })).max(6).optional(),
+});
 export type SpellBody = z.infer<typeof SpellBody>;
 export interface SpellView {
   tags: SpellTag[];
@@ -30,10 +40,80 @@ export interface SpellView {
 type Entry = { ja: string; en: string; group: SpellGroup; re: RegExp; for?: SpellKind[] };
 const SONG: SpellKind[] = ['song'];
 const PIC: SpellKind[] = ['art', 'video', 'look', 'bati'];
+const PICG: SpellKind[] = [...PIC, 'game'];
+const BOOK: SpellKind[] = ['novel'];
+const CHAP: SpellKind[] = ['chapter'];
+const GAME: SpellKind[] = ['game'];
+const TALE: SpellKind[] = ['novel', 'game'];
 const e = (ja: string, en: string, group: SpellGroup, re: RegExp | string, kinds?: SpellKind[]): Entry => ({ ja, en, group, re: typeof re === 'string' ? new RegExp(re) : re, for: kinds });
 
 /** the fixed tags (first match wins inside a group; the longer words come first) */
 export const SPELL_DICTIONARY: Entry[] = [
+  // a book: its world (where), its genre, its length
+  e('魔法の森', 'an enchanted forest', 'world', /魔法の森|まほうの森|森/, BOOK),
+  e('未来の街', 'a city in the future', 'world', /未来の街|未来の町|未来/, BOOK),
+  e('海の底の国', 'a kingdom under the sea', 'world', /海の底|海底/, BOOK),
+  e('空の島', 'an island floating in the sky', 'world', /空の島|空に浮/, BOOK),
+  e('宇宙の旅', 'a journey through outer space', 'world', /宇宙/, BOOK),
+  e('ふしぎな学校', 'a mysterious school', 'world', /学校|学園/, BOOK),
+  e('小さな町', 'a small quiet town', 'world', /小さな町|町|まち/, BOOK),
+  e('ファンタジー', 'fantasy', 'genre', /ファンタジー|魔法|まほう/, BOOK),
+  e('冒険', 'adventure', 'genre', /冒険|ぼうけん/, BOOK),
+  e('ミステリー', 'gentle mystery', 'genre', /ミステリー|なぞ解き|謎解き|探偵/, BOOK),
+  e('SF', 'science fiction', 'genre', /SF|ＳＦ|サイエンス/i, BOOK),
+  e('学園もの', 'school life story', 'genre', /学園もの|クラス|部活/, BOOK),
+  e('日常', 'slice of life', 'genre', /日常|ほのぼの/, BOOK),
+  e('ちょっと怖い', 'mildly spooky (not scary for teens)', 'genre', /怖|こわ|ホラー|おばけ/, BOOK),
+  e('短め', 'short chapters (about 1500 Japanese characters)', 'length', /短め|みじか|短い/, BOOK),
+  e('ふつうの長さ', 'chapters of about 2000 Japanese characters', 'length', /ふつうの長さ/, BOOK),
+  e('長め', 'long chapters (about 2500 Japanese characters)', 'length', /長め|ながめ|たっぷり|長い/, BOOK),
+  // who it is about (a book's hero, a game's character)
+  e('猫', 'a young cat', 'hero', /猫|ねこ|ネコ/, TALE),
+  e('犬', 'a brave little dog', 'hero', /犬|いぬ|イヌ/, TALE),
+  e('うさぎ', 'a rabbit', 'hero', /うさぎ|ウサギ/, TALE),
+  e('ロボット', 'a small robot', 'hero', /ロボット|ロボ/, TALE),
+  e('ドラゴン', 'a baby dragon', 'hero', /ドラゴン|竜|りゅう/, TALE),
+  e('魔女', 'a young witch', 'hero', /魔女|魔法使い|まほうつかい/, TALE),
+  e('宇宙船', 'a little spaceship', 'hero', /宇宙船|ロケット/, GAME),
+  e('女の子', 'a girl', 'hero', /女の子|少女/, TALE),
+  e('男の子', 'a boy', 'hero', /男の子|少年/, TALE),
+  // a chapter: what happens next
+  e('最終章', 'the final chapter: bring the story to a warm ending', 'event', /最後|さいご|おわり|終わり|完結|最終/, CHAP),
+  e('新しい仲間', 'a new friend joins', 'event', /仲間|なかま|友だち|ともだち|友達/, CHAP),
+  e('ライバル登場', 'a rival appears', 'event', /ライバル/, CHAP),
+  e('なぞの人', 'a mysterious stranger appears', 'event', /なぞの人|謎の人|知らない人/, CHAP),
+  e('嵐', 'a sudden storm', 'event', /嵐|あらし|大雨/, CHAP),
+  e('なぞの手紙', 'a mysterious letter arrives', 'event', /手紙/, CHAP),
+  e('迷子', 'the hero gets lost', 'event', /迷子|まいご|迷う|迷っ/, CHAP),
+  e('宝さがし', 'a treasure hunt', 'event', /宝|たから/, CHAP),
+  e('大ピンチ', 'a big trouble to overcome', 'event', /ピンチ|大変|危な|あぶな/, CHAP),
+  e('旅立ち', 'setting off on a journey', 'event', /旅立|出発|旅に/, CHAP),
+  e('ひみつ', 'a secret is revealed', 'event', /秘密|ひみつ/, CHAP),
+  e('なかなおり', 'making up after a quarrel', 'event', /けんか|ケンカ|なかなおり|仲直り/, CHAP),
+  e('おまかせ', "the writer's own idea of what happens next", 'event', /おまかせ|お任せ|まかせ|任せ|つづき|続き|なんでも|何でも/, CHAP),
+  // a game: what kind, its rules, its goal, how hard
+  e('集める', 'collect game: move left and right to catch falling items', 'genre', /集め|あつめ|キャッチ|拾/, GAME),
+  e('よける', 'dodge game: avoid falling obstacles', 'genre', /よけ|避け|かわす|逃げ/, GAME),
+  e('ジャンプ', 'endless runner: jump over obstacles', 'genre', /ジャンプ|ランナー|走る|はしる/, GAME),
+  e('シューティング', 'shooter: shoot down enemies coming from above', 'genre', /シューティング|撃|打ち落|うち落|弾/, GAME),
+  e('タップ', 'tap game: tap the targets before they disappear', 'genre', /タップ|たたく|叩/, GAME),
+  e('ブロックくずし', 'breakout: bounce a ball to break blocks', 'genre', /ブロック|くずし|崩し/, GAME),
+  e('クイズ', 'quiz: answer simple multiple-choice questions', 'genre', /クイズ|問題/, GAME),
+  e('パズル', 'puzzle: tap to match tiles of the same colour', 'genre', /パズル|そろえ|揃え|並べ/, GAME),
+  e('敵が多い', 'many enemies and obstacles', 'rule', /敵|てき|おじゃま|じゃま/, GAME),
+  e('スピードアップ', 'it gets faster over time', 'rule', /だんだん|スピード|速く|はやく/, GAME),
+  e('ライフ3つ', 'three lives', 'rule', /ライフ|命|いのち/, GAME),
+  e('60秒', 'a 60 second time limit', 'rule', /秒|時間/, GAME),
+  e('30こ集めたら勝ち', 'win by reaching 30 points', 'goal', /30|３０|勝ち|クリア/, GAME),
+  e('ハイスコア', 'aim for a high score', 'goal', /ハイスコア|スコア|点数/, GAME),
+  e('とてもむずかしい', 'very hard', 'level', /とても(難し|むずかし)|激ムズ|鬼むず/, GAME),
+  e('むずかしい', 'hard', 'level', /難し|むずかし|ハード/, GAME),
+  e('かんたん', 'easy', 'level', /かんたん|簡単|やさしめ/, GAME),
+  e('ふつう', 'normal difficulty', 'level', /^ふつう$|ふつうの難しさ/, GAME),
+  e('ネオン', 'neon glow on a dark background', 'color', /ネオン|ピカピカ/, GAME),
+  e('夜空', 'a night sky with stars', 'color', /夜空|星空/, GAME),
+  e('わくわく', 'exciting', 'mood', /わくわく|ワクワク|ドキドキ|どきどき/, TALE),
+  e('おもしろい', 'funny', 'mood', /おもしろ|面白|笑える|ギャグ/, TALE),
   // a song's genre
   e('ポップ', 'pop', 'genre', /ポップ|pop/i, SONG),
   e('ロック', 'rock', 'genre', /ロック|rock/i, SONG),
@@ -81,17 +161,17 @@ export const SPELL_DICTIONARY: Entry[] = [
   e('クレヨン', 'crayon drawing', 'style', /クレヨン/, PIC),
   e('絵本風', 'picture book illustration', 'style', /絵本/, PIC),
   e('アニメ風', 'anime style', 'style', /アニメ/, PIC),
-  e('ドット絵', 'pixel art', 'style', /ドット/, PIC),
+  e('ドット絵', 'pixel art', 'style', /ドット/, PICG),
   e('切り絵', 'paper cut art', 'style', /切り絵/, PIC),
   e('えんぴつ画', 'pencil sketch', 'style', /鉛筆|えんぴつ/, PIC),
   e('立体', '3D render', 'style', /3D|立体/i, PIC),
-  e('やわらかい色', 'soft pastel colors', 'color', /やわらかい色|パステル|淡い/, PIC),
-  e('あざやかな色', 'vivid colors', 'color', /あざやか|鮮やか|カラフル/, PIC),
-  e('青い色', 'blue tones', 'color', /青い色|青っぽ|ブルー/, PIC),
-  e('金色', 'golden tones', 'color', /金色|ゴールド/, PIC),
-  e('ピンク', 'pink tones', 'color', /ピンク/, PIC),
-  e('虹色', 'rainbow colors', 'color', /虹色|レインボー/, PIC),
-  e('モノクロ', 'monochrome', 'color', /モノクロ|白黒/, PIC),
+  e('やわらかい色', 'soft pastel colors', 'color', /やわらかい色|パステル|淡い/, PICG),
+  e('あざやかな色', 'vivid colors', 'color', /あざやか|鮮やか|カラフル/, PICG),
+  e('青い色', 'blue tones', 'color', /青い色|青っぽ|ブルー/, PICG),
+  e('金色', 'golden tones', 'color', /金色|ゴールド/, PICG),
+  e('ピンク', 'pink tones', 'color', /ピンク/, PICG),
+  e('虹色', 'rainbow colors', 'color', /虹色|レインボー/, PICG),
+  e('モノクロ', 'monochrome', 'color', /モノクロ|白黒/, PICG),
   e('夕焼け', 'sunset light', 'light', /夕焼け|夕日|ゆうひ/, PIC),
   e('月明かり', 'moonlight', 'light', /月明かり/, PIC),
   e('星明かり', 'starlight', 'light', /星明かり/, PIC),
@@ -151,10 +231,10 @@ const THEMES: [RegExp, string, string][] = [
 ];
 
 /** the groups that take one tag only (a new one replaces the old) */
-const ONE: SpellGroup[] = ['genre', 'tempo', 'voice', 'style', 'composition', 'camera'];
+const ONE: SpellGroup[] = ['genre', 'tempo', 'voice', 'style', 'composition', 'camera', 'world', 'hero', 'length', 'level', 'goal'];
 /** moods that do not go together */
 const OPPOSITE: Record<string, string[]> = { bright: ['dark', 'bittersweet'], dark: ['bright', 'joyful'], joyful: ['dark', 'bittersweet'], bittersweet: ['bright', 'joyful'], energetic: ['calm', 'mellow'], calm: ['energetic'], mellow: ['energetic'] };
-const ORDER: SpellGroup[] = ['theme', 'wear', 'genre', 'style', 'mood', 'tempo', 'instrument', 'voice', 'color', 'light', 'composition', 'camera'];
+const ORDER: SpellGroup[] = ['world', 'hero', 'theme', 'wear', 'genre', 'event', 'style', 'mood', 'tempo', 'instrument', 'voice', 'rule', 'goal', 'level', 'color', 'light', 'composition', 'camera', 'length'];
 const INSTRUMENTS: Record<string, string[]> = { pop: ['ピアノ', 'ドラム'], rock: ['エレキギター', 'ドラム'], ballad: ['ピアノ', 'ストリングス'], 'hip hop': ['ドラム', 'ベース'], 'dance, EDM': ['シンセ', 'ドラム'], jazz: ['ピアノ', 'サックス'], 'acoustic folk': ['ギター'], 'lo-fi': ['ピアノ', 'ドラム'] };
 /** what a kind's spell always has (the dictionary's ja), when the words did not say it */
 const DEFAULTS: Record<SpellKind, Partial<Record<SpellGroup, string>>> = {
@@ -163,7 +243,13 @@ const DEFAULTS: Record<SpellKind, Partial<Record<SpellGroup, string>>> = {
   video: { style: 'アニメ風', camera: 'ゆっくりズーム' },
   look: { style: 'アニメ風' },
   bati: { style: 'アニメ風' },
+  // client 2026-11-25: {bati} fills what was not said (the member never has to write anything)
+  novel: { world: '小さな町', hero: '女の子', genre: 'ファンタジー', mood: 'わくわく', length: 'ふつうの長さ' },
+  chapter: { event: 'おまかせ' },
+  game: { genre: '集める', goal: 'ハイスコア', level: 'ふつう', color: 'あざやかな色' },
 };
+/** client 2026-11-25: a book's or a game's spell is at most 8 talismans */
+export const SPELL_MAX_TAGS: Record<SpellKind, number> = { song: 14, art: 14, video: 14, look: 14, bati: 14, novel: 8, chapter: 8, game: 8 };
 
 const byJa = (ja: string) => SPELL_DICTIONARY.find((x) => x.ja === ja)!;
 const tagOf = (x: Entry): SpellTag => ({ ja: x.ja, en: x.en, group: x.group });
@@ -187,7 +273,7 @@ function named(kind: SpellKind, said: string): { tags: SpellTag[]; rest: string 
   return { tags, rest };
 }
 
-const KIND_WORDS = /曲|歌|うた|ソング|絵|イラスト|アート|映像|動画|MV|ムービー|姿|かっこう|格好|着せかえ|服/g;
+const KIND_WORDS = /曲|歌|うた|ソング|絵|イラスト|アート|映像|動画|MV|ムービー|姿|かっこう|格好|着せかえ|服|小説|物語|ものがたり|お話|おはなし|本|ゲーム|次の章|章/g;
 const ASKING = /(を|で|の|に)?(作って|つくって|描いて|かいて|作りたい|つくりたい|作る|つくる|お願い|おねがい|ください|して|ちょうだい|ほしい|にする|にして|足して|たして|加えて|入れて|いれて|外して|はずして|消して|抜いて|やめて|いらない|変えて|かえて)[！!。]*/g;
 const FILLER = /^(もっと|ちょっと|すこし|少し|なんか|あと|それと|それから|も|は|が|を|の|で|に|と|な|感じ|かんじ|系|っぽい|みたいな?|して|する)+$/;
 
@@ -208,17 +294,82 @@ function themes(rest: string): SpellTag[] {
   return out.slice(0, 4);
 }
 
+/** a book's / a game's free words: the bits of grammar left over (「新しい」「来て」「ちょっ」) are not tags */
+const CRAFT: SpellKind[] = ['novel', 'chapter', 'game'];
+const scrap = (t: SpellTag) => /^[\p{sc=Hiragana}ー]{1,4}$/u.test(t.ja) || ([...t.ja].length <= 3 && /(て|っ|た|い|く|に)$/.test(t.ja));
+const freeWords = (kind: SpellKind, rest: string) => (CRAFT.includes(kind) ? themes(rest).filter((t) => !scrap(t)) : themes(rest));
+
 /** a fresh spell for the words: the tags they name, what it is about, then the kind's own defaults */
 export function spellFrom(kind: SpellKind, said: string): SpellTag[] {
   const n = named(kind, said);
-  const tags = [...themes(n.rest), ...n.tags];
+  const tags = [...freeWords(kind, n.rest), ...n.tags];
   for (const [g, ja] of Object.entries(DEFAULTS[kind]) as [SpellGroup, string][]) if (!tags.some((t) => t.group === g)) tags.push(tagOf(byJa(ja)));
   if (kind === 'song') {
     const mood = tags.find((t) => t.group === 'mood')?.en;
     if (!tags.some((t) => t.group === 'tempo')) tags.push(tagOf(byJa(mood === 'mellow' || mood === 'bittersweet' || mood === 'calm' ? 'ゆっくり' : mood === 'energetic' || mood === 'joyful' ? 'アップテンポ' : 'ふつうの速さ')));
     if (!tags.some((t) => t.group === 'instrument')) for (const ja of INSTRUMENTS[tags.find((t) => t.group === 'genre')!.en] ?? []) tags.push(tagOf(byJa(ja)));
   }
-  return sortTags(tags).slice(0, 14);
+  return sortTags(tags).slice(0, SPELL_MAX_TAGS[kind]);
+}
+
+/** one answer to one of {bati}'s questions: the group its free words go into (the book's world, the hero …) */
+export type SpellAnswer = { group?: SpellGroup; said: string };
+const LEAVE_IT = /^(おまかせ|お任せ|まかせる|任せる|なんでも|何でも|なんでもいい|わからない|べつに|特に(ない)?|バティが決めて|決めて)[！!。、]*$/;
+
+/**
+ * client 2026-11-25 (本・ゲーム): {bati} asks 2–4 short questions, then distils the answers into one spell — the
+ * dictionary tags each answer names, its other words as a tag of the question's group (Q「主人公はだれ？」→
+ * 「メガネの少年」 is the hero), then the kind's defaults for whatever was not said. At most SPELL_MAX_TAGS; the
+ * member's extra words go first when there are too many, the defaults never.
+ */
+/** the groups the words already name (a question about them need not be asked) */
+export function spellNamedGroups(kind: SpellKind, said: string): SpellGroup[] {
+  return [...new Set(named(kind, said).tags.map((t) => t.group))];
+}
+
+export function spellOfAnswers(kind: SpellKind, answers: SpellAnswer[]): SpellTag[] {
+  const tags: SpellTag[] = [];
+  const add = (t: SpellTag) => {
+    if (tags.some((o) => same(o, t))) return;
+    if (ONE.includes(t.group) && tags.some((o) => o.group === t.group)) return;
+    tags.push(t);
+  };
+  for (const a of answers) {
+    const said = a.said.trim();
+    if (!said || LEAVE_IT.test(said)) continue;
+    const n = named(kind, said);
+    const free = freeWords(kind, n.rest);
+    const g = a.group && a.group !== 'theme' ? a.group : null;
+    // a hero / a world in the member's own short words keeps them (「メガネの少年」, not just 男の子); the English behind it
+    // is the dictionary's with the extra words (the API's model rewrites it in English)
+    const own = said.replace(/[、。！!？?\s　]+$/, '').replace(/(で|が|かな|がいい|にする|にして)$/, '');
+    const hit = g && (g === 'hero' || g === 'world') && free.length && [...own].length <= 10 ? n.tags.find((t) => t.group === g) : undefined;
+    for (const t of n.tags) add(t === hit ? { ...t, ja: own, en: `${free.map((f) => f.ja).join(' ')} ${t.en}` } : t);
+    if (hit) continue;
+    // the answer's own words are the question's tag (「しゃべるペンギン」 is the hero); when the dictionary already said
+    // it (「メガネの少年」 → 男の子), the words around it are only its colour
+    if (g && !n.tags.some((t) => t.group === g) && free.length) add({ ...free[0], group: g });
+    else if (!n.tags.length) for (const t of free.slice(0, 2)) add(t);
+  }
+  for (const [g, ja] of Object.entries(DEFAULTS[kind]) as [SpellGroup, string][]) if (!tags.some((t) => t.group === g)) tags.push(tagOf(byJa(ja)));
+  const out = sortTags(tags);
+  while (out.length > SPELL_MAX_TAGS[kind]) {
+    let i = -1;
+    for (let k = out.length - 1; k >= 0 && i < 0; k--) if (out[k].group === 'theme' || out[k].group === 'mood' || out[k].group === 'rule') i = k;
+    out.splice(i < 0 ? out.length - 1 : i, 1);
+  }
+  return out;
+}
+
+const LEVELS = ['かんたん', 'ふつう', 'むずかしい', 'とてもむずかしい'];
+/** 「もっと難しく」「もっとかんたんに」: the game's level one step up / down from the one there */
+export function levelStep(tags: SpellTag[], said: string): SpellTag | null {
+  const up = /難しく|むずかしく|難しい|むずかしい|ハード|レベル(を)?上げ/.test(said);
+  const down = /かんたん|簡単|やさしく|やさしめ|レベル(を)?下げ/.test(said);
+  if (up === down) return null;
+  const now = LEVELS.indexOf(tags.find((t) => t.group === 'level')?.ja ?? 'ふつう');
+  const next = LEVELS[Math.max(0, Math.min(LEVELS.length - 1, (now < 0 ? 1 : now) + (up ? 1 : -1)))];
+  return tagOf(byJa(next));
 }
 
 const REMOVE = /外して|はずして|消して|けして|なくして|抜いて|ぬいて|取って|とって|いらない|やめて|なしで|なしに|なし$|じゃなくて|ではなく/;
@@ -243,8 +394,10 @@ export function spellEdit(kind: SpellKind, tags: SpellTag[], said: string): Spel
     take((t) => n.tags.some((x) => same(x, t)) || words.some((w) => t.ja.includes(w.ja) || w.ja.includes(t.ja)));
     return { tags: out, added, removed };
   }
-  const n = named(kind, said);
-  const add = [...n.tags];
+  // a game: 「もっと難しく」 is the level one step up (not a word of its own)
+  const step = kind === 'game' ? levelStep(out, said) : null;
+  const n = named(kind, step ? said.replace(/もっと|とても|難し[いく]?|むずかし[いく]?|かんたんに|簡単に|やさしく|やさしめ|ハード|に|して/g, '、') : said);
+  const add = [...(step ? [step] : []), ...n.tags.filter((t) => !step || t.group !== 'level')];
   if (/足して|たして|加えて|くわえて|入れて|いれて|追加|も(ほしい|入れ|欲しい)/.test(said) || !add.length) for (const t of themes(n.rest)) add.push(t);
   for (const t of add) {
     if (out.some((o) => same(o, t))) continue;
@@ -253,7 +406,7 @@ export function spellEdit(kind: SpellKind, tags: SpellTag[], said: string): Spel
     out.push(t);
     added.push(t);
   }
-  return { tags: sortTags(out).slice(0, 16), added, removed };
+  return { tags: sortTags(out).slice(0, Math.min(16, SPELL_MAX_TAGS[kind] + 2)), added, removed };
 }
 
 /** a tag taken off by tapping it */
@@ -280,7 +433,7 @@ export function spellNormalize(kind: SpellKind, pairs: { ja?: unknown; en?: unkn
   return sortTags(out).slice(0, 16);
 }
 
-const PREFIX: Record<SpellKind, string> = { song: 'song', art: 'illustration', video: 'music video', look: 'character look', bati: 'character outfit' };
+const PREFIX: Record<SpellKind, string> = { song: 'song', art: 'illustration', video: 'music video', look: 'character look', bati: 'character outfit', novel: 'story', chapter: 'next chapter', game: 'small HTML5 canvas game' };
 /** the English prompt the generator is given (built from the tags as they are now) */
 export function spellPrompt(kind: SpellKind, tags: SpellTag[]): string {
   const g = (k: SpellGroup) => tags.filter((t) => t.group === k).map((t) => t.en);
@@ -289,6 +442,16 @@ export function spellPrompt(kind: SpellKind, tags: SpellTag[]): string {
   if (kind === 'song') {
     const parts = [`${[...g('mood'), ...g('genre')].join(' ')} song`.trim(), about.length && `about ${about.join(', ')}`, g('tempo').join(', '), g('instrument').length && `featuring ${g('instrument').join(', ')}`, g('voice').join(', ')];
     return parts.filter(Boolean).join(', ');
+  }
+  if (kind === 'novel') {
+    const parts = [`${[...g('mood'), ...g('genre')].join(' ')} story`.trim(), g('world').length && `set in ${g('world').join(', ')}`, g('hero').length && `the hero is ${g('hero').join(', ')}`, about.length && `about ${about.join(', ')}`, ...g('length')];
+    return parts.filter(Boolean).join('; ');
+  }
+  if (kind === 'chapter') return [`next chapter: ${[...g('event'), ...about].join(', ') || "the writer's own idea of what happens next"}`, g('mood').length && `mood: ${g('mood').join(', ')}`, g('hero').length && `featuring ${g('hero').join(', ')}`].filter(Boolean).join('; ');
+  if (kind === 'game') {
+    const look = [...g('color'), ...g('style'), ...g('mood')];
+    const parts = [`${PREFIX.game}: ${g('genre').join(', ') || 'collect game'}`, g('hero').length && `the player is ${g('hero').join(', ')}`, about.length && `about ${about.join(', ')}`, g('rule').length && `rules: ${g('rule').join(', ')}`, g('goal').length && `goal: ${g('goal').join(', ')}`, g('level').length && `difficulty: ${g('level').join(', ')}`, look.length && `look: ${look.join(', ')}`];
+    return parts.filter(Boolean).join('; ');
   }
   return [PREFIX[kind], about.length && `of ${about.join(', ')}`, ...rest].filter(Boolean).join(', ');
 }

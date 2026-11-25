@@ -14,6 +14,13 @@ import type { AtelierKind } from '@/lib/atelier/unlock';
 import { countdown, jobView, onJobs } from '@/lib/atelier/jobs';
 import type { RefineTarget, WorkMaterial } from '@obolo/shared';
 import { faceTo, FLIES, swipeTo, versionsOf, type Work } from './work';
+import { BookById, BookFace } from './BookRead';
+import { GameById, GameFace } from './GamePlay';
+
+/** client 2026-11-25: a book / a game — one face (its chapters / versions live on the server), its own body on the card */
+const isCraftWork = (w: Work) => w.kind === 'novel' || w.kind === 'game';
+const loadGame = (id: string) => getApi().game(id);
+const loadBook = (id: string) => getApi().book(id);
 
 /** the folder mark for each kind (glyph only, M-R211) */
 export function KindMark({ kind, className = 'h-5 w-5' }: { kind: AtelierKind; className?: string }) {
@@ -28,6 +35,7 @@ export function KindMark({ kind, className = 'h-5 w-5' }: { kind: AtelierKind; c
   if (kind === 'bati') return <LineIcon id="moon" className={className} />;
   if (kind === 'lookup') return <LineIcon id="compass" className={className} />;
   if (kind === 'image') return <LineIcon id="camera" className={className} />;
+  if (kind === 'novel') return <Glyph id="book" label={false} className={className} />;
   return <Glyph id={kind} label={false} className={className} />;
 }
 
@@ -61,7 +69,7 @@ const btn = 'flex items-center justify-center gap-1 rounded-full px-3 py-1.5 tex
 
 /** what pointing means for a kind (M-R253 §2): a spot, a stretch of the song, a scene, some words */
 export function aimOf(w: Work): RefineTarget['kind'] | null {
-  if (w.status !== 'ready') return null;
+  if (w.status !== 'ready' || isCraftWork(w)) return null;
   if (w.video) return 'frame';
   if (w.kind === 'song' || ((w.audio || w.ref?.demoSong) && !w.text)) return 'range';
   if (w.image) return 'point';
@@ -112,7 +120,7 @@ export function WorkCard({
   /** §3: the song a show is recorded over (a material) */
   songUrl?: { url: string; title: string };
 }) {
-  const vs = versionsOf(w);
+  const vs = isCraftWork(w) ? [] : versionsOf(w);
   const making = w.status === 'making';
   const pages = vs.length + (making ? 1 : 0);
   const [page, setPage] = useState(() => (making ? vs.length : (w.active ?? Math.max(0, vs.length - 1))));
@@ -188,7 +196,9 @@ export function WorkCard({
 
         {w.status === 'record' && <RadioRecorder onDone={onRecorded} song={songUrl} />}
 
-        {!showMaking && shown.image && (
+        {!showMaking && w.kind === 'novel' && (w.book ? <BookFace book={w.book} /> : w.ref?.bookId ? <BookById id={w.ref.bookId} load={loadBook} /> : null)}
+        {!showMaking && w.kind === 'game' && (w.game ? <GameFace game={w.game} /> : w.ref?.gameId ? <GameById id={w.ref.gameId} own load={loadGame} /> : null)}
+        {!showMaking && shown.image && !isCraftWork(w) && (
           <div
             className="relative"
             onClick={(e) => {
@@ -285,7 +295,7 @@ export function WorkCard({
               {on ? '❚❚ 止める' : '▶ 再生'}
             </button>
           )}
-          {onAgain && (
+          {onAgain && w.kind !== 'novel' && w.kind !== 'game' && (
             <button onClick={onAgain} disabled={busy} className={`${btn} border border-white/20`}>
               やり直し
             </button>

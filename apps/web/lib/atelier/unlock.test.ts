@@ -15,7 +15,11 @@ describe('atelier unlock by journey day (M-R210)', () => {
     expect(openKinds(JOURNEY_PAYMENT)).toHaveLength(9);
   });
   it('opens everything after the journey', () => {
-    expect(openKinds(JOURNEY_DONE)).toHaveLength(9);
+    // client 2026-11-25: 本 and ゲーム come with the journey's end
+    expect(openKinds(JOURNEY_DONE)).toHaveLength(11);
+    expect(openKinds(JOURNEY_DONE).slice(-2)).toEqual(['novel', 'game']);
+    expect(isOpen('game', JOURNEY_PAYMENT)).toBe(false);
+    expect(daysUntil('novel', 7)).toBe(JOURNEY_DONE - 7);
     expect(isOpen('radio', JOURNEY_DONE)).toBe(true);
   });
   it('says how many days are left', () => {

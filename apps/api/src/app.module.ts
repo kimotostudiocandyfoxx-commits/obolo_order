@@ -34,6 +34,9 @@ import { MoonWorksController } from './moon/moon-works.controller';
 import { MoonWorksService } from './moon/moon-works.service';
 import { SpellController } from './moon/spell.controller';
 import { SpellService } from './moon/spell.service';
+import { CraftController } from './craft/craft.controller';
+import { GameService } from './craft/game.service';
+import { NovelService } from './craft/novel.service';
 import { InfraModule } from './infra/infra.module';
 import { InvitesController } from './invites/invites.controller';
 import { InvitesService } from './invites/invites.service';
@@ -117,6 +120,7 @@ import { WalletController } from './wallet/wallet.controller';
     FindsController,
     MoonWorksController,
     SpellController,
+    CraftController,
   ],
   providers: [
     AuthGuard,
@@ -159,6 +163,8 @@ import { WalletController } from './wallet/wallet.controller';
     FindsService,
     MoonWorksService,
     SpellService,
+    NovelService,
+    GameService,
   ],
 })
 export class AppModule {}

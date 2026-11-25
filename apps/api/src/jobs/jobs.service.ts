@@ -9,6 +9,7 @@ import { activeBati } from '../look/batis';
 import type { JobQueue } from '../infra/queue';
 import { QUEUE } from '../infra/tokens';
 import { MvService } from '../mv/mv.service';
+import { GameService, type GameJobInput } from '../craft/game.service';
 import { PushService } from '../push/push.service';
 
 type Row = typeof jobs.$inferSelect;
@@ -18,10 +19,12 @@ type Inputs = {
   'mv-lyrics': { mvId: string; origin: string };
   /** M-R253: the review page's stand-in (it only waits) */
   demo: DemoJobBody;
+  /** client 2026-11-25: a game built or tweaked (its yes: the mana goes back when it fails for good) */
+  game: GameJobInput;
 };
 
 /** what each job is timed as (M-R253 §4) */
-export const ETA_OF: Record<JobKind, EtaKind> = { song: 'song', 'mv-story': 'mv', 'mv-lyrics': 'mv', demo: 'demo' };
+export const ETA_OF: Record<JobKind, EtaKind> = { song: 'song', 'mv-story': 'mv', 'mv-lyrics': 'mv', demo: 'demo', game: 'game' };
 type Patch = Partial<typeof jobs.$inferInsert>;
 
 /** A job running longer than this was lost (its instance went away): the member may try again. */
@@ -52,6 +55,7 @@ export class JobsService implements OnModuleInit {
     private readonly songs: SongService,
     private readonly mv: MvService,
     private readonly push: PushService,
+    private readonly games: GameService,
   ) {}
 
   onModuleInit() {
@@ -173,6 +177,8 @@ export class JobsService implements OnModuleInit {
         }
       }
       await this.finish(jobId, 'failed', null, err);
+      // a game that could not be made gives its mana back (once per yes)
+      if (row.kind === 'game') await this.games.refundJob(row.userId, row.inputJson as unknown as GameJobInput);
       await this.notify(row, false);
     }
   }
@@ -203,6 +209,11 @@ export class JobsService implements OnModuleInit {
         const input = row.inputJson as unknown as Inputs['mv-lyrics'];
         await this.stage(row.id, 'lyrics');
         return { mv: await this.mv.withLyrics(row.userId, input.mvId, input.origin) };
+      }
+      case 'game': {
+        const input = row.inputJson as unknown as Inputs['game'];
+        await this.stage(row.id, 'writing');
+        return { game: await this.games.make(row.userId, input) };
       }
       case 'demo': {
         const input = row.inputJson as unknown as Inputs['demo'];
@@ -240,8 +251,8 @@ export class JobsService implements OnModuleInit {
     const input = row.inputJson as { from?: string; body?: { from?: string; title?: string } };
     const atelier = input.from === 'atelier' || input.body?.from === 'atelier' || row.kind === 'demo';
     const url = atelier ? `/moon/atelier?job=${row.id}` : row.kind === 'song' ? '/mercury' : '/mars';
-    const r = (result ?? {}) as { song?: { title?: string }; mv?: { songTitle?: string } };
-    const work = (r.song?.title || (r.mv?.songTitle ? `${r.mv.songTitle}（MV）` : '') || input.body?.title || (row.kind === 'song' ? '曲' : row.kind === 'demo' ? '作品' : 'MV')).slice(0, 30);
+    const r = (result ?? {}) as { song?: { title?: string }; mv?: { songTitle?: string }; game?: { title?: string } };
+    const work = (r.song?.title || (r.mv?.songTitle ? `${r.mv.songTitle}（MV）` : '') || r.game?.title || input.body?.title || (row.kind === 'song' ? '曲' : row.kind === 'demo' ? '作品' : row.kind === 'game' ? 'ゲーム' : 'MV')).slice(0, 30);
     const bati = await this.batiOf(row.userId).catch(() => ({ name: 'バティ', speech: null }));
     const body = fillLine(batiSay(ok ? MOON_LINES.push : MOON_LINES.stop, bati.speech), { bati: bati.name, work });
     await this.push.notify(row.userId, { title: bati.name, body, url, tag: `job-${row.id}` }).catch(() => undefined);

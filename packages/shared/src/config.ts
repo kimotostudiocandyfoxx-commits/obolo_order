@@ -51,7 +51,19 @@ export const STARTER_GEM_MANA = 40;
 /**
  * What making costs (the story's table, D08-S002). Voice kororins, photo / words-only jackets, delivering and DJ are free.
  */
-export const MAKE_COST = { look: 3, kororinDesign: 3, jacketArt: 3, song: 2, mv: 8, story: 1 } as const;
+export const MAKE_COST = { look: 3, kororinDesign: 3, jacketArt: 3, song: 2, mv: 8, story: 1, game: 12, gameTweak: 3 } as const;
+/**
+ * client 2026-11-25 (本・ゲーム): the costs above — a game's first build (MAKE_COST.game) and each recast / tweak after
+ * it (MAKE_COST.gameTweak) spend mana, with the member's yes; a book's chapters are free (no confirm card) and capped per
+ * day instead, to keep the model's cost sane. PROPOSED numbers for the client (change them here only).
+ */
+export const NOVEL_CHAPTERS_PER_DAY = 20;
+/** a book's chapters at most (then {bati} says the book is full: start a new one) */
+export const NOVEL_MAX_CHAPTERS = 30;
+/** game builds and tweaks a day per member (mana is spent too; this is only the model's safety cap) */
+export const GAME_BUILDS_PER_DAY = 20;
+/** games a member can report as not running (the mana given back) per day */
+export const GAME_REFUNDS_PER_DAY = 3;
 export type MakeKind = keyof typeof MAKE_COST;
 /**
  * Bati's room (the Moon, P-BATI-ROOM): rounds a day per member of dressing up the Bati, and of Bati's magic on the
