@@ -4,8 +4,15 @@ from PIL import Image
 R='/home/user/obolo_order'; O=R+'/design/mv-art/out'; H=R+'/design/home'
 def uri(im, q=80): b=io.BytesIO(); im.save(b,'WEBP',quality=q,method=6); return 'data:image/webp;base64,'+base64.b64encode(b.getvalue()).decode()
 def key(im):
-    a=np.asarray(im.convert('RGB')).astype(np.float32); r,g,b=a[...,0],a[...,1],a[...,2]
+    a=np.asarray(im.convert('RGB')).astype(np.float32); o0=a.copy(); r,g,b=a[...,0],a[...,1],a[...,2]
     gn=g-np.maximum(r,b); al=np.clip(1-(gn-28)/55,0,1); a[...,1]=np.minimum(g,np.maximum(r,b)+12)
+    # M-R325: leftover backdrop-coloured fringes that touch the backdrop go too (flooded from the border by distance to
+    # the measured backdrop colour); green parts of the figure that are not backdrop-coloured are kept
+    from scipy import ndimage as _nd
+    bd=np.concatenate([o0[0],o0[-1],o0[:,0],o0[:,-1]]); bgc=np.median(bd,axis=0)
+    near=np.abs(o0-bgc).max(2)<60
+    lab,_n=_nd.label(near); ed=set(np.unique(np.concatenate([lab[0],lab[-1],lab[:,0],lab[:,-1]])))-{0}
+    al[np.isin(lab,list(ed))]=0
     k=Image.fromarray(np.dstack([a.clip(0,255),al*255]).astype(np.uint8),'RGBA'); return k.crop(k.getbbox())
 A={}
 for p in 'saturn jupiter mercury mars venus uranus pluto neptune'.split():
@@ -84,15 +91,34 @@ for k in 'user kimorin monban mikie brother sister'.split():
     if os.path.exists(f): kk=key(Image.open(f)); kk.thumbnail((260,260)); A['chibi4-'+k]=uri(kk,86)
 # profile korolin (white background, ears/hair stick out): remove only the white that touches the border
 def unwhite(im):
+    """Cut a picture painted on a plain light background (M-R325).
+    - the background colour is measured on the border (not assumed pure white)
+    - the outside is flooded only through pixels very close to that colour and with no edge (so a white korolin or a
+      white shirt that touches the background is not eaten)
+    - holes of background enclosed by the figure (between an arm and the body, inside a boat) are removed too, but only
+      when they are flat and the figure around them is clearly not background-coloured (so highlights stay)"""
     from PIL import ImageFilter as _F
-    a=np.asarray(im.convert('RGB')).astype(int); h,w,_=a.shape; wh=(a.min(2)>228)
-    seen=np.zeros((h,w),bool); st=[(0,x) for x in range(w)]+[(h-1,x) for x in range(w)]+[(y,0) for y in range(h)]+[(y,w-1) for y in range(h)]
-    while st:
-        y,x=st.pop()
-        if y<0 or y>=h or x<0 or x>=w or seen[y,x] or not wh[y,x]: continue
-        seen[y,x]=True; st+= [(y+1,x),(y-1,x),(y,x+1),(y,x-1)]
-    al=Image.fromarray(((~seen)*255).astype('uint8')).filter(_F.MinFilter(3)).filter(_F.GaussianBlur(1.2))
-    o=im.convert('RGBA'); o.putalpha(al); return o.crop(o.getbbox())
+    from scipy import ndimage as _nd
+    a=np.asarray(im.convert('RGB')).astype(np.float32); h,w,_=a.shape
+    bd=np.concatenate([a[0],a[-1],a[:,0],a[:,-1]]); bg=np.median(bd,axis=0)
+    dist=np.abs(a-bg).max(2)
+    lum=a.mean(2); gx=_nd.sobel(lum,1); gy=_nd.sobel(lum,0); grad=np.hypot(gx,gy)
+    bgl=(dist<=12)&(grad<60)
+    lab,n=_nd.label(bgl)
+    edge=set(np.unique(np.concatenate([lab[0],lab[-1],lab[:,0],lab[:,-1]])))-{0}
+    out=np.isin(lab,list(edge))
+    # enclosed background holes
+    hole=np.zeros_like(out)
+    if n:
+        idx=np.arange(1,n+1); area=_nd.sum(np.ones_like(lab),lab,idx)
+        md=_nd.mean(dist,lab,idx); sd=_nd.standard_deviation(lum,lab,idx)
+        for k,ar,m,sdv in zip(idx,area,md,sd):
+            if k in edge or ar<0.0006*h*w or m>7 or sdv>3: continue
+            comp=lab==k; ring=_nd.binary_dilation(comp,iterations=3)&~comp
+            if dist[ring].mean()>45: hole|=comp
+    clear=out|hole
+    al=Image.fromarray(((~clear)*255).astype('uint8')).filter(_F.MinFilter(3)).filter(_F.GaussianBlur(1.0))
+    o=im.convert('RGBA'); o.putalpha(al); bb=o.getbbox(); return o.crop(bb) if bb else o
 for k in 'user kimorin monban mikie brother sister'.split():
     f=f'{O}/kor4-{k}.jpg'
     if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((220,220),Image.LANCZOS); A['kor4-'+k]=uri(o,88)
