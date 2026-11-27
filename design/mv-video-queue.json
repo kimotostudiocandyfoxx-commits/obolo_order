@@ -408,6 +408,24 @@
    "always": false,
    "cameraFixed": true,
    "prompt": "The old spiny lobster slowly moves its long antennae, small fish swim past, light rays from the surface ripple softly, bubbles rise. Calm, seamless, the same painterly style, no cuts, no text."
+  },
+  {
+   "id": "su-uni-dad",
+   "image": "design/mv-art/out/su/uni/dad.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "always": false,
+   "cameraFixed": true,
+   "prompt": "Kelp sways slowly in the moonlit water, the sea urchins gently move their spines, soft moonbeams ripple, tiny particles drift. Calm, seamless, the same painterly style, no cuts, no text."
+  },
+  {
+   "id": "su-ika-dad",
+   "image": "design/mv-art/out/su/ika/dad.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "always": false,
+   "cameraFixed": true,
+   "prompt": "The firefly squids softly pulse with blue light in the night water, gentle waves roll, stars twinkle. Calm, seamless, the same painterly style, no cuts, no text."
   }
  ],
  "redo": []
