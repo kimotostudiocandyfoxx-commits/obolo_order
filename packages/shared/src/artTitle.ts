@@ -52,6 +52,17 @@ export function artTitleFallback(tags: readonly Tag[] = [], said = ''): string {
   return any ? cleanArtTitle(any) : 'むだい';
 }
 
+/** story 2026-11-27: a song's title as kept (one line, no quotes around it, at most 40 — the song's own limit) */
+export const SONG_TITLE_MAX = 40;
+export function cleanSongTitle(t: string | null | undefined): string {
+  return (t ?? '')
+    .replace(/[\r\n]+/g, ' ')
+    .trim()
+    .replace(/^[「『"'“]+|[」』"'”]+$/g, '')
+    .trim()
+    .slice(0, SONG_TITLE_MAX);
+}
+
 /** what words to {bati} about a made picture's title mean: a new title said, another one asked for, or nothing about it */
 export type ArtTitleTalk = { to: string } | { again: true } | null;
 const TITLE_WORD = '(?:タイトル|題名|だいめい|絵の名前|作品の名前|アートの名前)';
@@ -67,6 +78,29 @@ export function artTitleTalk(said: string): ArtTitleTalk {
   const to = cleanArtTitle(m?.[1]);
   if (to && !VAGUE.test(to) && !new RegExp(TITLE_WORD).test(to)) return { to };
   return AGAIN.test(s) ? { again: true } : null;
+}
+
+/**
+ * story 2026-11-27: the same words about a made SONG's title (「タイトルは〇〇にして」「〇〇ってタイトルにして」, and the
+ * song's own words 曲名 / 曲の名前 / 歌の名前) — a new title said, or nothing about it. (Another title by {bati} is not
+ * asked for a song: its title came with its lyrics.) `named`: the words say 曲 / 歌, so they mean the song and not a picture.
+ */
+const SONG_WORD = '(?:曲名|曲のタイトル|曲の名前|歌の名前|うたの名前|歌のタイトル)';
+const SONG_SET_A = new RegExp(`${SONG_WORD}\\s*(?:は|を|も)?\\s*[「『"]?(.+?)[」』"]?\\s*(?:に|で|が)\\s*(?:して|する|変えて|かえて|しよう|お願い|おねがい|いい|決めた|きめた)?\\s*(?:ください|ね|よ|な)?[。！!]*$`);
+const SONG_SET_B = new RegExp(`^[「『"]?(.+?)[」』"]?\\s*(?:って|という|っていう)\\s*${SONG_WORD}\\s*(?:に|で)`);
+export function songTitleTalk(said: string): { to: string; named: boolean } | null {
+  const s = said.trim();
+  if (new RegExp(SONG_WORD).test(s)) {
+    const m = SONG_SET_A.exec(s) ?? SONG_SET_B.exec(s);
+    const to = cleanSongTitle(m?.[1]);
+    return to && !VAGUE.test(to) && !new RegExp(SONG_WORD).test(to) ? { to, named: true } : null;
+  }
+  if (/絵|アート|作品/.test(s)) return null;
+  const t = artTitleTalk(s);
+  if (!t || !('to' in t)) return null;
+  const m = SET_A.exec(s) ?? SET_B.exec(s);
+  const to = cleanSongTitle(m?.[1]);
+  return to ? { to, named: false } : null;
 }
 
 // ───────────────────────────── {bati}'s lines (PROVISIONAL; the story chat checks them) ─────────────────────────────

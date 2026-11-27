@@ -21,6 +21,7 @@ import { Database } from '../db/db';
 import { follows, jupiterPosts, jupiterReplies, jupiterRoots, mediaObjects, starEvents, users } from '../db/schema';
 import { LLM } from '../infra/tokens';
 import { notChild, planetWorkScope } from '../common/child';
+import { postOfArt } from '../planets/one-post';
 import { PlanetWorksService } from '../planets/planet-works.service';
 
 type PostRow = typeof jupiterPosts.$inferSelect;
@@ -118,14 +119,34 @@ export class JupiterService {
       const mod = await moderateText(body.text, this.llm);
       if (mod.flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'MODERATION', 'This post breaks the community rules');
     }
-    const [p] = await this.db.write
-      .insert(jupiterPosts)
-      .values({ userId, rootId: root.id, kind: root.kind, url: root.url, posterUrl: root.posterUrl, text: body.text, title: root.title ?? null, filter: body.filter, branch: body.branch })
-      .returning();
+    // story 2026-11-27 (one work = one post): an art that flew before flies as the same post — what it shows now, its 88
+    // hours from now (also when it was taken out: 外す) — never a second one
+    const prev = await postOfArt(this.db, userId, root.id);
+    const shown = { kind: root.kind, url: root.url, posterUrl: root.posterUrl, text: body.text, title: root.title ?? null, filter: body.filter, branch: body.branch };
+    const now = new Date();
+    const [p] = prev
+      ? await this.db.write
+          .update(jupiterPosts)
+          .set({ ...shown, createdAt: now, updatedAt: now, deletedAt: null })
+          .where(eq(jupiterPosts.id, prev.id))
+          .returning()
+      : await this.db.write
+          .insert(jupiterPosts)
+          .values({ userId, rootId: root.id, ...shown })
+          .returning();
     // planets 2-1: the hidden tags, from the spell the picture was painted with (a photo: none yet)
     await this.works?.tag('jupiter_post', p.id, { userId, planet: 'jupiter', tags: artTags(root.spellJson), words: p.text });
     const [author] = await this.db.write.select(authorCols).from(users).where(eq(users.id, userId));
-    return this.toView(p, author, false);
+    return this.toView(p, author, prev ? await this.starredBy(userId, p.id) : false);
+  }
+
+  private async starredBy(userId: string, postId: string): Promise<boolean> {
+    const [r] = await this.db.read
+      .select({ id: starEvents.id })
+      .from(starEvents)
+      .where(and(eq(starEvents.userId, userId), eq(starEvents.targetType, 'jupiter_post'), eq(starEvents.targetId, postId)))
+      .limit(1);
+    return !!r;
   }
 
   async remove(userId: string, postId: string): Promise<void> {

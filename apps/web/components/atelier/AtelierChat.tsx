@@ -21,7 +21,7 @@ import { findAll, PLANET_NAME, workMarkRef, type Found } from '@/lib/finds/works
 import { choiceOf, detectOpen, pickOpen, type OpenAsk } from '@/lib/bluena/find';
 import { EDIT_EVENT, openInBluena, takeEdit } from '@/lib/bluena/edit';
 import { isStorageAsk, isStorageCancel, storageTierOf, STORAGE_LINES, type StorageTierPrice, type StorageView } from '@obolo/shared';
-import { ART_TITLE_LINES, artTitleTalk, type ArtTitleTalk } from '@obolo/shared';
+import { ART_TITLE_LINES, artTitleTalk, songTitleTalk, type ArtTitleTalk } from '@obolo/shared';
 import { coverTalk, GAME_COVER_LINES, GOODS_LINES, goodsKindOf, MAKE_COST, pickArt, type GoodsArt, type GoodsKind } from '@obolo/shared';
 import { BATI_REST_HINT, type BatiRest, BLUENA_LINES, formatMana, LOOK_LOCKED_LINE, gameTierFor, gameMakeKind, matchGameTemplate, type GameTemplateId, type GameTier } from '@obolo/shared';
 import { daysUntil, isOpen, KINDS, lockLine, openKinds, openLessons, type AtelierKind, type Lesson } from '@/lib/atelier/unlock';
@@ -722,12 +722,35 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
    * asks {bati} for another (the small writer, POST /moon/art-title); kept on its Jupiter root (and the posts flown from it)
    */
   const artTitleSend = (text: string): boolean => {
+    // story 2026-11-27: a song's title is changed by the same words — the words are about the work made last (a
+    // picture or a song), or about the song when they say 曲名 / 曲の名前
+    const st = songTitleTalk(text);
+    const made = [...msgsRef.current].reverse().filter((m): m is Extract<Msg, { who: 'work' }> => m.who === 'work' && m.work.status === 'ready' && (m.work.kind === 'art' || m.work.kind === 'song'));
+    const song = st ? (st.named ? made.find((m) => m.work.kind === 'song') : made[0]?.work.kind === 'song' ? made[0] : undefined)?.work : undefined;
+    if (st && song) {
+      void retitleSong(song, st.to);
+      return true;
+    }
     const t = artTitleTalk(text);
     if (!t) return false;
-    const art = [...msgsRef.current].reverse().find((m): m is Extract<Msg, { who: 'work' }> => m.who === 'work' && m.work.kind === 'art' && m.work.status === 'ready')?.work;
+    const art = made.find((m) => m.work.kind === 'art')?.work;
     if (!art) return false;
     void retitle(art, t);
     return true;
+  };
+  /** the song keeps the new title (its Mercury post and its reading in your voice follow: PATCH /compose/songs/:id/title) */
+  const retitleSong = async (w: Work, to: string) => {
+    const card = cardOf(w.id) ?? w;
+    setBusy(true);
+    try {
+      const title = card.ref?.songId ? (await getApi().setSongTitle(card.ref.songId, to)).title : to;
+      put({ ...card, title });
+      sayT(ART_TITLE_LINES.changed, { title });
+    } catch (e) {
+      sayT(e instanceof ApiError && e.code === 'MODERATION' ? ART_TITLE_LINES.flagged : ART_TITLE_LINES.failed);
+    } finally {
+      setBusy(false);
+    }
   };
   const retitle = async (w: Work, t: NonNullable<ArtTitleTalk>) => {
     const card = cardOf(w.id) ?? w;

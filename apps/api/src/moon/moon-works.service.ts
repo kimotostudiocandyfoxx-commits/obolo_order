@@ -21,7 +21,7 @@ import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { apiError } from '../common/errors';
 import { dachiOf } from '../common/child';
 import { Database } from '../db/db';
-import { jupiterPosts, moonWorks, planetPosts, radioShows, saturnPosts, starEvents, users, workHomecomings } from '../db/schema';
+import { bluenaSaves, books, games, goods, jupiterPosts, moonWorks, planetPosts, radioShows, saturnPosts, starEvents, users, workHomecomings } from '../db/schema';
 
 type Row = typeof moonWorks.$inferSelect;
 /** a flown post that came home (before its reactions are read) */
@@ -120,7 +120,14 @@ export class MoonWorksService {
   /** the flown works that came home and were not told about yet, with who put a ★ (under 15: the dachi only) */
   async homecomings(userId: string, now = new Date()): Promise<HomecomingView[]> {
     const [items, told, birthYear] = await Promise.all([this.homeItems(userId, now), this.told(userId), this.birthYear(userId)]);
-    const fresh = items.filter((x) => !told.has(x.key)).slice(0, HOME_LIMIT);
+    // told once per flight: a work flown again (story 2026-11-27: the same post, its 88 hours from now) is told again
+    // when it comes home again — its report of before was said before this homecoming
+    const fresh = items
+      .filter((x) => {
+        const at = told.get(x.key);
+        return !at || at.getTime() < x.flownAt.getTime() + PLANET_FLY_MS;
+      })
+      .slice(0, HOME_LIMIT);
     if (!fresh.length) return [];
     const stars = await this.reactions(userId, fresh);
     return fresh.map((x) => ({
@@ -140,12 +147,13 @@ export class MoonWorksService {
     await this.db.write
       .insert(workHomecomings)
       .values(keys.map((key) => ({ userId, key })))
-      .onConflictDoNothing();
+      .onConflictDoUpdate({ target: [workHomecomings.userId, workHomecomings.key], set: { toldAt: new Date() } });
   }
 
-  protected async told(userId: string): Promise<Set<string>> {
-    const rows = await this.db.read.select({ key: workHomecomings.key }).from(workHomecomings).where(eq(workHomecomings.userId, userId)).limit(5000);
-    return new Set(rows.map((r) => r.key));
+  /** the reports said already, and when (a later flight of the same post comes home after it) */
+  protected async told(userId: string): Promise<Map<string, Date>> {
+    const rows = await this.db.read.select({ key: workHomecomings.key, at: workHomecomings.toldAt }).from(workHomecomings).where(eq(workHomecomings.userId, userId)).limit(5000);
+    return new Map(rows.map((r) => [r.key, r.at]));
   }
 
   protected async birthYear(userId: string): Promise<number | null> {
@@ -159,7 +167,7 @@ export class MoonWorksService {
     const home = flyingSince(now);
     const from = new Date(home.getTime() - TELL_WITHIN_MS);
     const win = (col: AnyPgColumn) => and(gt(col, from), lte(col, home));
-    const [sat, jup, pp, radio] = await Promise.all([
+    const [sat, jup, pp, radio, gds, bks, gms] = await Promise.all([
       this.db.read
         .select()
         .from(saturnPosts)
@@ -180,12 +188,31 @@ export class MoonWorksService {
         .from(radioShows)
         .where(and(eq(radioShows.userId, userId), eq(radioShows.status, 'public'), isNull(radioShows.deletedAt), win(radioShows.publishedAt)))
         .limit(50),
+      // story 2026-11-27: goods (Uranus), books (Pluto) and games (Neptune) come home too
+      this.db.read
+        .select()
+        .from(goods)
+        .where(and(eq(goods.userId, userId), isNull(goods.deletedAt), win(goods.flownAt)))
+        .limit(50),
+      this.db.read
+        .select()
+        .from(books)
+        .where(and(eq(books.userId, userId), isNull(books.deletedAt), win(books.flownAt)))
+        .limit(50),
+      this.db.read
+        .select()
+        .from(games)
+        .where(and(eq(games.userId, userId), isNull(games.deletedAt), win(games.flownAt)))
+        .limit(50),
     ]);
     return [
       ...sat.map((r) => ({ key: `saturn_post:${r.id}`, targetType: 'saturn_post', id: r.id, planet: 'saturn' as const, title: r.text, image: r.photoUrl, flownAt: r.createdAt })),
       ...jup.map((r) => ({ key: `jupiter_post:${r.id}`, targetType: 'jupiter_post', id: r.id, planet: 'jupiter' as const, title: r.text, image: r.url, flownAt: r.createdAt })),
       ...pp.map((r) => ({ key: `planet_post:${r.id}`, targetType: 'planet_post', id: r.id, planet: (r.planet === 'mars' ? 'mars' : 'mercury') as BluenaPlanet, title: r.title, image: r.posterUrl, flownAt: r.createdAt })),
       ...radio.map((r) => ({ key: `radio_show:${r.id}`, targetType: 'radio_show', id: r.id, planet: 'venus' as const, title: r.title, image: r.thumbUrl, flownAt: r.publishedAt! })),
+      ...gds.map((r) => ({ key: `goods:${r.id}`, targetType: 'goods', id: r.id, planet: 'uranus' as const, title: r.title, image: r.artUrl, flownAt: r.flownAt! })),
+      ...bks.map((r) => ({ key: `book:${r.id}`, targetType: 'book', id: r.id, planet: 'pluto' as const, title: r.title, image: r.coverUrl, flownAt: r.flownAt! })),
+      ...gms.map((r) => ({ key: `game:${r.id}`, targetType: 'game', id: r.id, planet: 'neptune' as const, title: r.title, image: r.coverUrl, flownAt: r.flownAt! })),
     ].sort((a, b) => a.flownAt.getTime() - b.flownAt.getTime());
   }
 
@@ -196,6 +223,7 @@ export class MoonWorksService {
         type: starEvents.targetType,
         id: starEvents.targetId,
         tier: starEvents.tier,
+        by: starEvents.userId,
         name: users.displayName,
         dachi: sql<boolean>`${starEvents.userId} IN (${dachiOf(userId)})`,
       })
@@ -209,10 +237,32 @@ export class MoonWorksService {
         ),
       )
       .limit(2000);
+    // the new homes' ☆ (kept in someone's Bluena: bluena_saves) is a ★ too — the only one goods, books and games have
+    const saves = await this.db.read
+      .select({ type: bluenaSaves.kind, id: bluenaSaves.postId, by: bluenaSaves.userId, name: users.displayName, dachi: sql<boolean>`${bluenaSaves.userId} IN (${dachiOf(userId)})` })
+      .from(bluenaSaves)
+      .innerJoin(users, eq(users.id, bluenaSaves.userId))
+      .where(
+        and(
+          inArray(bluenaSaves.postId, items.map((x) => x.id)),
+          sql`${bluenaSaves.userId} <> ${userId}`,
+          sql`${bluenaSaves.userId} NOT IN (SELECT blocked_id FROM user_blocks WHERE blocker_id = ${userId})`,
+        ),
+      )
+      .limit(2000);
     const out = new Map<string, HomeReaction[]>();
+    const seen = new Set<string>();
     for (const r of rows) {
       const key = `${r.type}:${r.id}`;
+      seen.add(`${key}|${r.by}`);
       (out.get(key) ?? out.set(key, []).get(key)!).push({ name: r.name, dachi: !!r.dachi, stars: r.tier });
+    }
+    // one person, one ★ on a work (someone who starred it on the screen of before and kept it too counts once)
+    for (const r of saves) {
+      const key = `${r.type}:${r.id}`;
+      if (seen.has(`${key}|${r.by}`)) continue;
+      seen.add(`${key}|${r.by}`);
+      (out.get(key) ?? out.set(key, []).get(key)!).push({ name: r.name, dachi: !!r.dachi, stars: 1 });
     }
     return out;
   }

@@ -86,3 +86,22 @@ export function templateSample(planet: HomePlanet, now = Date.now()): PlanetHome
     far: [],
   };
 }
+
+/**
+ * Story 2026-11-27 (B7): what a home shows for the feed it got. The preview (`emptyAsSample`) falls back to the sample
+ * cast whenever there is nothing real to show; a live planet route never does for a signed-in member's own feed — an
+ * empty feed is their own place with no visitors ('empty'). The in-browser demo (a feed that is not live) keeps the
+ * sample: there is no member behind it.
+ */
+export function liveHomeShows(view: PlanetHomeView | null, emptyAsSample: boolean): 'real' | 'empty' | 'sample' {
+  const has = !!view && view.live && (view.around.length > 0 || view.own.length > 0);
+  if (has) return 'real';
+  if (emptyAsSample) return 'sample';
+  if (view && !view.live) return 'sample';
+  return 'empty';
+}
+
+/** a member's own place with nothing flown and nobody around */
+export function emptyHome(planet: HomePlanet, id: string, name: string, now = Date.now()): PlanetHomeView {
+  return { planet, live: true, owner: { id, name }, young: false, lastVisitAt: new Date(now).toISOString(), own: [], around: [], far: [] };
+}

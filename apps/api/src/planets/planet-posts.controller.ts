@@ -7,6 +7,7 @@ import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
 import type { KvStore } from '../infra/kv';
 import { KV } from '../infra/tokens';
+import { moonOnly } from './moon-only';
 import { PlanetPostsService } from './planet-posts.service';
 
 const planetOf = (p: string): TimelinePlanet => {
@@ -36,7 +37,10 @@ export class PlanetPostsController {
   @Post('posts')
   async create(@UserId() userId: string, @Param('planet') planet: string, @Body() body: unknown, @Req() req: Request) {
     await rateLimit(this.kv, `planet-post:${userId}`, 20, 600);
-    return this.posts.create(userId, planetOf(planet), parseBody(CreatePlanetPostBody, body), `${req.protocol}://${req.get('host')}`);
+    const b = parseBody(CreatePlanetPostBody, body);
+    // story 2026-11-27: with the planet's new home, only the Moon's 〔星へ飛ばす〕 posts here
+    moonOnly(planetOf(planet), b.via === 'moon');
+    return this.posts.create(userId, planetOf(planet), b, `${req.protocol}://${req.get('host')}`);
   }
 
   @Delete('posts/:id')
@@ -63,8 +67,9 @@ export class PlanetPostsController {
   }
 
   @Post('posts/:id/replies')
-  async reply(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string, @Body() body: unknown) {
+  async reply(@UserId() userId: string, @Param('planet') planet: string, @Param('id', new ParseUUIDPipe()) id: string, @Body() body: unknown) {
     await rateLimit(this.kv, `planet-reply:${userId}`, 30, 600);
+    moonOnly(planetOf(planet));
     return this.posts.reply(userId, id, parseBody(JupiterReplyBody, body).text);
   }
 }

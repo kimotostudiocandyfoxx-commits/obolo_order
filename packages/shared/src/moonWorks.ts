@@ -357,10 +357,13 @@ export function fillLine(text: string, vars: Record<string, string | number | un
   return text.replace(/\{([a-z]+)\}/g, (m, k: string) => (vars[k] == null ? m : String(vars[k])));
 }
 
-const PLANET_WORD: Partial<Record<BluenaPlanet, string>> = { saturn: '土星', jupiter: '木星', mercury: '水星', mars: '火星', venus: '金星' };
+const PLANET_WORD: Partial<Record<BluenaPlanet, string>> = { saturn: '土星', jupiter: '木星', mercury: '水星', mars: '火星', venus: '金星', uranus: '天王星', pluto: '冥王星', neptune: '海王星' };
 
-/** each planet's own place a work goes home to (M-R208) */
-export const HOME_PLACE: Partial<Record<BluenaPlanet, string>> = { saturn: 'レコード', jupiter: 'アトリエ', mercury: '島', mars: 'スタジオ', venus: 'ブース' };
+/**
+ * each planet's own place a work goes home to (M-R208). Story 2026-11-27: goods, books and games are told too — their
+ * places are the new homes' own (the ♡ line's きみのお店 / きみの図書館 / きみのゲーム小屋; PROVISIONAL wording)
+ */
+export const HOME_PLACE: Partial<Record<BluenaPlanet, string>> = { saturn: 'レコード', jupiter: 'アトリエ', mercury: '島', mars: 'スタジオ', venus: 'ブース', uranus: 'お店', pluto: '図書館', neptune: 'ゲーム小屋' };
 
 /**
  * M-R253 §6 ⑥: {bati}'s report when a work comes home — the lines to say with their placeholders (render each in the

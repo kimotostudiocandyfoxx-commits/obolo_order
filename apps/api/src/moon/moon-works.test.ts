@@ -210,13 +210,22 @@ describe('M-R253 §5: back home after 88 hours', () => {
   });
   it('the service tells each once, with the viewer’s age rule', async () => {
     const item: HomeItem = { key: 'planet_post:p1', targetType: 'planet_post', id: 'p1', planet: 'mercury', title: '月のうた', image: null, flownAt: new Date(now.getTime() - 90 * 3600_000) };
-    const mk = (birthYear: number | null, told: string[] = []) => {
+    const mk = (birthYear: number | null, told: string[] = [], toldAt = now) => {
       const s = new MoonWorksService({} as never);
-      Object.assign(s, { homeItems: async () => [item], told: async () => new Set(told), birthYear: async () => birthYear, reactions: async () => new Map([[item.key, rs]]) });
+      Object.assign(s, { homeItems: async () => [item], told: async () => new Map(told.map((k) => [k, toldAt])), birthYear: async () => birthYear, reactions: async () => new Map([[item.key, rs]]) });
       return s;
     };
     expect((await mk(2014).homecomings('u', now))[0]).toMatchObject({ named: [{ name: 'ミキエ' }], strangers: 0, homeAt: '2026-11-22T10:00:00.000Z' });
     expect((await mk(1990).homecomings('u', now))[0].strangers).toBe(2);
     expect(await mk(1990, [item.key]).homecomings('u', now)).toEqual([]);
+    // story 2026-11-27 (one work = one post): the same post flown again comes home again — its report of the flight
+    // before (said before this homecoming) does not silence the new one
+    expect(await mk(1990, [item.key], new Date(now.getTime() - 30 * 86400_000)).homecomings('u', now)).toHaveLength(1);
+  });
+  it('story 2026-11-27: goods, books and games come home too (their planet and their place)', () => {
+    const say = (h: Parameters<typeof homecomingSay>[0]) => homecomingSay(h).map((x) => fillLine(x.text, x.vars));
+    expect(say({ title: 'ねこのトート', planet: 'uranus', named: [], strangers: 0 })).toEqual(['「ねこのトート」が、天王星から帰ってきたよ。のんびり、浮かんでたって。', 'お店に、しまっておいたよ。']);
+    expect(say({ title: 'よるの学校', planet: 'pluto', named: [{ name: 'ミキエ', stars: 1 }], strangers: 0 })).toEqual(['「よるの学校」が、冥王星から帰ってきたよ。ミキエが★つけてたよ。', '図書館に、しまっておいたよ。']);
+    expect(say({ title: 'ねこパズル', planet: 'neptune', named: [{ name: 'ミキエ', stars: 1 }], strangers: 1 })).toEqual(['「ねこパズル」が、海王星から帰ってきたよ。ミキエと、ほか1人が★つけてた。', 'ゲーム小屋に、しまっておいたよ。']);
   });
 });

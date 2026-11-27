@@ -200,6 +200,14 @@ const Env = z.object({
    */
   /** Story MV stills move in 2.5D (depth picture on the API's CPU + Gemini's camera moves); the depth model's ONNX (default Depth Anything V2 Small) */
   // R13: on by default — the 2.5D camera is the spell's default (パララックス); depth on the CPU, no cost per video
+  /**
+   * Story 2026-11-27 (M-R331): the planets with their new home (mirrors the web's NEXT_PUBLIC_PLANET_HOMES*; docs/planets.md
+   * 「新しい家への切り替え」). On for a planet: its posting doors of before answer 403 MADE_ON_MOON (planets/moon-only.ts
+   * reads these at each call). PLANET_HOMES=new: every planet; _NEW: only these; _OLD: these stay as before. Default: off.
+   */
+  PLANET_HOMES: z.string().default(''),
+  PLANET_HOMES_NEW: z.string().default(''),
+  PLANET_HOMES_OLD: z.string().default(''),
   MV_PARALLAX: bool(true),
   MV_DEPTH_ONNX_URL: secret(),
   MV_PLAN: z.preprocess((v) => (v === '' ? undefined : v), z.enum(['A', 'B']).optional()),

@@ -502,6 +502,9 @@ export class HttpApi implements Api {
   addJupiterRoot(body: Parameters<Api['addJupiterRoot']>[0]) {
     return this.req<Awaited<ReturnType<Api['addJupiterRoot']>>>('POST', '/jupiter/roots', body);
   }
+  setSongTitle(id: string, title: string) {
+    return this.req<Awaited<ReturnType<Api['setSongTitle']>>>('PATCH', `/compose/songs/${id}/title`, { title });
+  }
   setJupiterRootTitle(id: string, title: string) {
     return this.req<Awaited<ReturnType<Api['setJupiterRootTitle']>>>('PATCH', `/jupiter/roots/${id}`, { title });
   }

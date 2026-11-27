@@ -547,6 +547,10 @@ export type JupiterRootBody = z.infer<typeof JupiterRootBody>;
 export const JupiterRootTitleBody = z.object({ title: z.string().trim().min(1).max(ART_TITLE_MAX) });
 export type JupiterRootTitleBody = z.infer<typeof JupiterRootTitleBody>;
 
+/** story 2026-11-27: PATCH /compose/songs/:id/title — the song's title changed by words in the Moon atelier (its Mercury post too) */
+export const SongTitleBody = z.object({ title: z.string().trim().min(1).max(40) });
+export type SongTitleBody = z.infer<typeof SongTitleBody>;
+
 export const JUPITER_FILTERS = ['none', 'warm', 'sepia', 'mono', 'soft'] as const;
 
 /** A round post made from one of your roots. */
@@ -555,6 +559,8 @@ export const CreateJupiterPostBody = z.object({
   text: z.string().trim().max(30).default(''),
   filter: z.enum(JUPITER_FILTERS).default('none'),
   branch: z.number().int().min(0).max(3),
+  /** story 2026-11-27: the Moon's own call (〔星へ飛ばす〕); the screens of before send none (refused once the planet has its new home) */
+  via: z.literal('moon').optional(),
 });
 export type CreateJupiterPostBody = z.infer<typeof CreateJupiterPostBody>;
 
@@ -600,6 +606,8 @@ export const CreatePlanetPostBody = z.object({
   sourceId: z.string().uuid(),
   title: z.string().trim().max(40).optional(),
   text: z.string().trim().max(60).default(''),
+  /** story 2026-11-27: the Moon's own call (〔星へ飛ばす〕); the screens of before send none (refused once the planet has its new home) */
+  via: z.literal('moon').optional(),
 });
 export type CreatePlanetPostBody = z.infer<typeof CreatePlanetPostBody>;
 

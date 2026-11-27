@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ART_TITLE_LINE_TEXTS, ART_TITLE_LINES, ART_TITLE_MAX, ArtTitleBody, artTitleFallback, artTitleTalk, cleanArtTitle } from './artTitle';
+import { ART_TITLE_LINE_TEXTS, ART_TITLE_LINES, ART_TITLE_MAX, ArtTitleBody, artTitleFallback, artTitleTalk, cleanArtTitle, cleanSongTitle, songTitleTalk } from './artTitle';
 import { BATI_VARIANTS } from './batiVariants';
 import { JupiterRootBody, JupiterRootTitleBody } from './schemas';
 import { spellFrom } from './spell';
@@ -18,6 +18,18 @@ describe('story 2026-11-25: an art work has a title', () => {
     expect(artTitleTalk('もっと明るくして')).toBeNull();
     expect(artTitleTalk('ねこの絵を描いて')).toBeNull();
     expect(artTitleTalk('夜の森にして')).toBeNull();
+  });
+  it('story 2026-11-27: the same words change a SONG\'s title (and 曲名 / 曲の名前 mean the song)', () => {
+    expect(songTitleTalk('タイトルは「夜の森」にして')).toEqual({ to: '夜の森', named: false });
+    expect(songTitleTalk('星の海ってタイトルにして')).toEqual({ to: '星の海', named: false });
+    expect(songTitleTalk('曲名は月とねこにして')).toEqual({ to: '月とねこ', named: true });
+    expect(songTitleTalk('曲の名前をはじまりの朝に変えて')).toEqual({ to: 'はじまりの朝', named: true });
+    // words about a picture, another title asked of {bati}, or nothing about a title: not a song's new title
+    expect(songTitleTalk('絵の名前は夜の森にして')).toBeNull();
+    expect(songTitleTalk('ほかのタイトルにして')).toBeNull();
+    expect(songTitleTalk('もっと速くして')).toBeNull();
+    expect(cleanSongTitle('「ほしのうた」\n')).toBe('ほしのうた');
+    expect(cleanSongTitle('あ'.repeat(60))).toHaveLength(40);
   });
   it('a title as kept: no quotes, no 「〜の絵」, one line, at most ART_TITLE_MAX', () => {
     expect(cleanArtTitle('「月と海」')).toBe('月と海');

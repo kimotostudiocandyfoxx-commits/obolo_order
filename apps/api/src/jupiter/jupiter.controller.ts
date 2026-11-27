@@ -5,6 +5,7 @@ import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
 import type { KvStore } from '../infra/kv';
 import { KV } from '../infra/tokens';
+import { moonOnly } from '../planets/moon-only';
 import { JupiterService } from './jupiter.service';
 
 /** Jupiter — パタパタ: roots, posts (butterflies → leaves), the sky, trees, search. */
@@ -48,7 +49,10 @@ export class JupiterController {
   @Post('posts')
   async create(@UserId() userId: string, @Body() body: unknown) {
     await rateLimit(this.kv, `jupiter-post:${userId}`, 20, 600);
-    return this.jupiter.create(userId, parseBody(CreateJupiterPostBody, body));
+    const b = parseBody(CreateJupiterPostBody, body);
+    // story 2026-11-27: with Jupiter's new home, only the Moon's 〔星へ飛ばす〕 posts here
+    moonOnly('jupiter', b.via === 'moon');
+    return this.jupiter.create(userId, b);
   }
 
   @Delete('posts/:id')
@@ -77,6 +81,7 @@ export class JupiterController {
   @Post('posts/:id/replies')
   async reply(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string, @Body() body: unknown) {
     await rateLimit(this.kv, `jupiter-reply:${userId}`, 30, 600);
+    moonOnly('jupiter');
     return this.jupiter.reply(userId, id, parseBody(JupiterReplyBody, body).text);
   }
 

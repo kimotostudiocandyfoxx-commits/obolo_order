@@ -36,6 +36,8 @@ export const CreateRadioShowBody = z.object({
   /** the recording, after POST /media/show */
   mediaId: z.string().uuid(),
   title: z.string().trim().min(1).max(40),
+  /** story 2026-11-27: the Moon's own call (〔星へ飛ばす〕); the screens of before send none (refused once the planet has its new home) */
+  via: z.literal('moon').optional(),
   /** a picture from Bluena (after POST /media/photo, or one of your Jupiter photos) */
   thumbUrl: z.string().url().max(500).nullable().optional(),
   loop: z.enum(RADIO_LOOPS).default('drift'),

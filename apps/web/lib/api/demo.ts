@@ -2313,6 +2313,10 @@ export class DemoApi implements Api {
     return view;
   }
 
+  /** the review: the demo's songs live on their cards (nothing to keep here) */
+  async setSongTitle(id: string, title: string) {
+    return { id, title };
+  }
   async setJupiterRootTitle(id: string, title: string) {
     const viewer = this.uid();
     const r = (this.s.jroots ?? []).find((x) => x.id === id && x.owner === viewer);

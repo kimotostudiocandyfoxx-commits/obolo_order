@@ -22,6 +22,7 @@ import { follows, marsBackstage, mvProjects, planetPosts, planetReplies, songs, 
 import { LLM } from '../infra/tokens';
 import { MediaService } from '../media/media.service';
 import { notChild, planetWorkScope } from '../common/child';
+import { postOfSource } from './one-post';
 import { PlanetWorksService } from './planet-works.service';
 import { SongTitleVoiceService, titleKey, titleVoiceOf } from '../compose/song-title-voice.service';
 
@@ -85,12 +86,23 @@ export class PlanetPostsService {
       const sq = mv ? { url: v.url, posterUrl: v.posterUrl, seconds: v.seconds } : await this.media.squareCopy(userId, v.url, MARS_VIDEO_SECONDS, origin);
       values = { planet, userId, kind: 'video', sourceId: v.id, title: body.title || v.title || '', text: body.text, url: sq.url, posterUrl: sq.posterUrl, seconds: sq.seconds };
     }
-    const [p] = await this.db.write.insert(planetPosts).values(values).returning();
+    // story 2026-11-27 (one work = one post): a song / a video that flew before flies as the same post — what it is now
+    // (title, sound, film), its 88 hours from now (also when it was taken out: 外す) — never a second one
+    const prev = await postOfSource(this.db, userId, planet, body.sourceId);
+    const now = new Date();
+    const [p] = prev
+      ? await this.db.write
+          .update(planetPosts)
+          .set({ kind: values.kind, title: values.title, text: values.text, url: values.url, posterUrl: values.posterUrl ?? null, seconds: values.seconds ?? null, createdAt: now, updatedAt: now, deletedAt: null })
+          .where(eq(planetPosts.id, prev.id))
+          .returning()
+      : await this.db.write.insert(planetPosts).values(values).returning();
     await this.works?.tag('planet_post', p.id, { userId, planet, tags, words: `${p.title} ${p.text}` });
     // client 2026-11-25: a song flying under a title with no reading in the maker's voice yet (another title than the
     // song's, or one made before the readings): read in the background (nothing when they have no voice)
     if (song && p.title && !titleVoiceOf(song.designJson, p.title)) await this.titleVoice?.later(userId, song.id, origin, titleKey(p.title) === titleKey(song.title) ? undefined : p.title);
     const [author] = await this.db.write.select(authorCols).from(users).where(eq(users.id, userId));
+    if (prev) return (await this.views(userId, [{ p, u: author }]))[0];
     return this.toView(p, author, false, []);
   }
 

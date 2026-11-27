@@ -11,6 +11,7 @@ import { timedLyrics } from '../compose/lyrics';
 import { AppConfig, CONFIG } from '../config';
 import { Database } from '../db/db';
 import { jupiterRoots, marsBackstage, mvProjects, songs, users } from '../db/schema';
+import { followMv } from '../planets/mv-follow';
 import { probe, run } from '../media/transcode';
 import { MediaService } from '../media/media.service';
 import { idToken } from '../compose/music.client';
@@ -222,6 +223,8 @@ export class MvService {
         })
         .where(eq(mvProjects.id, id))
         .returning();
+      // story 2026-11-27: made again — the MV flown before shows this film on Mars
+      await followMv(this.db, userId, { backstageId: p.backstageId, urls: [p.videoUrl, p.lyricsVideoUrl] }, { backstageId: b.id, url: v.url, posterUrl: poster.url, seconds: info.seconds });
       return this.view(up);
     } catch (e) {
       this.log.warn(`MV failed: ${String(e).slice(0, 300)}`);
@@ -581,6 +584,8 @@ export class MvService {
       })
       .where(eq(mvProjects.id, p.id))
       .returning();
+    // story 2026-11-27: a repainted scene / a changed cut — the MV flown before shows this film on Mars
+    await followMv(this.db, userId, { backstageId: p.backstageId, urls: [p.videoUrl, p.lyricsVideoUrl] }, { backstageId, url: v.url, posterUrl: poster.url, seconds: info.seconds });
     return this.view(up);
   }
 
@@ -636,6 +641,8 @@ export class MvService {
         .values({ userId, mediaId: v.id, url: v.url, posterUrl: p.posterUrl, seconds: p.seconds, title: `${s.title}（MV・歌詞つき）`.slice(0, 40) })
         .returning();
       const [up] = await this.db.write.update(mvProjects).set({ lyricsVideoUrl: v.url, backstageId: b.id, updatedAt: new Date() }).where(eq(mvProjects.id, id)).returning();
+      // story 2026-11-27: the lyrics put on — the MV flown before shows the film with its lyrics on Mars
+      await followMv(this.db, userId, { backstageId: p.backstageId, urls: [p.videoUrl, p.lyricsVideoUrl] }, { backstageId: b.id, url: v.url, posterUrl: p.posterUrl, seconds: p.seconds });
       return this.view(up);
     } catch (e) {
       if (e instanceof Error && 'status' in e) throw e;

@@ -2,7 +2,10 @@ import { MockProvider } from '@obolo/ai';
 import { KIND_HOME_PLANET, PLANET_FIGURE_OF, PLANET_FLY_HOURS, type HomePlanet, type HomeWork, type PlanetWorkKind } from '@obolo/shared';
 import { sql } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { SongRetitleService } from '../compose/song-retitle.service';
 import { SongTweakService } from '../compose/song-tweak.service';
+import { MoonWorksService } from '../moon/moon-works.service';
+import { followMv } from './mv-follow';
 import type { AppConfig } from '../config';
 import { GameService } from '../craft/game.service';
 import { GoodsService } from '../craft/goods.service';
@@ -168,6 +171,21 @@ describe.skipIf(!URL)('月で作る → 星: each kind made, flown, shown, chang
     expect(await flownInBluena('jupiter', rootId)).toBe(false);
     const again = await jupiter.create(me, { rootId, text: '', filter: 'none', branch: 0 } as never);
     expect(await own('jupiter', again.id)).toBeTruthy();
+    // story 2026-11-27 — one work = one post: flown again it is the SAME post (never a second one), its 88 hours from now
+    expect(again.id).toBe(post.id);
+    await db.write.execute(sql`UPDATE jupiter_posts SET created_at = now() - interval '50 hours' WHERE id = ${post.id}`);
+    const third = await jupiter.create(me, { rootId, text: '', filter: 'none', branch: 0 } as never);
+    expect(third.id).toBe(post.id);
+    expect(Date.now() - Date.parse((await own('jupiter', post.id))!.flownAt)).toBeLessThan(60_000);
+    expect((await q(sql`SELECT id FROM jupiter_posts WHERE root_id = ${rootId}`)).length).toBe(1);
+    // an art flown twice BEFORE the rule (two live posts): the home shows it once (the newest), 外す takes both out
+    const [{ id: twin }] = await q<{ id: string }>(sql`INSERT INTO jupiter_posts (user_id, root_id, kind, url, title, created_at) VALUES (${me}, ${rootId}, 'photo', 'https://x/art.png', 'あさやけ', now() - interval '3 hours') RETURNING id`);
+    expect((await home.feed(me, 'jupiter')).own.filter((w) => w.id === twin || w.id === post.id).map((w) => w.id)).toEqual([post.id]);
+    expect(await around('jupiter', twin)).toBeUndefined();
+    await home.takeOut(me, 'jupiter', post.id);
+    await gone('jupiter', post.id);
+    await gone('jupiter', twin);
+    expect((await jupiter.create(me, { rootId, text: '', filter: 'none', branch: 0 } as never)).id).toBe(post.id);
     // the art thrown away on the Moon: its post goes with it
     await storage.remove(me, 'jupiter_root', rootId);
     await gone('jupiter', again.id);
@@ -203,6 +221,18 @@ describe.skipIf(!URL)('月で作る → 星: each kind made, flown, shown, chang
     // flown again, then the song thrown away on the Moon
     const again = await posts.create(me, 'mercury', { sourceId: songId, title: '', text: '' } as never, 'https://api');
     expect(await own('mercury', again.id)).toBeTruthy();
+    // story 2026-11-27 — one work = one post: the same post again, its 88 hours from now
+    expect(again.id).toBe(post.id);
+    expect((await q(sql`SELECT id FROM planet_posts WHERE source_id = ${songId}`)).length).toBe(1);
+    expect(Date.now() - Date.parse((await own('mercury', post.id))!.flownAt)).toBeLessThan(60_000);
+    // story 2026-11-27: the song's title changed by words on the Moon — the song, its Mercury post, and the reading asked again
+    const asked: string[] = [];
+    const retitle = new SongRetitleService(db, llm, { later: async (_u: string, id: string) => (asked.push(id), true) } as never);
+    expect(await retitle.retitle(me, songId, '「よるのうた」', 'https://api')).toMatchObject({ title: 'よるのうた' });
+    expect((await around('mercury', post.id))!.title).toBe('よるのうた');
+    expect((await songs.song(dachi, post.id)).title).toBe('よるのうた');
+    expect(asked).toEqual([songId]);
+    await expect(retitle.retitle(dachi, songId, 'ぬすんだうた', 'https://api')).rejects.toThrow();
     await storage.remove(me, 'song', songId);
     await gone('mercury', again.id);
     await expect(songs.song(dachi, again.id)).rejects.toThrow();
@@ -229,7 +259,16 @@ describe.skipIf(!URL)('月で作る → 星: each kind made, flown, shown, chang
     await gone('mars', post.id);
     expect(await flownInBluena('mars', backstageId)).toBe(false);
     const again = await posts.create(me, 'mars', { sourceId: backstageId, title: '', text: '' } as never, 'https://api');
-    await storage.remove(me, 'mars_backstage', backstageId);
+    expect(again.id).toBe(post.id); // one work = one post
+    // story 2026-11-27: the MV made again on the Moon (a new film in a new 裏スタジオ entry) — Mars shows the film of now,
+    // the post belongs to the new entry (Bluena: 「星にいる」 there), and flying the new film is the same post
+    const [{ id: backstage2 }] = await q<{ id: string }>(sql`INSERT INTO mars_backstage (user_id, url, poster_url, title, seconds) VALUES (${me}, 'https://x/mv-2.mp4', 'https://x/mv-2.jpg', 'はじめてのMV', 58) RETURNING id`);
+    await followMv(db, me, { backstageId, urls: ['https://x/mv.mp4', null] }, { backstageId: backstage2, url: 'https://x/mv-2.mp4', posterUrl: 'https://x/mv-2.jpg', seconds: 58 });
+    await db.write.execute(sql`UPDATE mv_projects SET video_url = 'https://x/mv-2.mp4', backstage_id = ${backstage2} WHERE backstage_id = ${backstageId}`);
+    expect(await around('mars', post.id)).toMatchObject({ title: 'はじめてのMV', url: 'https://x/mv-2.mp4', thumbUrl: 'https://x/mv-2.jpg', seconds: 58 });
+    expect(await flownInBluena('mars', backstage2)).toBe(true);
+    expect((await posts.create(me, 'mars', { sourceId: backstage2, title: '', text: '' } as never, 'https://api')).id).toBe(post.id);
+    await storage.remove(me, 'mars_backstage', backstage2);
     await gone('mars', again.id);
   });
 
@@ -310,6 +349,30 @@ describe.skipIf(!URL)('月で作る → 星: each kind made, flown, shown, chang
     await novel.fly(me, id, true);
     await storage.remove(me, 'book', id);
     await gone('pluto', id);
+  });
+
+  it('story 2026-11-27: the homecoming report after 88 hours tells goods, books and games too (and a second flight again)', async () => {
+    const moon = new MoonWorksService(db);
+    const [{ id: goodsId }] = await q<{ id: string }>(sql`INSERT INTO goods (user_id, kind, title, art_url, flown_at) VALUES (${me}, 'トート', 'かえりのトート', 'https://x/g.png', now() - make_interval(hours => ${PLANET_FLY_HOURS + 2})) RETURNING id`);
+    const [{ id: bookId }] = await q<{ id: string }>(sql`INSERT INTO books (user_id, title, spell_json, chapters_json, flown_at) VALUES (${me}, 'かえりの本', '[]', '[]', now() - make_interval(hours => ${PLANET_FLY_HOURS + 3})) RETURNING id`);
+    const [{ id: gameId }] = await q<{ id: string }>(sql`INSERT INTO games (user_id, title, versions_json, active, flown_at) VALUES (${me}, 'かえりのゲーム', '[]', 0, now() - make_interval(hours => ${PLANET_FLY_HOURS + 4})) RETURNING id`);
+    // the dachi kept the goods in their Bluena (the new homes' ☆)
+    await db.write.execute(sql`INSERT INTO bluena_saves (user_id, kind, post_id) VALUES (${dachi}, 'goods', ${goodsId})`);
+    const told = await moon.homecomings(me);
+    const by = (key: string) => told.find((h) => h.key === key);
+    expect(by(`goods:${goodsId}`)).toMatchObject({ planet: 'uranus', title: 'かえりのトート', named: [{ name: 'dachi' }], strangers: 0 });
+    expect(by(`book:${bookId}`)).toMatchObject({ planet: 'pluto', title: 'かえりの本', named: [] });
+    expect(by(`game:${gameId}`)).toMatchObject({ planet: 'neptune', title: 'かえりのゲーム' });
+    await moon.markTold(me, told.map((h) => h.key));
+    expect((await moon.homecomings(me)).some((h) => h.key === `goods:${goodsId}`)).toBe(false);
+    // flown again and home again: told again (its report of before was said before this homecoming)
+    await db.write.execute(sql`UPDATE work_homecomings SET told_at = now() - interval '10 days' WHERE user_id = ${me}`);
+    expect((await moon.homecomings(me)).some((h) => h.key === `goods:${goodsId}`)).toBe(true);
+    await db.write.execute(sql`DELETE FROM bluena_saves WHERE user_id = ${dachi}`);
+    await db.write.execute(sql`DELETE FROM work_homecomings WHERE user_id = ${me}`);
+    await db.write.execute(sql`DELETE FROM goods WHERE id = ${goodsId}`);
+    await db.write.execute(sql`DELETE FROM books WHERE id = ${bookId}`);
+    await db.write.execute(sql`DELETE FROM games WHERE id = ${gameId}`);
   });
 
   it('ゲーム → 海王星: POST /moon/games/:id/fly (games.flown_at)', async () => {
