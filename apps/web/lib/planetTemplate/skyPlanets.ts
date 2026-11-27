@@ -11,8 +11,9 @@ import { floorMotionOn, type FloorRec } from './saturn';
  *
  * Mercury: ships sail the sea lanes, on the sea only. Jupiter: butterflies holding a small art flutter around the glade.
  * Saturn: kororins hop on the plaza's record floor (the same hops as the home, on the landed picture's record). The five
- * (Mars, Venus, Uranus, Pluto, Neptune): 06 leaves their sky to be decided with 05's worlds (Neptune: a deep-sea dome),
- * so they get the generic flutter and their 05 openers, and the sky opens only once their sea and continents exist.
+ * (Mars, Venus, Uranus, Pluto, Neptune; handoff 07, prototype SKYV): their 05 vehicles (UFO, DJ booth, balloon, flying
+ * book, bubble) flutter round the landed scene like Jupiter's butterflies, come down from the top to the bottom left on
+ * the shore and leave to the right; their 05 viewers open the work with the maker's figure and name at the top.
  */
 
 /** at most seven strangers on a continent (06 §5) */
@@ -93,8 +94,10 @@ export interface SkyPlanet {
   shore: { from: ShorePoint; to: ShorePoint; out: ShorePoint };
   /** how long one work stays on the shore (ms); null: until it has finished (Mercury's song, Mars's MV) */
   holdMs: number | null;
-  /** where the maker's figure and name sit under the opened work (fraction of the screen's height) */
+  /** where the maker's figure and name sit (fraction of the screen's height): under the opened work, or above it (the five) */
   whoTop: number;
+  /** the five: their 05 viewer opens no higher than this (fraction of the screen's height), clear of the maker above it */
+  workTop?: number;
   /** ♡: 「これから〇〇にも来てくれるよ」 */
   home: string;
   /** what drifts here, for the under-15 line (「15歳になると、ここに知らない人の〇〇が…」) */
@@ -102,18 +105,24 @@ export interface SkyPlanet {
 }
 
 const P = (x: number, y: number, size: number): ShorePoint => ({ x, y, size });
-/** the five: from the top down to the front, back up (06 leaves their shore to 05's worlds; this is the template's) */
-const FIVE_SKY: SkyPlanet = { land: 'flutter', shore: { from: P(0.5, -0.12, 0.35), to: P(0.22, 0.86, 0.95), out: P(0.5, -0.2, 0.3) }, holdMs: 5200, whoTop: 0.79, home: 'きみの星', works: '作品' };
+/**
+ * 07 §3 the five (prototype SKYV pierFrom / pierTo / pierOut): the vehicle comes down from above and stops at the bottom
+ * left (☆ ♡ stay clear), then leaves to the right; the maker's figure and name at the top of the screen (whoTop 7.5%:
+ * the work's title is under the work, so they never overlap). How long one work stays: Mars the MV's length (the
+ * prototype's 14 s), Venus 6 s, Uranus 5 s, Pluto 6 s, Neptune 5 s.
+ */
+const FIVE_SKY = { land: 'flutter', shore: { from: P(0.5, -0.1, 0.35), to: P(0.2, 0.88, 0.9), out: P(1.2, 0.3, 0.4) }, whoTop: 0.075, workTop: 0.16 } as const;
 
 export const SKY_PLANETS: Record<HomePlanet, SkyPlanet> = {
   mercury: { land: 'sail', shore: { from: P(-0.2, 0.5, 0.35), to: P(0.22, 0.86, 0.9), out: P(1.25, 0.55, 0.45) }, holdMs: null, whoTop: 0.73, home: 'きみの島', works: '曲' },
   jupiter: { land: 'flutter', shore: { from: P(0.5, 0.08, 0.3), to: P(0.17, 0.86, 0.9), out: P(0.5, -0.2, 0.3) }, holdMs: 7000, whoTop: 0.76, home: 'きみの森', works: 'アート' },
   saturn: { land: 'floor', shore: { from: P(0.5, -0.1, 0.4), to: P(0.5, 0.62, 1.25), out: P(1.2, 0.5, 0.6) }, holdMs: 5000, whoTop: 0.72, home: 'きみのレコード', works: '声' },
-  mars: { ...FIVE_SKY, holdMs: null, works: 'MV' },
-  venus: { ...FIVE_SKY, works: '番組' },
-  uranus: { ...FIVE_SKY, works: 'グッズ' },
-  pluto: { ...FIVE_SKY, works: '物語' },
-  neptune: { ...FIVE_SKY, works: 'ゲーム' },
+  // 07 §1: 推した時 — 「これから{きみのシアター／ブース／お店／図書館／ゲーム小屋}にも来てくれるよ」
+  mars: { ...FIVE_SKY, holdMs: null, home: 'きみのシアター', works: 'MV' },
+  venus: { ...FIVE_SKY, holdMs: 6000, home: 'きみのブース', works: '番組' },
+  uranus: { ...FIVE_SKY, holdMs: 5000, home: 'きみのお店', works: 'グッズ' },
+  pluto: { ...FIVE_SKY, holdMs: 6000, home: 'きみの図書館', works: '物語' },
+  neptune: { ...FIVE_SKY, holdMs: 5000, home: 'きみのゲーム小屋', works: 'ゲーム' },
 };
 
 /** a planet's landed motion */

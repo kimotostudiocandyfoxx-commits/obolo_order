@@ -3,7 +3,8 @@
 import { PLANET_HOMES, type HomePlanet, type HomeWork, type PlanetSongView } from '@obolo/shared';
 import { useEffect, useState, type ReactNode } from 'react';
 import { templateConfig } from '@/lib/planetTemplate/config';
-import { isFivePlanet } from '@/lib/planetTemplate/five';
+import { FIVE, isFivePlanet } from '@/lib/planetTemplate/five';
+import { SKY_PLANETS } from '@/lib/planetTemplate/skyPlanets';
 import { artTitleOf } from '@/lib/planetTemplate/jupiter';
 import { shipStandIn } from '@/lib/planetTemplate/mercury';
 import { figureOfAuthor } from '@/lib/planetTemplate/people';
@@ -27,7 +28,8 @@ export interface SkyOpenWork {
 /**
  * 06 §5 per planet: how a stranger rides on a landed continent (and comes to the shore) and how their work opens there —
  * the planet's own opener (Mercury the song's disc, Jupiter the hanging scroll, Saturn the kororin popping, the five
- * their 05 viewers). The maker's figure and name, ☆ ♡ ⋯ are SkyExplore's own (the same on every planet).
+ * their 05 viewers, a little lower so the maker's figure and name fit above, 07 §3). The maker's figure and name, ☆ ♡ ⋯
+ * are SkyExplore's own (the same on every planet; under the work, or at the top on the five).
  */
 export interface SkyKit {
   /** the maker's figure on this planet (figureFor; a stand-in until theirs is painted) */
@@ -113,14 +115,14 @@ export function skyKitOf(planet: HomePlanet, load: (w: HomeWork) => Promise<Plan
       figureOf,
       rider: ({ w }) => <img src={figureOf(w)} alt="" draggable={false} />,
       // PRESS START is not pressed in the sky (06 §5 opens the work; playing a stranger's game is the home's)
-      opener: ({ w, shore, closing, onEnd }) => <FiveViewer key={w.id} planet={planet} work={w} playing={shore} closing={closing} onDone={onEnd} />,
+      opener: ({ w, shore, closing, onEnd }) => <FiveViewer key={w.id} planet={planet} work={w} playing={shore} closing={closing} onDone={onEnd} top={Math.max(FIVE[planet].top, SKY_PLANETS[planet].workTop ?? 0)} />,
     };
   return { figureOf, rider: ({ w }) => <img src={figureOf(w)} alt="" draggable={false} />, opener: () => null };
 }
 
 /**
  * The sky hook for any planet (06): pinch in on the home → SkyExplore with the planet's kit. Only where the planet has a
- * sky (templateConfig(planet).sky: Mercury, Jupiter, Saturn) and a source (the API or the sample).
+ * sky (templateConfig(planet).sky: every planet since 07) and a source (the API or the sample).
  */
 export function skyHookOf(planet: HomePlanet, o: { sky: SkySource | null; me: TemplateMe; load: (w: HomeWork) => Promise<PlanetSongView | null> }): ((h: SkyOpen) => ReactNode) | undefined {
   if (!o.sky || !templateConfig(planet).sky) return undefined;

@@ -1,5 +1,6 @@
 import {
   DRIFT_MIN_SCORE,
+  PLANET_HOMES,
   favouritesOf,
   pickTravel,
   rankContinents,
@@ -16,6 +17,7 @@ import {
   type WorkTags,
 } from '@obolo/shared';
 import type { Api } from '@/lib/api';
+import { sampleOpening } from './five';
 import { SAMPLE_LYRICS, SAMPLE_SONGS, sampleSongOf, sampleSongUrl, shipStandIn } from './mercury';
 
 /**
@@ -30,7 +32,7 @@ import { SAMPLE_LYRICS, SAMPLE_SONGS, sampleSongOf, sampleSongUrl, shipStandIn }
  * words alone (no 「#」), and under each continent only how many works drifted there, counted the planet's way.
  */
 export const SEARCH_PLACEHOLDER = '大陸の名前・ジャンル';
-export const SKY_COUNT_UNIT: Record<HomePlanet, string> = { mercury: '曲', jupiter: '作品', saturn: '人', mars: '作品', venus: '作品', uranus: '作品', pluto: '作品', neptune: '作品' };
+export const SKY_COUNT_UNIT: Record<HomePlanet, string> = { mercury: '曲', jupiter: '作品', saturn: '人', mars: '本', venus: '番組', uranus: '個', pluto: '冊', neptune: 'こ' };
 export const countLine = (planet: HomePlanet, n: number | null | undefined) => `🌊 ${n ?? 0}${SKY_COUNT_UNIT[planet]}`;
 
 /** じぶんの空: the five islands' places (x, y, width — fractions) and your own island's (ESLOT / EME) */
@@ -175,8 +177,91 @@ export const SAMPLE_PLAZAS: ContinentView[] = [
   S('asa', 'おはよう広場', ['朝', 'おはよう', '元気'], { g: ['朝'], m: ['おはよう', '元気'] }),
   S('nemui', 'ねむねむ星', ['眠い', 'ゆるい', 'おやすみ'], { g: ['眠い'], m: ['おやすみ'] }),
 ];
-/** the sample continents of a planet (the five have none yet: 06 leaves them to 05's worlds) */
-export const sampleContinentsOf = (planet: HomePlanet): ContinentView[] => (planet === 'mercury' ? SAMPLE_CONTINENTS : planet === 'jupiter' ? SAMPLE_GLADES : planet === 'saturn' ? SAMPLE_PLAZAS : []);
+/**
+ * 07 the five skies (handoff planets-07-five-skies.md §2, prototype CONT / RULE of each planet; the API's seed, migration
+ * 0063 with its pictures): Mars's night neon districts (the songs' rules), Venus's sunset cloud stations (Saturn's
+ * topics), Uranus's floating shops (the goods' kind or the art's touch), Pluto's starry library rooms, Neptune's deep-sea
+ * bubble domes. The last five of each the prototype credits to people are the operator's (creator null).
+ */
+const F = continentOf;
+/** 07 mars: the API's seed  */
+export const SAMPLE_MARS: ContinentView[] = [
+  F('mars')('edm', 'ネオン地区', ['EDM', 'ダンス', 'フェス'], { g: ['EDM'], m: ['ダンス', 'フェス'], bpm: [118, 999] }),
+  F('mars')('hiphop', 'ストリート地区', ['ヒップホップ', 'ストリート'], { g: ['ヒップホップ'], m: ['ストリート'] }),
+  F('mars')('ballad', 'ラブソング通り', ['バラード', 'しっとり'], { g: ['バラード'], m: ['しっとり'], bpm: [0, 90] }),
+  F('mars')('rock', 'ライブハウス街', ['ロック', 'バンド', '熱い'], { g: ['ロック'], m: ['熱い'] }),
+  F('mars')('chill', 'ローファイ横丁', ['チル', '作業用', 'ローファイ'], { g: ['ローファイ'], m: ['チル', '作業用'], bpm: [0, 100] }),
+  F('mars')('citypop', 'シティポップ・ハイウェイ', ['シティポップ', '夜ドライブ', '80s'], { g: ['シティポップ'], m: ['夜ドライブ', '80s'] }),
+  F('mars')('anison', 'アニソン劇場街', ['アニソン', 'アニメ'], { g: ['アニソン'], m: ['アニメ'] }),
+  F('mars')('jazz', 'ジャズバー通り', ['ジャズ', 'おしゃれ'], { g: ['ジャズ'], m: ['おしゃれ'] }),
+  F('mars')('matsuri', '夏祭り商店街', ['夏', '祭り', '和風'], { g: [], m: ['祭り', '和風', '夏'] }),
+  F('mars')('rain', '雨の路地', ['雨', 'しっとり'], { g: [], m: ['雨'] }),
+];
+/** 07 venus: the API's seed  */
+export const SAMPLE_VENUS: ContinentView[] = [
+  F('venus')('chat', 'おしゃべり雲', ['雑談', 'ゆるい', '日常'], { g: ['雑談'], m: ['ゆるい', '日常'] }),
+  F('venus')('koi', '恋バナ放送局', ['恋バナ', '好きな人', 'ドキドキ'], { g: ['恋バナ'], m: ['好きな人', 'ドキドキ'] }),
+  F('venus')('oshi', '推し語りラジオ', ['推し', 'アイドル', 'ライブ'], { g: ['推し'], m: ['アイドル', 'ライブ'] }),
+  F('venus')('school', '放課後ステーション', ['学校', '部活', 'テスト'], { g: ['学校'], m: ['部活', 'テスト'] }),
+  F('venus')('night', '深夜のひとりごと雲', ['夜', '深夜', '眠れない'], { g: ['夜'], m: ['深夜', '眠れない'] }),
+  F('venus')('game', 'ゲーム実況FM', ['ゲーム', '対戦', '実況'], { g: ['ゲーム'], m: ['対戦', '実況'] }),
+  F('venus')('warai', 'お笑いラジオ', ['お笑い', 'ボケ', 'ツッコミ'], { g: ['お笑い'], m: ['ボケ', 'ツッコミ'] }),
+  F('venus')('anime', 'アニメ語りの雲', ['アニメ', '名シーン', 'マンガ'], { g: ['アニメ'], m: ['名シーン', 'マンガ'] }),
+  F('venus')('asa', 'おはようラジオ', ['朝', 'おはよう', '元気'], { g: ['朝'], m: ['おはよう', '元気'] }),
+  F('venus')('nemui', 'ねむねむFM', ['眠い', 'おやすみ'], { g: ['眠い'], m: ['おやすみ'] }),
+];
+/** 07 uranus: the API's seed  */
+export const SAMPLE_URANUS: ContinentView[] = [
+  F('uranus')('tote', 'トートの店', ['トート'], { g: ['トート'], m: [] }),
+  F('uranus')('tee', 'Tシャツの店', ['Tシャツ'], { g: ['Tシャツ'], m: [] }),
+  F('uranus')('sticker', 'ステッカー屋', ['ステッカー'], { g: ['ステッカー'], m: [] }),
+  F('uranus')('acst', 'アクスタの店', ['アクスタ'], { g: ['アクスタ'], m: [] }),
+  F('uranus')('mug', 'マグカップ屋', ['マグカップ'], { g: ['マグカップ'], m: [] }),
+  F('uranus')('yume', 'ゆめかわ雑貨店', ['ゆめかわ', 'パステル'], { g: [], m: ['ゆめかわ', 'パステル'] }),
+  F('uranus')('retro', 'レトロポップ屋', ['レトロ', 'ポップ'], { g: [], m: ['レトロ', 'ポップ'] }),
+  F('uranus')('wa', '和モダン堂', ['和風', '和モダン'], { g: [], m: ['和風', '和モダン'] }),
+  F('uranus')('neko', 'ねこグッズ屋', ['ねこ'], { g: [], m: ['ねこ'] }),
+  F('uranus')('mono', 'モノクロ・セレクト', ['モノクロ', '白黒'], { g: [], m: ['モノクロ', '白黒'] }),
+];
+/** 07 pluto: the API's seed  */
+export const SAMPLE_PLUTO: ContinentView[] = [
+  F('pluto')('fantasy', 'ファンタジーの塔', ['ファンタジー', '魔法'], { g: ['ファンタジー'], m: ['魔法'] }),
+  F('pluto')('love', '恋の庭の書架', ['恋愛'], { g: ['恋愛'], m: [] }),
+  F('pluto')('horror', '地下のこわい書庫', ['ホラー', 'こわい'], { g: ['ホラー'], m: ['こわい'] }),
+  F('pluto')('daily', '日常の窓辺', ['日常', 'やさしい'], { g: ['日常'], m: ['やさしい'] }),
+  F('pluto')('sf', 'SFの天文台', ['SF', '宇宙'], { g: ['SF'], m: ['宇宙'] }),
+  F('pluto')('mystery', 'ミステリーの迷路', ['ミステリー'], { g: ['ミステリー'], m: [] }),
+  F('pluto')('tears', '泣ける本の小部屋', ['泣ける'], { g: [], m: ['泣ける'] }),
+  F('pluto')('laugh', '笑える本のサロン', ['笑える'], { g: [], m: ['笑える'] }),
+  F('pluto')('short', '短編の宝石箱', ['短い'], { g: [], m: ['短い'] }),
+  F('pluto')('adventure', '冒険の本の船', ['わくわく', '冒険'], { g: [], m: ['わくわく', '冒険'] }),
+];
+/** 07 neptune: the API's seed  */
+export const SAMPLE_NEPTUNE: ContinentView[] = [
+  F('neptune')('action', 'アクションのドーム', ['アクション'], { g: ['アクション'], m: [] }),
+  F('neptune')('puzzle', 'パズルのドーム', ['パズル'], { g: ['パズル'], m: [] }),
+  F('neptune')('race', 'レースのドーム', ['レース'], { g: ['レース'], m: [] }),
+  F('neptune')('rhythm', 'リズムのドーム', ['リズム', '音楽'], { g: ['リズム'], m: ['音楽'] }),
+  F('neptune')('shoot', 'シューティングのドーム', ['シューティング'], { g: ['シューティング'], m: [] }),
+  F('neptune')('quiz', 'クイズのドーム', ['クイズ'], { g: ['クイズ'], m: [] }),
+  F('neptune')('party', 'みんなで遊ぶドーム', ['みんなで'], { g: [], m: ['みんなで'] }),
+  F('neptune')('solo', 'ひとりでじっくりドーム', ['ひとりで', 'じっくり'], { g: [], m: ['ひとりで', 'じっくり'] }),
+  F('neptune')('quick', 'すぐ遊べるドーム', ['すぐ終わる'], { g: [], m: ['すぐ終わる'] }),
+  F('neptune')('retro', 'レトロゲームのドーム', ['レトロ', 'ドット絵'], { g: [], m: ['レトロ', 'ドット絵'] }),
+];
+
+const SAMPLE_OF: Record<HomePlanet, ContinentView[]> = {
+  mercury: SAMPLE_CONTINENTS,
+  jupiter: SAMPLE_GLADES,
+  saturn: SAMPLE_PLAZAS,
+  mars: SAMPLE_MARS,
+  venus: SAMPLE_VENUS,
+  uranus: SAMPLE_URANUS,
+  pluto: SAMPLE_PLUTO,
+  neptune: SAMPLE_NEPTUNE,
+};
+/** the sample continents of a planet */
+export const sampleContinentsOf = (planet: HomePlanet): ContinentView[] => SAMPLE_OF[planet] ?? [];
 
 /** the prototype's GSONG: which sample song plays for a genre */
 const GSONG: Record<string, number> = { EDM: 3, ヒップホップ: 2, バラード: 4, ロック: 5, ローファイ: 1, シティポップ: 1, アニソン: 3, ジャズ: 4, 'J-POP': 3 };
@@ -279,6 +364,59 @@ export function sampleWorksOf(planet: HomePlanet, now = Date.now()): (HomeWork &
       tags: { main: topic, moods },
     }));
   if (planet === 'mercury') return sampleSkyWorks(now);
+  return sampleFiveWorks(planet, now);
+}
+
+/** the prototype's WORKS.uranus: each art on a kind of goods, and its look (GK / GM) */
+const GK = ['トート', 'Tシャツ', 'ステッカー', 'アクスタ', 'マグカップ'];
+const GM = [['ねこ', 'かわいい'], ['パステル', 'ゆめかわ'], ['レトロ', 'ポップ'], ['和風', '花'], ['モノクロ', '白黒'], ['夜', '風景'], ['ポップ', '夏']];
+/** the prototype's WORKS.pluto: strangers' books (title, by, genre, moods) */
+const BOOKS: [string, string, string, string[]][] = [
+  ['月の図書館と魔法の鍵', 'ぽんず', 'ファンタジー', ['魔法', 'わくわく', '長い']], ['竜の背中で眠る夜', 'タク', 'ファンタジー', ['冒険', 'わくわく']], ['星をひろう魔女', 'はるか', 'ファンタジー', ['魔法', 'やさしい', '短い']],
+  ['となりの席の約束', 'ことね', '恋愛', ['泣ける', 'やさしい']], ['放課後の告白', 'みお', '恋愛', ['短い', 'やさしい']], ['雨の日だけの恋人', 'REN', '恋愛', ['泣ける', '長い']],
+  ['真夜中の三面鏡', 'kei', 'ホラー', ['こわい', '短い']], ['階段が一段ふえる', 'ショウ', 'ホラー', ['こわい', '笑える']], ['呼ばないで', 'REN', 'ホラー', ['こわい']],
+  ['ねこと朝ごはん', 'みお', '日常', ['やさしい', '短い']], ['コンビニの夜勤さん', 'そら', '日常', ['笑える', 'やさしい']], ['おばあちゃんの梅ジャム', 'はるか', '日常', ['泣ける', 'やさしい']],
+  ['火星行きの最終便', 'Nagi', 'SF', ['宇宙', 'わくわく']], ['ロボットは夢を見る', 'kei', 'SF', ['泣ける', '宇宙']], ['1000年後の教室', 'YUZU', 'SF', ['わくわく', '長い']],
+  ['消えた音楽室の鍵', 'kei', 'ミステリー', ['わくわく']], ['犯人はこの中にいない', 'ショウ', 'ミステリー', ['笑える', '短い']], ['三日月ホテルの密室', 'Rio', 'ミステリー', ['長い']],
+  ['しっぽの長い冒険', 'タク', 'ファンタジー', ['冒険', '笑える']], ['海賊ねこの宝の地図', 'ぽんず', '日常', ['冒険', 'わくわく', '笑える']],
+];
+/** the prototype's WORKS.neptune: strangers' games (title, by, genre, how it is played) */
+const GAMES: [string, string, string, string[]][] = [
+  ['ネオンランナー', 'タク', 'アクション', ['ひとりで', 'すぐ終わる']], ['ねこジャンプ', 'みお', 'アクション', ['すぐ終わる', 'みんなで']], ['忍者の屋根伝い', 'ショウ', 'アクション', ['じっくり', 'ひとりで']],
+  ['ラーメンパズル', 'ぽんず', 'パズル', ['じっくり', 'ひとりで']], ['おにぎり落とし', 'はるか', 'パズル', ['すぐ終わる']], ['星座つなぎ', 'Nagi', 'パズル', ['じっくり', 'ひとりで']],
+  ['さくらレース', 'YUZU', 'レース', ['みんなで', 'すぐ終わる']], ['深海カーチェイス', 'REN', 'レース', ['みんなで']], ['ほうきでレース', 'ことね', 'レース', ['すぐ終わる']],
+  ['ムーンダイブ', 'そら', 'リズム', ['音楽', 'すぐ終わる']], ['太鼓でドン', 'タク', 'リズム', ['音楽', 'みんなで']], ['ペンライト・ラッシュ', 'YUZU', 'リズム', ['音楽']],
+  ['星くずシューター', 'kei', 'シューティング', ['レトロ', 'ドット絵']], ['クラゲ迎撃せよ', 'Rio', 'シューティング', ['すぐ終わる']],
+  ['3秒クイズ', 'Rio', 'クイズ', ['すぐ終わる', 'みんなで']], ['推しクイズ王', 'はるか', 'クイズ', ['みんなで']], ['8bitダンジョン', 'タク', 'アクション', ['レトロ', 'ドット絵', 'じっくり']], ['ドットの釣り堀', 'そら', 'パズル', ['レトロ', 'ドット絵', 'ひとりで']],
+];
+
+/**
+ * 07 the five's strangers' works (the prototype's WORKS.<planet>): Mars's MVs are Mercury's songs on a picture (the
+ * sample song plays), Venus's shows are Saturn's words as programme titles, Uranus's goods Jupiter's arts on a kind,
+ * Pluto's books and Neptune's games the prototype's own. Each on one of the five sample pictures.
+ */
+export function sampleFiveWorks(planet: HomePlanet, now = Date.now()): (HomeWork & { tags: WorkTags })[] {
+  const at = (i: number) => new Date(now - i * 3_600_000).toISOString();
+  const kind = PLANET_HOMES[planet].store ?? 'planet_post';
+  const one = (i: number, by: string, title: string, tags: WorkTags, o: Partial<HomeWork> = {}): HomeWork & { tags: WorkTags } => ({
+    id: `sky-${planet}${i}`,
+    kind,
+    author: { id: `sky-${by}`, name: by, pic: null, figure: `/planets/sample/fig-${planet}-${sampleLookOf(by)}.webp` },
+    rel: 'stranger',
+    text: '',
+    title,
+    url: null,
+    thumbUrl: `/planets/sample/art-${(i % 5) + 1}.webp`,
+    flownAt: at(i),
+    demo: true,
+    tags,
+    ...o,
+  });
+  if (planet === 'mars') return WORKS.map(([title, by, genre, bpm, moods], i) => one(i, by, title, { main: genre, moods, bpm }, { url: sampleSongUrl(GSONG[genre] ?? 1) }));
+  if (planet === 'venus') return VOICES.map(([words, by, topic, moods], i) => one(i, by, words.replace(/[！？…。]+$/, '') + (i % 3 === 0 ? 'の回' : ''), { main: topic, moods }));
+  if (planet === 'uranus') return ARTS.map(([title, by], i) => one(i, by, `${title} ${GK[i % 5]}`, { main: GK[i % 5], moods: [...GM[i % 7]] }, { text: GK[i % 5] }));
+  if (planet === 'pluto') return BOOKS.map(([title, by, genre, moods], i) => one(i, by, title, { main: genre, moods }, { text: sampleOpening(by) }));
+  if (planet === 'neptune') return GAMES.map(([title, by, genre, moods], i) => one(i, by, title, { main: genre, moods }, { text: 'タップで遊べるよ', thumbUrl: i % 2 ? null : `/planets/sample/art-${(i % 5) + 1}.webp` }));
   return [];
 }
 

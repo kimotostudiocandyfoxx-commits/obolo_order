@@ -90,9 +90,23 @@ describe('landing: each planet’s figures (06 §5)', () => {
     for (const p of HOME_PLANETS) {
       const s = SKY_PLANETS[p];
       expect(s.shore.to.y).toBeGreaterThan(0);
-      expect(s.whoTop).toBeGreaterThan(0.5);
       expect(s.home).toMatch(/^きみの/);
     }
+    // Mercury, Jupiter, Saturn: the maker under the work; the five (07 §3): at the top, above the work and its title
+    for (const p of ['mercury', 'jupiter', 'saturn'] as const) expect(SKY_PLANETS[p].whoTop).toBeGreaterThan(0.5);
+    for (const p of ['mars', 'venus', 'uranus', 'pluto', 'neptune'] as const) {
+      expect(SKY_PLANETS[p].whoTop).toBeLessThan(0.1);
+      expect(SKY_PLANETS[p].land).toBe('flutter');
+      // 07 §3: from above, stopping at the bottom left (☆ ♡ clear)
+      expect(SKY_PLANETS[p].shore.from.y).toBeLessThan(0);
+      expect(SKY_PLANETS[p].shore.to.x).toBeLessThan(0.3);
+      expect(SKY_PLANETS[p].shore.to.y).toBeGreaterThan(0.8);
+    }
+    // 07 §1: what ♡ says
+    expect(['mars', 'venus', 'uranus', 'pluto', 'neptune'].map((p) => SKY_PLANETS[p as 'mars'].home)).toEqual(['きみのシアター', 'きみのブース', 'きみのお店', 'きみの図書館', 'きみのゲーム小屋']);
+    expect(Object.values(SKY_PLANETS).some((s) => s.home === 'きみの星')).toBe(false);
+    // 07 §3: Venus 6 s, Uranus 5 s, Pluto 6 s, Neptune 5 s
+    expect([SKY_PLANETS.venus.holdMs, SKY_PLANETS.uranus.holdMs, SKY_PLANETS.pluto.holdMs, SKY_PLANETS.neptune.holdMs]).toEqual([6000, 5000, 6000, 5000]);
     // a song / an MV stays until it has finished; the others a set time
     expect(SKY_PLANETS.mercury.holdMs).toBeNull();
     expect(SKY_PLANETS.mars.holdMs).toBeNull();

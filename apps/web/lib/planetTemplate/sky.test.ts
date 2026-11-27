@@ -107,7 +107,39 @@ describe('the sample sky on Jupiter and Saturn (06)', () => {
     expect(l.works.every((w) => w.kind === 'saturn_post' && !!w.text && !!w.author.ball && !!w.author.figure)).toBe(true);
     expect((await s.search('', '推し'))[0].key).toBe('oshi');
   });
-  it('the five have no sample continents yet (06: their sky follows 05’s worlds)', async () => {
-    expect((await sampleSky('neptune', seq()).sky()).continents).toEqual([]);
+});
+
+describe('07 the five skies: ten continents each, their works drift there, counted the planet’s way', () => {
+  const FIVE = ['mars', 'venus', 'uranus', 'pluto', 'neptune'] as const;
+  it('ten operator continents with their three pictures; every one gathers some sample work', async () => {
+    for (const p of FIVE) {
+      const s = sampleSky(p, seq());
+      const v = await s.sky();
+      expect(v.continents, p).toHaveLength(10);
+      expect(v.continents.every((c) => c.creator === null && c.planet === p)).toBe(true);
+      expect(v.favourites.filter(Boolean)).toHaveLength(5);
+      for (const c of v.continents) {
+        expect(c.pictures.sky).toBe(`/planets/continents/${p}/${c.key}-sky.webp`);
+        expect(c.pictures.shore).toBe(`/planets/continents/${p}/${c.key}-shore.webp`);
+        const l = await s.land(c.key);
+        expect(l.works.length, `${p}/${c.key}`).toBeGreaterThan(0);
+        expect(l.works.every((w) => !!w.title && !!w.author.figure && w.author.figure.includes(`fig-${p}-`))).toBe(true);
+      }
+    }
+  });
+  it('the names and rules of 07 §2', async () => {
+    const names = async (p: (typeof FIVE)[number]) => (await sampleSky(p, seq()).sky()).continents.map((c) => c.name);
+    expect(await names('mars')).toEqual(['ネオン地区', 'ストリート地区', 'ラブソング通り', 'ライブハウス街', 'ローファイ横丁', 'シティポップ・ハイウェイ', 'アニソン劇場街', 'ジャズバー通り', '夏祭り商店街', '雨の路地']);
+    expect((await names('venus'))[1]).toBe('恋バナ放送局');
+    expect((await names('uranus'))[7]).toBe('和モダン堂');
+    expect((await names('pluto'))[9]).toBe('冒険の本の船');
+    expect((await names('neptune'))[9]).toBe('レトロゲームのドーム');
+    const retro = (await sampleSky('neptune', seq()).land('retro')).works.map((w) => w.title);
+    expect(retro).toEqual(expect.arrayContaining(['星くずシューター', '8bitダンジョン', 'ドットの釣り堀']));
+    expect((await sampleSky('pluto', seq()).land('fantasy')).works.map((w) => w.title)).toContain('月の図書館と魔法の鍵');
+    expect((await sampleSky('uranus', seq()).land('mug')).works.every((w) => w.tags?.main === 'マグカップ' || (w.tags?.moods ?? []).length > 0)).toBe(true);
+  });
+  it('🌊 counts 本・番組・個・冊・こ', () => {
+    expect(FIVE.map((p) => countLine(p, 3))).toEqual(['🌊 3本', '🌊 3番組', '🌊 3個', '🌊 3冊', '🌊 3こ']);
   });
 });

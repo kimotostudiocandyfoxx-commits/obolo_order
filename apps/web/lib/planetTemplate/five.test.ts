@@ -31,6 +31,9 @@ describe('05 the five planets on the common template', () => {
     expect(FIVE_HOLD_MS).toBeGreaterThanOrEqual(5000);
     expect(FIVE_HOLD_MS).toBeLessThanOrEqual(7000);
   });
+  it('07: the five skies are on — their sea and your own island', () => {
+    for (const p of FIVE_PLANETS) expect(templateConfig(p).sky).toEqual({ sea: `/planets/continents/${p}/sea.webp`, me: `/planets/continents/${p}/me.webp` });
+  });
   it('the title: its own (never 「〜のアート」), else the first line; its font by title, then by its main tag', () => {
     expect(fiveTitleOf({ title: ' ネオンの夜 ', text: 'x' })).toBe('ネオンの夜');
     expect(fiveTitleOf({ title: '', text: '一行目\n二行目' })).toBe('一行目');

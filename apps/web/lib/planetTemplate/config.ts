@@ -69,8 +69,8 @@ export interface PlanetTemplateConfig {
     /** said when every work has been seen (null: nothing) */
     doneLine: string | null;
   };
-  /** the sky (handoff 06): the sea seen from above and your island on it (public/planets/continents/<planet>/); null = no
-   * sky yet (the five: 06 leaves their sky, continents and pictures to 05's worlds) */
+  /** the sky (handoff 06, the five 07): the sea seen from above and your island on it (public/planets/continents/<planet>/);
+   * null = no sky */
   sky: { sea: string; me: string } | null;
 }
 
@@ -100,6 +100,8 @@ const fiveOwn = (p: FivePlanet): Partial<Omit<PlanetTemplateConfig, 'planet'>> =
   openLook: { scale: 1.65, blur: 5, bright: 0.55 },
   holdMs: FIVE_HOLD_MS,
   play: { path: DEFAULT_PLAY_PATH, untilDone: p === 'mars', night: false, fireworks: false, fireflies: false, dance: { x: PLACE[p][0], y: PLACE[p][1] }, danceAs: 'dance', doneLine: ALL_SEEN_FIVE },
+  // 07: their skies (the continents and pictures of migration 0063)
+  sky: skyOf(p),
 });
 
 /** 06: the sky's two pictures (the sea from above, your island) */

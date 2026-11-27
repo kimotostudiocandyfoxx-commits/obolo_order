@@ -47,8 +47,8 @@ function once(key: string): boolean {
  * island and your five favourite continents on the planet's sky, 〔🔍 大陸をさがす〕 and 〔✈ 旅〕 (six continents, the
  * ones not seen yet first). ☆ with five already: drag the new island onto one of yours, or tap one. Tap an island to
  * land: the strangers' works that drifted there come on the planet's figures (Mercury's ships on the sea, Jupiter's
- * butterflies, Saturn's kororins on the plaza's record; drag them about). Tap one: the work opens the planet's way, its
- * maker's figure and name under it, ☆ into Bluena, ♡ 推す, ⋯ hide / report. ▶: the shore view, the works come one at a
+ * butterflies, Saturn's kororins on the plaza's record, the five's vehicles round their scene, 07; drag them about).
+ * Tap one: the work opens the planet's way, its maker's figure and name under it (the five: at the top), ☆ into Bluena, ♡ 推す, ⋯ hide / report. ▶: the shore view, the works come one at a
  * time in a random order until stopped. Pinch in / ← go back up; pinch out on the sky (or your island) goes home.
  */
 export function SkyExplore({ planet, source, kit, me, onClose, toast }: { planet: HomePlanet; source: SkySource; kit: SkyKit; me: SkyMe; onClose: () => void; toast: (t: string) => void }) {
@@ -755,8 +755,8 @@ function Landed({
 }
 
 /**
- * a stranger's work opened (06 §5, M-R309 / M-R310): the planet's opener; under it only its maker's figure (on their
- * ride) and name — no tags; ☆ keeps it in Bluena, ♡ 推す the maker (from then on they come to your home on this planet);
+ * a stranger's work opened (06 §5, M-R309 / M-R310): the planet's opener; under it (the five: above it, 07 §3) only its
+ * maker's figure (on their ride) and name — no tags; ☆ keeps it in Bluena, ♡ 推す the maker (from then on they come to your home on this planet);
  * ⋯ hides the person or reports the work (they are gone at once). A tap elsewhere closes it (on the shore: stops ▶).
  */
 function WorkOpen({

@@ -71,6 +71,7 @@ export function FiveViewer({
   closing = false,
   onDone,
   onStart,
+  top,
 }: {
   planet: FivePlanet;
   work: HomeWork;
@@ -79,6 +80,8 @@ export function FiveViewer({
   onDone?: () => void;
   /** Neptune: PRESS START (none: it only blinks) */
   onStart?: () => void;
+  /** where it opens instead of the planet's own place (the sky: lower, under the maker's name, 07 §3) */
+  top?: number;
 }) {
   const def = FIVE[planet];
   const on = useNextFrame();
@@ -93,7 +96,7 @@ export function FiveViewer({
     const id = setTimeout(() => setVoice(true), RADIO_VOICE_MS);
     return () => clearTimeout(id);
   }, [def.kind, work.url]);
-  const style = { top: `${def.top * 100}%`, ['--glow' as string]: def.glow } as CSSProperties;
+  const style = { top: `${(top ?? def.top) * 100}%`, ['--glow' as string]: def.glow } as CSSProperties;
   const cls = `${f.vw} ${f[def.kind]} ${on && !closing ? f.on : ''}`;
   if (def.kind === 'mv') {
     const audio = isAudioUrl(work.url);

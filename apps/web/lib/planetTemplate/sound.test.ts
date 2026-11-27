@@ -64,6 +64,13 @@ describe('which event plays what (the prototype’s call sites)', () => {
     expect(sfx('jupiter', 'skyShow')).toEqual(['splash', 'chime']);
     expect(sfx('neptune', 'skyShow')).toEqual(['splash', 'chip']);
     expect(sfx('saturn', 'skyKeep')).toEqual(['chime']);
+    // 07: the five skies follow the same rules (Neptune's work also bleeps)
+    for (const p of ['mars', 'venus', 'uranus', 'pluto', 'neptune'] as const) {
+      for (const e of ['skyOpen', 'skyLand', 'skyTrip', 'skyTripBack', 'skyShore'] as const) expect(sfx(p, e)).toEqual(['whoosh']);
+      expect(sfx(p, 'skyArrive')).toEqual(['splash']);
+      expect(sfx(p, 'skyShow')[0]).toBe('splash');
+      expect(sfx(p, 'skyKeep')).toEqual(['chime']);
+    }
   });
   it('a planet without the new home has no sounds', () => {
     expect(cuesFor('earth' as never, 'tap')).toEqual([]);
