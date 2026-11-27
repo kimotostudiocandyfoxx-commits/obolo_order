@@ -4,20 +4,25 @@
  *             new speaker; the story's bubbles stacked from the bottom (components/story/Chat.tsx ChatLog)
  *   'row'     the side-by-side talk (components/talk/TalkScene.tsx) in the story's bubble skin: the front row of
  *             three (the one speaking, the one they talk to, you), the rest in the back row
- * Days 1–2 (the scenes before the day-3 morning on the Moon, D04) are cinema; day 3 on, and the members' days, are the
- * row. A single scene can be moved either way in SCENE_STAGE.
+ *   'film'    day 1 as it was before the cinema (client 2026-11-27: 「トークの見せ方を前の形に戻す」): the motion keeps
+ *             playing with the characters in it, the camera pushes in on the picture itself (the script's 〔カメラ〕
+ *             steps), and the lines are the story's first chat bubbles over it (a small round face, the name, the
+ *             bubble; ChatLog without closeUp). No cut-out comes forward
+ * Day 1 (D01) is film; day 2 (D02–D03, until the day-3 morning on the Moon, D04) is cinema; day 3 on, and the members'
+ * days, are the row. A single scene can be moved either way in SCENE_STAGE.
  */
-export type StoryStage = 'cinema' | 'row';
+export type StoryStage = 'film' | 'cinema' | 'row';
 
 /** per-scene override (scene id → stage), e.g. { 'D04-S005': 'cinema' } */
 export const SCENE_STAGE: Record<string, StoryStage> = {};
 
-/** the scenes whose id starts with one of these are cinema (unless SCENE_STAGE says otherwise) */
-export const CINEMA_SCENES = /^D0[1-3]-/;
+/** the scenes whose id starts with one of these are film / cinema (unless SCENE_STAGE says otherwise) */
+export const FILM_SCENES = /^D01-/;
+export const CINEMA_SCENES = /^D0[23]-/;
 
 export function stageOf(sceneId: string | null | undefined): StoryStage {
   if (!sceneId) return 'row';
-  return SCENE_STAGE[sceneId] ?? (CINEMA_SCENES.test(sceneId) ? 'cinema' : 'row');
+  return SCENE_STAGE[sceneId] ?? (FILM_SCENES.test(sceneId) ? 'film' : CINEMA_SCENES.test(sceneId) ? 'cinema' : 'row');
 }
 
 /**
@@ -30,5 +35,5 @@ export const SCENE_LINES: Record<string, StoryLines> = {};
 export function linesOf(sceneId: string | null | undefined, stage: StoryStage, flag?: string | null): StoryLines {
   if (flag === '1') return 'subtitles';
   if (flag === '0') return 'bubbles';
-  return (sceneId && SCENE_LINES[sceneId]) || (stage === 'cinema' ? 'bubbles' : 'subtitles');
+  return (sceneId && SCENE_LINES[sceneId]) || (stage === 'row' ? 'subtitles' : 'bubbles');
 }

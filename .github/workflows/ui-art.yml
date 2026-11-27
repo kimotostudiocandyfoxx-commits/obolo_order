@@ -3,8 +3,15 @@ name: UI art
 # UI art (client request 2026-10-12): the pictures listed in design/ui-art-queue.json are
 # painted with Seedream 5.0 Pro and saved under apps/web/public (see scripts/ui-art/paint.mjs).
 # The story's backgrounds and items (design/story-art-queue.json → public/onboarding/s) go the same way.
+# One queue alone (run by hand with `queue`): only that file is painted — the cast's repaint,
+# design/cast-art-queue.json → design/cast/<id>.jpg (MONBAN, client 2026-11-27; scripts/cast/build.py cuts them).
 on:
   workflow_dispatch:
+    inputs:
+      queue:
+        description: 'paint only this queue file (e.g. design/cast-art-queue.json); empty = all the usual queues'
+        required: false
+        default: ''
   push:
     branches: ['claude/**', main]
     paths: ['design/ui-art-queue.json', 'design/story-art-queue.json', 'design/review-art-queue.json', 'design/atelier-art-queue.json', 'design/ui-parts-queue.json', 'design/messenger-art-queue.json', 'design/plaza-art-queue.json', 'design/ui1-art-queue.json']
@@ -39,9 +46,16 @@ jobs:
       - name: Paint
         env:
           ONLY_MESSENGER: '1'
+          ONE_QUEUE: ${{ github.event.inputs.queue }}
         run: |
           export SEEDREAM_API_KEY="$(gcloud secrets versions access latest --secret=obolo-seedream-api-key)"
           command -v ffmpeg >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
+          # one queue asked for by hand: paint it and nothing else
+          if [ -n "${ONE_QUEUE:-}" ]; then
+            case "$ONE_QUEUE" in design/*-queue.json) ;; *) echo "queue must be design/<name>-queue.json"; exit 1 ;; esac
+            node scripts/ui-art/paint.mjs "$ONE_QUEUE"
+            exit 0
+          fi
           node scripts/ui-art/paint.mjs
           node scripts/ui-art/paint.mjs design/story-art-queue.json
           node scripts/ui-art/paint.mjs design/atelier-art-queue.json
@@ -60,6 +74,7 @@ jobs:
         run: |
           git config user.name "ui-art"
           git config user.email "ui-art@users.noreply.github.com"
+          [ -d design/cast ] && git add -f design/cast design/cast-art-queue.json
           git add -f apps/web/public/dj/art apps/web/public/onboarding/s apps/web/public/atelier/raw apps/web/public/ui/parts/raw design/ui-parts-queue.json design/ui-art-queue.json design/story-art-queue.json design/atelier-art-queue.json art/review design/review-art-queue.json design/messenger-art-queue.json design/plaza-art-queue.json design/ui1-art-queue.json
           git diff --cached --quiet && exit 0
           git commit -m "UI art: new pictures [skip ci]"

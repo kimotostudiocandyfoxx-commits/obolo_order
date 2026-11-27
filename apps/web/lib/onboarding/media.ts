@@ -85,10 +85,29 @@ export const hasMotion = (n: MotionId) => AVAILABLE_MOTIONS.has(n) || (typeof n 
 /** a luxury film's parts and its sound (scripts/films/split.py): mfilm-<id>-<k>.mp4 and bgm-film-<id>.m4a */
 export const filmParts = (id: string, n: number): MotionId[] => Array.from({ length: n }, (_, k) => `film-${id}-${k + 1}`);
 
+/**
+ * Pictures replaced under the same name: a version on the URL, because the browsers keep /onboarding for a day (and a
+ * week stale). 2026-11-27: OBOLON's new look (the client's own picture, design/refs/2026-11-27-story/05) — his
+ * cut-out, and the nine stills he floats in (the same orb laid over the painted one).
+ */
+const REPLACED: Record<string, number> = {
+  obolon: 2,
+  'obolon-pit': 2,
+  's/d2-hall-kimorin': 2,
+  's/d2-hall-kimorin-squint': 2,
+  's/d2-hall-kimorin-up': 2,
+  's/d2-hall-run': 2,
+  's/d2-hall-sky-monban': 2,
+  's/d2-moon-in': 2,
+  's/d2-moon-kimorin': 2,
+  's/d2-moon-kimorin-half': 2,
+  's/d2-moon-kimorin-squint': 2,
+};
+const ver = (name: string) => (REPLACED[name] ? `?v=${REPLACED[name]}` : '');
 /** Character images shown over the motions (transparent WebP). */
-export const spriteUrl = (name: string) => `${MEDIA_BASE}/${name}.webp`;
+export const spriteUrl = (name: string) => `${MEDIA_BASE}/${name}.webp${ver(name)}`;
 /** Still background images (JPEG). */
-export const stillUrl = (name: string) => `${MEDIA_BASE}/${name}.jpg`;
+export const stillUrl = (name: string) => `${MEDIA_BASE}/${name}.jpg${ver(name)}`;
 /**
  * Stills with an open-mouth patch (`<still>-mouth.webp`, same size): the one drawn in it speaks with a moving
  * mouth (client 2026-10-29: KIMORIN's mouth opens and closes whenever he talks).

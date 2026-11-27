@@ -666,7 +666,25 @@ body {
 }
 
 /* the characters' life (numbers in lib/story/motion.ts, passed as CSS variables) */
-@keyframes breathe { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(calc(1 + var(--breath, 0.009))); } }
+/* (named stageBreathe: a later `breathe` — the 「また明日」 countdown's opacity pulse — took the name and made every
+   standing figure fade in and out instead of breathing) */
+@keyframes stageBreathe { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(calc(1 + var(--breath, 0.009))); } }
+/*
+ * OBOLON (client 2026-11-27: no shaking — slow and divine, a very few mystical lights; components/story/Stage.tsx
+ * DivineAura, numbers in lib/story/motion.ts MOTION.poise.divine): the orb floats a hair, its corona breathes, a few
+ * motes drift up and fade. Transform and opacity only. Nothing moves with prefers-reduced-motion (the motes are gone).
+ */
+@keyframes divineFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(calc(var(--float, 1.6%) * -1)); } }
+@keyframes divineCorona { 0%, 100% { opacity: var(--cmin, 0.55); transform: scale(1); } 50% { opacity: var(--cmax, 0.95); transform: scale(1.035); } }
+@keyframes divineMote { 0% { opacity: 0; transform: translate(0, 0) scale(0.6); } 18% { opacity: 0.9; } 70% { opacity: 0.55; } 100% { opacity: 0; transform: translate(var(--sway, 6px), var(--rise, -26%)) scale(1); } }
+.divine-float { animation: divineFloat 9s ease-in-out infinite; will-change: transform; }
+.divine-corona { animation: divineCorona 7s ease-in-out infinite; }
+.divine-mote { opacity: 0; animation: divineMote 11s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .divine-float, .divine-corona { animation: none; }
+  .divine-corona { opacity: 0.8; }
+  .divine-mote { display: none; }
+}
 @keyframes hop { 0%, 100% { transform: none; } 40% { transform: translateY(var(--hop, -2%)); } }
 /* the story's cinema (days 1–2, lib/story/motion.ts MOTION.cinema): the camera pushes onto a new speaker, then drifts closer */
 @keyframes cinePush { from { transform: translateX(var(--pan, 0)) scale(var(--from, 0.8)); opacity: 0.35; } 55% { opacity: 1; } to { transform: none; opacity: 1; } }

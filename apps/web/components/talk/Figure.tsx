@@ -43,6 +43,7 @@ export function Figure({
   breath = 3.6,
   calm = false,
   reduced = false,
+  poise,
   lit = false,
   glow,
   level,
@@ -67,6 +68,12 @@ export function Figure({
   breath?: number;
   calm?: boolean;
   reduced?: boolean;
+  /**
+   * the story's MONBAN and OBOLON (client 2026-11-27): 'still' — no bob with the voice, no breath, no idle tilt, no
+   * reaction, no step forward: he stands like a statue; 'divine' — the same stillness, floating up and down very
+   * slowly (talk-divine, 9 s; not with reduced motion)
+   */
+  poise?: 'still' | 'divine';
   /** steps forward (the one speaking in a group) */
   lit?: boolean;
   glow?: string;
@@ -120,7 +127,7 @@ export function Figure({
   // a wide one (a round creature) stands lower and, chest up, a little smaller (its whole width shows)
   height = wide ? height * (chest ? 0.72 : 0.58) : height;
   const open = useFlap(state === 'talk', level);
-  const idle = useIdle(state === 'idle' && !reduced && !calm);
+  const idle = useIdle(state === 'idle' && !reduced && !calm && !poise);
   const yawn = idle === 'yawn';
   const live = !reduced;
   const still = !live || calm;
@@ -128,7 +135,7 @@ export function Figure({
 
   const outer: CSSProperties = { height, ...style };
   const pose =
-    !live || calm
+    !live || calm || poise
       ? undefined
       : state === 'listen'
         ? `talk-listen 2.2s ease-in-out infinite`
@@ -157,17 +164,17 @@ export function Figure({
           className="h-full origin-bottom"
           style={{
             ['--dir' as string]: dir,
-            animation: live && motion && motion !== 'none' && motionKey ? REACTION[motion] : undefined,
+            animation: live && !poise && motion && motion !== 'none' && motionKey ? REACTION[motion] : undefined,
             // the one speaking steps a little forward and larger
-            transform: lit && live ? 'translateY(-6px) scale(1.03)' : undefined,
+            transform: lit && live && !poise ? 'translateY(-6px) scale(1.03)' : undefined,
             transition: 'transform .35s ease',
             filter: glow ? `drop-shadow(0 0 10px ${glow}) drop-shadow(0 0 3px ${glow})` : undefined,
           }}
         >
           <div className="h-full origin-bottom" style={{ ['--dir' as string]: dir, animation: pose }}>
-            <div className="h-full origin-bottom" style={{ animation: still && !calm ? undefined : `talk-breath ${breath}s ease-in-out infinite` }}>
-              <div className="h-full" style={{ transform: open && live ? 'translateY(-0.8%) scaleY(1.006)' : undefined, transformOrigin: '50% 100%', transition: 'transform 70ms linear' }}>
-                <div key={prev ? `sq${prev.n}` : 'still'} className="relative h-full origin-bottom" style={prev ? { animation: 'talk-squash .32s ease-out' } : undefined}>
+            <div className="h-full origin-bottom" style={{ animation: poise ? (poise === 'divine' && live ? 'talk-divine 9s ease-in-out infinite' : undefined) : still && !calm ? undefined : `talk-breath ${breath}s ease-in-out infinite` }}>
+              <div className="h-full" style={{ transform: open && live && !poise ? 'translateY(-0.8%) scaleY(1.006)' : undefined, transformOrigin: '50% 100%', transition: 'transform 70ms linear' }}>
+                <div key={prev ? `sq${prev.n}` : 'still'} className="relative h-full origin-bottom" style={prev && !poise ? { animation: 'talk-squash .32s ease-out' } : undefined}>
                   {prev && (
                     <div className="absolute bottom-0 left-1/2 h-full -translate-x-1/2" style={{ animation: 'talk-fadeout .2s linear forwards' }}>
                       <Picture faceAt={faceBox(look)} expr={prev.e} img={img} chest={chest} height={height} shut={false} open={false} sway={false} breath={breath} />
@@ -352,6 +359,7 @@ export const TALK_CSS = `
 @keyframes talk-ring-up { 0%,100% { transform: rotate(5deg) } 50% { transform: rotate(-5deg) } }
 @keyframes talk-in { from { transform: scale(.6); opacity: 0 } to { transform: scale(1); opacity: 1 } }
 @keyframes talk-shrinkin { 0% { opacity: 0; transform: translate(var(--fx), var(--fy)) scale(3.2) } 60% { opacity: 1 } 100% { opacity: 1; transform: none } }
+@keyframes talk-divine { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-1.6%) } }
 @keyframes talk-bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-4px) } }
 @keyframes talk-kohop { 0%,86%,100% { transform: translateY(0) } 91% { transform: translateY(-9px) } }
 @keyframes talk-koin { from { transform: translateX(-50%) scale(.4); opacity: 0 } to { transform: translateX(-50%) scale(1); opacity: 1 } }

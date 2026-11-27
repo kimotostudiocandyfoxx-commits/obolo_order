@@ -51,6 +51,11 @@ export type TalkPerson = {
   offstage?: boolean;
   /** the figure's size in the row (a small round character stands smaller); 1 = the row's height */
   scale?: number;
+  /**
+   * how the figure holds itself (the story's MONBAN and OBOLON, client 2026-11-27): 'still' never bobs, tilts or hops;
+   * 'divine' only floats very slowly (Figure's `poise`)
+   */
+  poise?: 'still' | 'divine';
   /** where their head is, down from the top of the row's height (0..1; default 0.16, the talk looks' headroom) */
   headAt?: number;
   /**
@@ -1344,6 +1349,7 @@ export function TalkScene({
                 breath={p.self ? 4.1 : 3.4 + ((k * 0.37) % 0.5)}
                 calm={isGroup && !speaking && talkingId != null && (!directed || !!p.back)}
                 reduced={reduced}
+                poise={p.poise}
                 lit={speaking}
                 glow={isGroup && speaking && !directed ? p.color : undefined}
                 level={voice?.who === p.id && voice.level ? voice.level : speech?.who === p.id ? speech.level : undefined}

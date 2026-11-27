@@ -1,0 +1,127 @@
+{
+  "note": "MONBAN の絵を描き直す（依頼主 2026-11-27：「安く見える（光る目など）。もっとリッチでかっこよく」）。黒いフードの長いローブに金の線と魔法陣、覆面の額に金属の金の目がひとつ（強く光らせない）、黒い手袋とブーツに金の縁。写実寄りのダークファンタジー（3DCG）。緑の背景（クロマキー）で描き、scripts/cast/build.py で切り抜いて onboarding/<id>.webp にする。頭の後ろの金の光の輪は monban-halo（真っ黒の背景）を別の層にして重ねる。見本：design/story/refs/client/monban.jpg（透かしのない版）。OBOLON は依頼主の絵（design/refs/2026-11-27-story/05）をそのまま使うので、ここでは描かない。実行：Actions の「UI art」を、このブランチで、queue=design/cast-art-queue.json で動かす",
+  "dir": "../../../design/cast",
+  "png": true,
+  "always": "",
+  "items": [
+    {
+      "always": false,
+      "id": "monban",
+      "w": 1536,
+      "h": 2048,
+      "size": [
+        1152,
+        1536
+      ],
+      "refs": [
+        "design/story/refs/client/monban.jpg"
+      ],
+      "prompt": "Picture 1 is the character design reference — copy his costume, mask, single golden eye, proportions and gold patterns faithfully (but not its background, and not its halo). MONBAN, the gatekeeper of a secret order: a tall, imposing, motionless figure in a long black hooded robe that falls to the floor, layered like a ceremonial mantle with wide hanging sleeves. The black cloth is heavy and rich (velvet and brocade with a faint woven pattern); along every hem, seam and the edge of the hood run fine lines of real metallic gold embroidery, and down the centre of the chest hangs a vertical chain of small engraved gold magic-circle emblems (circles with compass stars) joined by a thin gold line, with thin gold cords and tassels at the sleeves. Deep inside the hood the whole face is covered by a black mask of layered cloth and dark metal plates with thin gold edges; in the middle of its forehead is ONE single eye made of polished gold — an engraved metallic golden eye with a gold iris, like jewellery. The eye is NOT a lamp: it does not glow, has no rays, no bloom, no halo and lights nothing around it; it only carries one tiny bright specular point of light, as polished metal does. There is no second eye, no nose, no mouth, no skin anywhere. Black gloves with fine gold trim on the knuckles and cuffs; black boots with gold trim. Pose: standing perfectly still and upright, facing the viewer, arms down at his sides inside the wide sleeves, gloved hands just visible. Calm, silent, watchful. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no ground shadow, no smoke, no mist, no light spill, no glow outside the figure, no other objects. Nothing on the character is green; no green reflections on the gold or the black cloth. The whole body is in the picture, centred, seen straight from the front at eye level, from the tip of the hood to the hem of the robe and the boots with a small margin, the hem near the bottom, the figure fills about 88% of the picture's height. Realistic dark fantasy, the quality of a high-end 3DCG film character render (physically based materials: matte black cloth, fine gold thread, brushed and polished gold metal), extremely detailed, crisp and sharp, rich but restrained — gold appears only as thin lines and small ornaments on black. Soft, even studio key light from the front with a faint cool rim light so the black folds read clearly; no coloured light. There is NO halo, NO ring, NO magic circle and NO disc behind his head in this picture (the reference shows one — leave it out completely; it is added later as a separate layer). No text, no letters, no numbers, no writing, no logo, no watermark, no signature anywhere."
+    },
+    {
+      "always": false,
+      "id": "monban-close",
+      "w": 1536,
+      "h": 2048,
+      "size": [
+        1152,
+        1536
+      ],
+      "refs": [
+        "design/cast/monban.jpg",
+        "design/story/refs/client/monban.jpg"
+      ],
+      "prompt": "Picture 1 is this exact character already painted in this style; picture 2 is his original design reference. A close-up portrait of the same character from the middle of the chest up, seen straight from the front at eye level: the hood, the masked face with the single polished-gold eye on the forehead, the shoulders of the mantle and the first gold emblem on the chest. MONBAN, the gatekeeper of a secret order: a tall, imposing, motionless figure in a long black hooded robe that falls to the floor, layered like a ceremonial mantle with wide hanging sleeves. The black cloth is heavy and rich (velvet and brocade with a faint woven pattern); along every hem, seam and the edge of the hood run fine lines of real metallic gold embroidery, and down the centre of the chest hangs a vertical chain of small engraved gold magic-circle emblems (circles with compass stars) joined by a thin gold line, with thin gold cords and tassels at the sleeves. Deep inside the hood the whole face is covered by a black mask of layered cloth and dark metal plates with thin gold edges; in the middle of its forehead is ONE single eye made of polished gold — an engraved metallic golden eye with a gold iris, like jewellery. The eye is NOT a lamp: it does not glow, has no rays, no bloom, no halo and lights nothing around it; it only carries one tiny bright specular point of light, as polished metal does. There is no second eye, no nose, no mouth, no skin anywhere. Black gloves with fine gold trim on the knuckles and cuffs; black boots with gold trim. The hood's tip is near the top of the picture with a small margin, the eye about one third of the way down, both shoulders inside the picture, the bottom edge cuts across the chest. Far more fine detail than picture 1 because he is closer: the weave of the cloth, every stitch of gold thread, the engraving of the gold eye, the layered plates of the mask. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no ground shadow, no smoke, no mist, no light spill, no glow outside the figure, no other objects. Nothing on the character is green; no green reflections on the gold or the black cloth. Realistic dark fantasy, the quality of a high-end 3DCG film character render (physically based materials: matte black cloth, fine gold thread, brushed and polished gold metal), extremely detailed, crisp and sharp, rich but restrained — gold appears only as thin lines and small ornaments on black. Soft, even studio key light from the front with a faint cool rim light so the black folds read clearly; no coloured light. There is NO halo, NO ring, NO magic circle and NO disc behind his head in this picture (the reference shows one — leave it out completely; it is added later as a separate layer). No text, no letters, no numbers, no writing, no logo, no watermark, no signature anywhere."
+    },
+    {
+      "always": false,
+      "id": "monban-x-talk",
+      "w": 1536,
+      "h": 2048,
+      "size": [
+        1152,
+        1536
+      ],
+      "refs": [
+        "design/cast/monban.jpg",
+        "design/story/refs/client/monban.jpg"
+      ],
+      "prompt": "Picture 1 is this exact character already painted in this style (copy him exactly: the same robe, the same gold patterns, the same mask and single golden eye, the same proportions, the same light); picture 2 is his original design reference. MONBAN, the gatekeeper of a secret order: a tall, imposing, motionless figure in a long black hooded robe that falls to the floor, layered like a ceremonial mantle with wide hanging sleeves. The black cloth is heavy and rich (velvet and brocade with a faint woven pattern); along every hem, seam and the edge of the hood run fine lines of real metallic gold embroidery, and down the centre of the chest hangs a vertical chain of small engraved gold magic-circle emblems (circles with compass stars) joined by a thin gold line, with thin gold cords and tassels at the sleeves. Deep inside the hood the whole face is covered by a black mask of layered cloth and dark metal plates with thin gold edges; in the middle of its forehead is ONE single eye made of polished gold — an engraved metallic golden eye with a gold iris, like jewellery. The eye is NOT a lamp: it does not glow, has no rays, no bloom, no halo and lights nothing around it; it only carries one tiny bright specular point of light, as polished metal does. There is no second eye, no nose, no mouth, no skin anywhere. Black gloves with fine gold trim on the knuckles and cuffs; black boots with gold trim. Pose: speaking slowly — one gloved hand lifted a little in front of him at waist height, palm half open, the other arm down; the body upright and still. Only the pose changes; everything else is identical to picture 1. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no ground shadow, no smoke, no mist, no light spill, no glow outside the figure, no other objects. Nothing on the character is green; no green reflections on the gold or the black cloth. The whole body is in the picture, centred, from the tip of the hood to the hem of the robe with a small margin, the hem near the bottom, the figure fills about 88% of the picture's height, at the same size and position as in picture 1. Realistic dark fantasy, the quality of a high-end 3DCG film character render (physically based materials: matte black cloth, fine gold thread, brushed and polished gold metal), extremely detailed, crisp and sharp, rich but restrained — gold appears only as thin lines and small ornaments on black. Soft, even studio key light from the front with a faint cool rim light so the black folds read clearly; no coloured light. There is NO halo, NO ring, NO magic circle and NO disc behind his head in this picture (the reference shows one — leave it out completely; it is added later as a separate layer). No text, no letters, no numbers, no writing, no logo, no watermark, no signature anywhere."
+    },
+    {
+      "always": false,
+      "id": "monban-x-point",
+      "w": 1536,
+      "h": 2048,
+      "size": [
+        1152,
+        1536
+      ],
+      "refs": [
+        "design/cast/monban.jpg",
+        "design/story/refs/client/monban.jpg"
+      ],
+      "prompt": "Picture 1 is this exact character already painted in this style (copy him exactly: the same robe, the same gold patterns, the same mask and single golden eye, the same proportions, the same light); picture 2 is his original design reference. MONBAN, the gatekeeper of a secret order: a tall, imposing, motionless figure in a long black hooded robe that falls to the floor, layered like a ceremonial mantle with wide hanging sleeves. The black cloth is heavy and rich (velvet and brocade with a faint woven pattern); along every hem, seam and the edge of the hood run fine lines of real metallic gold embroidery, and down the centre of the chest hangs a vertical chain of small engraved gold magic-circle emblems (circles with compass stars) joined by a thin gold line, with thin gold cords and tassels at the sleeves. Deep inside the hood the whole face is covered by a black mask of layered cloth and dark metal plates with thin gold edges; in the middle of its forehead is ONE single eye made of polished gold — an engraved metallic golden eye with a gold iris, like jewellery. The eye is NOT a lamp: it does not glow, has no rays, no bloom, no halo and lights nothing around it; it only carries one tiny bright specular point of light, as polished metal does. There is no second eye, no nose, no mouth, no skin anywhere. Black gloves with fine gold trim on the knuckles and cuffs; black boots with gold trim. Pose: giving an order — one arm raised and stretched forward to the viewer's right, the gloved index finger pointing ahead, the wide sleeve hanging from the arm; the other arm down. Only the pose changes; everything else is identical to picture 1. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no ground shadow, no smoke, no mist, no light spill, no glow outside the figure, no other objects. Nothing on the character is green; no green reflections on the gold or the black cloth. The whole body is in the picture, centred, from the tip of the hood to the hem of the robe with a small margin, the hem near the bottom, the figure fills about 88% of the picture's height, at the same size and position as in picture 1. Realistic dark fantasy, the quality of a high-end 3DCG film character render (physically based materials: matte black cloth, fine gold thread, brushed and polished gold metal), extremely detailed, crisp and sharp, rich but restrained — gold appears only as thin lines and small ornaments on black. Soft, even studio key light from the front with a faint cool rim light so the black folds read clearly; no coloured light. There is NO halo, NO ring, NO magic circle and NO disc behind his head in this picture (the reference shows one — leave it out completely; it is added later as a separate layer). No text, no letters, no numbers, no writing, no logo, no watermark, no signature anywhere."
+    },
+    {
+      "always": false,
+      "id": "monban-x-arms",
+      "w": 1536,
+      "h": 2048,
+      "size": [
+        1152,
+        1536
+      ],
+      "refs": [
+        "design/cast/monban.jpg",
+        "design/story/refs/client/monban.jpg"
+      ],
+      "prompt": "Picture 1 is this exact character already painted in this style (copy him exactly: the same robe, the same gold patterns, the same mask and single golden eye, the same proportions, the same light); picture 2 is his original design reference. MONBAN, the gatekeeper of a secret order: a tall, imposing, motionless figure in a long black hooded robe that falls to the floor, layered like a ceremonial mantle with wide hanging sleeves. The black cloth is heavy and rich (velvet and brocade with a faint woven pattern); along every hem, seam and the edge of the hood run fine lines of real metallic gold embroidery, and down the centre of the chest hangs a vertical chain of small engraved gold magic-circle emblems (circles with compass stars) joined by a thin gold line, with thin gold cords and tassels at the sleeves. Deep inside the hood the whole face is covered by a black mask of layered cloth and dark metal plates with thin gold edges; in the middle of its forehead is ONE single eye made of polished gold — an engraved metallic golden eye with a gold iris, like jewellery. The eye is NOT a lamp: it does not glow, has no rays, no bloom, no halo and lights nothing around it; it only carries one tiny bright specular point of light, as polished metal does. There is no second eye, no nose, no mouth, no skin anywhere. Black gloves with fine gold trim on the knuckles and cuffs; black boots with gold trim. Pose: stern — both arms folded across the chest, the gloved hands resting on the opposite sleeves, the wide sleeves hanging in heavy folds. Only the pose changes; everything else is identical to picture 1. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no ground shadow, no smoke, no mist, no light spill, no glow outside the figure, no other objects. Nothing on the character is green; no green reflections on the gold or the black cloth. The whole body is in the picture, centred, from the tip of the hood to the hem of the robe with a small margin, the hem near the bottom, the figure fills about 88% of the picture's height, at the same size and position as in picture 1. Realistic dark fantasy, the quality of a high-end 3DCG film character render (physically based materials: matte black cloth, fine gold thread, brushed and polished gold metal), extremely detailed, crisp and sharp, rich but restrained — gold appears only as thin lines and small ornaments on black. Soft, even studio key light from the front with a faint cool rim light so the black folds read clearly; no coloured light. There is NO halo, NO ring, NO magic circle and NO disc behind his head in this picture (the reference shows one — leave it out completely; it is added later as a separate layer). No text, no letters, no numbers, no writing, no logo, no watermark, no signature anywhere."
+    },
+    {
+      "always": false,
+      "id": "monban-x-stop",
+      "w": 1536,
+      "h": 2048,
+      "size": [
+        1152,
+        1536
+      ],
+      "refs": [
+        "design/cast/monban.jpg",
+        "design/story/refs/client/monban.jpg"
+      ],
+      "prompt": "Picture 1 is this exact character already painted in this style (copy him exactly: the same robe, the same gold patterns, the same mask and single golden eye, the same proportions, the same light); picture 2 is his original design reference. MONBAN, the gatekeeper of a secret order: a tall, imposing, motionless figure in a long black hooded robe that falls to the floor, layered like a ceremonial mantle with wide hanging sleeves. The black cloth is heavy and rich (velvet and brocade with a faint woven pattern); along every hem, seam and the edge of the hood run fine lines of real metallic gold embroidery, and down the centre of the chest hangs a vertical chain of small engraved gold magic-circle emblems (circles with compass stars) joined by a thin gold line, with thin gold cords and tassels at the sleeves. Deep inside the hood the whole face is covered by a black mask of layered cloth and dark metal plates with thin gold edges; in the middle of its forehead is ONE single eye made of polished gold — an engraved metallic golden eye with a gold iris, like jewellery. The eye is NOT a lamp: it does not glow, has no rays, no bloom, no halo and lights nothing around it; it only carries one tiny bright specular point of light, as polished metal does. There is no second eye, no nose, no mouth, no skin anywhere. Black gloves with fine gold trim on the knuckles and cuffs; black boots with gold trim. Pose: \"stop\" — one gloved hand raised in front of him at shoulder height with the open palm toward the viewer, fingers together; the other arm down. Only the pose changes; everything else is identical to picture 1. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no ground shadow, no smoke, no mist, no light spill, no glow outside the figure, no other objects. Nothing on the character is green; no green reflections on the gold or the black cloth. The whole body is in the picture, centred, from the tip of the hood to the hem of the robe with a small margin, the hem near the bottom, the figure fills about 88% of the picture's height, at the same size and position as in picture 1. Realistic dark fantasy, the quality of a high-end 3DCG film character render (physically based materials: matte black cloth, fine gold thread, brushed and polished gold metal), extremely detailed, crisp and sharp, rich but restrained — gold appears only as thin lines and small ornaments on black. Soft, even studio key light from the front with a faint cool rim light so the black folds read clearly; no coloured light. There is NO halo, NO ring, NO magic circle and NO disc behind his head in this picture (the reference shows one — leave it out completely; it is added later as a separate layer). No text, no letters, no numbers, no writing, no logo, no watermark, no signature anywhere."
+    },
+    {
+      "always": false,
+      "id": "monban-back",
+      "w": 1536,
+      "h": 2048,
+      "size": [
+        1152,
+        1536
+      ],
+      "refs": [
+        "design/cast/monban.jpg",
+        "design/story/refs/client/monban.jpg"
+      ],
+      "prompt": "Picture 1 is this exact character already painted in this style, seen from the front; picture 2 is his original design reference. Now the same character seen straight from BEHIND (his back to the viewer): the back of the black hood (no face, no eye visible), the back of the long layered black mantle falling to the floor with the same fine gold embroidery along the hems and seams and one large engraved gold magic-circle emblem between the shoulder blades, the wide sleeves hanging at his sides. Standing perfectly still and upright. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no ground shadow, no smoke, no mist, no light spill, no glow outside the figure, no other objects. Nothing on the character is green; no green reflections on the gold or the black cloth. The whole body is in the picture, centred, from the tip of the hood to the hem of the robe with a small margin, the hem near the bottom, the figure fills about 88% of the picture's height, at the same size and position as in picture 1. Realistic dark fantasy, the quality of a high-end 3DCG film character render (physically based materials: matte black cloth, fine gold thread, brushed and polished gold metal), extremely detailed, crisp and sharp, rich but restrained — gold appears only as thin lines and small ornaments on black. Soft, even studio key light from the front with a faint cool rim light so the black folds read clearly; no coloured light. There is NO halo, NO ring, NO magic circle and NO disc behind his head in this picture (the reference shows one — leave it out completely; it is added later as a separate layer). No text, no letters, no numbers, no writing, no logo, no watermark, no signature anywhere."
+    },
+    {
+      "always": false,
+      "id": "monban-halo",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1280,
+        1280
+      ],
+      "refs": [
+        "design/story/refs/client/monban.jpg"
+      ],
+      "prompt": "Picture 1 shows a character with a golden halo disc behind his head — paint ONLY that disc, with no character and nothing else: a flat circular magic-circle halo seen exactly from the front, perfectly centred, made of thin precise lines of polished metallic gold like fine jewellery or an astrolabe: three concentric rings of different thickness, a fine web of meridian and latitude lines inside, a small eight-pointed compass star at the centre, four thin spikes reaching a little beyond the outer ring at the top, bottom, left and right, tiny engraved tick marks along the outer ring. Solid metal gold with a soft sheen and only a very gentle warm glow close to the lines — not neon, not a light source, no lens flare, no rays. Background: completely flat pure black (#000000) everywhere, nothing else in the picture. The disc fills about 80% of the picture and is perfectly symmetrical. Realistic dark fantasy, high-end 3DCG render, extremely detailed and sharp. No text, no letters, no numbers, no runes that look like writing, no logo, no watermark."
+    }
+  ],
+  "redo": []
+}

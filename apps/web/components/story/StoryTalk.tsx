@@ -209,7 +209,7 @@ export function storyPeople({
     const look = spriteLook(sprite, v);
     const t = toneFor(id);
     const who = (id === 'KIMORIN' ? 'KIMORIN' : id) as Speaker;
-    people.push({ id, name: speakerName(who), look, color: t.line, tone: t, scale: scaleOf(sprite), headAt: headOf(sprite), offstage: !look, views: viewsOf(sprite, id), ...(front.includes(id) ? {} : { back: true }) });
+    people.push({ id, name: speakerName(who), look, color: t.line, tone: t, scale: scaleOf(sprite), poise: charSpec(sprite).poise, headAt: headOf(sprite), offstage: !look, views: viewsOf(sprite, id), ...(front.includes(id) ? {} : { back: true }) });
   }
   // heard only: 「？？？」, a speaker with no picture, and who spoke before this scene
   for (const who of entries.flatMap((e) => (e.kind === 'them' ? [e.who] : []))) {

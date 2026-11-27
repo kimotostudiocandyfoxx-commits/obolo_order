@@ -38,6 +38,20 @@ export const MOTION = {
    * and shakes; muse: a 「……」 line drifts in further and slower
    */
   cinema: { zoom: 2.5, smallBoost: 1.35, faceAt: 33, push: { from: 0.78, panPct: 9, ms: 560 }, drift: { scale: 1.045, px: 1.2, ms: 6500 }, cutMs: 110, punch: { zoom: 1.1, shakeMs: 360 }, muse: { scale: 1.1, ms: 5200 } },
+  /**
+   * the ones who do not move like the rest (client 2026-11-27; components/story/Stage.tsx CharSpec.poise, and the row's
+   * figures in components/story/StoryTalk.tsx):
+   *   still   MONBAN — no bob with the voice, no hop, no breathing; eyeLight: how bright the small light on his golden
+   *           eye is (0–1; it never flares with the voice), eyeLayer: how much of the poses' painted eye glow is
+   *           left (0 = none)
+   *   divine  OBOLON — no shaking: the orb floats floatPct % of its height up and down once every floatMs (very slow),
+   *           its corona breathes between corona[0] and corona[1] (opacity) every coronaMs, and `motes` small lights
+   *           drift up risePct % of the orb's height, one trip in about moteMs. prefers-reduced-motion: none of it moves
+   */
+  poise: {
+    still: { eyeLight: 0.45, eyeLayer: 0.12 },
+    divine: { floatPct: 1.6, floatMs: 9000, corona: [0.55, 0.95], coronaMs: 7000, motes: 6, moteMs: 11000, risePct: 26 },
+  },
   /** the ones not speaking step back into the dark */
   dim: { brightness: 0.45, saturate: 0.7 },
 } as const;
