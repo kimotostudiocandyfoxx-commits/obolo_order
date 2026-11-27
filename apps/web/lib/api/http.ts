@@ -803,9 +803,6 @@ export class HttpApi implements Api {
   batiRestyle(wish?: string, from?: string, paid?: Paid) {
     return this.req<Awaited<ReturnType<Api['batiRestyle']>>>('POST', '/me/bati/restyle', { ...(wish?.trim() ? { wish } : {}), ...(from ? { from } : {}), ...(paid?.confirm ? { via: 'atelier', confirm: paid.confirm, ...(paid.spell ? { spell: paid.spell } : {}) } : {}) });
   }
-  batiLookBack() {
-    return this.req<Me>('POST', '/me/bati/restyle/back', {});
-  }
   batiLookRestore(url: string) {
     return this.req<Me>('POST', '/me/bati/look/restore', { url });
   }

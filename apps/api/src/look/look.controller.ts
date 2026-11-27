@@ -8,6 +8,7 @@ import { parseBody } from '../common/validate';
 import { AppConfig, CONFIG } from '../config';
 import type { KvStore } from '../infra/kv';
 import { KV } from '../infra/tokens';
+import { lookEndpointGone } from './lock';
 import { LookService } from './look.service';
 import { BatiMemoryService } from './memory.service';
 import { LookStepsService } from './steps.service';
@@ -176,7 +177,10 @@ export class LookController {
     return this.look.batiFaces(userId, origin(req));
   }
 
-  /** Bati's room (P-BATI-ROOM): the Bati dressed up / changed a little by the wish — 3 pictures, 8 rounds a day */
+  /**
+   * {bati} changed by a wish — an Obolo Order member's paid making (the Moon atelier; always the look's mana). Client
+   * 2026-11-27 (M-R338): a resident's {bati} stays as decided on day 2 → 403 BATI_LOOK_LOCKED (it was free before)
+   */
   @Post('bati/restyle')
   @HttpCode(200)
   async restyle(@UserId() userId: string, @Body() body: unknown, @Req() req: Request, @Headers('x-admin-token') token?: string) {
@@ -184,11 +188,10 @@ export class LookController {
     return this.look.restyle(userId, parseBody(BatiRestyleBody, body), origin(req), this.admin(token));
   }
 
-  /** M-R223 〔前に戻す〕: the {bati} look decided before the one worn now */
+  /** the old 〔前に戻す〕 of the four-card dress-up (M-R223): no screen has it any more — 410 for everyone */
   @Post('bati/restyle/back')
-  @HttpCode(200)
-  restyleBack(@UserId() userId: string, @Req() req: Request) {
-    return this.look.restyleBack(userId, origin(req));
+  restyleBack(): never {
+    throw lookEndpointGone();
   }
 
   /** M-R247 〔写真を消す〕: every look made from the photo goes (the photo itself was never kept); the placeholder look again */
@@ -197,11 +200,11 @@ export class LookController {
     return this.look.removeLook(userId);
   }
 
-  /** M-R223: Bluena's first shelf — a {bati} look kept before, worn again */
+  /** M-R223: Bluena's first shelf — a {bati} look kept before, worn again (a member's; a resident: 403 BATI_LOOK_LOCKED) */
   @Post('bati/look/restore')
   @HttpCode(200)
-  restoreBati(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
-    return this.look.restoreBati(userId, parseBody(LookRestoreBody, body).url, origin(req));
+  restoreBati(@UserId() userId: string, @Body() body: unknown, @Req() req: Request, @Headers('x-admin-token') token?: string) {
+    return this.look.restoreBati(userId, parseBody(LookRestoreBody, body).url, origin(req), this.admin(token));
   }
 
   /** M-R223: Bluena's first shelf — a look of one's own worn before, worn again */
@@ -211,10 +214,11 @@ export class LookController {
     return this.look.restoreLook(userId, parseBody(LookRestoreBody, body).url, origin(req));
   }
 
+  /** a picture of the paid dress-up worn (a member's; a resident: 403 BATI_LOOK_LOCKED) */
   @Post('bati/restyle/choose')
   @HttpCode(200)
-  chooseRestyle(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
-    return this.look.chooseRestyle(userId, parseBody(BatiRestyleChooseBody, body).id, origin(req));
+  chooseRestyle(@UserId() userId: string, @Body() body: unknown, @Req() req: Request, @Headers('x-admin-token') token?: string) {
+    return this.look.chooseRestyle(userId, parseBody(BatiRestyleChooseBody, body).id, origin(req), this.admin(token));
   }
 
   /** M-R215: another of the member's {bati} comes into the chat */

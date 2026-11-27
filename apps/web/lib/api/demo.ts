@@ -70,6 +70,7 @@ import {
   type MembersDay,
   MAKE_COST,
   LOOK_LOCKED_LINE,
+  BATI_LOOK_LOCKED_LINE,
   profileLookLocked,
   CHARGE_ERROR_WORDS,
   confirmKey,
@@ -2026,13 +2027,14 @@ export class DemoApi implements Api {
   // demo: the Bati picture recoloured three ways stands in for the dressed-up Bati (no network)
   async batiRestyle(wish = '', from?: string, paid?: Paid): Promise<BatiRestyleResult> {
     const u = this.s.users[this.uid()];
+    demoBatiUnlocked(u);
     if (!u.bati?.imageUrl) throw new ApiError(409, 'NO_BATI', 'Not hatched yet');
     // M-R215: no real person's or another work's lookalike, nothing sexual or violent
     if (wish.trim() && lookWishCategory(wish)) throw new ApiError(422, 'MODERATION', 'その姿には、できないんだ');
     const key = this.roomKey('restyle');
     const used = Number(localStorage.getItem(key) ?? 0);
     if (used >= BATI_RESTYLE_PER_DAY) throw new ApiError(429, 'RESTYLE_TRIES', '今日はもう着替えられません');
-    if (u.journeyDay >= JOURNEY_DONE) this.charge('look', paid, false, 'bati');
+    this.charge('look', paid, false, 'bati');
     localStorage.setItem(key, String(used + 1));
     await sleep(1500);
     // M-R223: four cards from the look worn now (or the card tapped just before); four touches without a wish
@@ -2058,15 +2060,9 @@ export class DemoApi implements Api {
       return { bati: { ...u.bati, imageUrl: url, looks, stand: false, faces: Object.fromEntries(BATI_FACES.map((f) => [f, url])) } };
     });
   }
-  async batiLookBack() {
-    const u = this.s.users[this.uid()];
-    const looks = this.batiLooks(u);
-    const at = looks.indexOf(u.bati?.imageUrl ?? '');
-    if (at <= 0) throw new ApiError(409, 'NO_PREVIOUS', 'もう前の姿はない');
-    return this.wearBati(looks[at - 1], false);
-  }
   async batiLookRestore(url: string) {
     const u = this.s.users[this.uid()];
+    demoBatiUnlocked(u);
     if (!this.batiLooks(u).includes(url)) throw new ApiError(404, 'NOT_FOUND', 'not found');
     return this.wearBati(url, false);
   }
@@ -2077,6 +2073,7 @@ export class DemoApi implements Api {
   }
 
   async chooseBatiRestyle(id: string) {
+    demoBatiUnlocked(this.s.users[this.uid()]);
     const c = this.lookCache.find((x) => x.id === id);
     if (!c) throw new ApiError(404, 'NOT_FOUND', 'not found');
     // the faces are drawn again from the new picture (the demo: the picture itself stands in for each); kept in its looks
@@ -3128,6 +3125,10 @@ function withTalk<T extends Me | undefined>(u: T): T {
 /** client 2026-11-25: like the API (lock.ts) — a resident's confirmed look stays as it is until they join */
 function demoLookLocked(u: Me): boolean {
   return profileLookLocked({ journeyDay: u.journeyDay, journeyCompletedAt: u.journeyCompletedAt, confirmed: !!u.story?.['look.confirmed'], hasLook: !!u.avatarUrl, member: isActiveMember(u) });
+}
+/** client 2026-11-27 (M-R338), like the API: {bati}'s look stays as decided on day 2 until Obolo Order */
+function demoBatiUnlocked(u: Me) {
+  if (!isActiveMember(u)) throw new ApiError(403, 'BATI_LOOK_LOCKED', BATI_LOOK_LOCKED_LINE.replace('{self}', u.bati?.self || 'ボク'));
 }
 function demoUnlocked(u: Me) {
   if (demoLookLocked(u)) throw new ApiError(403, 'LOOK_LOCKED', LOOK_LOCKED_LINE.replace('{neo}', u.displayName || 'きみ').replace('{self}', 'ボク'));

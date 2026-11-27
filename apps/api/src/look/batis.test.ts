@@ -175,11 +175,12 @@ describe('the grown egg and the three (M-R215 / M-R218)', () => {
 
 describe("{bati}'s look (M-R215)", () => {
   it('refuses a dress-up wish for a real person or another work, and passes the born look along', async () => {
+    // (the operator's token: a resident's own dress-up is refused before the wish is read — restyle.test.ts)
     const { s, prompts } = make({ batiFood: 'カレー', batiName: 'ポン', batiImageUrl: 'https://x/now.png', batiId: 'b1', batisJson: [{ ...born('b1', 'ポン'), bornImageUrl: 'https://x/born.png' }] });
-    await expect(s.restyle('u', 'ピカチュウにして', 'https://x')).rejects.toMatchObject({ response: { error: { code: 'MODERATION' } } });
-    await expect(s.restyle('u', '有名な俳優にそっくり', 'https://x')).rejects.toMatchObject({ response: { error: { code: 'MODERATION' } } });
+    await expect(s.restyle('u', 'ピカチュウにして', 'https://x', true)).rejects.toMatchObject({ response: { error: { code: 'MODERATION' } } });
+    await expect(s.restyle('u', '有名な俳優にそっくり', 'https://x', true)).rejects.toMatchObject({ response: { error: { code: 'MODERATION' } } });
     expect(prompts).toEqual([]);
-    await s.restyle('u', '水彩画のタッチで', 'https://x');
+    await s.restyle('u', '水彩画のタッチで', 'https://x', true);
     expect(prompts[0]).toContain('second picture');
     expect(prompts[0]).toContain('must not resemble any real, existing person');
   }, 30_000);

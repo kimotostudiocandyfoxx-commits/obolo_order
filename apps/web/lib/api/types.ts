@@ -450,13 +450,14 @@ export interface Api {
   batiName(name: string): Promise<Me>;
   /** Bati's six expressions from the hatched picture (once; M-R139) */
   batiFaces(): Promise<Me>;
-  /** Bati's room: pictures of the same Bati dressed up / changed a little by the wish (BATI_RESTYLE_PER_DAY rounds a day) */
+  /**
+   * {bati} dressed up / changed a little by the wish — an Obolo Order member's paid making in the Moon atelier (always the
+   * look's mana; BATI_RESTYLE_PER_DAY rounds a day). A resident: 403 BATI_LOOK_LOCKED (M-R338)
+   */
   batiRestyle(wish?: string, from?: string, paid?: Paid): Promise<BatiRestyleResult>;
-  /** one of them becomes the Bati picture (its expressions are drawn again in the background) */
+  /** one of them becomes the Bati picture (its expressions are drawn again in the background; a resident: BATI_LOOK_LOCKED) */
   chooseBatiRestyle(id: string): Promise<Me>;
-  /** M-R223 〔前に戻す〕: the {bati} look decided before the one worn now (NO_PREVIOUS when none) */
-  batiLookBack(): Promise<Me>;
-  /** M-R223: Bluena's first shelf — a {bati} look kept before (Me.bati.looks), worn again */
+  /** M-R223: Bluena's first shelf — a {bati} look kept before (Me.bati.looks), worn again (a resident: BATI_LOOK_LOCKED) */
   batiLookRestore(url: string): Promise<Me>;
   /** M-R223: Bluena's first shelf — a look of one's own worn before (Me.lookHistory), worn again */
   lookRestore(url: string): Promise<Me>;

@@ -4,7 +4,6 @@ import { L2Step } from '@/components/lap2/L2Step';
 import { BatiChat } from './BatiChat';
 import { SongShow } from '@/components/lap2/SongShow';
 import { MIKIE_DRILL } from '@/lib/onboarding/lap2';
-import { BatiLook, type BatiLookApi } from '@/components/bati/BatiLook';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { hasMotion, motionUrl, spriteUrl, STILL_MOUTH, stillMouthUrl, stillShows, stillUrl, type MotionId } from '@/lib/onboarding/media';
 import { Bgm } from '@/lib/onboarding/bgm';
@@ -153,8 +152,6 @@ interface Props {
   replayFilms?: boolean;
   /** the review page (not real=1): the atelier steps make stand-in works in this browser (makers.ts makeTest) */
   atelierTest?: boolean;
-  /** the review page: stand-ins for {bati}'s look (D03-S008) — no account there */
-  batiLookApi?: BatiLookApi;
 }
 
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
@@ -260,7 +257,7 @@ const STILL_LOOK: Record<string, string> = {
   's/d2-moon-kimorin-half': 'kimorin-iu',
 };
 
-export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onLookFixed, onHatch, onBatiName, orderApi, ordered, onNeoName, lessonApi, seals, stamps, onClock, timeUp, onTimeUp, onPause, onEnd, onScene, textOnly = false, autoStart = false, showGate = false, replayFilms = false, atelierTest = false, batiLookApi }: Props) {
+export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onLookFixed, onHatch, onBatiName, orderApi, ordered, onNeoName, lessonApi, seals, stamps, onClock, timeUp, onTimeUp, onPause, onEnd, onScene, textOnly = false, autoStart = false, showGate = false, replayFilms = false, atelierTest = false }: Props) {
   const seenFilm = (id: string) => !replayFilms && filmWatched(id);
   const videoA = useRef<HTMLVideoElement>(null);
   const videoB = useRef<HTMLVideoElement>(null);
@@ -1942,27 +1939,6 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
             run(iRef.current + 1);
           }}
         />
-      )}
-      {/* D03-S008 (M-R223): {bati}'s look in the chat — four cards, a tap pops it, a wish brings four more, 〔前に戻す〕 */}
-      {started && step?.t === 'batilook' && (
-        <div className="pb-safe absolute inset-x-0 bottom-0 z-20 max-h-[88svh] overflow-y-auto rounded-t-3xl border-t border-amber-200/30 bg-black/85 px-5 pb-8 pt-5 text-amber-50 backdrop-blur-md">
-          <div className="mx-auto max-w-md">
-            <BatiLook
-              key={i}
-              api={batiLookApi}
-              bati={v.bati || 'バティ'}
-              ask={sayText(step.ask.who, step.ask.text, v)}
-              ok={step.ok}
-              more={step.more}
-              onDecided={(me) => {
-                if (me.bati?.imageUrl) remember('batiImage', me.bati.imageUrl);
-                remember('f_d03_bati_look', 'true');
-                addLine({ id: `c${i}`, kind: 'me', text: step.ok });
-                run(iRef.current + 1);
-              }}
-            />
-          </div>
-        </div>
       )}
       {started && step?.t === 'egg' && (
         <EggStep

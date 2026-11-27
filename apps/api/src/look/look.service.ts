@@ -26,7 +26,7 @@ import { canUseMedia } from '../voice/media-consent';
 import { costScope } from '../wallet/cost-scope';
 import { PlanetFiguresService } from './figures.service';
 import type { FigureStore } from './figures';
-import { firstLookKey, LOOK_CONFIRMED_KEY, lookConfirmedOf, lookLocked, lookLockedOf } from './lock';
+import { batiLookLocked, batiLookLockedOf, firstLookKey, LOOK_CONFIRMED_KEY, lookConfirmedOf, lookLocked, lookLockedOf } from './lock';
 
 /**
  * Generations per OBOLO NEO. The story (2026-10-14) lets the visitor redraw "何度でも", so the screen
@@ -234,6 +234,14 @@ export class LookService {
   }
 
   /**
+   * client 2026-11-27 (M-R338): {bati}'s look stays as decided on day 2 until Obolo Order (BATI_LOOK_LOCKED) — every way
+   * that changes it outside the step round asks this first, so none of them is a free way around the round
+   */
+  private batiUnlocked(u: typeof users.$inferSelect, unlimited: boolean) {
+    if (!unlimited && batiLookLockedOf(u)) throw batiLookLocked(u);
+  }
+
+  /**
    * the paid making a look's own pictures belong to (the standee, the chibi, the talk's, the back view): the profile look
    * round it was chosen from (kept 30 days per picture), else the first look while it is not confirmed yet
    */
@@ -396,12 +404,14 @@ export class LookService {
 
   /**
    * Bati's room (P-BATI-ROOM): the Bati dressed up / changed a little by the wish — its picture put back on its grey
-   * (like the faces), edited three ways and cut out like the hatched one. BATI_RESTYLE_PER_DAY rounds a day; free
-   * during the first journey, the look's mana after it.
+   * (like the faces), edited three ways and cut out like the hatched one. BATI_RESTYLE_PER_DAY rounds a day.
+   * Client 2026-11-27 (M-R338): an Obolo Order member's paid making only (the Moon atelier) — a resident is refused
+   * (BATI_LOOK_LOCKED), and a round is never free: the look's mana is taken whatever the journey day.
    */
   async restyle(userId: string, wishOrBody: string | { wish?: string; from?: string; via?: 'atelier'; confirm?: MakeConfirm; spell?: SpellTag[] }, origin: string, unlimited = false): Promise<BatiRestyleResult> {
     const { wish = '', from, via, confirm, spell } = typeof wishOrBody === 'string' ? { wish: wishOrBody, via: undefined, confirm: undefined, spell: undefined } : wishOrBody;
     const u = await this.user(userId);
+    this.batiUnlocked(u, unlimited);
     if (!u.batiImageUrl) throw apiError(HttpStatus.CONFLICT, 'NO_BATI', 'Not hatched yet');
     // M-R215: any touch or dress-up, but no real person's or another work's lookalike, nothing sexual or violent
     if (wish.trim()) {
@@ -422,12 +432,12 @@ export class LookService {
     // the picture it was born with goes along, so the creature does not drift over many dress-ups (M-R215)
     const born = await this.bornRef(userId, u, bg);
     const refs = born ? [ref, born] : [ref];
-    const fee = u.journeyDay < JOURNEY_DONE ? { refund: async () => undefined } : await this.fee(userId, 'look', unlimited, { via, confirm, spell: spell ? spellKey('bati', spell) : null });
+    const fee = await this.fee(userId, 'look', unlimited, { via, confirm, spell: spell ? spellKey('bati', spell) : null });
     const n = await this.kv.incr(key, 60 * 60 * 26);
     // M-R223: the seed it was born from (food / sound / word) stays somewhere small in every look
     const r0 = activeBati(u);
     const seed = { seed: r0?.seed || u.batiFood || '', kind: paintKind(r0?.seedKind) };
-    const count = u.journeyDay >= JOURNEY_DONE && !unlimited ? this.lookCount(true) : RESTYLE_CANDIDATES;
+    const count = unlimited ? RESTYLE_CANDIDATES : this.lookCount(true);
     const made = await settleWithRetry(count, (i) => this.bati.generate(batiRestylePrompt(spell ? spellPrompt('bati', spell) : wish, i, !!born, seed, KEY_WORDS[bg]), i, refs));
     const candidates = [];
     for (const r of made) {
@@ -446,10 +456,11 @@ export class LookService {
   }
 
   /** a restyle candidate becomes the Bati picture; its expressions are drawn again in the background (the old ones go) */
-  async chooseRestyle(userId: string, id: string, origin: string): Promise<Me> {
+  async chooseRestyle(userId: string, id: string, origin: string, unlimited = false): Promise<Me> {
+    const cur = await this.user(userId);
+    this.batiUnlocked(cur, unlimited);
     const m = await this.media.getOwned(userId, id, 'bati');
     if (!m) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Image not found');
-    const cur = await this.user(userId);
     if (!cur.batiImageUrl) throw apiError(HttpStatus.CONFLICT, 'NO_BATI', 'Not hatched yet');
     if (cur.batiImageUrl === m.url) return toMe(cur);
     return this.wearBati(userId, cur, m.url, origin, true);
@@ -483,21 +494,10 @@ export class LookService {
     return toMe(nu);
   }
 
-  /** M-R223 〔前に戻す〕: the {bati} look decided before the one worn now */
-  async restyleBack(userId: string, origin: string): Promise<Me> {
+  /** M-R223: Bluena's first shelf — a {bati} look kept before is worn again (only its own looks; a member's: M-R338) */
+  async restoreBati(userId: string, url: string, origin: string, unlimited = false): Promise<Me> {
     const cur = await this.user(userId);
-    const r = activeBati(cur);
-    if (!r || !cur.batiImageUrl) throw apiError(HttpStatus.CONFLICT, 'NO_BATI', 'Not hatched yet');
-    const urls = [...new Set([...(r.bornImageUrl ? [r.bornImageUrl] : []), ...(r.looks ?? []).map((l) => l.url)])];
-    const at = urls.indexOf(cur.batiImageUrl);
-    const prev = at > 0 ? urls[at - 1] : at < 0 ? urls[urls.length - 1] : null;
-    if (!prev || prev === cur.batiImageUrl) throw apiError(HttpStatus.CONFLICT, 'NO_PREVIOUS', 'もう前の姿はない');
-    return this.wearBati(userId, cur, prev, origin, false);
-  }
-
-  /** M-R223: Bluena's first shelf — a {bati} look kept before is worn again (only its own looks) */
-  async restoreBati(userId: string, url: string, origin: string): Promise<Me> {
-    const cur = await this.user(userId);
+    this.batiUnlocked(cur, unlimited);
     const r = activeBati(cur);
     if (!r || !cur.batiImageUrl) throw apiError(HttpStatus.CONFLICT, 'NO_BATI', 'Not hatched yet');
     if (url === cur.batiImageUrl) return toMe(cur);

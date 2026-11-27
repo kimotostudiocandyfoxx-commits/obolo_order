@@ -9,8 +9,9 @@ import { batiLine, batiLineVoiceOf } from '@/lib/onboarding/batiLine';
 
 /**
  * Bati's room (the Moon; client 2026-11-22: "24時間の間はバティと喋らせまくる時間にしたい"): next to the chat,
- * 〔着替え・変身〕 dresses up / changes the Bati a little (POST /me/bati/restyle) and 〔自分の姿を変えてもらう〕 is Bati's
- * magic on the member's own look (POST /me/look/refine with `magic`, again and again until they like it).
+ * 〔着替え・変身〕 and 〔自分の姿を変えてもらう〕. An Obolo Order member changes either step by step (the paid round of
+ * /me/look/steps); a resident's {bati} stays as decided on day 2 (the API refuses a change: BATI_LOOK_LOCKED), and their
+ * own look takes {bati}'s magic only until it is confirmed (POST /me/look/refine with `magic`; LOOK_LOCKED after).
  * No counts on screen; at the day's end Bati says so.
  */
 export type RoomMode = 'bati' | 'me';
@@ -170,7 +171,7 @@ function MeSheet({ onClose, onDone, name: given }: { onClose: () => void; onDone
     setLine(LINES[mode].busy);
     try {
       // Bati's magic goes on from the picked one, so the look can be changed step by step
-      const r = mode === 'bati' ? await api.batiRestyle(w) : await api.refineLook(pick, w, true);
+      const r = await api.refineLook(pick, w, true);
       if (!r.candidates.length) {
         setLine(LINES.failed);
         return;
@@ -199,7 +200,7 @@ function MeSheet({ onClose, onDone, name: given }: { onClose: () => void; onDone
     if (!pick || busy) return;
     setBusy(true);
     try {
-      setMe(mode === 'bati' ? await api.chooseBatiRestyle(pick) : await api.chooseLook(pick));
+      setMe(await api.chooseLook(pick));
       onDone(LINES[mode].done);
       onClose();
     } catch {

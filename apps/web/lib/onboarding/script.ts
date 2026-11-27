@@ -238,12 +238,6 @@ export type Step =
   | { t: 'branch'; key: string; cases: Record<string, string>; otherwise: string }
   | { t: 'label'; id: string }
   /**
-   * D03-S008 (M-R223): {bati}'s look inside the chat — four cards of the {bati} now in four art touches, a tap makes it pop
-   * into one, a wish in words brings a new four, 〔前に戻す〕 any time; once a card is tapped {bati} asks `ask`
-   * (「これで、決まり？」) with `ok` / `more` (D03-S008#c1). Decided: saved, f_d03_bati_look = true (components/bati/BatiLook).
-   */
-  | { t: 'batilook'; ask: ScriptLine; ok: string; more: string }
-  /**
    * 月で作る inside the day (M-R208/M-R210/M-R211, days 3–7): the Moon atelier's one {bati} chat
    * (components/atelier/AtelierChat) opens with `kind` asked at once; what is made comes in as a card and is in Bluena at
    * once. 〔次へ〕 goes on with the story. `lines`: the script's lines that are said inside that chat ({bati}'s questions,
