@@ -34,7 +34,7 @@ for f in sorted(os.listdir(H+'/kororin')):
     if f.endswith('.webp'): im=Image.open(H+'/kororin/'+f).convert('RGBA'); im.thumbnail((200,200)); A['kor-'+f[:-5]]=uri(im,86)
 for f in sorted(os.listdir(H+'/puni')):
     if f.endswith('.png'): im=Image.open(H+'/puni/'+f).convert('RGBA'); im.thumbnail((200,200)); A['puni-'+f[:-4]]=uri(im,88)
-for k in 'user kimorin monban mikie brother sister sapon'.split():
+for k in 'user kimorin monban mikie brother sister sapon gari ebi uni ika shari kani'.split():
     f=f'{O}/chibi-{k}.jpg'
     if os.path.exists(f): kk=key(Image.open(f)); kk.thumbnail((300,300)); A['chibi-'+k]=uri(kk,86)
     f2=f.replace('/chibi-','/chibi2-')
@@ -99,7 +99,7 @@ for n in range(1,5):
 for n in range(1,6):
     f=f'{H}/songs/song-{n}.mp3'
     if os.path.exists(f): A[f'song-{n}']='data:audio/mpeg;base64,'+base64.b64encode(open(f,'rb').read()).decode()
-for k in 'user kimorin monban mikie brother sister sapon'.split():
+for k in 'user kimorin monban mikie brother sister sapon gari ebi uni ika shari kani'.split():
     f=f'{O}/chibi3-{k}.jpg'
     if os.path.exists(f): kk=key(Image.open(f)); kk.thumbnail((260,260)); A['chibi3-'+k]=uri(kk,86)
     f=f'{O}/chibi4-{k}.jpg'
@@ -134,7 +134,7 @@ def unwhite(im):
     clear=out|hole
     al=Image.fromarray(((~clear)*255).astype('uint8')).filter(_F.MinFilter(3)).filter(_F.GaussianBlur(1.0))
     o=im.convert('RGBA'); o.putalpha(al); bb=o.getbbox(); return o.crop(bb) if bb else o
-for k in 'user kimorin monban mikie brother sister sapon'.split():
+for k in 'user kimorin monban mikie brother sister sapon gari ebi uni ika shari kani'.split():
     f=f'{O}/kor4-{k}.jpg'
     if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((220,220),Image.LANCZOS); A['kor4-'+k]=uri(o,88)
     for n in (1,2):
@@ -203,7 +203,7 @@ for pl in ['mars','venus','uranus','pluto','neptune']:
     for key,k2 in [('main',f'bg5-{pl}'),('hv',f'bg5-{pl}-hv'),('prof',f'bg5-{pl}-prof')]:
         f=f'{O}/home5-{pl}-{key}.jpg'
         if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A[k2]=uri(im,76)
-    for k in 'user kimorin monban mikie brother sister sapon'.split():
+    for k in 'user kimorin monban mikie brother sister sapon gari ebi uni ika shari kani'.split():
         f=f'{O}/p5-{pl}-{k}.jpg'
         if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((220,220),Image.LANCZOS); A[f'p5-{pl}-{k}']=uri(o,84)
 for k in ['saturn','jupiter','mercury','mars','venus','uranus','pluto','neptune']:
@@ -301,9 +301,28 @@ if os.environ.get('EXTERN'):
         raw=base64.b64decode(v[m.end():]); fp=os.path.join(AD,fn)
         if not (os.path.exists(fp) and open(fp,'rb').read()==raw): open(fp,'wb').write(raw)
         A[k]='a/'+fn
+
+# the other Sushimon (M-R339): works in out/su/<k>/, sounds in design/home/sushi/<k>/, data in design/home/sushi/sushi.json
+_SU=json.load(open(H+'/sushi/sushi.json')); _SUX={}
+for k,c in _SU.items():
+    for f in sorted(_g.glob(f'{O}/su/{k}/*.jpg')):
+        im=Image.open(f).convert('RGB'); im.thumbnail((560,560)); A[f'su-{k}-'+os.path.basename(f)[:-4]]=uri(im,74)
+    f=f'{O}/sushi/{k}-ref.jpg'
+    if os.path.exists(f): o=cleancut(Image.open(f)); o.thumbnail((520,520),Image.LANCZOS); A[f'su-{k}-game']=uri(o,88)
+    for f in sorted(_g.glob(f'{H}/sushi/{k}/*')):
+        b=os.path.basename(f); mt={'mp3':'audio/mpeg','mp4':'video/mp4'}.get(b.rsplit('.',1)[-1])
+        if mt: A[f'su-{k}-'+b.rsplit('.',1)[0]]=f'data:{mt};base64,'+base64.b64encode(open(f,'rb').read()).decode()
+    ly=f'{H}/sushi/{k}/lyrics.json'
+    _SUX[c['name']]=dict(k=k,p=f'su-{k}-',name=c['name'],saturn=c['saturn'],jupiter=c['jupiter'],song=c['song'],radio=c['radio'],goods=c['goods'],book=c['book'],pages=c['pages'],game=c['game'],kind=c['gameKind'],goodsImg='goods',goodsVoice='goodsv',ly=json.load(open(ly)) if os.path.exists(ly) else [])
+_ON=[x for x in os.environ.get('SUSHION','サーぽん').split(',') if x]
+_ONK={('sapon' if n=='サーぽん' else _SUX[n]['k']) for n in _ON}
+for _k in ['sapon']+list(_SU):
+    if _k in _ONK: continue
+    for key in list(A):
+        if key.endswith('-'+_k) or key.startswith(f'su-{_k}-') or (_k=='sapon' and key.startswith('sap-')): A.pop(key,None)
 for _k in os.environ.get('SAP_DROP','').split(','):
     A.pop(_k,None)
-t=open(H+'/template.html').read().replace('/*ASSETS*/{}',json.dumps(A))
+t=open(H+'/template.html').read().replace('/*ASSETS*/{}',json.dumps(A)).replace('/*SUSHI*/{}',json.dumps({n:v for n,v in _SUX.items() if n in _ON},ensure_ascii=False)).replace("/*SUSHION*/['サーぽん']",json.dumps(_ON,ensure_ascii=False))
 if os.environ.get('PAGELINK'): t=t.replace('/*PAGELINK*/null',os.environ['PAGELINK'])
 if os.environ.get('PAGETITLE'): t=t.replace('<title>星のホーム</title>','<title>'+os.environ['PAGETITLE']+'</title>')
 open(os.environ.get('OUT_HTML') or H+'/home-inline.html','w').write(t); print(len(A),'assets',round(len(t)/1e6,2),'MB')
