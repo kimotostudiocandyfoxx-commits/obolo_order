@@ -70,7 +70,8 @@ async function paint(x) {
       {
         taskType: 'imageInference',
         taskUUID,
-        model: 'bytedance:seedream@5.0-pro',
+        // an item may name its own painter (planet figures are painted on the model the app uses for that planet)
+        model: x.model ?? 'bytedance:seedream@5.0-pro',
         // always: false — a picture that edits its first ref (the place kept exactly) skips the queue's style line
         positivePrompt: `${x.prompt} ${x.always === false ? '' : (queue.always ?? '')}`.slice(0, 3000),
         width: x.w,
@@ -79,7 +80,7 @@ async function paint(x) {
         outputType: 'URL',
         outputFormat: 'JPG',
         includeCost: true,
-        ...(refsOf(x).length ? { referenceImages: refsOf(x).map(dataUri) } : {}),
+        ...(refsOf(x).length ? { referenceImages: refsOf(x).slice(0, x.maxRefs ?? 10).map(dataUri) } : {}),
       },
     ]),
     signal: AbortSignal.timeout(180_000),

@@ -14491,6 +14491,1158 @@
       ],
       "prompt": "Deep sea Japanese anime background art in exactly the same style and colours as the reference picture (glowing jellyfish, bubbles, blue light). Vertical phone wallpaper 9:16. The view of a retro game dome, inside the bubble dome looking out at the sea: the foreground at the very bottom is the edge where you sit, and in front of you open space in the middle of the picture, empty, for small characters coming towards you. No planet in the sky. No characters, no people, no text.",
       "always": false
+    },
+    {
+      "id": "fig/mercury-a-user",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/user.jpg"
+      ],
+      "always": false,
+      "prompt": "A 5-heads-tall Japanese anime character in a bright summer TV-anime style (clean cel shading, crisp lineart, sunlit highlights). Standing at the bow of a small wooden sailboat with a big glossy speaker on deck, wearing headphones around the neck, hair and clothes moving in the sea breeze, relaxed confident smile. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/mercury-a-mikie",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg"
+      ],
+      "always": false,
+      "prompt": "A 5-heads-tall Japanese anime character in a bright summer TV-anime style (clean cel shading, crisp lineart, sunlit highlights). Standing at the bow of a small wooden sailboat with a big glossy speaker on deck, wearing headphones around the neck, hair and clothes moving in the sea breeze, relaxed confident smile. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/mercury-a-kimorin",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg"
+      ],
+      "always": false,
+      "prompt": "A 5-heads-tall Japanese anime character in a bright summer TV-anime style (clean cel shading, crisp lineart, sunlit highlights). Standing at the bow of a small wooden sailboat with a big glossy speaker on deck, wearing headphones around the neck, hair and clothes moving in the sea breeze, relaxed confident smile. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/mercury-a-sister",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/sister.jpg"
+      ],
+      "always": false,
+      "prompt": "A 5-heads-tall Japanese anime character in a bright summer TV-anime style (clean cel shading, crisp lineart, sunlit highlights). Standing at the bow of a small wooden sailboat with a big glossy speaker on deck, wearing headphones around the neck, hair and clothes moving in the sea breeze, relaxed confident smile. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/mercury-b-user",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/user.jpg"
+      ],
+      "always": false,
+      "prompt": "A 6-heads-tall stylish character drawn as a 1980s Japanese city-pop illustration (flat pastel colours, soft airbrush gradients, thin clean lines, retro magazine art). Leaning on the rail of a small white yacht, holding a cassette player, cool smile. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/mercury-b-mikie",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg"
+      ],
+      "always": false,
+      "prompt": "A 6-heads-tall stylish character drawn as a 1980s Japanese city-pop illustration (flat pastel colours, soft airbrush gradients, thin clean lines, retro magazine art). Leaning on the rail of a small white yacht, holding a cassette player, cool smile. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/mercury-b-kimorin",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg"
+      ],
+      "always": false,
+      "prompt": "A 6-heads-tall stylish character drawn as a 1980s Japanese city-pop illustration (flat pastel colours, soft airbrush gradients, thin clean lines, retro magazine art). Leaning on the rail of a small white yacht, holding a cassette player, cool smile. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/mercury-b-sister",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/sister.jpg"
+      ],
+      "always": false,
+      "prompt": "A 6-heads-tall stylish character drawn as a 1980s Japanese city-pop illustration (flat pastel colours, soft airbrush gradients, thin clean lines, retro magazine art). Leaning on the rail of a small white yacht, holding a cassette player, cool smile. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/mercury-c-user",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/user.jpg"
+      ],
+      "always": false,
+      "prompt": "A 4-heads-tall cute character in a soft watercolour picture-book style (gentle washes, pencil outlines, warm summer light). Sitting in a little rowboat with a portable record player, swinging legs, happy. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/mercury-c-mikie",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg"
+      ],
+      "always": false,
+      "prompt": "A 4-heads-tall cute character in a soft watercolour picture-book style (gentle washes, pencil outlines, warm summer light). Sitting in a little rowboat with a portable record player, swinging legs, happy. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/mercury-c-kimorin",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg"
+      ],
+      "always": false,
+      "prompt": "A 4-heads-tall cute character in a soft watercolour picture-book style (gentle washes, pencil outlines, warm summer light). Sitting in a little rowboat with a portable record player, swinging legs, happy. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/mercury-c-sister",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/sister.jpg"
+      ],
+      "always": false,
+      "prompt": "A 4-heads-tall cute character in a soft watercolour picture-book style (gentle washes, pencil outlines, warm summer light). Sitting in a little rowboat with a portable record player, swinging legs, happy. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/mars-a-user",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/user.jpg"
+      ],
+      "always": false,
+      "prompt": "A 7-heads-tall idol-style character from a modern anime music video (sharp detailed cel shading, neon rim light in pink and cyan, dynamic pose, glossy eyes). Riding a small hovering UFO board like a skateboard, one hand pointing forward, cool and confident. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/mars-a-mikie",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg"
+      ],
+      "always": false,
+      "prompt": "A 7-heads-tall idol-style character from a modern anime music video (sharp detailed cel shading, neon rim light in pink and cyan, dynamic pose, glossy eyes). Riding a small hovering UFO board like a skateboard, one hand pointing forward, cool and confident. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/mars-a-kimorin",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg"
+      ],
+      "always": false,
+      "prompt": "A 7-heads-tall idol-style character from a modern anime music video (sharp detailed cel shading, neon rim light in pink and cyan, dynamic pose, glossy eyes). Riding a small hovering UFO board like a skateboard, one hand pointing forward, cool and confident. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/mars-a-sister",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/sister.jpg"
+      ],
+      "always": false,
+      "prompt": "A 7-heads-tall idol-style character from a modern anime music video (sharp detailed cel shading, neon rim light in pink and cyan, dynamic pose, glossy eyes). Riding a small hovering UFO board like a skateboard, one hand pointing forward, cool and confident. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/mars-b-user",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/user.jpg"
+      ],
+      "always": false,
+      "prompt": "A 6-heads-tall character in a cinematic cyberpunk anime film style (moody lighting, strong shadows, neon reflections on the clothes). Standing on a small glowing UFO saucer, holding a vintage film camera, looking back over the shoulder. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/mars-b-mikie",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg"
+      ],
+      "always": false,
+      "prompt": "A 6-heads-tall character in a cinematic cyberpunk anime film style (moody lighting, strong shadows, neon reflections on the clothes). Standing on a small glowing UFO saucer, holding a vintage film camera, looking back over the shoulder. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/mars-b-kimorin",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg"
+      ],
+      "always": false,
+      "prompt": "A 6-heads-tall character in a cinematic cyberpunk anime film style (moody lighting, strong shadows, neon reflections on the clothes). Standing on a small glowing UFO saucer, holding a vintage film camera, looking back over the shoulder. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/mars-b-sister",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/sister.jpg"
+      ],
+      "always": false,
+      "prompt": "A 6-heads-tall character in a cinematic cyberpunk anime film style (moody lighting, strong shadows, neon reflections on the clothes). Standing on a small glowing UFO saucer, holding a vintage film camera, looking back over the shoulder. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/mars-c-user",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/user.jpg"
+      ],
+      "always": false,
+      "prompt": "A 5-heads-tall character in a bold American-comic meets anime pop-art style (thick black outlines, halftone dots, flat neon colours). Sitting cross-legged on a tiny retro flying saucer, waving with a peace sign. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/mars-c-mikie",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg"
+      ],
+      "always": false,
+      "prompt": "A 5-heads-tall character in a bold American-comic meets anime pop-art style (thick black outlines, halftone dots, flat neon colours). Sitting cross-legged on a tiny retro flying saucer, waving with a peace sign. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/mars-c-kimorin",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg"
+      ],
+      "always": false,
+      "prompt": "A 5-heads-tall character in a bold American-comic meets anime pop-art style (thick black outlines, halftone dots, flat neon colours). Sitting cross-legged on a tiny retro flying saucer, waving with a peace sign. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/mars-c-sister",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/sister.jpg"
+      ],
+      "always": false,
+      "prompt": "A 5-heads-tall character in a bold American-comic meets anime pop-art style (thick black outlines, halftone dots, flat neon colours). Sitting cross-legged on a tiny retro flying saucer, waving with a peace sign. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/venus-a-user",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/user.jpg"
+      ],
+      "always": false,
+      "prompt": "A 4-heads-tall character in a cosy lo-fi anime illustration style (soft muted warm colours, gentle grain, calm mood, like a lo-fi music stream cover). Sitting at a tiny radio desk with a big studio microphone and headphones on, talking with a soft smile. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/venus-a-mikie",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg"
+      ],
+      "always": false,
+      "prompt": "A 4-heads-tall character in a cosy lo-fi anime illustration style (soft muted warm colours, gentle grain, calm mood, like a lo-fi music stream cover). Sitting at a tiny radio desk with a big studio microphone and headphones on, talking with a soft smile. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/venus-a-kimorin",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg"
+      ],
+      "always": false,
+      "prompt": "A 4-heads-tall character in a cosy lo-fi anime illustration style (soft muted warm colours, gentle grain, calm mood, like a lo-fi music stream cover). Sitting at a tiny radio desk with a big studio microphone and headphones on, talking with a soft smile. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/venus-a-sister",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/sister.jpg"
+      ],
+      "always": false,
+      "prompt": "A 4-heads-tall character in a cosy lo-fi anime illustration style (soft muted warm colours, gentle grain, calm mood, like a lo-fi music stream cover). Sitting at a tiny radio desk with a big studio microphone and headphones on, talking with a soft smile. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/venus-b-user",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/user.jpg"
+      ],
+      "always": false,
+      "prompt": "A 5-heads-tall character in a dreamy pastel watercolour style (sunset pink and lavender washes, soft edges). Standing in a little cloud-shaped DJ booth, holding a microphone, eyes closed, singing softly. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/venus-b-mikie",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg"
+      ],
+      "always": false,
+      "prompt": "A 5-heads-tall character in a dreamy pastel watercolour style (sunset pink and lavender washes, soft edges). Standing in a little cloud-shaped DJ booth, holding a microphone, eyes closed, singing softly. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/venus-b-kimorin",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg"
+      ],
+      "always": false,
+      "prompt": "A 5-heads-tall character in a dreamy pastel watercolour style (sunset pink and lavender washes, soft edges). Standing in a little cloud-shaped DJ booth, holding a microphone, eyes closed, singing softly. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/venus-b-sister",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/sister.jpg"
+      ],
+      "always": false,
+      "prompt": "A 5-heads-tall character in a dreamy pastel watercolour style (sunset pink and lavender washes, soft edges). Standing in a little cloud-shaped DJ booth, holding a microphone, eyes closed, singing softly. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/venus-c-user",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/user.jpg"
+      ],
+      "always": false,
+      "prompt": "A 2.5-heads-tall cute chibi character in a clean pastel anime style. Sitting on a fluffy cloud with a small vintage radio and a microphone, cheerful. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/venus-c-mikie",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg"
+      ],
+      "always": false,
+      "prompt": "A 2.5-heads-tall cute chibi character in a clean pastel anime style. Sitting on a fluffy cloud with a small vintage radio and a microphone, cheerful. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/venus-c-kimorin",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg"
+      ],
+      "always": false,
+      "prompt": "A 2.5-heads-tall cute chibi character in a clean pastel anime style. Sitting on a fluffy cloud with a small vintage radio and a microphone, cheerful. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/venus-c-sister",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/sister.jpg"
+      ],
+      "always": false,
+      "prompt": "A 2.5-heads-tall cute chibi character in a clean pastel anime style. Sitting on a fluffy cloud with a small vintage radio and a microphone, cheerful. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/uranus-a-user",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/user.jpg"
+      ],
+      "always": false,
+      "prompt": "A 3-heads-tall character drawn as a glossy Y2K sticker illustration (thick white sticker outline, candy colours, shiny highlights, sparkles). Holding a bunch of pastel balloons and a tote bag, jumping happily. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/uranus-a-mikie",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg"
+      ],
+      "always": false,
+      "prompt": "A 3-heads-tall character drawn as a glossy Y2K sticker illustration (thick white sticker outline, candy colours, shiny highlights, sparkles). Holding a bunch of pastel balloons and a tote bag, jumping happily. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/uranus-a-kimorin",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg"
+      ],
+      "always": false,
+      "prompt": "A 3-heads-tall character drawn as a glossy Y2K sticker illustration (thick white sticker outline, candy colours, shiny highlights, sparkles). Holding a bunch of pastel balloons and a tote bag, jumping happily. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/uranus-a-sister",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/sister.jpg"
+      ],
+      "always": false,
+      "prompt": "A 3-heads-tall character drawn as a glossy Y2K sticker illustration (thick white sticker outline, candy colours, shiny highlights, sparkles). Holding a bunch of pastel balloons and a tote bag, jumping happily. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/uranus-b-user",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/user.jpg"
+      ],
+      "always": false,
+      "prompt": "A designer vinyl toy figure version of the character (smooth matte vinyl, rounded simplified shapes, big head about 2.5 heads tall, soft studio lighting), standing and holding a small shopping bag and a balloon. Product-photo look. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/uranus-b-mikie",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg"
+      ],
+      "always": false,
+      "prompt": "A designer vinyl toy figure version of the character (smooth matte vinyl, rounded simplified shapes, big head about 2.5 heads tall, soft studio lighting), standing and holding a small shopping bag and a balloon. Product-photo look. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/uranus-b-kimorin",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg"
+      ],
+      "always": false,
+      "prompt": "A designer vinyl toy figure version of the character (smooth matte vinyl, rounded simplified shapes, big head about 2.5 heads tall, soft studio lighting), standing and holding a small shopping bag and a balloon. Product-photo look. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/uranus-b-sister",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/sister.jpg"
+      ],
+      "always": false,
+      "prompt": "A designer vinyl toy figure version of the character (smooth matte vinyl, rounded simplified shapes, big head about 2.5 heads tall, soft studio lighting), standing and holding a small shopping bag and a balloon. Product-photo look. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/uranus-c-user",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/user.jpg"
+      ],
+      "always": false,
+      "prompt": "A 6-heads-tall fashionable character in a Japanese fashion-magazine illustration style (clean lines, flat pastel colours, stylish pose). Holding a tote bag over the shoulder and a balloon, walking pose. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/uranus-c-mikie",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg"
+      ],
+      "always": false,
+      "prompt": "A 6-heads-tall fashionable character in a Japanese fashion-magazine illustration style (clean lines, flat pastel colours, stylish pose). Holding a tote bag over the shoulder and a balloon, walking pose. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/uranus-c-kimorin",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg"
+      ],
+      "always": false,
+      "prompt": "A 6-heads-tall fashionable character in a Japanese fashion-magazine illustration style (clean lines, flat pastel colours, stylish pose). Holding a tote bag over the shoulder and a balloon, walking pose. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/uranus-c-sister",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/sister.jpg"
+      ],
+      "always": false,
+      "prompt": "A 6-heads-tall fashionable character in a Japanese fashion-magazine illustration style (clean lines, flat pastel colours, stylish pose). Holding a tote bag over the shoulder and a balloon, walking pose. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/pluto-a-user",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/user.jpg"
+      ],
+      "always": false,
+      "prompt": "A 6-heads-tall character in a gothic fairy-tale picture-book illustration style (fine ink linework, muted purple and gold, candlelight glow, Victorian storybook mood). Sitting on a large open flying book, reading, a little lantern beside. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/pluto-a-mikie",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg"
+      ],
+      "always": false,
+      "prompt": "A 6-heads-tall character in a gothic fairy-tale picture-book illustration style (fine ink linework, muted purple and gold, candlelight glow, Victorian storybook mood). Sitting on a large open flying book, reading, a little lantern beside. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/pluto-a-kimorin",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg"
+      ],
+      "always": false,
+      "prompt": "A 6-heads-tall character in a gothic fairy-tale picture-book illustration style (fine ink linework, muted purple and gold, candlelight glow, Victorian storybook mood). Sitting on a large open flying book, reading, a little lantern beside. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/pluto-a-sister",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/sister.jpg"
+      ],
+      "always": false,
+      "prompt": "A 6-heads-tall character in a gothic fairy-tale picture-book illustration style (fine ink linework, muted purple and gold, candlelight glow, Victorian storybook mood). Sitting on a large open flying book, reading, a little lantern beside. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/pluto-b-user",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/user.jpg"
+      ],
+      "always": false,
+      "prompt": "A 5-heads-tall character in a classic European storybook watercolour style (gentle textured paper, soft pencil). Floating while hugging an old leather book, a few pages fluttering around. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/pluto-b-mikie",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg"
+      ],
+      "always": false,
+      "prompt": "A 5-heads-tall character in a classic European storybook watercolour style (gentle textured paper, soft pencil). Floating while hugging an old leather book, a few pages fluttering around. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/pluto-b-kimorin",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg"
+      ],
+      "always": false,
+      "prompt": "A 5-heads-tall character in a classic European storybook watercolour style (gentle textured paper, soft pencil). Floating while hugging an old leather book, a few pages fluttering around. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/pluto-b-sister",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/sister.jpg"
+      ],
+      "always": false,
+      "prompt": "A 5-heads-tall character in a classic European storybook watercolour style (gentle textured paper, soft pencil). Floating while hugging an old leather book, a few pages fluttering around. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/pluto-c-user",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/user.jpg"
+      ],
+      "always": false,
+      "prompt": "A character as an elegant cut-paper silhouette illustration (layered deep purple paper with gold foil details, a few soft highlights on the face so it is still recognisable). Sitting on a crescent moon reading a book. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/pluto-c-mikie",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg"
+      ],
+      "always": false,
+      "prompt": "A character as an elegant cut-paper silhouette illustration (layered deep purple paper with gold foil details, a few soft highlights on the face so it is still recognisable). Sitting on a crescent moon reading a book. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/pluto-c-kimorin",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg"
+      ],
+      "always": false,
+      "prompt": "A character as an elegant cut-paper silhouette illustration (layered deep purple paper with gold foil details, a few soft highlights on the face so it is still recognisable). Sitting on a crescent moon reading a book. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/pluto-c-sister",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/sister.jpg"
+      ],
+      "always": false,
+      "prompt": "A character as an elegant cut-paper silhouette illustration (layered deep purple paper with gold foil details, a few soft highlights on the face so it is still recognisable). Sitting on a crescent moon reading a book. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/neptune-a-user",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/user.jpg"
+      ],
+      "always": false,
+      "prompt": "The character drawn as a 16-bit pixel art game sprite (crisp pixels, limited bright palette, retro RPG style, about 3 heads tall). Standing inside a round glass bubble holding a game controller. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/neptune-a-mikie",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg"
+      ],
+      "always": false,
+      "prompt": "The character drawn as a 16-bit pixel art game sprite (crisp pixels, limited bright palette, retro RPG style, about 3 heads tall). Standing inside a round glass bubble holding a game controller. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/neptune-a-kimorin",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg"
+      ],
+      "always": false,
+      "prompt": "The character drawn as a 16-bit pixel art game sprite (crisp pixels, limited bright palette, retro RPG style, about 3 heads tall). Standing inside a round glass bubble holding a game controller. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/neptune-a-sister",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/sister.jpg"
+      ],
+      "always": false,
+      "prompt": "The character drawn as a 16-bit pixel art game sprite (crisp pixels, limited bright palette, retro RPG style, about 3 heads tall). Standing inside a round glass bubble holding a game controller. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/neptune-b-user",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/user.jpg"
+      ],
+      "always": false,
+      "prompt": "A 3-heads-tall character in a colourful arcade fighting-game character-select art style (bold outlines, dynamic pose, bright gradient shading). Inside a floating bubble, holding a game controller up like a trophy. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/neptune-b-mikie",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg"
+      ],
+      "always": false,
+      "prompt": "A 3-heads-tall character in a colourful arcade fighting-game character-select art style (bold outlines, dynamic pose, bright gradient shading). Inside a floating bubble, holding a game controller up like a trophy. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/neptune-b-kimorin",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg"
+      ],
+      "always": false,
+      "prompt": "A 3-heads-tall character in a colourful arcade fighting-game character-select art style (bold outlines, dynamic pose, bright gradient shading). Inside a floating bubble, holding a game controller up like a trophy. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/neptune-b-sister",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/sister.jpg"
+      ],
+      "always": false,
+      "prompt": "A 3-heads-tall character in a colourful arcade fighting-game character-select art style (bold outlines, dynamic pose, bright gradient shading). Inside a floating bubble, holding a game controller up like a trophy. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/neptune-c-user",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/user.jpg"
+      ],
+      "always": false,
+      "prompt": "A 5-heads-tall character in a deep-sea anime illustration style (cool blue light, glowing particles, soft caustic light on the clothes). Floating inside a big glass bubble with a handheld game console, calm smile. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/neptune-c-mikie",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg"
+      ],
+      "always": false,
+      "prompt": "A 5-heads-tall character in a deep-sea anime illustration style (cool blue light, glowing particles, soft caustic light on the clothes). Floating inside a big glass bubble with a handheld game console, calm smile. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/neptune-c-kimorin",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg"
+      ],
+      "always": false,
+      "prompt": "A 5-heads-tall character in a deep-sea anime illustration style (cool blue light, glowing particles, soft caustic light on the clothes). Floating inside a big glass bubble with a handheld game console, calm smile. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
+    },
+    {
+      "id": "fig/neptune-c-sister",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        768,
+        768
+      ],
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3,
+      "refs": [
+        "design/home/chibi-ref/sister.jpg"
+      ],
+      "always": false,
+      "prompt": "A 5-heads-tall character in a deep-sea anime illustration style (cool blue light, glowing particles, soft caustic light on the clothes). Floating inside a big glass bubble with a handheld game console, calm smile. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
     }
   ],
   "redo": []
