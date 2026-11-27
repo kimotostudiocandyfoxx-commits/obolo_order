@@ -6,8 +6,13 @@ import { z } from 'zod';
  * 「もとの声に近づけて」「間をつめないで」「もとにもどす」).
  *
  * The default (apps/api/src/voice/voice-mix.ts): clean (rumble out, strong noise removal, a gate) → the parts where
- * nobody speaks are cut short (`cut`) → a light pitch correction (`tune`, 0.6) → 1.8× faster and 6 semitones higher
- * (`speed`, `key`; formants not kept — that is the approved sound) → one loudness.
+ * nobody speaks are cut short (`cut`) → a light pitch correction (`tune`, 0.6) → 1.8× faster and 2 semitones higher
+ * (`speed`, `key`; formants not kept — that is the approved sound) → one loudness. The key was +6 in the morning's
+ * sample K; the client, after trying it, made it +2 (the rest of the chain as it was). A member who saved settings of
+ * their own keeps them (they are kept whole); 「もとにもどす」 is this default.
+ *
+ * The SENDER never hears their own voice (client 2026-11-27, after trying it: most people dislike their own recording):
+ * there is nothing to listen to here — {bati} says the new settings in words.
  *
  * Kept per member in users.onboarding_json['voice.dachi'] (a JSON string; no migration), clamped on the server. They
  * apply to the member's own recorded voice only — never to the default cute voice of a member who is not recorded.
@@ -22,7 +27,7 @@ export interface VoiceTune {
   /** 「間をつめる」: the parts where nobody speaks are cut short */
   cut: boolean;
 }
-export const VOICE_TUNE_DEFAULT: Readonly<VoiceTune> = Object.freeze({ key: 6, speed: 1.8, tune: 0.6, cut: true });
+export const VOICE_TUNE_DEFAULT: Readonly<VoiceTune> = Object.freeze({ key: 2, speed: 1.8, tune: 0.6, cut: true });
 export const VOICE_TUNE_LIMITS = { key: [-6, 8], speed: [1, 2], tune: [0, 1] } as const;
 /** users.onboarding_json key */
 export const VOICE_TUNE_KEY = 'voice.dachi';
@@ -55,7 +60,7 @@ export function voiceTuneOf(onboarding: unknown): VoiceTune {
 }
 export const sameVoiceTune = (a: VoiceTune, b: VoiceTune): boolean => a.key === b.key && a.speed === b.speed && a.tune === b.tune && a.cut === b.cut;
 export const isDefaultVoiceTune = (t: VoiceTune): boolean => sameVoiceTune(t, VOICE_TUNE_DEFAULT);
-/** semitones → the pitch ratio (6 → 1.414214) */
+/** semitones → the pitch ratio (2 → 1.122462) */
 export const semitoneRatio = (semitones: number): number => Math.round(2 ** (semitones / 12) * 1e6) / 1e6;
 
 /** PUT /dachi/voice/tune: the parts to change (clamped on the server), or `reset` = back to the default */
@@ -72,14 +77,15 @@ export interface VoiceTuneView {
   tune: VoiceTune;
   /** the settings are the default ones */
   isDefault: boolean;
-  /** there is a last recording to try them on (〔きいてみる〕) */
-  hasTake: boolean;
 }
 
 // ───────────────────────────── the words to {bati} ─────────────────────────────
 
-/** what the words mean: the settings asked about, set back, heard, or changed to `next` (`what`: the parts that moved) */
-export type VoiceTuneTalk = { do: 'open' } | { do: 'limit' } | { do: 'reset' } | { do: 'preview' } | { do: 'set'; next: VoiceTune; what: (keyof VoiceTune)[] } | null;
+/**
+ * what the words mean: the settings asked about, set back, asked to be heard (they cannot be: `listen`), or changed to
+ * `next` (`what`: the parts that moved)
+ */
+export type VoiceTuneTalk = { do: 'open' } | { do: 'limit' } | { do: 'reset' } | { do: 'listen' } | { do: 'set'; next: VoiceTune; what: (keyof VoiceTune)[] } | null;
 
 /** half-width digits, no spaces */
 const norm = (s: string) => s.replace(/[０-９．＋－]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0)).replace(/[−―](?=\d)/g, '-').replace(/\s+/g, '');
@@ -90,7 +96,7 @@ const GAP = /間(?:を|は)?(?:つめ|詰め|あけ|空け|そのまま|のこ|�
 const SPEED = /速さ|はやさ|スピード|速度|テンポ|[\d.]+倍|ゆっくり|おそ[くめい]|遅[くめい]|はや[くめい]|速[くめい]|早[くめい]|早口|はやくち/;
 const KEYW = /キー|高さ|たかさ|ピッチ|低[くめい]|ひく[くめい]|高[くめい]|たか[くめい]/;
 const RESET = /もとにもど|元に戻|もとに戻|元にもど|リセット|最初(?:の設定)?に(?:戻|もど)|はじめ(?:の設定)?に(?:戻|もど)|デフォルト|初期設定/;
-const PREVIEW = /^(?:きいてみ|聞いてみ|聴いてみ|きかせて|聞かせて|聴かせて|ためし|試し|プレビュー|どんな(?:声|こえ|感じ|かんじ))/;
+const LISTEN = /^(?:きいてみ|聞いてみ|聴いてみ|きかせて|聞かせて|聴かせて|ためし|試し|プレビュー|どんな(?:声|こえ|感じ|かんじ))/;
 const MORE = /すごく|かなり|めっちゃ|超|ぐっと|うんと/;
 const LITTLE = /(?:少|すこ)し|ちょっと|ちょい|やや/;
 const OFF = /な[しく]|無し|オフ|切っ|きっ|やめ|いらな|要らな|はずし|外し|つけな|かけな|消し|けし/;
@@ -98,7 +104,7 @@ const ON = /オン|あり|つけて|かけて|入れて|いれて|ほしい|欲�
 
 /**
  * The words about the voice settings. `inTalk`: the turn before was about them, so short words count too (「もっとゆっくり」
- * 「もとにもどす」「きいてみる」); outside it the words must name the voice (声 / オートチューン / 間をつめる …) — 「もっと
+ * 「もとにもどす」; 「きいてみたい」 gets the line that one's own voice is not played back); outside it the words must name the voice (声 / オートチューン / 間をつめる …) — 「もっと
  * ゆっくり」 alone may be about a song. null: not about the voice settings.
  */
 export function voiceTuneTalk(said: string, now: VoiceTune = VOICE_TUNE_DEFAULT, inTalk = false): VoiceTuneTalk {
@@ -107,7 +113,7 @@ export function voiceTuneTalk(said: string, now: VoiceTune = VOICE_TUNE_DEFAULT,
   const voice = VOICE.test(s);
   const named = SETTINGS.test(s) || TUNE.test(s) || /間(?:を|は)?(?:つめ|詰め)/.test(s) || (voice && (KEYW.test(s) || SPEED.test(s) || GAP.test(s) || RESET.test(s) || /もとの声|元の声|自分の声|じぶんの声|地声|じごえ|そのままの声|ふつうの声|普通の声/.test(s)));
   if (!named && !inTalk) return null;
-  if (inTalk && PREVIEW.test(s)) return { do: 'preview' };
+  if (inTalk && LISTEN.test(s)) return { do: 'listen' };
   if (RESET.test(s)) return { do: 'reset' };
 
   const next: VoiceTune = { ...now };
@@ -159,14 +165,14 @@ export function voiceTuneTalk(said: string, now: VoiceTune = VOICE_TUNE_DEFAULT,
   return named ? { do: 'open' } : null;
 }
 
-/** the settings in words (「キー +6・はやさ 1.8倍・オートチューン 0.6・間をつめる」) */
+/** the settings in words (「キー +2・はやさ 1.8倍・オートチューン 0.6・間をつめる」) */
 export function voiceTuneWords(t: VoiceTune): string {
   const key = t.key > 0 ? `+${t.key}` : String(t.key);
   return `キー ${key}・はやさ ${t.speed.toFixed(1)}倍・オートチューン ${t.tune ? t.tune.toFixed(1) : 'なし'}・${t.cut ? '間をつめる' : '間はそのまま'}`;
 }
 
 /** the chips under {bati}'s answer (their words come back as the member's next words) */
-export const VOICE_TUNE_CHIPS = { preview: 'きいてみる', reset: 'もとにもどす' } as const;
+export const VOICE_TUNE_CHIPS = { reset: 'もとにもどす' } as const;
 
 /** {bati}'s lines (PROVISIONAL: the story session confirms them). {now} = voiceTuneWords */
 export const VOICE_TUNE_LINES = {
@@ -178,12 +184,8 @@ export const VOICE_TUNE_LINES = {
   limit: 'これ以上は、変えられないみたい。いまは「{now}」だよ。',
   /** 「もとにもどす」 */
   reset: 'さいしょの設定にもどしたよ。いまは「{now}」。',
-  /** 〔きいてみる〕: the last recording with the settings of now */
-  preview: 'さっきの声で、ためしてみるね。',
-  /** no recording to try them on yet */
-  noTake: 'ためせる声が、まだないみたい。つぎにダチへ声を送るとき、送る前に聞けるよ。',
-  /** the preview could not be made */
-  previewFailed: 'ごめん、いまは聞かせられないみたい。つぎに声を送るとき、送る前に聞けるよ。',
+  /** 「きいてみたい」: one's own voice is not played back — it is for the ダチ to hear */
+  noListen: 'じぶんの声は、ここでは流さないんだ。ダチに送って、どう聞こえたか聞いてみてね。いまは「{now}」だよ。',
   /** the change could not be kept */
   failed: 'ごめん、うまく変えられなかった。もう一回、言ってみて。',
   /** a member who is not recorded: there is no voice of their own to set */

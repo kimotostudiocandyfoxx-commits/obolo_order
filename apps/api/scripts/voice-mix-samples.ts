@@ -2,8 +2,8 @@
  * Client 2026-11-27 (the ダチ voice message trial): sample mixes for the ear — the production clean-up and mix
  * (src/voice/voice-mix.ts) run on a recording, nothing else called (no model, no storage).
  *   npx tsx apps/api/scripts/voice-mix-samples.ts <out dir> <recording> [more recordings …]
- * Per recording: the voice alone in the default settings (sample K: clean, the silences cut, autotune 0.6, 1.8×, +6
- * semitones), and one mix per mood (MOODS=a,b picks some) and the weakest うれしい. TUNE='{"key":0,"speed":1.2}' tries
+ * Per recording: the voice alone in the default settings (sample K at the key the client chose after trying it: clean, the silences cut, autotune 0.6,
+ * 1.8×, +2 semitones), and one mix per mood (MOODS=a,b picks some) and the weakest うれしい. TUNE='{"key":0,"speed":1.2}' tries
  * other settings. Prints the time each took, how it was made and the loudness of each file.
  */
 import { spawnSync } from 'node:child_process';

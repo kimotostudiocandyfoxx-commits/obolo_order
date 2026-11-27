@@ -131,38 +131,17 @@ export class HttpApi implements Api {
   buddyForget() {
     return this.req<void>('DELETE', '/buddy/memory');
   }
-  dachiVoiceDraft(blob: Blob) {
-    return this.req<Awaited<ReturnType<Api['dachiVoiceDraft']>>>('POST', '/dachi/voice', undefined, blob);
+  dachiVoiceDraft(blob: Blob, _seconds: number, as?: Parameters<Api['dachiVoiceDraft']>[2]) {
+    return this.req<Awaited<ReturnType<Api['dachiVoiceDraft']>>>('POST', `/dachi/voice${as ? `?as=${as}` : ''}`, undefined, blob);
   }
-  /** an MP3 comes back (not JSON) */
-  private async mp3(path: string, body?: unknown) {
-    const headers: Record<string, string> = { 'content-type': 'application/json' };
-    const token = tokenStore.get();
-    if (token) headers.authorization = `Bearer ${token}`;
-    let res: Response;
-    try {
-      res = await fetch(`${this.base}${path}`, { method: 'POST', headers, body: JSON.stringify(body ?? {}) });
-    } catch {
-      throw new ApiError(0, 'NETWORK', 'Network error');
-    }
-    if (!res.ok) {
-      const json = (await res.json().catch(() => null)) as { error?: { code: string; message: string } } | null;
-      if (res.status === 401) tokenStore.clear();
-      throw new ApiError(res.status, json?.error?.code ?? 'ERROR', json?.error?.message ?? res.statusText);
-    }
-    return res.blob();
-  }
-  dachiVoicePreview(body: Parameters<Api['dachiVoicePreview']>[0]) {
-    return this.mp3('/dachi/voice/preview', body);
+  setDachiVoiceVersion(version: Parameters<Api['setDachiVoiceVersion']>[0]) {
+    return this.req<Awaited<ReturnType<Api['setDachiVoiceVersion']>>>('PUT', '/dachi/voice/version', { version });
   }
   voiceTune() {
     return this.req<Awaited<ReturnType<Api['voiceTune']>>>('GET', '/dachi/voice/tune');
   }
   setVoiceTune(body: Parameters<Api['setVoiceTune']>[0]) {
     return this.req<Awaited<ReturnType<Api['setVoiceTune']>>>('PUT', '/dachi/voice/tune', body);
-  }
-  voiceTunePreview() {
-    return this.mp3('/dachi/voice/tune/preview');
   }
   dachiCuteVoice() {
     return this.req<Awaited<ReturnType<Api['dachiCuteVoice']>>>('GET', '/dachi/voice/cute');

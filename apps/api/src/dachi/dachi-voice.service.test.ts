@@ -66,7 +66,9 @@ describe('ダチの声のメッセージ: who may write (M-R212)', () => {
     const w = world();
     w.dachi(A, B);
     const m = await w.s.send(A, B, voice(A));
-    expect(m).toMatchObject({ fromMe: true, kind: 'voice', audioUrl: expect.stringContaining('https://cdn/'), seconds: 4.2 });
+    // client 2026-11-27: the sender does not hear their own voice — no audio in their view, the receiver's has it
+    expect(m).toMatchObject({ fromMe: true, kind: 'voice', audioUrl: null, sentVoice: true, seconds: 4.2 });
+    expect(w.s.toView(B, w.rows.at(-1) as never)).toMatchObject({ fromMe: false, kind: 'voice', audioUrl: expect.stringContaining('https://cdn/'), seconds: 4.2 });
     await w.s.send(B, A, { work: { kind: 'song', title: 'うた', text: '' } });
     expect(w.rows.at(-1)).toMatchObject({ senderId: B, recipientId: A, kind: 'work' });
     await new Promise((r) => setTimeout(r, 0));

@@ -212,7 +212,7 @@ import { demoUnfurl } from './demoUnfurl';
 import { tokenStore } from './token';
 import { ApiError, type Api, type Paid } from './types';
 import { afterLookStep, backLookStep, canLookStep, canLookStepBack, EMPTY_LOOK_STEPS, foodNameByRules, lookStepView, type LookPick4Result, type LookStepResult, type LookStepsInfo, type LookStepState, type LookStepWho } from '@obolo/shared';
-import { BIRTH_YEAR_REQUIRED_WORDS, clampVoiceTune, CUTE_VOICE_RATE, isDefaultVoiceTune, validBirthYear, VOICE_TUNE_DEFAULT } from '@obolo/shared';
+import { BIRTH_YEAR_REQUIRED_WORDS, clampVoiceTune, CUTE_VOICE_RATE, cuteVoiceMana, isDefaultVoiceTune, isVoiceVersion, validBirthYear, VOICE_TUNE_DEFAULT, type VoiceVersion } from '@obolo/shared';
 import { incantNorm, premiumRequest, songVoiceKey, songVoiceQuote, type IncantView, type SongVoiceQuoteView, type SongVoiceUseView, type SongVoiceVersion } from '@obolo/shared';
 
 /** R17: the passphrase's digests and lengths (its normalized forms) — the demo's only knowledge of it */
@@ -2207,7 +2207,9 @@ export class DemoApi implements Api {
     this.dachiThreadOk(thread);
     const all = this.dachiArrive()
       .filter((m) => m.thread === thread && (!page.before || m.createdAt < page.before))
-      .map(({ thread: _t, lineId: _l, read, ...m }) => ({ ...m, read: m.fromMe || !!read }));
+      .map(({ thread: _t, lineId: _l, read, ...m }) => ({ ...m, read: m.fromMe || !!read }))
+      // client 2026-11-27: your own voice is not played back to you (also one kept in this browser before that)
+      .map((m) => (m.fromMe && m.kind === 'voice' ? { ...m, audioUrl: null, sound: undefined, sentVoice: true } : m));
     return page.limit ? all.slice(-page.limit) : all;
   }
   async dachiHistory(cursor?: string | null) {
@@ -2224,13 +2226,18 @@ export class DemoApi implements Api {
     await sleep(300);
     const m: DachiMessageView =
       'mediaId' in body
-        ? { id: uid(), fromMe: true, character: null, kind: 'voice', audioUrl: `idb:${body.mediaId}`, seconds: Math.round(body.seconds * 10) / 10, text: body.caption || null, work: null, face: body.face ?? null, createdAt: now(), ...(body.sound && body.sound !== 'none' ? { sound: { mood: body.sound, plainUrl: `idb:${body.mediaId}` } } : {}) }
+        ? // client 2026-11-27: your own voice is not played back to you (no audio in your view: `sentVoice`)
+          { id: uid(), fromMe: true, character: null, kind: 'voice', audioUrl: null, sentVoice: true, seconds: Math.round(body.seconds * 10) / 10, text: body.caption || null, work: null, face: body.face ?? null, createdAt: now() }
+        : 'text' in body && body.spoken && this.s.users[this.uid()]?.mediaOk
+          ? // 「きれい」 in the demo: no voice service — the bubble a read voice would leave, with the price it would cost
+            { id: uid(), fromMe: true, character: null, kind: 'voice', audioUrl: null, sentVoice: true, seconds: null, text: body.text, work: null, face: body.face ?? null, createdAt: now(), cute: { mana: cuteVoiceMana(body.text) } }
         : 'text' in body
           ? { id: uid(), fromMe: true, character: null, kind: 'text', audioUrl: null, seconds: null, text: body.text, work: null, face: body.face ?? null, createdAt: now() }
           : 'fileId' in body
           ? { id: uid(), fromMe: true, character: null, kind: 'file', audioUrl: null, seconds: null, text: null, work: null, file: (this.s.clips ?? []).find((f) => f.id === body.fileId) ?? null, face: body.face ?? null, createdAt: now() }
           : { id: uid(), fromMe: true, character: null, kind: 'work', audioUrl: null, seconds: null, text: null, work: body.work, face: body.face ?? null, createdAt: now() };
-    (this.s.dachiMsgs ??= []).push({ ...m, thread });
+    const { cute: _cute, ...kept } = m;
+    (this.s.dachiMsgs ??= []).push({ ...kept, thread });
     // R9 in the demo: KIMORIN⭐︎ answers with a set line (the server answers through the chat provider)
     let reply: DachiMessageView | null = null;
     if (thread === 'kimorin') {
@@ -2241,33 +2248,36 @@ export class DemoApi implements Api {
     this.save();
     return reply ? { ...m, reply } : m;
   }
-  // demo: no server to clean, hear or mix — the take itself, a stand-in line, the weakest sound; the chips and the
-  // caption can be walked through, 〔▶ きいてみる〕 plays the take as it is
-  async dachiVoiceDraft(blob: Blob, seconds: number) {
+  // demo: no server to clean, hear or mix — the take itself, a stand-in line, the weakest sound; the chips, the caption
+  // and the version button can be walked through (「きれい」 keeps nothing of the take, as on the server)
+  private demoVoiceVersion(): VoiceVersion {
+    const v = (this.s as { voiceVersion?: unknown }).voiceVersion;
+    return isVoiceVersion(v) ? v : 'asis';
+  }
+  async dachiVoiceDraft(blob: Blob, seconds: number, as?: VoiceVersion) {
     await sleep(900);
-    const { id, url } = await this.uploadVoice(blob);
-    return { mediaId: id, url, seconds: Math.round(seconds * 10) / 10, text: '（デモ）こんにちは', sound: 'ureshii' as const, soft: true };
+    const version = as ?? this.demoVoiceVersion();
+    const clean = { on: true, own: false, rate: CUTE_VOICE_RATE };
+    if (version === 'clean') return { version, mediaId: null, seconds: 0, text: '（デモ）こんにちは', sound: 'ureshii' as const, soft: true, clean };
+    const { id } = await this.uploadVoice(blob);
+    return { version, mediaId: id, seconds: Math.round(seconds * 10) / 10, text: '（デモ）こんにちは', sound: 'ureshii' as const, soft: true, clean };
   }
-  async dachiVoicePreview(body: Parameters<Api['dachiVoicePreview']>[0]) {
-    await sleep(300);
-    const b = await getBlob(body.mediaId);
-    if (!b) throw new ApiError(404, 'MEDIA_NOT_FOUND', 'not found');
-    return b;
+  async setDachiVoiceVersion(version: VoiceVersion) {
+    (this.s as { voiceVersion?: unknown }).voiceVersion = version;
+    this.save();
+    return { version, clean: { on: true, own: false, rate: CUTE_VOICE_RATE } };
   }
-  // demo: the voice settings are kept in this browser; there is no server to change a voice, so 〔きいてみる〕 has no take
+  // demo: the voice settings are kept in this browser
   async voiceTune() {
     const tune = clampVoiceTune((this.s as { voiceTune?: unknown }).voiceTune);
-    return { tune, isDefault: isDefaultVoiceTune(tune), hasTake: false };
+    return { tune, isDefault: isDefaultVoiceTune(tune) };
   }
   async setVoiceTune(body: Parameters<Api['setVoiceTune']>[0]) {
     const now = (await this.voiceTune()).tune;
     const tune = body.reset ? { ...VOICE_TUNE_DEFAULT } : clampVoiceTune(body, now);
     (this.s as { voiceTune?: unknown }).voiceTune = tune;
     this.save();
-    return { tune, isDefault: isDefaultVoiceTune(tune), hasTake: false };
-  }
-  async voiceTunePreview(): Promise<Blob> {
-    throw new ApiError(404, 'NO_TAKE', 'no take');
+    return { tune, isDefault: isDefaultVoiceTune(tune) };
   }
   // demo: there is no voice service — the words of a member who is not recorded go as words (no switch, no price)
   async dachiCuteVoice() {

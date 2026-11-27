@@ -8,6 +8,7 @@ import { CHARACTER_AVATAR } from '@/lib/dachi/useDachiThreads';
 import { loadBluenaWorks, workCard, WORK_WORD, type BluenaWork } from '@/lib/dachi/works';
 import { Wave } from './HoldMic';
 import { TapVoice, type VoiceToSend } from './TapVoice';
+import { voicePartOf, voiceSendBody } from '@/lib/dachi/voiceSend';
 import { playClip, readyClip, type Clip } from '@/lib/voice/webVoice';
 import { CUTE_VOICE_WORDS, cuteVoiceMana, cuteVoiceMissWords, DACHI_PAGE, DACHI_TEXT_MAX, formatMana, linkDomain, TALK_FIXED_FACE_KEY, wordsAndLinks, type CuteVoiceInfo } from '@obolo/shared';
 import { DeviceButton } from '@/components/atelier/DeviceButton';
@@ -60,8 +61,9 @@ export type DachiThreadProps = {
 
 /**
  * One ダチ conversation (M-R212), in the same look as the {bati} chat (components/story/Chat.tsx bubbles and message bar):
- * voice messages and Bluena work cards. The mic records only while held; released, the take is heard back before it is
- * sent or thrown away. Block and report are in the menu at the top right (a person's thread only). Messages go only
+ * voice messages and Bluena work cards. A tap starts the take, a tap ends it; it is made ready on the server and sent
+ * from its draft card (TapVoice.tsx). Client 2026-11-27, after trying it: the sender does not hear their own voice —
+ * not on the card, and not here (their own voice bubbles show the words and a small mark, no play control). Block and report are in the menu at the top right (a person's thread only). Messages go only
  * between dachi — the server refuses anything else. No live calls here (a later members' feature).
  */
 export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone, place = 'moon', day, banner, onBack, onDevice }: DachiThreadProps) {
@@ -215,11 +217,18 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
     });
   };
 
-  /** client 2026-11-27: the voice made ready (components/dachi/TapVoice.tsx): its caption and its sound go with it */
+  /**
+   * client 2026-11-27: the voice made ready (components/dachi/TapVoice.tsx): its caption and its sound go with it — the
+   * recording (「そのまま」), or the caption to be read as the voice (「きれい」: with no mana, or when it cannot be made, the
+   * words go alone and one calm line says so)
+   */
   const sendVoice = async (v: VoiceToSend) => {
+    setNote(null);
     if (id === 'kimorin') setWaiting(true);
     try {
-      sent(await getApi().sendDachiMessage(id, { ...v, seconds: Math.max(0.1, Math.round(v.seconds * 10) / 10) }));
+      const { cute: c, ...m } = await getApi().sendDachiMessage(id, voiceSendBody(v));
+      if (c && 'miss' in c) setNote(cuteVoiceMissWords(c.miss));
+      sent(m);
     } catch (e) {
       setWaiting(false);
       throw e;
@@ -306,7 +315,8 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
       // M-R238: from the words (a character's line), else the sender's own face with it, else the rules
       face: m.faces ? undefined : (m.face ?? undefined),
       faces: m.faces,
-      voice: m.kind === 'voice' ? { url: m.audioUrl, seconds: m.seconds, plainUrl: m.sound?.plainUrl } : undefined,
+      // your own voice is not played back to you: the words and a quiet mark (lib/dachi/voiceSend.ts)
+      ...voicePartOf(m),
       mark: { kind: 'dachi_message' as const, id: m.id },
       ...(relics.length ? { relics, relicLabel: g.length > 1 ? `${label}ほか${g.length - 1}つ` : label, relicFan: g.every((i) => parts[i].m.file?.kind === 'photo') } : {}),
     };

@@ -742,8 +742,9 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   /**
    * client 2026-11-27 (shared voiceTune.ts): the words about the member's own voice for ダチ voice messages — 「声の設定」
    * says where they are, 「声を低くして」「もっとゆっくり」「オートチューンをなしに」「もとの声に近づけて」「間をつめないで」
-   * change them (kept on the server, inside its limits), 〔きいてみる〕 plays the last take in them, 〔もとにもどす〕 is the
-   * default. `inTalk`: the turn before was about them (short words count). With a song on the table the words must
+   * change them (kept on the server, inside its limits), 〔もとにもどす〕 is the default. {bati} says the new settings in
+   * words: nothing is played — the sender does not hear their own voice (client, after trying it); 「きいてみたい」 gets
+   * one line that says so. `inTalk`: the turn before was about them (short words count). With a song on the table the words must
    * say they are about the voice settings — 「もっとゆっくり」 is the song's then. true: taken here.
    */
   const voiceTuneSend = (text: string, inTalk: boolean, songOnTable: boolean): boolean => {
@@ -751,7 +752,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     // (asked at the default settings; the real ones are read below — whether the words are about the voice is the same)
     if (!first && !voiceTuneTalk(text, { key: 0, speed: 1.4, tune: 0.4, cut: false }, inTalk)) return false;
     if (songOnTable && !inTalk && !/(?:声|こえ|ボイス)の?(?:設定|せってい|加工)|ダチ|メッセージ|オートチューン|間を(?:つめ|詰め)/.test(text)) return false;
-    const chips = [VOICE_TUNE_CHIPS.preview, VOICE_TUNE_CHIPS.reset];
+    const chips = [VOICE_TUNE_CHIPS.reset];
     void (async () => {
       setBusy(true);
       try {
@@ -760,20 +761,12 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
         const api = getApi();
         const now = await api.voiceTune();
         const t = voiceTuneTalk(text, now.tune, inTalk) ?? { do: 'open' as const };
-        if (t.do === 'preview') {
-          sayT(VOICE_TUNE_LINES.preview);
-          try {
-            const url = URL.createObjectURL(await api.voiceTunePreview());
-            const clip = await playClip(url);
-            void (clip ? clip.done : Promise.resolve()).then(() => URL.revokeObjectURL(url));
-          } catch (e) {
-            sayT(e instanceof ApiError && e.code === 'NO_TAKE' ? VOICE_TUNE_LINES.noTake : VOICE_TUNE_LINES.previewFailed);
-          }
-        } else if (t.do === 'open') sayT(VOICE_TUNE_LINES.open, { now: voiceTuneWords(now.tune) }, now.isDefault ? [VOICE_TUNE_CHIPS.preview] : chips);
+        if (t.do === 'listen') sayT(VOICE_TUNE_LINES.noListen, { now: voiceTuneWords(now.tune) }, now.isDefault ? [] : chips);
+        else if (t.do === 'open') sayT(VOICE_TUNE_LINES.open, { now: voiceTuneWords(now.tune) }, now.isDefault ? [] : chips);
         else if (t.do === 'limit') sayT(VOICE_TUNE_LINES.limit, { now: voiceTuneWords(now.tune) }, chips);
         else {
           const r = await api.setVoiceTune(t.do === 'reset' ? { reset: true } : t.next);
-          sayT(t.do === 'reset' ? VOICE_TUNE_LINES.reset : VOICE_TUNE_LINES.changed, { now: voiceTuneWords(r.tune) }, r.isDefault ? [VOICE_TUNE_CHIPS.preview] : chips);
+          sayT(t.do === 'reset' ? VOICE_TUNE_LINES.reset : VOICE_TUNE_LINES.changed, { now: voiceTuneWords(r.tune) }, r.isDefault ? [] : chips);
         }
         setPending({ voiceTune: true });
       } catch {

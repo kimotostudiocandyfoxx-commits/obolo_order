@@ -8,11 +8,12 @@ const set = (said: string, now: VoiceTune = D, inTalk = false) => {
 };
 
 describe('the voice settings of a ダチ voice message (client 2026-11-27)', () => {
-  it('the default is sample K: +6 semitones, 1.8×, autotune 0.6, the silences cut', () => {
-    expect(D).toEqual({ key: 6, speed: 1.8, tune: 0.6, cut: true });
+  it('the default is sample K with the key the client chose after trying it: +2 semitones (it was +6), 1.8×, autotune 0.6, the silences cut', () => {
+    expect(D).toEqual({ key: 2, speed: 1.8, tune: 0.6, cut: true });
+    expect(semitoneRatio(2)).toBe(1.122462);
     expect(semitoneRatio(6)).toBe(1.414214);
     expect(semitoneRatio(0)).toBe(1);
-    expect(voiceTuneWords(D)).toBe('キー +6・はやさ 1.8倍・オートチューン 0.6・間をつめる');
+    expect(voiceTuneWords(D)).toBe('キー +2・はやさ 1.8倍・オートチューン 0.6・間をつめる');
     expect(voiceTuneWords({ key: -2, speed: 1, tune: 0, cut: false })).toBe('キー -2・はやさ 1.0倍・オートチューン なし・間はそのまま');
   });
 
@@ -30,6 +31,9 @@ describe('the voice settings of a ダチ voice message (client 2026-11-27)', () 
   it('kept as a JSON string in onboarding_json; nothing, or something unreadable, is the default', () => {
     expect(voiceTuneOf({ [VOICE_TUNE_KEY]: JSON.stringify({ key: 0, speed: 1.2, tune: 0, cut: false }) })).toEqual({ key: 0, speed: 1.2, tune: 0, cut: false });
     expect(voiceTuneOf({ [VOICE_TUNE_KEY]: '{"key":40}' })).toEqual({ ...D, key: 8 });
+    // a member who saved settings of their own before the default moved keeps them, whole (also the old default's key)
+    expect(voiceTuneOf({ [VOICE_TUNE_KEY]: JSON.stringify({ key: 6, speed: 1.6, tune: 0.6, cut: true }) })).toEqual({ key: 6, speed: 1.6, tune: 0.6, cut: true });
+    expect(isDefaultVoiceTune({ key: 6, speed: 1.8, tune: 0.6, cut: true })).toBe(false);
     for (const j of [{}, null, undefined, { [VOICE_TUNE_KEY]: 'not json' }, { [VOICE_TUNE_KEY]: '' }]) expect(voiceTuneOf(j)).toEqual(D);
     expect(isDefaultVoiceTune(voiceTuneOf({}))).toBe(true);
     expect(VoiceTuneBody.safeParse({ key: 3, reset: false }).success).toBe(true);
@@ -44,11 +48,11 @@ describe('the words to {bati} about the voice settings', () => {
   });
 
   it('lower / higher: two semitones (a little: one, a lot: four)', () => {
-    expect(set('声を低くして')).toEqual({ ...D, key: 4 });
-    expect(set('こえをひくくして')).toEqual({ ...D, key: 4 });
-    expect(set('声をもう少し低くして')).toEqual({ ...D, key: 5 });
-    expect(set('声をすごく低くして')).toEqual({ ...D, key: 2 });
-    expect(set('声を高くして')).toEqual({ ...D, key: 8 });
+    expect(set('声を低くして')).toEqual({ ...D, key: 0 });
+    expect(set('こえをひくくして')).toEqual({ ...D, key: 0 });
+    expect(set('声をもう少し低くして')).toEqual({ ...D, key: 1 });
+    expect(set('声をすごく低くして')).toEqual({ ...D, key: -2 });
+    expect(set('声を高くして')).toEqual({ ...D, key: 4 });
     expect(set('声のキーを+3にして')).toEqual({ ...D, key: 3 });
     expect(set('声のキーを－２にして')).toEqual({ ...D, key: -2 });
     expect(set('キーを0に', D, true)).toEqual({ ...D, key: 0 });
@@ -84,24 +88,26 @@ describe('the words to {bati} about the voice settings', () => {
   });
 
   it('「もとの声に近づけて」: half-way back to the voice as recorded; 「もとの声のままで」: the voice as recorded', () => {
-    expect(set('もとの声に近づけて')).toEqual({ key: 3, speed: 1.4, tune: 0.3, cut: true });
+    expect(set('もとの声に近づけて')).toEqual({ key: 1, speed: 1.4, tune: 0.3, cut: true });
     expect(set('自分の声に近づけて', { key: 3, speed: 1.4, tune: 0.3, cut: true })).toEqual({ key: 1, speed: 1.2, tune: 0.2, cut: true });
     expect(set('もとの声のままで送りたい')).toEqual({ key: 0, speed: 1, tune: 0, cut: true });
     expect(set('声の加工をなしにして')).toEqual({ key: 0, speed: 1, tune: 0, cut: true });
   });
 
   it('several at once', () => {
-    expect(set('声を低くして、もっとゆっくり、オートチューンはなしで')).toEqual({ key: 4, speed: 1.6, tune: 0, cut: true });
+    expect(set('声を低くして、もっとゆっくり、オートチューンはなしで')).toEqual({ key: 0, speed: 1.6, tune: 0, cut: true });
   });
 
-  it('〔もとにもどす〕 and 〔きいてみる〕', () => {
+  it('〔もとにもどす〕; 「きいてみる」 is answered in words (the sender never hears their own voice: no chip, nothing played)', () => {
     expect(set('声の設定をもとにもどして')).toBe('reset');
     expect(set('声をリセット')).toBe('reset');
     expect(set(VOICE_TUNE_CHIPS.reset, D, true)).toBe('reset');
-    expect(set(VOICE_TUNE_CHIPS.preview, D, true)).toBe('preview');
+    for (const s of ['きいてみる', '聞いてみたい', 'ためしてみて', 'どんな声？']) expect(set(s, D, true)).toBe('listen');
+    expect(Object.keys(VOICE_TUNE_CHIPS)).toEqual(['reset']);
+    expect(Object.keys(VOICE_TUNE_LINES)).not.toContain('preview');
     // outside the talk about them these short words are another matter
     expect(set(VOICE_TUNE_CHIPS.reset)).toBeNull();
-    expect(set(VOICE_TUNE_CHIPS.preview)).toBeNull();
+    expect(set('きいてみる')).toBeNull();
   });
 
   it('already at the end of the range: nothing moves, {bati} says so', () => {
@@ -119,6 +125,6 @@ describe('the words to {bati} about the voice settings', () => {
   });
 
   it('{bati}’s lines carry the settings in words', () => {
-    for (const k of ['open', 'changed', 'limit', 'reset'] as const) expect(VOICE_TUNE_LINES[k]).toContain('{now}');
+    for (const k of ['open', 'changed', 'limit', 'reset', 'noListen'] as const) expect(VOICE_TUNE_LINES[k]).toContain('{now}');
   });
 });

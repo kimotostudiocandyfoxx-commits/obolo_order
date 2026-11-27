@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { AUTOTUNE, autotuneArgs, cleanFilter, cleanVoice, cutFilter, MIX, mixArgs, mixPlan, mp3Seconds, NoVoiceError, prepareArgs, shapeArgs, shapeFilter, SILENCE_CUT, VOICE_SOUNDS_DIR } from './voice-mix';
+import { AUTOTUNE, autotuneArgs, cleanFilter, cleanVoice, cutFilter, hearArgs, heardVoice, MIX, mixArgs, mixPlan, mp3Seconds, NoVoiceError, prepareArgs, shapeArgs, shapeFilter, SILENCE_CUT, VOICE_SOUNDS_DIR } from './voice-mix';
 
 describe('the ダチ voice message made ready (client 2026-11-27, sample K)', () => {
   it('a. clean: rumble out at 100 Hz, the strong noise removal that follows the noise, the gate — the approved chain', () => {
@@ -30,6 +30,14 @@ describe('the ダチ voice message made ready (client 2026-11-27, sample K)', ()
     expect(whole[whole.indexOf('-filter_complex') + 1]).toMatch(/\[v0\]anull\[v\]$/);
   });
 
+  it('「きれい」: the take is only heard as words — step a alone (clean, whole, as it was said), no file beside it', () => {
+    const a = hearArgs('/tmp/x/in');
+    expect(a.slice(0, 8)).toEqual(['-hide_banner', '-loglevel', 'error', '-y', '-t', '62', '-i', '/tmp/x/in']);
+    expect(a[a.indexOf('-af') + 1]).toBe(`${cleanFilter()},aresample=44100`);
+    expect(a.join(' ')).not.toMatch(/silenceremove|rubberband|atempo|asetrate/);
+    expect(a.at(-1)).toBe('pipe:1');
+  });
+
   it('c. the autotune: the script, the two files, the strength inside 0…1', () => {
     expect(autotuneArgs('a.wav', 'b.wav', 0.6)).toEqual([AUTOTUNE.script, 'a.wav', 'b.wav', '0.6']);
     expect(autotuneArgs('a.wav', 'b.wav', 7, 's.py')).toEqual(['s.py', 'a.wav', 'b.wav', '1']);
@@ -42,8 +50,10 @@ describe('the ダチ voice message made ready (client 2026-11-27, sample K)', ()
     expect(py).toContain('"Get resynthesis (overlap-add)"');
   });
 
-  it('d. the default: 1.8× and +6 semitones in one rubberband step (formants not kept), then one loudness', () => {
-    expect(shapeFilter(VOICE_TUNE_DEFAULT)).toBe('rubberband=tempo=1.8:pitch=1.414214,loudnorm=I=-16:TP=-1.5:LRA=11,aresample=44100');
+  it('d. the default: 1.8× and +2 semitones in one rubberband step (formants not kept), then one loudness', () => {
+    expect(shapeFilter(VOICE_TUNE_DEFAULT)).toBe('rubberband=tempo=1.8:pitch=1.122462,loudnorm=I=-16:TP=-1.5:LRA=11,aresample=44100');
+    // a member who kept the morning's +6 of their own still gets it
+    expect(shapeFilter({ key: 6, speed: 1.8 })).toBe('rubberband=tempo=1.8:pitch=1.414214,loudnorm=I=-16:TP=-1.5:LRA=11,aresample=44100');
     expect(shapeFilter(VOICE_TUNE_DEFAULT)).not.toContain('formant');
     const a = shapeArgs('/tmp/x/voice.wav', VOICE_TUNE_DEFAULT);
     expect(a[a.indexOf('-af') + 1]).toBe(shapeFilter(VOICE_TUNE_DEFAULT));
@@ -59,8 +69,9 @@ describe('the ダチ voice message made ready (client 2026-11-27, sample K)', ()
   });
 
   it('an ffmpeg without rubberband: the same speed and key by asetrate + atempo', () => {
-    // +6 semitones by the sample rate makes it 1.414× faster too: atempo adds the rest of the 1.8×
-    expect(shapeFilter(VOICE_TUNE_DEFAULT, false)).toBe('asetrate=62367,aresample=44100,atempo=1.272792,loudnorm=I=-16:TP=-1.5:LRA=11,aresample=44100');
+    // +2 semitones by the sample rate makes it 1.122× faster too: atempo adds the rest of the 1.8×
+    expect(shapeFilter(VOICE_TUNE_DEFAULT, false)).toBe('asetrate=49501,aresample=44100,atempo=1.603618,loudnorm=I=-16:TP=-1.5:LRA=11,aresample=44100');
+    expect(shapeFilter({ key: 6, speed: 1.8 }, false)).toBe('asetrate=62367,aresample=44100,atempo=1.272792,loudnorm=I=-16:TP=-1.5:LRA=11,aresample=44100');
     // one atempo step is 0.5–2.0: more is two steps (−6 semitones at 2× = 2.83×)
     expect(shapeFilter({ key: -6, speed: 2 }, false)).toContain('asetrate=31183,aresample=44100,atempo=2,atempo=1.414213,');
     expect(shapeFilter({ key: 0, speed: 1 }, false)).toBe(shapeFilter({ key: 0, speed: 1 }));
@@ -93,6 +104,10 @@ describe.skipIf(!FFMPEG)('the chain run for real (ffmpeg on this machine)', () =
     const whole = await cleanVoice(take(true), { ...VOICE_TUNE_DEFAULT, tune: 0, cut: false });
     expect(whole.seconds).toBeGreaterThan(3.1);
     expect(whole.seconds).toBeLessThan(3.6);
+  }, 30_000);
+
+  it('「きれい」: the take heard whole, at the speed it was said', async () => {
+    expect(mp3Seconds((await heardVoice(take(true))).length)).toBeGreaterThan(5.8);
   }, 30_000);
 
   it('a take that is all silence is no message (the web says 「もう少し長く、話してね」)', async () => {

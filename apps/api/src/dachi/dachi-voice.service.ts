@@ -57,6 +57,12 @@ type NewRow = typeof dachiMessages.$inferInsert;
 const fileOf = (j: unknown): ClipFile | null => (j && typeof j === 'object' && (j as { file?: unknown }).file && typeof (j as { file: { id?: unknown } }).file.id === 'string' ? (j as { file: ClipFile }).file : null);
 const fileWords = (f: ClipFile | null) => (f ? `${CLIP_WORD[f.kind]}「${f.name}」` : 'ファイル');
 const textOf = (j: unknown): string | null => (j && typeof j === 'object' && typeof (j as { text?: unknown }).text === 'string' ? (j as { text: string }).text : null);
+/**
+ * client 2026-11-27 (after trying it): the SENDER does not hear their own voice — the recording, or their words read as
+ * the 「きれい」 version. Their own view of such a row carries no audio. Not so for 'cute': the default cute voice that
+ * reads the words of a member who is not recorded is not their voice, and their flow stays as it was.
+ */
+const ownVoiceHidden = (j: unknown): boolean => !(j && typeof j === 'object' && (j as { tts?: unknown }).tts === 'cute');
 /** client 2026-11-27: the sound mixed into a voice (work_json { sound }): the mood, and the voice alone for 〔おとをけす〕 */
 const soundOf = (j: unknown): { mood: VoiceSound; plainUrl: string } | null => {
   const s = j && typeof j === 'object' ? (j as { sound?: { mood?: unknown; plainUrl?: unknown } }).sound : null;
@@ -337,18 +343,22 @@ export class DachiVoiceService {
       // kept in work_json { text, face } (the kind column is free text: no migration)
       if ((await moderateText(body.text, this.llm)).flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'CONTENT_FLAGGED', 'This cannot be sent');
       row = { ...base, kind: 'text', workJson: { text: body.text, ...(body.face ? { face: body.face } : {}) } };
-      // client 2026-11-27 (shared/cuteVoice.ts): a member who is not recorded asked for a voice — the checked words are
-      // read by the default cute voice (mana) and sent as a voice message with the words as its caption; with no mana,
-      // or when it cannot be made, the words go as they are (`cute.miss`: a calm line, never an error)
+      // client 2026-11-27 (shared/cuteVoice.ts, voiceVersion.ts): a voice was asked for — the checked words are read
+      // (mana) and sent as a voice message with the words as its caption: by the default cute voice for a member who
+      // is not recorded ('cute'), in their own voice model (else the cute voice) for a recorded member's 「きれい」
+      // version ('clean'). With no mana, or when it cannot be made, the words go as they are (`cute.miss`: a calm
+      // line, never an error)
       if (body.spoken && this.cute) {
-        const v = await this.cute.speak(userId, body.text, opts.origin ?? '').catch((e: unknown) => (this.log.warn(`cute voice: ${String(e)}`), { miss: 'failed' as const }));
+        const v = await this.cute.speak(userId, body.text, opts.origin ?? '', { sound: body.sound, soft: body.soft }).catch((e: unknown) => (this.log.warn(`cute voice: ${String(e)}`), { miss: 'failed' as const }));
         if (v && 'miss' in v) cute = v;
         else if (v) {
           cute = { mana: v.mana };
           const sound = v.mixed ? { sound: { mood: v.mixed.mood, ...(v.mixed.soft ? { soft: true } : {}), plainUrl: v.voice.url, plainMediaId: v.voice.id } } : {};
-          row = { ...base, kind: 'voice', audioUrl: v.mixed?.url ?? v.voice.url, audioMediaId: v.mixed?.id ?? v.voice.id, seconds: Math.round(v.seconds * 10) / 10, workJson: { text: body.text, tts: 'cute', ...(body.face ? { face: body.face } : {}), ...sound } };
+          row = { ...base, kind: 'voice', audioUrl: v.mixed?.url ?? v.voice.url, audioMediaId: v.mixed?.id ?? v.voice.id, seconds: Math.round(v.seconds * 10) / 10, workJson: { text: body.text, tts: v.tts, ...(body.face ? { face: body.face } : {}), ...sound } };
         }
       }
+      // the 「そのまま」 draft made from the same take before 「きれい」 was chosen: the recording is not kept beside it
+      if (body.drop && this.mixer) await this.mixer.discard(userId, body.drop).catch((e: unknown) => this.log.warn(`draft not dropped: ${String(e)}`));
     } else {
       row = { ...base, kind: 'work', workJson: body.face ? { ...body.work, face: body.face } : body.work };
     }
@@ -436,18 +446,21 @@ export class DachiVoiceService {
 
   toView(userId: string, r: Row): DachiMessageView {
     const line = r.senderId ? undefined : dachiLine(r.lineId);
+    // the sender's own voice is not played back to them: no audio in their view of it (the receiver's has it)
+    const hidden = r.kind === 'voice' && r.senderId === userId && ownVoiceHidden(r.workJson);
     return {
       id: r.id,
       fromMe: r.senderId === userId,
       character: r.senderId ? null : ((r.character as DachiCharacter | null) ?? null),
       kind: r.kind === 'work' ? 'work' : r.kind === 'text' ? 'text' : r.kind === 'file' ? 'file' : 'voice',
       // a character's voice comes from the line data (filled in when the voice is made), so no migration is needed then
-      audioUrl: line ? line.voice : (r.audioUrl ?? null),
+      audioUrl: line ? line.voice : hidden ? null : (r.audioUrl ?? null),
       seconds: r.seconds ?? null,
       text: line?.text ?? textOf(r.workJson),
       work: r.kind === 'work' ? cardOf(r.workJson) : null,
       ...(r.kind === 'file' ? { file: fileOf(r.workJson) } : {}),
-      ...(r.kind === 'voice' && soundOf(r.workJson) ? { sound: soundOf(r.workJson) } : {}),
+      ...(r.kind === 'voice' && !hidden && soundOf(r.workJson) ? { sound: soundOf(r.workJson) } : {}),
+      ...(hidden ? { sentVoice: true } : {}),
       face: faceOf(r.workJson),
       // M-R238: a line with words gets its sentences' faces by the rules (no call: the characters' lines are fixed)
       ...(line?.text ? { faces: ruleBeats(line.text) } : textOf(r.workJson) ? { faces: ruleBeats(textOf(r.workJson)!) } : {}),

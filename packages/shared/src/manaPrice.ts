@@ -678,8 +678,10 @@ export const MAKE_COST: Readonly<ManaPrices> = Object.freeze(manaPrices());
  * made without mana, a post that flies under another title, the admin backfill — is absorbed too (a paid song's is in its
  * price: TITLE_VOICE_CHARS).
  * 'voiceMix' (client 2026-11-27, voiceSound.ts): a ダチ voice message made ready — the clean-up and the mix on our CPU,
- * its words, its mood (about ¥0.03 a message). Unlike the rest of the ダチ talk it is NOT absorbed: it is added to the
- * member's small costs like any free feature, and capped a day (VOICE_MIX_DAILY_CAP).
+ * its words, its mood (about ¥0.03 for a 10 s take, ¥0.07 for 30 s). Unlike the rest of the ダチ talk it is NOT
+ * absorbed: it is added to the member's small costs like any free feature — taken a whole mana at a time as they add up
+ * (about one mana every 30 short messages) — and capped a day (VOICE_MIX_DAILY_CAP). The 「きれい」 version's hearing of
+ * the take (voiceVersion.ts) is filed here too; its read voice is the paid making 'cuteVoice'.
  */
 export const USAGE_FEATURES = ['chat', 'search', 'draw', 'voice', 'spell', 'lyrics', 'compass', 'songEdit', 'videoEdit', 'novel', 'unfurl', 'listen', 'memory', 'look', 'story', 'dachi', 'figures', 'titleVoice', 'cutRetry', 'voiceMix', 'other'] as const;
 export type UsageFeature = (typeof USAGE_FEATURES)[number];

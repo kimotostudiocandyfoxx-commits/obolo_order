@@ -14,7 +14,9 @@ import { speakText } from './storyVoice';
  *        + UTF-8 bytes of what is spoken × (Fish per byte + the two MP3s kept 12 months per byte)
  *   mana = max(0.1, ceil( yen ÷ (1 − fee) × 1.08 × 10 ) / 10)
  * With no mana / not enough the message goes as words only — no voice, no error, one calm line (CUTE_VOICE_WORDS).
- * A member who IS recorded never gets here: their recorded voice message is unchanged.
+ * A member who IS recorded has no switch for it. After the client tried the voice messages they have a choice of their
+ * own instead (voiceVersion.ts): 「きれい」 reads the caption of their take with this same machinery and this same price —
+ * in their own registered voice model when they have one, else in this default cute voice.
  */
 
 /** the UTF-8 bytes Fish is paid for: the words as they are spoken (speakText: the readings, no line breaks) */

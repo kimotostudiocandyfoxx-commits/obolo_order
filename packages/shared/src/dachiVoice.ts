@@ -4,6 +4,7 @@ import { TALK_FACES, type TalkBeat, type TalkFace, type TalkLook } from './talk'
 import type { ClipFile } from './clip';
 import { VOICE_SOUNDS, type VoiceSound } from './voiceSound';
 import type { CuteVoiceMiss } from './cuteVoice';
+import type { VoiceCleanInfo, VoiceVersion } from './voiceVersion';
 
 /**
  * ダチの声のメッセージ (client decision M-R212). After {name} becomes dachi with {inviter} on Saturn (day 3,
@@ -219,6 +220,12 @@ export interface DachiMessageView {
    * alone, for 〔おとをけす〕
    */
   sound?: { mood: VoiceSound; plainUrl: string } | null;
+  /**
+   * client 2026-11-27 (after trying it): YOUR OWN voice message — the recording, or your words read in your voice
+   * model. It is not played back to its sender: `audioUrl` is null and there is no `sound`; the talk shows the caption
+   * and a small quiet mark that a voice was sent. (The receiver's view carries the voice as ever.)
+   */
+  sentVoice?: boolean;
   /** a 📎 file (a picture, a film, a sound, a document); opened through GET /media/files/:id */
   file?: ClipFile | null;
   /** M-R234: the sender's expression, decided when it was sent */
@@ -252,9 +259,19 @@ export const SendDachiMessageBody = z.union([
   }),
   z.object({ work: DachiWorkCard, face: SendFace }),
   // client 2026-11-24: words typed in the ダチ talk (the small keyboard beside the mic)
-  // client 2026-11-27 (cuteVoice.ts): `spoken` — a member who is not recorded asks for the words to be read by the
-  // default cute voice (mana; with none, or when it cannot be made, the words go alone). Ignored for everyone else.
-  z.object({ text: z.string().trim().min(1).max(DACHI_TEXT_MAX), face: SendFace, spoken: z.boolean().optional() }),
+  // client 2026-11-27 (cuteVoice.ts): `spoken` — the words are read by a voice and sent as a voice message (mana; with
+  // none, or when it cannot be made, the words go alone): for a member who is not recorded the default cute voice; for
+  // a member who is recorded the 「きれい」 version (voiceVersion.ts) — their own voice model, else the default cute
+  // voice. `sound` / `soft`: the sound the member chose under 「おと」 (left out: picked from the words). `drop`: the
+  // 「そのまま」 draft made from the same take, thrown away now (the recording is not kept beside the read voice).
+  z.object({
+    text: z.string().trim().min(1).max(DACHI_TEXT_MAX),
+    face: SendFace,
+    spoken: z.boolean().optional(),
+    sound: z.enum(VOICE_SOUNDS).optional(),
+    soft: z.boolean().optional(),
+    drop: z.string().uuid().optional(),
+  }),
   // Bluena's 📎: one of your own files (POST /media/files …/done), sent into the talk
   z.object({ fileId: z.string().uuid(), face: SendFace }),
 ]);
@@ -263,18 +280,24 @@ export type SendDachiMessageBody = z.infer<typeof SendDachiMessageBody>;
 /** a thread id: a user id (uuid) or a character */
 export const isCharacterThread = (id: string): id is DachiCharacter => (DACHI_CHARACTERS as readonly string[]).includes(id);
 
-/** client 2026-11-27: a recording made ready to send (POST /dachi/voice): in the member's voice settings, heard as words */
+/**
+ * client 2026-11-27: a take made ready to send (POST /dachi/voice). As 「そのまま」 ('asis'): the recording in the
+ * member's voice settings, kept as a draft. As 「きれい」 ('clean'): heard as words only — nothing of it is kept. The
+ * member's remembered version decides (`?as=` asks for the other one, for the button on the draft card). There is no
+ * URL in it: the sender does not hear the take.
+ */
 export interface DachiVoiceDraft {
-  /** the cleaned voice (the member's own media, kind 'voice') */
-  mediaId: string;
-  url: string;
-  /** its length now (the recording in the member's voice settings: the silences cut, faster — voiceTune.ts) */
+  /** which version this draft was made as */
+  version: VoiceVersion;
+  /** 'asis': the made-ready voice (the member's own media, kind 'voice'); 'clean': null — no file */
+  mediaId: string | null;
+  /** 'asis': its length now (the silences cut, faster — voiceTune.ts); 'clean': 0 (the voice is made at the send) */
   seconds: number;
   /** the words heard ('' when none could be heard) */
   text: string;
   /** the sound picked from the words */
   sound: VoiceSound;
   soft: boolean;
+  /** whether 「きれい」 can be chosen, in whose voice, and its live price (the small 「−0.3」 beside 〔送る〕) */
+  clean: VoiceCleanInfo;
 }
-export const VoicePreviewBody = z.object({ mediaId: z.string().uuid(), sound: z.enum(VOICE_SOUNDS), soft: z.boolean().optional() });
-export type VoicePreviewBody = z.infer<typeof VoicePreviewBody>;

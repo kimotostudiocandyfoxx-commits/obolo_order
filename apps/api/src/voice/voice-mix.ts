@@ -15,11 +15,12 @@ import { semitoneRatio, VOICE_SOUND_PARTS, VOICE_TUNE_DEFAULT, type VoiceMood, t
  *       c. autotune   assets/voice-tune/autotune.py (python3 + praat-parselmouth): every pitch point pulled toward
  *                     the nearest semitone by the strength (0.6). A subprocess with a time limit: when it fails or
  *                     is late the chain goes on without it — a message is never lost for it.
- *       d. the shape  ffmpeg rubberband: 1.8× faster and +6 semitones (formants not kept: the approved sound), then
- *                     one loudness (−16 LUFS). Without the rubberband filter: asetrate + atempo (the same speed and
+ *       d. the shape  ffmpeg rubberband: 1.8× faster and +2 semitones (formants not kept: the approved sound; the key
+ *                     was +6 until the client tried it), then one loudness (−16 LUFS). Without the rubberband filter: asetrate + atempo (the same speed and
  *                     pitch, a rougher sound).
  *     The words are heard from (a) — clean, uncut, at the speed and pitch it was said in (`heard`), so the caption
- *     does not depend on the settings.
+ *     does not depend on the settings. heardVoice is (a) alone, for the 「きれい」 version (shared voiceVersion.ts):
+ *     the take is heard as words and nothing of it is kept.
  *  2. mixVoice — a small sound that fits the words, far under the voice, pushed down further while the voice sounds
  *     (a side-chain compressor keyed by the voice), a short lead-in, a 1.5 s fade at the end.
  *
@@ -118,6 +119,10 @@ const IN_ARGS = ['-hide_banner', '-loglevel', 'error', '-y'];
 export function prepareArgs(src: string, heard: string, voice: string, cut: boolean = SILENCE_CUT.on): string[] {
   const graph = `[0:a]${cleanFilter()},aresample=${MIX_RATE},aformat=sample_fmts=s16:channel_layouts=mono,asplit=2[h][v0];[v0]${cut ? cutFilter() : 'anull'}[v]`;
   return [...IN_ARGS, '-t', String(MIX_MAX_INPUT_SEC), '-i', src, '-filter_complex', graph, '-map', '[h]', '-b:a', `${MIX_KBPS}k`, '-map_metadata', '-1', '-f', 'mp3', heard, '-map', '[v]', '-c:a', 'pcm_s16le', '-f', 'wav', voice];
+}
+/** ffmpeg's arguments for a alone: the recording at `src` → clean and whole (MP3 on stdout), to be heard as words */
+export function hearArgs(src: string): string[] {
+  return [...IN_ARGS, '-t', String(MIX_MAX_INPUT_SEC), '-i', src, '-af', `${cleanFilter()},aresample=${MIX_RATE}`, ...OUT_ARGS];
 }
 /** ffmpeg's arguments for d: the WAV at `src` → the voice as it is sent (MP3 on stdout) */
 export function shapeArgs(src: string, tune: Pick<VoiceTune, 'key' | 'speed'>, rubberband = true): string[] {
@@ -249,18 +254,14 @@ export interface CleanOptions {
   /** config VOICE_TUNE_PYTHON / VOICE_TUNE_TIMEOUT_MS */
   python?: string;
   timeoutMs?: number;
-  /** only the first seconds of the take (a preview) */
-  maxSec?: number;
 }
 
-/** a recording (webm / mp4 … from the browser, or a `heard` MP3 for a preview) → the voice in these settings */
+/** a recording (webm / mp4 … from the browser) → the voice in these settings */
 export async function cleanVoice(input: Buffer, tune: VoiceTune = VOICE_TUNE_DEFAULT, o: CleanOptions = {}): Promise<CleanVoice> {
   return withFile(input, async (src, dir) => {
     const heardFile = join(dir, 'heard.mp3');
     const voice = join(dir, 'voice.wav');
-    const args = prepareArgs(src, heardFile, voice, tune.cut);
-    if (o.maxSec) args[args.indexOf('-t') + 1] = String(o.maxSec);
-    await run(args, false);
+    await run(prepareArgs(src, heardFile, voice, tune.cut), false);
     const left = Math.max(0, ((await stat(voice)).size - 44) / WAV_BYTES_PER_SEC);
     if (left < MIN_VOICE_SEC) throw new NoVoiceError(Math.round(left * 100) / 100);
     const tuned = join(dir, 'tuned.wav');
@@ -276,6 +277,13 @@ export async function cleanVoice(input: Buffer, tune: VoiceTune = VOICE_TUNE_DEF
     if (mp3.length < 1000) throw new Error(`ffmpeg made no sound (${mp3.length} bytes)`);
     return { mp3, seconds: mp3Seconds(mp3.length), heard: await readFile(heardFile), made: { autotune: tunedOk, shape } };
   });
+}
+
+/** a recording → clean and whole (MP3), only to be heard as words: step a alone, nothing cut or changed */
+export async function heardVoice(input: Buffer): Promise<Buffer> {
+  const mp3 = await withFile(input, (src) => run(hearArgs(src)));
+  if (mp3.length < 1000) throw new Error(`ffmpeg made no sound (${mp3.length} bytes)`);
+  return mp3;
 }
 
 /** the cleaned voice with its sound mixed in (MP3); `none` is not mixed — the caller keeps the clean voice */

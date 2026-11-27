@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, Header, Headers, HttpCode, Inject, NotFoundException, Param, Post, Put, Query, Req, StreamableFile, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, HttpCode, HttpStatus, Inject, NotFoundException, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
-import { DACHI_SEND_PER_DAY, DACHI_SEND_PER_HOUR, KIMORIN_REPLIES_PER_DAY, DELIVERY_KINDS, DeliverBody, isCharacterThread, SendDachiMessageBody, VoicePreviewBody, VoiceTuneBody } from '@obolo/shared';
+import { DACHI_SEND_PER_DAY, DACHI_SEND_PER_HOUR, KIMORIN_REPLIES_PER_DAY, DELIVERY_KINDS, DeliverBody, isCharacterThread, isVoiceVersion, SendDachiMessageBody, VoiceTuneBody, VoiceVersionBody, type DachiVoiceDraft, type VoiceVersionView } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
+import { apiError } from '../common/errors';
 import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
 import type { KvStore } from '../infra/kv';
@@ -84,14 +85,28 @@ export class DachiController {
     return this.voice.send(userId, thread, b, { reply, voiced, origin: `${req.protocol}://${req.get('host')}` });
   }
 
-  // ── client 2026-11-27: a voice message made ready (the trial: clean-up, 1.2×, its words, a quiet sound) ──
+  // ── client 2026-11-27: a voice message made ready (clean-up, the member's voice settings, its words, a quiet sound) ──
 
-  /** the recording as the raw body (audio/*, main.ts) → the clean voice kept, its words, the sound picked from them */
+  /**
+   * the recording as the raw body (audio/*, main.ts) → made ready in the version the member sends (remembered;
+   * `?as=asis|clean` asks for the other one — the button on the draft card). 「そのまま」: the made-ready voice kept,
+   * its words, the sound picked from them. 「きれい」: its words and the sound only — nothing of the take is kept.
+   */
   @Post('voice')
   @HttpCode(200)
-  async voiceDraft(@UserId() userId: string, @Headers('content-type') type: string | undefined, @Req() req: Request) {
+  async voiceDraft(@UserId() userId: string, @Headers('content-type') type: string | undefined, @Req() req: Request, @Query('as') as?: string): Promise<DachiVoiceDraft> {
     await rateLimit(this.kv, `dachi-voice-draft:${userId}`, 40, 3600);
-    return this.drafts.draft(userId, type, req.body, `${req.protocol}://${req.get('host')}`);
+    const clean = await this.cute.cleanInfo(userId);
+    const draft = await this.drafts.draft(userId, type, req.body, `${req.protocol}://${req.get('host')}`, { as: isVoiceVersion(as) ? as : undefined, cleanOn: clean.on });
+    return { ...draft, clean };
+  }
+
+  /** the one button on the draft card: 「そのまま」 or 「きれい」, remembered for the next takes (shared voiceVersion.ts) */
+  @Put('voice/version')
+  async setVoiceVersion(@UserId() userId: string, @Body() body: unknown): Promise<VoiceVersionView> {
+    await rateLimit(this.kv, `dachi-voice-version:${userId}`, 120, 3600);
+    const version = await this.drafts.setVersion(userId, parseBody(VoiceVersionBody, body).version);
+    return { version, clean: await this.cute.cleanInfo(userId) };
   }
 
   /**
@@ -103,14 +118,18 @@ export class DachiController {
     return this.cute.info(userId);
   }
 
-  /** 〔▶ きいてみる〕: the mix with the chosen sound, as MP3 bytes (nothing kept) */
+  /**
+   * client 2026-11-27 (after trying it): the SENDER does not hear their own voice. The two endpoints that played it back
+   * — the draft's mix (〔▶ きいてみる〕) and the settings' trial on the last take — refuse for everyone (410), whatever an
+   * older page asks: it is not only the buttons that are gone.
+   */
   @Post('voice/preview')
-  @HttpCode(200)
-  @Header('content-type', 'audio/mpeg')
-  @Header('cache-control', 'no-store')
-  async voicePreview(@UserId() userId: string, @Body() body: unknown) {
-    await rateLimit(this.kv, `dachi-voice-preview:${userId}`, 120, 3600);
-    return new StreamableFile(await this.drafts.preview(userId, parseBody(VoicePreviewBody, body)));
+  voicePreview(): never {
+    throw apiError(HttpStatus.GONE, 'VOICE_NOT_PLAYED', 'Your own voice message is not played back');
+  }
+  @Post('voice/tune/preview')
+  voiceTunePreview(): never {
+    throw apiError(HttpStatus.GONE, 'VOICE_NOT_PLAYED', 'Your own voice message is not played back');
   }
 
   // ── client 2026-11-27: the member's own voice settings (shared voiceTune.ts), changed by talking to {bati} ──
@@ -127,17 +146,7 @@ export class DachiController {
     return this.drafts.setTune(userId, parseBody(VoiceTuneBody, body));
   }
 
-  /** 〔きいてみる〕: the last take's first seconds in the settings of now, as MP3 bytes (nothing kept) */
-  @Post('voice/tune/preview')
-  @HttpCode(200)
-  @Header('content-type', 'audio/mpeg')
-  @Header('cache-control', 'no-store')
-  async voiceTunePreview(@UserId() userId: string) {
-    await rateLimit(this.kv, `dachi-voice-tune-preview:${userId}`, 40, 3600);
-    return new StreamableFile(await this.drafts.tunePreview(userId));
-  }
-
-  /** 〔けす〕 / a new take: the draft's file goes */
+  /** 〔とりなおす〕 / the other version chosen: the draft's file goes */
   @Delete('voice/:mediaId')
   @HttpCode(200)
   discardVoice(@UserId() userId: string, @Param('mediaId') mediaId: string) {

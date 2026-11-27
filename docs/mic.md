@@ -49,6 +49,28 @@ One component, `components/mic/VoiceText.tsx` (rules: `lib/mic/edit.ts`, tests `
 - A server that cannot make the take ready sends it as before (no caption, no sound).
 - Not checked on a real phone: everything heard — the levels of the sounds on a phone's speaker, the clean-up on a real room's noise, the time it takes on Cloud Run (here: about 1 s for a 23 s take, 0.3–0.7 s a mix).
 
+## After the client tried it (2026-11-27, evening): key +2, the sender does not hear their own voice, two versions
+
+The section above still tells the morning's trial (〔listen〕 through `POST /dachi/voice/preview`); the sections below are brought up to this. It is now:
+
+1. **The default key is +2 semitones** (it was +6): `VOICE_TUNE_DEFAULT = { key: 2, speed: 1.8, tune: 0.6, cut: true }` — step d is `rubberband=tempo=1.8:pitch=1.122462`. The rest of the chain is unchanged. A member who saved settings of their own keeps them (they are kept whole in `users.onboarding_json['voice.dachi']`, also a +6 of their own); a member who never changed anything had no entry and gets +2; 「もとにもどす」 is the new default (kept as no entry). `design/refs/2026-11-27-voice-samples/` was made again at +2.
+2. **The sender never hears their own voice** (most people dislike hearing their own recording):
+   - the draft card has no 〔▶ きいてみる〕; the sound under 「おと」 is chosen without hearing it;
+   - the sender's own voice bubbles in the talk have no play control: the caption and a small quiet mark 「🎙 声を送ったよ・12秒」 (`TalkItem.voiceSent`, `lib/dachi/voiceSend.ts voicePartOf`). The receiver plays it as before;
+   - {bati}'s voice settings play nothing: the new settings are said in words; 「きいてみたい」 gets one line (`VOICE_TUNE_LINES.noListen`); the chip 〔きいてみる〕 is gone;
+   - **on the server too**: `POST /dachi/voice/preview` and `POST /dachi/voice/tune/preview` answer 410 `VOICE_NOT_PLAYED` for everyone; the draft (`POST /dachi/voice`) carries no URL; the sender's own view of their voice message (`DachiVoiceService.toView`) has `audioUrl: null`, no `sound.plainUrl`, and `sentVoice: true` — in the answer to the send and in every later read. Not closed: the file itself is still the member's own media (`/media/...` by its URL, for someone who kept the URL from before) — the URL is simply no longer given to them.
+   - The **default cute voice of a member who is not recorded** is not their own voice: their flow is as it was (their bubble plays). To be confirmed with the client.
+   - **The "last take" is not kept any more** (it existed only for the settings' trial): the code is gone. What was kept on 2026-11-27 — one clean file per member and the pointer `voice-take:<member>` in Redis — is removed for a member at their next take or voice-settings turn (`DachiVoiceDraftService.forgetTake`) and for everyone by the one-off `POST /admin/voice-takes-cleanup?limit=500` (admin token; answers `{ looked, removed, next }`; run again with `&after=<next>` until `next` is null). It walks the members by id and looks each pointer up (the key-value store has no key listing).
+3. **Two versions, one button on the draft card**, remembered per member on the server (`users.onboarding_json['voice.dachi.version']`, `PUT /dachi/voice/version`; `packages/shared/src/voiceVersion.ts`):
+   - **「そのまま」** (`asis`, the default, the cheap one): the recording made ready as above.
+   - **「きれい」** (`clean`): Fish reads the caption — the words heard from the take, as the member fixed them — in **the member's own registered voice model** (`users.voice_bati_id`, the one their {bati} imitates, only when it may be used) or, without one, in the default cute voice (`defaultCuteVoiceId`). It is `CuteVoiceService.speak` with the same checks: the words moderated, the mana taken first (`cuteVoice`, per character, shown small beside 〔送る〕 as 「−0.6」), given back when no voice came, and with no mana the words go as a text message with the calm line. The row is a voice message with `work_json.tts = 'clean'`.
+   - **The recording in 「きれい」**: when 「きれい」 is the member's remembered version the take is only heard as words (`heardVoice`: step a → the speech model) and **nothing of it is kept**. When the member had a 「そのまま」 draft and then presses 「きれい」, that draft's file is thrown away at the send (`drop`), also when the words went alone. The other way round (「きれい」 → 「そのまま」) the recording is made ready then, from the take still in the page's memory (`POST /dachi/voice?as=asis`).
+   - 「きれい」 is offered only where it can be made (the voice service on, a voice to read in): `DachiVoiceDraft.clean.on`. A member who is not recorded has no such button (their cute-voice switch is unchanged).
+   - The sender hears neither version.
+4. **What each costs the member**: `docs/マナの値段.md` 「ダチの声のメッセージ：2つの声」.
+
+Not checked on a real phone or with a real voice model: how 「きれい」 sounds in a member's own model (it is the model made for {bati}: pitched up two semitones), and the card's layout with the new button on a small screen.
+
 ## The voice itself: sample K, and the member's own settings (client 2026-11-27)
 
 The lines above about "1.2× faster with the pitch kept" are the trial of the morning; the client then chose **sample K** by ear. `cleanVoice` (`apps/api/src/voice/voice-mix.ts`) is now:
@@ -58,14 +80,14 @@ The lines above about "1.2× faster with the pitch kept" are the trial of the mo
 | a. clean | `highpass=f=100,afftdn=nr=24:nf=-45:tn=1,agate=threshold=0.012:ratio=2:attack=10:release=250` | ffmpeg (`CLEAN`) |
 | b. 「間をつめる」 | `silenceremove`: the silence before the first word goes, a pause longer than 0.28 s becomes 0.14 s, −40 dB | ffmpeg (`SILENCE_CUT`: `on` and the thresholds in one constant — the client may still tune or drop it) |
 | c. autotune 0.6 | every pitch point pulled toward the nearest semitone (A = 440) by the strength: Praat "To Manipulation" (0.01, 75, 500) → pitch tier → "Get resynthesis (overlap-add)" | `apps/api/assets/voice-tune/autotune.py`, python3 + praat-parselmouth 0.4.7, a subprocess |
-| d. the shape | `rubberband=tempo=1.8:pitch=1.414214` (+6 semitones, formants not kept — the approved sound), then `loudnorm=I=-16:TP=-1.5:LRA=11` | ffmpeg |
+| d. the shape | `rubberband=tempo=1.8:pitch=1.122462` (+2 semitones — it was +6, `pitch=1.414214`, until the client tried it; formants not kept — the approved sound), then `loudnorm=I=-16:TP=-1.5:LRA=11` | ffmpeg |
 
 - **Never fails the message for the autotune.** The subprocess has a time limit (`VOICE_TUNE_TIMEOUT_MS`, 8 s); no Python, no parselmouth, an error or late → the chain goes on without step c. An ffmpeg without the rubberband filter → the same speed and key by `asetrate` + `atempo` (a rougher sound). `cleanVoice` says which it was (`made`).
 - **The image**: `apps/api/Dockerfile` installs python3 and praat-parselmouth in `/opt/voice` (`VOICE_TUNE_PYTHON=/opt/voice/bin/python`). Debian's ffmpeg has rubberband; the build log prints the filter's line (or a note that it is missing). Not checked in a built image here (no Docker daemon in the work machine): after the next deploy, one voice message and the log line `clean … autotune` tell.
 - **The caption** is heard from step a's output — clean, uncut, at the speed and pitch it was said in — not from the changed voice, so the settings do not touch the words.
 - **A take that is all silence** leaves nothing after step b: `VOICE_SILENT` (422), and the mic says 「もう少し長く、話してね」 like a take that was too short. It is never sent "as it is".
 - **Time**: a 20 s take in 1.8–1.9 s here (4 cores; 1.35 s without the autotune), the 23 s sample in 2.4 s; a mix 0.25–0.33 s. Cloud Run's one core will be slower — the target is 2–4 s.
-- **Samples**: `design/refs/2026-11-27-voice-samples/` (made again with this default from `design/voices/default-bati-source.m4a`: `npx tsx apps/api/scripts/voice-mix-samples.ts <out> <recording>`; `TUNE='{"key":0,"speed":1.2}'` tries other settings).
+- **Samples**: `design/refs/2026-11-27-voice-samples/` (now at key +2; made again with the default from `design/voices/default-bati-source.m4a`: `npx tsx apps/api/scripts/voice-mix-samples.ts <out> <recording>`; `TUNE='{"key":0,"speed":1.2}'` tries other settings).
 
 ### The member's own settings, by talking to {bati}
 
@@ -73,14 +95,14 @@ The lines above about "1.2× faster with the pitch kept" are the trial of the mo
 
 | | range | default |
 |---|---|---|
-| key | −6 … +8 semitones (whole) | +6 |
+| key | −6 … +8 semitones (whole) | +2 (was +6) |
 | speed | 1.0 … 2.0 (tenths) | 1.8 |
 | autotune | 0 … 1 (tenths; 0 = none) | 0.6 |
 | 「間をつめる」 | on / off | on |
 
-- In the Moon talk (`AtelierChat.voiceTuneSend`, found like the title words — a pure parser, `voiceTuneTalk`): 「声の設定」 says where they are; 「声を低くして／高くして」 (2 semitones; 「少し」1, 「すごく」4; 「キーを+3に」), 「もっとゆっくり／速く」 (0.2; 「1.5倍に」), 「オートチューンを強く／弱く／なしに／80%に」, 「間をつめないで／つめて」, 「もとの声に近づけて」 (half-way back to the voice as recorded), 「もとの声のままで」 (key 0, 1.0×, no autotune), 「もとにもどす」 (the default). After a turn about them short words count (「もっとゆっくり」, the chips 〔きいてみる〕〔もとにもどす〕); outside it the words must name the voice — 「もっとゆっくり」 with a song on the table is the song's.
-- `GET /dachi/voice/tune`, `PUT /dachi/voice/tune` (the parts given, or `reset`; **clamped on the server** whatever is sent), `POST /dachi/voice/tune/preview` (〔きいてみる〕: the first 12 s of the last take in the settings of now, MP3 bytes, nothing kept; `NO_TAKE` when there is none — {bati} then says the next one can be heard before it is sent).
-- For that preview the **last take is kept clean and whole** (step a's output) as one file per member, replaced by the next take (the pointer `voice-take:<user>` in Redis, 30 days). It is the member's own media like the voice messages themselves.
+- In the Moon talk (`AtelierChat.voiceTuneSend`, found like the title words — a pure parser, `voiceTuneTalk`): 「声の設定」 says where they are; 「声を低くして／高くして」 (2 semitones; 「少し」1, 「すごく」4; 「キーを+3に」), 「もっとゆっくり／速く」 (0.2; 「1.5倍に」), 「オートチューンを強く／弱く／なしに／80%に」, 「間をつめないで／つめて」, 「もとの声に近づけて」 (half-way back to the voice as recorded), 「もとの声のままで」 (key 0, 1.0×, no autotune), 「もとにもどす」 (the default). After a turn about them short words count (「もっとゆっくり」, the chip 〔もとにもどす〕; 「きいてみたい」 gets the line that one's own voice is not played back); outside it the words must name the voice — 「もっとゆっくり」 with a song on the table is the song's.
+- `GET /dachi/voice/tune`, `PUT /dachi/voice/tune` (the parts given, or `reset`; **clamped on the server** whatever is sent). Nothing is played: {bati} says the new settings in words (`POST /dachi/voice/tune/preview` refuses, 410).
+- No "last take" is kept (it was, on 2026-11-27 only, for a trial that is gone: see the cleanup above).
 - Only a member who is recorded has settings (`VOICE_NOT_ALLOWED` otherwise; {bati} says so). They never touch the default cute voice.
 - The cost is still the small cost `voiceMix` (CPU seconds × `CPU_SECOND_JPY`: about 2–4 s a take now instead of 1).
 

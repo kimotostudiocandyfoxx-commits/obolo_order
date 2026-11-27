@@ -12,7 +12,7 @@ const B = 'b0000000-0000-4000-8000-000000000002';
 const VOICE_ID = 'default-cute-voice';
 
 /** the cute voice with the database, the ledger, the voice service, the storage and the mix replaced (no real call) */
-function world(o: { recorded?: boolean; balance?: number; fish?: boolean | 'fails'; voiceId?: string | null; mixFails?: boolean; chargeFails?: boolean } = {}) {
+function world(o: { recorded?: boolean; own?: string | null; balance?: number; fish?: boolean | 'fails'; voiceId?: string | null; mixFails?: boolean; chargeFails?: boolean } = {}) {
   let balance = o.balance ?? 10;
   const taken: number[] = [];
   const refunds: number[] = [];
@@ -47,7 +47,7 @@ function world(o: { recorded?: boolean; balance?: number; fish?: boolean | 'fail
   };
   const s = new CuteVoiceService({} as never, media as never, {} as never, {} as never, models as never, { FISH_DEFAULT_VOICE_ID: o.voiceId === null ? undefined : (o.voiceId ?? VOICE_ID) }, mixer as never, undefined);
   const x = s as unknown as Record<string, unknown>;
-  x.notRecorded = async () => !(o.recorded ?? false);
+  x.who = async () => ({ recorded: o.recorded ?? false, own: o.recorded ? (o.own ?? null) : null });
   x.rate = async () => CUTE_VOICE_RATE;
   x.charge = async (_u: string, price: number) => {
     if (o.chargeFails) throw apiError(507, 'STORAGE_QUOTA', 'full');
@@ -72,7 +72,7 @@ describe('the default cute voice reads the ダチ words of a member who is not r
     const words = 'やったー！すごく、うれしい';
     const r = await w.s.speak(U, words, 'https://api');
     const price = cuteVoiceMana(words);
-    expect(r).toEqual({ mana: price, voice: { id: 'v0', url: 'https://r2/cute-0.mp3' }, mixed: { id: 'mix0', url: 'https://r2/mix-ureshii.mp3', mood: 'ureshii', soft: false }, seconds: 3.5 });
+    expect(r).toEqual({ tts: 'cute', mana: price, voice: { id: 'v0', url: 'https://r2/cute-0.mp3' }, mixed: { id: 'mix0', url: 'https://r2/mix-ureshii.mp3', mood: 'ureshii', soft: false }, seconds: 3.5 });
     expect(w.taken).toEqual([price]);
     expect(w.refunds).toEqual([]);
     // only the words go to the voice service, in the one default voice — and its cost is this paid making's
@@ -99,11 +99,11 @@ describe('the default cute voice reads the ダチ words of a member who is not r
     expect(await one.s.speak(U, 'おはよう', '')).toMatchObject({ mana: 0.1 });
   });
 
-  it('a member who IS recorded never gets the cute voice (their recorded voice message is unchanged)', async () => {
+  it('a member who IS recorded does not get the cute voice’s switch (theirs is the version button on the draft card)', async () => {
     const w = world({ recorded: true });
-    expect(await w.s.speak(U, 'こんにちは', '')).toBeNull();
-    expect([w.taken, w.spoken]).toEqual([[], []]);
     expect((await w.s.info(U)).on).toBe(false);
+    // …and a member who is not recorded has no 「きれい」 version to choose
+    expect(await world().s.cleanInfo(U)).toEqual({ on: false, own: false, rate: CUTE_VOICE_RATE });
   });
 
   it('no voice service, or no default voice set: nothing taken, the words go alone', async () => {
@@ -134,12 +134,58 @@ describe('the default cute voice reads the ダチ words of a member who is not r
   });
 });
 
+describe('「きれい」: a recorded member’s caption read as the voice message (client 2026-11-27, shared voiceVersion.ts)', () => {
+  it('in the member’s own registered voice model when they have one — the per-character price first, the same machinery', async () => {
+    const w = world({ recorded: true, own: 'my-own-model' });
+    const words = 'あした、あそぼう';
+    const r = await w.s.speak(U, words, 'https://api');
+    const price = cuteVoiceMana(words);
+    expect(r).toMatchObject({ tts: 'clean', mana: price, voice: { id: 'v0' } });
+    expect(w.taken).toEqual([price]);
+    expect(w.spoken).toEqual([{ id: 'my-own-model', text: words, scope: { feature: 'dachi', kind: 'cuteVoice', paid: true } }]);
+    expect(await w.s.cleanInfo(U)).toEqual({ on: true, own: true, rate: CUTE_VOICE_RATE });
+  });
+
+  it('with no voice model of their own: the default cute voice', async () => {
+    const w = world({ recorded: true });
+    expect(await w.s.speak(U, 'こんにちは', '')).toMatchObject({ tts: 'clean' });
+    expect(w.spoken[0].id).toBe(VOICE_ID);
+    expect(await w.s.cleanInfo(U)).toEqual({ on: true, own: false, rate: CUTE_VOICE_RATE });
+    // no model of their own and no default voice here, or no voice service: 「きれい」 is not offered
+    expect((await world({ recorded: true, voiceId: null }).s.cleanInfo(U)).on).toBe(false);
+    expect((await world({ recorded: true, own: 'my-own-model', voiceId: null }).s.cleanInfo(U)).on).toBe(true);
+    expect((await world({ recorded: true, own: 'my-own-model', fish: false }).s.cleanInfo(U)).on).toBe(false);
+  });
+
+  it('the sound the member chose under 「おと」 is the one mixed in (なし: the voice alone); left out, it is picked from the words', async () => {
+    const chosen = world({ recorded: true });
+    expect(await chosen.s.speak(U, 'やったー！', '', { sound: 'oyasumi' })).toMatchObject({ mixed: { mood: 'oyasumi', soft: false } });
+    expect(chosen.mixes).toEqual([{ sound: 'oyasumi', soft: false }]);
+    const soft = world({ recorded: true });
+    expect(await soft.s.speak(U, 'やったー！', '', { sound: 'ureshii', soft: true })).toMatchObject({ mixed: { mood: 'ureshii', soft: true } });
+    const none = world({ recorded: true });
+    expect(await none.s.speak(U, 'やったー！', '', { sound: 'none' })).toMatchObject({ mixed: null, seconds: 2 });
+    expect(none.mixes).toEqual([]);
+  });
+
+  it('no mana: nothing taken, nothing read — the words go alone; a failure gives the mana back', async () => {
+    const poor = world({ recorded: true, own: 'my-own-model', balance: 0 });
+    expect(await poor.s.speak(U, 'こんにちは', '')).toEqual({ miss: 'noMana' });
+    expect([poor.taken, poor.spoken, poor.stored]).toEqual([[], [], []]);
+    const broken = world({ recorded: true, own: 'my-own-model', fish: 'fails', balance: 3 });
+    expect(await broken.s.speak(U, 'こんにちは', '')).toEqual({ miss: 'failed' });
+    expect(broken.balance()).toBe(3);
+  });
+});
+
 describe('sending words with 〔こえをつける〕', () => {
-  function talk(cute: { speak: (u: string, t: string) => Promise<unknown> } | undefined, o: { flagged?: boolean } = {}) {
+  function talk(cute: { speak: (u: string, t: string, origin: string, chosen: { sound?: string; soft?: boolean }) => Promise<unknown> } | undefined, o: { flagged?: boolean } = {}) {
+    const dropped: string[] = [];
+    const mixer = { discard: async (_u: string, id: string) => void dropped.push(id) };
     const rows: Record<string, unknown>[] = [];
     const pushes: { title: string }[] = [];
     const llm = { name: 'gemini', chat: async () => (o.flagged ? 'FLAG:harassment' : 'OK') };
-    const s = new DachiVoiceService({} as never, { list: async () => [] } as never, {} as never, { notify: async (_to: string, n: { title: string }) => void pushes.push(n) } as never, llm as never, undefined, undefined, cute as never);
+    const s = new DachiVoiceService({} as never, { list: async () => [] } as never, {} as never, { notify: async (_to: string, n: { title: string }) => void pushes.push(n) } as never, llm as never, undefined, mixer as never, cute as never);
     const x = s as unknown as Record<string, unknown>;
     x.journey = async () => ({ journeyDay: 3, journeyCompletedAt: null, dachiAt: new Date(), displayName: 'A' });
     x.areDachi = async () => reachable({ follows: 2, blocks: 0, peerOk: true });
@@ -148,9 +194,9 @@ describe('sending words with 〔こえをつける〕', () => {
       rows.push(m);
       return m;
     };
-    return { s, rows, pushes };
+    return { s, rows, pushes, dropped };
   }
-  const made = { mana: 0.2, voice: { id: 'v0', url: 'https://r2/cute-0.mp3' }, mixed: { id: 'mix0', url: 'https://r2/mix-ureshii.mp3', mood: 'ureshii', soft: true }, seconds: 3.52 };
+  const made = { tts: 'cute', mana: 0.2, voice: { id: 'v0', url: 'https://r2/cute-0.mp3' }, mixed: { id: 'mix0', url: 'https://r2/mix-ureshii.mp3', mood: 'ureshii', soft: true }, seconds: 3.52 };
 
   it('made: a voice message — the words as its caption, the mix heard, the voice alone for 〔おとをけす〕, the mana said', async () => {
     const asked: string[] = [];
@@ -173,7 +219,33 @@ describe('sending words with 〔こえをつける〕', () => {
     expect(await thrown.s.send(U, B, { text: 'うん', spoken: true })).toMatchObject({ kind: 'text', cute: { miss: 'failed' } });
   });
 
-  it('a recorded member (null), no switch, or no cute voice here: plain words as ever, nothing said about a voice', async () => {
+  it('the default cute voice is not the member’s own voice: a member who is not recorded hears their message as before', async () => {
+    const w = talk({ speak: async () => made });
+    const mine = await w.s.send(U, B, { text: 'やったー！', spoken: true });
+    expect(mine).toMatchObject({ fromMe: true, audioUrl: 'https://r2/mix-ureshii.mp3' });
+    expect(mine.sentVoice).toBeUndefined();
+  });
+
+  it('「きれい」: sent as a voice message the SENDER does not hear; the sound chosen rides along; the 「そのまま」 draft of the same take goes', async () => {
+    const asked: unknown[] = [];
+    const w = talk({ speak: async (_u, t, _o, chosen) => (asked.push([t, chosen]), { ...made, tts: 'clean' }) });
+    const drop = 'd1111111-1111-4111-8111-111111111111';
+    const mine = await w.s.send(U, B, { text: 'あした、あそぼう', spoken: true, sound: 'ureshii', soft: true, drop });
+    expect(asked).toEqual([['あした、あそぼう', { sound: 'ureshii', soft: true }]]);
+    expect(w.rows[0]).toMatchObject({ kind: 'voice', audioMediaId: 'mix0', workJson: { text: 'あした、あそぼう', tts: 'clean' } });
+    // the sender: the words, the mana, a mark that a voice went — no audio
+    expect(mine).toMatchObject({ kind: 'voice', fromMe: true, audioUrl: null, sentVoice: true, text: 'あした、あそぼう', cute: { mana: 0.2 } });
+    expect(mine.sound).toBeUndefined();
+    // the receiver hears it
+    expect(w.s.toView(B, w.rows[0] as never)).toMatchObject({ audioUrl: 'https://r2/mix-ureshii.mp3', sound: { plainUrl: 'https://r2/cute-0.mp3' } });
+    expect(w.dropped).toEqual([drop]);
+    // with no mana the words go alone with the calm line — and the recording's draft is still not kept
+    const poor = talk({ speak: async () => ({ miss: 'noMana' }) });
+    expect(await poor.s.send(U, B, { text: 'あした、あそぼう', spoken: true, drop })).toMatchObject({ kind: 'text', cute: { miss: 'noMana' } });
+    expect(poor.dropped).toEqual([drop]);
+  });
+
+  it('no such member (null), no switch, or no cute voice here: plain words as ever, nothing said about a voice', async () => {
     let asked = 0;
     const recorded = talk({ speak: async () => (asked++, null) });
     const v = await recorded.s.send(U, B, { text: 'うん', spoken: true });
