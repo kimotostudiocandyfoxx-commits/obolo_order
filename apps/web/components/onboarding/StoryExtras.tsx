@@ -9,6 +9,8 @@ import { playPreset, type Preset } from '@/lib/story/sfx';
 import { IconButton } from '@/components/story/parts';
 import { TicketArt } from '@/components/story/Ticket';
 import { micTrouble, useDictation } from '@/lib/useDictation';
+import { RECORD_NOTICE_POLITE } from '@/lib/mic/core';
+import { useRecordNotice } from '@/lib/mic/useRecordNotice';
 import { nameCharsOk } from '@obolo/shared';
 import { LineIcon } from '@/components/LineIcon';
 
@@ -145,6 +147,7 @@ export function VoiceField({
 }) {
   const ref = useRef<HTMLInputElement & HTMLTextAreaElement>(null);
   const mic = useDictation({ field: ref, value, onChange, maxLength, path: 'story' });
+  const recordNote = useRecordNotice(mic.listening, mic.engine);
   // while they speak, their own figure comes up big (M-R149, components/NeoSpeaking.tsx)
   useEffect(() => {
     window.dispatchEvent(new CustomEvent('obolo:speaking', { detail: mic.listening }));
@@ -214,6 +217,7 @@ export function VoiceField({
       </button>
       <p className={`mt-2 text-[15px] font-black ${light ? 'text-amber-700' : 'text-amber-100'}`}>{mic.listening ? '話しおわったら、もう一度タップ' : value ? 'もう一度、話してみる' : '話してみよう'}</p>
       <p className={`mt-0.5 text-center text-[11px] ${sub}`}>{mic.listening ? mic.interim || (mic.phase === 'thinking' ? '文字にしています…' : mic.phase === 'hearing' ? '聞こえています…' : 'きいています…') : (micTrouble(mic.supported ? mic.code : 'unsupported') ?? (placeholder ? `例「${exampleOf(placeholder)}」` : ''))}</p>
+      {recordNote && <p className={`mt-0.5 text-center text-[11px] ${sub}`} data-testid="mic-record-notice">{RECORD_NOTICE_POLITE}</p>}
       {example}
       {/* the emergency exit: only when you cannot speak */}
       {!typing && (

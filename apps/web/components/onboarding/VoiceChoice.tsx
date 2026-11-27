@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { ReplyChips } from '@/components/story/Chat';
-import { micAdvice } from '@/lib/mic/core';
+import { micAdvice, RECORD_NOTICE_POLITE, recordNoticeOnce } from '@/lib/mic/core';
 import { currentEngine, currentEnv } from '@/lib/mic/env';
 import { hear, type HearPhase, type Hearing } from '@/lib/mic/hear';
 import { LineIcon } from '@/components/LineIcon';
@@ -43,6 +43,7 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
   const [mode, setMode] = useState<'mic' | 'listen' | 'keys'>('mic');
   const [heard, setHeard] = useState('');
   const [note, setNote] = useState('');
+  const [recordNote, setRecordNote] = useState(false);
   const [phase, setPhase] = useState<HearPhase | null>(null);
   const [level, setLevel] = useState<number | null>(null);
   const take = useRef<Hearing | null>(null);
@@ -113,6 +114,8 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
     stopNow.current = stop;
     // the recogniser never ends by itself while nothing is said: the cap (the recorder has its own quiet stop)
     if (h.engine() === 'speech') timers.push(setTimeout(stop, 9000));
+    // story chat 2026-11-27: the first take sent to the server says, once, that the voice is not kept
+    setRecordNote(h.engine() === 'record' && recordNoticeOnce());
   };
 
   if (mode === 'keys') return <ReplyChips options={options} onPick={onPick} />;
@@ -120,7 +123,7 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
   return (
     <div className="pb-safe absolute inset-x-0 bottom-0 z-20 flex flex-col items-center px-5 pb-8">
       <p data-testid="voice-choice-line" className="mb-4 min-h-[2rem] rounded-2xl border border-amber-200/15 bg-black/55 px-4 py-1.5 text-center text-[12px] tracking-[0.08em] text-amber-50/85 backdrop-blur" style={{ fontFamily: SERIF }}>
-        {on ? heard || (phase === 'thinking' ? '文字にしています……' : phase === 'hearing' ? '聞こえています……' : '聞いています……') : note || `例：${options.join('・')}`}
+        {on && recordNote && !heard && phase !== 'thinking' ? RECORD_NOTICE_POLITE : on ? heard || (phase === 'thinking' ? '文字にしています……' : phase === 'hearing' ? '聞こえています……' : '聞いています……') : note || `例：${options.join('・')}`}
       </p>
       <button onClick={on ? () => stopNow.current() : listen} className="relative flex h-24 w-24 items-center justify-center rounded-full active:scale-95" aria-label="話してみよう">
         {/* rings of light going out while it listens; a slow breath while it waits */}

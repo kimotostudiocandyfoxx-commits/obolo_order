@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { MicGlyph, SendGlyph } from '@/components/dachi/HoldMic';
 import { MicNotice } from '@/components/mic/MicCheck';
-import { micAdvice, RECORD_NOTICE, recordNoticeOnce, type MicPath } from '@/lib/mic/core';
+import { micAdvice, RECORD_NOTICE, type MicPath } from '@/lib/mic/core';
+import { useRecordNotice } from '@/lib/mic/useRecordNotice';
 import { currentEnv } from '@/lib/mic/env';
 import type { HearPhase } from '@/lib/mic/hear';
 import { useDictation } from '@/lib/useDictation';
@@ -77,12 +78,7 @@ export function TalkComposer({
   const advice = mic.listening ? null : (mic.advice ?? (noMic ? micAdvice('unsupported', currentEnv()) : null));
   // the ring around the mic: the real loudness (the recorder), or a set size while the recogniser hears a voice
   // story chat 2026-11-27: the first take sent to the server says, once, that the voice is not kept
-  const [recordNote, setRecordNote] = useState(false);
-  useEffect(() => {
-    if (mic.listening && mic.engine === 'record') {
-      if (recordNoticeOnce()) setRecordNote(true);
-    } else if (!mic.listening) setRecordNote(false);
-  }, [mic.listening, mic.engine]);
+  const recordNote = useRecordNotice(mic.listening, mic.engine);
   const loud = !mic.listening ? 0 : mic.level !== null ? Math.min(1, mic.level * 1.5) : mic.phase === 'hearing' ? 0.6 : 0.12;
 
   if (hint)

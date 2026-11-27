@@ -212,6 +212,8 @@ const openIn = (env: MicEnv) => (env.os === 'ios' ? 'Safari' : 'Chrome');
 const leaveApp = (env: MicEnv) => (env.os === 'ios' ? 'Safariで開く' : 'ブラウザで開く');
 /** story chat 2026-11-27: said once, the first time a take is sent to the server to be made into words (POST /voice/dictate keeps nothing) */
 export const RECORD_NOTICE = '声は、文字にするためだけに使って、保存しないよ';
+/** the same, in the story's polite register */
+export const RECORD_NOTICE_POLITE = '声は、文字にするためだけに使います。保存はしません。';
 const RECORD_NOTICE_KEY = 'obolo.mic.recordNotice';
 /** true the first time on this device (and marks it said) */
 export function recordNoticeOnce(store: Pick<Storage, 'getItem' | 'setItem'> | null = typeof localStorage === 'undefined' ? null : localStorage): boolean {

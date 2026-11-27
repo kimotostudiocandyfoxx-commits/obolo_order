@@ -4,6 +4,8 @@ import { fastTap } from '@/lib/story/fastTap';
 import { useContext, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { MicAllowed } from '@/components/onboarding/StoryExtras';
 import { useDictation } from '@/lib/useDictation';
+import { RECORD_NOTICE_POLITE } from '@/lib/mic/core';
+import { useRecordNotice } from '@/lib/mic/useRecordNotice';
 import { useHint } from './parts';
 
 /**
@@ -359,6 +361,7 @@ export function MessageBar({
   // the name can be said, too (client 2026-11-22: answer by pressing the mic button)
   const micOk = useContext(MicAllowed);
   const dict = useDictation({ field: input, value: v, onChange: setV, maxLength: 24, path: 'story' });
+  const recordNote = useRecordNotice(dict.listening, dict.engine);
   useEffect(() => {
     if (micOk) return;
     const t = setTimeout(() => input.current?.focus(), 450);
@@ -380,7 +383,7 @@ export function MessageBar({
   return (
     <form onSubmit={send} className="pb-safe absolute inset-x-0 bottom-0 z-[12] px-3" style={{ fontFamily: SANS }}>
       <div className="mx-auto mb-3 max-w-md animate-[chatIn_0.45s_cubic-bezier(.2,.8,.2,1)_both]">
-        <div className="mb-1.5 min-h-[18px] px-2 text-right">{err ? <p className="text-xs text-rose-300">{err}</p> : dict.advice && !dict.listening ? <p className="text-xs leading-relaxed text-amber-100/85">{dict.advice.text}</p> : dict.listening && dict.phase === 'thinking' ? <p className="text-xs text-amber-100/70">文字にしています…</p> : note?.(v)}</div>
+        <div className="mb-1.5 min-h-[18px] px-2 text-right">{err ? <p className="text-xs text-rose-300">{err}</p> : dict.advice && !dict.listening ? <p className="text-xs leading-relaxed text-amber-100/85">{dict.advice.text}</p> : recordNote ? <p className="text-xs text-amber-100/70" data-testid="mic-record-notice">{RECORD_NOTICE_POLITE}</p> : dict.listening && dict.phase === 'thinking' ? <p className="text-xs text-amber-100/70">文字にしています…</p> : note?.(v)}</div>
         <div className="flex items-center gap-2 rounded-full border border-amber-200/30 bg-[rgba(16,11,26,0.72)] p-1.5 pl-4 shadow-[0_10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl">
           <input
             ref={input}
