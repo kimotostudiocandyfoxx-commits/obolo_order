@@ -209,7 +209,7 @@ import { getBlob, putBlob } from './idb';
 import { demoUnfurl } from './demoUnfurl';
 import { tokenStore } from './token';
 import { ApiError, type Api, type Paid } from './types';
-import { afterLookStep, canLookStep, EMPTY_LOOK_STEPS, foodNameByRules, lookStepView, type LookPick4Result, type LookStepResult, type LookStepsInfo, type LookStepState, type LookStepWho } from '@obolo/shared';
+import { afterLookStep, backLookStep, canLookStep, canLookStepBack, EMPTY_LOOK_STEPS, foodNameByRules, lookStepView, type LookPick4Result, type LookStepResult, type LookStepsInfo, type LookStepState, type LookStepWho } from '@obolo/shared';
 import { incantNorm, premiumRequest, songVoiceKey, songVoiceQuote, type IncantView, type SongVoiceQuoteView, type SongVoiceUseView, type SongVoiceVersion } from '@obolo/shared';
 
 /** R17: the passphrase's digests and lengths (its normalized forms) — the demo's only knowledge of it */
@@ -2641,14 +2641,8 @@ export class DemoApi implements Api {
 
   // M-R215 / M-R217: the personality by the rules alone (no model), the card, the small egg
   async batiEgg(food: string, egg?: BatiEggKind) {
-    // M-R334: the food's name only is kept (the rules; the API asks its model); the birth picture's mana from the gem
-    const me = this.patchMe((u) => demoBatiEgg(u, foodNameByRules(food), egg ?? 'sun'));
-    try {
-      this.charge('batiBirth');
-    } catch {
-      /* a balance short of it never stops the story */
-    }
-    return me;
+    // M-R334: the food's name only is kept (the rules; the API asks its model)
+    return this.patchMe((u) => demoBatiEgg(u, foodNameByRules(food), egg ?? 'sun'));
   }
 
   // --- client 2026-11-27 (story M-R334): the look changed step by step, like the API (LookStepsService), in this browser
@@ -2705,6 +2699,13 @@ export class DemoApi implements Api {
     this.saveRound('self', next);
     return { who: 'self', steps: lookStepView(next, this.wornOf('self')), mana: 0 };
   }
+  async lookStepBack(who: LookStepWho): Promise<LookStepResult> {
+    const s = this.stepRound(who);
+    if (!canLookStepBack(s)) throw new ApiError(409, 'LOOK_STEPS_NO_BACK', 'もう前の姿はない');
+    const next = backLookStep(s);
+    this.saveRound(who, next);
+    return { who, steps: lookStepView(next, this.wornOf(who)), mana: 0 };
+  }
   async lookStepFix(who: LookStepWho): Promise<LookStepResult & { me: Me }> {
     const s = this.stepRound(who);
     let mana = 0;
@@ -2735,8 +2736,22 @@ export class DemoApi implements Api {
     return { who, steps: lookStepView(next, this.wornOf(who)), mana: 0 };
   }
 
+  async batiBirthRetry() {
+    // the demo's {bati} is never a stand-in
+    return this.s.users[this.uid()];
+  }
+
   async batiHatch() {
     await new Promise((r) => setTimeout(r, 2500));
+    // client 2026-11-27: the birth picture's mana from the gem, once the picture is there (a short balance never stops the story)
+    const first = this.s.users[this.uid()];
+    if (first.bati && !first.bati.imageUrl && (first.batis ?? []).length <= 1) {
+      try {
+        this.charge('batiBirth');
+      } catch {
+        /* never stops the story */
+      }
+    }
     this.patchMe((u) => (u.bati ? { bati: { ...u.bati, imageUrl: u.bati.imageUrl ?? demoBati(u.bati.food) } } : {}));
     return this.patchMe(demoBatiSync);
   }

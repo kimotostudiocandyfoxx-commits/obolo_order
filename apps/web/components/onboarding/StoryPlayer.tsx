@@ -114,7 +114,7 @@ interface Props {
   /** 'evolve' step decided ({bati}'s look / one's own): the account changed — the caller reads it again */
   onLookFixed?: (who: 'bati' | 'self') => void;
   /** Day 4 'hatch' step: resolves with the Bati picture. */
-  onHatch?: () => Promise<string>;
+  onHatch?: () => Promise<string | { url: string; /** the mana the birth picture took (shown small) */ mana?: number }>;
   /** Day 4 'batiname' step. */
   onBatiName?: (name: string) => Promise<void>;
   /** The Eclipse day's 'order' step: the payment. `ordered` = already paid. */
@@ -166,7 +166,7 @@ const FLY_CHOICES = new Set(['f_d04_fly', 'f_d05_sent_jacket', 'f_d06_sent_song'
 
 const AVATARS: Partial<Record<Speaker, Avatar>> = {
   MONBAN: { src: '/story/avatars/monban.webp', dark: true },
-  OBOLON: { src: '/story/avatars/obolon.webp', dark: true },
+  OBOLON: { src: '/story/avatars/obolon.webp?v=2', dark: true },
   KIMORIN: { src: '/story/avatars/kimorin.webp' },
   たこ焼きブラザー: { src: '/story/avatars/brother.webp' },
   たこ焼きシスター: { src: '/story/avatars/sister.webp' },
@@ -232,6 +232,18 @@ function neoSays() {
   window.dispatchEvent(new CustomEvent('obolo:speaking', { detail: true }));
   setTimeout(() => window.dispatchEvent(new CustomEvent('obolo:speaking', { detail: false })), 1800);
 }
+
+/**
+ * The motions that show a speaker themselves — MONBAN standing at the gate in the film (client 2026-11-27: his cut-out
+ * laid over that very film looked cheap). While one of them plays, the cinema brings no cut-out for their lines: the
+ * film is the close-up, and where `focus` is set the camera pushes in on it for as long as they speak (as on day 1).
+ * Motion 11 (the gate opens, MONBAN steps aside) has no push: the gate is what is watched.
+ */
+const MOTION_CAST: Record<string, { who: string; focus?: string }> = {
+  '9-l': { who: 'MONBAN', focus: '50% 30%' },
+  '11': { who: 'MONBAN' },
+  '28-l': { who: 'MONBAN', focus: '50% 30%' },
+};
 
 /** day 2's stills with KIMORIN drawn in, and the look he has in them */
 const STILL_LOOK: Record<string, string> = {
@@ -890,6 +902,22 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     if (who === 'バティ') return spriteSrc('@bati') ? '@bati' : null;
     return defaultSprite(who);
   };
+  /** the motion playing behind step k (none once a still, a black or a film replaced it) */
+  const motionBehind = (k: number): string | null => {
+    for (let j = k; j >= 0; j--) {
+      const x = steps[j];
+      if (x?.t === 'loop' || x?.t === 'bgvideo' || x?.t === 'video') return String(x.motion);
+      if (x?.t === 'still' || x?.t === 'black' || x?.t === 'film') return null;
+    }
+    return null;
+  };
+  /** the film behind this line shows its speaker (MOTION_CAST): no cut-out over them */
+  const inFilm = (() => {
+    const st = steps[i];
+    if (st?.t !== 'say' || still || sprite) return null;
+    const m = MOTION_CAST[motionBehind(i) ?? ''];
+    return m && m.who === talkId(st.who) ? m : null;
+  })();
   const autoStandee = (() => {
     const st = steps[i];
     // once the look is made, answering puts the visitor's own look big on screen (client 2026-11-22)
@@ -899,6 +927,11 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     // unless the still is itself their painted close-up (its mouth moves) or the screen is black (a voice in the dark)
     if (stageOf(sceneIdAt(steps, i)) === 'cinema') {
       if (blackout || (still && STILL_MOUTH[still] === talkId(st.who))) return null;
+      // already in the film behind (MONBAN at the gate): the film is his close-up
+      if (inFilm) return null;
+      // KIMORIN before he has been seen today (day 2's 「待ちなさい。」 comes from behind, before the look back): a voice
+      // from off the screen — his face does not come up ahead of his entrance
+      if (talkId(st.who) === 'KIMORIN' && !lookBefore(i - 1)) return null;
       return cinemaSprite(st.who);
     }
     if (!still) return null;
@@ -1227,12 +1260,18 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const talkHidden = chatOn && step?.t === 'choice' && !!step.pics;
   // the stage of this scene (lib/onboarding/stage.ts): days 1–2 the story's own close-ups, day 3 on the side-by-side row
   const sceneNow = sceneIdAt(steps, i);
-  const cinema = stageOf(sceneNow) === 'cinema';
+  const stage = stageOf(sceneNow);
+  const cinema = stage === 'cinema';
+  // day 1 (client 2026-11-27): as before the cinema — the motion plays on, the first chat bubbles over it, the camera
+  // moves on the picture; nobody is cut out and brought forward
+  const film = stage === 'film';
+  /** the story's own staging (film or cinema), not the side-by-side row */
+  const ownStage = cinema || film;
   // the cinema's push for this line, from the same reading of the line as the directed row (a shout / a muse)
   const cineKind = cinema && talkSays ? lineKind(sayText(talkSays.who, talkSays.text, v)) : null;
   const cineShot = cineKind === 'shout' ? 'punch' : cineKind === 'muse' ? 'push' : null;
   // the row's background: the scene's plate (made for the figures' size) or the still with its cast painted out
-  const plate = !cinema ? plateFor(sceneNow, still) : undefined;
+  const plate = !ownStage ? plateFor(sceneNow, still) : undefined;
   const [plateAspect, setPlateAspect] = useState(0.5625);
   useEffect(() => {
     if (!plate) return;
@@ -1240,11 +1279,11 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     im.onload = () => setPlateAspect(im.naturalWidth / im.naturalHeight);
     im.src = plateUrl(plate.image);
   }, [plate]);
-  const cleanStill = (img: string) => (!cinema && STILL_CLEAN[img] ? STILL_CLEAN[img] : img);
-  const sharpBack = !!plate || (!!still && !!STILL_CLEAN[still] && !cinema);
-  const ambientPlanet = !cinema ? planetOf(sceneNow, still) : null;
-  const lineMode = linesOf(sceneNow, cinema ? 'cinema' : 'row', subsFlag);
-  const talkOn = !cinema && started && !!step && (chatOn || (charsOnStage.length > 0 && ['wait', 'vanish', 'spark'].includes(step.t)));
+  const cleanStill = (img: string) => (!ownStage && STILL_CLEAN[img] ? STILL_CLEAN[img] : img);
+  const sharpBack = !!plate || (!!still && !!STILL_CLEAN[still] && !ownStage);
+  const ambientPlanet = !ownStage ? planetOf(sceneNow, still) : null;
+  const lineMode = linesOf(sceneNow, stage, subsFlag);
+  const talkOn = !ownStage && started && !!step && (chatOn || (charsOnStage.length > 0 && ['wait', 'vanish', 'spark'].includes(step.t)));
   const sysNow = chatOn && step && chatLine(step, '')?.kind === 'sys' ? log[log.length - 1] : null;
   const talkDock = Math.max(84, chatOn && step ? chatBottom(step) : 30);
   // Keep the question visible while the visitor answers it (e.g. "お前の名前は？" above the name field).
@@ -1257,7 +1296,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   // (their plain picture added for the line: the others step back)
   let castNames = sprite ? (Array.isArray(sprite) ? sprite : [sprite]).map((n) => (talkOn && n && (speakerOfSprite(n) || n === '@me') ? '' : n)) : [];
   let castSpeaking = speakerSprite(step?.t === 'say' ? step.who : prompt?.who, spriteNames);
-  if (cinema && talkSays && castSpeaking === OFFSTAGE && !blackout && !screen) {
+  if (cinema && talkSays && castSpeaking === OFFSTAGE && !blackout && !screen && !inFilm && !(talkId(talkSays.who) === 'KIMORIN' && !lookBefore(i - 1))) {
     const pic = cinemaSprite(talkSays.who);
     if (pic && spriteSrc(pic)) {
       castNames = [...castNames, pic];
@@ -1278,7 +1317,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         <img src={backdrop} alt="" className="absolute inset-0 h-full w-full scale-110 object-cover opacity-40 blur-2xl" aria-hidden />
       )}
       {/* the background layers move with the camera (〔カメラ：寄る／揺れ〕) */}
-      <Camera move={cam?.move ?? null} focus={cam?.focus}>
+      {/* cinema: a speaker who stands in the film itself gets the camera's push on the film (MOTION_CAST) */}
+      <Camera move={cinema && inFilm?.focus ? 'in' : (cam?.move ?? null)} focus={cinema && inFilm?.focus ? inFilm.focus : cam?.focus}>
       {/* double-buffered motion videos (see DualVideo) */}
       <div className="absolute inset-0 z-0">
         {[videoA, videoB].map((ref, k) => (
@@ -1416,7 +1456,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       )}
       {ticketArt && <TicketArt dest={ticketArt.dest} leaving={ticketArt.leaving} stamped={(id) => stampList.includes(id)} />}
       {invite && <Invitation inviter={v.inviter} message={v.inviterMessage} settled={step?.t !== 'invitation'} leaving={inviteLeaving} fromMotion={steps.slice(0, i + 1).reverse().find((x) => x.t === 'invitation')?.t === 'invitation' && (steps.slice(0, i + 1).reverse().find((x) => x.t === 'invitation') as { fromMotion?: boolean }).fromMotion} onOpened={() => run(iRef.current + 1)} />}
-      {cinema && (chatOn || chatLeaving || chatWas.current) && (
+      {ownStage && (chatOn || chatLeaving || chatWas.current) && (
         // cinema (days 1–2): the story's thread. It and its shade fade out over 0.3 s when they go (QA 12 R35), with
         // what they showed last (chatWas keeps it mounted the frame it went out on: QA 13 R35)
         <div className="pointer-events-none absolute inset-0 z-[10] transition-opacity duration-300" style={{ opacity: chatOn ? 1 : 0 }}>
@@ -1452,7 +1492,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
             })()
           ) : (
           <ChatLog
-            closeUp
+            closeUp={cinema}
             entries={chatOn ? chatEntries : lastChat.current.entries}
             talking={chatOn && talking}
             reveal={chatOn ? reveal : leavingReveal}
@@ -1485,7 +1525,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           labels={step.options.map((o) => o.label)}
           onPick={(k) => {
             addLine({ id: `c${i}`, kind: 'me', text: step.options[k].label });
-            if (cinema) neoSays();
+            if (ownStage) neoSays();
             choose(step.key, step.options[k].label, step.options[k].goto);
           }}
         />
@@ -1509,7 +1549,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
             if (words) remember(`${step.key}Words`, words);
             // the bubble shows what was said, as said (client 2026-11-22); the matched answer only picks the way on
             addLine({ id: `c${i}`, kind: 'me', text: words || step.options[k].label });
-            if (cinema) neoSays();
+            if (ownStage) neoSays();
             choose(step.key, step.options[k].label, step.options[k].goto);
           }}
         />
@@ -1843,6 +1883,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           image={step.who === 'bati' ? v.batiImage : v.look}
           egg={step.who === 'bati' ? eggOf(stateRef.current.answers, v.story) : undefined}
           noImage={v.mediaOk === false}
+          film={step.who === 'self'}
           onSaid={(t) => addLine({ id: `es${i}-${Date.now()}`, kind: 'me', text: t })}
           onLimit={() => addLine({ id: `el${i}`, kind: 'them', who: step.limit.who, text: step.limit.text })}
           onStep={(url, used) => {
@@ -1925,6 +1966,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           food={v.batiFood ?? ''}
           egg={eggOf(stateRef.current.answers, v.story)}
           onHatch={() => (onHatch ? onHatch() : Promise.resolve(''))}
+          fallback="/onboarding/bati-stand-food.webp"
           onDone={(url) => {
             remember('batiImage', url);
             run(iRef.current + 1);

@@ -71,6 +71,12 @@ export class LookController {
     return this.steps.base(userId, parseBody(LookBaseBody, body).mediaId);
   }
 
+  @Post('look/steps/back')
+  @HttpCode(200)
+  stepBack(@UserId() userId: string, @Body() body: unknown) {
+    return this.steps.back(userId, parseBody(LookWhoBody, body).who);
+  }
+
   @Post('look/steps/fix')
   @HttpCode(200)
   stepFix(@UserId() userId: string, @Body() body: unknown, @Req() req: Request, @Headers('x-admin-token') token?: string) {
@@ -136,6 +142,14 @@ export class LookController {
   async hatch(@UserId() userId: string, @Req() req: Request) {
     await rateLimit(this.kv, `hatch:${userId}`, 4, 60);
     return this.look.hatch(userId, origin(req));
+  }
+
+  /** client 2026-11-27: the stand-in {bati} gets its real birth picture (the normal price; given back when it fails again) */
+  @Post('bati/birth/retry')
+  @HttpCode(200)
+  async retryBirth(@UserId() userId: string, @Req() req: Request) {
+    await rateLimit(this.kv, `hatch:${userId}`, 4, 60);
+    return this.look.retryBirth(userId, origin(req));
   }
 
   /** the NEO look standing without a background (M-R149), drawn once per look */

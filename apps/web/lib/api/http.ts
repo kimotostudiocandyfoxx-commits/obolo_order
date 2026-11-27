@@ -743,6 +743,9 @@ export class HttpApi implements Api {
   lookStepBase(mediaId: string) {
     return this.req<Awaited<ReturnType<Api['lookStepBase']>>>('POST', '/me/look/steps/base', { mediaId });
   }
+  lookStepBack(who: Parameters<Api['lookStepBack']>[0]) {
+    return this.req<Awaited<ReturnType<Api['lookStepBack']>>>('POST', '/me/look/steps/back', { who });
+  }
   lookStepFix(who: Parameters<Api['lookStepFix']>[0]) {
     return this.req<Awaited<ReturnType<Api['lookStepFix']>>>('POST', '/me/look/steps/fix', { who });
   }
@@ -769,6 +772,9 @@ export class HttpApi implements Api {
   }
   batiRole(role: BatiRole, id?: string) {
     return this.req<Me>('POST', '/me/bati/role', { role, id });
+  }
+  batiBirthRetry() {
+    return this.req<Awaited<ReturnType<Api['batiBirthRetry']>>>('POST', '/me/bati/birth/retry');
   }
   batiHatch() {
     return this.req<Awaited<ReturnType<Api['batiHatch']>>>('POST', '/me/bati/hatch');
