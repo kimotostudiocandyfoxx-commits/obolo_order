@@ -631,10 +631,14 @@ export const MAKE_COST: Readonly<ManaPrices> = Object.freeze(manaPrices());
  * made without mana, a post that flies under another title, the admin backfill — is absorbed too (a paid song's is in its
  * price: TITLE_VOICE_CHARS).
  */
-export const USAGE_FEATURES = ['chat', 'search', 'draw', 'voice', 'spell', 'lyrics', 'compass', 'songEdit', 'videoEdit', 'novel', 'unfurl', 'listen', 'memory', 'look', 'story', 'dachi', 'figures', 'titleVoice', 'other'] as const;
+export const USAGE_FEATURES = ['chat', 'search', 'draw', 'voice', 'spell', 'lyrics', 'compass', 'songEdit', 'videoEdit', 'novel', 'unfurl', 'listen', 'memory', 'look', 'story', 'dachi', 'figures', 'titleVoice', 'cutRetry', 'other'] as const;
 export type UsageFeature = (typeof USAGE_FEATURES)[number];
-/** the free costs the operator absorbs (recorded, never taken from the member) */
-export const ABSORBED_FEATURES: readonly string[] = ['dachi', 'figures', 'titleVoice'];
+/**
+ * the free costs the operator absorbs (recorded, never taken from the member). 'cutRetry' (client 2026-11-27): what a
+ * cut-out's retries cost outside a paid making — the repaints after a failed check and the checks of those
+ * (LookService.ladder); the member pays a picture once, never its retries
+ */
+export const ABSORBED_FEATURES: readonly string[] = ['dachi', 'figures', 'titleVoice', 'cutRetry'];
 
 export interface AccrualStep {
   /** mana to take now (a ledger row of this many, reason 'usage') */
