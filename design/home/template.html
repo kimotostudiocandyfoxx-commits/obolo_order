@@ -765,8 +765,9 @@ button:focus-visible,.item:focus-visible,.home:focus-visible{outline:3px solid v
 const A=/*ASSETS*/{};
 const PAGELINK=/*PAGELINK*/null;if(PAGELINK){const l=document.getElementById('pagelink');l.href=PAGELINK.href;l.textContent=PAGELINK.label;l.hidden=false}
 const ME='ミナト★';
-const PEOPLE=[{n:'MIKIE⭐︎DRILL',k:'dachi',inv:1},{n:'KIMORIN⭐︎',k:'dachi'},{n:'ユウキ',k:'dachi'},{n:'たこ焼きシスター',k:'oshi'},{n:'nana',k:'oshi'}];
-const FAR=['はるか','ショウ','れい','ぽんず','kei','みお'];
+/* M-R342: only the story cast appears (KIMORIN as dachi; MIKIE joins after Order; oshi come from ROSTER) */
+const PEOPLE=[{n:'KIMORIN⭐︎',k:'dachi'}];
+const FAR=[];
 /* one row per planet: the whole home is this config */
 const RES={venus:[['longg','ロングG','……いい音だろ。','l'],['bossg','ボスG','誰だ、お前ら。……ネオか。','r']],mercury:[['freezie','フリージー','音に乗っけると、100倍だ。','l'],['salmon','サーモン','おかえり。おかえり。','r']],mars:[['hippo','ヒポキン','……いい画だ。また見せに来い。','l']],uranus:[['croco','クロコパトラ','あら、いらっしゃい。','l']],neptune:[['boombox','ラジカセの侍','遊んでいくか。','r']],pluto:[['ribbon','リボンのもこもこ','おはなし、きかせて！','l']]};
 const P={
@@ -796,7 +797,7 @@ const P={
   card:i=>({big:'🕹',cap:'ゲーム'})}
 };
 const $=id=>document.getElementById(id);
-let mode='anime',cur='saturn', items=[], oshi=new Set(['たこ焼きシスター','nana']), playing=null;
+let mode='anime',cur='saturn', items=[], oshi=new Set(), playing=null;
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),1600)}
 function sprite(k){return (mode==='anime'&&A['sp2-'+k])||A['sp-'+k]||''}
 function render(){
@@ -823,7 +824,7 @@ function render(){
   else if(cur==='saturn'){const d=document.createElement('button');d.type='button';d.className='recdoor';d.setAttribute('aria-label','自分のレコードを開く');d.style.left='72%';d.style.top='52%';d.onclick=()=>openProf(ME);$('sky').appendChild(d);const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,ax=.6*W,ay=.505*H,bx=.99*W,by=.465*H,am=document.createElement('button');am.type='button';am.className='armdoor';am.setAttribute('aria-label','自分のレコードを開く');am.style.left=ax+'px';am.style.top=(ay-22)+'px';am.style.width=Math.hypot(bx-ax,by-ay)+'px';am.style.transform=`rotate(${Math.atan2(by-ay,bx-ax)}rad)`;am.onclick=()=>openProf(ME);$('sky').appendChild(am)}
   if(cur==='saturn'){if(window.MYKORO===undefined&&!window.__picked&&!A['kor4-user']){window.__picked=1;korPicker(()=>{$('sky').innerHTML='';setupRoll()})}setupRoll();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));closeAll();return}
   const spots=[[20,33],[72,31],[46,27],[84,44],[15,47],[58,41],[33,40]];
-  const list=[...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n))];
+  const list=[...ROSTER(cur)];
   list.forEach((p,i)=>{const [x,y]=spots[i%spots.length];add({...p,x,y,i,isNew:i<2})});
   FAR.forEach((n,i)=>add({n,k:'far',x:[7,16,25,75,84,93][i],y:[53,56,51,52,57,54][i],i:i+7,far:1}));
   document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));
@@ -1576,7 +1577,7 @@ function lyricsStop(){if(LYR){LYR.stop();LYR=null}}
 function stopSong(){lyricsStop();if(SONG){const s=SONG;SONG=null;try{if(s.g&&AC){s.g.gain.setTargetAtTime(0,AC.currentTime,.08);setTimeout(()=>{try{s.stop()}catch(e){}},400)}else s.stop()}catch(e){}}}
 function playSong(k){const c=getAC(),buf=VBUF[k];stopSong();if(c&&buf&&buf!=='loading'){const s=c.createBufferSource(),g=c.createGain();g.gain.value=.9;s.buffer=buf;s.loop=true;s.connect(g);g.connect(c.destination);s.start();s.g=g;s.__t0=c.currentTime;SONG=s;return buf.duration}
   if(A[k]){const au=VEL.length?VEL[VEL.length-1]:new Audio();try{au.pause();au.src=A[k];au.loop=true;au.currentTime=0;au.play().catch(()=>{});SONG={stop:()=>au.pause(),__el:au}}catch(e){}return au.duration&&isFinite(au.duration)?au.duration:60}return 60}
-const OSHIX=()=>[...oshi].filter(n=>!PEOPLE.some(p=>p.n===n)&&!['たこ焼きブラザー','nana','れい','みお'].includes(n)).map(n=>({n,k:'oshi'}));
+const OSHIX=()=>[...oshi].filter(n=>!PEOPLE.some(p=>p.n===n)&&!ROSTER('uranus').some(o=>o.n===n)).map(n=>({n,k:'oshi'}));
 function setupMer(){setTimeout(()=>{if(cur!=='mercury')return;predecode(['exp-mercury-sea',...CONT.mercury.flatMap(c=>['isl-mercury-'+c.k,'exp-mercury-'+c.k]),'isl-mercury-me'])},1200);
   const base=[...ROSTER(cur)];
   SH=[];SHQ=base.slice(MMAX);base.slice(0,MMAX).forEach((o,i)=>SH.push(makeSh(o,i,i)));
