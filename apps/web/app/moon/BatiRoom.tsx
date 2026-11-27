@@ -3,8 +3,7 @@
 import { useEffect, useState } from 'react';
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
-import { BatiLook } from '@/components/bati/BatiLook';
-import { isActiveMember, LOOK_LOCKED_LINE } from '@obolo/shared';
+import { BATI_LOOK_LOCKED_LINE, isActiveMember, LOOK_LOCKED_LINE } from '@obolo/shared';
 import { LookStepsPanel } from '@/components/look/LookSteps';
 import { batiLine, batiLineVoiceOf } from '@/lib/onboarding/batiLine';
 
@@ -64,14 +63,11 @@ export function RoomSheet({ mode, onClose, onDone, name }: { mode: RoomMode; onC
   // client 2026-11-27: an Obolo Order member changes {bati} (進化) and their own look (変身) step by step — the same round
   // as day 2 (shared lookSteps.ts): each step from the look it has now, 8 a round, the mana per step
   if (me && isActiveMember(me)) return <StepsRoom mode={mode} onClose={onClose} onDone={onDone} />;
-  // a resident: the looks decided on day 2 stay as they are until Obolo Order — {bati} says so. (No account — the review
-  // page — keeps the four cards of the story.)
-  if (mode === 'bati') return me ? <LockedSheet onClose={onClose} /> : <BatiLookSheet onClose={onClose} onDone={onDone} />;
+  // a resident: the looks decided on day 2 stay as they are until Obolo Order — {bati} says so (M-R338: the free four-card
+  // restyle is gone)
+  if (mode === 'bati') return <LockedSheet onClose={onClose} />;
   return <MeSheet onClose={onClose} onDone={onDone} name={name} />;
 }
-
-/** PLACEHOLDER (story chat): {bati}'s words when a resident asks to change {bati}'s look after day 2 ({self}: its 一人称) */
-export const BATI_LOOK_LOCKED_LINE = '{self}の姿は、もう決まったよ。Obolo Orderに入ったら、また進化できるからね！';
 
 function LockedSheet({ onClose }: { onClose: () => void }) {
   const { me } = useAuth();
@@ -141,28 +137,6 @@ function StepsRoom({ mode, onClose, onDone }: { mode: RoomMode; onClose: () => v
           <path d="M6 6l12 12M18 6 6 18" />
         </svg>
       </button>
-    </div>
-  );
-}
-
-function BatiLookSheet({ onClose, onDone }: { onClose: () => void; onDone: (line: string) => void }) {
-  const { me, setMe } = useAuth();
-  const bati = me?.bati?.name || 'バティ';
-  return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60" onClick={onClose}>
-      <div className="card max-h-[92svh] w-full max-w-xl overflow-y-auto rounded-b-none px-4 pb-[calc(20px+env(safe-area-inset-bottom))] pt-4" onClick={(e) => e.stopPropagation()}>
-        <BatiLook
-          bati={bati}
-          ask="これで、決まり？"
-          auto={false}
-          onMe={setMe}
-          onClose={onClose}
-          onDecided={() => {
-            onDone(LINES.bati.done);
-            onClose();
-          }}
-        />
-      </div>
     </div>
   );
 }

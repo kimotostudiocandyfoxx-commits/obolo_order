@@ -2,7 +2,9 @@ import { HttpStatus, Inject, Injectable, Logger, Optional } from '@nestjs/common
 import { lookPick4Prompt, lookStepPrompt, moderateLookWish, type GeneratedImage, type ImageProvider, type LlmProvider } from '@obolo/ai';
 import {
   afterLookStep,
+  backLookStep,
   canLookStep,
+  canLookStepBack,
   EMPTY_LOOK_STEPS,
   LOOK_PICK4_HEADS,
   lookStepView,
@@ -44,7 +46,8 @@ export function stepsOf(u: Pick<Row, 'onboardingJson'>, who: LookStepWho): LookS
   if (!raw) return { ...EMPTY_LOOK_STEPS };
   try {
     const s = JSON.parse(raw) as Partial<LookStepState>;
-    return { used: Number(s.used) || 0, fixed: !!s.fixed, url: typeof s.url === 'string' ? s.url : null };
+    const back = Array.isArray(s.back) ? s.back.filter((x): x is string | null => x === null || typeof x === 'string') : [];
+    return { used: Number(s.used) || 0, fixed: !!s.fixed, url: typeof s.url === 'string' ? s.url : null, back };
   } catch {
     return { ...EMPTY_LOOK_STEPS };
   }
@@ -91,7 +94,7 @@ export class LookStepsService {
 
   private async save(userId: string, who: LookStepWho, s: LookStepState): Promise<Row> {
     const cur = await this.user(userId);
-    const j = { ...((cur.onboardingJson ?? {}) as Record<string, string>), [stepsKey(who)]: JSON.stringify({ used: s.used, fixed: s.fixed, url: s.url ?? null }) };
+    const j = { ...((cur.onboardingJson ?? {}) as Record<string, string>), [stepsKey(who)]: JSON.stringify({ used: s.used, fixed: s.fixed, url: s.url ?? null, back: s.back ?? [] }) };
     const [nu] = await this.db.write.update(users).set({ onboardingJson: j, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
     return nu;
   }
@@ -224,6 +227,16 @@ export class LookStepsService {
     const next: LookStepState = { used: 0, fixed: false, url: m.url };
     await this.save(userId, 'self', next);
     return { who: 'self', steps: lookStepView(next, u.avatarUrl), mana: 0 };
+  }
+
+  /** 〔↶ ひとつ前の姿にもどす〕 (M-R338): the picture before the last step again; the steps used and their mana stay */
+  async back(userId: string, who: LookStepWho): Promise<LookStepResult> {
+    const u = await this.user(userId);
+    const s = stepsOf(u, who);
+    if (!canLookStepBack(s)) throw apiError(HttpStatus.CONFLICT, 'LOOK_STEPS_NO_BACK', 'もう前の姿はない');
+    const next = backLookStep(s);
+    const nu = await this.save(userId, who, next);
+    return { who, steps: lookStepView(next, this.worn(nu, who)), mana: 0 };
   }
 
   /** 〔{bati}の姿はこれだ〕 / 〔この姿にする〕: the round is decided and its picture worn */

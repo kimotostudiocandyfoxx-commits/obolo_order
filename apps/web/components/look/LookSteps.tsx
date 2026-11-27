@@ -167,6 +167,21 @@ export function LookStepsPanel({
     setBusy(false);
   };
 
+  const goBack = async () => {
+    if (busy) return;
+    setBusy(true);
+    setErr(null);
+    try {
+      const r = await getApi().lookStepBack(who);
+      setView(r.steps);
+      setTook(null);
+      if (r.steps.url) onStep?.(r.steps.url, r.steps.used);
+    } catch {
+      setErr('うまく戻せなかった……もういちど');
+    }
+    setBusy(false);
+  };
+
   // decided: (the film of the bowl of water →) the round is closed and the look worn → (the look full screen →) on
   const settle = async () => {
     try {
@@ -235,6 +250,12 @@ export function LookStepsPanel({
           style={{ filter: 'drop-shadow(0 0 26px rgba(255,220,150,0.45))' }}
         />
         {who === 'bati' && egg && <EggMark egg={egg} className="absolute right-[12%] top-[8%]" />}
+        {/* M-R338: small, at the picture's corner, over the two choices — the look before the last step (the count and the mana stay) */}
+        {phase === 'shown' && view.canBack && (
+          <button type="button" disabled={busy} onClick={() => void goBack()} data-testid="look-step-back" className="absolute bottom-1 left-[6%] rounded-full border border-white/20 bg-black/45 px-2.5 py-1 text-[10px] tracking-wider text-white/70 backdrop-blur-sm disabled:opacity-40" style={{ fontFamily: SERIF }}>
+            ↶ ひとつ前の姿にもどす
+          </button>
+        )}
         {phase === 'cast' && <span aria-hidden className="look-rise absolute inset-x-[10%] bottom-0 top-0 rounded-[45%]" />}
       </div>
 

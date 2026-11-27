@@ -209,7 +209,7 @@ import { getBlob, putBlob } from './idb';
 import { demoUnfurl } from './demoUnfurl';
 import { tokenStore } from './token';
 import { ApiError, type Api, type Paid } from './types';
-import { afterLookStep, canLookStep, EMPTY_LOOK_STEPS, foodNameByRules, lookStepView, type LookPick4Result, type LookStepResult, type LookStepsInfo, type LookStepState, type LookStepWho } from '@obolo/shared';
+import { afterLookStep, backLookStep, canLookStep, canLookStepBack, EMPTY_LOOK_STEPS, foodNameByRules, lookStepView, type LookPick4Result, type LookStepResult, type LookStepsInfo, type LookStepState, type LookStepWho } from '@obolo/shared';
 import { incantNorm, premiumRequest, songVoiceKey, songVoiceQuote, type IncantView, type SongVoiceQuoteView, type SongVoiceUseView, type SongVoiceVersion } from '@obolo/shared';
 
 /** R17: the passphrase's digests and lengths (its normalized forms) — the demo's only knowledge of it */
@@ -2682,6 +2682,13 @@ export class DemoApi implements Api {
     const next: LookStepState = { used: 0, fixed: false, url: c.url };
     this.saveRound('self', next);
     return { who: 'self', steps: lookStepView(next, this.wornOf('self')), mana: 0 };
+  }
+  async lookStepBack(who: LookStepWho): Promise<LookStepResult> {
+    const s = this.stepRound(who);
+    if (!canLookStepBack(s)) throw new ApiError(409, 'LOOK_STEPS_NO_BACK', 'もう前の姿はない');
+    const next = backLookStep(s);
+    this.saveRound(who, next);
+    return { who, steps: lookStepView(next, this.wornOf(who)), mana: 0 };
   }
   async lookStepFix(who: LookStepWho): Promise<LookStepResult & { me: Me }> {
     const s = this.stepRound(who);

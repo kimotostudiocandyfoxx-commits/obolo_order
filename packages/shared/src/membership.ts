@@ -53,4 +53,9 @@ export function profileLookLocked(s: LookLockLike): boolean {
  * PLACEHOLDER (story chat, client 2026-11-25): {bati}'s words when a resident asks to change their own look after it
  * was confirmed — provisional until the story chat writes them ({neo}: the member's name)
  */
-export const LOOK_LOCKED_LINE = '{neo}の姿は、もう決まったよ。Obolo Orderに入ったら、また変えられるからね。{self}の着せかえなら、いつでもできるよ！';
+export const LOOK_LOCKED_LINE = '{neo}の姿は、もう決まったよ。Obolo Orderに入ったら、また変えられるからね。';
+/**
+ * PLACEHOLDER (story chat, client 2026-11-27 / M-R338): {bati}'s words when a resident asks to change {bati}'s own look —
+ * decided on day 2 (D03-S005b) and kept until Obolo Order ({self}: its 一人称)
+ */
+export const BATI_LOOK_LOCKED_LINE = '{self}の姿は、もう決まったよ。Obolo Orderに入ったら、また進化できるからね！';

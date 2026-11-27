@@ -71,6 +71,12 @@ export class LookController {
     return this.steps.base(userId, parseBody(LookBaseBody, body).mediaId);
   }
 
+  @Post('look/steps/back')
+  @HttpCode(200)
+  stepBack(@UserId() userId: string, @Body() body: unknown) {
+    return this.steps.back(userId, parseBody(LookWhoBody, body).who);
+  }
+
   @Post('look/steps/fix')
   @HttpCode(200)
   stepFix(@UserId() userId: string, @Body() body: unknown, @Req() req: Request, @Headers('x-admin-token') token?: string) {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { afterLookStep, BATI_BIRTH_MODEL, canLookStep, eggMark, EMPTY_LOOK_STEPS, foodNameByRules, LOOK_STEP_MAX, LOOK_STEP_MODEL, LookStepBody, lookStepChoices, lookStepsLeft, lookStepsMana, lookStepView, type LookStepState } from './lookSteps';
+import { afterLookStep, backLookStep, BATI_BIRTH_MODEL, canLookStep, canLookStepBack, eggMark, EMPTY_LOOK_STEPS, foodNameByRules, LOOK_STEP_MAX, LOOK_STEP_MODEL, LookStepBody, lookStepChoices, lookStepsLeft, lookStepsMana, lookStepView, type LookStepState } from './lookSteps';
 import { CUT_CHECK_USD, DEFAULT_COST_RATES, estimateJpy, MAKE_COST, MAKE_COST_ESTIMATE, manaFor10, pictureUsd } from './manaPrice';
 
 describe('the step counter (進化 / 変身 あと◯回)', () => {
@@ -13,7 +13,7 @@ describe('the step counter (進化 / 変身 あと◯回)', () => {
       left.push(lookStepsLeft(s.used));
     }
     expect(left).toEqual([8, 7, 6, 5, 4, 3, 2, 1, 0]);
-    expect(s).toEqual({ used: 8, fixed: false, url: 'u7' });
+    expect(s).toMatchObject({ used: 8, fixed: false, url: 'u7' });
     expect(canLookStep(s)).toBe(false);
     expect(() => afterLookStep(s, 'u8')).toThrow('LOOK_STEPS_DONE');
   });
@@ -25,8 +25,27 @@ describe('the step counter (進化 / 変身 あと◯回)', () => {
     expect(lookStepsLeft(-3)).toBe(8);
     expect(lookStepsLeft(99)).toBe(0);
     expect(lookStepsLeft(Number.NaN)).toBe(8);
-    expect(lookStepView({ used: 3, fixed: false }, 'worn')).toEqual({ used: 3, left: 5, fixed: false, url: 'worn' });
+    expect(lookStepView({ used: 3, fixed: false }, 'worn')).toEqual({ used: 3, left: 5, fixed: false, url: 'worn', canBack: false });
     expect(lookStepView({ used: 3, fixed: false, url: 'now' }, 'worn').url).toBe('now');
+  });
+  it('〔↶ ひとつ前の姿にもどす〕: one picture back at a time, down to the look the round began with; the count does not come back', () => {
+    let s: LookStepState = { used: 0, fixed: false, url: 'base' };
+    expect(canLookStepBack(s)).toBe(false);
+    s = afterLookStep(afterLookStep(s, 'a'), 'b');
+    expect(canLookStepBack(s)).toBe(true);
+    s = backLookStep(s);
+    expect(s).toMatchObject({ used: 2, url: 'a' });
+    s = backLookStep(s);
+    expect(s).toMatchObject({ used: 2, url: 'base' });
+    expect(canLookStepBack(s)).toBe(false);
+    expect(() => backLookStep(s)).toThrow('LOOK_STEPS_NO_BACK');
+    // {bati}: the round began with the look worn (no picture of its own)
+    const b = backLookStep(afterLookStep(EMPTY_LOOK_STEPS, 'x'));
+    expect(b.url).toBeNull();
+    expect(lookStepsLeft(b.used)).toBe(7);
+    // a step after going back goes on from the picture gone back to
+    expect(afterLookStep(s, 'c')).toMatchObject({ used: 3, url: 'c', back: ['base'] });
+    expect(canLookStepBack({ fixed: true, back: ['a'] })).toBe(false);
   });
   it('the two choices stay after every step; after the 8th only deciding is left', () => {
     expect(lookStepChoices({ used: 0, fixed: false })).toEqual({ decide: false, again: false, last: false });

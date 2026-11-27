@@ -112,6 +112,24 @@ describe('{bati} の進化 (D03-S005b)', () => {
     expect(t.worn).toEqual([]);
   });
 
+  it('〔↶ ひとつ前の姿にもどす〕: the picture before again — nothing painted, nothing given back, the count stays', async () => {
+    const t = make();
+    await expect(t.s.back('u', 'bati')).rejects.toMatchObject({ response: { error: { code: 'LOOK_STEPS_NO_BACK' } } });
+    await t.s.step('u', { who: 'bati', wish: '翼' }, 'https://x');
+    await t.s.step('u', { who: 'bati', wish: '王冠' }, 'https://x');
+    const b = await t.s.back('u', 'bati');
+    expect(b).toMatchObject({ mana: 0, steps: { used: 2, left: 6, url: 'https://x/bati-0.png', canBack: true } });
+    const b2 = await t.s.back('u', 'bati');
+    // back to the look it was born with (the one worn)
+    expect(b2.steps).toMatchObject({ used: 2, url: 'https://x/bati-born.png', canBack: false });
+    expect(t.charged).toEqual(['lookStep', 'lookStep']);
+    expect(t.refunded).toEqual([]);
+    expect(t.prompts).toHaveLength(2);
+    // deciding now wears nothing new
+    await t.s.fix('u', 'bati', 'https://x');
+    expect(t.worn).toEqual([]);
+  });
+
   it('eight steps at most: the ninth is refused, nothing charged, nothing painted', async () => {
     const t = make();
     for (let k = 0; k < LOOK_STEP_MAX; k++) await t.s.step('u', { who: 'bati', wish: `その${k}` }, 'https://x');

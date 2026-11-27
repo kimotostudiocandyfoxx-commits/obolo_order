@@ -308,6 +308,8 @@ export interface Api {
   /** the four first pictures of one's own look (from the photo, or from the wish when no photo may be used) */
   lookPick4(body: { photo?: { mime: 'image/jpeg' | 'image/png' | 'image/webp'; data: string }; wish?: string; via?: 'folder' | 'camera' }): Promise<import('@obolo/shared').LookPick4Result>;
   lookStepBase(mediaId: string): Promise<import('@obolo/shared').LookStepResult>;
+  /** 〔↶ ひとつ前の姿にもどす〕: the picture before the last step again (the count and the mana stay) */
+  lookStepBack(who: import('@obolo/shared').LookStepWho): Promise<import('@obolo/shared').LookStepResult>;
   /** the round is decided: the picture is worn (one's own look is confirmed with it) */
   lookStepFix(who: import('@obolo/shared').LookStepWho): Promise<import('@obolo/shared').LookStepResult & { me: Me }>;
   /** an Obolo Order member starts a new round from the look worn now */
