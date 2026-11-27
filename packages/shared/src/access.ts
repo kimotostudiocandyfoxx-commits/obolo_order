@@ -48,15 +48,15 @@ export function outOfMana(s: SpendState): boolean {
 }
 
 /**
- * Client 2026-11-27 (cuteVoice.ts): for a member who is NOT recorded (under 13; 13〜15 without the guardian's consent;
- * the branch without photo and voice), {bati}'s read-aloud is not made with no mana left (the words stay) — a member
- * and the first journey too. A recorded member is as before (outOfMana).
- * M-R342 (the same day): every {bati} now speaks in the same fixed voice (batiFixedVoice.ts), recorded or not; the
- * rule was written when a not-recorded member's {bati} had the default cute voice and is kept as it is until the
- * client says otherwise (open question: one rule for everyone?).
+ * {bati}'s voice at 0 mana — ONE rule for everyone (client 2026-11-27, with M-R342: every {bati} speaks in the same
+ * fixed voice, so the rule no longer looks at recorded / not recorded, nor at Obolo Order):
+ *  - during the first journey (onFirstJourney: the journey's constants, never a day number) everyone hears {bati};
+ *  - after it, with no mana left, {bati}'s read-aloud is not made — the words stay (the Moon chat answers in text,
+ *    a post read by {bati} falls back to the device's reading voice).
+ * The price is unchanged: the small cost 'voice', taken a whole mana at a time as it adds up.
  */
-export function defaultVoiceSilent(o: { recorded: boolean; balance: number }): boolean {
-  return !o.recorded && Math.floor(o.balance) <= 0;
+export function batiVoiceSilent(s: Pick<SpendState, 'journeyDay' | 'journeyCompletedAt' | 'balance'>): boolean {
+  return !onFirstJourney(s) && Math.floor(s.balance) <= 0;
 }
 
 export type BatiGate = { allow: true } | { allow: false; rest: BatiRest };

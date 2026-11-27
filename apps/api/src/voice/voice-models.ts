@@ -42,7 +42,8 @@ export const defaultCuteVoiceId = (cfg: Partial<Pick<AppConfig, 'FISH_DEFAULT_VO
 export type BatiVoiceIds = Partial<Pick<AppConfig, 'FISH_BATI_MOON_VOICE_ID' | 'FISH_BATI_SUN_VOICE_ID'>>;
 
 /**
- * {bati}'s voice (M-R342, client 2026-11-27): the FIXED Fish voice of the egg it was born from — ♀ Moon / ♂ Sun, the
+ * {bati}'s voice (M-R342, client 2026-11-27): the FIXED Fish voice of the egg it was born from (both eggs the same
+ * voice for now) — the
  * server's FISH_BATI_MOON_VOICE_ID / FISH_BATI_SUN_VOICE_ID, else the shared constants (batiFixedVoice.ts). The same for
  * every member (recorded or not, under 13 too) and for the 2nd / 3rd {bati} (each its own egg's). No egg known (no
  * {bati} born yet): the Moon egg's. Never null: the voice exists whenever the voice service is connected.

@@ -1,6 +1,6 @@
 'use client';
 
-import { batiStoryVoice, type BatiEggKind } from '@obolo/shared';
+import { BATI_FIXED_VOICES, BATI_VOICE_DEFAULT_EGG, batiStoryVoice, type BatiEggKind } from '@obolo/shared';
 import { masterBus, unlockAudio } from '@/lib/onboarding/audio';
 import { voiceKey, voiceable } from './voice';
 
@@ -41,8 +41,9 @@ export function saveMix(m: Mix) {
 /** the story's speaker name of {bati} */
 const BATI = 'バティ';
 /**
- * M-R342 (client 2026-11-27): {bati} speaks in the fixed voice of its egg (♀ Moon / ♂ Sun). Its pre-made lines are
- * kept once per egg (story-voices.ts: under batiStoryVoice(egg)). Which egg: the one just chosen in the story playing
+ * M-R342 (client 2026-11-27): {bati} speaks in the fixed voice of its egg (both eggs the same voice for now). Its
+ * pre-made lines are kept once per distinct voice (story-voices.ts: under batiStoryVoice(egg) — the same key for eggs
+ * that share a voice). Which egg: the one just chosen in the story playing
  * now (day 2 / SYS-S003: StoryPlayer, while it is on screen), else the account's {bati} in the chat (lib/auth).
  * null: not known.
  */
@@ -59,8 +60,11 @@ export const batiVoiceEgg = (): BatiEggKind | null => eggs.scene ?? eggs.account
  * The pre-made file of a line: {bati}'s in its egg's voice; while that file is not made yet (or the egg is not known),
  * the line's old voice stands in rather than silence. Everyone else: their one file.
  */
-export function storyVoiceFile(m: Record<string, string>, who: string, text: string, act?: string, egg: BatiEggKind | null = batiVoiceEgg()): string | null {
-  const own = who === BATI && egg ? (m[voiceKey(batiStoryVoice(egg), act, text)] ?? m[voiceKey(batiStoryVoice(egg), undefined, text)]) : undefined;
+export function storyVoiceFile(m: Record<string, string>, who: string, text: string, act?: string, egg: BatiEggKind | null = batiVoiceEgg(), voices: Readonly<Record<BatiEggKind, string>> = BATI_FIXED_VOICES): string | null {
+  // the egg not known: when every egg has the same voice, that one set is right anyway
+  const all = new Set(Object.values(voices)).size === 1;
+  const as = who === BATI && (egg || all) ? batiStoryVoice(egg ?? BATI_VOICE_DEFAULT_EGG, voices) : null;
+  const own = as ? (m[voiceKey(as, act, text)] ?? m[voiceKey(as, undefined, text)]) : undefined;
   return own ?? m[voiceKey(who, act, text)] ?? null;
 }
 

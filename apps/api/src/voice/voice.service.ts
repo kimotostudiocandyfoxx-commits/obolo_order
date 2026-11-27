@@ -1,7 +1,7 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { type LlmProvider, moderateText } from '@obolo/ai';
 import { LLM } from '../infra/tokens';
-import { batiSpeakSpeed, defaultVoiceSilent, VOICE_MAX_BYTES, VOICE_MIME_TYPES, VOICE_SCRIPTS, VOICE_STYLES, type Me, type RegisterVoiceBody, type SpeakBody, type VoiceSlot } from '@obolo/shared';
+import { batiSpeakSpeed, batiVoiceSilent, VOICE_MAX_BYTES, VOICE_MIME_TYPES, VOICE_SCRIPTS, VOICE_STYLES, type Me, type RegisterVoiceBody, type SpeakBody, type VoiceSlot } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { AppConfig, CONFIG } from '../config';
@@ -160,8 +160,8 @@ export class VoiceService {
     const key = this.key();
     if ((await moderateText(body.text)).flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'CONTENT_FLAGGED', 'This cannot be read aloud');
     if (body.slot === 'bati') {
-      // M-R342: {bati}'s fixed voice, under the same rule as a post read by {bati} (no voice at 0 mana for a member
-      // who is not recorded) — the caller falls back to the device's reading voice
+      // M-R342: {bati}'s fixed voice, under the same rule as a post read by {bati} (after the first journey, no voice
+      // at 0 mana) — the caller falls back to the device's reading voice
       const v = await this.readByBati(userId, body, origin);
       if (!v) throw apiError(HttpStatus.CONFLICT, 'NO_VOICE_NOW', "The partner's voice is not available now");
       return v;
@@ -184,9 +184,9 @@ export class VoiceService {
   async readByBati(userId: string, body: Omit<SpeakBody, 'slot'>, origin: string): Promise<{ url: string; mediaId: string } | null> {
     if (!this.cfg.FISH_API_KEY) return null;
     const [u] = await this.db.write.select().from(users).where(eq(users.id, userId));
-    // client 2026-11-27 (kept as it was through M-R342): a member who is not recorded hears {bati}'s read-aloud only
-    // while there is mana (no voice at 0: the caller's fallback, the device's reading voice, costs nothing)
-    if (u && defaultVoiceSilent({ recorded: canUseMedia(u), balance: await this.balance(userId) })) return null;
+    // M-R342, one rule for everyone (shared batiVoiceSilent): after the first journey, no voice with no mana left
+    // (the caller's fallback, the device's reading voice, costs nothing); during the journey everyone hears {bati}
+    if (u && batiVoiceSilent({ journeyDay: u.journeyDay ?? 1, journeyCompletedAt: u.journeyCompletedAt ?? null, balance: await this.balance(userId) })) return null;
     return this.readWith(batiVoiceId(this.cfg, u ? activeBati(u)?.egg : null), userId, { ...body, slot: 'bati' }, origin, this.key());
   }
 

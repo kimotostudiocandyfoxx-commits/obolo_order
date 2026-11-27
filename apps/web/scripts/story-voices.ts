@@ -15,9 +15,11 @@
  * formants, saturation, low end). A Fish model is made once from the recording (Gemini writes the
  * transcript) and its id is written back to the config.
  *
- * M-R342 (client 2026-11-27): {bati} speaks in the fixed Fish voice of its egg (♀ Moon / ♂ Sun — the ids in
- * packages/shared/src/batiFixedVoice.ts, not in the config). Every バティ line is made once per egg and kept under
- * batiStoryVoice(egg) ("バティ:moon" / "バティ:sun"); the player picks the member's {bati}'s (lib/story/lineVoice.ts).
+ * M-R342 (client 2026-11-27): {bati} speaks in the fixed Fish voice of its egg (the ids in
+ * packages/shared/src/batiFixedVoice.ts, not in the config). Every バティ line is made once per DISTINCT voice and kept
+ * under batiStoryVoice(egg): both eggs have the same voice now, so each line is made once ("バティ:moon"); with two
+ * voices it would be made twice ("バティ:moon" / "バティ:sun"). The player picks the member's {bati}'s
+ * (lib/story/lineVoice.ts).
  * "chosen.バティ" in the config is the old voice (Gemini Leda +3): its files stay as the stand-in for a line until
  * both egg files of that line are made, then go; it is also what name-lines.json lists (the server swaps in the egg's
  * voice per member). New files are made by running this workflow by hand (Actions → Story voices).
@@ -244,17 +246,19 @@ function voiceFor(name: string, l: { act?: string; text: string }): { s: Spec; b
 
 /** M-R342: {bati}'s story speaker, and its two fixed voices (a Fish voice that exists already: no recording, no model made) */
 const BATI = 'バティ';
-const EGGS = ['moon', 'sun'] as const;
-const batiSpec = (egg: (typeof EGGS)[number]): Spec => ({ fish: 'fixed', model: BATI_FIXED_VOICES[egg], label: egg === 'moon' ? '月のたまご' : '太陽のたまご' });
+const ALL_EGGS = ['moon', 'sun'] as const;
+/** one egg per distinct voice (eggs that share a voice share the files) */
+const EGGS = ALL_EGGS.filter((egg) => batiStoryVoice(egg) === `${BATI}:${egg}`);
+const batiSpec = (egg: (typeof EGGS)[number]): Spec => ({ fish: 'fixed', model: BATI_FIXED_VOICES[egg], label: ALL_EGGS.filter((e) => batiStoryVoice(e) === batiStoryVoice(egg)).map((e) => (e === 'moon' ? '月のたまご' : '太陽のたまご')).join('・') });
 /**
- * The files a line is made as: one in the speaker's voice — {bati}'s once per egg, each in that egg's fixed voice
+ * The files a line is made as: one in the speaker's voice — {bati}'s once per distinct egg voice
  * (the story's "tempo" 1.3 with the pitch as it is: the same atempo as every line).
  */
 function takesOf(name: string, v: { s: Spec; brief: string }): { as: string; s: Spec; brief: string }[] {
   return name === BATI ? EGGS.map((egg) => ({ as: batiStoryVoice(egg), s: batiSpec(egg), brief: v.brief })) : [{ as: name, ...v }];
 }
-/** the names a speaker's files are kept under ({bati}: the old voice's and the two eggs') */
-const keptAs = (name: string) => (name === BATI ? [BATI, ...EGGS.map(batiStoryVoice)] : [name]);
+/** the names a speaker's files are kept under ({bati}: the old voice's and the egg voices') */
+const keptAs = (name: string) => (name === BATI ? [BATI, ...EGGS.map((egg) => batiStoryVoice(egg))] : [name]);
 
 /**
  * public/story/voices/name-lines.json: every line with a member's name in it ({name} {neo} {bati} …), in
@@ -388,7 +392,7 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
       const v = voiceFor(name, l);
       if (!v) continue;
       if (!voiceable(l.text)) skipped++;
-      // M-R342: {bati}'s line once per egg (kept under "バティ:moon" / "バティ:sun"), everyone else's once
+      // M-R342: {bati}'s line once per distinct egg voice (kept under "バティ:<egg>"), everyone else's once
       for (const { as, s, brief } of takesOf(name, v)) {
         if (!voiceable(l.text)) {
           // a line that starts with a name (「{name}、お前は…」): its words after the name are voiced too
@@ -477,7 +481,7 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
   if (retimed) log.push(`- ⏩ 前に作った声 ${retimed}個を ${TEMPO}倍速・頭の無音なしにした`);
   // cleanup: voices of lines that are no longer in any part of the story
   const alive = new Set<string>();
-  // M-R342: a {bati} line's old voice (the stand-in) goes once both of its egg voices are there
+  // M-R342: a {bati} line's old voice (the stand-in) goes once all of its egg voices are there
   const bothEggs = (act: string | undefined, text: string) => EGGS.every((egg) => manifest[voiceKey(batiStoryVoice(egg), act, text)]);
   for (const [who, ls] of said)
     for (const l of ls) {

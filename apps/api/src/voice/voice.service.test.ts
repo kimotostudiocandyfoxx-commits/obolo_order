@@ -1,4 +1,4 @@
-import { BATI_FIXED_VOICES, MEDIA_CONSENT_VERSION } from '@obolo/shared';
+import { JOURNEY_DONE, MEDIA_CONSENT_VERSION } from '@obolo/shared';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { VoiceService } from './voice.service';
 
@@ -10,7 +10,7 @@ const U = 'a0000000-0000-4000-8000-000000000001';
 const bati = (id: string, egg: 'moon' | 'sun') => ({ id, name: id, egg, seed: 'カレー', seedKind: 'food', personality: 'genki', self: 'ぼく', call: '{neo}', catchphrase: '', intro: '', imageUrl: null, createdAt: new Date().toISOString() });
 
 /** the service over one user row; Fish stands in (what it was asked is kept) */
-function world(o: { egg?: 'moon' | 'sun'; recorded?: boolean; balance?: number; own?: string | null; cfg?: Record<string, unknown> } = {}) {
+function world(o: { egg?: 'moon' | 'sun'; recorded?: boolean; balance?: number; own?: string | null; journeyDay?: number; cfg?: Record<string, unknown> } = {}) {
   const user = {
     id: U,
     voiceSelfId: 'self-model',
@@ -25,6 +25,8 @@ function world(o: { egg?: 'moon' | 'sun'; recorded?: boolean; balance?: number; 
     batiId: 'b1',
     batisJson: [bati('b1', o.egg ?? 'moon')],
     createdAt: new Date(),
+    journeyDay: o.journeyDay ?? 2,
+    journeyCompletedAt: null,
   };
   const db = { write: { select: () => ({ from: () => ({ where: async () => [user] }) }) } };
   const media = { storeAudio: vi.fn(async () => ({ id: 'm1', url: 'https://cdn/m1.mp3' })) };
@@ -36,7 +38,7 @@ function world(o: { egg?: 'moon' | 'sun'; recorded?: boolean; balance?: number; 
       return new Response(new Uint8Array([1, 2, 3]), { status: 200 });
     }),
   );
-  const s = new VoiceService({ FISH_API_KEY: 'k', FISH_MODEL: 's2.1-pro', ...o.cfg } as never, db as never, media as never, {} as never);
+  const s = new VoiceService({ FISH_API_KEY: 'k', FISH_MODEL: 's2.1-pro', FISH_BATI_MOON_VOICE_ID: 'girl', FISH_BATI_SUN_VOICE_ID: 'boy', ...o.cfg } as never, db as never, media as never, {} as never);
   (s as unknown as { balance: () => Promise<number> }).balance = async () => o.balance ?? 5;
   return { s, user, sent, media };
 }
@@ -47,10 +49,10 @@ describe('M-R342 (client 2026-11-27): the bati slot is the fixed voice of the {b
   it('a post read by {bati}: the egg’s voice — never the member’s own model — at 1.3× with the reading style’s speed on top', async () => {
     const moon = world({ egg: 'moon' });
     expect(await moon.s.readByBati(U, { text: 'やっほー' }, 'http://api')).toEqual({ url: 'https://cdn/m1.mp3', mediaId: 'm1' });
-    expect(moon.sent[0]).toMatchObject({ text: 'やっほー', reference_id: BATI_FIXED_VOICES.moon, prosody: { speed: 1.3 } });
+    expect(moon.sent[0]).toMatchObject({ text: 'やっほー', reference_id: 'girl', prosody: { speed: 1.3 } });
     const sun = world({ egg: 'sun' });
     await sun.s.readByBati(U, { text: 'やっほー', style: 'yukkuri' }, 'http://api');
-    expect(sun.sent[0]).toMatchObject({ text: '[calm] やっほー', reference_id: BATI_FIXED_VOICES.sun, prosody: { speed: 1.04 } });
+    expect(sun.sent[0]).toMatchObject({ text: '[calm] やっほー', reference_id: 'boy', prosody: { speed: 1.04 } });
   });
 
   it('the server’s own ids and speed win', async () => {
@@ -61,7 +63,7 @@ describe('M-R342 (client 2026-11-27): the bati slot is the fixed voice of the {b
 
   it('voiceId: bati is always there (its egg’s voice); self is the member’s own model', async () => {
     const w = world({ egg: 'sun', own: null });
-    expect(await w.s.voiceId(U, 'bati')).toBe(BATI_FIXED_VOICES.sun);
+    expect(await w.s.voiceId(U, 'bati')).toBe('boy');
     expect(await w.s.voiceId(U, 'self')).toBe('self-model');
     expect(code(await w.s.voiceId(U, 'kororin').catch((e: unknown) => e))).toBe('VOICE_NOT_REGISTERED');
   });
@@ -82,17 +84,22 @@ describe('M-R342 (client 2026-11-27): the bati slot is the fixed voice of the {b
   });
 });
 
-describe('the mana rule of {bati}’s read-aloud (client 2026-11-27, kept through M-R342)', () => {
-  it('a member who is not recorded: no voice at 0 mana (the device’s reading voice instead), the voice with mana', async () => {
-    const none = world({ recorded: false, balance: 0 });
-    expect(await none.s.readByBati(U, { text: 'やっほー' }, 'http://api')).toBeNull();
-    expect(none.sent).toHaveLength(0);
-    const some = world({ recorded: false, balance: 1, egg: 'sun' });
-    expect(await some.s.readByBati(U, { text: 'やっほー' }, 'http://api')).not.toBeNull();
-    expect(some.sent[0].reference_id).toBe(BATI_FIXED_VOICES.sun);
+describe('M-R342: {bati}’s voice at 0 mana — one rule for everyone', () => {
+  it('during the first journey everyone hears {bati}, at 0 mana too (recorded or not)', async () => {
+    for (const recorded of [true, false]) {
+      const w = world({ recorded, balance: 0, journeyDay: 2 });
+      expect(await w.s.readByBati(U, { text: 'やっほー' }, 'http://api')).not.toBeNull();
+    }
   });
-  it('a recorded member: the voice at 0 mana too', async () => {
-    const w = world({ recorded: true, balance: 0 });
-    expect(await w.s.readByBati(U, { text: 'やっほー' }, 'http://api')).not.toBeNull();
+  it('after the journey: no voice at 0 mana (the device’s reading voice instead) — recorded or not; the voice with mana', async () => {
+    for (const recorded of [true, false]) {
+      const none = world({ recorded, balance: 0, journeyDay: JOURNEY_DONE });
+      expect(await none.s.readByBati(U, { text: 'やっほー' }, 'http://api')).toBeNull();
+      expect(none.sent).toHaveLength(0);
+      expect(code(await none.s.speak(U, { slot: 'bati', text: 'やっほー' }, 'http://api').catch((e: unknown) => e))).toBe('NO_VOICE_NOW');
+      const some = world({ recorded, balance: 1, journeyDay: JOURNEY_DONE, egg: 'sun' });
+      expect(await some.s.readByBati(U, { text: 'やっほー' }, 'http://api')).not.toBeNull();
+      expect(some.sent[0].reference_id).toBe('boy');
+    }
   });
 });

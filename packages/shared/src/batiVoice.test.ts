@@ -32,8 +32,8 @@ describe('M-R250: the fallback (Gemini) {bati} voices by egg × personality', ()
 });
 
 describe('M-R342: every {bati} speaks in the fixed voice of its egg, at 1.3×', () => {
-  it('♀ the Moon egg: 活発なマスコットキャラ; ♂ the Sun egg: 元気な少年', () => {
-    expect(BATI_FIXED_VOICES).toEqual({ moon: '270c409c18d14a60a81ad8c2f24007b9', sun: 'ed07fac0ac144ba6b7f6b208d57ace05' });
+  it('both eggs: 活発なマスコットキャラ (the ♂ voice first chosen is not used); still two constants', () => {
+    expect(BATI_FIXED_VOICES).toEqual({ moon: '270c409c18d14a60a81ad8c2f24007b9', sun: '270c409c18d14a60a81ad8c2f24007b9' });
     expect(batiFixedVoice('moon')).toBe(BATI_FIXED_VOICES.moon);
     expect(batiFixedVoice('sun')).toBe(BATI_FIXED_VOICES.sun);
   });
@@ -51,8 +51,11 @@ describe('M-R342: every {bati} speaks in the fixed voice of its egg, at 1.3×', 
     expect(batiSpeakSpeed(0.9)).toBe(1.17);
     expect(batiSpeakSpeed(1.8)).toBe(2);
   });
-  it('the story’s pre-made lines are kept per egg', () => {
+  it('the story’s pre-made lines are kept once per distinct voice: the same voice for both eggs → one set', () => {
     expect(batiStoryVoice('moon')).toBe('バティ:moon');
-    expect(batiStoryVoice('sun')).toBe('バティ:sun');
+    expect(batiStoryVoice('sun')).toBe('バティ:moon');
+    // split again later: each egg its own set
+    expect(batiStoryVoice('sun', { moon: 'a', sun: 'b' })).toBe('バティ:sun');
+    expect(batiStoryVoice('moon', { moon: 'a', sun: 'b' })).toBe('バティ:moon');
   });
 });

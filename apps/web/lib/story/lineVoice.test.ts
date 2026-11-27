@@ -1,7 +1,11 @@
-import { batiStoryVoice } from '@obolo/shared';
+import { batiStoryVoice as sharedStoryVoice } from '@obolo/shared';
 import { afterEach, describe, expect, it } from 'vitest';
 import { batiVoiceEgg, setBatiVoiceEgg, setSceneBatiVoiceEgg, storyVoiceFile } from './lineVoice';
 import { voiceKey } from './voice';
+
+/** the eggs with a voice each (the story keeps one set of lines per distinct voice) */
+const SPLIT = { moon: 'a', sun: 'b' };
+const batiStoryVoice = (egg: 'moon' | 'sun') => sharedStoryVoice(egg, SPLIT);
 
 const LINE = 'いっしょに行こう！';
 const manifest = (o: { old?: boolean; moon?: boolean; sun?: boolean }) => ({
@@ -19,20 +23,23 @@ afterEach(() => {
 describe('M-R342: {bati}’s pre-made story lines play in the voice of its egg', () => {
   it('the egg’s own file (♀ Moon / ♂ Sun)', () => {
     const m = manifest({ old: true, moon: true, sun: true });
-    expect(storyVoiceFile(m, 'バティ', LINE, undefined, 'moon')).toBe('/moon.mp3');
-    expect(storyVoiceFile(m, 'バティ', LINE, undefined, 'sun')).toBe('/sun.mp3');
+    expect(storyVoiceFile(m, 'バティ', LINE, undefined, 'moon', SPLIT)).toBe('/moon.mp3');
+    expect(storyVoiceFile(m, 'バティ', LINE, undefined, 'sun', SPLIT)).toBe('/sun.mp3');
+    // both eggs the same voice (as now): the one set, whichever the egg
+    expect(storyVoiceFile(m, 'バティ', LINE, undefined, 'sun')).toBe('/moon.mp3');
+    expect(storyVoiceFile(manifest({ old: true, moon: true }), 'バティ', LINE, undefined, 'sun')).toBe('/moon.mp3');
   });
 
   it('not made yet (or the egg not known): the line’s old voice stands in — never silence because of the change', () => {
     expect(storyVoiceFile(manifest({ old: true }), 'バティ', LINE, undefined, 'sun')).toBe('/old.mp3');
-    expect(storyVoiceFile(manifest({ old: true, moon: true }), 'バティ', LINE, undefined, 'sun')).toBe('/old.mp3');
-    expect(storyVoiceFile(manifest({ old: true, moon: true, sun: true }), 'バティ', LINE, undefined, null)).toBe('/old.mp3');
+    expect(storyVoiceFile(manifest({ old: true, moon: true }), 'バティ', LINE, undefined, 'sun', SPLIT)).toBe('/old.mp3');
+    expect(storyVoiceFile(manifest({ old: true }), 'バティ', LINE, undefined, null)).toBe('/old.mp3');
     expect(storyVoiceFile(manifest({}), 'バティ', LINE, undefined, 'sun')).toBeNull();
   });
 
   it('a line made with a stage direction is found for the egg without it too', () => {
     const m = { [voiceKey(batiStoryVoice('sun'), undefined, LINE)]: '/sun.mp3' };
-    expect(storyVoiceFile(m, 'バティ', LINE, 'にっこり', 'sun')).toBe('/sun.mp3');
+    expect(storyVoiceFile(m, 'バティ', LINE, 'にっこり', 'sun', SPLIT)).toBe('/sun.mp3');
   });
 
   it('everyone else keeps their one voice', () => {
@@ -45,7 +52,7 @@ describe('M-R342: {bati}’s pre-made story lines play in the voice of its egg',
     expect(batiVoiceEgg()).toBe('moon');
     setSceneBatiVoiceEgg('sun');
     expect(batiVoiceEgg()).toBe('sun');
-    expect(storyVoiceFile(manifest({ moon: true, sun: true }), 'バティ', LINE)).toBe('/sun.mp3');
+    expect(storyVoiceFile(manifest({ moon: true, sun: true }), 'バティ', LINE, undefined, batiVoiceEgg(), SPLIT)).toBe('/sun.mp3');
     setSceneBatiVoiceEgg(undefined);
     expect(batiVoiceEgg()).toBe('moon');
   });

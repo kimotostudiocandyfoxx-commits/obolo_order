@@ -1,6 +1,7 @@
 import { HttpStatus, Inject, Injectable, Logger, type OnModuleInit } from '@nestjs/common';
+import { timed } from '@obolo/ai';
 import { BATI_VOICE_MAX_SECONDS, BATI_VOICE_MIN_SECONDS, BATI_VOICE_SPEED, batiDefaultVoice, batiSpeakSpeed, type BatiVoiceBody, type Me } from '@obolo/shared';
-import { eq } from 'drizzle-orm';
+import { and, asc, eq, gt, isNotNull, isNull, sql } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { CONFIG, type AppConfig } from '../config';
 import { Database } from '../db/db';
@@ -10,6 +11,7 @@ import { QUEUE } from '../infra/tokens';
 import { activeBati } from '../look/batis';
 import { MediaService } from '../media/media.service';
 import { toMe } from '../users/users.service';
+import { costScope } from '../wallet/cost-scope';
 import { toMp3 } from './audio';
 import { canUseMedia } from './media-consent';
 import { batiVoiceId, VOICE_MODELS, type BatiVoiceIds, type VoiceModels } from './voice-models';
@@ -18,6 +20,27 @@ export { canUseMedia, hasMediaConsent } from './media-consent';
 
 type User = typeof users.$inferSelect;
 type Patch = Partial<Pick<User, 'voiceBatiId' | 'voiceBatiUrl' | 'voiceBatiState'>>;
+
+/**
+ * users.onboarding_json['voice.unpitched'] = '1': this member's voice model was made from the recording as it is
+ * (M-R342). No mark: a model from before, made from the recording pitched up two semitones — remakeOld's work.
+ */
+export const VOICE_UNPITCHED = 'voice.unpitched';
+export const voiceUnpitched = (u: Pick<User, 'onboardingJson'>) => ((u.onboardingJson ?? {}) as Record<string, string>)[VOICE_UNPITCHED] === '1';
+
+/** POST /admin/voice-models-remake: one page */
+export interface RemakeResult {
+  /** members looked at (those with an old model and a stored recording, in the order of their ids) */
+  looked: number;
+  remade: number;
+  /** not now: the voice may not be used (no current agreement / age) — nothing is sent anywhere; tried again on a later run */
+  notAllowed: number;
+  /** the stored recording could not be read (gone): left as it is */
+  noRecording: number;
+  failed: number;
+  /** pass as `after` for the next page; null = the end */
+  next: string | null;
+}
 
 /**
  * Two things that share the day-2 scene (D03-S005 「声を聞かせる」, M-R246 / M-R247) and, since M-R342, nothing else:
@@ -69,6 +92,86 @@ export class BatiVoiceService implements OnModuleInit {
     return nu;
   }
 
+  /** the mark of a model made without the pitch change (only that key of onboarding_json is written) */
+  protected async mark(userId: string, on: boolean): Promise<void> {
+    await this.db.write
+      .update(users)
+      .set({ onboardingJson: on ? sql`coalesce(${users.onboardingJson}, '{}'::jsonb) || ${JSON.stringify({ [VOICE_UNPITCHED]: '1' })}::jsonb` : sql`coalesce(${users.onboardingJson}, '{}'::jsonb) - ${VOICE_UNPITCHED}` })
+      .where(eq(users.id, userId));
+  }
+
+  /**
+   * the members whose model is an old one: made by make() ('ready') before M-R342 (no mark), with the recording it was
+   * made from still stored — a page in the order of their ids. Never a member without a stored recording, never a
+   * voice registered another way (no state), never a deleted account.
+   */
+  protected async oldModels(after: string | null, limit: number): Promise<User[]> {
+    return this.db.read
+      .select()
+      .from(users)
+      .where(
+        and(
+          isNull(users.deletedAt),
+          isNotNull(users.voiceBatiId),
+          isNotNull(users.voiceBatiUrl),
+          eq(users.voiceBatiState, 'ready'),
+          sql`coalesce(${users.onboardingJson} ->> ${VOICE_UNPITCHED}, '') <> '1'`,
+          ...(after ? [gt(users.id, after)] : []),
+        ),
+      )
+      .orderBy(asc(users.id))
+      .limit(limit);
+  }
+
+  /**
+   * M-R342, the operator's one-off (POST /admin/voice-models-remake): the members' voice models made before M-R342 —
+   * from the recording pitched up two semitones — made again from the stored recording as it is, `limit` members at a
+   * time. Idempotent: a model made (or made again) without the pitch change is marked (VOICE_UNPITCHED) and never
+   * looked at again; a failure leaves the old model in place for the next run. The same checks as make(): the voice
+   * may be used NOW (the current agreement, the age) — otherwise nothing is sent and the member is left for a later
+   * run — and a recording deleted or made again meanwhile wins. The cost (our CPU; Fish's model call is not billed
+   * per call in our books) is the operator's: filed under 'voiceRemake' (ABSORBED_FEATURES), never the member's.
+   */
+  async remakeOld(after: string | null, limit: number): Promise<RemakeResult> {
+    const out: RemakeResult = { looked: 0, remade: 0, notAllowed: 0, noRecording: 0, failed: 0, next: null };
+    if (!this.models.enabled) return out;
+    const rows = await this.oldModels(after, limit);
+    for (const u of rows) {
+      out.looked++;
+      if (!canUseMedia(u)) {
+        out.notAllowed++;
+        continue;
+      }
+      const url = u.voiceBatiUrl!;
+      const old = u.voiceBatiId!;
+      try {
+        const done = await costScope.run({ feature: 'voiceRemake', userId: u.id }, async () => {
+          const raw = await this.media.audioByUrl(u.id, url);
+          if (!raw) return 'noRecording' as const;
+          const audio = await timed('cpu', 'voice-remake', () => this.convert(raw, 0));
+          const id = await this.models.create({ title: `obolo-${u.id.slice(0, 8)}-own`, audio, filename: 'own.mp3', mime: 'audio/mpeg' });
+          const now = await this.row(u.id);
+          if (!now || now.voiceBatiUrl !== url || now.voiceBatiId !== old || !canUseMedia(now)) {
+            // deleted, recorded again or no longer allowed while it was being made: the new model goes
+            await this.models.remove(id).catch(() => undefined);
+            return 'failed' as const;
+          }
+          await this.save(u.id, { voiceBatiId: id });
+          await this.mark(u.id, true);
+          void this.models.remove(old).catch(() => undefined);
+          return 'remade' as const;
+        });
+        out[done]++;
+      } catch (e) {
+        this.log.warn(`voice model not remade for ${u.id}: ${String(e)}`);
+        out.failed++;
+      }
+    }
+    out.next = rows.length === limit ? rows[rows.length - 1].id : null;
+    this.log.log(`voice models remade: ${JSON.stringify(out)}`);
+    return out;
+  }
+
   async record(userId: string, body: BatiVoiceBody, origin: string): Promise<Me> {
     const u = await this.row(userId);
     if (!u) throw apiError(HttpStatus.UNAUTHORIZED, 'UNAUTHENTICATED', 'User not found');
@@ -117,6 +220,7 @@ export class BatiVoiceService implements OnModuleInit {
       }
       const old = now.voiceBatiId;
       await this.save(p.userId, { voiceBatiId: id, voiceBatiState: 'ready' });
+      await this.mark(p.userId, true);
       if (old && old !== id) void this.models.remove(old).catch(() => undefined);
       this.log.log(`bati voice ready for ${p.userId}`);
     } catch (e) {
@@ -130,6 +234,7 @@ export class BatiVoiceService implements OnModuleInit {
     const u = await this.row(userId);
     if (!u) throw apiError(HttpStatus.UNAUTHORIZED, 'UNAUTHENTICATED', 'User not found');
     const nu = await this.save(userId, { voiceBatiId: null, voiceBatiUrl: null, voiceBatiState: 'none' });
+    await this.mark(userId, false);
     if (u.voiceBatiId) await this.models.remove(u.voiceBatiId).catch((e) => this.log.warn(`delete model: ${String(e)}`));
     if (u.voiceBatiUrl) await this.media.removeByUrl(userId, u.voiceBatiUrl).catch((e) => this.log.warn(`delete recording: ${String(e)}`));
     return toMe(nu);

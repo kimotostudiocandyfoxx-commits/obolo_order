@@ -35,9 +35,8 @@ export type BatiVoiceState = 'none' | 'making' | 'ready' | 'failed';
 
 /**
  * the ⓘ next to the mic (M-R247: shown only to those who tap it). M-R342: what the voice is used for now, after the
- * client's decision (「ユーザーの声は、ダチへの声メッセージに使う」).
- * PLACEHOLDER (P-LEGAL-1): the start-of-app agreement (legal.ts) still says the voice makes {bati}'s voice — its
- * wording is the specialist's to change.
+ * client's decision (「ユーザーの声は、ダチへの声メッセージに使う」); the start-of-app agreement says the same
+ * (legal.ts, MEDIA_CONSENT_VERSION '2026-11-27.1').
  */
 export const BATI_VOICE_EXPLAIN = 'あなたの声は、ダチへの声メッセージを、あなたの声できれいに読むために使います。ほかには使いません。あとで設定から消せます';
 
@@ -96,15 +95,20 @@ export type BatiVoiceBody = z.infer<typeof BatiVoiceBody>;
 /**
  * The start-of-app agreement (M-R247): the terms of use and the privacy policy, with what photos and voice are used for.
  * Raise the version when the words change; the server keeps the version agreed to.
- * M-R252: the words are the draft's (legal.ts: CONSENT_TEXT, TERMS_DRAFT, PRIVACY_DRAFT); '.2' = that draft.
+ * M-R252: the words are the draft's (legal.ts: CONSENT_TEXT, TERMS_DRAFT, PRIVACY_DRAFT); '2026-11-22.2' = that draft.
+ * '2026-11-27.1' (M-R342, client approved): the use of the voice changed — no longer to make {bati}'s voice; for the
+ * ダチ voice messages (a voice model of the member that reads their words) and to turn what is said into words.
+ * A new version asks EVERY account to agree again the next time the app opens (ConsentGate: agreedNow), 13〜15 with
+ * the guardian again; until then the server treats the account as not recorded (canUseMedia false: no photo or
+ * voice is used, nothing new is recorded).
  * PLACEHOLDER (P-LEGAL-1): the texts are drafts; the wording and the flow are checked by a specialist (a lawyer) before
  * launch (M-R248).
  */
-export const MEDIA_CONSENT_VERSION = '2026-11-22.2';
+export const MEDIA_CONSENT_VERSION = '2026-11-27.1';
 /** the M-R247 summary lines (the agreement before M-R252; the screen now shows CONSENT_TEXT) */
 export const CONSENT_POINTS = [
   '利用規約とプライバシーポリシーに同意します。',
-  '写真と声は、あなたの姿と相方（バティ）を作るためだけに使い、ほかのことには使いません。',
+  '写真は、あなたの姿を作るためだけに使います。声は、話した言葉を文字にするためと、ダチへの声メッセージ（あなたの声のモデルが、あなたの言葉を読みます）のためだけに使い、相方（バティ）の声を作るためには使いません。ほかのことには使いません。',
   '写真そのものは保存しません。声と、写真から作った姿は、設定からいつでも消せます。',
 ] as const;
 /** M-R248: 13〜15歳 — the guardian's consent, confirmed once at the start (the one line to tick) */

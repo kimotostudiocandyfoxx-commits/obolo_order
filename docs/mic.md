@@ -114,7 +114,7 @@ The lines above about "1.2× faster with the pitch kept" are the trial of the mo
 - The send is the text message's (`POST /dachi/threads/:id/messages` `{ text, spoken: true }`): the words are checked as ever, the mana taken (`MakeKind` `cuteVoice`, per message on its own words), the voice made, the quiet sound picked from the words and mixed in as for a recorded voice, and a **voice message with the words as its caption** is sent (the receiver's 〔おとをけす〕 as built).
 - No mana / not enough, no voice service, a failure (the mana is given back): the same words go as a text message and one calm line says so (`cute.miss`) — never an error.
 - A member who is recorded never gets it (`spoken` is ignored): their recorded voice message is unchanged.
-- {bati} for these members: there is no voice of their own to imitate (the egg recording is not kept: `BatiVoiceService.record`), so {bati} speaks in the same default voice — as before. New: with **no mana left there is no voice** (`defaultVoiceSilent`: `POST /voice/bati-says` answers `{ url: null }`, the words stay; a post read by {bati} falls back to the device's reading voice), also for a member and during the first journey.
+- {bati} for these members: the same fixed voice as everyone's (M-R342). At 0 mana one rule for everyone (`batiVoiceSilent`): during the first journey {bati} is always heard; after it, with **no mana left there is no voice** (`POST /voice/bati-says` answers `{ url: null }`, the words stay; a post read by {bati} falls back to the device's reading voice) — recorded or not, Obolo Order or not.
 
 ## Diagnostics
 

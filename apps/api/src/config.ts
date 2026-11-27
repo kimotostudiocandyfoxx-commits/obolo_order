@@ -235,8 +235,8 @@ const Env = z.object({
    */
   FISH_DEFAULT_VOICE_ID: secret(),
   /**
-   * M-R342 (client 2026-11-27): {bati}'s fixed Fish voices by egg — ♀ the Moon egg 「活発なマスコットキャラ」, ♂ the Sun
-   * egg 「元気な少年」 (shared batiFixedVoice.ts; not secrets). Another voice = these variables (GitHub variables of the
+   * M-R342 (client 2026-11-27): {bati}'s fixed Fish voices by egg — both 「活発なマスコットキャラ」 for now (shared
+   * batiFixedVoice.ts; not secrets; two settings so the eggs can differ again). Another voice = these variables (GitHub variables of the
    * same names, deploy-api.yml); empty = the defaults.
    */
   FISH_BATI_MOON_VOICE_ID: secret().transform((v) => v ?? BATI_FIXED_VOICES.moon),

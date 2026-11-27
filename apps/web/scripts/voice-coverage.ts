@@ -34,7 +34,7 @@ lines.push({ who: 'KIMORIN', text: 'ダチなので。', where: 'saturn' }, { wh
 
 const voiced = new Set([...Object.keys(cfg.chosen), ...(cfg.special ?? []).map((x) => x.who)]);
 const under = (who: string, l: Line, text: string) => !!(manifest[voiceKey(who, l.act, text)] ?? manifest[voiceKey(who, undefined, text)]);
-// M-R342: a {bati} line has a voice when its old one is there (the stand-in) or both of its egg voices are
+// M-R342: a {bati} line has a voice when its old one is there (the stand-in) or its egg voices are (one set while both eggs share a voice)
 const has = (l: Line, text: string) => under(l.who, l, text) || (l.who === 'バティ' && under(batiStoryVoice('moon'), l, text) && under(batiStoryVoice('sun'), l, text));
 const missing: Line[] = [];
 const seen = new Set<string>();

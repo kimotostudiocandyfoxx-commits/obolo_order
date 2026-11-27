@@ -61,7 +61,10 @@ describe('たまごに声を聞かせる (D03-S005, M-R246 / M-R247)', () => {
     const all = CONSENT_POINTS.join('');
     expect(all).toContain('利用規約');
     expect(all).toContain('プライバシーポリシー');
-    expect(all).toMatch(/写真と声は、あなたの姿と相方/);
+    // M-R342: the voice is for the ダチ voice messages and the words said, not for {bati}'s voice
+    expect(all).toMatch(/写真は、あなたの姿を作るためだけ/);
+    expect(all).toContain('ダチへの声メッセージ');
+    expect(all).toContain('相方（バティ）の声を作るためには使いません');
     expect(all).toContain('ほかのことには使いません');
     expect(all).toContain('設定からいつでも消せます');
   });

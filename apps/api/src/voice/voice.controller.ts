@@ -97,9 +97,8 @@ export class VoiceController {
   @HttpCode(200)
   async batiSays(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
     await rateLimit(this.kv, `voice-bati-says:${userId}`, 30, 60);
-    // R18: no voice (text only) for a non-member past the first journey at 0 mana; client 2026-11-27: nor for a member
-    // who is not recorded with no mana left (the rule is kept as it was through M-R342, where everyone's {bati} speaks
-    // in the same fixed voice)
+    // M-R342, one rule for everyone: after the first journey, no voice (text only) at 0 mana — recorded or not, Obolo
+    // Order or not; during the journey everyone hears {bati}
     if (await this.access.noVoice(userId)) return { url: null };
     return (await this.lines.batiSays(userId, parseBody(BatiSaysBody, body).text, `${req.protocol}://${req.get('host')}`)) ?? { url: null };
   }
