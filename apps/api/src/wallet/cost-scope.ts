@@ -49,7 +49,7 @@ export function featureOfPath(path: string): UsageFeature {
     [/^\/buddy\/picture/, 'draw'],
     [/^\/buddy\/story/, 'story'],
     [/^\/buddy\//, 'chat'],
-    [/^\/voice\/transcribe/, 'listen'],
+    [/^\/voice\/(transcribe|dictate)/, 'listen'],
     [/^\/voice\//, 'voice'],
     [/^\/compose\//, 'songEdit'],
     [/^\/mars\//, 'videoEdit'],

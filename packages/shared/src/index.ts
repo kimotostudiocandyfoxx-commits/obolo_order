@@ -17,6 +17,7 @@ export * from './lap2';
 export * from './radio';
 export * from './flying';
 export * from './dachiVoice';
+export * from './micDiag';
 export * from './batiPersona';
 export * from './batiVariants';
 export * from './batiMemory';

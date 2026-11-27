@@ -20,6 +20,8 @@ export function setAudioSession(type: 'ambient' | 'playback' = 'ambient'): boole
   if (typeof navigator === 'undefined') return false;
   const n = navigator as NavigatorWithAudioSession;
   if (!n.audioSession) return false;
+  // the mic is open: iOS records under "play-and-record" only — nothing may pull the session back while it listens
+  if (micOpen) return true;
   try {
     if (n.audioSession.type !== type) n.audioSession.type = type;
     return true;
@@ -27,6 +29,28 @@ export function setAudioSession(type: 'ambient' | 'playback' = 'ambient'): boole
     return false;
   }
 }
+
+/**
+ * Client 2026-11-27 (iPhone: 「マイクが反応しないことが多い」): the "ambient" session above (the silent switch, M-R239) is a
+ * play-only session. On iPhone / iPad a microphone opened under it can give no sound (or not start), and every sound
+ * the page played called audioCtx() and set "ambient" again, also in the middle of a recording. So: while a mic is
+ * open (lib/micStream.ts, lib/mic/hear.ts) the session is "play-and-record" and stays so; when the mic is let go it
+ * goes back to "ambient". No audioSession API (Android, older iOS): nothing to do.
+ */
+let micOpen = false;
+export function micSession(on: boolean) {
+  micOpen = on;
+  if (typeof navigator === 'undefined') return;
+  const n = navigator as NavigatorWithAudioSession;
+  if (!n.audioSession) return;
+  try {
+    const want = on ? 'play-and-record' : 'ambient';
+    if (n.audioSession.type !== want) n.audioSession.type = want;
+  } catch {
+    /* an older WebKit without this type: the system decides */
+  }
+}
+export const isMicSession = () => micOpen;
 /** the old name (the BGM calls it): now the silent-switch-respecting session */
 export const hasPlaybackSession = () => setAudioSession('ambient');
 

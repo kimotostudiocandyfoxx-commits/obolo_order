@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { ReplyChips } from '@/components/story/Chat';
-import { micTrouble } from '@/lib/useDictation';
+import { micAdvice } from '@/lib/mic/core';
+import { currentEngine, currentEnv } from '@/lib/mic/env';
+import { hear, type HearPhase, type Hearing } from '@/lib/mic/hear';
 import { LineIcon } from '@/components/LineIcon';
 
 /**
@@ -13,25 +15,8 @@ import { LineIcon } from '@/components/LineIcon';
  * word of why (it used to drop to the buttons, which looked like the old choice coming back); only a mic that cannot
  * be used goes to the buttons, saying so.
  */
-type Rec = {
-  lang: string;
-  interimResults: boolean;
-  continuous: boolean;
-  start(): void;
-  abort(): void;
-  stop(): void;
-  onresult: ((e: { results: ArrayLike<{ isFinal: boolean; 0: { transcript: string } }> }) => void) | null;
-  onerror: ((e: { error: string }) => void) | null;
-  onend: (() => void) | null;
-};
 export const VOICE_OK_KEY = 'obolo.voiceOk';
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
-
-function recognizer(): (new () => Rec) | null {
-  if (typeof window === 'undefined') return null;
-  const w = window as unknown as { SpeechRecognition?: new () => Rec; webkitSpeechRecognition?: new () => Rec };
-  return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
-}
 
 /** heard words → the answer they mean: a "not" wins over a "yes", unsure over nothing */
 export function matchAnswer(heard: string, options: string[]): number {
@@ -58,97 +43,84 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
   const [mode, setMode] = useState<'mic' | 'listen' | 'keys'>('mic');
   const [heard, setHeard] = useState('');
   const [note, setNote] = useState('');
-  const rec = useRef<Rec | null>(null);
+  const [phase, setPhase] = useState<HearPhase | null>(null);
+  const [level, setLevel] = useState<number | null>(null);
+  const take = useRef<Hearing | null>(null);
   const done = useRef(false);
-  // no recogniser on this phone: the mic stays, with the reason in one line; ⌨ in the corner is the way on
+  // no way to hear on this browser: the mic stays, with the reason in one line; ⌨ in the corner is the way on
   // (story chat 2026-10-29: never switch to the buttons by itself)
   useEffect(() => {
-    if (!recognizer()) setNote(micTrouble('unsupported') ?? '');
-    return () => rec.current?.abort();
+    if (!currentEngine()) setNote(micAdvice('unsupported', currentEnv()).text);
+    return () => take.current?.abort();
   }, []);
 
   // ends the take now (the tap, a quiet after words, the 9 s cap); set by listen()
   const stopNow = useRef<() => void>(() => undefined);
+  // client 2026-11-27: the hearing is lib/mic/hear.ts — the browser's recogniser where it works, else the recorder and
+  // the server's words (iPhone Chrome, in-app browsers: the mic used to be dead here)
   const listen = () => {
-    const R = recognizer();
-    if (!R) return setNote(micTrouble('unsupported') ?? '');
-    const r = new R();
-    r.lang = 'ja-JP';
-    r.interimResults = true;
-    // iOS ends a one-shot recognition almost at once: listen on and stop ourselves after a short quiet
-    r.continuous = true;
+    if (take.current) return;
     let said = '';
-    let trouble: string | null = null;
     let ended = false;
     const timers: ReturnType<typeof setTimeout>[] = [];
-    // the end of the take, whether or not the recogniser says so: iOS Safari sometimes never fires onend after a
-    // stop, which left the mic open with no way on (client 2026-10-29)
-    const finish = () => {
-      if (ended) return;
-      ended = true;
-      timers.forEach(clearTimeout);
-      rec.current = null;
-      try {
-        r.abort();
-      } catch {
-        /* already over */
-      }
-      if (said.trim() && !done.current) {
-        done.current = true;
-        const k = matchAnswer(said, options);
-        setTimeout(() => onPick(k, said.trim().slice(0, 120)), 500);
-        return;
-      }
-      setNote(micTrouble(trouble) ?? 'うまく聞き取れませんでした。もう一度どうぞ');
-      setMode('mic');
-    };
-    // stop: let the last words come in (stop, not abort), then finish anyway after a moment
-    const stop = () => {
-      if (ended) return;
-      try {
-        r.stop();
-      } catch {
-        /* not started */
-      }
-      timers.push(setTimeout(finish, 900));
-    };
-    stopNow.current = stop;
     let quiet: ReturnType<typeof setTimeout> | undefined;
-    r.onresult = (e) => {
-      const all = Array.from(e.results);
-      said = all.map((x) => x[0].transcript).join('');
-      setHeard(said);
+    const stop = () => take.current?.stop();
+    const soon = (ms: number) => {
       clearTimeout(quiet);
-      quiet = setTimeout(stop, all[all.length - 1]?.isFinal ? 400 : 1400);
+      quiet = setTimeout(stop, ms);
       timers.push(quiet);
     };
-    r.onerror = (e) => {
-      trouble = e.error;
-      if (e.error !== 'no-speech') finish();
-    };
-    r.onend = finish;
-    timers.push(setTimeout(stop, 9000));
-    rec.current = r;
     setHeard('');
     setNote('');
+    setLevel(null);
+    setPhase('opening');
     setMode('listen');
-    try {
-      r.start();
-    } catch {
-      rec.current = null;
-      timers.forEach(clearTimeout);
-      ended = true;
-      setNote(micTrouble('start-failed') ?? '');
-      setMode('mic');
-    }
+    const h = hear({
+      path: 'story',
+      // a short answer: the recorder gives up sooner than in a talk
+      maxMs: 12000,
+      onPhase: setPhase,
+      onLevel: setLevel,
+      onInterim: (t) => {
+        if (!t) return;
+        setHeard(said + t);
+        // iOS ends a one-shot recognition almost at once: listen on and stop ourselves after a short quiet
+        soon(1400);
+      },
+      onFinal: (t) => {
+        said += t;
+        setHeard(said);
+        soon(400);
+      },
+      onEnd: (r) => {
+        ended = true;
+        take.current = null;
+        timers.forEach(clearTimeout);
+        setPhase(null);
+        setLevel(null);
+        if (said.trim() && !done.current) {
+          done.current = true;
+          const k = matchAnswer(said, options);
+          setTimeout(() => onPick(k, said.trim().slice(0, 120)), 500);
+          return;
+        }
+        setNote(micAdvice(r.fault ?? 'empty', currentEnv()).text);
+        setMode('mic');
+      },
+    });
+    if (ended) return;
+    take.current = h;
+    stopNow.current = stop;
+    // the recogniser never ends by itself while nothing is said: the cap (the recorder has its own quiet stop)
+    if (h.engine() === 'speech') timers.push(setTimeout(stop, 9000));
   };
 
   if (mode === 'keys') return <ReplyChips options={options} onPick={onPick} />;
   const on = mode === 'listen';
   return (
     <div className="pb-safe absolute inset-x-0 bottom-0 z-20 flex flex-col items-center px-5 pb-8">
-      <p className="mb-4 min-h-[2rem] rounded-full border border-amber-200/15 bg-black/55 px-4 py-1.5 text-center text-[12px] tracking-[0.08em] text-amber-50/85 backdrop-blur" style={{ fontFamily: SERIF }}>
-        {on ? heard || '聞いています……' : note || `例：${options.join('・')}`}
+      <p data-testid="voice-choice-line" className="mb-4 min-h-[2rem] rounded-2xl border border-amber-200/15 bg-black/55 px-4 py-1.5 text-center text-[12px] tracking-[0.08em] text-amber-50/85 backdrop-blur" style={{ fontFamily: SERIF }}>
+        {on ? heard || (phase === 'thinking' ? '文字にしています……' : phase === 'hearing' ? '聞こえています……' : '聞いています……') : note || `例：${options.join('・')}`}
       </p>
       <button onClick={on ? () => stopNow.current() : listen} className="relative flex h-24 w-24 items-center justify-center rounded-full active:scale-95" aria-label="話してみよう">
         {/* rings of light going out while it listens; a slow breath while it waits */}
@@ -158,6 +130,7 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
           <span className="absolute -inset-2 rounded-full bg-[radial-gradient(circle,rgba(255,206,120,0.28),transparent_70%)]" style={{ animation: 'micBreath 2.6s ease-in-out infinite' }} />
         )}
         <span className={`absolute inset-0 rounded-full border transition-colors duration-300 ${on ? 'border-amber-100 bg-[radial-gradient(circle_at_50%_35%,rgba(255,214,140,0.35),rgba(40,26,8,0.92)_70%)] shadow-[0_0_34px_rgba(255,204,120,0.65)]' : 'border-amber-200/70 bg-[radial-gradient(circle_at_50%_30%,rgba(70,48,18,0.95),rgba(8,6,12,0.95)_72%)] shadow-[0_0_22px_rgba(255,204,120,0.3)]'}`} />
+        {on && level !== null && <span aria-hidden data-testid="mic-ring" className="absolute inset-0 rounded-full bg-amber-200/20" style={{ transform: `scale(${(1.05 + Math.min(1, level * 1.5) * 0.6).toFixed(3)})`, transition: 'transform 90ms linear' }} />}
         <span className="absolute inset-[7px] rounded-full border border-amber-200/25" />
         <svg viewBox="0 0 24 24" className={`relative h-9 w-9 transition-colors ${on ? 'text-amber-50' : 'text-amber-200'}`} fill="none" stroke="currentColor" strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <rect x="9" y="3" width="6" height="11" rx="3" fill={on ? 'currentColor' : 'none'} />

@@ -8,6 +8,7 @@ import { getApi } from '@/lib/api';
 import { openManaGems, WALLET_CHANGED } from '@/components/ManaGemSheet';
 import { useAuth } from '@/lib/auth';
 import { canJoinEarly } from '@/lib/onboarding/joinFlags';
+import { MicCheckRow } from '@/components/mic/MicCheck';
 
 /**
  * 〔設定〕 — for now the 〔毎月のマナ〕 part (M-R199 / M-R202): your mana, whether you are Obolo Order, and on days 3–7 of
@@ -64,6 +65,12 @@ function Settings() {
         )}
       </section>
       {ordered && <Eclipse />}
+      {/* client 2026-11-27 (「設定を見ても、何を変えたらいいのか分からない」): the mic has its own place here */}
+      <section className="mt-4 rounded-3xl border border-white/10 bg-white/5 p-4" data-testid="settings-mic">
+        <h2 className="text-sm font-black">マイク</h2>
+        <p className="mt-1 text-[11px] leading-relaxed text-white/50">バティやダチと話すときに使います。使えるかどうかと、直し方が分かります。</p>
+        <MicCheckRow className="pt-3" />
+      </section>
       <VoiceAndPhoto />
       <WorksAndTalk />
       <section className="mt-4 rounded-3xl border border-white/10 bg-white/5 p-4">

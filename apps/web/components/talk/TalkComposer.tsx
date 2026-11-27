@@ -2,14 +2,30 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { MicGlyph, SendGlyph } from '@/components/dachi/HoldMic';
-import { micTrouble, useDictation } from '@/lib/useDictation';
+import { MicNotice } from '@/components/mic/MicCheck';
+import { micAdvice, type MicPath } from '@/lib/mic/core';
+import { currentEnv } from '@/lib/mic/env';
+import type { HearPhase } from '@/lib/mic/hear';
+import { useDictation } from '@/lib/useDictation';
 import { bargeIn } from '@/lib/voice/barge';
 
 /**
  * The talk's bottom (M-R232 §3): the mic button in the middle; the keyboard only when answering in letters (⌨ at the
  * side). What is heard shows above the mic with 〔送る〕. `onState` tells the talk when you are speaking or typing (the
  * others turn to you) and when the keyboard is up (the people go chest up and move up).
+ *
+ * Client 2026-11-27 (phones: 「マイクが反応しないことが多い」): the mic never opens the keyboard by itself any more — where
+ * the browser has no speech recognition (iPhone Chrome, in-app browsers) it records and the server makes the words
+ * (lib/mic/hear.ts). While it listens a ring follows the loudness and a line says what it is doing; when it cannot,
+ * one line says what to do, with 〔マイクをためす〕.
  */
+/** PROVISIONAL wording: what the mic is doing now */
+export const MIC_PHASE_WORDS: Record<HearPhase, string> = {
+  opening: 'マイクをひらいているよ…',
+  listening: '聞いているよ。話してね',
+  hearing: '聞こえているよ',
+  thinking: '文字にしているよ…',
+};
 export function TalkComposer({
   onSend,
   placeholder,
@@ -21,6 +37,7 @@ export function TalkComposer({
   startTyping = false,
   onVoice,
   hint,
+  micPath = 'bati',
 }: {
   onSend: (text: string) => void | Promise<void>;
   placeholder: string;
@@ -36,12 +53,16 @@ export function TalkComposer({
   onVoice?: () => void;
   /** R18: the talk is resting ({bati} has no mana / is tired): a calm hint where the mic and typing are (not an error) */
   hint?: string;
+  /** where this mic is (the diagnostics) */
+  micPath?: MicPath;
 }) {
   const [text, setText] = useState(initial);
   const [typing, setTyping] = useState(startTyping);
   const [focus, setFocus] = useState(false);
   const field = useRef<HTMLInputElement>(null);
-  const mic = useDictation({ field, value: text, onChange: setText, maxLength });
+  const mic = useDictation({ field, value: text, onChange: setText, maxLength, path: micPath });
+  // this browser has no mic way at all: said in a line (the keyboard is one tap away, never opened by itself)
+  const [noMic, setNoMic] = useState(false);
   useEffect(() => {
     onState?.({ listening: mic.listening || (typing && !!text.trim()), keyboard: typing && focus });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -53,7 +74,9 @@ export function TalkComposer({
     setText('');
     await onSend(t);
   };
-  const trouble = micTrouble(mic.code);
+  const advice = mic.listening ? null : (mic.advice ?? (noMic ? micAdvice('unsupported', currentEnv()) : null));
+  // the ring around the mic: the real loudness (the recorder), or a set size while the recogniser hears a voice
+  const loud = !mic.listening ? 0 : mic.level !== null ? Math.min(1, mic.level * 1.5) : mic.phase === 'hearing' ? 0.6 : 0.12;
 
   if (hint)
     return (
@@ -119,22 +142,31 @@ export function TalkComposer({
           )}
         </div>
       )}
-      {trouble && <p className="mb-1.5 text-center text-[11px] text-amber-100/70">{trouble}</p>}
+      <MicNotice advice={advice} className="mb-2 max-w-sm text-center text-[12px] leading-relaxed text-amber-100/90 [text-shadow:0_1px_4px_#000]" linkClass="ml-1 rounded-full border border-amber-100/50 px-2 py-0.5 text-[11px] font-bold text-amber-50" />
+      {mic.listening && mic.phase && (
+        <p className="mb-2 text-center text-[12px] font-bold text-[#dfe6ff] [text-shadow:0_1px_4px_#000]" data-testid="mic-phase" data-phase={mic.phase} data-engine={mic.engine ?? ''} role="status">
+          {MIC_PHASE_WORDS[mic.phase]}
+          {mic.engine === 'record' && (mic.phase === 'listening' || mic.phase === 'hearing') && <span className="ml-1 font-normal text-[#b9bde6]">（話し終わったら、もう一度タップ）</span>}
+        </p>
+      )}
       <div className="relative flex w-full items-center justify-center">
         {side && <div className="absolute left-0 top-1/2 -translate-y-1/2">{side}</div>}
         {/* the hidden field the dictation writes into */}
         <input ref={field} value={text} onChange={(e) => setText(e.target.value)} className="sr-only" tabIndex={-1} aria-hidden />
+        {/* it hears you: a ring that grows with the loudness */}
+        {mic.listening && <span aria-hidden data-testid="mic-ring" className="pointer-events-none absolute left-1/2 top-1/2 h-[74px] w-[74px] rounded-full border-2 border-[#ffd0dc]/70 bg-[rgba(255,170,190,.14)]" style={{ transform: `translate(-50%,-50%) scale(${(1.12 + loud * 0.75).toFixed(3)})`, transition: 'transform 90ms linear', opacity: mic.phase === 'thinking' ? 0.35 : 1 }} />}
         {/* the prototype's big glowing mic (design/talk/proto.html .mic) */}
         <button
+          data-testid="talk-mic"
           onClick={() => {
             // R14 (client 2026-11-25): the mic pressed while {bati} speaks — {bati} stops, its words show whole, you talk
             if (!mic.listening) bargeIn({ mic: true });
             if (mic.supported) mic.toggle();
-            else setTyping(true);
+            else setNoMic(true);
           }}
           disabled={disabled}
           aria-label={mic.listening ? '話し終わる' : '話す'}
-          className="grid h-[74px] w-[74px] place-items-center rounded-full text-[#070b24] transition active:scale-95 disabled:opacity-40"
+          className="relative grid h-[74px] w-[74px] place-items-center rounded-full text-[#070b24] transition active:scale-95 disabled:opacity-40"
           style={{ background: 'radial-gradient(circle at 35% 30%,#ffffff,#cdd8ff 55%,#9fb2ff)', boxShadow: '0 0 0 6px rgba(223,230,255,.16),0 0 32px rgba(160,180,255,.55)', animation: mic.listening ? 'talk-pulse 1.2s ease-in-out infinite' : undefined }}
         >
           <MicGlyph className="h-[30px] w-[30px]" />

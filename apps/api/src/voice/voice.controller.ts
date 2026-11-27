@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
 import { BatiSaysBody, BatiVoiceBody, LineVoicesBody, RegisterVoiceBody, SpeakBody, TranscribeBody } from '@obolo/shared';
 import type { Request } from 'express';
 import { AuthGuard, UserId } from '../auth/auth.guard';
@@ -60,6 +60,19 @@ export class VoiceController {
     const b = parseBody(TranscribeBody, body);
     await rateLimit(this.kv, `voice-stt:${userId}`, 200, 86400);
     return this.voice.transcribe(userId, b.mediaId);
+  }
+
+  /**
+   * The mic where the browser cannot hear by itself (iPhone Chrome, in-app browsers): one take as the raw body
+   * (Content-Type: audio/*, parsed by express.raw in main.ts) → its words; the take is not stored.
+   * PLACEHOLDER (P-VOICE-7): 300 a day and 40 in ten minutes per member.
+   */
+  @Post('dictate')
+  @HttpCode(200)
+  async dictate(@UserId() userId: string, @Headers('content-type') type: string | undefined, @Req() req: Request) {
+    await rateLimit(this.kv, `voice-dictate:${userId}`, 300, 86400);
+    await rateLimit(this.kv, `voice-dictate-burst:${userId}`, 40, 600);
+    return this.voice.dictate(type, req.body);
   }
 
   /** PLACEHOLDER (P-VOICE-3): 100 read-alouds a day per member until pricing is decided. */

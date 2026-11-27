@@ -625,7 +625,7 @@ function FullSong({ song, onMade }: { song: MadeSong; onMade: (v: SongView) => v
 export function Mic({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const btn = useRef<HTMLButtonElement>(null);
   const field = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
-  const mic = useDictation({ field, value, onChange });
+  const mic = useDictation({ field, value, onChange, path: 'compose' });
   if (!mic.supported) return null;
   return (
     <button

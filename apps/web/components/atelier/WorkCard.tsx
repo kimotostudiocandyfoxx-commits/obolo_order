@@ -11,6 +11,7 @@ import { getApi } from '@/lib/api';
 import { stopAudio, subscribeAudio, toggleAudio } from '@/lib/audio';
 import { synth } from '@/lib/synth';
 import { BoothMixer } from '@/lib/venus/booth';
+import { micFailText } from '@/lib/mic/env';
 import type { AtelierKind } from '@/lib/atelier/unlock';
 import { countdown, jobView, onJobs } from '@/lib/atelier/jobs';
 import { lyricBlockLabels, lyricHintLabel, type RefineTarget, type SongLyrics, type WorkMaterial } from '@obolo/shared';
@@ -499,8 +500,8 @@ function RadioRecorder({ onDone, song: given }: { onDone: (blob: Blob, seconds: 
     const mx = (mixer.current ??= new BoothMixer());
     try {
       await mx.openMic();
-    } catch {
-      return setErr('マイクが使えない…。設定でマイクを許してね');
+    } catch (e) {
+      return setErr(micFailText(e));
     }
     // M-R253 §3: a song chosen as material goes on first
     const s = given ? { url: given.url, title: given.title, bpm: 0 } : (await getApi().radioDeck().catch(() => [])).find((x) => x.from !== 'mine' || x.allowRadio !== false);

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useHoldRecorder } from '@/lib/dachi/useHoldRecorder';
 import { playClip, type Clip } from '@/lib/voice/webVoice';
 import { bargeIn } from '@/lib/voice/barge';
+import { MicNotice } from '@/components/mic/MicCheck';
 
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 
@@ -29,6 +30,12 @@ export function SendGlyph() {
 /**
  * Hold-to-record voice (M-R212): records only while pressed; on release the take can be heard back, then 〔送る〕 or
  * 〔けす〕. Used in the ダチ threads and for the invitation's voice note. `onSend` gets the take (throw to keep it).
+ *
+ * Client 2026-11-27 (phones: 「マイクが反応しないことが多い」): while it records, a ring around the mic follows the
+ * loudness (it hears you); a mic that would not open says what is wrong on this phone and browser (it used to say
+ * 「設定 → Safari → マイク」 for every failure, also in Chrome and on Android) with 〔マイクをためす〕; a take with no sound
+ * in it is not offered for sending. The first press of a visit only asks for the microphone: the line then says to
+ * press again.
  */
 export function HoldMic({
   onSend,
@@ -50,7 +57,9 @@ export function HoldMic({
   /** the talk's dock (M-R232, design/talk/proto.html): the big glowing mic in the middle */
   big?: boolean;
 }) {
-  const r = useHoldRecorder();
+  const r = useHoldRecorder(undefined, 'dachi-voice');
+  // the ring around the mic while it records: the loudness now
+  const loud = r.recording ? Math.min(1, r.level * 1.5) : 0;
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -82,10 +91,10 @@ export function HoldMic({
 
   const note = err
     ? err
-    : r.error === 'denied'
-      ? 'マイクを許可してね（設定 → Safari → マイク）'
-      : r.error === 'unsupported'
-        ? 'この端末では録音できません'
+    : r.advice
+      ? null
+      : r.asked
+        ? 'マイクが使えるようになったよ。もう一度、押したまま話してね'
         : r.recording
           ? `録音中… ${r.elapsed}秒（最長${r.maxSec}秒）`
           : r.tooShort
@@ -97,7 +106,11 @@ export function HoldMic({
   return (
     <div className="pb-safe px-3" style={{ fontFamily: big ? undefined : SERIF }}>
       <div className={`mx-auto max-w-md ${big ? 'mb-[14px]' : 'mb-3'}`}>
-        <p className={`mb-1.5 min-h-[18px] px-2 text-xs ${big ? 'text-center [text-shadow:0_1px_4px_#000]' : 'text-right'} ${err || r.error ? 'text-rose-300' : big ? 'text-[#b9bde6]' : 'text-amber-100/60'}`}>{note}</p>
+        {note === null ? (
+          <MicNotice advice={r.advice} className={`mb-1.5 min-h-[18px] px-2 text-xs leading-relaxed text-rose-200 ${big ? 'text-center [text-shadow:0_1px_4px_#000]' : 'text-right'}`} linkClass="ml-1 rounded-full border border-rose-200/60 px-2 py-0.5 text-[11px] font-bold text-rose-50" />
+        ) : (
+          <p className={`mb-1.5 min-h-[18px] px-2 text-xs ${big ? 'text-center [text-shadow:0_1px_4px_#000]' : 'text-right'} ${err ? 'text-rose-300' : big ? 'text-[#b9bde6]' : 'text-amber-100/60'}`} data-testid="holdmic-note">{note}</p>
+        )}
         {r.take ? (
           <div className="flex items-center gap-2 rounded-full border border-amber-200/30 bg-[rgba(16,11,26,0.72)] p-1.5 pl-2 shadow-[0_10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl">
             <TakePlayer blob={r.take.blob} seconds={r.take.seconds} />
@@ -120,7 +133,9 @@ export function HoldMic({
           <div className="relative flex items-center justify-center pb-1 pt-1">
             <div className="absolute left-1 top-1/2 -translate-y-1/2">{left}</div>
             {right && <div className="absolute right-1 top-1/2 -translate-y-1/2">{right}</div>}
+            {r.recording && <span aria-hidden data-testid="mic-ring" className="pointer-events-none absolute left-1/2 top-1/2 h-[74px] w-[74px] rounded-full border-2 border-[#ffd0dc]/70 bg-[rgba(255,170,190,.14)]" style={{ transform: `translate(-50%,-50%) scale(${(1.15 + loud * 0.8).toFixed(3)})`, transition: 'transform 90ms linear' }} />}
             <button
+              data-testid="hold-mic"
               type="button"
               disabled={disabled}
               aria-label="押している間、録音"
@@ -135,7 +150,7 @@ export function HoldMic({
               onPointerUp={r.release}
               onPointerCancel={r.release}
               onContextMenu={(e) => e.preventDefault()}
-              className={`grid h-[74px] w-[74px] touch-none select-none place-items-center rounded-full text-[#070b24] transition disabled:opacity-35 ${r.recording ? 'scale-105' : ''}`}
+              className={`relative grid h-[74px] w-[74px] touch-none select-none place-items-center rounded-full text-[#070b24] transition disabled:opacity-35 ${r.recording ? 'scale-105' : ''}`}
               style={{ background: 'radial-gradient(circle at 35% 30%,#ffffff,#cdd8ff 55%,#9fb2ff)', boxShadow: r.recording ? '0 0 0 14px rgba(255,170,190,.14),0 0 48px rgba(255,150,180,.8)' : '0 0 0 6px rgba(223,230,255,.16),0 0 32px rgba(160,180,255,.55)' }}
             >
               <MicGlyph className="h-[30px] w-[30px]" />
@@ -161,7 +176,7 @@ export function HoldMic({
               onContextMenu={(e) => e.preventDefault()}
               className={`relative flex h-12 w-12 shrink-0 touch-none select-none items-center justify-center rounded-full border text-amber-100 transition disabled:opacity-35 ${r.recording ? 'scale-110 border-rose-300 bg-rose-400/30' : 'border-amber-200/40 bg-white/5'}`}
             >
-              {r.recording && <span className="absolute inset-0 animate-ping rounded-full bg-rose-400/30" />}
+              {r.recording && <span data-testid="mic-ring" className="absolute inset-0 rounded-full border border-rose-200/70 bg-rose-400/25" style={{ transform: `scale(${(1.1 + loud * 0.7).toFixed(3)})`, transition: 'transform 90ms linear' }} />}
               <MicGlyph className="relative h-6 w-6" />
             </button>
           </div>

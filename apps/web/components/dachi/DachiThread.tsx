@@ -305,7 +305,7 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
             {err && <p className="mb-1 text-center text-xs text-rose-300">{err}</p>}
             {msgs === null && <p className="mb-1 text-center text-xs text-white/40">…</p>}
             {typing ? (
-              <TalkComposer key={bar} startTyping placeholder={`${name}に送る`} maxLength={DACHI_TEXT_MAX} onVoice={() => setTyping(false)} onState={(st) => setKeyboard(st.keyboard)} onSend={(t) => { void sendText(t); setBar((n) => n + 1); }} />
+              <TalkComposer key={bar} micPath="dachi" startTyping placeholder={`${name}に送る`} maxLength={DACHI_TEXT_MAX} onVoice={() => setTyping(false)} onState={(st) => setKeyboard(st.keyboard)} onSend={(t) => { void sendText(t); setBar((n) => n + 1); }} />
             ) : (
             <HoldMic
               big

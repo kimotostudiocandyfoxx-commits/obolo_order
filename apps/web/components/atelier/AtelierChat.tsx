@@ -2507,6 +2507,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
         composer={
           <TalkComposer
             key={bar}
+            micPath="atelier"
             placeholder={`${partner.name}に頼む`}
             disabled={busy}
             hint={rest && !story ? BATI_REST_HINT[rest] : undefined}

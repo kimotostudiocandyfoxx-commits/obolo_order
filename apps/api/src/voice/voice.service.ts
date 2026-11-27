@@ -1,7 +1,7 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { type LlmProvider, moderateText } from '@obolo/ai';
 import { LLM } from '../infra/tokens';
-import { batiDefaultVoice, VOICE_SCRIPTS, VOICE_STYLES, type Me, type RegisterVoiceBody, type SpeakBody, type VoiceSlot } from '@obolo/shared';
+import { batiDefaultVoice, VOICE_MAX_BYTES, VOICE_MIME_TYPES, VOICE_SCRIPTS, VOICE_STYLES, type Me, type RegisterVoiceBody, type SpeakBody, type VoiceSlot } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { AppConfig, CONFIG } from '../config';
@@ -13,6 +13,9 @@ import { toMp3 } from './audio';
 import { canUseMedia } from './media-consent';
 import { activeBati } from '../look/batis';
 import { createVoiceModel, deleteVoiceModel, textToSpeech, type TtsOptions } from './fish.client';
+
+/** one dictated take is at most this long (the web's recorder stops at 45 s) */
+export const DICTATE_MAX_SECONDS = 50;
 
 /**
  * Member voices (client decision 2026-10-07): two Fish Audio voice models per member — their own
@@ -109,6 +112,35 @@ export class VoiceService {
       return { text };
     } catch (e) {
       this.log.warn(`stt failed: ${String(e)}`);
+      throw apiError(HttpStatus.BAD_GATEWAY, 'STT_FAILED', 'Could not turn the voice into text');
+    }
+  }
+
+  /**
+   * Client 2026-11-27 (phones: 「マイクが反応しないことが多い」): the words of what was just said, for the browsers that
+   * cannot hear by themselves (Chrome / Firefox / Edge on iPhone and the in-app browsers have no speech recognition;
+   * apps/web/lib/mic/hear.ts records and sends the take here). The same way as transcribe() — ffmpeg → MP3 → the
+   * model — but the recording comes in the request and is NOT stored: it is turned into words and dropped.
+   * iPhone sends audio/mp4, Chrome / Firefox audio/webm (VOICE_MIME_TYPES).
+   */
+  async dictate(mimeHeader: string | undefined, body: unknown): Promise<{ text: string }> {
+    const mime = (mimeHeader ?? '').split(';')[0].trim().toLowerCase();
+    if (!(VOICE_MIME_TYPES as readonly string[]).includes(mime)) throw apiError(HttpStatus.UNSUPPORTED_MEDIA_TYPE, 'UNSUPPORTED_AUDIO', `Unsupported audio type: ${mime || 'none'}`);
+    if (!Buffer.isBuffer(body) || body.length === 0) throw apiError(HttpStatus.BAD_REQUEST, 'EMPTY_UPLOAD', 'No audio received');
+    if (body.length > VOICE_MAX_BYTES) throw apiError(HttpStatus.PAYLOAD_TOO_LARGE, 'TOO_LARGE', 'Audio file too large');
+    if (!this.llm.transcribe) throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'STT_OFF', 'Speech to text is not available');
+    let mp3: Buffer;
+    try {
+      mp3 = await toMp3(body, 0, DICTATE_MAX_SECONDS);
+    } catch (e) {
+      this.log.warn(`dictate convert failed (${mime}, ${body.length} bytes): ${String(e)}`);
+      throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'BAD_AUDIO', 'Could not read this recording');
+    }
+    try {
+      const text = (await this.llm.transcribe(mp3, 'audio/mp3')).replace(/\s+/g, ' ').trim().slice(0, 600);
+      return { text };
+    } catch (e) {
+      this.log.warn(`dictate failed: ${String(e)}`);
       throw apiError(HttpStatus.BAD_GATEWAY, 'STT_FAILED', 'Could not turn the voice into text');
     }
   }

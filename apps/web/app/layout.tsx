@@ -11,6 +11,7 @@ import { ConsentGate } from '@/components/ConsentGate';
 import { JobToasts } from '@/components/JobToasts';
 import { TesterBar } from '@/components/TesterBar';
 import { AudioUnlock } from '@/components/AudioUnlock';
+import { MicCheck } from '@/components/mic/MicCheck';
 
 export const metadata: Metadata = {
   title: 'Obolo Order',
@@ -51,6 +52,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             <JobToasts />
             {/* iPad: the first real tap lets the voices sound */}
             <AudioUnlock />
+            {/* 〔マイクをためす〕: opened from the settings and from every mic notice */}
+            <MicCheck />
             {/* the tester entrance: only for accounts on the server's allowlist (Me.tester) */}
             <TesterBar />
           </AuthProvider>

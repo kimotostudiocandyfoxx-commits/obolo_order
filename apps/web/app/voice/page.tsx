@@ -5,6 +5,9 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { blobType, pickMime } from '@/lib/mic/core';
+import { currentEnv, micFailText } from '@/lib/mic/env';
+import { openMic, quietMic } from '@/lib/micStream';
 
 /**
  * /voice — register the member's two voices (client decision 2026-10-07):
@@ -49,14 +52,17 @@ function VoiceCard({ slot, title, done }: { slot: VoiceSlot; title: string; done
 
   const start = async () => {
     setMsg('');
+    let stream: MediaStream | null = null;
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const r = new MediaRecorder(stream);
+      // client 2026-11-27: the page's one mic (the record session on iPhone) and a container the API takes
+      stream = await openMic();
+      const mime = pickMime(typeof MediaRecorder.isTypeSupported === 'function' ? (t) => MediaRecorder.isTypeSupported(t) : undefined);
+      const r = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
       const chunks: Blob[] = [];
       r.ondataavailable = (e) => e.data.size && chunks.push(e.data);
       r.onstop = () => {
-        stream.getTracks().forEach((t) => t.stop());
-        setBlob(new Blob(chunks, { type: r.mimeType || 'audio/mp4' }));
+        quietMic();
+        setBlob(new Blob(chunks, { type: blobType(r.mimeType, mime, currentEnv()) }));
         setPhase('recorded');
       };
       rec.current = r;
@@ -71,8 +77,9 @@ function VoiceCard({ slot, title, done }: { slot: VoiceSlot; title: string; done
           }),
         1000,
       );
-    } catch {
-      setMsg('マイクが使えませんでした。ブラウザの設定でマイクを許可してください。');
+    } catch (e) {
+      if (stream) quietMic();
+      setMsg(micFailText(e));
     }
   };
   const stop = () => {

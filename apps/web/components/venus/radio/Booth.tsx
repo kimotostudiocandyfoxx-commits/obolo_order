@@ -8,6 +8,7 @@ import { useToast } from '@/components/Toast';
 import { getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { BoothMixer } from '@/lib/venus/booth';
+import { micFailText } from '@/lib/mic/env';
 import { LOOP_CHOICES, ShowArt } from './ShowArt';
 import { LineIcon } from '@/components/LineIcon';
 
@@ -162,8 +163,8 @@ export function Booth({ onClose, practice, use = 'live', bare = false }: { onClo
     else
       try {
         await mx.openMic();
-      } catch {
-        toast.show('マイクが使えない…。設定でマイクを許してね');
+      } catch (e) {
+        toast.show(micFailText(e));
       }
     setTick((n) => n + 1);
   };

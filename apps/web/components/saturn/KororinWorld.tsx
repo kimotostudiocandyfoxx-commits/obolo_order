@@ -1045,7 +1045,7 @@ function DropComposer({
       })
       .catch(() => undefined);
   }, [choosePlaza]);
-  const mic = useDictation({ field: box, value: text, onChange: setText, maxLength: SATURN_MAX_CHARS * 2 });
+  const mic = useDictation({ field: box, value: text, onChange: setText, maxLength: SATURN_MAX_CHARS * 2, path: 'kororin' });
   const left = SATURN_MAX_CHARS - [...text].length;
   const canPost = !!text.trim() && left >= 0 && !busy && !mic.listening;
 
@@ -1147,7 +1147,7 @@ function DropComposer({
 
         {/* the mic types the words */}
         <div className="mt-4">
-          <MicButton listening={mic.listening} interim={mic.interim} supported={mic.supported} error={mic.error} onToggle={mic.toggle} />
+          <MicButton listening={mic.listening} interim={mic.interim} supported={mic.supported} error={mic.error} advice={mic.advice?.text} thinking={mic.phase === 'thinking'} onToggle={mic.toggle} />
         </div>
         <textarea
           ref={box}

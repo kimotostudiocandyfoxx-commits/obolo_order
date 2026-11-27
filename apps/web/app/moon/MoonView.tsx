@@ -16,6 +16,7 @@ import { LineIcon } from '@/components/LineIcon';
 import { BatiSettings, MoonEgg, eggReady } from '@/components/bati/BatiSheet';
 import { EggMorning } from '@/components/bati/EggMorning';
 import { TalkComposer } from '@/components/talk/TalkComposer';
+import { MicCheckRow } from '@/components/mic/MicCheck';
 import { TalkScene, TonePicker } from '@/components/talk/TalkScene';
 import { BATI_COLOR, batiLook, characterLook, PLACE_BG, SELF_COLOR, selfLook, selfTone, TALK_COLOR_KEY } from '@/lib/talk/looks';
 
@@ -358,6 +359,11 @@ function SettingsSheet({
             onChange={(e) => void getApi().saveSysStory({ [TALK_FIXED_FACE_KEY.replace(/^sys\./, '')]: e.target.checked ? '1' : '0' }).then(setMe).catch(() => undefined)}
           />
         </label>
+        {/* client 2026-11-27: the mic can be checked from the talk's own settings */}
+        <div className="mt-4 rounded-xl bg-white/5 px-3 py-3">
+          <p className="text-[13px] font-bold text-white/80">マイク</p>
+          <MicCheckRow className="pt-1.5" />
+        </div>
         {/* M-R245: your bubble colour */}
         <div className="mt-4 rounded-xl bg-white/5 px-3 py-3">
           <p className="mb-2 text-[13px] font-bold text-white/80">吹き出しの色</p>

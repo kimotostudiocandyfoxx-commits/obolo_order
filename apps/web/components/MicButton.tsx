@@ -12,6 +12,8 @@ export function MicButton({
   onToggle,
   size = 76,
   caption,
+  advice,
+  thinking = false,
 }: {
   listening: boolean;
   interim: string;
@@ -21,6 +23,10 @@ export function MicButton({
   size?: number;
   /** replaces the default hint under the button */
   caption?: string;
+  /** what to do about a mic that could not hear (lib/mic/core micAdvice) */
+  advice?: string;
+  /** the recording is being turned into words */
+  thinking?: boolean;
 }) {
   return (
     <div className="flex flex-col items-center">
@@ -47,9 +53,13 @@ export function MicButton({
       <p className="mt-2 min-h-[1.25rem] text-center text-xs font-black text-violet-500">
         {caption ??
           (!supported
-          ? 'この端末では音声入力が使えないので、文字で入力してね'
+          ? 'このブラウザではマイクが使えないので、文字で入力してね'
+          : thinking
+            ? '文字にしているよ…'
+          : !listening && advice
+            ? advice
           : error === 'denied'
-            ? 'マイクを許可してね（設定 → Safari → マイク）'
+            ? 'マイクが許可されていないよ'
             : error === 'failed'
               ? 'うまく聞き取れなかった…もう一度タップしてね'
               : listening

@@ -993,6 +993,20 @@ export class DemoApi implements Api {
     return { text: '' };
   }
 
+  // demo: nothing is heard for real — a recording with sound in it comes back as a stand-in line, so the mic's way
+  // (record → words → 〔送る〕) can be walked through
+  async dictate(blob: Blob): Promise<{ text: string }> {
+    await sleep(500);
+    return { text: blob.size > 1500 ? '（デモ）こんにちは' : '' };
+  }
+
+  // demo: kept on the page for the review (window.__micDiag), sent nowhere
+  async micDiag(report: Parameters<Api['micDiag']>[0]): Promise<void> {
+    if (typeof window === 'undefined') return;
+    const w = window as unknown as { __micDiag?: unknown[] };
+    (w.__micDiag ??= []).push(report);
+  }
+
   // demo: no voices are made here (the lines with names stay silent)
   async lineVoices(): Promise<{ voices: Record<string, string>; pending: number }> {
     return { voices: {}, pending: 0 };

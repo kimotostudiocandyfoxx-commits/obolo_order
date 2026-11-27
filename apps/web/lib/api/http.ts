@@ -278,6 +278,12 @@ export class HttpApi implements Api {
   transcribe(mediaId: string) {
     return this.req<{ text: string }>('POST', '/voice/transcribe', { mediaId });
   }
+  dictate(blob: Blob) {
+    return this.req<{ text: string }>('POST', '/voice/dictate', undefined, blob);
+  }
+  async micDiag(report: Parameters<Api['micDiag']>[0]) {
+    await this.req<void>('POST', '/diag/mic', report);
+  }
 
   lineVoices(body: LineVoicesBody) {
     return this.req<LineVoicesView>('POST', '/voice/lines', body);

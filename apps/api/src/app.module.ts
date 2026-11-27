@@ -30,6 +30,7 @@ import { CompassService } from './buddy/compass.service';
 import { StoryService } from './buddy/story.service';
 import { PictureService } from './buddy/picture.service';
 import { HealthController } from './health.controller';
+import { MicDiagController } from './diag/mic-diag.controller';
 import { DachiController } from './dachi/dachi.controller';
 import { DachiService } from './dachi/dachi.service';
 import { DachiLinkService } from './dachi/dachi-link.service';
@@ -110,6 +111,7 @@ import { StorageWorksService } from './storage/storage-works.service';
   imports: [InfraModule],
   controllers: [
     HealthController,
+    MicDiagController,
     AuthController,
     UsersController,
     TesterController,

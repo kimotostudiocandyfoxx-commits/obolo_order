@@ -144,7 +144,7 @@ export function VoiceField({
   textFirst?: boolean;
 }) {
   const ref = useRef<HTMLInputElement & HTMLTextAreaElement>(null);
-  const mic = useDictation({ field: ref, value, onChange, maxLength });
+  const mic = useDictation({ field: ref, value, onChange, maxLength, path: 'story' });
   // while they speak, their own figure comes up big (M-R149, components/NeoSpeaking.tsx)
   useEffect(() => {
     window.dispatchEvent(new CustomEvent('obolo:speaking', { detail: mic.listening }));
@@ -213,7 +213,7 @@ export function VoiceField({
         </svg>
       </button>
       <p className={`mt-2 text-[15px] font-black ${light ? 'text-amber-700' : 'text-amber-100'}`}>{mic.listening ? '話しおわったら、もう一度タップ' : value ? 'もう一度、話してみる' : '話してみよう'}</p>
-      <p className={`mt-0.5 text-center text-[11px] ${sub}`}>{mic.listening ? mic.interim || 'きいています…' : (micTrouble(mic.supported ? mic.code : 'unsupported') ?? (placeholder ? `例「${exampleOf(placeholder)}」` : ''))}</p>
+      <p className={`mt-0.5 text-center text-[11px] ${sub}`}>{mic.listening ? mic.interim || (mic.phase === 'thinking' ? '文字にしています…' : mic.phase === 'hearing' ? '聞こえています…' : 'きいています…') : (micTrouble(mic.supported ? mic.code : 'unsupported') ?? (placeholder ? `例「${exampleOf(placeholder)}」` : ''))}</p>
       {example}
       {/* the emergency exit: only when you cannot speak */}
       {!typing && (

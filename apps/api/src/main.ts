@@ -27,6 +27,8 @@ async function bootstrap() {
   // client 2026-11-25: every provider cost of a request is filed under its member and feature (wallet/cost-scope.ts)
   app.use((req: express.Request, _res: express.Response, next: express.NextFunction) => costScope.run({ feature: featureOfPath(req.path) }, next));
   app.use('/media/voice', express.raw({ type: 'audio/*', limit: VOICE_MAX_BYTES }));
+  // the mic where the browser cannot hear by itself (iPhone Chrome …): one take, turned into words, not kept
+  app.use('/voice/dictate', express.raw({ type: 'audio/*', limit: VOICE_MAX_BYTES }));
   // the NEO look can start from a reference image (sent once, never stored)
   app.use('/me/look', express.json({ limit: '3mb' }));
   app.use('/me/puni/pic/candidates', express.json({ limit: '8mb' }));

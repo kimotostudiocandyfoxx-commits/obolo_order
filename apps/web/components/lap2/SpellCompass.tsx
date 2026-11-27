@@ -4,6 +4,8 @@ import type { CompassCard } from '@obolo/shared';
 import { useRef, useState } from 'react';
 import { saveSpell } from '@/components/jupiter/JupiterLesson';
 import { getApi } from '@/lib/api';
+import { micFailText } from '@/lib/mic/env';
+import { micSession } from '@/lib/onboarding/audio';
 
 /**
  * 〔🧭 スペルコンパス〕 (M-R167/M-R168): point it at a picture you like (Jupiter) or a song (Mercury: a public
@@ -67,12 +69,15 @@ export function SpellCompass({ kind, onAdd, onClose }: { kind: 'art' | 'song'; o
   // ten seconds of the song played next to the phone
   const listen = async () => {
     try {
+      // client 2026-11-27: iPhone records under the record session only (lib/onboarding/audio micSession)
+      micSession(true);
       const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: true } });
       const rec = new MediaRecorder(stream);
       const chunks: BlobPart[] = [];
       rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
       rec.onstop = async () => {
         stream.getTracks().forEach((t) => t.stop());
+        micSession(false);
         setListening(false);
         const blob = new Blob(chunks, { type: rec.mimeType || 'audio/webm' });
         void read({ media: { mime: (blob.type || 'audio/webm').split(';')[0], data: await toBase64(blob) } });
@@ -80,7 +85,9 @@ export function SpellCompass({ kind, onAdd, onClose }: { kind: 'art' | 'song'; o
       rec.start();
       setListening(true);
       setTimeout(() => rec.state !== 'inactive' && rec.stop(), 10_000);
-    } catch {
+    } catch (e) {
+      micSession(false);
+      micFailText(e);
       setPhase('fail');
     }
   };

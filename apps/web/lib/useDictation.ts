@@ -1,62 +1,83 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
+import { micAdvice, type HearEngine, type MicAdvice, type MicFault, type MicPath } from '@/lib/mic/core';
+import { currentEngine, currentEnv } from '@/lib/mic/env';
+import { hear, type HearPhase, type Hearing } from '@/lib/mic/hear';
 
 /**
  * Voice input, the main way to type in this app (client decision 2026-10-07: mic first).
  * Tap once → start listening, tap again → stop. What is heard is inserted where the cursor is
  * (replacing a selection), so fixing a part is: tap there / select it, delete, speak again.
- * Uses the browser's speech recognition (Safari on iPad: webkitSpeechRecognition).
+ *
+ * Client 2026-11-27 (phones: 「マイクが反応しないことが多い」): the hearing itself is lib/mic/hear.ts now — the browser's
+ * speech recognition where it works (Safari on iPhone / iPad, Chrome on Android), else the recorder and the server's
+ * words (iPhone Chrome / Firefox / Edge, in-app browsers, Firefox: there the mic used to be dead, or to open the
+ * keyboard without a word). `supported` is true wherever either way exists; `phase` and `level` say that it listens;
+ * `advice` is the one line of what to do when it could not.
  */
-type Rec = {
-  lang: string;
-  interimResults: boolean;
-  continuous: boolean;
-  start(): void;
-  stop(): void;
-  abort(): void;
-  onresult: ((e: { resultIndex: number; results: ArrayLike<{ isFinal: boolean; 0: { transcript: string } }> }) => void) | null;
-  onerror: ((e: { error: string }) => void) | null;
-  onend: (() => void) | null;
-};
-
 type Field = HTMLTextAreaElement | HTMLInputElement;
+
+const FAULTS: MicFault[] = ['denied', 'no-device', 'busy', 'unsupported', 'silent', 'empty', 'stt', 'network', 'failed'];
 
 /**
  * Why the voice cannot be heard, in one line (story chat 2026-10-29: never switch to the keyboard by itself; say why
- * and leave the small ⌨ in the corner). The code is the recogniser's error (or 'unsupported' when there is none).
+ * and leave the small ⌨ in the corner). The code is a mic fault (lib/mic/core MicFault) or, from older callers, the
+ * recogniser's own error code. PROVISIONAL wording: lib/mic/core micAdvice.
  */
 export function micTrouble(code: string | null): string | null {
   if (!code || code === 'no-speech' || code === 'aborted') return null;
-  if (code === 'not-allowed') return 'マイクの許可がありません（設定 → Safari → マイク を「許可」に）';
-  if (code === 'service-not-allowed' || code === 'unsupported') return 'この端末では声の聞き取りが使えません（設定 → 一般 → キーボード →「音声入力」をオンに）';
-  if (code === 'audio-capture') return 'マイクが使えません。ほかのアプリがマイクを使っていないか、たしかめてください';
-  if (code === 'network') return '通信がうまくいかず、聞き取れませんでした。もう一度どうぞ';
-  return 'うまく聞き取れませんでした。もう一度どうぞ';
+  const fault: MicFault = (FAULTS as string[]).includes(code)
+    ? (code as MicFault)
+    : code === 'not-allowed'
+      ? 'denied'
+      : code === 'service-not-allowed'
+        ? 'unsupported'
+        : code === 'audio-capture'
+          ? 'busy'
+          : code === 'network'
+            ? 'network'
+            : 'failed';
+  return micAdvice(fault, currentEnv()).text;
 }
 
-function recognizer(): (new () => Rec) | null {
-  if (typeof window === 'undefined') return null;
-  const w = window as unknown as { SpeechRecognition?: new () => Rec; webkitSpeechRecognition?: new () => Rec };
-  return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
-}
-
-export function useDictation({ field, value, onChange, maxLength, lang = 'ja-JP' }: { field: RefObject<Field | null>; value: string; onChange: (v: string) => void; maxLength?: number; lang?: string }) {
+export function useDictation({
+  field,
+  value,
+  onChange,
+  maxLength,
+  lang = 'ja-JP',
+  path = 'other',
+}: {
+  field: RefObject<Field | null>;
+  value: string;
+  onChange: (v: string) => void;
+  maxLength?: number;
+  lang?: string;
+  /** where this mic is (for the diagnostics) */
+  path?: MicPath;
+}) {
   const [supported, setSupported] = useState(false);
   const [listening, setListening] = useState(false);
+  const [phase, setPhase] = useState<HearPhase | null>(null);
+  const [level, setLevel] = useState<number | null>(null);
+  const [engine, setEngine] = useState<HearEngine | null>(null);
   const [interim, setInterim] = useState('');
   const [error, setError] = useState<'denied' | 'failed' | null>(null);
-  // the recogniser's own error code, for the one-line reason (micTrouble)
-  const [code, setCode] = useState<string | null>(null);
-  const rec = useRef<Rec | null>(null);
-  const want = useRef(false);
+  // the fault of the last take (lib/mic/core MicFault), for the one-line reason (micTrouble / advice)
+  const [code, setCode] = useState<MicFault | null>(null);
+  const take = useRef<Hearing | null>(null);
   // the text around the insertion point while listening, and what has been heard so far
   const session = useRef({ before: '', after: '', heard: '' });
   const latest = useRef({ value, onChange });
   latest.current = { value, onChange };
 
-  useEffect(() => setSupported(!!recognizer()), []);
-  useEffect(() => () => rec.current?.abort(), []);
+  useEffect(() => {
+    const e = currentEngine();
+    setSupported(!!e);
+    setEngine(e);
+  }, []);
+  useEffect(() => () => take.current?.abort(), []);
 
   const write = useCallback(() => {
     const s = session.current;
@@ -65,63 +86,8 @@ export function useDictation({ field, value, onChange, maxLength, lang = 'ja-JP'
     latest.current.onChange(next);
   }, [maxLength]);
 
-  const listen = useCallback(() => {
-    const R = recognizer();
-    if (!R) return;
-    const r = new R();
-    r.lang = lang;
-    r.interimResults = true;
-    r.continuous = true;
-    r.onresult = (e) => {
-      let fin = '';
-      let mid = '';
-      for (let i = e.resultIndex; i < e.results.length; i++) {
-        const t = e.results[i][0].transcript;
-        if (e.results[i].isFinal) fin += t;
-        else mid += t;
-      }
-      if (fin) {
-        session.current.heard += fin;
-        write();
-      }
-      setInterim(mid);
-      midRef.current = mid;
-    };
-    r.onerror = (e) => {
-      if (e.error !== 'no-speech' && e.error !== 'aborted') setCode(e.error);
-      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
-        want.current = false;
-        setError('denied');
-      } else if (e.error !== 'no-speech' && e.error !== 'aborted') setError('failed');
-    };
-    // Safari stops after a pause: keep listening until the member taps again
-    r.onend = () => {
-      if (rec.current !== r) return;
-      setInterim('');
-      midRef.current = '';
-      if (want.current) {
-        try {
-          r.start();
-          return;
-        } catch {
-          /* fall through to stopped */
-        }
-      }
-      setListening(false);
-      rec.current = null;
-      const el = field.current;
-      const s = session.current;
-      if (el) {
-        const at = s.before.length + s.heard.length;
-        el.focus();
-        el.setSelectionRange(at, at);
-      }
-    };
-    rec.current = r;
-    r.start();
-  }, [field, lang, write]);
-
   const start = useCallback(() => {
+    if (take.current) return;
     const el = field.current;
     const v = latest.current.value;
     // insert at the cursor; a selection is replaced by what is said
@@ -133,49 +99,62 @@ export function useDictation({ field, value, onChange, maxLength, lang = 'ja-JP'
     session.current = { before: before + sep, after: v.slice(b), heard: '' };
     setError(null);
     setCode(null);
-    want.current = true;
+    setLevel(null);
     setListening(true);
-    try {
-      listen();
-    } catch {
-      want.current = false;
-      setListening(false);
-      setError('failed');
-      setCode((c) => c ?? 'start-failed');
-    }
-  }, [field, lang, listen]);
-
-  // what is being heard and not final yet (kept if the take is cut off)
-  const midRef = useRef('');
-  // stop: let the last words come in, then stop anyway — iOS Safari sometimes never fires onend after a stop, which
-  // left the mic open (client 2026-10-29)
-  const stop = useCallback(() => {
-    want.current = false;
-    const r = rec.current;
-    try {
-      r?.stop();
-    } catch {
-      /* not started */
-    }
-    setTimeout(() => {
-      if (!r || rec.current !== r) return;
-      rec.current = null;
-      if (midRef.current) {
-        session.current.heard += midRef.current;
-        midRef.current = '';
+    setPhase('opening');
+    let ended = false;
+    let live: Hearing | null = null;
+    const h: Hearing = hear({
+      path,
+      lang,
+      onPhase: (p) => {
+        setPhase(p);
+        // the recogniser gave up in the middle: the recorder goes on
+        if (live) setEngine(live.engine());
+      },
+      onLevel: setLevel,
+      onInterim: setInterim,
+      onFinal: (t) => {
+        session.current.heard += t;
         write();
-      }
-      try {
-        r.abort();
-      } catch {
-        /* already over */
-      }
-      setInterim('');
-      setListening(false);
-    }, 900);
-  }, [write]);
+      },
+      onEnd: (r) => {
+        ended = true;
+        take.current = null;
+        setInterim('');
+        setListening(false);
+        setPhase(null);
+        setLevel(null);
+        setEngine(currentEngine());
+        if (r.fault) {
+          setCode(r.fault);
+          setError(r.fault === 'denied' ? 'denied' : 'failed');
+        }
+        const f = field.current;
+        const s = session.current;
+        if (f && r.heard) {
+          const at = Math.min(s.before.length + s.heard.length, f.value.length);
+          try {
+            f.focus();
+            f.setSelectionRange(at, at);
+          } catch {
+            /* a field that takes no selection */
+          }
+        }
+      },
+    });
+    if (ended) return;
+    live = h;
+    take.current = h;
+    setEngine(h.engine());
+  }, [field, lang, path, write]);
 
-  const toggle = useCallback(() => (listening ? stop() : start()), [listening, start, stop]);
+  const stop = useCallback(() => take.current?.stop(), []);
 
-  return { supported, listening, interim, error, code, toggle, stop };
+  const toggle = useCallback(() => (take.current ? stop() : start()), [start, stop]);
+
+  /** the one line of what to do (null: nothing is wrong) */
+  const advice: MicAdvice | null = code ? micAdvice(code, currentEnv()) : null;
+
+  return { supported, listening, interim, error, code, advice, phase, level, engine, toggle, stop };
 }

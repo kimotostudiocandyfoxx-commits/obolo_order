@@ -147,6 +147,13 @@ export interface Api {
   batiSays(text: string): Promise<{ url: string | null }>;
   /** The words of one of your recordings (from uploadVoice). */
   transcribe(mediaId: string): Promise<{ text: string }>;
+  /**
+   * The words of what was just said (the mic where the browser has no speech recognition of its own: iPhone Chrome,
+   * in-app browsers …). The recording is turned into words and thrown away — nothing is kept (POST /voice/dictate).
+   */
+  dictate(blob: Blob): Promise<{ text: string }>;
+  /** a mic failure for the operator (POST /diag/mic): the fault and the browser family only, no personal data */
+  micDiag(report: import('@/lib/mic/core').MicReport): Promise<void>;
   /** story lines with the member's names in them: voiced ones back, the rest being voiced (poll) */
   lineVoices(body: LineVoicesBody): Promise<LineVoicesView>;
   /** Sing the song in a registered voice and mix it over its instrumental (Fish [singing] + ffmpeg). */

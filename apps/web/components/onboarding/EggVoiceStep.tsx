@@ -50,7 +50,7 @@ export function EggVoiceStep({
   onShort?: () => void;
   onDone: (r: { words: string; seconds: number; skipped?: boolean }) => void;
 }) {
-  const rec = useRecorder(BATI_VOICE_TARGET_SECONDS + 2);
+  const rec = useRecorder(BATI_VOICE_TARGET_SECONDS + 2, 'egg', { keepSilent: true });
   // audio is recorded only when it may become {bati}'s voice
   const recording = !fake && !listenOnly;
   const takes = useRef<{ blob: Blob | null; seconds: number }[]>([]);
@@ -183,7 +183,8 @@ export function EggVoiceStep({
   }, [held]);
 
   const shown = Math.min(BATI_VOICE_TARGET_SECONDS, total + (held ? live : 0));
-  const trouble = recording && rec.error ? (rec.error === 'denied' ? 'マイクを許可してね（設定 → Safari → マイク）' : 'この端末では録音できません') : null;
+  // client 2026-11-27: the line says what is wrong on this phone and browser (lib/mic/core micAdvice)
+  const trouble = recording && rec.advice ? rec.advice.text : null;
 
   return (
     <div className="pb-safe absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black via-black/85 to-transparent px-6 pt-16 text-amber-50" style={{ fontFamily: SERIF }}>
@@ -233,7 +234,7 @@ export function EggVoiceStep({
           </button>}
         </div>
         {info && <p className="mt-2 rounded-xl bg-black/70 px-3 py-2 text-[11px] leading-relaxed text-white/70">{BATI_VOICE_EXPLAIN}</p>}
-        <p className="mt-1 min-h-[18px] text-[12px] text-amber-100/80">{trouble ?? (done ? '' : held ? 'たまごに、声が届いている…' : '押している間、たまごに声が届く')}</p>
+        <p className="mt-1 min-h-[18px] text-center text-[12px] leading-relaxed text-amber-100/80">{trouble ?? (done ? '' : held ? 'たまごに、声が届いている…' : '押している間、たまごに声が届く')}</p>
         <p className="mt-1 text-center text-[11px] leading-relaxed text-white/50">例「{example}」</p>
         {trouble && (
           <button type="button" onClick={() => onDone({ words: '', seconds: 0, skipped: true })} className="mt-3 text-[12px] text-white/55 underline">
