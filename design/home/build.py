@@ -286,6 +286,8 @@ if os.environ.get('EXTERN'):
         raw=base64.b64decode(v[m.end():]); fp=os.path.join(AD,fn)
         if not (os.path.exists(fp) and open(fp,'rb').read()==raw): open(fp,'wb').write(raw)
         A[k]='a/'+fn
+for _k in os.environ.get('SAP_DROP','').split(','):
+    A.pop(_k,None)
 t=open(H+'/template.html').read().replace('/*ASSETS*/{}',json.dumps(A))
 if os.environ.get('PAGELINK'): t=t.replace('/*PAGELINK*/null',os.environ['PAGELINK'])
 if os.environ.get('PAGETITLE'): t=t.replace('<title>星のホーム</title>','<title>'+os.environ['PAGETITLE']+'</title>')

@@ -704,8 +704,8 @@ button:focus-visible,.item:focus-visible,.home:focus-visible{outline:3px solid v
 
 .pagelink{display:block;width:fit-content;margin:6px auto 10px;padding:7px 14px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);color:#fff;font:800 12px var(--f-body);text-decoration:none}
 .pagelink[hidden]{display:none}
-.sapbk .book{position:relative}.sapbk .pg.r .sp{font-size:15px;line-height:1.7}.sapbk .pno{position:absolute;right:10px;bottom:8px;font-size:11px;opacity:.6}
-.bknav{display:flex;justify-content:space-between;margin-top:10px}.bknav button{width:46px;height:46px;border-radius:50%;border:0;background:rgba(255,255,255,.9);font:800 24px var(--f-body);color:#5a3d8a;box-shadow:0 4px 10px rgba(0,0,0,.25)}.bknav button[disabled]{opacity:.35}
+.vw.sapbk{width:94%}.sapbk .book{position:relative;width:100%}.vw.sapmug,.vw.sapgm{width:82%}.sapmug .mug{width:100%!important}.sapgm .gscr{width:100%!important}.sapbk .pg.r .sp{font-size:12.5px;line-height:1.75}.sapbk .pno{position:absolute;right:10px;bottom:8px;font-size:11px;opacity:.6}
+.vw.live{pointer-events:auto}.bknav{display:flex;justify-content:space-between;margin-top:10px}.bknav button{width:46px;height:46px;border-radius:50%;border:0;background:rgba(255,255,255,.9);font:800 24px var(--f-body);color:#5a3d8a;box-shadow:0 4px 10px rgba(0,0,0,.25)}.bknav button[disabled]{opacity:.35}
 .sapmug .mug{width:78%;margin:0 auto;border-radius:22px;overflow:hidden;box-shadow:0 14px 30px rgba(0,0,0,.35)}.sapmug .mug img{display:block;width:100%}
 .mvv .scr video{width:100%;height:100%;object-fit:cover;display:block}
 .sapgm .gscr{position:relative;width:86%;margin:0 auto;aspect-ratio:1;border-radius:26px;background:radial-gradient(circle at 50% 40%,#bff3ff,#2a7fc4 70%,#123c78);box-shadow:inset 0 0 0 4px rgba(255,255,255,.5),0 14px 30px rgba(0,0,0,.35);overflow:hidden}
@@ -1326,13 +1326,13 @@ function makeG5(o,i,slot){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight
 /* Sapon (M-R332/333): everyone's first oshi. Its works on each planet. */
 const SAPON={saturn:'サーモン食べると若返り効果があるポン！',jupiter:'お父さんだポン。',song:'サーモン・トランス',radio:'サーぽんのサーモンまめちしきラジオ',goods:'サーぽんのマグカップ',book:'サーぽんの オレンジいろ',game:'ぷるぷるサーぽん',
   pages:['サーぽんは、オレンジいろの からだが じまんだポン。','でも ある日、ふしぎに おもったポン。「どうして ぼくは オレンジなんだポン？」','うみの おとうさんに、ききに いったポン。「おとうさーん！」','おとうさんは いいました。「うみで ちいさな エビを たくさん たべると、からだが オレンジに なるんだよ」','「えっ！ ぼくの おかげっすか！？」と、えびすけ。','「ぼくの オレンジは、みんなと つながってる いろだポン！」 おしまい。']};
-LYRICS['sap-song']=[[3.48, "サーモン！"], [13.91, "サーモン、サーモン！"], [16.52, "サーモン！"], [17.39, "サーモン、サーモン！"], [20.0, "サーモン！"], [20.87, "サーモン、サーモン！"], [23.48, "サーモン！"], [24.35, "サーモン、サーモン！"], [26.96, "サーモン！"], [27.83, "♪"], [29.57, "サーモーン！"], [33.04, "サーモーン！"], [41.74, "サーモン、サーモン！"], [44.35, "サーモン！"], [45.22, "サーモン、サーモン！"], [47.83, "サーモン！"], [48.7, "サーモン、サーモン！"], [51.3, "サーモン！"], [53.91, "サーモン！"]];
-function sapBook(into){const v=document.createElement('div');v.className='vw bkv sapbk';v.style.top='16%';let p=0;
+const SAPLY=[[3.48, "サーモン！"], [13.91, "サーモン、サーモン！"], [16.52, "サーモン！"], [17.39, "サーモン、サーモン！"], [20.0, "サーモン！"], [20.87, "サーモン、サーモン！"], [23.48, "サーモン！"], [24.35, "サーモン、サーモン！"], [26.96, "サーモン！"], [27.83, "♪"], [29.57, "サーモーン！"], [33.04, "サーモーン！"], [41.74, "サーモン、サーモン！"], [44.35, "サーモン！"], [45.22, "サーモン、サーモン！"], [47.83, "サーモン！"], [48.7, "サーモン、サーモン！"], [51.3, "サーモン！"], [53.91, "サーモン！"]];
+function sapBook(into){const v=document.createElement('div');v.className='vw bkv sapbk live';v.style.top='16%';let p=0;
   const draw=()=>{v.innerHTML=`<div class="book"><div class="pg l" style="background-image:url(${A['sap-book-'+(p+1)]||''})"></div><div class="pg r">${p===0?`<h4>${SAPON.book}</h4>`:''}<p class="sp">${SAPON.pages[p]}</p><span class="pno">${p+1} / 6</span></div></div><div class="bknav"><button type="button" class="bkp" aria-label="まえのページ" ${p?'':'disabled'}>‹</button><button type="button" class="bkn" aria-label="つぎのページ">${p<5?'›':'↺'}</button></div>`};
   draw();v.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;e.stopPropagation();if(b.classList.contains('bkp'))p=Math.max(0,p-1);else p=p<5?p+1:0;pageFlip();draw()});return v}
 function pageFlip(){const c=getAC();if(!c)return;const n=c.sampleRate*.18,b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2)*.5;const s=c.createBufferSource(),f=c.createBiquadFilter();f.type='bandpass';f.frequency.value=2400;s.buffer=b;s.connect(f);f.connect(c.destination);s.start()}
 /* Neptune: tap Sapon and the place you touched wobbles ("ぽよよん") */
-function sapGame(into){const v=document.createElement('div');v.className='vw gmv sapgm';v.style.top='10%';
+function sapGame(into){const v=document.createElement('div');v.className='vw gmv sapgm live';v.style.top='10%';
   v.innerHTML=`<div class="gscr"><canvas width="600" height="600" aria-label="サーぽんをタップしてね"></canvas><div class="gcnt">ぷるぷる 0</div><div class="ghint">サーぽんを タップしてね</div></div><div class="ttl2">${SAPON.game}</div>`;
   const cv=v.querySelector('canvas'),gl=cv.getContext('webgl',{premultipliedAlpha:false});let hits=[],raf2=0,cnt=0;
   if(!gl){return v}
@@ -1350,8 +1350,8 @@ function poyo(k){const c=getAC();if(!c)return;const t0=c.currentTime+.005,o=c.cr
   o.frequency.setValueAtTime(520*k,t0);o.frequency.exponentialRampToValueAtTime(260*k,t0+.45);lf.frequency.value=14;lg.gain.setValueAtTime(70*k,t0);lg.gain.exponentialRampToValueAtTime(4,t0+.5);lf.connect(lg);lg.connect(o.frequency);
   g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(.35,t0+.012);g.gain.exponentialRampToValueAtTime(.0001,t0+.55);o.connect(g);g.connect(c.destination);o.start(t0);lf.start(t0);o.stop(t0+.6);lf.stop(t0+.6)}
 function sapViewer(into,pl){const c=G5[pl],ttl=t=>{const st=TSTYLE[t]||{f:"'Dela Gothic One'"};return `<div class="ttl2" style="font-family:${st.f},var(--f-body)">${[...t].map(ch=>`<span class="${chk(ch)}">${ch}</span>`).join('')}</div>`};let v=document.createElement('div'),stop=()=>{};
-  if(c.t==='mv'){v.className='vw mvv';v.style.top='12%';v.innerHTML=`<div class="scr"><video src="${A['sap-mv']||''}" poster="${A['sap-dad']||''}" muted loop playsinline autoplay></video></div>${ttl(SAPON.song)}`;playSong('sap-song');stop=()=>stopSong();setTimeout(()=>{const vd=v.querySelector('video');if(vd)vd.play().catch(()=>{})},50)}
-  if(c.t==='radio'){v.className='vw rdv';v.style.top='14%';v.innerHTML=`<div class="disc2" style="background-image:url(${A['sap-radio']||''})"></div><span class="air">ON AIR</span><div class="wave">${Array.from({length:15},(_,i)=>`<b style="height:${10+((i*7)%5)*6}px;animation-delay:${(i%5)*.08}s"></b>`).join('')}</div>${ttl(SAPON.radio)}`;setTimeout(()=>{playSong('sap-radio');if(SONG&&SONG.loop!==undefined)SONG.loop=false;if(SONG&&SONG.__el)SONG.__el.loop=false},400);stop=()=>stopSong()}
+  if(c.t==='mv'){v.className='vw mvv';v.style.top='12%';v.innerHTML=`<div class="scr"><video src="${A['sap-mv']||''}" poster="${A['sap-dad']||''}" muted loop playsinline autoplay></video></div>${ttl(SAPON.song)}`;if(!A['sap-mv'])setTimeout(()=>toast('🎬 動くMVは「星のホーム2」で見られるよ'),600);playSong('sap-song');stop=()=>stopSong();setTimeout(()=>{const vd=v.querySelector('video');if(vd)vd.play().catch(()=>{})},50)}
+  if(c.t==='radio'){v.className='vw rdv';v.style.top='14%';v.innerHTML=`<div class="disc2" style="background-image:url(${A['sap-radio']||''})"></div><span class="air">ON AIR</span><div class="wave">${Array.from({length:15},(_,i)=>`<b style="height:${10+((i*7)%5)*6}px;animation-delay:${(i%5)*.08}s"></b>`).join('')}</div>${ttl(SAPON.radio)}`;if(!A['sap-radiov'])setTimeout(()=>toast('📻 このラジオは「星のホーム2」で聞けるよ'),600);setTimeout(()=>{playSong('sap-radiov');if(SONG&&SONG.loop!==undefined)SONG.loop=false;if(SONG&&SONG.__el)SONG.__el.loop=false},400);stop=()=>stopSong()}
   if(c.t==='goods'){v.className='vw gdv sapmug';v.style.top='16%';v.innerHTML=`<div class="mug"><img alt="サーぽんのマグカップ" src="${A['sap-mug']||''}"></div>${ttl(SAPON.goods)}`}
   if(c.t==='book'){v=sapBook(into)}
   if(c.t==='game'){v=sapGame(into);stop=()=>{v.__stop&&v.__stop()}}
@@ -1489,7 +1489,7 @@ function stopMer(){cancelAnimationFrame(SHraf);SH=[];SHQ=[];if(MV)stopM();stopSo
 const LYRICS={'song-1':[[.6,'青い空に 手をのばして'],[4.4,'波の音が 背中を押す'],[8.2,'はじまるよ ぼくらの夏'],[12.0,'いま 走り出せ']],
   'song-3':[[.5,'光るフロアに 飛びこんで'],[4.2,'みんなで 手を上げろ'],[8.0,'夜が明けるまで 踊ろう'],[12.0,'パーティー パーティー']]};
 let LYR=null;
-function lyricsStart(into,k,top){lyricsStop();const L=LYRICS[k];if(!L||!SONG||!AC||!SONG.buffer)return;const d=SONG.buffer.duration,t0=SONG.__t0||AC.currentTime;
+function lyricsStart(into,k,top){lyricsStop();const L=k==='sap-song'?SAPLY:LYRICS[k];if(!L||!SONG||!AC||!SONG.buffer)return;const d=SONG.buffer.duration,t0=SONG.__t0||AC.currentTime;
   const e=document.createElement('div');e.className='lyr';e.style.top=top;e.innerHTML='<div class="ln"></div><div class="nx"></div>';into.appendChild(e);let cur=-1,raf2=0;
   const tick=()=>{if(!SONG){lyricsStop();return}const tt=(AC.currentTime-t0)%d;let i=-1;for(let j=0;j<L.length;j++)if(tt>=L[j][0])i=j;
     if(i!==cur){cur=i;e.classList.add('swap');setTimeout(()=>{e.querySelector('.ln').textContent=i>=0?L[i][1]:'';e.querySelector('.nx').textContent=L[(i+1)%L.length][1];e.classList.remove('swap')},140)}
@@ -1549,7 +1549,7 @@ function popSh(s){if(s.gone||MBUSY||MPLAY)return;s.gone=true;const ph=$('phone')
   MBUSY={s,t0:performance.now(),close};
 }
 // a second tap closes quickly (Mercury and Jupiter)
-document.addEventListener('click',e=>{if(!e.target.closest('#phone')||e.target.closest('#cta'))return;
+document.addEventListener('click',e=>{if(!e.target.closest('#phone')||e.target.closest('#cta')||e.target.closest('.vw.live'))return;
   if(MBUSY&&performance.now()-MBUSY.t0>500){MBUSY.close();return}
   if(JOPEN&&performance.now()-JOPEN.t0>300){JOPEN.close()}
   if(GOPEN&&performance.now()-GOPEN.t0>300){GOPEN.close()}},true);
@@ -1651,7 +1651,7 @@ const VEL=[];let VELi=0,VEL_ON=false;
 document.addEventListener('pointerdown',()=>{if(VEL_ON)return;VEL_ON=true;for(let n=0;n<3;n++){const a=new Audio();a.preload='auto';a.src=SILENT;a.play().then(()=>a.pause()).catch(()=>{});VEL.push(a)}},{passive:true});
 function playEl(src){if(VEL.length<2)return false;const a=VEL[VELi++%(VEL.length-1)];try{a.pause();a.src=src;a.currentTime=0;a.play().catch(()=>{});return true}catch(e){return false}}
 function decodeOne(c,k){return Promise.race([fetch(A[k]).then(r=>r.arrayBuffer()).then(b=>new Promise((ok,ng)=>c.decodeAudioData(b,ok,ng))),new Promise((_,ng)=>setTimeout(()=>ng('timeout'),5000))])}
-function loadVoices(){const c=getAC();if(!c)return;const ks=[1,2,3,4,5].map(n=>'voice-'+String(n).padStart(2,'0')).concat([1,2,3,4,5].flatMap(n=>['vtitle-'+n,'stitle-'+n]),[1,2,3,4,5].map(n=>'song-'+n),['sap-saturn','sap-dadv','sap-stitle','sap-song','sap-radio']);for(const k of ks){if(!A[k]||VBUF[k])continue;VBUF[k]='loading';
+function loadVoices(){const c=getAC();if(!c)return;const ks=[1,2,3,4,5].map(n=>'voice-'+String(n).padStart(2,'0')).concat([1,2,3,4,5].flatMap(n=>['vtitle-'+n,'stitle-'+n]),[1,2,3,4,5].map(n=>'song-'+n),['sap-saturn','sap-dadv','sap-stitle','sap-song','sap-radiov']);for(const k of ks){if(!A[k]||VBUF[k])continue;VBUF[k]='loading';
   VPROM[k]=DQ=DQ.then(()=>decodeOne(c,k)).then(buf=>{VBUF[k]=buf}).catch(()=>{VBUF[k]=null})}}
 // decoding starts on the first tap (after the context is resumed)
 document.addEventListener('pointerdown',()=>{getAC();loadVoices()},{once:false,passive:true});
