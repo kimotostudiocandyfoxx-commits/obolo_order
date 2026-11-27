@@ -23,4 +23,4 @@ export function birthYearOf(onboarding: unknown): number | null {
   return Number.isInteger(y) && y >= BIRTH_YEAR_MIN ? y : null;
 }
 /** what the app says when the server asks for the year (PROVISIONAL wording) */
-export const BIRTH_YEAR_REQUIRED_WORDS = '生まれた年を、教えてください';
+export const BIRTH_YEAR_REQUIRED_WORDS = '生まれた年を、教えてね';

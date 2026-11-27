@@ -32,12 +32,12 @@ const MIN_SECONDS = 0.6;
 /** PROVISIONAL wording (the story chat confirms) */
 export const TAP_VOICE_WORDS = {
   idle: 'タップして、話してね',
-  recording: (sec: number, max: number) => `録音中… ${sec}秒（もう一度タップで、おわり。最長${max}秒）`,
+  recording: (sec: number, max: number) => `録音中… ${sec}秒（もう一度タップで、おわり）${max - sec <= 10 ? `　あと${Math.max(0, max - sec)}秒` : ''}`,
   tooShort: 'もう少し長く、話してね',
   making: '声をととのえているよ…',
   caption: 'ことば',
   noWords: '（ことばは、聞きとれなかったよ。声だけ送れるよ）',
-  voiceFixed: '声そのものは直せないよ。直すときは、とりなおしてね',
+  voiceFixed: '声は、とりなおしで直せるよ',
   preview: 'きいてみる',
   stop: 'とめる',
   retake: 'とりなおす',
