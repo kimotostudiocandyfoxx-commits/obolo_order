@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Headers, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
 import { timingSafeEqual } from 'node:crypto';
-import { BatiForgetBody, BatiMemoryBody, BatiRoleBody, BatiEggBody, BatiIdBody, BatiNameBody, BatiNewHatchBody, BatiSpeechBody, BatiRestyleBody, BatiRestyleChooseBody, ChooseLookBody, LookRestoreBody, ChoosePuniPicBody, NeoLookBody, PuniPicBody, RefineLookBody, StickerArtBody } from '@obolo/shared';
+import { BatiForgetBody, BatiMemoryBody, BatiRoleBody, BatiEggBody, BatiIdBody, BatiNameBody, BatiNewHatchBody, BatiSpeechBody, BatiRestyleBody, BatiRestyleChooseBody, ChooseLookBody, LookBaseBody, LookPick4Body, LookRestoreBody, LookStepBody, LookWhoBody, ChoosePuniPicBody, NeoLookBody, PuniPicBody, RefineLookBody, StickerArtBody } from '@obolo/shared';
 import type { Request } from 'express';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
@@ -10,6 +10,7 @@ import type { KvStore } from '../infra/kv';
 import { KV } from '../infra/tokens';
 import { LookService } from './look.service';
 import { BatiMemoryService } from './memory.service';
+import { LookStepsService } from './steps.service';
 
 const origin = (req: Request) => `${req.protocol}://${req.get('host')}`;
 
@@ -19,6 +20,7 @@ export class LookController {
   constructor(
     private readonly look: LookService,
     private readonly memory: BatiMemoryService,
+    private readonly steps: LookStepsService,
     @Inject(KV) private readonly kv: KvStore,
     @Inject(CONFIG) private readonly cfg: AppConfig,
   ) {}
@@ -41,6 +43,44 @@ export class LookController {
   async refine(@UserId() userId: string, @Body() body: unknown, @Req() req: Request, @Headers('x-admin-token') token?: string) {
     await rateLimit(this.kv, `look:${userId}`, 6, 60);
     return this.look.refine(userId, parseBody(RefineLookBody, body), origin(req), this.admin(token));
+  }
+
+  // client 2026-11-27 (story M-R334): a look changed step by step — {bati}'s 進化 and one's own 変身 (LookStepsService)
+  @Get('look/steps')
+  stepsInfo(@UserId() userId: string) {
+    return this.steps.info(userId);
+  }
+
+  @Post('look/steps')
+  @HttpCode(200)
+  async stepLook(@UserId() userId: string, @Body() body: unknown, @Req() req: Request, @Headers('x-admin-token') token?: string) {
+    await rateLimit(this.kv, `look-step:${userId}`, 6, 60);
+    return this.steps.step(userId, parseBody(LookStepBody, body), origin(req), this.admin(token));
+  }
+
+  @Post('look/steps/pick4')
+  @HttpCode(200)
+  async pick4(@UserId() userId: string, @Body() body: unknown, @Req() req: Request, @Headers('x-admin-token') token?: string) {
+    await rateLimit(this.kv, `look-pick4:${userId}`, 3, 60);
+    return this.steps.pick4(userId, parseBody(LookPick4Body, body), origin(req), this.admin(token));
+  }
+
+  @Post('look/steps/base')
+  @HttpCode(200)
+  stepBase(@UserId() userId: string, @Body() body: unknown) {
+    return this.steps.base(userId, parseBody(LookBaseBody, body).mediaId);
+  }
+
+  @Post('look/steps/fix')
+  @HttpCode(200)
+  stepFix(@UserId() userId: string, @Body() body: unknown, @Req() req: Request, @Headers('x-admin-token') token?: string) {
+    return this.steps.fix(userId, parseBody(LookWhoBody, body).who, origin(req), this.admin(token));
+  }
+
+  @Post('look/steps/open')
+  @HttpCode(200)
+  stepOpen(@UserId() userId: string, @Body() body: unknown) {
+    return this.steps.open(userId, parseBody(LookWhoBody, body).who);
   }
 
   @Post('look')

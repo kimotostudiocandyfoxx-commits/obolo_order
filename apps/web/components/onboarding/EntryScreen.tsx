@@ -59,20 +59,22 @@ export function EntryScreen() {
   };
 
   return (
-    <main className="pt-safe pb-safe flex min-h-svh flex-col items-center justify-center px-8 text-center" style={{ fontFamily: SERIF }}>
-      <div className="relative mb-6 flex h-28 w-28 items-center justify-center">
-        <span className="absolute inset-0 rounded-full border border-amber-200/30" />
-        <span className="absolute inset-3 animate-[spin-slow_40s_linear_infinite] rounded-full border border-dashed border-amber-200/25" />
-        <span className="h-3 w-3 rounded-full bg-amber-100 shadow-[0_0_40px_12px_rgba(255,214,140,0.55)]" />
-      </div>
-      <span className="text-xs tracking-[0.5em] text-amber-200/70">OBOLO ORDER</span>
+    // client 2026-11-27: the golden eclipse (the client's own picture) behind the entry; the words sit under the ring in its gold
+    <main className="pt-safe pb-safe relative flex min-h-svh flex-col items-center overflow-hidden bg-black px-8 text-center" style={{ fontFamily: SERIF }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/onboarding/entry-eclipse.webp" alt="" aria-hidden draggable={false} className="pointer-events-none absolute inset-0 h-full w-full select-none object-cover object-[50%_0%]" data-testid="entry-backdrop" />
+      {/* the lower half goes darker, so the form reads */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0)_38%,rgba(0,0,0,.55)_58%,rgba(0,0,0,.78)_100%)]" />
+      {/* the ring's own place: the words begin under it */}
+      <div aria-hidden className="h-[45svh] min-h-[220px] w-full shrink-0" />
+      <span className="relative text-xs tracking-[0.55em] text-[#f0cf8a] [text-shadow:0_0_14px_rgba(255,200,110,.45)]">OBOLO ORDER</span>
 
       {step === 'email' ? (
-        <form onSubmit={send} className="mt-8 flex w-full max-w-xs animate-[fadeUp_0.8s_ease-out] flex-col gap-4">
-          <p className="text-lg tracking-wider text-amber-50">{m.entry.title}</p>
-          <p className="-mt-2 text-xs leading-relaxed text-white/45">{m.entry.lead}</p>
+        <form onSubmit={send} className="relative mt-7 flex w-full max-w-xs animate-[fadeUp_0.8s_ease-out] flex-col gap-4">
+          <p className="text-lg tracking-wider text-[#fff3d6] [text-shadow:0_1px_10px_rgba(0,0,0,.8)]">{m.entry.title}</p>
+          <p className="-mt-2 text-xs leading-relaxed text-[#e9d3a3]/70">{m.entry.lead}</p>
           <input
-            className="rounded-full border border-amber-200/50 bg-black/60 px-6 py-3.5 text-center tracking-wider text-amber-50 outline-none placeholder:text-white/30 focus:border-amber-100"
+            className="rounded-full border border-[#e2b866]/60 bg-black/70 px-6 py-3.5 text-center tracking-wider text-[#fff3d6] outline-none backdrop-blur-sm placeholder:text-[#e9d3a3]/35 focus:border-[#ffd98a] focus:shadow-[0_0_18px_rgba(255,200,110,.3)]"
             style={{ fontSize: 16 }}
             type="email"
             inputMode="email"
@@ -84,18 +86,18 @@ export function EntryScreen() {
             onChange={(e) => setEmail(e.target.value)}
           />
           <button
-            className="rounded-full border border-amber-200/70 bg-black px-6 py-3.5 tracking-[0.2em] text-amber-50 shadow-[0_0_24px_rgba(255,210,130,0.25)] disabled:opacity-40"
+            className="rounded-full border border-[#ffd98a]/80 bg-[linear-gradient(180deg,#2a1e08,#0c0802)] px-6 py-3.5 tracking-[0.2em] text-[#ffe9b8] shadow-[0_0_26px_rgba(255,200,110,0.32)] disabled:opacity-40"
             disabled={busy || !email}
           >
             {busy ? '……' : m.entry.next}
           </button>
         </form>
       ) : (
-        <form onSubmit={verify} className="mt-8 flex w-full max-w-xs animate-[fadeUp_0.8s_ease-out] flex-col gap-4">
-          <p className="text-sm text-white/70">{t(m.entry.codeSent, { email })}</p>
+        <form onSubmit={verify} className="relative mt-7 flex w-full max-w-xs animate-[fadeUp_0.8s_ease-out] flex-col gap-4">
+          <p className="text-sm text-[#fff3d6]/85 [text-shadow:0_1px_8px_rgba(0,0,0,.8)]">{t(m.entry.codeSent, { email })}</p>
           {devCode && <p className="text-xs text-amber-200/80">{t(m.entry.demoCode, { code: devCode })}</p>}
           <input
-            className="rounded-full border border-amber-200/50 bg-black/60 px-6 py-3.5 text-center font-mono text-2xl tracking-[0.5em] text-amber-50 outline-none focus:border-amber-100"
+            className="rounded-full border border-[#e2b866]/60 bg-black/70 px-6 py-3.5 text-center font-mono text-2xl tracking-[0.5em] text-[#fff3d6] outline-none backdrop-blur-sm focus:border-[#ffd98a] focus:shadow-[0_0_18px_rgba(255,200,110,.3)]"
             inputMode="numeric"
             autoComplete="one-time-code"
             maxLength={6}
@@ -105,18 +107,18 @@ export function EntryScreen() {
             onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
           />
           <button
-            className="rounded-full border border-amber-200/70 bg-black px-6 py-3.5 tracking-[0.2em] text-amber-50 shadow-[0_0_24px_rgba(255,210,130,0.25)] disabled:opacity-40"
+            className="rounded-full border border-[#ffd98a]/80 bg-[linear-gradient(180deg,#2a1e08,#0c0802)] px-6 py-3.5 tracking-[0.2em] text-[#ffe9b8] shadow-[0_0_26px_rgba(255,200,110,0.32)] disabled:opacity-40"
             disabled={busy || code.length !== 6}
           >
             {busy ? '……' : m.entry.enter}
           </button>
-          <button type="button" className="text-xs text-white/40 underline" onClick={() => setStep('email')}>
+          <button type="button" className="text-xs text-[#e9d3a3]/60 underline" onClick={() => setStep('email')}>
             {m.entry.back}
           </button>
         </form>
       )}
-      {err && <p className="mt-4 max-w-xs text-sm text-rose-300">{err}</p>}
-      {demo && step === 'email' && <p className="mt-10 max-w-xs text-[11px] text-white/30">{m.entry.demoHint}</p>}
+      {err && <p className="relative mt-4 max-w-xs text-sm text-[#ffb09a] [text-shadow:0_1px_8px_rgba(0,0,0,.9)]">{err}</p>}
+      {demo && step === 'email' && <p className="relative mt-8 max-w-xs text-[11px] text-[#e9d3a3]/45">{m.entry.demoHint}</p>}
     </main>
   );
 }

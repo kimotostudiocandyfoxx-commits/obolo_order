@@ -1,0 +1,53 @@
+name: Runware evolve chain test
+
+# One-off comparison (client 2026-11-27): which model changes a look step by step from its own previous picture
+# (the day-2 "evolve the Bati / transform yourself up to 8 times" flow). scripts/art-lab/runware_evolve_chain.py;
+# pictures, sheets and costs are saved to art/lab/runware-evolve-chain on this branch. About $0.5.
+on:
+  workflow_dispatch:
+    inputs:
+      models:
+        description: 'model slugs (comma-separated); empty = klein 4B, klein 9B, Qwen 2.1 Turbo, Seedream flash'
+        required: false
+        default: ''
+      budget_usd:
+        description: 'stop once this much is spent (USD)'
+        required: false
+        default: '1.5'
+
+env:
+  WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER || format('projects/{0}/locations/global/workloadIdentityPools/github/providers/github', vars.GCP_PROJECT_NUMBER) }}
+  DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA || format('obolo-deployer@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+
+jobs:
+  paint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Pillow
+        run: python3 -m pip install --quiet pillow
+      - name: Paint the chains
+        env:
+          MODELS: ${{ inputs.models }}
+          BUDGET_USD: ${{ inputs.budget_usd }}
+        run: |
+          export RUNWARE_API_KEY="$(gcloud secrets versions access latest --secret=obolo-seedream-api-key)"
+          python3 scripts/art-lab/runware_evolve_chain.py
+      - name: Save to the branch
+        if: always()
+        run: |
+          git config user.name "art-lab"
+          git config user.email "art-lab@users.noreply.github.com"
+          git add -f art/lab/runware-evolve-chain
+          git diff --cached --quiet && exit 0
+          git commit -m "Art lab: step-by-step look changes on four models [skip ci]"
+          for i in 1 2 3 4; do git pull --rebase -X theirs origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep $((i * 5)); done

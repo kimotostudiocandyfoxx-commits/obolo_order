@@ -1,0 +1,188 @@
+{
+  "spent_usd": 0.1847,
+  "per_model": {
+    "flux2-klein-4b": {
+      "pictures": 8,
+      "avg_jpy": 0.18
+    },
+    "flux2-klein-9b": {
+      "pictures": 8,
+      "avg_jpy": 0.44
+    },
+    "seedream-5-flash": {
+      "pictures": 8,
+      "avg_jpy": 3.08
+    }
+  },
+  "prompt": "One cute mascot character that IS {food} itself: the food's own shape, colours and texture become its body (not an animal wearing or holding the food, no bowl or plate unless the food is the bowl). 2D Japanese anime illustration, soft clean line art and gentle cel shading with a slight painterly texture, big round sparkling eyes with star highlights, a small happy smile, pink blush on the cheeks, tiny simple arms and legs, standing, facing front, full body, centred, plain pure white background, no text, no shadow on the floor. Same drawing style, eyes and charm as the characters in the reference image; one single character only.",
+  "rows": [
+    {
+      "model": "flux2-klein-4b",
+      "food": "curry",
+      "file": "flux2-klein-4b__curry.jpg",
+      "cost_usd": 0.0011,
+      "seconds": 3.2
+    },
+    {
+      "model": "flux2-klein-4b",
+      "food": "ramen",
+      "file": "flux2-klein-4b__ramen.jpg",
+      "cost_usd": 0.0011,
+      "seconds": 2.9
+    },
+    {
+      "model": "flux2-klein-4b",
+      "food": "strawberry",
+      "file": "flux2-klein-4b__strawberry.jpg",
+      "cost_usd": 0.0011,
+      "seconds": 2.8
+    },
+    {
+      "model": "flux2-klein-4b",
+      "food": "takoyaki",
+      "file": "flux2-klein-4b__takoyaki.jpg",
+      "cost_usd": 0.0011,
+      "seconds": 4.2
+    },
+    {
+      "model": "flux2-klein-4b",
+      "food": "onigiri",
+      "file": "flux2-klein-4b__onigiri.jpg",
+      "cost_usd": 0.0011,
+      "seconds": 2.4
+    },
+    {
+      "model": "flux2-klein-4b",
+      "food": "hamburger",
+      "file": "flux2-klein-4b__hamburger.jpg",
+      "cost_usd": 0.0011,
+      "seconds": 2.9
+    },
+    {
+      "model": "flux2-klein-4b",
+      "food": "pudding",
+      "file": "flux2-klein-4b__pudding.jpg",
+      "cost_usd": 0.0011,
+      "seconds": 2.3
+    },
+    {
+      "model": "flux2-klein-4b",
+      "food": "yakiniku",
+      "file": "flux2-klein-4b__yakiniku.jpg",
+      "cost_usd": 0.0011,
+      "seconds": 2.7
+    },
+    {
+      "model": "flux2-klein-9b",
+      "food": "curry",
+      "file": "flux2-klein-9b__curry.jpg",
+      "cost_usd": 0.00273,
+      "seconds": 3.4
+    },
+    {
+      "model": "flux2-klein-9b",
+      "food": "ramen",
+      "file": "flux2-klein-9b__ramen.jpg",
+      "cost_usd": 0.00273,
+      "seconds": 4.0
+    },
+    {
+      "model": "flux2-klein-9b",
+      "food": "strawberry",
+      "file": "flux2-klein-9b__strawberry.jpg",
+      "cost_usd": 0.00273,
+      "seconds": 3.1
+    },
+    {
+      "model": "flux2-klein-9b",
+      "food": "takoyaki",
+      "file": "flux2-klein-9b__takoyaki.jpg",
+      "cost_usd": 0.00273,
+      "seconds": 4.0
+    },
+    {
+      "model": "flux2-klein-9b",
+      "food": "onigiri",
+      "file": "flux2-klein-9b__onigiri.jpg",
+      "cost_usd": 0.00273,
+      "seconds": 2.8
+    },
+    {
+      "model": "flux2-klein-9b",
+      "food": "hamburger",
+      "file": "flux2-klein-9b__hamburger.jpg",
+      "cost_usd": 0.00273,
+      "seconds": 4.6
+    },
+    {
+      "model": "flux2-klein-9b",
+      "food": "pudding",
+      "file": "flux2-klein-9b__pudding.jpg",
+      "cost_usd": 0.00273,
+      "seconds": 3.2
+    },
+    {
+      "model": "flux2-klein-9b",
+      "food": "yakiniku",
+      "file": "flux2-klein-9b__yakiniku.jpg",
+      "cost_usd": 0.00273,
+      "seconds": 2.9
+    },
+    {
+      "model": "seedream-5-flash",
+      "food": "curry",
+      "file": "seedream-5-flash__curry.jpg",
+      "cost_usd": 0.01926,
+      "seconds": 11.9
+    },
+    {
+      "model": "seedream-5-flash",
+      "food": "ramen",
+      "file": "seedream-5-flash__ramen.jpg",
+      "cost_usd": 0.01926,
+      "seconds": 15.4
+    },
+    {
+      "model": "seedream-5-flash",
+      "food": "strawberry",
+      "file": "seedream-5-flash__strawberry.jpg",
+      "cost_usd": 0.01926,
+      "seconds": 13.1
+    },
+    {
+      "model": "seedream-5-flash",
+      "food": "takoyaki",
+      "file": "seedream-5-flash__takoyaki.jpg",
+      "cost_usd": 0.01926,
+      "seconds": 12.2
+    },
+    {
+      "model": "seedream-5-flash",
+      "food": "onigiri",
+      "file": "seedream-5-flash__onigiri.jpg",
+      "cost_usd": 0.01926,
+      "seconds": 18.7
+    },
+    {
+      "model": "seedream-5-flash",
+      "food": "hamburger",
+      "file": "seedream-5-flash__hamburger.jpg",
+      "cost_usd": 0.01926,
+      "seconds": 13.4
+    },
+    {
+      "model": "seedream-5-flash",
+      "food": "pudding",
+      "file": "seedream-5-flash__pudding.jpg",
+      "cost_usd": 0.01926,
+      "seconds": 16.7
+    },
+    {
+      "model": "seedream-5-flash",
+      "food": "yakiniku",
+      "file": "seedream-5-flash__yakiniku.jpg",
+      "cost_usd": 0.01926,
+      "seconds": 17.3
+    }
+  ]
+}

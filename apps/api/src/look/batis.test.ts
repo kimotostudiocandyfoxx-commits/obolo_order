@@ -34,10 +34,12 @@ function make(over: Record<string, unknown> = {}, llmAnswer?: string) {
   const prompts: string[] = [];
   const looks = { generate: async (p: string) => (prompts.push(p), { data: await grey(), mime: 'image/png' }) };
   const jobs: string[] = [];
+  /** the charges taken whole (the birth picture, client 2026-11-27) */
+  const whole: { kind: string; key: string }[] = [];
   const queue = { register: () => undefined, enqueue: async (name: string) => void jobs.push(name) };
   const llm = llmAnswer === undefined ? { name: 'mock', chat: async () => '' } : { name: 'fake', chat: async () => llmAnswer };
-  const s = new LookService(db as never, media as never, looks as never, looks as never, { name: 'mock' } as never, new MemoryKv(), { charge: async () => ({ refund: async () => undefined }) } as never, queue as never, llm as never);
-  return { s, user, prompts, jobs };
+  const s = new LookService(db as never, media as never, looks as never, looks as never, { name: 'mock' } as never, new MemoryKv(), { charge: async () => ({ refund: async () => undefined }), chargeWhole: async (_db: unknown, _u: string, kind: string, key: string) => (whole.push({ kind, key }), { price: 0, taken: 0, waiting: 0, repeat: false }) } as never, queue as never, llm as never);
+  return { s, user, prompts, jobs, whole };
 }
 
 /** a born {bati}, as the list keeps it */
@@ -57,6 +59,17 @@ describe("the first {bati}: the personality from the favourite food (M-R217)", (
     // M-R231: the small egg hatches on the app's day 9 (not yet: the first journey is on day 3)
     expect(me.batiEgg).toMatchObject({ nth: 2, ready: false });
     void user;
+  });
+
+  it('M-R334: the sentence as said → only the food’s name is kept (the card, the seed); the birth picture is charged once', async () => {
+    const { s, user, whole } = make();
+    const me = await s.egg('u', { food: 'ゼロ時零分カレーだよ。', egg: 'moon' });
+    expect(me.bati?.food).toBe('カレー');
+    expect(me.bati?.card?.seed).toBe('カレー');
+    expect(user.batiFood).toBe('カレー');
+    expect(whole).toHaveLength(1);
+    expect(whole[0].kind).toBe('batiBirth');
+    expect(whole[0].key).toBe(`make:batiBirth:${me.bati?.id}`);
   });
 
   it('the first is never rare (the bright group, M-R230); an unfit seed is asked again', async () => {

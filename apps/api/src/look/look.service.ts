@@ -1,11 +1,11 @@
 import { HttpStatus, Inject, Injectable, Logger, Optional } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { decideBatiPersona, decideBatiWish, moderateLookWish, rewriteBatiLines, withAgeBand, withTouch, batiPrompt, keyedBackground, batiRestylePrompt, batiSeedRule, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromPhotoPrompt, neoFromReferencePrompt, neoAnimalPrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, kororinPicPrompt, refineLookPrompt } from '@obolo/ai';
+import { decideBatiPersona, decideBatiWish, moderateLookWish, rewriteBatiLines, withAgeBand, withTouch, batiPrompt, batiCharacterPrompt, foodNameOf, keyedBackground, batiRestylePrompt, batiSeedRule, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromPhotoPrompt, neoFromReferencePrompt, neoAnimalPrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, kororinPicPrompt, refineLookPrompt } from '@obolo/ai';
 import { readdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import sharp from 'sharp';
 import type { BackgroundRemover } from '@obolo/ai';
-import { cutLadder, cutPicture, ladderRecord, llmCutJudge } from '../media/cutting';
+import { cutLadder, cutPicture, ladderRecord, llmCutJudge, type LadderResult } from '../media/cutting';
 import { chooseKey, cutoutKey, KEY_WORDS, moveToKey, onKey, rankKeys, rekeyPrompt, type KeyName } from '../media/keying';
 import { ageBand, BATI_SEED_QUESTION, BATI_WISH_REFUSE, batiEggState, BATI_RESTYLE_TOUCHES, LOOK_HISTORY_MAX, BATI_MAX, BATI_SCRIPT_LINES, batiSeedKind, type BatiEggKind, type BatiNewHatchBody, type BatiSpeechBody, BATI_FACES, BATI_MAGIC_PER_DAY, BATI_RESTYLE_PER_DAY, type BatiRestyleResult, type BatiFace, JOURNEY_DONE, type MakeKind, type MakeConfirm, type SpellTag, spellKey, spellPrompt, type StickerArtBody, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type PuniPicBody, type PuniPicResult, type RefineLookBody, SELF_TALK_FACES, TALK_FACES, type TalkExpression, type TalkFace, type TalkLook } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
@@ -16,7 +16,7 @@ import { alreadyStarted } from '../wallet/confirmed';
 import { buddyProfiles, users } from '../db/schema';
 import type { KvStore } from '../infra/kv';
 import type { JobQueue } from '../infra/queue';
-import { BATI_IMAGES, BUDDY_LLM, CUTOUT_MODEL, IMAGES, KORORIN_IMAGES, KV, LLM, LOOK_IMAGES, QUEUE } from '../infra/tokens';
+import { BATI_BIRTH_IMAGES, BATI_IMAGES, BUDDY_LLM, CUTOUT_MODEL, IMAGES, KORORIN_IMAGES, KV, LLM, LOOK_IMAGES, QUEUE } from '../infra/tokens';
 import { CONFIG, type AppConfig } from '../config';
 import { activeBati, batiList, columnsOf, keepLook, lookHistory, type BatiRecord } from './batis';
 import { MediaService } from '../media/media.service';
@@ -63,6 +63,9 @@ let butterflySheet: Promise<GeneratedImage> | null = null;
 let kororinSheet: Promise<GeneratedImage> | null = null;
 /** The client's パタパタ butterflies (cut from the Jupiter mock), the style to follow. */
 /** The Bati's prepared body types (client decision 2026-10-25): eight per egg, on flat grey (assets/bati/<egg>-<n>.jpg); put on the key colour before an edit. */
+/** client 2026-11-27: the style sheet of a newborn {bati} (design/refs/2026-11-27-story/09: food characters, no watermark) */
+let batiSheet: Promise<{ data: Buffer; mime: string }> | undefined;
+const batiStyle = () => (batiSheet ??= readFile(resolve(__dirname, '../../assets/bati-style-food.jpg')).then((data) => ({ data, mime: 'image/jpeg' })));
 const BATI_DIR = resolve(__dirname, '../../assets/bati');
 const BATI_GREY: [number, number, number] = [128, 128, 128];
 /*
@@ -107,6 +110,23 @@ const FACE_WORDS: Record<BatiFace, string> = {
 };
 const BATI_FACE_PROMPT = (f: BatiFace, key: KeyName) =>
   `Edit the first picture: keep the same creature exactly — the same body, colours, materials, size, framing and light, on ${keyedBackground(KEY_WORDS[key])} — and change only its expression to ${FACE_WORDS[f]}. A small natural change of pose that fits the expression is fine. Cute, kids-friendly. No text, no letters.`;
+/**
+ * Client 2026-11-27: the expression variants and the back view whose cut-out failed every retry (media/cutting.ts
+ * cutLadder), kept in onboardingJson like the planet figures' `#cutfail`: `{ of: <the picture they were made from>,
+ * faces: { <face>: "colour:shape|model:area|…" } }`. Only for the picture worn now: a new picture starts afresh.
+ */
+export const BATI_FACES_CUTFAIL = 'bati.faces.cutfail';
+export const LOOK_BACK_CUTFAIL = 'look.back.cutfail';
+export function cutFailsOf(raw: string | null | undefined, of: string | null | undefined): Record<string, string> {
+  try {
+    const v = raw ? (JSON.parse(raw) as { of?: string; faces?: Record<string, string> }) : null;
+    return v && of && v.of === of && v.faces ? { ...v.faces } : {};
+  } catch {
+    return {};
+  }
+}
+/** the ladder gave nothing for an expression: it is left out (not a painting to try again) */
+class CutFailed extends Error {}
 const butterflyStyle = () => (butterflySheet ??= readFile(resolve(__dirname, '../../assets/butterfly-style.jpg')).then((data) => ({ data, mime: 'image/jpeg' })));
 
 /**
@@ -151,6 +171,8 @@ export class LookService {
     @Optional() private readonly figures?: PlanetFiguresService,
     /** M-R326: the background-removal model of the cut-out's checks and first retry (CUTOUT_MODEL; none: those are skipped) */
     @Optional() @Inject(CUTOUT_MODEL) private readonly cutModel?: BackgroundRemover | null,
+    /** client 2026-11-27: the one picture a {bati} is born with (BATI_BIRTH_MODEL, Seedream 5.0 Flash); {bati}'s painter without it */
+    @Optional() @Inject(BATI_BIRTH_IMAGES) private readonly birthPainter?: ImageProvider,
   ) {
     this.queue.register('bati.lines', ({ userId, batiId }) => this.writeLines(userId, batiId));
     this.queue.register('bati.paint', ({ userId, origin }) => this.paintBati(userId, origin).then(() => undefined));
@@ -159,6 +181,10 @@ export class LookService {
     this.queue.register('talk.look', ({ userId, origin, who }) => this.talkLook(userId, who, origin));
   }
 
+  /** client 2026-11-27: the painter of a {bati}'s birth picture (BATI_BIRTH_MODEL) */
+  private get birth(): ImageProvider {
+    return this.birthPainter ?? this.bati;
+  }
   /** R17: {bati}'s painter (BATI_MODEL) */
   private get bati(): ImageProvider {
     return this.batiPainter ?? this.looks;
@@ -431,7 +457,7 @@ export class LookService {
    * look worn until now is noted with its expressions, so putting it back needs no painting; a look without them has
    * them drawn again in the background.
    */
-  private async wearBati(userId: string, cur: typeof users.$inferSelect, url: string, origin: string, isNew: boolean): Promise<Me> {
+  async wearBati(userId: string, cur: typeof users.$inferSelect, url: string, origin: string, isNew: boolean): Promise<Me> {
     const r = activeBati(cur);
     const j = { ...((cur.onboardingJson ?? {}) as Record<string, string>) };
     let nowFaces: Record<string, string> | undefined;
@@ -529,7 +555,7 @@ export class LookService {
    * M-R223: the member's own look worn — a new one (added to the looks, onboardingJson 'look.history') or one worn
    * before (Bluena's first shelf). Each look keeps its round icon, so putting one back paints nothing.
    */
-  private async wearLook(userId: string, url: string, origin: string | undefined, isNew: boolean): Promise<Me> {
+  async wearLook(userId: string, url: string, origin: string | undefined, isNew: boolean): Promise<Me> {
     const before = await this.user(userId);
     const j0 = (before.onboardingJson ?? {}) as Record<string, string>;
     let hist = lookHistory(j0);
@@ -737,6 +763,9 @@ export class LookService {
    */
   async egg(userId: string, body: BatiEggBody, origin?: string): Promise<Me> {
     await this.clean(body.food);
+    // M-R334: the bubble keeps the sentence as said; what is kept as the favourite food (f_food, the card's 好物, the
+    // picture's seed) is the food's name only (「ゼロ時零分カレーだよ。」 → カレー)
+    const food = await foodNameOf(this.llm, body.food);
     const egg: BatiEggKind = body.egg === 'sun' ? 'sun' : body.egg ? 'moon' : 'sun';
     const cur = await this.user(userId);
     // the first {bati} (again): the list starts over unless more were born since (then only the one in the chat is made again)
@@ -744,15 +773,15 @@ export class LookService {
     const keep = list.length > 1 ? list.filter((r) => r.id !== cur.batiId) : [];
     // M-R227: never the same style as the member's other {bati}
     // M-R230: a first {bati} (none other yet) comes from the bright group only
-    const persona = await decideBatiPersona(this.buddyLlm ?? this.llm, body.food, egg, 'food', { exclude: keep.map((r) => r.personality), first: keep.length === 0 });
+    const persona = await decideBatiPersona(this.buddyLlm ?? this.llm, food, egg, 'food', { exclude: keep.map((r) => r.personality), first: keep.length === 0 });
     if (!persona) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'SEED_REASK', '、、、食べられるものを、言ってみろ。');
-    const rec = this.record(body.food, 'food', egg, persona);
+    const rec = this.record(food, 'food', egg, persona);
     const [u] = await this.db.write
       .update(users)
       .set({
         batisJson: [...keep, rec],
         batiId: rec.id,
-        batiFood: body.food,
+        batiFood: food,
         batiImageUrl: null,
         batiName: null,
         // M-R218: the broken shell becomes a small egg; M-R231: it hatches on the app's day 9 (users.bati_egg_at keeps when
@@ -761,6 +790,13 @@ export class LookService {
       })
       .where(eq(users.id, userId))
       .returning();
+    // client 2026-11-27: the birth picture's mana from the gem (one per {bati} born; a balance short of it never stops
+    // the story: the rest waits with the tenths)
+    try {
+      await this.ledger.chargeWhole(this.db, userId, 'batiBirth', `make:batiBirth:${rec.id}`, rec.id);
+    } catch (e) {
+      this.log.warn(`bati birth charge failed: ${String(e)}`);
+    }
     // which egg: its body types (kept beside the account until the hatching)
     await this.kv.set(`bati:egg:${userId}`, egg, TRY_TTL);
     if (persona.rare) await this.queue.enqueue('bati.lines', { userId, batiId: rec.id }, { dedupeKey: `bati-lines-${rec.id}` }).catch(() => undefined);
@@ -821,30 +857,74 @@ export class LookService {
   }
 
   /**
-   * A painting on `key` cut out and checked (M-R325 / M-R326, media/cutting.ts cutLadder): the colour cut, then the
-   * background-removal model's cut, then its background painted again on the key farthest from its colours (one edit,
-   * the re-key of before) — the first that passes the checks. When none does the colour cut is still handed back, as
-   * before the checks (these pictures have no stand-in yet; logged for the operators). Null: nothing to cut.
+   * The one cut-out of every character picture of this service (M-R325 / M-R326, media/cutting.ts cutLadder), check and
+   * retry: the colour cut → the background-removal model's cut of the same painting → its background painted again on
+   * the key farthest from its colours (one edit, the re-key of before) → once more on the key that is left. Never more
+   * than these three retries; the first that passes the five checks is the result.
+   * Client 2026-11-27 — a retry is never the member's cost twice: in a paid making the retries are that making's costs
+   * (one price, taken once, like the planet figures'); outside one, everything after the first failed check runs as
+   * 'cutRetry', which the operator absorbs (ABSORBED_FEATURES) instead of the member's small costs.
    */
-  private async cut(img: GeneratedImage, out: number, key: KeyName): Promise<Buffer | null> {
-    const r = await cutLadder({
+  private async ladder(img: GeneratedImage, out: number, key: KeyName, what: string): Promise<LadderResult | null> {
+    const scope = costScope.get();
+    const free = !(scope?.paid && scope.kind);
+    let retrying = false;
+    const run = <T>(fn: () => Promise<T>): Promise<T> => (retrying && free ? costScope.run({ userId: scope?.userId, feature: 'cutRetry' }, fn) : fn());
+    const model = this.cutModel;
+    const judge = llmCutJudge(this.llm);
+    let others: KeyName[] | null = null;
+    return cutLadder({
       first: { ...img, background: key },
       out,
       kind: 'figure',
-      model: this.cutModel,
-      judge: llmCutJudge(this.llm),
-      repaint: async (n) => {
-        if (n !== 1) return null;
-        const ranked = (await rankKeys(img.data).catch(() => [])).filter((x) => x.key !== key);
-        const to = ranked[0]?.key ?? (key === 'magenta' ? 'green' : 'magenta');
-        return { ...(await this.looks.generate(rekeyPrompt(to), 0, [img])), background: to };
+      model: model ? { name: model.name, remove: (i) => run(() => model.remove(i)) } : null,
+      judge: judge ? { judge: (sheet) => run(() => judge.judge(sheet)) } : null,
+      repaint: (n) =>
+        run(async () => {
+          if (!others) {
+            others = (await rankKeys(img.data).catch(() => [])).map((x) => x.key).filter((k) => k !== key);
+            for (const k of ['magenta', 'green', 'blue'] as const) if (k !== key && !others.includes(k)) others.push(k);
+          }
+          const to = others[n - 1];
+          if (!to) return null;
+          return { ...(await this.looks.generate(rekeyPrompt(to), 0, [img])), background: to };
+        }),
+      onTry: (t) => {
+        retrying = true;
+        this.log.warn(`cut-out of ${what}: ${t.step} failed its checks (${t.failed.join(', ') || t.reason}${t.failed.length && t.reason ? `: ${t.reason}` : ''})`);
       },
-    }).catch(() => null);
+    }).catch((e: unknown) => {
+      this.log.warn(`cut-out of ${what} broke: ${String(e)}`);
+      return null;
+    });
+  }
+
+  /**
+   * A painting on `key` cut out and checked (ladder). When no try passes the colour cut is still handed back, as before
+   * the checks (the standee, the chibi and {bati}'s own picture have no stand-in yet; logged for the operators). Null:
+   * nothing to cut. (Also the cut of the day-2 steps: look/steps.service.ts.)
+   */
+  async cut(img: GeneratedImage, out: number, key: KeyName, what = 'a picture'): Promise<Buffer | null> {
+    const r = await this.ladder(img, out, key, what);
     if (r?.ok) return r.png;
-    if (r) this.log.error(`cut-out failed every retry (${ladderRecord(r.tries)}): the colour cut is used`);
+    if (r) this.log.error(`cut-out failed every retry (${what}; ${ladderRecord(r.tries)}): the colour cut is used`);
     return cutPicture(img.data, out, key)
       .then((c) => c.png)
       .catch(() => null);
+  }
+
+  /**
+   * Client 2026-11-27: an expression variant ({bati}'s faces, the talk's faces and their blink / mouth parts) or the back
+   * view, cut out and checked (ladder) — pictures that have a stand-in already (the plain face, the bob, the talk cast's
+   * back). When no try passes NOTHING is kept, as the ladder is meant (the planet figures' way): `png` is null, the
+   * caller leaves the picture out, and it is logged as an error with every step and the checks it failed (`record`).
+   */
+  private async cutOrNothing(img: GeneratedImage, out: number, key: KeyName, what: string): Promise<{ png: Buffer | null; record: string }> {
+    const r = await this.ladder(img, out, key, what);
+    if (r?.ok) return { png: r.png, record: '' };
+    const record = (r && ladderRecord(r.tries)) || 'error';
+    this.log.error(`cut-out failed every retry and is not shown (${what}; ${record})`);
+    return { png: null, record };
   }
 
   /**
@@ -971,10 +1051,7 @@ export class LookService {
     let url: string | null = null;
     for (let k = 0; k < 2 && !url; k++) {
       try {
-        const img = await this.bati.generate(batiPrompt(u.batiFood, !!body, paintKind(activeBati(u)?.seedKind), body ? KEY_WORDS[body.key] : undefined), k, body ? [body] : []);
-        // painted on the body's flat key colour: cut out, so the Bati stands on the stage like the others
-        const png = body ? await this.cut(img, 768, body.key) : null;
-        url = (png ? await this.media.storeImage(userId, 'bati', 'image/png', png, origin) : await this.media.storeImage(userId, 'bati', img.mime, img.data, origin)).url;
+        url = await this.paintBorn(userId, u, origin, k);
       } catch (e) {
         this.log.warn(`bati generation failed (${k + 1}): ${String(e)}`);
       }
@@ -1003,6 +1080,19 @@ export class LookService {
     return nu;
   }
 
+  /**
+   * client 2026-11-27 (story M-R334): the picture a {bati} is born with — the seed itself as a character, 2D anime
+   * (batiCharacterPrompt; BATI_BIRTH_MODEL with the style sheet as reference), on a flat key colour and cut out so it
+   * stands on the stage without a frame. Blue: the colour food has least of.
+   */
+  private async paintBorn(userId: string, u: typeof users.$inferSelect, origin: string, variant: number): Promise<string> {
+    const key: KeyName = 'blue';
+    const style = await batiStyle().catch(() => null);
+    const img = await this.birth.generate(batiCharacterPrompt(u.batiFood ?? '', paintKind(activeBati(u)?.seedKind), KEY_WORDS[key], !!style), variant, style ? [style] : []);
+    const png = await this.cut(img, 768, key);
+    return (png ? await this.media.storeImage(userId, 'bati', 'image/png', png, origin) : await this.media.storeImage(userId, 'bati', img.mime, img.data, origin)).url;
+  }
+
   /** the stand-in body replaced by the real picture (a few tries, a minute apart); the faces are made again from it */
   private async repaintBati(userId: string, origin: string) {
     for (let k = 0; k < 3; k++) {
@@ -1011,9 +1101,7 @@ export class LookService {
       if (!u.batiFood || !(u.onboardingJson as Record<string, string> | null)?.['bati.stand']) return;
       const body = await this.batiBody(activeBati(u)?.egg ?? (await this.kv.get(`bati:egg:${userId}`)) ?? 'sun');
       try {
-        const img = await this.bati.generate(batiPrompt(u.batiFood, !!body, paintKind(activeBati(u)?.seedKind), body ? KEY_WORDS[body.key] : undefined), 7 + k, body ? [body] : []);
-        const png = body ? await this.cut(img, 768, body.key) : null;
-        const url = (png ? await this.media.storeImage(userId, 'bati', 'image/png', png, origin) : await this.media.storeImage(userId, 'bati', img.mime, img.data, origin)).url;
+        const url = await this.paintBorn(userId, u, origin, 7 + k);
         const cur = await this.user(userId);
         if (cur.batiFood !== u.batiFood) return;
         const j = { ...((cur.onboardingJson ?? {}) as Record<string, string>) };
@@ -1059,7 +1147,9 @@ export class LookService {
         return {} as Record<string, string>;
       }
     })();
-    const todo = BATI_FACES.filter((f) => !have[f]);
+    // client 2026-11-27: a face whose cut-out failed every retry for this picture is not painted again and again
+    const failed = cutFailsOf((u.onboardingJson as Record<string, string> | null)?.[BATI_FACES_CUTFAIL], u.batiImageUrl);
+    const todo = BATI_FACES.filter((f) => !have[f] && !failed[f]);
     if (!todo.length) return toMe(u);
     const png = await this.media.bytesByUrl(userId, u.batiImageUrl);
     if (!png) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Bati picture not found');
@@ -1075,11 +1165,18 @@ export class LookService {
         this.log.warn(`bati face ${todo[i]} failed: ${String(r.reason)}`);
         continue;
       }
-      const cut = await this.cut(r.value, 768, key);
-      const m = cut ? await this.media.storeImage(userId, 'bati', 'image/png', cut, origin) : await this.media.storeImage(userId, 'bati', r.value.mime, r.value.data, origin);
-      faces[todo[i]] = m.url;
+      // client 2026-11-27: the shared cut-out, checked and retried; a face no try cut cleanly is left out (the plain
+      // picture stands in, as for a face that was not painted) — never the painting on its key colour, never a bad cut
+      const cut = await this.cutOrNothing(r.value, 768, key, `bati face ${todo[i]} of ${userId}`);
+      if (!cut.png) {
+        failed[todo[i]] = cut.record;
+        continue;
+      }
+      faces[todo[i]] = (await this.media.storeImage(userId, 'bati', 'image/png', cut.png, origin)).url;
     }
-    const cur = (await this.user(userId)).onboardingJson as Record<string, string>;
+    const cur = { ...((await this.user(userId)).onboardingJson as Record<string, string>) };
+    if (Object.keys(failed).length) cur[BATI_FACES_CUTFAIL] = JSON.stringify({ of: u.batiImageUrl, faces: failed });
+    else delete cur[BATI_FACES_CUTFAIL];
     const [nu] = await this.db.write
       .update(users)
       .set({ onboardingJson: { ...cur, 'bati.faces': JSON.stringify(faces) }, updatedAt: new Date() })
@@ -1138,10 +1235,14 @@ export class LookService {
     const kw = KEY_WORDS[key];
     const ref = await onKey(png, key);
     const kind = who === 'me' ? ('avatar' as const) : ('bati' as const);
-    const store = async (img: GeneratedImage) => {
-      const cut = await this.cut(img, 1024, key);
-      const m = cut ? await this.media.storeImage(userId, kind, 'image/png', cut, origin) : await this.media.storeImage(userId, kind, img.mime, img.data, origin);
-      return { url: m.url, png: cut ?? img.data };
+    // client 2026-11-27: the shared cut-out, checked and retried; an expression no try cut cleanly is left out (thrown
+    // here: the face is missing like one that was not painted, the normal face stands in)
+    const todoName = (i: number) => `talk face ${todo[i]} (${who}) of ${userId}`;
+    const store = async (img: GeneratedImage, i: number) => {
+      const cut = await this.cutOrNothing(img, 1024, key, todoName(i));
+      if (!cut.png) throw new CutFailed(cut.record);
+      const m = await this.media.storeImage(userId, kind, 'image/png', cut.png, origin);
+      return { url: m.url, png: cut.png };
     };
     // {bati}'s faces drawn before (M-R139) stand for theirs; only the missing ones are painted
     let old: Record<string, string> = {};
@@ -1153,12 +1254,17 @@ export class LookService {
     const reuse: Partial<Record<TalkFace, string>> = { smile: old.smile, surprised: old.surprise, thinking: old.think, sad: old.sad };
     const wanted = (who === 'me' ? SELF_TALK_FACES : TALK_FACES).filter((f) => f !== 'normal');
     const todo = wanted.filter((f) => !reuse[f]);
-    const painted = await settleWithRetry(todo.length, (i) => this.looks.generate(talkFacePrompt(todo[i], kw), 11 + i, [ref]).then(store));
+    // (a painting that fails is painted once more by settleWithRetry; a failed cut-out is not: the ladder has retried it)
+    const painted = await settleWithRetry(todo.length, (i) =>
+      this.looks
+        .generate(talkFacePrompt(todo[i], kw), 11 + i, [ref])
+        .then((img) => store(img, i).catch((e: unknown) => (e instanceof CutFailed ? null : Promise.reject(e)))),
+    );
     const pics: Partial<Record<TalkFace, { url: string; png: Buffer | null }>> = { normal: { url: stand, png } };
     for (const f of wanted) if (reuse[f]) pics[f] = { url: reuse[f]!, png: null };
     painted.forEach((r, i) => {
-      if (r.status === 'fulfilled') pics[todo[i]] = r.value;
-      else this.log.warn(`talk face ${todo[i]} failed: ${String(r.reason)}`);
+      if (r.status === 'rejected') this.log.warn(`talk face ${todo[i]} failed: ${String(r.reason)}`);
+      else if (r.value) pics[todo[i]] = r.value;
     });
     const faces: Partial<Record<TalkFace, TalkExpression>> = {};
     for (const [f, p] of Object.entries(pics) as [TalkFace, { url: string; png: Buffer | null }][]) faces[f] = { kind: 'image', url: p.url };
@@ -1170,8 +1276,9 @@ export class LookService {
         if (!base) return;
         const r = await onKey(base, key);
         const [blink, mouth] = await Promise.allSettled([this.looks.generate(talkBlinkPrompt(kw), 31 + i, [r]), this.looks.generate(talkMouthPrompt(kw), 41 + i, [r])]);
-        const cutOf = async (g: PromiseSettledResult<GeneratedImage>) => (g.status === 'fulfilled' ? ((await this.cut(g.value, 1024, key)) ?? g.value.data) : null);
-        const [eb, mb] = await Promise.all([cutOf(blink), cutOf(mouth)]);
+        // client 2026-11-27: the same cut-out; a part whose edit no try cut cleanly is left out (the client bobs / does not blink)
+        const cutOf = async (g: PromiseSettledResult<GeneratedImage>, part: string) => (g.status === 'fulfilled' ? (await this.cutOrNothing(g.value, 1024, key, `talk ${part} of ${f} (${who}) of ${userId}`)).png : null);
+        const [eb, mb] = await Promise.all([cutOf(blink, 'blink'), cutOf(mouth, 'mouth')]);
         const e = faces[f] as Extract<TalkExpression, { kind: 'image' }>;
         const eyes = eb ? await findPart(base, eb, [0, 0.5]).catch(() => null) : null;
         if (eyes) Object.assign(e, { blink: (await this.media.storeImage(userId, kind, 'image/png', eyes.png, origin)).url, eyesBox: eyes.box });
@@ -1199,14 +1306,28 @@ export class LookService {
     if (!u.avatarUrl) return toMe(u);
     const j = (u.onboardingJson ?? {}) as Record<string, string>;
     if (j['look.back'] && j['look.back.of'] === u.avatarUrl) return toMe(u);
+    // client 2026-11-27: a back view whose cut-out failed every retry for this look is not painted again and again
+    if (cutFailsOf(j[LOOK_BACK_CUTFAIL], u.avatarUrl).back) return toMe(u);
     const standee = j['look.standee.of'] === u.avatarUrl ? j['look.standee'] : null;
     const png = await this.media.bytesByUrl(userId, standee ?? u.avatarUrl);
     if (!png) return toMe(u);
     await this.tagLookJob(u, u.avatarUrl);
     const key = await chooseKey(png);
     const img = await this.looks.generate(BACK_PROMPT(key), 21, [await onKey(png, key)]);
-    const cut = await this.cut(img, 1024, key);
-    const m = cut ? await this.media.storeImage(userId, 'avatar', 'image/png', cut, origin) : await this.media.storeImage(userId, 'avatar', img.mime, img.data, origin);
+    // client 2026-11-27: the shared cut-out, checked and retried; a back no try cut cleanly is not kept — the back of
+    // before stays for its own look only, the app shows the talk cast's back (Me.lookBack is null), and it is recorded
+    const cut = await this.cutOrNothing(img, 1024, key, `back view of ${userId}`);
+    if (!cut.png) {
+      const now = await this.user(userId);
+      if (now.avatarUrl !== u.avatarUrl) return toMe(now);
+      const [nu] = await this.db.write
+        .update(users)
+        .set({ onboardingJson: { ...((now.onboardingJson ?? {}) as Record<string, string>), [LOOK_BACK_CUTFAIL]: JSON.stringify({ of: u.avatarUrl, faces: { back: cut.record } }) }, updatedAt: new Date() })
+        .where(eq(users.id, userId))
+        .returning();
+      return toMe(nu);
+    }
+    const m = await this.media.storeImage(userId, 'avatar', 'image/png', cut.png, origin);
     const cur = await this.user(userId);
     // the look changed meanwhile: this back is not of the look worn now
     if (cur.avatarUrl !== u.avatarUrl) {
@@ -1232,10 +1353,10 @@ export class LookService {
    * figures are painted, as that making. From now on a resident's look stays as it is (LOOK_LOCKED) until they join.
    * Returns the member and the mana the look took (0: nothing taken — no own look, already confirmed, not day 2's end).
    */
-  async confirmFirstLook(userId: string, origin: string): Promise<{ me: Me; mana: number }> {
+  async confirmFirstLook(userId: string, origin: string, /** M-R334: decided at the bowl of water (〔この姿にする〕), before the day is finished */ atFix = false): Promise<{ me: Me; mana: number }> {
     const u = await this.user(userId);
     const j = (u.onboardingJson ?? {}) as Record<string, string>;
-    if (j[LOOK_CONFIRMED_KEY] || u.journeyDay !== 2 || !u.journeyCompletedAt) return { me: toMe(u), mana: 0 };
+    if (j[LOOK_CONFIRMED_KEY] || (atFix ? u.journeyDay > 2 : u.journeyDay !== 2 || !u.journeyCompletedAt)) return { me: toMe(u), mana: 0 };
     const look = u.avatarUrl;
     let mana = 0;
     if (look) {

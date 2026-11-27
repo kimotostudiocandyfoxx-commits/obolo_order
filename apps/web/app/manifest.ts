@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Obolo Order',
     short_name: 'Obolo',
-    description: 'A social solar system connected by sound',
+    description: '完全招待制宇宙秘密結社',
     start_url: '/',
     display: 'standalone',
     orientation: 'portrait',
@@ -14,7 +14,6 @@ export default function manifest(): MetadataRoute.Manifest {
     icons: [
       { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
       { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
-      { src: '/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
     ],
   };
 }

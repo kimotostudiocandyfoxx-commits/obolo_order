@@ -301,6 +301,17 @@ export interface Api {
   /** `magic`: Bati's magic in Bati's room (the Moon) — rounds counted per day (BATI_MAGIC_PER_DAY), free on the first journey */
   refineLook(mediaId: string | null, instruction: string, magic?: boolean, paid?: Paid): Promise<NeoLookResult>;
   chooseLook(mediaId: string): Promise<Me>;
+  // --- client 2026-11-27 (story M-R334; shared lookSteps.ts): a look changed step by step — {bati}'s 進化, one's own 変身
+  lookStepsInfo(): Promise<import('@obolo/shared').LookStepsInfo>;
+  /** one step: how to change it from the look it has now (words and / or a reference picture); one step's mana */
+  lookStep(body: { who: import('@obolo/shared').LookStepWho; wish: string; image?: { mime: 'image/jpeg' | 'image/png' | 'image/webp'; data: string } }): Promise<import('@obolo/shared').LookStepResult>;
+  /** the four first pictures of one's own look (from the photo, or from the wish when no photo may be used) */
+  lookPick4(body: { photo?: { mime: 'image/jpeg' | 'image/png' | 'image/webp'; data: string }; wish?: string; via?: 'folder' | 'camera' }): Promise<import('@obolo/shared').LookPick4Result>;
+  lookStepBase(mediaId: string): Promise<import('@obolo/shared').LookStepResult>;
+  /** the round is decided: the picture is worn (one's own look is confirmed with it) */
+  lookStepFix(who: import('@obolo/shared').LookStepWho): Promise<import('@obolo/shared').LookStepResult & { me: Me }>;
+  /** an Obolo Order member starts a new round from the look worn now */
+  lookStepOpen(who: import('@obolo/shared').LookStepWho): Promise<import('@obolo/shared').LookStepResult>;
   /** Saturn picture character: 2 painted candidates from a description (+ optional inspiration picture). */
   puniPicCandidates(body: PuniPicBody): Promise<PuniPicResult>;
   /** Pick a candidate as your Saturn character (null = back to the code-drawn look). */

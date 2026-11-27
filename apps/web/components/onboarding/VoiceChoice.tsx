@@ -121,7 +121,7 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
   if (mode === 'keys') return <ReplyChips options={options} onPick={onPick} />;
   const on = mode === 'listen';
   return (
-    <div className="pb-safe absolute inset-x-0 bottom-0 z-20 flex flex-col items-center px-5 pb-8">
+    <div className="voice-magic pb-safe absolute inset-x-0 bottom-0 z-20 flex flex-col items-center px-5 pb-8">
       <p data-testid="voice-choice-line" className="mb-4 min-h-[2rem] rounded-2xl border border-amber-200/15 bg-black/55 px-4 py-1.5 text-center text-[12px] tracking-[0.08em] text-amber-50/85 backdrop-blur" style={{ fontFamily: SERIF }}>
         {on && recordNote && !heard && phase !== 'thinking' ? RECORD_NOTICE_POLITE : on ? heard || (phase === 'thinking' ? '文字にしています……' : phase === 'hearing' ? '聞こえています……' : '聞いています……') : note || `例：${options.join('・')}`}
       </p>

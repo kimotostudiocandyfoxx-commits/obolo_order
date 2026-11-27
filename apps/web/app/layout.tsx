@@ -15,11 +15,20 @@ import { MicCheck } from '@/components/mic/MicCheck';
 
 export const metadata: Metadata = {
   title: 'Obolo Order',
-  description: 'A social solar system connected by sound — 音でつながる、ひとつの太陽系',
+  description: '完全招待制宇宙秘密結社',
   applicationName: 'Obolo Order',
   appleWebApp: { capable: true, title: 'Obolo Order', statusBarStyle: 'black-translucent' },
-  // app icon (Art workshop): Home Screen, notifications
-  icons: { icon: [{ url: '/icon-192.png', sizes: '192x192', type: 'image/png' }, { url: '/icon.svg' }], apple: '/apple-touch-icon.png' },
+  // client 2026-11-27: the golden eclipse (the client's own picture) as the app icon and as the picture a shared link shows
+  icons: { icon: [{ url: '/icon-192.png', sizes: '192x192', type: 'image/png' }, { url: '/icon-512.png', sizes: '512x512', type: 'image/png' }], apple: '/apple-touch-icon.png' },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://oboloorder-web.vercel.app'),
+  openGraph: {
+    type: 'website',
+    siteName: 'Obolo Order',
+    title: 'Obolo Order',
+    description: '完全招待制宇宙秘密結社',
+    images: [{ url: '/og.jpg', width: 1200, height: 630, alt: 'Obolo Order' }],
+  },
+  twitter: { card: 'summary_large_image', title: 'Obolo Order', description: '完全招待制宇宙秘密結社', images: ['/og.jpg'] },
 };
 
 export const viewport: Viewport = {

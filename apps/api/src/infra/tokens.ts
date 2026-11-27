@@ -7,6 +7,9 @@ export const IMAGES = Symbol('IMAGES');
 export const LOOK_IMAGES = Symbol('LOOK_IMAGES');
 export const BATI_IMAGES = Symbol('BATI_IMAGES');
 export const KORORIN_IMAGES = Symbol('KORORIN_IMAGES');
+/** client 2026-11-27: one evolve / transform step (shared LOOK_STEP_MODEL) and a {bati}'s birth picture (BATI_BIRTH_MODEL) */
+export const LOOK_STEP_IMAGES = Symbol('LOOK_STEP_IMAGES');
+export const BATI_BIRTH_IMAGES = Symbol('BATI_BIRTH_IMAGES');
 /** client 2026-11-25: the member's planet figures — the Saturn chibi (SATURN_CHIBI_MODEL), the Saturn ball (SATURN_BALL_MODEL), the seven planets' chibis (PLANET_CHIBI_MODEL) */
 export const SATURN_CHIBI_IMAGES = Symbol('SATURN_CHIBI_IMAGES');
 export const SATURN_BALL_IMAGES = Symbol('SATURN_BALL_IMAGES');

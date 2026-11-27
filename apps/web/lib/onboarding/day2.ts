@@ -8,15 +8,20 @@ import type { Step } from './script';
  *    MONBAN checks the ticket; his warning and his mother's invitation at the gate
  *  - the Earth temple, the rocket pit and the Moon temple are back to the longer conversations (KIMORIN's 24-hour skip,
  *    「魔法、使えるのですか？」, the 「引っかけ問題」)
- *  - on the Moon the visitor's look first (LookMaker: photo into the bowl of water, the animal by voice, four looks),
- *    then KIMORIN's dragon (D03-S004b), the names, the eggs, うんちピンポンくん and {bati} are born, the first chat with
- *    {bati}, {bati}'s look in four touches and its lookups (D03-S008, M-R223), and sleep on the Moon (D03-S009). Bluena
- *    comes on the morning of day 3.
+ *  - on the Moon (M-R334, client 2026-11-27): the eggs (moon = ♀, sun = ♂, shown only as a small mark once {bati} is
+ *    born), the favourite food right after 「愛、と言っても…」, うんちピンポンくん, {bati} born from the food's name (the
+ *    food itself as a 2D anime character, no frame) and named, THEN the voice ({bati} copies {name}'s voice), the bowl of
+ *    water, {bati}'s evolution (D03-S005b: up to 8 steps, each from the look it has now), the visitor's own look
+ *    (D03-S004: photo → four pictures → up to 8 transformations → confirmed), KIMORIN's dragon (D03-S004b), the names,
+ *    {bati}'s chat (D03-S008) and sleep on the Moon (D03-S009). Bluena comes on the morning of day 3.
+ *  - mana: every picture is taken from the gem as it is made — the birth picture, each step ({mana_step}), the four
+ *    first pictures ({mana_pick4}) and the confirmed look ({mana_fix}); the numbers are the live prices (MAKE_COST is
+ *    their fallback).
  * Pictures: Seedance motions d2-* (each starting and ending on the stills around it), the Day-1 motions for
  * the HQ (d1-gate-loop, 9, 11, 12), Seedream stills s/d2-*.
- * The egg (M-R215): the visitor picks the moon egg (girl-leaning) or the sun egg (boy-leaning), f_egg; KIMORIN⭐︎ gets the other one.
- * Saved: times (+ timesWords), the look, the NEO name, egg, f_d03_voice (the egg recording, M-R246), the favourite food, {bati} and its name, f_d03_bati_look,
- * f_d03_bati_talk.
+ * The egg (M-R215 / M-R334): the visitor picks the moon egg (♀) or the sun egg (♂), f_egg; KIMORIN⭐︎ gets the other one.
+ * Saved: times (+ timesWords), egg, the favourite food (its name only), {bati} and its name, f_d03_voice, f_bati_evolve, the look
+ * (f_d03_photo, f_d03_card, f_d03_change), the NEO name, f_d03_bati_look, f_d03_bati_talk.
  */
 export const DAY2: Step[] = [
   { t: 'bgm', track: 'opening' },
@@ -29,39 +34,19 @@ export const DAY2: Step[] = [
   { t: 'action', label: '本部へ向かう' },
 
   // M-R207: the ticket no longer folds into a crane — it glows in the hand and a thin line of light runs along the ground
-  // to the HQ gate; at the gate KIMORIN calls from behind (at once, no pause), then MONBAN comes out of black smoke
+  // to the HQ gate. M-R334 (client 2026-11-27): the order — MONBAN comes out of black smoke and checks the ticket, the
+  // gate opens, and only as the visitor goes through KIMORIN calls from behind; his entrance is one short still (the
+  // walk-up and the long reveal film are cut), he talks at once
   { t: 'scene', id: 'D02-S002' }, // お待ちなさい
   { t: 'se', sound: 'sparkle' }, // 手の中の切符が、金色に光る。光が一本の細い線になって、本部の門の前まで続いていく
   { t: 'bgm', track: 'city' }, // 金と黒の都へ（2026-10-25）
   { t: 'still', image: 's/d2-gate-near' }, // 光の線をたどって、本部の門の前へ（床の光の筋が門まで続く絵）
   { t: 'cam', move: 'in', focus: '50% 60%' },
   { t: 'wait', s: 1.6 },
-  { t: 'loop', motion: 'd1-gate-loop' },
-  { t: 'say', who: 'KIMORIN', text: '待ちなさい。' }, // 後ろから（すぐに：間を置かない）
-  { t: 'bgm', track: null, fade: 1.5 },
-  { t: 'se', sound: 'whoosh' },
-  { t: 'video', motion: 'd2-look-back' }, // ふり返る：来た道のほうを見た景色
-  { t: 'se', sound: 'footsteps' },
-  { t: 'video', motion: 'd2-kimorin-walkup' }, // 来た道の逆光の中に細い人影。ゆっくり歩いてくる → 顔のドアップ
-  // the clips' own made-up sound is gone (client 2026-10-29: an odd sound at his entrance); a gust as his coat flares
-  { t: 'se', sound: 'whoosh' },
-  { t: 'video', motion: 'd2-reveal' }, // 豪華映像 #2 KIMORINの登場（M-R90）：白衣がひるがえり、扇の尾が一気に開き、ゴーグルに空の光がきらっと映る
-  { t: 'still', image: 's/d2-reveal-end' }, // the film's last frame with a mouth layer (client 2026-10-29)
-  { t: 'say', who: 'KIMORIN', text: 'なんですか、この怪しい建物は。' }, // こちらの横まで歩いてきて、本部の建物を、下から上まで、じろじろと見上げる
-  { t: 'bgm', track: 'monban' },
+  { t: 'cam', move: 'out' },
   { t: 'se', sound: 'smoke' },
-  // the clip d2-monban-smoke showed KIMORIN already in the order's robe (client 2026-10-28: on day 2 he wears the white
-  // coat and goggles until he changes on the Moon) — a still until the new cut is made (art/review)
-  { t: 'still', image: 's/d2-gate-two-inside' }, // 黒い煙が湧き、MONBANが現れる。MONBANが左、白衣のKIMORINが右
-  { t: 'say', who: 'MONBAN', text: '誰だお前…。' },
-  { t: 'say', who: 'KIMORIN', text: '私ですか？私は、なんでもすぐに発明してしまう、天才発明家、KIMORINです。' },
-  { t: 'say', who: 'MONBAN', text: 'この先はObolo Orderしか入れない…帰れ…。' },
-  { t: 'say', who: 'KIMORIN', text: 'おやおや、帰れは失礼なのでは？　なぜなら、私は！招待客なんですよー？' },
-  { t: 'sprite', image: null },
-  { t: 'still', image: 's/d2-invite-hand' }, // KIMORINが白衣のポケットから招待状を出して、MONBANに渡す
-  { t: 'se', sound: 'pop' },
-  { t: 'say', who: 'MONBAN', text: '……なんだ、招待か。' },
-  // MONBANの金色の目が、こちらへ向く
+  // 黒い煙が湧き、MONBANが現れる。金色の目が、こちらへ向く (the day-1 film of his arrival; his music comes with him)
+  { t: 'video', motion: 'd1-monban', bgmAt: { track: 'monban', at: 6.5 } },
   { t: 'loop', motion: '9-l' },
   { t: 'say', who: 'MONBAN', text: '来たか…切符は持ってきたか？' },
   { t: 'action', label: '切符を見せる' },
@@ -70,6 +55,27 @@ export const DAY2: Step[] = [
   // the line comes while the gate opens and MONBAN steps aside (client 2026-10-29), as on day 1
   { t: 'bgvideo', motion: 11 }, // 門が開き、MONBANが、横へ動く（M-R180）
   { t: 'say', who: 'MONBAN', text: '地球の神殿に行け…地下にロケット場がある' },
+  // 門をくぐろうとした、その時
+  { t: 'say', who: 'KIMORIN', text: '待ちなさい。' }, // 後ろから
+  { t: 'bgm', track: null, fade: 1.5 },
+  { t: 'se', sound: 'whoosh' },
+  { t: 'video', motion: 'd2-look-back' }, // ふり返る：来た道のほうを見た景色
+  // 止め絵：来た道の逆光の中の人影（立っているだけの間は短く、すぐ話しはじめる） — the still with a mouth layer
+  { t: 'still', image: 's/d2-reveal-end' },
+  { t: 'wait', s: 0.6 },
+  { t: 'say', who: 'KIMORIN', text: 'なんですか、この怪しい建物は。' }, // こちらの横まで歩いてきて、本部の建物を、下から上まで、じろじろと見上げる
+  { t: 'bgm', track: 'monban' },
+  // the clip d2-monban-smoke showed KIMORIN already in the order's robe (client 2026-10-28: on day 2 he wears the white
+  // coat and goggles until he changes on the Moon) — a still until the new cut is made (art/review)
+  { t: 'still', image: 's/d2-gate-two-inside' }, // MONBANが左、白衣のKIMORINが右
+  { t: 'say', who: 'MONBAN', text: '誰だお前…。' },
+  { t: 'say', who: 'KIMORIN', text: '私ですか？私は、なんでもすぐに発明してしまう、天才発明家、KIMORINです。' },
+  { t: 'say', who: 'MONBAN', text: 'この先はObolo Orderしか入れない…帰れ…。' },
+  { t: 'say', who: 'KIMORIN', text: 'おやおや、帰れは失礼なのでは？　なぜなら、私は！招待客なんですよー？' },
+  { t: 'sprite', image: null },
+  { t: 'still', image: 's/d2-invite-hand' }, // KIMORINが白衣のポケットから招待状を出して、MONBANに渡す
+  { t: 'se', sound: 'pop' },
+  { t: 'say', who: 'MONBAN', text: '……なんだ、招待か。' },
   { t: 'bgm', track: 'comedy' }, // KIMORINの「気をつけなさい」「詐欺グループに違いありません」
   { t: 'video', motion: 'd2-kimorin-face' }, // KIMORINが門をくぐろうとして、止まる。こちらに向き直る
   // the film's last frame with a mouth layer, so he talks with a moving mouth (client 2026-10-29)
@@ -179,7 +185,7 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'MONBAN', text: 'マナジェムだ…。' },
   { t: 'caption', text: 'マナジェムを手に入れた' },
   { t: 'still', image: 's/d2-monban-pit' },
-  { t: 'say', who: 'MONBAN', text: 'お前のもある' }, // KIMORINの手のひらにも、小さな石
+  { t: 'say', who: 'MONBAN', text: 'キモリンのもある' }, // MONBANが、KIMORINの手のひらにも、小さな石をのせる（M-R334）
   { t: 'say', who: 'KIMORIN', text: 'なんやこれ！　光っとる！　どういう仕組み！？' },
   { t: 'say', who: 'MONBAN', text: '使い方は…そのうち、わかる…。' },
   { t: 'say', who: 'KIMORIN', text: 'いや今教えてくださいよ。' },
@@ -188,8 +194,7 @@ export const DAY2: Step[] = [
   { t: 'se', sound: 'sparkle' }, // OBOLONが消える
   { t: 'vanish', s: 2.2 }, // 神秘的に、光の粒になって薄れていく（client 2026-10-29）
   { t: 'say', who: 'KIMORIN', text: 'すごい、、全然どういう仕組みかわからん、、、。' },
-  { t: 'say', who: 'KIMORIN', text: 'それでは私たちも行きましょう。。。宇宙へ！' },
-  { t: 'say', who: 'MONBAN', text: '月だ' },
+  { t: 'say', who: 'KIMORIN', text: 'それでは私たちも行きましょう。。。月へ！' }, // M-R334 (MONBAN's 「月だ」 is gone)
   { t: 'action', label: 'ロケットに乗る' },
   { t: 'sprite', image: null },
   { t: 'film', id: 'launch', parts: 4 }, // 豪華映像 #3 ロケットの発射（M-R90）：扉が閉まる → 炎と白い煙 → 雲の上、黒くなっていく空
@@ -274,29 +279,26 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'ほう。新しい姿とは、、、仮装でもするのですか？' },
   { t: 'say', who: 'OBOLON', text: 'どんな姿になりたいか、伝えてくれたら、、、魔法で、その姿にする。' },
   { t: 'say', who: 'KIMORIN', text: 'え？魔法？　……魔法、使えるのですか？' },
-  { t: 'say', who: 'OBOLON', text: '使える。お前も、宇宙を旅していたら、、、そのうち、使えるようになる。' },
-  { t: 'say', who: 'KIMORIN', text: 'え！？！？マジで！？' }, // ゴーグルを額に押し上げる。目の切れ目が、青く光る
-  { t: 'say', who: 'KIMORIN', text: 'では魔法ってことは、じゃあ、どんな見た目にも、なれるんですか？' }, // 興奮気味。はぁはぁしている
-  { t: 'say', who: 'OBOLON', text: 'なれる。だが、、、最初は、いっぱい望みすぎないほうがいい。変になるから。' },
-  { t: 'say', who: 'OBOLON', text: '旅を続けて、自分で魔法を使えるようになったら、、、ちょっとずつ、自分の好きな見た目に変えていく、それがいい。' },
-  { t: 'say', who: 'OBOLON', text: 'それでは、宇宙旅行の相方を誕生させよう' },
+  // M-R334: the magic talk, shortened
+  { t: 'say', who: 'OBOLON', text: 'この月の神殿なら、、、魔法を、唱えられる。' },
+  { t: 'say', who: 'OBOLON', text: 'それでは、、、魔法の相方を、誕生させよう。' },
   { t: 'say', who: 'KIMORIN', text: '相方？' },
-  { t: 'say', who: 'OBOLON', text: 'うん。さっき、魔法が使えるようになる、と言ったが。' },
+  { t: 'say', who: 'OBOLON', text: 'うん。魔法を唱えられる、と言ったが。' },
   { t: 'say', who: 'OBOLON', text: '厳密には、一人では、魔法は使えない。相方と、力を合わせて、魔法を唱えるんだ。' },
   { t: 'say', who: 'OBOLON', text: 'お前たちの新しい姿も、、、相方が、魔法で、作る。' },
   { t: 'say', who: 'OBOLON', text: 'こっちに、来い。' },
   // M-R209: {bati} is born first — the egg, the mana gem, KIMORIN's food (うんちピンポンくん), then {name}'s food and {bati}
   { t: 'scene', id: 'D03-S005' }, // 相方の誕生
   { t: 'sprite', image: null },
-  // M-R215: the moon egg (girl-leaning {bati}) and the sun egg (boy-leaning). PROVISIONAL (docs/placeholders.md P-BATI-EGGS):
+  // M-R215 / M-R334: the moon egg (♀) and the sun egg (♂) — never told before the birth. PROVISIONAL (docs/placeholders.md P-BATI-EGGS):
   // the moon egg's pictures and films are the old earth-and-moon egg's ('earth' in the file names) until the new ones come
   { t: 'video', motion: 'd2-altar' }, // 光の柱が神殿の奥へ。小さな祭壇に、たまごが二つ（白く静かに光る月のたまご／金色に燃える太陽のたまご）
   { t: 'still', image: 's/d2-altar' },
   { t: 'say', who: 'OBOLON', text: '月と、太陽。、、、陰と陽の力で、このたまごは、生まれた。' },
   { t: 'say', who: 'OBOLON', text: 'どちらか好きな方を選べ' },
-  { t: 'notice', text: '月のたまごからは、女の子寄りの相方が。太陽のたまごからは、男の子寄りの相方が、生まれます。生まれたあとの見た目は、自由に変えられます' },
+  { t: 'notice', text: 'どちらのたまごからも、旅の相方が生まれます。生まれたあとの姿は、魔法で自由に変えられます' },
   // the egg itself is tapped (client 2026-10-29); f_egg = moon / sun (the script's ids)
-  { t: 'choice', key: 'egg', pics: ['/onboarding/egg-pick-earth.webp', '/onboarding/egg-pick-sun.webp'], options: [{ label: '月のたまご（女の子寄り）', goto: 'egg-moon' }, { label: '太陽のたまご（男の子寄り）', goto: 'egg-sun' }] },
+  { t: 'choice', key: 'egg', pics: ['/onboarding/egg-pick-earth.webp', '/onboarding/egg-pick-sun.webp'], options: [{ label: '月のたまご', goto: 'egg-moon' }, { label: '太陽のたまご', goto: 'egg-sun' }] },
   // KIMORIN names the one left (client 2026-10-29)
   { t: 'label', id: 'egg-moon' },
   { t: 'set', key: 'f_egg', value: 'moon' },
@@ -321,25 +323,7 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'OBOLON', text: 'この卵にマナと、愛が、加われば、、、お前だけの旅の相方、バティが、生まれる。' },
   { t: 'say', who: 'KIMORIN', text: 'ア、、、アイ//？' }, // 声が裏返る。狐の耳の先まで赤くなる
   { t: 'say', who: 'OBOLON', text: '愛、と言っても、、、そんなに、構えなくていい。' },
-  // M-R246: before {bati} hatches, the two talk to their eggs — {bati}'s voice is made from {name}'s (two keys higher)
-  { t: 'say', who: 'OBOLON', text: 'その前に、、、相方は、お前たちの声から、生まれる。' },
-  { t: 'say', who: 'OBOLON', text: 'たまごに、、、声を、聞かせてやれ。' },
-  { t: 'sprite', image: ['obolon', 'kimorin-iu'] }, // 黒い球が、KIMORINのほうへ向く
-  { t: 'say', who: 'OBOLON', text: 'まずは、、、KIMORINだ。' },
-  { t: 'say', who: 'KIMORIN', text: '……なんと話しかけても、いいんですか？' },
-  { t: 'say', who: 'OBOLON', text: '、、、大丈夫だ。なんでも、いい。' },
-  // KIMORINが、たまごに顔を近づける。咳払いを一つ
-  { t: 'say', who: 'KIMORIN', text: 'こんな、よくわからない、初めて見るスピスピのたまごに向かって、何か話しかけろと言われましても。' },
-  { t: 'say', who: 'KIMORIN', text: 'なんて話しかければいいか、わかりません。……これが、本音です。' },
-  { t: 'se', sound: 'chime' }, // KIMORINのたまごの模様が、ゆっくり光る。中から、小さく：ピン……
-  { t: 'sprite', image: 'obolon' }, // 黒い球が、くるりと、こちらへ向く
-  { t: 'say', who: 'OBOLON', text: '、、、さあ、{name}。話しかけてみろ。' },
-  {
-    t: 'eggvoice', // held mic, the ring fills (~10 s), ⓘ only (M-R247); the words heard as {name}'s bubble; full → the egg glows
-    example: '私も正直、なんて話しかければいいか全然分かっていません。でも、分かりませんと話しかけていいなら、そう話しかけます。',
-    short: { t: 'say', who: 'OBOLON', text: '、、、もう少し、聞かせてやれ。' },
-  },
-  { t: 'se', sound: 'magic' }, // {name}のたまごの模様が、ゆっくり光る
+  // M-R334: the favourite food at once (the voice comes after {bati} is born and named; KIMORIN's 「何と話しかければ」 is gone)
   { t: 'say', who: 'OBOLON', text: 'お前たちの、好きなもの、、、そうだ。好きな食べ物を、教えてほしい。' },
   { t: 'sprite', image: ['obolon', 'kimorin-iu'] }, // 黒い球が、KIMORINのほうへ向く
   { t: 'say', who: 'OBOLON', text: 'まずは、、、KIMORINだ。好きな食べ物は？' },
@@ -413,28 +397,90 @@ export const DAY2: Step[] = [
   // M-R217: the {bati} card, in the chat (it is kept on Bluena's first shelf too)
   { t: 'baticard' },
   { t: 'face', who: '@bati', expr: 'smile' },
-
-  // M-R209: {bati}'s first magic makes {name}'s look — photo into the bowl of water, the animal by voice, {bati} on the
-  // rim (「いくよ、{name}！」), −3マナ, four looks, then the chosen look big on the screen (inside LookMaker)
-  { t: 'scene', id: 'D03-S004' }, // {name}のネオ
+  // M-R334: the voice now — {bati} copies {name}'s voice (M-R246: {bati}'s voice is made from it; M-R250: under 13 the
+  // scene is the same but nothing is recorded)
+  { t: 'sprite', image: ['obolon', '@bati'] },
+  { t: 'say', who: 'OBOLON', text: '{bati}は、、、お前の声を、真似して、喋る。' },
+  { t: 'say', who: 'OBOLON', text: 'だから、、、お前の声を、聞かせてやれ。' },
+  {
+    t: 'eggvoice', // a tap starts, a tap ends; the ring fills (~10 s); ⓘ only (M-R247); the words heard as {name}'s bubble
+    example: 'よろしくね。いっしょに、いろんな星に行こう。',
+    short: { t: 'say', who: 'OBOLON', text: '、、、もう少し、聞かせてやれ。' },
+  },
+  { t: 'se', sound: 'magic' }, // 光の輪が満ちると、{bati}の体が、ぽうっと光る
+  { t: 'sprite', image: '@bati' },
+  { t: 'face', who: '@bati', expr: 'sparkle' },
+  { t: 'say', who: 'バティ', text: '{name}の声、おぼえたよ！' }, // {name}の声に似た声で
+  // 黒い球が、床の真ん中の、水を張った大きな丸い器のほうへ向く
   { t: 'still', image: 's/d2-moon-in' },
-  { t: 'sprite', image: ['obolon', '@bati'] }, // KIMORINが、両腕を大きく広げて、息を吸いこむ — その前に、黒い球が、こちらへ向く
-  { t: 'say', who: 'OBOLON', text: '{name}、、、こっちへ来い。' }, // 器の水のそばへ。{bati}が、ころころ、あとからついてくる。KIMORINは、両腕を広げたまま
-  // M-R250: under 13 (or 13〜15 without the guardian's consent) the photo passage is skipped — the look from the animal only
-  { t: 'branch', key: 'f_media', cases: { no: 'look-animal' }, otherwise: 'look-photo' },
-  { t: 'label', id: 'look-photo' },
-  { t: 'say', who: 'OBOLON', text: 'まず、お前の姿を、器の水に映せ。' },
-  { t: 'goto', id: 'look-make' },
-  // （13歳未満の人）no photo: a favourite animal only; the four are that animal itself in the hood and round sunglasses
-  { t: 'label', id: 'look-animal' },
-  { t: 'say', who: 'OBOLON', text: '、、、器の水に、好きな動物を、思い浮かべろ。' },
-  { t: 'label', id: 'look-make' },
+  { t: 'sprite', image: ['obolon', '@bati'] },
+  { t: 'say', who: 'OBOLON', text: '{name}、{bati}。、、、こっちへ来い。' }, // {name}と{bati}が、器の前へ。器の水に、二人の姿が映る
+  { t: 'say', who: 'OBOLON', text: '魔法を唱える時は、、、この器の前に、来るんだ。' },
+  { t: 'say', who: 'OBOLON', text: 'まず、、、{bati}の姿と、お前の姿を、魔法で、変えるんだ。' },
+
+  // M-R334: {bati}'s evolution — one rule: say how to change it from the look it has now; up to 8 steps, each
+  // {mana_step} from the gem; 〔{bati}の姿はこれだ〕／〔進化させる〕 after every step
+  { t: 'scene', id: 'D03-S005b' }, // {bati}の進化
+  { t: 'sprite', image: ['obolon', '@bati'] }, // {bati}が、器のふちに、ぴょんと跳びのる
+  { t: 'say', who: 'OBOLON', text: 'まずは、、、{bati}の姿からだ。' },
+  { t: 'say', who: 'OBOLON', text: '決まりは、ひとつだけ。、、、今の姿から、どう変えるか、を伝えろ。' },
+  { t: 'say', who: 'OBOLON', text: 'それさえ守れば、、、どんな姿にも、なれる。' },
   { t: 'sprite', image: null },
   {
-    t: 'look', // 〔写真フォルダから器の水に映す〕〔カメラで撮って器の水に映す〕→ the animal → {bati} casts → −3マナ → 4枚
-    ask: { t: 'say', who: 'OBOLON', text: '何の動物に、アレンジする？' },
-    spell: { t: 'say', who: 'バティ', text: 'いくよ、{name}！' },
+    t: 'evolve',
+    who: 'bati',
+    counter: '進化',
+    ok: '{bati}の姿はこれだ',
+    more: '進化させる',
+    example: '翼を生やして',
+    spell: { t: 'say', who: 'バティ', text: 'いくよ！' },
+    limit: { t: 'say', who: 'OBOLON', text: '、、、今日の魔法は、ここまでだ。' },
   },
+  { t: 'sprite', image: '@bati' },
+  { t: 'face', who: '@bati', expr: 'smile' },
+  { t: 'se', sound: 'sparkle' },
+  { t: 'say', who: 'バティ', text: 'これが、ぼくの姿だね！' }, // 器のふちで、くるりと回る。♀／♂ のマークが、そばで小さく光る
+  { t: 'sprite', image: ['obolon', '@bati'] },
+  { t: 'say', who: 'OBOLON', text: '、、、いい相方だ。' },
+  { t: 'sprite', image: ['kimorin-iu', '@bati'] },
+  { t: 'say', who: 'KIMORIN', text: 'ほう。なかなか、やりますね。' },
+
+  // M-R334: the visitor's own look — photo → four pictures (anime touches, 2 / 3 / 5 / 7 heads; {mana_pick4}) → one is
+  // the base → up to 8 transformations ({mana_step} each) → 〔この姿にする〕 confirms it ({mana_fix}: the expressions,
+  // the back view, the figures on every planet). No animal question and no redraw any more.
+  { t: 'scene', id: 'D03-S004' }, // {name}のネオ
+  { t: 'still', image: 's/d2-moon-in' },
+  { t: 'sprite', image: ['obolon', '@bati'] }, // {bati}が、ころころと、こちらの足もとへ戻ってくる
+  { t: 'say', who: 'OBOLON', text: '、、、次は、お前の番だ。' }, // KIMORINが、両腕を大きく広げて、息を吸いこむ。黒い球は、こちらを向いたまま
+  // M-R250: under 13 (or 13〜15 without the guardian's consent) no photo — the wished look is said by voice
+  { t: 'branch', key: 'f_media', cases: { no: 'look-wish' }, otherwise: 'look-photo' },
+  { t: 'label', id: 'look-photo' },
+  { t: 'say', who: 'OBOLON', text: 'まず、、、お前の姿を、器の水に映せ。' },
+  { t: 'goto', id: 'look-make' },
+  { t: 'label', id: 'look-wish' },
+  { t: 'say', who: 'OBOLON', text: '、、、器の水に、なりたい姿を、思い浮かべろ。' },
+  { t: 'label', id: 'look-make' },
+  { t: 'sprite', image: null },
+  { t: 'pick4', spell: { t: 'say', who: 'バティ', text: 'いくよ、{name}！' } },
+  // a preset form (the four could not be drawn): nothing to transform, nothing taken
+  { t: 'branch', key: 'look', cases: { '': 'look-done' }, otherwise: 'look-change' },
+  { t: 'label', id: 'look-change' },
+  { t: 'sprite', image: ['obolon', '@me'] },
+  { t: 'say', who: 'OBOLON', text: 'ここからは、、、{bati}の時と、同じだ。今の姿から、どう変えるか、を伝えろ。' },
+  { t: 'sprite', image: null },
+  {
+    t: 'evolve',
+    who: 'self',
+    counter: '変身',
+    ok: 'この姿にする',
+    more: '変身させる',
+    example: '髪を銀色にして',
+    limit: { t: 'say', who: 'OBOLON', text: '、、、今日の魔法は、ここまでだ。' },
+  },
+  // 〔画面〕 after the look is shown big: it is the profile now, and what it took (PLACEHOLDER: {neo} is named in the next
+  // scene — until then the name told on day 1 is shown)
+  { t: 'notice', text: `この姿が、{me}のプロフィールになった｜マナジェム −${formatMana(MAKE_COST.profileLook)}（表情・後ろ姿・星ごとの姿を作る分）` },
+  { t: 'label', id: 'look-done' },
 
   // KIMORIN's dragon after the visitor's look (he had been waiting with his arms spread): うんちピンポンくん's magic
   { t: 'scene', id: 'D03-S004b' }, // パーティー好きのドラゴン
@@ -497,7 +543,8 @@ export const DAY2: Step[] = [
   { t: 'face', who: '@bati', expr: 'smile' },
   { t: 'se', sound: 'sparkle' },
   { t: 'say', who: 'バティ', text: 'やったー！　ボク、この姿、気に入った！' },
-  { t: 'notice', text: '{neo}の姿は、今夜まで変えられます。チャットの上の、{neo}の顔を押してください。今夜決まったあとは、Obolo Orderに入ると、また変えられます。{bati}の見た目は、いつでも変えられます' },
+  // (the script's 〔画面〕 note here — 「{neo}と{bati}の見た目は、あとでも変えられます…」 — is left out: {neo}'s look was decided at the bowl
+  // of water and stays until Obolo Order (client 2026-11-25 / 11-27); told to the story chat)
   { t: 'sprite', image: ['obolon', '@bati'] },
   { t: 'say', who: 'OBOLON', text: '、、、{neo}。もう一つ、教えておく。' },
   { t: 'say', who: 'OBOLON', text: '{bati}は、、、マナの力で、調べるのが、得意だ。' },
@@ -542,18 +589,8 @@ export const DAY2: Step[] = [
   { t: 'face', who: '@bati', expr: 'sparkle' },
   { t: 'say', who: 'バティ', text: 'ねえ、{neo}。ボク、まだ、ぜんぜん眠くない。' },
   { t: 'say', who: 'バティ', text: '明日まで、いっぱい、おしゃべりしよ！' },
-  // client 2026-11-25 (nothing absorbed): the night of day 2 confirms the profile look — its full price (everything painted
-  // for it: the talk's faces, the back view, the figures on every home planet) is taken from the gem when the day is
-  // finished (POST /me/journey/complete → LookService.confirmFirstLook). PLACEHOLDER (story chat): the notice's words are
-  // provisional; a look of the preset forms (no own look) takes nothing and is told nothing
-  { t: 'branch', key: 'look', cases: { '': 'look-kept' }, otherwise: 'look-paid' },
-  { t: 'label', id: 'look-paid' },
-  { t: 'notice', text: `{neo}の姿は、これで決まり。8つの星で会う{neo}も、話す時の顔も、後ろ姿も、この姿から描きます（マナジェムから ${formatMana(MAKE_COST.profileLook)}マナ）。姿は、Obolo Orderに入ると、また変えられます` },
-  { t: 'goto', id: 'look-told' },
-  // a preset form takes nothing: the same notice without the mana (story chat 2026-11-25)
-  { t: 'label', id: 'look-kept' },
-  { t: 'notice', text: '{neo}の姿は、これで決まり。8つの星で会う{neo}も、話す時の顔も、後ろ姿も、この姿から描きます。姿は、Obolo Orderに入ると、また変えられます' },
-  { t: 'label', id: 'look-told' },
+  // M-R334: the profile look is confirmed and its mana taken at the bowl of water (D03-S004); a look of the preset forms is
+  // confirmed without mana when the day is finished (POST /me/journey/complete → LookService.confirmFirstLook)
   { t: 'sprite', image: null },
   { t: 'black', fade: 0.8 }, // 暗くフェード
   // 〔完了画面：3日目まで24時間のカウントダウン。その下に、{bati}とのチャット〕〔0になったら、3日目が始まる〕（M-R269: no

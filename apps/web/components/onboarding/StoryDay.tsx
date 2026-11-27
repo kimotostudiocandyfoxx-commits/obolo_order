@@ -230,7 +230,31 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
         },
       }}
       onEgg={async (food, egg) => {
-        setMe(await getApi().batiEgg(food, egg));
+        const u = await getApi().batiEgg(food, egg);
+        setMe(u);
+        // M-R334: the food's name the server kept (「ゼロ時零分カレーだよ。」 → カレー)
+        return u.bati?.food ?? food;
+      }}
+      onLookFixed={(who) => {
+        // the decided look is worn on the account now: read it again, and have its pictures made (like a chosen look)
+        void getApi()
+          .me()
+          .then((u) => {
+            if (!u) return;
+            setMe(u);
+            if (who === 'bati') {
+              if (u.bati?.imageUrl && !u.bati.faces) void getApi().batiFaces().then(setMe).catch(() => undefined);
+              return;
+            }
+            void getApi()
+              .lookStandee()
+              .then(setMe)
+              .catch(() => undefined)
+              .then(() => getApi().lookChibi())
+              .then((m) => m && setMe(m))
+              .catch(() => undefined);
+          })
+          .catch(() => undefined);
       }}
       onHatch={async () => {
         try {

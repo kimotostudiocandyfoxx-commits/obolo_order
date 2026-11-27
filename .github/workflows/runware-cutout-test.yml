@@ -1,0 +1,55 @@
+name: Runware cutout test
+
+# One-off check (client 2026-11-27): the cut-out's background-removal model (CUTOUT_MODEL, RemBG 1.4 runware:109@1) run
+# ONCE against the real API, on one sample picture, with exactly the task the API sends (packages/ai runwareCutoutTask).
+# scripts/art-lab/runware_cutout_check.py; the answer, the cut PNG, a dark | light sheet and result.json are saved to
+# art/lab/runware-cutout-check on this branch. One call, about $0.0006. The job fails when the answer is not what
+# apps/api/src/media/cutting.ts cutByModel needs (a PNG with alpha, the background gone, the figure kept, a cost).
+on:
+  workflow_dispatch:
+    inputs:
+      sample:
+        description: 'the picture to cut (a path in the repository); empty = a lab planet figure'
+        required: false
+        default: ''
+      model:
+        description: 'Runware AIR id; empty = runware:109@1 (the API default)'
+        required: false
+        default: ''
+
+env:
+  WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER || format('projects/{0}/locations/global/workloadIdentityPools/github/providers/github', vars.GCP_PROJECT_NUMBER) }}
+  DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA || format('obolo-deployer@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+
+jobs:
+  cut:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Pillow
+        run: python3 -m pip install --quiet pillow
+      - name: Cut one picture
+        env:
+          SAMPLE: ${{ inputs.sample }}
+          CUTOUT_MODEL: ${{ inputs.model }}
+        run: |
+          export RUNWARE_API_KEY="$(gcloud secrets versions access latest --secret=obolo-seedream-api-key)"
+          python3 scripts/art-lab/runware_cutout_check.py
+      - name: Save to the branch
+        if: always()
+        run: |
+          git config user.name "art-lab"
+          git config user.email "art-lab@users.noreply.github.com"
+          git add -f art/lab/runware-cutout-check
+          git diff --cached --quiet && exit 0
+          git commit -m "Art lab: the cut-out's background-removal model, one real call [skip ci]"
+          for i in 1 2 3 4; do git pull --rebase -X theirs origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep $((i * 5)); done
