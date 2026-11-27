@@ -203,7 +203,7 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 
 前の人の姿（切り抜く前の絵は残していなかった）：`POST /admin/figures-recut` は、切り抜いた PNG の上でできることだけをする — 中に残った背景（すきま）は消せる。**食べられた白は戻せない**（描き直しが要る）。同じ確かめをして、通ったものは入れかえ（`#cut` r2）、落ちたものは前の絵のまま印を付ける（`#cut` x2:…）。これからは切り抜く前の絵も残す（`<姿>#src`）ので、次に切り方を変えた時は描かずに切り直せる。
 
-火星（M-R328）：UFO の下から光を出さない。プロンプトの版を `mars#v` に残す（今は 2）。前の火星の姿は `POST /admin/figures-repaint` で描き直す（今着ている姿だけ。確かめとやり直しを通す。運営がかぶる）。光の出ている絵のうち、ファイルで持っているもの（物語の部屋が描き直して送る）：`apps/web/public/planets/sample/fig-mars-{user,kimorin,monban,mikie,brother,sister}.webp`、`apps/web/public/planet-home/sp-ufo.webp`、ラボの見本 `art/lab/runware-planet-avatar/mars-ufo__*.jpg`。
+火星（M-R328）：UFO の下から光を出さない。プロンプトの版を `mars#v` に残す（今は 2）。前の火星の姿は `POST /admin/figures-repaint` で描き直す（今着ている姿だけ。確かめとやり直しを通す。運営がかぶる）。見本の6人の火星の姿 `apps/web/public/planets/sample/fig-mars-{user,kimorin,monban,mikie,brother,sister}.webp` は、物語の部屋が描き直した絵（`design/mv-art/out/p5-mars-*.jpg`）を本番の切り抜きと確かめに通して入れかえた（`npx tsx apps/api/scripts/sample-figures.ts mars <絵のフォルダ>`）。光の出ている絵でまだ残っているファイル：`apps/web/public/planet-home/sp-ufo.webp`（知らない人の UFO の見本）、ラボの見本 `art/lab/runware-planet-avatar/mars-ufo__*.jpg`（前のプロンプトの記録）。
 
 ## 新しい家への切り替え（準備だけ、M-R326）
 
