@@ -1,4 +1,4 @@
-import { HOME_PLANETS, type HomePlanet } from '@obolo/shared';
+import { HOME_PLANETS, planetHomeIsNew, type HomePlanet, type PlanetHomesEnv } from '@obolo/shared';
 
 /**
  * M-R326 (preparation only — the rollout is still being agreed with the client): which screen a live planet route
@@ -13,24 +13,7 @@ import { HOME_PLANETS, type HomePlanet } from '@obolo/shared';
  * A planet named in both lists keeps the screen of before (the careful side). The values are read when the web app is
  * built (NEXT_PUBLIC_*): changing one needs a new build. With nothing set, nothing changes anywhere.
  */
-export interface PlanetHomesEnv {
-  all?: string | null;
-  only?: string | null;
-  except?: string | null;
-}
-const listed = (v: string | null | undefined): Set<string> =>
-  new Set(
-    (v ?? '')
-      .split(/[\s,]+/)
-      .map((x) => x.trim().toLowerCase())
-      .filter(Boolean),
-  );
-
-export function planetHomeIsNew(planet: HomePlanet, env: PlanetHomesEnv): boolean {
-  if (listed(env.except).has(planet)) return false;
-  if (listed(env.only).has(planet)) return true;
-  return (env.all ?? '').trim().toLowerCase() === 'new';
-}
+export { planetHomeIsNew, type PlanetHomesEnv };
 
 /** the build's own values (each named in full: Next.js inlines NEXT_PUBLIC_* only when written out) */
 export const PLANET_HOMES_ENV: PlanetHomesEnv = {
@@ -40,9 +23,9 @@ export const PLANET_HOMES_ENV: PlanetHomesEnv = {
 };
 
 /**
- * Does this visit of a live planet route show the new home? Never when the address carries a query the screen of
- * before answers (`keep`: Venus's ?dj=1 practice console and ?booth=1 broadcast booth, which the Moon atelier's
- * 〔ラジオ〕 opens) — those doors stay where they are until the new home has its own.
+ * Does this visit of a live planet route show the new home? `keep`: queries the screen of before still answers while
+ * the planet is switched (none now — story 2026-11-27: with the switch on, the posting doors of before are closed at
+ * once, Venus's ?dj=1 and ?booth=1 too; making is on the Moon only).
  */
 export function showsNewHome(planet: HomePlanet, query?: { get(name: string): string | null } | null, keep: readonly string[] = [], env: PlanetHomesEnv = PLANET_HOMES_ENV): boolean {
   if (!planetHomeIsNew(planet, env)) return false;

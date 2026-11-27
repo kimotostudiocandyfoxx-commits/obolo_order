@@ -15,7 +15,7 @@ import { LivePlanetHome } from './LivePlanetHome';
  * in, and when, does not change with the screen. Pluto has no header of its own yet (it is not in the planet list).
  */
 export function NewPlanetScreen({ planet, auth = false, gate }: { planet: HomePlanet; auth?: boolean; gate?: string }) {
-  const home = <LivePlanetHome planet={planet} hrefOf={(p) => `/${p}`} className="relative h-full w-full overflow-hidden bg-[#04050d]" />;
+  const home = <LivePlanetHome planet={planet} emptyAsSample={false} hrefOf={(p) => `/${p}`} className="relative h-full w-full overflow-hidden bg-[#04050d]" />;
   if (planet === 'pluto') return <div className="h-svh">{home}</div>;
   const wall = (x: ReactNode) => (auth ? <RequireAuth>{x}</RequireAuth> : x);
   const lock = (x: ReactNode) =>

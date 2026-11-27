@@ -55,6 +55,7 @@ export * from './storage';
 export * from './storageVariants';
 export * from './planetFigures';
 export * from './artTitle';
+export * from './planetHomesSwitch';
 export * from './planetWorks';
 export * from './goods';
 export * from './lookSteps';

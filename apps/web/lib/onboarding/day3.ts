@@ -1,4 +1,6 @@
 import type { Step } from './script';
+import { PLANET_HOMES_ENV, planetHomeIsNew } from '../planetHomes';
+import { day3NewHomes } from './newHomeScenes';
 
 /**
  * DAY 3 【月 → 土星】 — the simple version (M-R208〜M-R212; wip/P02/c02.md D04-S002〜S002b, c03.md D04-S003〜S007; the scene
@@ -14,7 +16,7 @@ import type { Step } from './script';
  *  - the night: the Saturn stamp, back to the Moon to sleep, MONBAN's one-time offer to become Obolo Order early (SYS-S002)
  * Nothing is made on Saturn (M-R208).
  */
-export const DAY3: Step[] = [
+export const DAY3_BEFORE: Step[] = [
   // D04-S002 おはようございます／Bluena（M-R207：{bati}は2日目に生まれている。Bluenaと月の工房はここで）
   { t: 'scene', id: 'D04-S002' },
   { t: 'bgm', track: 'moon' }, // 月の神殿の朝
@@ -344,3 +346,12 @@ export const DAY3: Step[] = [
   // Jupiter (D05-S006); becoming a member early is from the settings on days 4–7 (SYS-S002)
   { t: 'end' },
 ];
+
+/**
+ * story 2026-11-27 (M-R330): the day on the planet's NEW home — the script of now, word for word (story-sync checks
+ * this one). Played only when the planet's switch is on (lib/planetHomes.ts, off by default).
+ */
+export const DAY3_NEW_HOME: Step[] = day3NewHomes(DAY3_BEFORE);
+
+/** the day as played: its steps of before, unchanged, until saturn's switch is on */
+export const DAY3: Step[] = planetHomeIsNew('saturn', PLANET_HOMES_ENV) ? DAY3_NEW_HOME : DAY3_BEFORE;

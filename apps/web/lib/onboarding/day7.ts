@@ -1,4 +1,6 @@
 import type { Step } from './script';
+import { PLANET_HOMES_ENV, planetHomeIsNew } from '../planetHomes';
+import { D7_BOOTH, D7_BOOTH_UNTIL, D7_BOOTHS, D7_BOOTHS_FROM, replaceStretch } from './newHomeScenes';
 import { kimorinBack } from './kimorinBack';
 
 /**
@@ -13,7 +15,7 @@ import { kimorinBack } from './kimorinBack';
  *    fifth stamp (D07V-S004, f_d07v_done). The only night of the journey slept on Venus: day 8 starts on a Venus morning.
  * Nothing is made on Venus (M-R208; the easy DJ practice is gone).
  */
-export const DAY7: Step[] = [
+export const DAY7_BEFORE: Step[] = [
   // D07V-S001 月の朝／番組が作れる
   { t: 'scene', id: 'D07V-S001' },
   { t: 'bgm', track: 'moon' },
@@ -172,3 +174,12 @@ export const DAY7: Step[] = [
   { t: 'caption', text: 'また明日' }, // 〔完了画面：8日目まで24時間のカウントダウン〕 (TomorrowScreen)
   { t: 'end' },
 ];
+
+/**
+ * story 2026-11-27 (M-R330): the day on the planet's NEW home — the script of now, word for word (story-sync checks
+ * this one). Played only when the planet's switch is on (lib/planetHomes.ts, off by default).
+ */
+export const DAY7_NEW_HOME: Step[] = replaceStretch(replaceStretch(DAY7_BEFORE, 'D07V-S003', D7_BOOTHS, { from: D7_BOOTHS_FROM }), 'D07V-S004', D7_BOOTH, { until: D7_BOOTH_UNTIL });
+
+/** the day as played: its steps of before, unchanged, until venus's switch is on */
+export const DAY7: Step[] = planetHomeIsNew('venus', PLANET_HOMES_ENV) ? DAY7_NEW_HOME : DAY7_BEFORE;

@@ -26,12 +26,13 @@ describe('M-R326: the switch from the live planet screens to the new homes (off 
     expect(planetHomeIsNew('pluto', { only: 'Pluto' })).toBe(true);
   });
 
-  it('a door of the screen of before stays open: Venus with ?dj=1 or ?booth=1 keeps the old screen even when switched', () => {
+  it('story 2026-11-27: the doors of before close with the switch — Venus with ?dj=1 or ?booth=1 shows the new home too', () => {
     const env = { all: 'new' };
-    expect(showsNewHome('venus', q(''), ['dj', 'booth'], env)).toBe(true);
+    expect(showsNewHome('venus', q('booth=1'), [], env)).toBe(true);
+    expect(showsNewHome('venus', q('dj=1'), [], env)).toBe(true);
+    // the mechanism stays for a door that must stay open one day
     expect(showsNewHome('venus', q('booth=1'), ['dj', 'booth'], env)).toBe(false);
-    expect(showsNewHome('venus', q('dj=1'), ['dj', 'booth'], env)).toBe(false);
-    expect(showsNewHome('venus', q('other=1'), ['dj', 'booth'], env)).toBe(true);
-    expect(showsNewHome('venus', q('booth=1'), ['dj', 'booth'], {})).toBe(false);
+    // switch off: the screen of before, whatever the query
+    expect(showsNewHome('venus', q('booth=1'), [], {})).toBe(false);
   });
 });

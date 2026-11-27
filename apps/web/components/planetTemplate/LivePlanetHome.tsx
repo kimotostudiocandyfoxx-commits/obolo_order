@@ -7,7 +7,7 @@ import { PlanetTemplateHome, type TemplateMe } from '@/components/planetTemplate
 import { planetHooks } from '@/components/planetTemplate/planetHooks';
 import { getApi } from '@/lib/api';
 import { ownFigure } from '@/lib/planetTemplate/people';
-import { SAMPLE_OWN_FIGURE, templateSample } from '@/lib/planetTemplate/sample';
+import { emptyHome, liveHomeShows, SAMPLE_OWN_FIGURE, templateSample } from '@/lib/planetTemplate/sample';
 import { samplePast } from '@/lib/planetTemplate/saturn';
 import { apiSky, sampleSky, songOf } from '@/lib/planetTemplate/sky';
 import { viewsOf } from '@/lib/story/views';
@@ -34,8 +34,22 @@ const backOf = (me: Me | null) => me?.lookBack ?? viewsOf('talk-user')?.back ?? 
  * with nobody signed in, no API (the in-browser demo) or no works yet, it shows the sample cast (`forced`: always).
  * Shown at /planets-preview/<planet>, and — M-R326, behind the switch in lib/planetHomes.ts, off by default — on the live
  * planet routes in place of the planet's screen of before. `hrefOf`: where the planet switcher goes.
+ * `emptyAsSample` (story 2026-11-27): what a member with nothing flown and nobody around sees — the preview keeps the
+ * sample cast (true, the default); a live planet route shows their own place with no visitors (false).
  */
-export function LivePlanetHome({ planet, forced = false, hrefOf, className = 'relative h-svh w-full overflow-hidden bg-[#04050d]' }: { planet: HomePlanet; forced?: boolean; hrefOf: (p: HomePlanet) => string; className?: string }) {
+export function LivePlanetHome({
+  planet,
+  forced = false,
+  emptyAsSample = true,
+  hrefOf,
+  className = 'relative h-svh w-full overflow-hidden bg-[#04050d]',
+}: {
+  planet: HomePlanet;
+  forced?: boolean;
+  emptyAsSample?: boolean;
+  hrefOf: (p: HomePlanet) => string;
+  className?: string;
+}) {
   const router = useRouter();
   const [data, setData] = useState<{ view: PlanetHomeView; me: TemplateMe; sample: boolean } | null>(null);
 
@@ -52,7 +66,13 @@ export function LivePlanetHome({ planet, forced = false, hrefOf, className = 're
       if (forced) return sample(me);
       const view = await api.planetHome(planet).catch(() => null);
       // story 2026-11-25: your own flown works alone are real too (a member's first goods / books / games)
-      if (!view || !view.live || (!view.around.length && !view.own.length)) return sample(me);
+      const real = liveHomeShows(view, emptyAsSample);
+      if (real === 'sample') return sample(me);
+      // a live route with nothing to show yet (or the feed could not be read): the member's own place, nobody around
+      if (real === 'empty' || !view) {
+        const empty = emptyHome(planet, me?.id ?? 'me', me?.displayName ?? '');
+        return { view: view?.live ? view : empty, me: { name: me?.displayName || empty.owner.name, figure: ownFigure(me?.planetFigures, planet), back: backOf(me), dance: me?.chibiPic ?? null, chibi: chibiOf(me, false) }, sample: false };
+      }
       return { view, me: { name: me?.displayName || view.owner.name, figure: ownFigure(me?.planetFigures, planet), back: backOf(me), dance: me?.chibiPic ?? null, chibi: chibiOf(me, false) }, sample: false };
     })().then((d) => live && setData(d));
     return () => {

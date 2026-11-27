@@ -8,6 +8,7 @@ import { parseBody } from '../common/validate';
 import { AppConfig, CONFIG } from '../config';
 import type { KvStore } from '../infra/kv';
 import { KV } from '../infra/tokens';
+import { moonOnly } from '../planets/moon-only';
 import { RadioService } from './radio.service';
 
 const OnBody = z.object({ on: z.boolean() });
@@ -52,7 +53,10 @@ export class RadioController {
   @Post('shows')
   async createShow(@UserId() userId: string, @Body() body: unknown) {
     await rateLimit(this.kv, `radio-show:${userId}`, 20, 3600);
-    return this.radio.createShow(userId, parseBody(CreateRadioShowBody, body));
+    const b = parseBody(CreateRadioShowBody, body);
+    // story 2026-11-27: with Venus's new home, the booth is closed — a show is recorded on the Moon (`via: 'moon'`)
+    moonOnly('venus', b.via === 'moon');
+    return this.radio.createShow(userId, b);
   }
 
   @Get('shows/:id')
@@ -74,6 +78,7 @@ export class RadioController {
   @Post('lives')
   async startLive(@UserId() userId: string, @Body() body: unknown) {
     await rateLimit(this.kv, `radio-live:${userId}`, 10, 3600);
+    moonOnly('venus');
     return this.radio.startLive(userId, parseBody(StartRadioLiveBody, body));
   }
 

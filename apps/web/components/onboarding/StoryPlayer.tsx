@@ -16,6 +16,8 @@ import { EclipsePay, type OrderApi } from './EclipsePay';
 import { LookMaker, type LookApi } from './LookMaker';
 import { LookPick4Panel, LookStepsPanel } from '@/components/look/LookSteps';
 import { PlanetHome } from '@/components/planetHome/PlanetHome';
+import { StoryNewHome, storyOwnWork } from './StoryNewHome';
+import { PLANET_HOMES_ENV, planetHomeIsNew } from '@/lib/planetHomes';
 import { getApi } from '@/lib/api';
 import { neoRecord, takoyakiRecord, TAKOYAKI_BACKDROP } from '@/lib/planetHome/storyHomes';
 import { RecordTint } from '@/components/planetHome/SaturnBallScene';
@@ -1757,7 +1759,21 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         />
       )}
       {/* 星のホーム in the story (M-R257 / M-R259): the takoyaki siblings' record, then {neo}'s — touch the rolling kororins */}
-      {started && step?.t === 'home' && (
+      {/* story 2026-11-27 (M-R330): with the planet's switch on, the NEW home with the people the script names */}
+      {started && step?.t === 'home' && planetHomeIsNew(step.planet, PLANET_HOMES_ENV) && (
+        <StoryNewHome
+          key={i}
+          planet={step.planet}
+          place={step.place}
+          until={step.until ?? 'next'}
+          neo={v.neo || v.name || ''}
+          inviter={v.inviter}
+          sent={step.planet === 'saturn' ? (stateRef.current.answers.f_d04_fly ?? v.story?.f_d04_fly) === 'fly' : !!step.sent && (stateRef.current.answers[step.sent.key] ?? v.story?.[step.sent.key]) === step.sent.value}
+          own={storyOwnWork(step.planet, atelierWorks.current, stateRef.current.answers.kororinWords ?? v.story?.['d3.kororinWords'])}
+          onDone={() => run(iRef.current + 1)}
+        />
+      )}
+      {started && step?.t === 'home' && !planetHomeIsNew(step.planet, PLANET_HOMES_ENV) && step.planet === 'saturn' && step.place !== 'host' && (
         <StoryHome
           key={i}
           place={step.place}

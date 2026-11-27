@@ -415,7 +415,7 @@ export async function keepShow(w: Work, blob: Blob, seconds: number): Promise<Wo
   if (w.ref?.test) return { ...w, status: 'ready', audio: URL.createObjectURL(blob), title: w.title || '名前のない番組', saved: true };
   const api = getApi();
   const up = await api.uploadShow(blob);
-  const show = await api.createRadioShow({ mediaId: up.id, title: w.title || '名前のない番組', thumbUrl: null, loop: 'drift', seconds: Math.round(seconds), cues: [] });
+  const show = await api.createRadioShow({ mediaId: up.id, title: w.title || '名前のない番組', thumbUrl: null, loop: 'drift', seconds: Math.round(seconds), cues: [], via: 'moon' });
   return { ...w, status: 'ready', audio: show.audioUrl, title: show.title, ref: { ...w.ref, showId: show.id }, saved: true };
 }
 
@@ -426,10 +426,10 @@ export async function fly(w: Work, ctx: Ctx): Promise<void> {
   // the review page: flown in the story only
   if (r.test) return;
   if (w.kind === 'voice' && r.postId) await api.publishSaturnPost(r.postId);
-  else if (w.kind === 'art' && r.rootId) await api.createJupiterPost({ rootId: r.rootId, text: '', filter: 'none', branch: 0 });
-  else if (w.kind === 'song' && r.songId) await api.createPlanetPost('mercury', { sourceId: r.songId, title: w.title ?? '', text: '' });
+  else if (w.kind === 'art' && r.rootId) await api.createJupiterPost({ rootId: r.rootId, text: '', filter: 'none', branch: 0, via: 'moon' });
+  else if (w.kind === 'song' && r.songId) await api.createPlanetPost('mercury', { sourceId: r.songId, title: w.title ?? '', text: '', via: 'moon' });
   else if (w.kind === 'song' && r.demoSong) ctx.mercury.release(r.demoSong.id);
-  else if (w.kind === 'video' && r.backstageId) await api.createPlanetPost('mars', { sourceId: r.backstageId, title: w.title ?? '', text: '' });
+  else if (w.kind === 'video' && r.backstageId) await api.createPlanetPost('mars', { sourceId: r.backstageId, title: w.title ?? '', text: '', via: 'moon' });
   else if (w.kind === 'video' && w.reel && api.mode !== 'live') {
     // R13: the review page's video (canned frames, no server): flown in the talk only
   } else if (w.kind === 'radio' && r.showId) await api.publishRadioShow(r.showId, true);

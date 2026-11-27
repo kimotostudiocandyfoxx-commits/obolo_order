@@ -320,6 +320,7 @@ function SongsFolder({ empty }: { empty: string }) {
         sourceId: s.id,
         title: s.title,
         text: '',
+        via: 'moon',
       });
       toast.show('ブルーナから水星へ投影した。船が出航する');
       reload();
@@ -363,7 +364,7 @@ function MarsFolder({ empty }: { empty: string }) {
   // the same projection as Mars's backstage: cut square and flying as a UFO for 88 hours; the original stays here
   const publish = async (v: MarsBackstageVideo) => {
     try {
-      await getApi().createPlanetPost('mars', { sourceId: v.id, title: v.title, text: '' });
+      await getApi().createPlanetPost('mars', { sourceId: v.id, title: v.title, text: '', via: 'moon' });
       setSent((s) => new Set(s).add(v.id));
       toast.show('ブルーナから火星へ投影した。UFOがとんでいく');
     } catch (e) {

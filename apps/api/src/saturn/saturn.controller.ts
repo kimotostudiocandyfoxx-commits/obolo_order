@@ -7,6 +7,7 @@ import { parseBody } from '../common/validate';
 import type { KvStore } from '../infra/kv';
 import { KV } from '../infra/tokens';
 import { PlazaService } from './plaza.service';
+import { moonOnly } from '../planets/moon-only';
 import { SaturnService } from './saturn.service';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -37,6 +38,9 @@ export class SaturnController {
   async create(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
     const input = parseBody(CreateSaturnPostBody, body);
     await rateLimit(this.kv, `saturn-post:${userId}`, 10, 600);
+    // story 2026-11-27: with Saturn's new home, 〔つぶやく〕 / 〔器〕 / 〔広場〕 are closed — a kororin is made on the Moon
+    // (kept in the room first: `room`), and flies by POST /saturn/posts/:id/publish
+    moonOnly('saturn', input.room === true);
     // own-voice posts are paid read-alouds: they share the read-aloud allowance (P-VOICE-3)
     if (input.ownVoice || input.readBy) await rateLimit(this.kv, `voice-speak:${userId}`, 100, 86400);
     return this.saturn.create(userId, input, `${req.protocol}://${req.get('host')}`);
@@ -126,6 +130,7 @@ export class SaturnPlazasController {
   async create(@UserId() userId: string, @Body() body: unknown) {
     const input = parseBody(CreatePlazaBody, body);
     await rateLimit(this.kv, `saturn-plaza-new:${userId}`, 5, 86400);
+    moonOnly('saturn');
     return this.plazas.create(userId, input);
   }
 

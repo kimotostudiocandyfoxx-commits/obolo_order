@@ -52,6 +52,8 @@ export interface TemplateHooks {
   profileFull?: boolean;
 }
 
+export type HomeEvent = 'open' | 'play' | 'sky' | 'profile';
+
 /** the 9:16 picture's box covering a W×H screen */
 function coverBox(W: number, H: number) {
   const k = Math.max(W / 9, H / 16);
@@ -68,7 +70,22 @@ const transformOf = (b: Body, k = 1) => `translate3d(${b.x.toFixed(1)}px,${b.y.t
  * view from your place), the planet's icon and name at the top left (slide to switch planets) and the profile. How the
  * figures move is the planet's (config.motion: Jupiter's drift, Mercury's sea lanes). No posting on a planet (M-R314).
  */
-export function PlanetTemplateHome({ planet, view, me, hooks = {}, onSwitchPlanet }: { planet: HomePlanet; view: PlanetHomeView | null; me: TemplateMe; hooks?: TemplateHooks; onSwitchPlanet?: (p: HomePlanet) => void }) {
+export function PlanetTemplateHome({
+  planet,
+  view,
+  me,
+  hooks = {},
+  onSwitchPlanet,
+  onEvent,
+}: {
+  planet: HomePlanet;
+  view: PlanetHomeView | null;
+  me: TemplateMe;
+  hooks?: TemplateHooks;
+  onSwitchPlanet?: (p: HomePlanet) => void;
+  /** what the visitor did (the story's steps wait for these; nobody else listens): a work opened, ▶, the sky, a profile (`id`: whose) */
+  onEvent?: (e: HomeEvent, id?: string) => void;
+}) {
   const cfg = useMemo(() => templateConfig(planet, hooks.config), [planet, hooks.config]);
   const motion = cfg.motion;
   const opener = hooks.opener ?? defaultOpener;
@@ -118,6 +135,21 @@ export function PlanetTemplateHome({ planet, view, me, hooks = {}, onSwitchPlane
   const [sky, setSky] = useState(false);
   const [toastText, setToastText] = useState<{ t: string; n: number } | null>(null);
   const toast = useCallback((t: string) => setToastText((o) => ({ t, n: (o?.n ?? 0) + 1 })), []);
+  // the story's steps (components/onboarding/StoryNewHome) hear what was done; the homes themselves pass no listener
+  const onEventRef = useRef(onEvent);
+  onEventRef.current = onEvent;
+  useEffect(() => {
+    if (opened) onEventRef.current?.('open', opened.work.id);
+  }, [opened]);
+  useEffect(() => {
+    if (playing) onEventRef.current?.('play');
+  }, [playing]);
+  useEffect(() => {
+    if (sky) onEventRef.current?.('sky');
+  }, [sky]);
+  useEffect(() => {
+    if (profile) onEventRef.current?.('profile', profile);
+  }, [profile]);
   useEffect(() => {
     if (!toastText) return;
     const id = setTimeout(() => setToastText(null), 1800);

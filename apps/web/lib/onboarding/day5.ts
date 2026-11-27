@@ -1,4 +1,6 @@
 import type { Step } from './script';
+import { PLANET_HOMES_ENV, planetHomeIsNew } from '../planetHomes';
+import { D5_NEW, withNewHomes } from './newHomeScenes';
 import { kimorinBack } from './kimorinBack';
 
 /**
@@ -11,7 +13,7 @@ import { kimorinBack } from './kimorinBack';
  *  - Mercury only to look: the food guess, フリージー, the sea of music ships (D06-S005), {neo}'s island (D06-S007b), the
  *    Mercury stamp, back to the Moon to sleep. Nothing is made on Mercury (M-R208).
  */
-export const DAY5: Step[] = [
+export const DAY5_BEFORE: Step[] = [
   // D06-S001 月の朝／曲が作れる
   { t: 'scene', id: 'D06-S001' },
   { t: 'bgm', track: 'moon' },
@@ -218,3 +220,12 @@ export const DAY5: Step[] = [
   { t: 'caption', text: 'また明日' }, // 〔完了画面：6日目まで24時間のカウントダウン〕 (TomorrowScreen)
   { t: 'end' },
 ];
+
+/**
+ * story 2026-11-27 (M-R330): the day on the planet's NEW home — the script of now, word for word (story-sync checks
+ * this one). Played only when the planet's switch is on (lib/planetHomes.ts, off by default).
+ */
+export const DAY5_NEW_HOME: Step[] = withNewHomes(DAY5_BEFORE, D5_NEW);
+
+/** the day as played: its steps of before, unchanged, until mercury's switch is on */
+export const DAY5: Step[] = planetHomeIsNew('mercury', PLANET_HOMES_ENV) ? DAY5_NEW_HOME : DAY5_BEFORE;

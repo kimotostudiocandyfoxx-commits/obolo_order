@@ -1,6 +1,6 @@
-import { Body, Controller, Get, HttpCode, Inject, Param, ParseUUIDPipe, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Inject, Optional, Param, ParseUUIDPipe, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
-import { ComposeChatBody, ComposeDesignBody, InstrumentalBody, SingBody, SongEditBody, FullSongBody, lyricsSections, songSpellKey, spellPrompt, SongTweakBody, SONG_TWEAKS_PER_HOUR, SongVoiceBody, SongVoiceUseBody } from '@obolo/shared';
+import { ComposeChatBody, ComposeDesignBody, InstrumentalBody, SingBody, SongEditBody, FullSongBody, lyricsSections, songSpellKey, spellPrompt, SongTweakBody, SONG_TWEAKS_PER_HOUR, SongVoiceBody, SongVoiceUseBody, SongTitleBody } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
@@ -11,6 +11,7 @@ import { JobsService } from '../jobs/jobs.service';
 import { SongService } from './song.service';
 import { SongTweakService } from './song-tweak.service';
 import { SongVoiceService } from './song-voice.service';
+import { SongRetitleService } from './song-retitle.service';
 import { Database } from '../db/db';
 import { LedgerService } from '../wallet/ledger.service';
 import { startConfirmed } from '../wallet/confirmed';
@@ -32,6 +33,7 @@ export class ComposeController {
     @Inject(KV) private readonly kv: KvStore,
     private readonly incants: IncantService,
     private readonly voices: SongVoiceService,
+    @Optional() private readonly retitles?: SongRetitleService,
   ) {}
 
   @Post('chat')
@@ -163,6 +165,14 @@ export class ComposeController {
     const b = parseBody(SongVoiceUseBody, body);
     await rateLimit(this.kv, `compose-tweak:${userId}`, SONG_TWEAKS_PER_HOUR, 3600);
     return this.tweaks.useVoice(userId, id, b.use, `${req.protocol}://${req.get('host')}`);
+  }
+
+  /** story 2026-11-27: the song's title changed by words in the Moon atelier (its Mercury post and its reading follow) */
+  @Patch('songs/:id/title')
+  async retitle(@UserId() userId: string, @Param('id', ParseUUIDPipe) id: string, @Body() body: unknown, @Req() req: Request) {
+    await rateLimit(this.kv, `compose-title:${userId}`, 30, 600);
+    if (!this.retitles) throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'UNAVAILABLE', 'Not available');
+    return this.retitles.retitle(userId, id, parseBody(SongTitleBody, body).title, `${req.protocol}://${req.get('host')}`);
   }
 
   /** 保存する (the client also buries it in the island). */

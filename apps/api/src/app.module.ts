@@ -17,6 +17,7 @@ import { SongService } from './compose/song.service';
 import { SongTweakService } from './compose/song-tweak.service';
 import { SongVoiceService } from './compose/song-voice.service';
 import { SongTitleVoiceService } from './compose/song-title-voice.service';
+import { SongRetitleService } from './compose/song-retitle.service';
 import { TitleVoiceBackfillController } from './compose/title-voice-backfill.controller';
 import { VoiceController } from './voice/voice.controller';
 import { LineVoiceService } from './voice/line-voice.service';
@@ -209,6 +210,7 @@ import { StorageWorksService } from './storage/storage-works.service';
     SongTweakService,
     SongVoiceService,
     SongTitleVoiceService,
+    SongRetitleService,
     VoiceService,
     LineVoiceService,
     BatiVoiceService,

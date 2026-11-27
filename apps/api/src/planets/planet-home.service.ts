@@ -26,6 +26,7 @@ import { apiError } from '../common/errors';
 import { Database } from '../db/db';
 import { books, follows, games, goods, jupiterPosts, planetHomes, planetPosts, planetWorkMeta, radioShows, saturnPosts, userBlocks, users } from '../db/schema';
 import { decodeWings, WINGS_KEY } from '../look/figures';
+import { newestOfArt, newestOfSource, takeOutTwinsOfArt, takeOutTwinsOfSource } from './one-post';
 import { isPublicWork, metaView } from './planet-works.service';
 
 /**
@@ -83,7 +84,8 @@ export function storeOf(planet: HomePlanet): Store | null {
         url: sql`${jupiterPosts.url}`,
         thumb: sql`${jupiterPosts.posterUrl}`,
         seconds: sql`NULL::real`,
-        live: sql`(${jupiterPosts.deletedAt} IS NULL)`,
+        // one work = one post (story 2026-11-27): an art flown twice before the rule shows once, as its newest post
+        live: sql`(${jupiterPosts.deletedAt} IS NULL AND ${newestOfArt})`,
       };
     case 'planet_post':
       return {
@@ -96,7 +98,7 @@ export function storeOf(planet: HomePlanet): Store | null {
         url: sql`${planetPosts.url}`,
         thumb: sql`${planetPosts.posterUrl}`,
         seconds: sql`${planetPosts.seconds}`,
-        live: sql`(${planetPosts.deletedAt} IS NULL AND ${planetPosts.planet} = ${cfg.storePlanet})`,
+        live: sql`(${planetPosts.deletedAt} IS NULL AND ${planetPosts.planet} = ${cfg.storePlanet} AND ${newestOfSource})`,
       };
     case 'radio_show':
       return {
@@ -346,10 +348,17 @@ export class PlanetHomeService {
     let n = 0;
     if (cfg.store === 'saturn_post')
       n = (await this.db.write.update(saturnPosts).set({ room: 1, updatedAt: new Date() }).where(and(eq(saturnPosts.id, id), eq(saturnPosts.userId, userId), eq(saturnPosts.room, 0), isNull(saturnPosts.deletedAt))).returning({ id: saturnPosts.id })).length;
-    else if (cfg.store === 'jupiter_post')
-      n = (await this.db.write.update(jupiterPosts).set({ deletedAt: new Date() }).where(and(eq(jupiterPosts.id, id), eq(jupiterPosts.userId, userId), isNull(jupiterPosts.deletedAt))).returning({ id: jupiterPosts.id })).length;
-    else if (cfg.store === 'planet_post')
-      n = (await this.db.write.update(planetPosts).set({ deletedAt: new Date() }).where(and(eq(planetPosts.id, id), eq(planetPosts.userId, userId), eq(planetPosts.planet, cfg.storePlanet!), isNull(planetPosts.deletedAt))).returning({ id: planetPosts.id })).length;
+    else if (cfg.store === 'jupiter_post') {
+      const out = await this.db.write.update(jupiterPosts).set({ deletedAt: new Date() }).where(and(eq(jupiterPosts.id, id), eq(jupiterPosts.userId, userId), isNull(jupiterPosts.deletedAt))).returning({ id: jupiterPosts.id, rootId: jupiterPosts.rootId });
+      n = out.length;
+      // an art flown twice before the one-post rule: its other posts leave with it (else an older one would show up)
+      if (out[0]) await takeOutTwinsOfArt(this.db, userId, out[0]);
+    }
+    else if (cfg.store === 'planet_post') {
+      const out = await this.db.write.update(planetPosts).set({ deletedAt: new Date() }).where(and(eq(planetPosts.id, id), eq(planetPosts.userId, userId), eq(planetPosts.planet, cfg.storePlanet!), isNull(planetPosts.deletedAt))).returning({ id: planetPosts.id, planet: planetPosts.planet, sourceId: planetPosts.sourceId });
+      n = out.length;
+      if (out[0]) await takeOutTwinsOfSource(this.db, userId, out[0]);
+    }
     else if (cfg.store === 'radio_show')
       n = (await this.db.write.update(radioShows).set({ status: 'private', publishedAt: null, updatedAt: new Date() }).where(and(eq(radioShows.id, id), eq(radioShows.userId, userId))).returning({ id: radioShows.id })).length;
     // 05: a book / a game / a goods item goes back to the Moon only (not flown; the work itself stays)

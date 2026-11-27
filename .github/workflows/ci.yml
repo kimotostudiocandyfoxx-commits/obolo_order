@@ -26,17 +26,20 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm build:packages
-      - run: pnpm test
-        env:
-          # the API's Postgres-backed tests (goods, a game case, a dachi work never opened by a stranger)
-          TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/obolo
-      - run: pnpm typecheck
       - name: Build API
         run: pnpm --filter @obolo/api build
+      # before the tests: the Postgres-backed tests (*.pg.test.ts) read a database with every migration applied and do
+      # not apply them themselves
       - name: API migrations apply cleanly
         run: pnpm --filter @obolo/api db:migrate
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/obolo
+      - run: pnpm test
+        env:
+          # the API's Postgres-backed tests: goods (a game case, a dachi work never opened by a stranger), 月で作る → 星
+          # for each of the eight kinds (moon-to-planet.pg.test.ts) and the planets' readiness counts — skipped without it
+          TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/obolo
+      - run: pnpm typecheck
       - name: Build web
         run: pnpm --filter @obolo/web build
         env:

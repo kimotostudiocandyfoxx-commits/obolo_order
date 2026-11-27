@@ -363,6 +363,8 @@ export interface Api {
   addJupiterRoot(body: { mediaId: string; spell?: SpellTag[]; title?: string }): Promise<JupiterRootView>;
   /** story 2026-11-25: the art's title changed by words (its flown posts too) */
   setJupiterRootTitle(id: string, title: string): Promise<JupiterRootView>;
+  /** story 2026-11-27: a song's title changed by words (its Mercury post and its reading in your voice follow) */
+  setSongTitle(id: string, title: string): Promise<{ id: string; title: string }>;
   removeJupiterRoot(id: string): Promise<void>;
   createJupiterPost(body: CreateJupiterPostBody): Promise<JupiterPostView>;
   starJupiterPost(id: string, on: boolean): Promise<{ starCount: number; starredByMe: boolean }>;

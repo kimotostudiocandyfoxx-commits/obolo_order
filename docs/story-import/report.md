@@ -1,6 +1,6 @@
 # 物語の取り込みレポート
 
-読み込んだ場所: `claude/hopeful-pascal-udqkh2 の docs/story-rewrite/wip` ／ 5パート・66場面
+読み込んだ場所: `claude/hopeful-pascal-udqkh2 の docs/story-rewrite/wip（FETCH_HEAD）` ／ 5パート・66場面
 
 - ❌ 直さないと動かない: **0件** ／ ⚠️ 確認してほしい: 48件
 - 新しく描く一枚絵: 1枚 ／ 機能の画面を呼ぶ場所: 165か所 ／ 参照している動画: 0本
