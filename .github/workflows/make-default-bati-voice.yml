@@ -1,5 +1,6 @@
-# One-off (iPad feedback 2026-11-24): {bati}'s default voice. The client's recording committed at
-# design/voices/default-bati-source.<ext> → +2 semitones (the egg recording's conversion) → a private Fish Audio
+# One-off (iPad feedback 2026-11-24): the default cute voice (since M-R342 not {bati}'s voice: it reads the ダチ voice
+# messages of members who are not recorded). The client's recording committed at
+# design/voices/default-bati-source.<ext> → +2 semitones → a private Fish Audio
 # voice model (paid; approved as part of the product). The id is printed in the run's summary: set it as the
 # repository variable FISH_DEFAULT_VOICE_ID, then run "Deploy API". Run by hand only (Actions → Default Bati voice).
 name: Default Bati voice

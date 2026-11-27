@@ -10,8 +10,8 @@ import { currentEnv, micFailText } from '@/lib/mic/env';
 import { openMic, quietMic } from '@/lib/micStream';
 
 /**
- * /voice — register the member's two voices (client decision 2026-10-07):
- *  自分の声 (Saturn read-aloud, singing) and バティの声 (a changed voice the member gives Bati).
+ * /voice — register the member's own voice (client decision 2026-10-07): 自分の声 (Saturn read-aloud, singing).
+ * M-R342 (client 2026-11-27): no バティの声 here any more — {bati} speaks in the fixed voice of its egg.
  * Read the script aloud (8–30 s); the recording becomes a private Fish Audio voice model.
  * PLACEHOLDER (P-VOICE-4): a standalone page until the client designs where this lives.
  */
@@ -21,7 +21,7 @@ export default function VoicePage() {
     <main className="min-h-svh bg-[#07060d] px-4 pb-16 pt-[calc(20px+env(safe-area-inset-top))] text-white">
       <h1 className="text-center text-lg tracking-[0.3em] text-amber-100">声の登録</h1>
       <p className="mx-auto mt-2 max-w-md text-center text-xs leading-relaxed text-white/55">
-        2つの声を登録します。<b>自分の声</b>は土星の読み上げや水星の歌に、<b>バティの声</b>はバティがしゃべるときに使います（声色を変えて録ってね）。
+        <b>自分の声</b>を登録します。土星の読み上げや水星の歌に使います。
       </p>
       {status === 'loading' ? null : !me ? (
         <p className="mt-8 text-center text-sm">
@@ -30,14 +30,13 @@ export default function VoicePage() {
       ) : (
         <div className="mx-auto mt-6 grid max-w-md gap-5">
           <VoiceCard slot="self" title="自分の声" done={!!me.voices?.self} />
-          <VoiceCard slot="bati" title={`${me.bati?.name ?? 'バティ'}の声（変声）`} done={!!me.voices?.bati} />
         </div>
       )}
     </main>
   );
 }
 
-function VoiceCard({ slot, title, done }: { slot: VoiceSlot; title: string; done: boolean }) {
+function VoiceCard({ slot, title, done }: { slot: Exclude<VoiceSlot, 'bati'>; title: string; done: boolean }) {
   const { setMe } = useAuth();
   const [phase, setPhase] = useState<'idle' | 'recording' | 'recorded' | 'sending'>('idle');
   const [secs, setSecs] = useState(0);
@@ -45,7 +44,7 @@ function VoiceCard({ slot, title, done }: { slot: VoiceSlot; title: string; done
   const [msg, setMsg] = useState('');
   const rec = useRef<MediaRecorder | null>(null);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
-  const [text, setText] = useState(slot === 'self' ? 'これは、わたしの声で読み上げたテストです。' : 'やっほー！バティだよ。今日もいっしょに遊ぼうね！');
+  const [text, setText] = useState('これは、わたしの声で読み上げたテストです。');
   const [busy, setBusy] = useState(false);
   const [audioUrl, setAudioUrl] = useState('');
   useEffect(() => () => void (timer.current && clearInterval(timer.current)), []);
@@ -131,7 +130,7 @@ function VoiceCard({ slot, title, done }: { slot: VoiceSlot; title: string; done
         <h2 className="text-base font-bold">{title}</h2>
         <span className={`rounded-full px-2 py-0.5 text-[11px] ${done ? 'bg-emerald-400/20 text-emerald-200' : 'bg-white/10 text-white/50'}`}>{done ? '登録済み' : '未登録'}</span>
       </div>
-      <p className="mt-3 text-[11px] text-white/50">この文を、声に出して読んでね（{VOICE_SAMPLE_SECONDS.min}〜{VOICE_SAMPLE_SECONDS.max}秒）{slot === 'bati' ? '。バティにあげたい声色で！' : ''}</p>
+      <p className="mt-3 text-[11px] text-white/50">この文を、声に出して読んでね（{VOICE_SAMPLE_SECONDS.min}〜{VOICE_SAMPLE_SECONDS.max}秒）</p>
       <p className="mt-1 rounded-2xl bg-black/30 p-3 text-sm leading-relaxed">{VOICE_SCRIPTS[slot]}</p>
       {slot === 'self' && (
         // what makes the singing voice come out like you (studio lab r10, 2026-10-12): a clean recording

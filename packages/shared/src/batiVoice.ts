@@ -1,17 +1,26 @@
 import { z } from 'zod';
 import type { BatiEggKind, BatiPersonality } from './batiPersona';
+import { BATI_VOICE_DEFAULT_EGG, BATI_VOICE_SPEED } from './batiFixedVoice';
 import { BirthYear } from './birthYear';
 
 /**
- * {bati}'s voice from the member's own voice (M-R246 / M-R247, D03-S005 「たまごに声を聞かせる」): on day 2, before
- * {bati} hatches, {name} talks to the egg (held mic, about 10 s). The recording becomes a private Fish Audio voice model
- * made from it pitched up two semitones, and that is {bati}'s voice. The 2nd and 3rd {bati} speak in the same base voice
- * with a small pitch / speed change for their personality (BATI_VOICE_TUNING). The voice is used for {bati}'s voice only.
+ * The member's own voice (M-R246 / M-R247, D03-S005 「声を聞かせる」): on day 2, after {bati} is born and named, {name}
+ * talks to it (held mic, about 10 s). The recording becomes a private Fish Audio voice model of the member's own voice.
+ *
+ * M-R342 (client 2026-11-27): {bati} no longer speaks in an imitation of that voice — every {bati} speaks in the fixed
+ * voice of its egg (batiFixedVoice.ts). The member's voice model (users.voice_bati_id: the column keeps its old name; it
+ * IS the member's voice model now) reads the member's own 「きれい」 ダチ voice messages (dachi/cute-voice.service.ts).
+ * New models are made from the recording as it is (no pitch change); the ones made before M-R342 were made from the
+ * recording pitched up two semitones and stay as they are.
  * Consent is the start-of-app agreement (MEDIA_CONSENT_VERSION) and, by age (M-R248, mediaAllowed): never under 13,
- * with the guardian's consent at 13〜15; otherwise no model is made and {bati} keeps the default voice. 〔声を消す〕 in the settings deletes the recording and the model.
+ * with the guardian's consent at 13〜15; otherwise nothing is recorded. 〔声を消す〕 in the settings deletes the recording
+ * and the model.
  */
 
-/** the recording is pitched up this much before the model is made from it (「少し高くして使います」) */
+/**
+ * +2 semitones: what the member's recording was pitched up by before M-R342 (the models made then keep it), and what the
+ * default cute voice's source recording is still pitched up by (apps/api/scripts/make-default-bati-voice.ts).
+ */
 export const BATI_VOICE_BASE_SEMITONES = 2;
 /** the light ring around the mic is full at this many seconds spoken (the script: 10秒くらいで満ちる) */
 export const BATI_VOICE_TARGET_SECONDS = 10;
@@ -21,60 +30,23 @@ export const BATI_VOICE_MIN_SECONDS = 8;
 export const BATI_VOICE_MAX_TAKES = 8;
 export const BATI_VOICE_MAX_SECONDS = 40;
 
-/** none = the default voice; making = the model is being made (queued job); ready; failed (the default voice for now) */
+/** the member's voice model: none; making = being made (queued job); ready; failed */
 export type BatiVoiceState = 'none' | 'making' | 'ready' | 'failed';
 
-/** the ⓘ next to the mic (M-R247: shown only to those who tap it; the words of M-R246's screen) */
-export const BATI_VOICE_EXPLAIN = 'あなたの声は、相方の声のもとになります（少し高くして使います）。相方の声のためだけに使い、ほかには使いません。あとで設定から消せます';
-
 /**
- * The 2nd / 3rd {bati}'s small changes on the same base voice, by personality: semitones on top of the base (+2) and a
- * speed multiplier for the TTS. The 1st {bati} always speaks in the base voice as it is.
+ * the ⓘ next to the mic (M-R247: shown only to those who tap it). M-R342: what the voice is used for now, after the
+ * client's decision (「ユーザーの声は、ダチへの声メッセージに使う」); the start-of-app agreement says the same
+ * (legal.ts, MEDIA_CONSENT_VERSION '2026-11-27.1').
  */
-export const BATI_VOICE_TUNING: Record<BatiPersonality, { semitones: number; speed: number }> = {
-  genki: { semitones: 1, speed: 1.05 },
-  teinei: { semitones: 0, speed: 0.97 },
-  kansai: { semitones: 0, speed: 1.06 },
-  cool: { semitones: -1, speed: 0.96 },
-  mellow: { semitones: -1, speed: 0.92 },
-  amae: { semitones: 2, speed: 0.97 },
-  gal: { semitones: 1, speed: 1.06 },
-  galfuwa: { semitones: 2, speed: 0.98 },
-  galane: { semitones: 0, speed: 1.0 },
-  galcool: { semitones: -1, speed: 1.0 },
-  galkansai: { semitones: 1, speed: 1.07 },
-  hakata: { semitones: 0, speed: 1.03 },
-  tohoku: { semitones: 0, speed: 0.94 },
-  okinawa: { semitones: 1, speed: 0.95 },
-  bushi: { semitones: -2, speed: 0.93 },
-  butler: { semitones: -2, speed: 0.95 },
-  king: { semitones: -2, speed: 0.92 },
-};
+export const BATI_VOICE_EXPLAIN = 'あなたの声は、ダチへの声メッセージを、あなたの声できれいに読むために使います。ほかには使いません。あとで設定から消せます';
 
-/**
- * R14 (client 2026-11-25, iPad: 「バティの話すスピードが少し遅い。速く、歯切れよく」): how fast {bati} speaks in the Moon
- * chat, on top of each {bati}'s own speed — Fish's prosody.speed (the pitch stays: no chipmunk), and the Gemini fallback's
- * pitch-keeping tempo. The API's BATI_VOICE_SPEED overrides it; 1 = the voice model as made.
- */
-export const BATI_VOICE_SPEED = 1.2;
-/** the speed {bati} speaks at: the base (BATI_VOICE_SPEED, or the server's setting) × the {bati}'s own, within Fish's 0.5–2 */
+/** the speed {bati} speaks at: the base (BATI_VOICE_SPEED, or the server's setting) × `own` (a reading style's), within Fish's 0.5–2 */
 export const batiSpeakSpeed = (own = 1, base = BATI_VOICE_SPEED) => Math.round(Math.min(2, Math.max(0.5, own * base)) * 100) / 100;
 
-/** the {bati}'s voice change on top of the model: the 1st (nth 1) none; the 2nd / 3rd by personality */
-export function batiVoiceTuning(nth: number, personality?: BatiPersonality | null): { semitones: number; speed: number } {
-  if (nth <= 1 || !personality) return { semitones: 0, speed: 1 };
-  return BATI_VOICE_TUNING[personality] ?? { semitones: 0, speed: 1 };
-}
-
-/** the whole pitch shift {bati} speaks in, from the member's own voice */
-export const batiVoicePitch = (nth: number, personality?: BatiPersonality | null) => BATI_VOICE_BASE_SEMITONES + batiVoiceTuning(nth, personality).semitones;
-
 /**
- * M-R250: the prepared voices {bati} speaks in when no voice of the member's own may be used (under 13, 13〜15 without the
- * guardian's consent), or none was recorded / it was deleted — by egg (moon = girl-leaning, sun = boy-leaning) and a group
- * of personalities. `gemini`: the story TTS voice (+ `pitch` in semitones, as the story's {bati} spec: Leda +3); `fish`: a
- * Fish Audio voice model id, or null = the server's FISH_DEFAULT_VOICE_ID.
- * PROVISIONAL (P-VOICE-BATI-4): no Fish preset voices are chosen yet (all null); the Gemini voices are a first pick by ear.
+ * M-R250: the Gemini voices {bati} falls back to where the Fish voice service is not connected (batiFixedVoice.ts is
+ * {bati}'s voice everywhere else) — by egg (moon = girl-leaning, sun = boy-leaning) and a group of personalities:
+ * the story TTS voice + `pitch` in semitones (as the story's old {bati} spec: Leda +3).
  */
 export type BatiVoiceGroup = 'bright' | 'calm' | 'rare';
 export const BATI_VOICE_GROUP: Record<BatiPersonality, BatiVoiceGroup> = {
@@ -96,13 +68,13 @@ export const BATI_VOICE_GROUP: Record<BatiPersonality, BatiVoiceGroup> = {
   butler: 'rare',
   king: 'rare',
 };
-export const BATI_DEFAULT_VOICES: Record<BatiEggKind, Record<BatiVoiceGroup, { gemini: string; pitch: number; fish: string | null }>> = {
-  moon: { bright: { gemini: 'Leda', pitch: 3, fish: null }, calm: { gemini: 'Aoede', pitch: 2, fish: null }, rare: { gemini: 'Kore', pitch: 1, fish: null } },
-  sun: { bright: { gemini: 'Puck', pitch: 3, fish: null }, calm: { gemini: 'Charon', pitch: 2, fish: null }, rare: { gemini: 'Orus', pitch: 0, fish: null } },
+export const BATI_DEFAULT_VOICES: Record<BatiEggKind, Record<BatiVoiceGroup, { gemini: string; pitch: number }>> = {
+  moon: { bright: { gemini: 'Leda', pitch: 3 }, calm: { gemini: 'Aoede', pitch: 2 }, rare: { gemini: 'Kore', pitch: 1 } },
+  sun: { bright: { gemini: 'Puck', pitch: 3 }, calm: { gemini: 'Charon', pitch: 2 }, rare: { gemini: 'Orus', pitch: 0 } },
 };
-/** the prepared voice for this {bati} (no egg / personality known: the story's {bati} voice, the moon's bright one) */
+/** the fallback voice for this {bati} (no egg / personality known: the moon's bright one) */
 export function batiDefaultVoice(egg?: BatiEggKind | null, personality?: BatiPersonality | null) {
-  return BATI_DEFAULT_VOICES[egg ?? 'moon'][personality ? (BATI_VOICE_GROUP[personality] ?? 'bright') : 'bright'];
+  return BATI_DEFAULT_VOICES[egg ?? BATI_VOICE_DEFAULT_EGG][personality ? (BATI_VOICE_GROUP[personality] ?? 'bright') : 'bright'];
 }
 
 const take = z.object({
@@ -112,7 +84,7 @@ const take = z.object({
     .max(60),
   data: z.string().min(100).max(3_000_000),
 });
-/** POST /voice/bati: the held takes, in order (appended), their total length and the words heard (optional) */
+/** POST /voice/bati (the member's own voice): the held takes, in order (appended), their total length and the words heard (optional) */
 export const BatiVoiceBody = z.object({
   takes: z.array(take).min(1).max(BATI_VOICE_MAX_TAKES),
   seconds: z.number().min(0).max(BATI_VOICE_MAX_SECONDS + 5),
@@ -123,15 +95,20 @@ export type BatiVoiceBody = z.infer<typeof BatiVoiceBody>;
 /**
  * The start-of-app agreement (M-R247): the terms of use and the privacy policy, with what photos and voice are used for.
  * Raise the version when the words change; the server keeps the version agreed to.
- * M-R252: the words are the draft's (legal.ts: CONSENT_TEXT, TERMS_DRAFT, PRIVACY_DRAFT); '.2' = that draft.
+ * M-R252: the words are the draft's (legal.ts: CONSENT_TEXT, TERMS_DRAFT, PRIVACY_DRAFT); '2026-11-22.2' = that draft.
+ * '2026-11-27.1' (M-R342, client approved): the use of the voice changed — no longer to make {bati}'s voice; for the
+ * ダチ voice messages (a voice model of the member that reads their words) and to turn what is said into words.
+ * A new version asks EVERY account to agree again the next time the app opens (ConsentGate: agreedNow), 13〜15 with
+ * the guardian again; until then the server treats the account as not recorded (canUseMedia false: no photo or
+ * voice is used, nothing new is recorded).
  * PLACEHOLDER (P-LEGAL-1): the texts are drafts; the wording and the flow are checked by a specialist (a lawyer) before
  * launch (M-R248).
  */
-export const MEDIA_CONSENT_VERSION = '2026-11-22.2';
+export const MEDIA_CONSENT_VERSION = '2026-11-27.1';
 /** the M-R247 summary lines (the agreement before M-R252; the screen now shows CONSENT_TEXT) */
 export const CONSENT_POINTS = [
   '利用規約とプライバシーポリシーに同意します。',
-  '写真と声は、あなたの姿と相方（バティ）を作るためだけに使い、ほかのことには使いません。',
+  '写真は、あなたの姿を作るためだけに使います。声は、話した言葉を文字にするためと、ダチへの声メッセージ（あなたの声のモデルが、あなたの言葉を読みます）のためだけに使い、相方（バティ）の声を作るためには使いません。ほかのことには使いません。',
   '写真そのものは保存しません。声と、写真から作った姿は、設定からいつでも消せます。',
 ] as const;
 /** M-R248: 13〜15歳 — the guardian's consent, confirmed once at the start (the one line to tick) */

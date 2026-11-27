@@ -130,7 +130,7 @@ export interface Api {
   composeMusicStatus(): Promise<Record<string, unknown>>;
   /** Register one of the two voices (own / Bati) from a recording of the fixed script. */
   registerVoice(body: RegisterVoiceBody): Promise<Me>;
-  /** M-R246: the egg recording (the held takes, appended) → {bati}'s voice (a queued voice model, +2 semitones) */
+  /** M-R246: the day-2 recording (the takes, appended) → the member's own voice model (queued; M-R342: not {bati}'s voice, no pitch change) */
   batiVoice(body: import('@obolo/shared').BatiVoiceBody): Promise<Me>;
   /** 〔声を消す〕: the recording and the voice model deleted; {bati} speaks in the default voice */
   removeBatiVoice(): Promise<Me>;

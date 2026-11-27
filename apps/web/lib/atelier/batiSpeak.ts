@@ -5,7 +5,7 @@ import { getApi } from '@/lib/api';
 
 /**
  * Client 2026-11-24: {bati} speaks its replies in the Moon chat, through the same voice path as the story chat
- * (POST /voice/bati-says → the member's own Fish model, else FISH_DEFAULT_VOICE_ID, else the Gemini voice). Long replies
+ * (POST /voice/bati-says → {bati}'s fixed Fish voice by its egg at 1.3× (M-R342), else the Gemini voice). Long replies
  * are read only up to SPEAK_MAX characters (cut at the last sentence end before it); the same words are fetched once
  * (here for the page, and the server keeps the file a day — it also counts every voice toward the day's read-aloud
  * limit). Played on the app's one AudioContext (webVoice playClip), so it follows the silent switch (M-R239), the first-

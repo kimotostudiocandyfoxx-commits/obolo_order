@@ -29,6 +29,7 @@ export * from './batiMemory';
 export * from './talk';
 export * from './finds';
 export * from './moonWorks';
+export * from './batiFixedVoice';
 export * from './batiVoice';
 export * from './legal';
 export * from './membership';

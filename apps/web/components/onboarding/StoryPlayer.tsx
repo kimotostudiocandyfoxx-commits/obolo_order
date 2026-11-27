@@ -46,7 +46,7 @@ import { exprFor, reactFor } from '@/lib/story/expression';
 import { DialogueWindow, IconButton, MixerPanel, Telop } from '@/components/story/parts';
 import { filmWatched, markFilmWatched } from '@/lib/story/films';
 import { fastTap, swallowClick } from '@/lib/story/fastTap';
-import { LineVoice, loadMix, saveMix, VOICE_DIP, type Mix } from '@/lib/story/lineVoice';
+import { LineVoice, loadMix, saveMix, setSceneBatiVoiceEgg, VOICE_DIP, type Mix } from '@/lib/story/lineVoice';
 import { useNameVoices } from '@/lib/story/useNameVoices';
 import { FilmReel } from './FilmReel';
 import { SaturnLesson } from '@/components/saturn/SaturnLesson';
@@ -447,6 +447,13 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const [voiceLoading, setVoiceLoading] = useState(false);
   const voice = useRef<LineVoice | null>(null);
   if (typeof window !== 'undefined') voice.current ??= new LineVoice();
+
+  // M-R342: {bati} speaks in its egg's voice — the egg just chosen here (day 2 / SYS-S003: f_egg) before the account has it
+  const pickedEgg = answers.f_egg;
+  useEffect(() => {
+    setSceneBatiVoiceEgg(pickedEgg);
+    return () => setSceneBatiVoiceEgg(null);
+  }, [pickedEgg]);
 
   const step = steps[i];
   const v: StoryVars = {
@@ -1805,7 +1812,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           }}
         />
       )}
-      {/* D03-S005 (M-R246 / M-R247): 「たまごに声を聞かせる」 — the held mic and its ring; {bati}'s voice from {name}'s */}
+      {/* D03-S005 (M-R246 / M-R247): 「声を聞かせる」 — the mic and its ring; {name}'s own voice model (M-R342: not {bati}'s voice) */}
       {started && step?.t === 'eggvoice' && (
         <EggVoiceStep
           key={i}

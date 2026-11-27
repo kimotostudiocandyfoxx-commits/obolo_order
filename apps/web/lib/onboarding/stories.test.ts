@@ -155,7 +155,7 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
       t.indexOf('hatch'),
       t.indexOf('batiname'),
       t.indexOf('baticard'),
-      say('{bati}は、、、お前の声を、真似して、喋る。'),
+      say('{bati}は、、、お前の声を、覚える。'),
       say('だから、、、お前の声を、聞かせてやれ。'),
       t.indexOf('eggvoice'),
       say('{name}の声、おぼえたよ！'),

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { defaultVoiceSilent } from './access';
+import { batiVoiceSilent } from './access';
+import { JOURNEY_DONE, JOURNEY_PAYMENT } from './journey';
 import { CUTE_VOICE_RATE, CUTE_VOICE_WORDS, cuteVoiceBytes, cuteVoiceCostJpy, cuteVoiceCostParts, cuteVoiceMana, cuteVoiceMissWords, cuteVoiceRate } from './cuteVoice';
 import { SendDachiMessageBody } from './dachiVoice';
 import { CUTE_VOICE_QUOTE_CHARS, DEFAULT_COST_RATES, FISH_USD_PER_MBYTE, isMakeKind, isTenthMana, MAKE_COST, MAKE_COST_ESTIMATE, estimateJpy, manaFor10, quoteMana, usageLineOf } from './manaPrice';
@@ -51,11 +52,17 @@ describe('the price of words read by the default cute voice (client 2026-11-27)'
   });
 });
 
-describe('{bati} in the default voice for a member who is not recorded: no voice at 0 mana', () => {
-  it('not recorded and no mana left: silent; with mana, or recorded: as before', () => {
-    expect(defaultVoiceSilent({ recorded: false, balance: 0 })).toBe(true);
-    expect(defaultVoiceSilent({ recorded: false, balance: 0.9 })).toBe(true);
-    expect(defaultVoiceSilent({ recorded: false, balance: 1 })).toBe(false);
-    expect(defaultVoiceSilent({ recorded: true, balance: 0 })).toBe(false);
+describe('{bati}’s voice at 0 mana: one rule for everyone (M-R342)', () => {
+  it('during the first journey everyone hears {bati}, with no mana too', () => {
+    expect(batiVoiceSilent({ journeyDay: 1, journeyCompletedAt: null, balance: 0 })).toBe(false);
+    expect(batiVoiceSilent({ journeyDay: JOURNEY_PAYMENT, journeyCompletedAt: null, balance: 0 })).toBe(false);
+    expect(batiVoiceSilent({ journeyDay: JOURNEY_DONE - 1, journeyCompletedAt: null, balance: 0 })).toBe(false);
+  });
+  it('after the journey: no voice with no mana left (below 1), the voice with mana', () => {
+    expect(batiVoiceSilent({ journeyDay: JOURNEY_DONE, journeyCompletedAt: null, balance: 0 })).toBe(true);
+    expect(batiVoiceSilent({ journeyDay: JOURNEY_DONE, journeyCompletedAt: null, balance: 0.9 })).toBe(true);
+    expect(batiVoiceSilent({ journeyDay: JOURNEY_DONE, journeyCompletedAt: null, balance: 1 })).toBe(false);
+    // the last day finished: the journey is over
+    expect(batiVoiceSilent({ journeyDay: JOURNEY_DONE - 1, journeyCompletedAt: new Date(), balance: 0 })).toBe(true);
   });
 });

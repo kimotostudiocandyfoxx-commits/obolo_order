@@ -37,8 +37,9 @@ export class VoiceController {
   }
 
   /**
-   * M-R246 (D03-S005 「たまごに声を聞かせる」): the egg recording → {bati}'s voice (a queued voice model, +2 semitones).
-   * Needs the start-of-app agreement (M-R247); without it nothing is kept and {bati} keeps the default voice.
+   * M-R246 (D03-S005 「声を聞かせる」): the day-2 recording → the member's own voice model (queued; M-R342: made from
+   * the recording as it is, and used for their 「きれい」 ダチ voice messages — {bati} speaks in its egg's fixed voice).
+   * Needs the start-of-app agreement (M-R247); without it nothing is kept.
    */
   @Post('bati')
   @HttpCode(200)
@@ -47,7 +48,7 @@ export class VoiceController {
     return this.batiVoices.record(userId, parseBody(BatiVoiceBody, body), `${req.protocol}://${req.get('host')}`);
   }
 
-  /** 〔声を消す〕 (settings): the recording and the voice model are deleted; the default voice again */
+  /** 〔声を消す〕 (settings): the member's recording and voice model are deleted */
   @Delete('bati')
   removeBatiVoice(@UserId() userId: string) {
     return this.batiVoices.remove(userId);
@@ -91,13 +92,13 @@ export class VoiceController {
     return this.lines.get(userId, parseBody(LineVoicesBody, body), `${req.protocol}://${req.get('host')}`);
   }
 
-  /** {bati}'s answer in the Moon chat, read aloud in {bati}'s story voice (M-R179); null when it cannot be made now */
+  /** {bati}'s answer in the Moon chat, read aloud in {bati}'s voice (M-R179; M-R342: its egg's fixed voice); null when it cannot be made now */
   @Post('bati-says')
   @HttpCode(200)
   async batiSays(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
     await rateLimit(this.kv, `voice-bati-says:${userId}`, 30, 60);
-    // R18: no voice (text only) for a non-member past the first journey at 0 mana; client 2026-11-27: nor for a member
-    // who is not recorded (the default cute voice speaks for them) with no mana left
+    // M-R342, one rule for everyone: after the first journey, no voice (text only) at 0 mana — recorded or not, Obolo
+    // Order or not; during the journey everyone hears {bati}
     if (await this.access.noVoice(userId)) return { url: null };
     return (await this.lines.batiSays(userId, parseBody(BatiSaysBody, body).text, `${req.protocol}://${req.get('host')}`)) ?? { url: null };
   }

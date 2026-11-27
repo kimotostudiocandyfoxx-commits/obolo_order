@@ -1023,7 +1023,6 @@ function DropComposer({
   quote?: SaturnPostView;
 }) {
   const { me } = useAuth();
-  const hasBatiVoice = !!me?.voices?.bati;
   // previews cost a voice call: keep the last one for the same text + style
   const [preview, setPreview] = useState<{ key: string; url: string } | null>(null);
   const [previewing, setPreviewing] = useState(false);
@@ -1052,8 +1051,6 @@ function DropComposer({
   const listen = async () => {
     const t = text.trim();
     if (!t) return;
-    // no registered Bati voice yet: the device's reading voice stands in
-    if (!hasBatiVoice) return void toggleAudio(neoVoiceUrl(style, me?.neoForm, t)).catch(() => undefined);
     const key = `${style}:${t}`;
     setErr(null);
     try {
@@ -1065,7 +1062,9 @@ function DropComposer({
       }
       await toggleAudio(url);
     } catch {
-      setErr('バティが読めなかった…もう一度');
+      // M-R342: {bati} reads in its egg's fixed voice; where that cannot be made now (no voice service, the mana rule),
+      // the device's reading voice stands in, as the post itself does
+      await toggleAudio(neoVoiceUrl(style, me?.neoForm, t)).catch(() => setErr('バティが読めなかった…もう一度'));
     } finally {
       setPreviewing(false);
     }
@@ -1166,11 +1165,6 @@ function DropComposer({
         <button onClick={() => void listen()} disabled={!text.trim() || previewing} className="mt-3 w-full rounded-full bg-amber-50 py-2 text-xs font-bold text-amber-700 disabled:opacity-40">
           {previewing ? 'バティが読んでいます…' : '▶ バティの声で聞いてみる'}
         </button>
-        {!hasBatiVoice && (
-          <a href="/voice" className="mt-2 block text-center text-[10px] font-bold text-amber-600 underline">
-            バティの声を登録すると、あなたのバティの声で読んでくれるよ →
-          </a>
-        )}
 
         {err && <p className="mt-2 text-xs text-rose-500">{err}</p>}
         <button

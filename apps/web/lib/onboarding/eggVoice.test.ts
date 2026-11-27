@@ -24,7 +24,7 @@ describe('たまごに声を聞かせる (D03-S005, M-R246 / M-R247)', () => {
     expect(hatch).toBeGreaterThan(0);
     expect(named).toBeGreaterThan(hatch);
     expect(at).toBeGreaterThan(named);
-    expect(DAY2[at - 2]).toEqual({ t: 'say', who: 'OBOLON', text: '{bati}は、、、お前の声を、真似して、喋る。' });
+    expect(DAY2[at - 2]).toEqual({ t: 'say', who: 'OBOLON', text: '{bati}は、、、お前の声を、覚える。' });
     expect(DAY2[at - 1]).toEqual({ t: 'say', who: 'OBOLON', text: 'だから、、、お前の声を、聞かせてやれ。' });
     expect(DAY2.slice(at).find((s) => s.t === 'say')).toEqual({ t: 'say', who: 'バティ', text: '{name}の声、おぼえたよ！' });
     // KIMORIN's 「何と話しかければ」 passage is gone
@@ -34,7 +34,10 @@ describe('たまごに声を聞かせる (D03-S005, M-R246 / M-R247)', () => {
     expect(step.example).toBe('よろしくね。いっしょに、いろんな星に行こう。');
     // M-R247: no explanation in the scene (only the ⓘ) — the consent words are not a line or a notice of the story
     expect(JSON.stringify(DAY2)).not.toContain('相方の声のためだけに使い');
-    expect(BATI_VOICE_EXPLAIN).toBe('あなたの声は、相方の声のもとになります（少し高くして使います）。相方の声のためだけに使い、ほかには使いません。あとで設定から消せます');
+    // M-R342: the voice is not {bati}'s any more — the ⓘ says what it is used for now
+    expect(JSON.stringify(DAY2)).not.toContain('真似して');
+    expect(BATI_VOICE_EXPLAIN).toBe('あなたの声は、ダチへの声メッセージを、あなたの声できれいに読むために使います。ほかには使いません。あとで設定から消せます');
+    expect(BATI_VOICE_EXPLAIN).not.toMatch(/相方の声|高く/);
   });
 
   it('M-R250 / M-R334: under 13 the photo passage is skipped — OBOLON asks for the wished look instead (the branch f_media no)', () => {
@@ -58,7 +61,10 @@ describe('たまごに声を聞かせる (D03-S005, M-R246 / M-R247)', () => {
     const all = CONSENT_POINTS.join('');
     expect(all).toContain('利用規約');
     expect(all).toContain('プライバシーポリシー');
-    expect(all).toMatch(/写真と声は、あなたの姿と相方/);
+    // M-R342: the voice is for the ダチ voice messages and the words said, not for {bati}'s voice
+    expect(all).toMatch(/写真は、あなたの姿を作るためだけ/);
+    expect(all).toContain('ダチへの声メッセージ');
+    expect(all).toContain('相方（バティ）の声を作るためには使いません');
     expect(all).toContain('ほかのことには使いません');
     expect(all).toContain('設定からいつでも消せます');
   });

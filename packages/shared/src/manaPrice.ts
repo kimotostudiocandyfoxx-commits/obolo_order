@@ -683,14 +683,15 @@ export const MAKE_COST: Readonly<ManaPrices> = Object.freeze(manaPrices());
  * (about one mana every 30 short messages) — and capped a day (VOICE_MIX_DAILY_CAP). The 「きれい」 version's hearing of
  * the take (voiceVersion.ts) is filed here too; its read voice is the paid making 'cuteVoice'.
  */
-export const USAGE_FEATURES = ['chat', 'search', 'draw', 'voice', 'spell', 'lyrics', 'compass', 'songEdit', 'videoEdit', 'novel', 'unfurl', 'listen', 'memory', 'look', 'story', 'dachi', 'figures', 'titleVoice', 'cutRetry', 'voiceMix', 'other'] as const;
+export const USAGE_FEATURES = ['chat', 'search', 'draw', 'voice', 'spell', 'lyrics', 'compass', 'songEdit', 'videoEdit', 'novel', 'unfurl', 'listen', 'memory', 'look', 'story', 'dachi', 'figures', 'titleVoice', 'cutRetry', 'voiceMix', 'voiceRemake', 'other'] as const;
 export type UsageFeature = (typeof USAGE_FEATURES)[number];
 /**
- * the free costs the operator absorbs (recorded, never taken from the member). 'cutRetry' (client 2026-11-27): what a
+ * the free costs the operator absorbs (recorded, never taken from the member). 'voiceRemake' (M-R342): a member's
+ * voice model made again from their recording without the old +2 semitones (the admin backfill: nobody asked for it). 'cutRetry' (client 2026-11-27): what a
  * cut-out's retries cost outside a paid making — the repaints after a failed check and the checks of those
  * (LookService.ladder); the member pays a picture once, never its retries
  */
-export const ABSORBED_FEATURES: readonly string[] = ['dachi', 'figures', 'titleVoice', 'cutRetry'];
+export const ABSORBED_FEATURES: readonly string[] = ['dachi', 'figures', 'titleVoice', 'cutRetry', 'voiceRemake'];
 
 export interface AccrualStep {
   /** mana to take now (a ledger row of this many, reason 'usage') */
