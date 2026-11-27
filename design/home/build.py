@@ -39,6 +39,21 @@ for k in 'user kimorin monban mikie brother sister sapon'.split():
     if os.path.exists(f): kk=key(Image.open(f)); kk.thumbnail((300,300)); A['chibi-'+k]=uri(kk,86)
     f2=f.replace('/chibi-','/chibi2-')
     if os.path.exists(f2): kk=key(Image.open(f2)); kk.thumbnail((300,300)); A['chibi-'+k]=uri(kk,86)
+def cleancut(im):
+    """white-background cutout without a white halo: the border band gets alpha from how white it is, and its colour is un-mixed from white"""
+    from scipy import ndimage as _nd
+    o=unwhite(im); a=np.asarray(o).astype(np.float32); rgb=a[...,:3]; al=a[...,3]/255.
+    solid=al>0.5
+    inner=_nd.binary_erosion(solid,iterations=3); band=_nd.binary_dilation(solid,iterations=2)&~inner
+    wh=np.clip((255-rgb.min(2))/70.,0,1)          # 0 = pure white, 1 = clearly coloured
+    na=np.where(inner,1.,np.where(band,wh,0.))
+    na=_nd.gaussian_filter(na,0.6)*band+inner*1.0
+    na=np.clip(na,0,1)
+    safe=np.maximum(na,1e-3)[...,None]
+    un=np.clip((rgb-(1-na[...,None])*255)/safe,0,255)
+    out=np.dstack([np.where(band[...,None],un,rgb),na*255]).astype('uint8')
+    o=Image.fromarray(out,'RGBA'); bb=o.getbbox(); return o.crop(bb) if bb else o
+
 for k in 'mine dachi oshi'.split():
     f=f'{O}/ball-{k}.jpg'
     if os.path.exists(f): kk=key(Image.open(f)); kk.thumbnail((160,160)); A['ball-'+k]=uri(kk,88)
@@ -211,7 +226,7 @@ for nm in ['map','sea','edm','hiphop','ballad','rock','chill','citypop','anison'
 for f in sorted(_g.glob(f'{O}/sapon/*.jpg')):
     k='sap-'+os.path.basename(f)[:-4]; im=Image.open(f).convert('RGB'); im.thumbnail((600,600)); A[k]=uri(im,76)
 f=f'{O}/sushi/salmon-ref2.jpg'
-if os.path.exists(f): o=unwhite(Image.open(f)); bb=o.getbbox(); o=o.crop(bb) if bb else o; o.thumbnail((600,600),Image.LANCZOS); A['sap-game']=uri(o,88)
+if os.path.exists(f): o=cleancut(Image.open(f)); o.thumbnail((600,600),Image.LANCZOS); A['sap-game']=uri(o,90)
 for f in sorted(_g.glob(H+'/sapon/*')):
     b=os.path.basename(f); k='sap-'+b.rsplit('.',1)[0]; mt={'mp3':'audio/mpeg','mp4':'video/mp4'}.get(b.rsplit('.',1)[1])
     if mt: A[k]=f'data:{mt};base64,'+base64.b64encode(open(f,'rb').read()).decode()

@@ -704,13 +704,26 @@ button:focus-visible,.item:focus-visible,.home:focus-visible{outline:3px solid v
 
 .pagelink{display:block;width:fit-content;margin:6px auto 10px;padding:7px 14px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);color:#fff;font:800 12px var(--f-body);text-decoration:none}
 .pagelink[hidden]{display:none}
-.vw.sapbk{width:94%}.sapbk .book{position:relative;width:100%}.vw.sapmug,.vw.sapgm{width:82%}.sapmug .mug{width:100%!important}.sapgm .gscr{width:100%!important}.sapbk .pg.r .sp{font-size:12.5px;line-height:1.75}.sapbk .pno{position:absolute;right:10px;bottom:8px;font-size:11px;opacity:.6}
-.vw.live{pointer-events:auto}.bknav{display:flex;justify-content:space-between;margin-top:10px}.bknav button{width:46px;height:46px;border-radius:50%;border:0;background:rgba(255,255,255,.9);font:800 24px var(--f-body);color:#5a3d8a;box-shadow:0 4px 10px rgba(0,0,0,.25)}.bknav button[disabled]{opacity:.35}.bknav{align-items:center}.bkspd{display:flex;gap:4px;padding:4px;border-radius:999px;background:rgba(20,16,40,.55);backdrop-filter:blur(6px);margin-left:auto;margin-right:8px}.bknav .bkspd button.spd{width:auto;height:30px;padding:0 10px;border-radius:999px;font:800 12px var(--f-body);background:transparent;color:#fff;box-shadow:none}.bknav .bkspd button.spd[aria-pressed=true]{background:#fff;color:#5a3d8a}
+.vw.sapbk{width:86%}.sapbk .bk{position:relative;width:100%;aspect-ratio:1;perspective:1400px}
+.sapbk .cover{position:absolute;inset:-6px -8px -9px -10px;border-radius:6px 12px 12px 6px;background:linear-gradient(90deg,#3b2a63,#5a3d8a 6%,#4a326f);box-shadow:0 18px 36px rgba(0,0,0,.55)}
+.sapbk .under,.sapbk .leaf{position:absolute;inset:0}.sapbk .sq{position:absolute;inset:0;border-radius:2px 8px 8px 2px;background:#fffdf6 center/cover no-repeat;box-shadow:inset 10px 0 14px -8px rgba(0,0,0,.35);overflow:hidden}
+.sapbk .sq h4{position:absolute;left:0;right:0;top:5%;margin:0;text-align:center;font:900 17px/1.2 var(--f-body);color:#3b2a20;text-shadow:0 0 6px #fff,0 0 12px #fff}
+.sapbk .sq .cap{position:absolute;left:6%;right:6%;bottom:4%;margin:0;padding:7px 10px;border-radius:12px;background:rgba(255,253,246,.86);font:700 12.5px/1.6 var(--f-body);color:#4a3a26;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.sapbk .sq .pno{position:absolute;right:8px;top:6px;font:800 10px var(--f-body);color:#7a6a50;opacity:.75}
+.sapbk .leaf{pointer-events:none;transform-origin:0 50%;transform-style:preserve-3d;visibility:hidden}
+.sapbk .leaf.on{visibility:visible}.sapbk .leaf.fwd{animation:leafF .72s cubic-bezier(.45,.05,.3,1) forwards}.sapbk .leaf.back{animation:leafB .72s cubic-bezier(.45,.05,.3,1) forwards}
+.sapbk .leaf .shade{position:absolute;inset:0;border-radius:2px 8px 8px 2px;background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.35));opacity:0;animation:leafS .72s ease forwards}
+@keyframes leafF{0%{transform:rotateY(0)}100%{transform:rotateY(-180deg);opacity:.0}}@keyframes leafB{0%{transform:rotateY(-180deg);opacity:0}30%{opacity:1}100%{transform:rotateY(0)}}@keyframes leafS{0%{opacity:0}50%{opacity:1}100%{opacity:0}}
+.sapbk .leaf.fwd .sq,.sapbk .leaf.back .sq{backface-visibility:hidden}
+.sapbk .bk.closing .under{transform-origin:0 50%;animation:bkClose .6s ease-in forwards}@keyframes bkClose{to{transform:perspective(1400px) rotateY(-100deg)}}
+.vw.sapbk.flyaway{transition:transform 1s cubic-bezier(.5,-.2,.6,1),opacity 1s;transform:translate(10%,-140%) rotate(-24deg) scale(.25)!important;opacity:0}
+.vw.sapmug,.vw.sapgm{width:82%}.sapmug .mug{width:100%!important}.sapgm .gscr{width:100%!important}.sapbk .pno{position:absolute;right:10px;bottom:8px;font-size:11px;opacity:.6}
+.vw.live{pointer-events:auto}.bknav{display:flex;justify-content:space-between;margin-top:10px}.bknav button{width:46px;height:46px;border-radius:50%;border:0;background:rgba(255,255,255,.9);font:800 24px var(--f-body);color:#5a3d8a;box-shadow:0 4px 10px rgba(0,0,0,.25)}.bknav button[disabled]{opacity:.35}.bknav{align-items:center}.bkspd{display:flex;flex-shrink:0;gap:2px;padding:3px;border-radius:999px;background:rgba(20,16,40,.55);backdrop-filter:blur(6px);margin-left:auto;margin-right:8px}.bknav .bkspd button.spd{width:auto;height:30px;padding:0 8px;white-space:nowrap;border-radius:999px;font:800 12px var(--f-body);background:transparent;color:#fff;box-shadow:none}.bknav .bkspd button.spd[aria-pressed=true]{background:#fff;color:#5a3d8a}
 .sapmug .mug{width:78%;margin:0 auto;border-radius:22px;overflow:hidden;box-shadow:0 14px 30px rgba(0,0,0,.35)}.sapmug .mug img{display:block;width:100%}
 .mvv .scr video{width:100%;height:100%;object-fit:cover;display:block}
 .sapgm .gscr{position:relative;width:86%;margin:0 auto;aspect-ratio:1;border-radius:26px;background:radial-gradient(circle at 50% 40%,#bff3ff,#2a7fc4 70%,#123c78);box-shadow:inset 0 0 0 4px rgba(255,255,255,.5),0 14px 30px rgba(0,0,0,.35);overflow:hidden}
 .sapgm canvas{position:absolute;inset:6%;width:88%;height:88%;touch-action:none;cursor:pointer}.sapgm .gcnt{position:absolute;left:12px;top:10px;font:800 14px var(--f-body);color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.4)}
-.sapgm .ghint{position:absolute;left:0;right:0;bottom:12px;text-align:center;font:800 14px var(--f-body);color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.5);transition:opacity .4s}
+.sapgm .ghint{position:absolute;left:0;right:0;bottom:4px;font-size:12px!important;text-align:center;font:800 14px var(--f-body);color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.5);transition:opacity .4s}
 </style>
 <div class="switch" id="mode" role="toolbar" aria-label="絵のタッチ"><button type="button" data-m="anime" aria-pressed="true">アニメ版</button><button type="button" data-m="toy" aria-pressed="false">箱庭版</button></div>
 <div class="switch" id="satmode" role="toolbar" aria-label="土星の見せ方" hidden><button type="button" data-s="d">土星：今の版（真下に落ちる）</button><button type="button" data-s="e">奥行き版（床に沿って）</button></div>
@@ -1277,7 +1290,7 @@ function expShow(b,o){o=o||{};if(EX.open)return;const ex=$('exp'),st=$('estage')
   const fb=document.createElement('button');fb.type='button';fb.className='favb'+(BLUENA.has(wk)?' done':'');fb.setAttribute('aria-label','お気に入り（ブルーナに保存）');fb.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2l2.6 5.5 6 .8-4.4 4.1 1.1 5.9L12 16.6l-5.3 2.9 1.1-5.9L3.4 9.5l6-.8z"/></svg>';acts.appendChild(fb);
   fb.onclick=ev=>{ev.stopPropagation();if(BLUENA.has(wk))return;BLUENA.add(wk);try{localStorage.setItem('obolo-bluena',JSON.stringify([...BLUENA]))}catch(e){}fb.classList.add('done','pop');chime();toast('⭐ ブルーナに保存したよ')};
   const ob=document.createElement('button');ob.type='button';if(b.w&&b.w.mine)ob.style.display='none';ob.className='oshib'+(oshi.has(b.n)?' done':'');ob.setAttribute('aria-label','推す');ob.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3s-7.6-4.6-7.6-10.2A4.3 4.3 0 0 1 12 7.4a4.3 4.3 0 0 1 7.6 2.7c0 5.6-7.6 10.2-7.6 10.2z"/></svg>';acts.appendChild(ob);
-  ob.onclick=ev=>{ev.stopPropagation();if(oshi.has(b.n))return;oshi.add(b.n);ob.classList.add('done','pop');chime();
+  ob.onclick=ev=>{ev.stopPropagation();if(oshi.has(b.n))return;oshi.add(b.n);ob.classList.add('done','pop');SFX.heart();
     for(let k=0;k<12;k++){const h=document.createElement('i');h.className='heartp';h.textContent='💗';h.style.left='50%';h.style.top='88%';h.style.setProperty('--dx',(Math.random()*160-80)+'px');h.style.setProperty('--dy',(-60-Math.random()*120)+'px');st.appendChild(h);setTimeout(()=>h.remove(),1000)}
     toast('💗 '+b.n+' を推しにしたよ。これから'+(HOMEW[EX.pl]||'きみの星')+'にも来てくれるよ')};
   const rb=document.createElement('button');rb.type='button';rb.className='repb';rb.setAttribute('aria-label','通報・非表示');rb.textContent='⋯';st.appendChild(rb);rb.onclick=ev=>{ev.stopPropagation();repMenu(b,st)};
@@ -1333,14 +1346,23 @@ function stopNarr(){if(NAREL){NAREL.onended=null;try{NAREL.pause()}catch(e){}}NA
 function narr(k,rate,onend){stopNarr();if(!A[k])return;try{if(!NAREL)NAREL=new Audio();const au=NAREL;au.preservesPitch=au.mozPreservesPitch=au.webkitPreservesPitch=true;au.src=A[k];au.defaultPlaybackRate=au.playbackRate=rate||1;
   au.onended=()=>{NAR=null;onend&&onend()};NAR=au;const p=au.play();if(p)p.catch(()=>{});if(BEAT&&AC){const bg=BEAT.out.gain,t0=AC.currentTime;bg.cancelScheduledValues(t0);bg.setTargetAtTime(.16,t0,.04)}}catch(e){}}
 const BSPD=[['ゆっくり',.8],['ふつう',1],['はやい',1.3]];
-function sapBook(into){const v=document.createElement('div');v.className='vw bkv sapbk live';v.style.top='16%';let p=0,auto=null,sp=1;
+function sapBook(into){const v=document.createElement('div');v.className='vw sapbk live';v.style.top='13%';let p=0,auto=null,sp=1,busy=false,done=false;
   try{const x=+localStorage.getItem('sapBookSpeed');if(BSPD.some(b=>b[1]===x))sp=x}catch(e){}
-  const read=(first)=>{clearTimeout(auto);const go=()=>narr('sap-page'+(p+1),sp,()=>{if(p<5)auto=setTimeout(()=>{p++;pageFlip();draw();read()},1200)});if(first&&A['sap-bookv'])narr('sap-bookv',sp,()=>setTimeout(go,250));else go()};
-  const draw=()=>{v.innerHTML=`<div class="book"><div class="pg l" style="background-image:url(${A['sap-book-'+(p+1)]||''})"></div><div class="pg r">${p===0?`<h4>${SAPON.book}</h4>`:''}<p class="sp">${SAPON.pages[p]}</p><span class="pno">${p+1} / 6</span></div></div><div class="bknav"><button type="button" class="bkp" aria-label="まえのページ" ${p?'':'disabled'}>‹</button><div class="bkspd" role="group" aria-label="読む速さ">${BSPD.map(([l,r])=>`<button type="button" class="spd" data-r="${r}" aria-pressed="${r===sp}">${l}</button>`).join('')}</div><button type="button" class="bkn" aria-label="つぎのページ">${p<5?'›':'↺'}</button></div>`};
-  draw();read(true);
+  const face=i=>`<div class="sq" style="background-image:url(${A['sap-book-'+(i+1)]||''})"><span class="pno">${i+1} / 6</span>${i===0?`<h4>${SAPON.book}</h4>`:''}<p class="cap">${SAPON.pages[i]}</p></div>`;
+  v.innerHTML=`<div class="bk"><div class="cover"></div><div class="under">${face(0)}</div><div class="leaf"></div></div><div class="bknav"><button type="button" class="bkp" aria-label="まえのページ" disabled>‹</button><div class="bkspd" role="group" aria-label="読む速さ">${BSPD.map(([l,r])=>`<button type="button" class="spd" data-r="${r}" aria-pressed="${r===sp}">${l}</button>`).join('')}</div><button type="button" class="bkn" aria-label="つぎのページ">›</button></div>`;
+  const under=v.querySelector('.under'),leaf=v.querySelector('.leaf'),bk=v.querySelector('.bk');
+  const nav=()=>{v.querySelector('.bkp').disabled=p===0;v.querySelector('.bkn').setAttribute('aria-label',p<5?'つぎのページ':'本をとじる')};
+  const read=first=>{clearTimeout(auto);const go=()=>narr('sap-page'+(p+1),sp,()=>{auto=setTimeout(()=>{if(p<5)turn(1);else finish()},p<5?1100:1600)});if(first&&A['sap-bookv'])narr('sap-bookv',sp,()=>setTimeout(go,250));else go()};
+  function turn(d){if(busy||done)return;const np=p+d;if(np<0)return;if(np>5){finish();return}busy=true;clearTimeout(auto);stopNarr();SFX.page();
+    if(d>0){leaf.innerHTML=face(p)+'<i class="shade"></i>';under.innerHTML=face(np);leaf.className='leaf on fwd'}
+    else{leaf.innerHTML=face(np)+'<i class="shade"></i>';leaf.className='leaf on back'}
+    p=np;nav();setTimeout(()=>{if(d<0)under.innerHTML=face(p);leaf.className='leaf';leaf.innerHTML='';busy=false;read()},720)}
+  function finish(){if(done)return;done=true;clearTimeout(auto);stopNarr();SFX.page();bk.classList.add('closing');
+    setTimeout(()=>{SFX.whoosh();v.classList.add('flyaway')},650);setTimeout(()=>{if(GOPEN)GOPEN.close()},1650)}
+  setTimeout(()=>read(true),0);
   v.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;e.stopPropagation();
-    if(b.classList.contains('spd')){sp=+b.dataset.r;try{localStorage.setItem('sapBookSpeed',String(sp))}catch(e2){}if(NAR)NAR.playbackRate=sp;v.querySelectorAll('.spd').forEach(x=>x.setAttribute('aria-pressed',String(+x.dataset.r===sp)));return}
-    if(b.classList.contains('bkp'))p=Math.max(0,p-1);else p=p<5?p+1:0;pageFlip();draw();read()});
+    if(b.classList.contains('spd')){SFX.tick();sp=+b.dataset.r;try{localStorage.setItem('sapBookSpeed',String(sp))}catch(e2){}if(NAR)NAR.playbackRate=sp;v.querySelectorAll('.spd').forEach(x=>x.setAttribute('aria-pressed',String(+x.dataset.r===sp)));return}
+    turn(b.classList.contains('bkp')?-1:1)});
   v.__stop=()=>{clearTimeout(auto);stopNarr()};return v}
 function pageFlip(){const c=getAC();if(!c)return;const n=c.sampleRate*.18,b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2)*.5;const s=c.createBufferSource(),f=c.createBiquadFilter();f.type='bandpass';f.frequency.value=2400;s.buffer=b;s.connect(f);f.connect(c.destination);s.start()}
 /* Neptune: tap Sapon and the place you touched wobbles ("ぽよよん") */
@@ -1364,7 +1386,7 @@ function poyo(k){const c=getAC();if(!c)return;const t0=c.currentTime+.005,o=c.cr
 function sapViewer(into,pl){const c=G5[pl],ttl=t=>{const st=TSTYLE[t]||{f:"'Dela Gothic One'"};return `<div class="ttl2" style="font-family:${st.f},var(--f-body)">${[...t].map(ch=>`<span class="${chk(ch)}">${ch}</span>`).join('')}</div>`};let v=document.createElement('div'),stop=()=>{};
   if(c.t==='mv'){v.className='vw mvv';v.style.top='12%';v.innerHTML=`<div class="scr"><video src="${A['sap-mv']||''}" poster="${A['sap-dad']||''}" muted loop playsinline autoplay></video></div>${ttl(SAPON.song)}`;if(!A['sap-mv'])setTimeout(()=>toast('🎬 動くMVは「星のホーム2」で見られるよ'),600);playSong('sap-song');stop=()=>stopSong();setTimeout(()=>{const vd=v.querySelector('video');if(vd)vd.play().catch(()=>{})},50)}
   if(c.t==='radio'){v.className='vw rdv';v.style.top='14%';v.innerHTML=`<div class="disc2" style="background-image:url(${A['sap-radio']||''})"></div><span class="air">ON AIR</span><div class="wave">${Array.from({length:15},(_,i)=>`<b style="height:${10+((i*7)%5)*6}px;animation-delay:${(i%5)*.08}s"></b>`).join('')}</div>${ttl(SAPON.radio)}`;if(!A['sap-radiov'])setTimeout(()=>toast('📻 このラジオは「星のホーム2」で聞けるよ'),600);setTimeout(()=>{playSong('sap-radiov');if(SONG&&SONG.loop!==undefined)SONG.loop=false;if(SONG&&SONG.__el)SONG.__el.loop=false},400);stop=()=>stopSong()}
-  if(c.t==='goods'){narr('sap-mugv',1);stop=()=>stopNarr();v.className='vw gdv sapmug';v.style.top='16%';v.innerHTML=`<div class="mug"><img alt="サーぽんのマグカップ" src="${A['sap-mug']||''}"></div>${ttl(SAPON.goods)}`}
+  if(c.t==='goods'){narr('sap-mugv',1);setTimeout(()=>SFX.mug(),420);stop=()=>stopNarr();v.className='vw gdv sapmug';v.style.top='16%';v.innerHTML=`<div class="mug"><img alt="サーぽんのマグカップ" src="${A['sap-mug']||''}"></div>${ttl(SAPON.goods)}`}
   if(c.t==='book'){v=sapBook(into);stop=()=>v.__stop()}
   if(c.t==='game'){v=sapGame(into);narr('sap-gamev',1);stop=()=>{stopNarr();v.__stop&&v.__stop()}}
   into.appendChild(v);requestAnimationFrame(()=>requestAnimationFrame(()=>v.classList.add('on')));
@@ -1380,7 +1402,7 @@ function viewer(into,pl,o){if(o.n==='サーぽん')return sapViewer(into,pl);con
   into.appendChild(v);requestAnimationFrame(()=>requestAnimationFrame(()=>v.classList.add('on')));
   return {close(){stop();v.classList.remove('on');setTimeout(()=>v.remove(),300)}}}
 function chip(){const c=getAC();if(!c)return;const t0=c.currentTime+.02;[523,659,784,1047,784,1047].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.type='square';o.frequency.value=f;g.gain.setValueAtTime(.0001,t0+i*.09);g.gain.exponentialRampToValueAtTime(.08,t0+i*.09+.01);g.gain.exponentialRampToValueAtTime(.0001,t0+i*.09+.08);o.connect(g);g.connect(c.destination);o.start(t0+i*.09);o.stop(t0+i*.09+.1)})}
-function popG5(b){if(b.gone||GOPEN||GV)return;b.gone=true;const sky=$('sky'),ph=$('phone'),pw=ph.clientWidth,phh=ph.clientHeight;chime();b.e.classList.add('held');ph.classList.add('zoomart');document.querySelector('.dock').classList.add('busy');
+function popG5(b){if(b.gone||GOPEN||GV)return;b.gone=true;const sky=$('sky'),ph=$('phone'),pw=ph.clientWidth,phh=ph.clientHeight;(SFX[cur]||chime)();b.e.classList.add('held');ph.classList.add('zoomart');document.querySelector('.dock').classList.add('busy');
   const f=document.createElement('div');f.className='flyc';f.style.zIndex='15';f.style.transition='left .35s,top .35s,transform .35s,opacity .3s';f.innerHTML=`<img alt="" src="${G5IMG(cur,b.o.n)}">`;f.style.left=b.x+'px';f.style.top=b.y+'px';sky.appendChild(f);
   const tag=document.createElement('div');tag.className='whotag';tag.textContent=b.o.n;requestAnimationFrame(()=>requestAnimationFrame(()=>{f.style.left=(pw*.15)+'px';f.style.top=(phh*.92)+'px';f.style.transform='scale(.85)'}));setTimeout(()=>{tag.style.left=(pw*.15)+'px';tag.style.top=(phh*.955)+'px';sky.appendChild(tag)},360);
   const vw=viewer(sky,cur,{ai:b.ai,n:b.o.n});const t0=performance.now();
@@ -1611,9 +1633,30 @@ function makeBf(o,i,slot){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight
   const b={o,e,i,ai,slot,sc:S[2],cx:S[0],cy:S[1],ax:S[3],ay:S[4],w1:.5+((i*17)%7)*.07,w2:.7+((i*11)%5)*.09,w3:.3,p1:i*1.7,p2:i*2.3,t:0,x:W*(i%2?1.1:-.1),y:H*.6,tl:0,gone:false};
   dragify(b,e,()=>popBf(b),()=>dropFloat(b,[[.44,.5],[.62,.82],[.83,1.22]],[.53,.74],[.06,.94,.36,.9]));e.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();popBf(b)}});
   return b}
+
+/* sound effects matched to the moment (no more one chime for everything) */
+function nz(c,dur){const n=Math.floor(c.sampleRate*dur),b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;const s=c.createBufferSource();s.buffer=b;return s}
+function tone(c,t0,f,dur,vol,type,f2){const o=c.createOscillator(),g=c.createGain();o.type=type||'sine';o.frequency.setValueAtTime(f,t0);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t0+dur);g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(vol,t0+.008);g.gain.exponentialRampToValueAtTime(.0001,t0+dur);o.connect(g);g.connect(c.destination);o.start(t0);o.stop(t0+dur+.02)}
+const SFX={
+  page(){const c=getAC();if(!c)return;const t0=c.currentTime+.005,s=nz(c,.42),f=c.createBiquadFilter(),g=c.createGain();f.type='bandpass';f.Q.value=.8;f.frequency.setValueAtTime(1200,t0);f.frequency.exponentialRampToValueAtTime(4200,t0+.22);f.frequency.exponentialRampToValueAtTime(1800,t0+.4);
+    g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(.32,t0+.12);g.gain.exponentialRampToValueAtTime(.08,t0+.28);g.gain.exponentialRampToValueAtTime(.0001,t0+.42);s.connect(f);f.connect(g);g.connect(c.destination);s.start(t0);
+    const k=nz(c,.03),kf=c.createBiquadFilter(),kg=c.createGain();kf.type='highpass';kf.frequency.value=2500;kg.gain.setValueAtTime(.25,t0+.36);kg.gain.exponentialRampToValueAtTime(.0001,t0+.39);k.connect(kf);kf.connect(kg);kg.connect(c.destination);k.start(t0+.36)},
+  tick(){const c=getAC();if(!c)return;tone(c,c.currentTime+.003,1800,.04,.12,'triangle')},
+  whoosh(){const c=getAC();if(!c)return;const t0=c.currentTime+.005,s=nz(c,.9),f=c.createBiquadFilter(),g=c.createGain();f.type='bandpass';f.Q.value=1.2;f.frequency.setValueAtTime(500,t0);f.frequency.exponentialRampToValueAtTime(3000,t0+.7);g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(.35,t0+.35);g.gain.exponentialRampToValueAtTime(.0001,t0+.9);s.connect(f);f.connect(g);g.connect(c.destination);s.start(t0);
+    [1568,2093,2637,3136].forEach((fr,i)=>tone(c,t0+.45+i*.07,fr,.35,.05))},
+  bookopen(){const c=getAC();if(!c)return;const t0=c.currentTime+.005;tone(c,t0,140,.18,.25,'sine',70);SFX.page()},
+  mars(){const c=getAC();if(!c)return;const t0=c.currentTime+.005;for(let i=0;i<10;i++){const k=nz(c,.012),f=c.createBiquadFilter(),g=c.createGain();f.type='bandpass';f.frequency.value=2200;g.gain.value=.22;k.connect(f);f.connect(g);g.connect(c.destination);k.start(t0+i*.055)}tone(c,t0,55,.7,.12,'sawtooth')},
+  venus(){const c=getAC();if(!c)return;const t0=c.currentTime+.005,s=nz(c,.4),f=c.createBiquadFilter(),g=c.createGain();f.type='bandpass';f.Q.value=6;f.frequency.setValueAtTime(300,t0);f.frequency.exponentialRampToValueAtTime(2600,t0+.35);g.gain.setValueAtTime(.18,t0);g.gain.exponentialRampToValueAtTime(.0001,t0+.4);s.connect(f);f.connect(g);g.connect(c.destination);s.start(t0);tone(c,t0+.38,988,.16,.12)},
+  uranus(){const c=getAC();if(!c)return;const t0=c.currentTime+.005;[[2093,0],[2637,.13]].forEach(([fr,d])=>{tone(c,t0+d,fr,.9,.12);tone(c,t0+d,fr*2.76,.4,.04)})},
+  mug(){const c=getAC();if(!c)return;const t0=c.currentTime+.005;[2650,3950,5300].forEach((fr,i)=>tone(c,t0,fr,.35-i*.08,.08/(i+1)))},
+  pluto(){SFX.bookopen()},
+  neptune(){const c=getAC();if(!c)return;const t0=c.currentTime+.005;tone(c,t0,260,.14,.25,'sine',900);tone(c,t0+.12,420,.12,.18,'sine',1200);tone(c,t0+.22,620,.1,.12,'sine',1500)},
+  jupiter(){const c=getAC();if(!c)return;const t0=c.currentTime+.005;for(let i=0;i<6;i++){const k=nz(c,.05),f=c.createBiquadFilter(),g=c.createGain();f.type='lowpass';f.frequency.value=1200;g.gain.setValueAtTime(.0001,t0+i*.07);g.gain.exponentialRampToValueAtTime(.16,t0+i*.07+.02);g.gain.exponentialRampToValueAtTime(.0001,t0+i*.07+.05);k.connect(f);f.connect(g);g.connect(c.destination);k.start(t0+i*.07)}[1175,1568,1976].forEach((fr,i)=>tone(c,t0+.3+i*.09,fr,.5,.05))},
+  heart(){const c=getAC();if(!c)return;const t0=c.currentTime+.005;tone(c,t0,784,.18,.12,'triangle');tone(c,t0+.12,1175,.3,.12,'triangle')}
+};
 function chime(){const c=getAC();if(!c)return;const t0=c.currentTime+.005;[1318.5,1975.5,2637].forEach((f,k)=>{const o=c.createOscillator(),g=c.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.0001,t0+k*.035);g.gain.exponentialRampToValueAtTime(.22/(k+1),t0+k*.035+.008);g.gain.exponentialRampToValueAtTime(.0001,t0+k*.035+.55);o.connect(g);g.connect(c.destination);o.start(t0+k*.035);o.stop(t0+k*.035+.6)})}
 let JBUSY=false,JOPEN=null;
-function popBf(b){if(b.gone||JBUSY||JV)return;b.gone=true;JBUSY=true;const sky=$('sky'),ph=$('phone'),pw=ph.clientWidth,phh=ph.clientHeight,x=b.x,y=b.y;chime();
+function popBf(b){if(b.gone||JBUSY||JV)return;b.gone=true;JBUSY=true;const sky=$('sky'),ph=$('phone'),pw=ph.clientWidth,phh=ph.clientHeight,x=b.x,y=b.y;SFX.jupiter();
   const ck=((window.BST||'4')==='4'&&A['chibi4-'+CHB(b.o.n)]?'chibi4-':'chibi3-')+CHB(b.o.n),img=A[ck]||A['bfly3-1']||'';b.e.classList.add('held');
   ph.classList.add('zoomart');document.querySelector('.dock').classList.add('busy');
   const f=document.createElement('div');f.className='flyc';f.style.zIndex='15';f.style.transition='left .35s cubic-bezier(.3,.9,.3,1),top .35s cubic-bezier(.3,.9,.3,1),transform .35s,opacity .3s';f.innerHTML=WG(img,CHB(b.o.n));f.style.left=x+'px';f.style.top=y+'px';sky.appendChild(f);
