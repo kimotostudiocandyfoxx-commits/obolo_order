@@ -11,6 +11,7 @@ import { DAY1 } from '../lib/onboarding/day1';
 import { DAY2 } from '../lib/onboarding/day2';
 import { DAY3 } from '../lib/onboarding/day3';
 import { nameRest, voiceKey, voiceable } from '../lib/story/voice';
+import { batiStoryVoice } from '../../../packages/shared/src/batiFixedVoice';
 
 const ROOT = resolve(__dirname, '../../..');
 const manifest = JSON.parse(readFileSync(resolve(__dirname, '../public/story/voices/manifest.json'), 'utf8')) as Record<string, string>;
@@ -32,7 +33,9 @@ for (const m of lesson.matchAll(/\{ k: 'say', who: '(\w+)', text: '((?:[^'\\]|\\
 lines.push({ who: 'KIMORIN', text: 'ダチなので。', where: 'saturn' }, { who: 'たこ焼きシスター', text: '……今日の夕焼け、きれいだったワ。', where: 'saturn' });
 
 const voiced = new Set([...Object.keys(cfg.chosen), ...(cfg.special ?? []).map((x) => x.who)]);
-const has = (l: Line, text: string) => !!(manifest[voiceKey(l.who, l.act, text)] ?? manifest[voiceKey(l.who, undefined, text)]);
+const under = (who: string, l: Line, text: string) => !!(manifest[voiceKey(who, l.act, text)] ?? manifest[voiceKey(who, undefined, text)]);
+// M-R342: a {bati} line has a voice when its old one is there (the stand-in) or both of its egg voices are
+const has = (l: Line, text: string) => under(l.who, l, text) || (l.who === 'バティ' && under(batiStoryVoice('moon'), l, text) && under(batiStoryVoice('sun'), l, text));
 const missing: Line[] = [];
 const seen = new Set<string>();
 for (const l of lines) {

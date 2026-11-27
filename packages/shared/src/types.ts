@@ -46,7 +46,7 @@ export interface Me {
   orderedAt: string | null;
   /** Registered voices (Fish Audio): own voice (Saturn, songs) and Bati's voice.
    *  `selfSings` = the recording is kept, so songs are sung in it (Seed-VC; registered before 2026-10-09 = no). */
-  voices: { self: boolean; bati: boolean; selfSings?: boolean; kororin?: boolean; /** M-R246: {bati}'s voice from the egg recording */ batiState?: import('./batiVoice').BatiVoiceState };
+  voices: { self: boolean; bati: boolean; selfSings?: boolean; kororin?: boolean; /** `bati` / `batiState`: the member's own voice model from the day-2 recording (M-R246; the names are from when it was {bati}'s voice — M-R342: {bati} speaks in its egg's fixed voice) */ batiState?: import('./batiVoice').BatiVoiceState };
   /** M-R247: the start-of-app agreement (terms, privacy, photos and voice) — the version agreed to; null = not yet */
   consent?: { version: string; at: string; /** M-R248: a guardian agreed too (13〜15) */ guardian?: boolean; /** M-R252: false = the start screen's branch without the photo and voice */ media?: boolean } | null;
   /** M-R248: whether the photo and the voice may be used (age + agreement + the guardian's for 13〜15) */

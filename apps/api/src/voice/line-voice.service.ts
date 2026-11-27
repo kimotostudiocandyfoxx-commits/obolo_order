@@ -19,6 +19,8 @@ const GEMINI = 'https://generativelanguage.googleapis.com/v1beta';
 const DAILY = 300;
 /** voices made at once on one server (the voice services refuse bursts) */
 const AT_ONCE = 3;
+/** the story's speaker name of {bati} */
+const BATI = 'バティ';
 /** {bati}'s answers read aloud at once (M-R179): the quicker model of the same voices */
 const BATI_SAYS_MODEL = 'gemini-2.5-flash-preview-tts';
 
@@ -99,11 +101,16 @@ export class LineVoiceService implements OnModuleInit {
   async get(userId: string, body: LineVoicesBody, origin: string): Promise<LineVoicesView> {
     const nl = await this.lines();
     if (!nl || (!this.cfg.GEMINI_API_KEY && !this.cfg.FISH_API_KEY)) return { voices: {}, pending: 0 };
+    // M-R342: {bati}'s lines are read in the fixed Fish voice of the member's {bati}'s egg (not the story list's old
+    // Gemini voice), at the story's tempo (1.3×, ffmpeg atempo: the pitch stays). Without the voice service: as listed.
+    const wanted = [...new Set(body.keys)].map((k) => nl.lines[k]);
+    const batiRef = this.cfg.FISH_API_KEY && this.batiVoice && wanted.some((l) => l?.who === BATI) ? await this.batiVoice.voiceOf(userId).catch(() => null) : null;
     const items: { key: string; hash: string; job: JobPayloads['voice.line'] }[] = [];
     for (const key of new Set(body.keys)) {
-      const l = nl.lines[key];
-      const text = l && fillNames(l.text, body.names);
-      if (!l || !text) continue;
+      const listed = nl.lines[key];
+      const text = listed && fillNames(listed.text, body.names);
+      if (!listed || !text) continue;
+      const l = listed.who === BATI && batiRef ? { ...listed, spec: { model: batiRef } } : listed;
       // keyed by what is spoken: a reading fixed later (STORY_READINGS) voices the line again
       // v2: takes matched to the speaker's speed and loudness (story chat 2026-10-29) — the lines made before are made again
       const hash = createHash('sha256').update(JSON.stringify([l.who, l.act ?? '', speakText(text), l.spec, l.brief, nl.tempo, nl.model, 'v2'])).digest('hex').slice(0, 32);
@@ -141,8 +148,10 @@ export class LineVoiceService implements OnModuleInit {
   async batiSays(userId: string, text: string, origin: string): Promise<{ url: string } | null> {
     // client 2026-11-24 (the Moon chat speaks too): the same words are read once a day per person (a cached file)
     // R14: {bati}'s speaking speed (BATI_VOICE_SPEED) is part of the file — a new speed reads the words again
+    // M-R342: and so is the voice (the active {bati}'s egg's: another {bati} in the chat reads the words again)
     const speed = batiSpeakSpeed(1, this.cfg.BATI_VOICE_SPEED ?? BATI_VOICE_SPEED);
-    const cacheKey = `bs:${userId}:${createHash('sha256').update(`${speakText(text)}|${speed}`).digest('hex').slice(0, 32)}`;
+    const ref = (await this.batiVoice?.voiceOf(userId).catch(() => null)) ?? '';
+    const cacheKey = `bs:${userId}:${createHash('sha256').update(`${speakText(text)}|${speed}|${ref}`).digest('hex').slice(0, 32)}`;
     const cached = await this.kv.get(cacheKey).catch(() => null);
     if (cached) return { url: cached };
     // every voice counts toward the day's read-aloud limit (DAILY, shared with the story's line voices) — Fish too
@@ -151,19 +160,19 @@ export class LineVoiceService implements OnModuleInit {
       await this.kv.set(cacheKey, url, 86_400).catch(() => undefined);
       return { url };
     };
-    // M-R246: the member's own {bati} voice (from the egg recording) when it is made; iPad feedback: else the shared
-    // default {bati} voice model (FISH_DEFAULT_VOICE_ID) when it is set; else the story's {bati} voice (Gemini)
-    const own = await this.batiVoice?.speak(userId, speakText(text)).catch((e) => (this.log.warn(`own bati voice: ${String(e)}`), null));
+    // M-R342: {bati}'s fixed Fish voice (its egg's), at 1.3×; where the voice service is off or fails, the Gemini
+    // voice for the egg × personality below
+    const own = await this.batiVoice?.speak(userId, speakText(text)).catch((e) => (this.log.warn(`bati voice: ${String(e)}`), null));
     if (own) return keep((await this.media.storeAudio(userId, 'audio/mpeg', own, origin)).url);
     const nl = await this.lines();
-    const bati = nl && Object.values(nl.lines).find((l) => l.who === 'バティ');
+    const bati = nl && Object.values(nl.lines).find((l) => l.who === BATI);
     if (!nl || !bati || !this.cfg.GEMINI_API_KEY) return null;
-    // M-R250: the prepared voice for this {bati}'s egg and personality (no voice of the member's own)
+    // M-R250: the Gemini voice for this {bati}'s egg and personality
     const dv = await this.batiVoice?.defaultVoice(userId).catch(() => null);
     const spec = { ...bati.spec, model: undefined, ...(dv ? { voice: dv.gemini, pitch: dv.pitch } : {}) };
     // R14: quicker and punchier — asked of the voice, and the story's tempo × BATI_VOICE_SPEED (ffmpeg atempo: the pitch stays)
     const brief = `${bati.brief ?? ''} Lively, crisp and punchy delivery, no dragging pauses`.trim();
-    const p: JobPayloads['voice.line'] = { userId, hash: '', origin, who: 'バティ', text, spec: { ...spec, brief: spec.brief ? `${spec.brief}. Lively, crisp and punchy delivery` : undefined }, brief, model: BATI_SAYS_MODEL, tempo: nl.tempo * speed };
+    const p: JobPayloads['voice.line'] = { userId, hash: '', origin, who: BATI, text, spec: { ...spec, brief: spec.brief ? `${spec.brief}. Lively, crisp and punchy delivery` : undefined }, brief, model: BATI_SAYS_MODEL, tempo: nl.tempo * speed };
     const mp3 = await this.slot(() => this.gemini(p, storyVoiceFilter(p.spec, p.tempo)));
     const m = await this.media.storeAudio(userId, 'audio/mpeg', mp3, origin);
     return keep(m.url);

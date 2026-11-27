@@ -175,8 +175,9 @@ function Eclipse() {
 }
 
 /**
- * M-R246 / M-R247 / M-R252: 〔写真と声を消す〕 — both at once (the draft's settings item): the egg recording and {bati}'s
- * voice model are deleted (DELETE /voice/bati) — {bati} speaks in the prepared voice; the photo itself was never kept,
+ * M-R246 / M-R247 / M-R252: 〔写真と声を消す〕 — both at once (the draft's settings item): the day-2 recording and the
+ * member's own voice model are deleted (DELETE /voice/bati). M-R342: that voice is no longer {bati}'s ({bati} speaks in
+ * its egg's fixed voice either way) — it reads the member's 「きれい」 ダチ voice messages; the photo itself was never kept,
  * the looks made from it are deleted (DELETE /me/look) — you stand as the look made without a photo.
  */
 function VoiceAndPhoto() {
@@ -194,7 +195,7 @@ function VoiceAndPhoto() {
     try {
       if (hasVoice) setMe(await getApi().removeBatiVoice());
       if (hasLook) setMe(await getApi().removeLook());
-      setNote('写真と声を消しました。写真を使わない姿と、用意した声に戻りました');
+      setNote('写真と声を消しました。写真を使わない姿に戻りました');
     } catch {
       setNote('うまく消せませんでした。もう一度どうぞ');
     } finally {
@@ -211,14 +212,14 @@ function VoiceAndPhoto() {
   return (
     <section className="mt-4 rounded-3xl border border-white/10 bg-white/5 p-4">
       <h2 className="text-sm font-black">写真と声</h2>
-      <p className="mt-1 text-[11px] leading-relaxed text-white/50">写真と声は、あなたの姿と相方（バティ）の声を作るためだけに使います。ほかの目的には使いません。</p>
+      <p className="mt-1 text-[11px] leading-relaxed text-white/50">写真は、あなたの姿を作るために使います。声は、ダチへの声メッセージを、あなたの声できれいに読むために使います。ほかの目的には使いません。</p>
       <div className="mt-1 divide-y divide-white/10">
-        {state('相方の声', hasVoice ? (voice === 'making' ? 'あなたの声から、相方の声を作っています' : 'あなたの声を、少し高くして使っています') : '用意した声で話しています')}
+        {state('あなたの声', hasVoice ? (voice === 'making' ? 'あなたの声を、覚えているところです' : 'ダチへの声メッセージ（きれい）を、あなたの声で読みます') : '録音した声はありません')}
         {state('あなたの姿', hasLook ? '写真から作った姿があります（写真そのものは保存していません）' : '写真から作った姿はありません')}
       </div>
       <ConfirmRow
         label="写真と声を消す"
-        note="消すと、写真を使わない姿と、用意した声に戻ります"
+        note="消すと、写真を使わない姿に戻り、声メッセージ（きれい）は用意した声で読みます"
         can={hasVoice || hasLook}
         ask={ask}
         busy={busy}

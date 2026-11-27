@@ -397,10 +397,11 @@ export const DAY2: Step[] = [
   // M-R217: the {bati} card, in the chat (it is kept on Bluena's first shelf too)
   { t: 'baticard' },
   { t: 'face', who: '@bati', expr: 'smile' },
-  // M-R334: the voice now — {bati} copies {name}'s voice (M-R246: {bati}'s voice is made from it; M-R250: under 13 the
-  // scene is the same but nothing is recorded)
+  // M-R334: the voice now. M-R342 (client 2026-11-27): {bati} LEARNS {name}'s voice (to hear them when spoken to) — it
+  // does not copy it: {bati} speaks in its egg's fixed voice, and {name}'s voice model is for their own ダチ voice
+  // messages (M-R246). M-R250: under 13 the scene is the same but nothing is recorded
   { t: 'sprite', image: ['obolon', '@bati'] },
-  { t: 'say', who: 'OBOLON', text: '{bati}は、、、お前の声を、真似して、喋る。' },
+  { t: 'say', who: 'OBOLON', text: '{bati}は、、、お前の声を、覚える。' },
   { t: 'say', who: 'OBOLON', text: 'だから、、、お前の声を、聞かせてやれ。' },
   {
     t: 'eggvoice', // a tap starts, a tap ends; the ring fills (~10 s); ⓘ only (M-R247); the words heard as {name}'s bubble
@@ -410,7 +411,7 @@ export const DAY2: Step[] = [
   { t: 'se', sound: 'magic' }, // 光の輪が満ちると、{bati}の体が、ぽうっと光る
   { t: 'sprite', image: '@bati' },
   { t: 'face', who: '@bati', expr: 'sparkle' },
-  { t: 'say', who: 'バティ', text: '{name}の声、おぼえたよ！' }, // {name}の声に似た声で
+  { t: 'say', who: 'バティ', text: '{name}の声、おぼえたよ！' }, // M-R342: in {bati}'s own (fixed) voice
   // 黒い球が、床の真ん中の、水を張った大きな丸い器のほうへ向く
   { t: 'still', image: 's/d2-moon-in' },
   { t: 'sprite', image: ['obolon', '@bati'] },

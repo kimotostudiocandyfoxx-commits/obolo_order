@@ -3,6 +3,7 @@
 import type { Me } from '@obolo/shared';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { ApiError, getApi, tokenStore } from './api';
+import { setBatiVoiceEgg } from './story/lineVoice';
 
 type Status = 'loading' | 'guest' | 'authed';
 
@@ -42,6 +43,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
     void load(true);
   }, []);
+
+  // M-R342: {bati}'s story lines play in its egg's voice (the {bati} in the chat now)
+  const egg = me?.bati?.egg;
+  useEffect(() => {
+    setBatiVoiceEgg(egg ?? null);
+  }, [egg]);
 
   const signIn = useCallback((token: string, u: Me) => {
     tokenStore.set(token);

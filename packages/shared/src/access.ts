@@ -48,10 +48,12 @@ export function outOfMana(s: SpendState): boolean {
 }
 
 /**
- * Client 2026-11-27 (cuteVoice.ts): a member who is NOT recorded (under 13; 13〜15 without the guardian's consent; the
- * branch without photo and voice) has no voice of their own for {bati} to imitate — {bati} speaks in the default cute
- * voice, which costs mana like every read-aloud. With no mana left there is no voice (the words stay): for everyone
- * who is not recorded, a member and the first journey too. A recorded member is as before (outOfMana).
+ * Client 2026-11-27 (cuteVoice.ts): for a member who is NOT recorded (under 13; 13〜15 without the guardian's consent;
+ * the branch without photo and voice), {bati}'s read-aloud is not made with no mana left (the words stay) — a member
+ * and the first journey too. A recorded member is as before (outOfMana).
+ * M-R342 (the same day): every {bati} now speaks in the same fixed voice (batiFixedVoice.ts), recorded or not; the
+ * rule was written when a not-recorded member's {bati} had the default cute voice and is kept as it is until the
+ * client says otherwise (open question: one rule for everyone?).
  */
 export function defaultVoiceSilent(o: { recorded: boolean; balance: number }): boolean {
   return !o.recorded && Math.floor(o.balance) <= 0;

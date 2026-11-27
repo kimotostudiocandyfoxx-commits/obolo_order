@@ -193,8 +193,8 @@ export class SaturnService {
         (await this.voices.readByBati(userId, { text: body.text, style: body.voiceStyle }, origin));
       voice = v ? { mediaId: null, url: v.url, source: 'cloned' } : { mediaId: null, url: neoVoiceUrl(body.voiceStyle, author?.neoForm, body.text), source: 'default' };
     } else if (body.readBy === 'bati' && body.voiceStyle) {
-      // Bati reads every post (client decision 2026-10-07): the registered Bati voice, the shared
-      // default voice, or — when neither exists — the device's reading voice (P-SAT-8)
+      // Bati reads every post (client decision 2026-10-07): in its egg's fixed voice (M-R342), or — when the voice
+      // service is off or the mana rule says no voice — the device's reading voice (P-SAT-8)
       const v = await this.voices.readByBati(userId, { text: body.text, style: body.voiceStyle }, origin);
       voice = v ? { mediaId: null, url: v.url, source: 'cloned' } : { mediaId: null, url: neoVoiceUrl(body.voiceStyle, author?.neoForm, body.text), source: 'default' };
     } else if (body.ownVoice && body.voiceStyle) {

@@ -41,7 +41,7 @@ export class AccessService {
 
   /**
    * {bati}'s read-aloud is not made: a non-member past the first journey at 0 mana (R18), or — client 2026-11-27 — a
-   * member who is not recorded (the default cute voice speaks for them) with no mana left. The words always stay.
+   * member who is not recorded with no mana left (kept through M-R342). The words always stay.
    */
   async noVoice(userId: string): Promise<boolean> {
     const [u] = await this.db.write.select().from(users).where(eq(users.id, userId));

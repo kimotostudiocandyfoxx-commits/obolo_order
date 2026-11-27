@@ -5,7 +5,7 @@ import { speakText } from './storyVoice';
  * Client 2026-11-27: the ダチ voice message of a member who is NOT recorded (under 13; 13〜15 without the guardian's
  * consent; the start screen's branch without photo and voice — Me.mediaOk false). Their own voice is never kept and
  * never sent anywhere beyond the dictating mic (POST /voice/dictate, not stored). Instead the words they said or typed
- * are read by the DEFAULT cute voice — the shared {bati} voice model (the API's FISH_DEFAULT_VOICE_ID, the one constant)
+ * are read by the DEFAULT cute voice — the shared voice model (the API's FISH_DEFAULT_VOICE_ID, the one constant; M-R342: no longer {bati}'s voice)
  * — and sent as a voice message like any other: the words as its caption, the audio, the quiet sound picked from the
  * words (the receiver's 〔おとをけす〕 as built).
  *

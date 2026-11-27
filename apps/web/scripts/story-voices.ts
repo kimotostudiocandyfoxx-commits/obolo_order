@@ -14,6 +14,13 @@
  * pitch in semitones (rubberband), echo 0–1 (a short delay), growl 0–1 (a monster's grit: lower
  * formants, saturation, low end). A Fish model is made once from the recording (Gemini writes the
  * transcript) and its id is written back to the config.
+ *
+ * M-R342 (client 2026-11-27): {bati} speaks in the fixed Fish voice of its egg (♀ Moon / ♂ Sun — the ids in
+ * packages/shared/src/batiFixedVoice.ts, not in the config). Every バティ line is made once per egg and kept under
+ * batiStoryVoice(egg) ("バティ:moon" / "バティ:sun"); the player picks the member's {bati}'s (lib/story/lineVoice.ts).
+ * "chosen.バティ" in the config is the old voice (Gemini Leda +3): its files stay as the stand-in for a line until
+ * both egg files of that line are made, then go; it is also what name-lines.json lists (the server swaps in the egg's
+ * voice per member). New files are made by running this workflow by hand (Actions → Story voices).
  */
 import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
@@ -23,6 +30,7 @@ import { idOf } from '../lib/story/sheets';
 import { nameRest, voiceKey, voiceable } from '../lib/story/voice';
 // by path: this runs without an install (the workflow), and the file has no imports of its own
 import { speakText, spokenChars, storyVoiceFilter, storyVoicePrompt, type NameLines } from '../../../packages/shared/src/storyVoice';
+import { BATI_FIXED_VOICES, batiStoryVoice } from '../../../packages/shared/src/batiFixedVoice';
 
 const ROOT = resolve(__dirname, '../../..');
 const PUB = join(ROOT, 'apps/web/public');
@@ -234,6 +242,20 @@ function voiceFor(name: string, l: { act?: string; text: string }): { s: Spec; b
   return { s, brief: s.brief ?? cfg.auditions.find((a) => a.name === (sp?.as ?? name))?.brief ?? '' };
 }
 
+/** M-R342: {bati}'s story speaker, and its two fixed voices (a Fish voice that exists already: no recording, no model made) */
+const BATI = 'バティ';
+const EGGS = ['moon', 'sun'] as const;
+const batiSpec = (egg: (typeof EGGS)[number]): Spec => ({ fish: 'fixed', model: BATI_FIXED_VOICES[egg], label: egg === 'moon' ? '月のたまご' : '太陽のたまご' });
+/**
+ * The files a line is made as: one in the speaker's voice — {bati}'s once per egg, each in that egg's fixed voice
+ * (the story's "tempo" 1.3 with the pitch as it is: the same atempo as every line).
+ */
+function takesOf(name: string, v: { s: Spec; brief: string }): { as: string; s: Spec; brief: string }[] {
+  return name === BATI ? EGGS.map((egg) => ({ as: batiStoryVoice(egg), s: batiSpec(egg), brief: v.brief })) : [{ as: name, ...v }];
+}
+/** the names a speaker's files are kept under ({bati}: the old voice's and the two eggs') */
+const keptAs = (name: string) => (name === BATI ? [BATI, ...EGGS.map(batiStoryVoice)] : [name]);
+
 /**
  * public/story/voices/name-lines.json: every line with a member's name in it ({name} {neo} {bati} …), in
  * the whole story, with its voice — the server voices them for each member (@obolo/shared storyVoice).
@@ -365,20 +387,22 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
     for (const l of spoken.get(name) ?? []) {
       const v = voiceFor(name, l);
       if (!v) continue;
-      const { s, brief } = v;
-      if (!voiceable(l.text)) {
-        skipped++;
-        // a line that starts with a name (「{name}、お前は…」): its words after the name are voiced too
-        const rest = nameRest(l.text);
-        const rk = rest && voiceKey(name, l.act, rest);
-        if (rest && rk && (again || redoLines.some((r) => r && l.text.includes(r)) || !manifest[rk] || !existsSync(join(PUB, manifest[rk]))) && !jobs.some((j) => j.key === rk))
-          jobs.push({ name, s, brief, act: l.act, text: rest, key: rk });
-        continue;
+      if (!voiceable(l.text)) skipped++;
+      // M-R342: {bati}'s line once per egg (kept under "バティ:moon" / "バティ:sun"), everyone else's once
+      for (const { as, s, brief } of takesOf(name, v)) {
+        if (!voiceable(l.text)) {
+          // a line that starts with a name (「{name}、お前は…」): its words after the name are voiced too
+          const rest = nameRest(l.text);
+          const rk = rest && voiceKey(as, l.act, rest);
+          if (rest && rk && (again || redoLines.some((r) => r && l.text.includes(r)) || !manifest[rk] || !existsSync(join(PUB, manifest[rk]))) && !jobs.some((j) => j.key === rk))
+            jobs.push({ name: as, s, brief, act: l.act, text: rest, key: rk });
+          continue;
+        }
+        const key = voiceKey(as, l.act, l.text);
+        const once = redoLines.some((r) => r && l.text.includes(r));
+        if (!again && !once && manifest[key] && existsSync(join(PUB, manifest[key]))) continue;
+        if (!jobs.some((j) => j.key === key)) jobs.push({ name: as, s, brief, act: l.act, text: l.text, key });
       }
-      const key = voiceKey(name, l.act, l.text);
-      const once = redoLines.some((r) => r && l.text.includes(r));
-      if (!again && !once && manifest[key] && existsSync(join(PUB, manifest[key]))) continue;
-      if (!jobs.some((j) => j.key === key)) jobs.push({ name, s, brief, act: l.act, text: l.text, key });
     }
   }
   // a batch takes lines from everyone in turn, so each chosen voice can be heard early
@@ -419,15 +443,17 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
     }
   });
   // the app plays a line by who + words: a line with a stage direction (〔…〕) is also found without it
-  for (const name of voiced)
-    for (const l of spoken.get(name) ?? []) {
+  for (const who of voiced)
+    for (const l of spoken.get(who) ?? []) {
       if (!l.act) continue;
-      const file = manifest[voiceKey(name, l.act, l.text)];
-      const plain = voiceKey(name, undefined, l.text);
-      if (file && !manifest[plain]) manifest[plain] = file;
-      const rest = nameRest(l.text);
-      const restFile = rest && manifest[voiceKey(name, l.act, rest)];
-      if (rest && restFile && !manifest[voiceKey(name, undefined, rest)]) manifest[voiceKey(name, undefined, rest)] = restFile;
+      for (const name of keptAs(who)) {
+        const file = manifest[voiceKey(name, l.act, l.text)];
+        const plain = voiceKey(name, undefined, l.text);
+        if (file && !manifest[plain]) manifest[plain] = file;
+        const rest = nameRest(l.text);
+        const restFile = rest && manifest[voiceKey(name, l.act, rest)];
+        if (rest && restFile && !manifest[voiceKey(name, undefined, rest)]) manifest[voiceKey(name, undefined, rest)] = restFile;
+      }
     }
   // every line file at the current tempo, without silence at the head (files made this run already are)
   const tempoPath = join(STORY, 'voices/tempo.json');
@@ -451,11 +477,16 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
   if (retimed) log.push(`- ⏩ 前に作った声 ${retimed}個を ${TEMPO}倍速・頭の無音なしにした`);
   // cleanup: voices of lines that are no longer in any part of the story
   const alive = new Set<string>();
-  for (const [name, ls] of said)
+  // M-R342: a {bati} line's old voice (the stand-in) goes once both of its egg voices are there
+  const bothEggs = (act: string | undefined, text: string) => EGGS.every((egg) => manifest[voiceKey(batiStoryVoice(egg), act, text)]);
+  for (const [who, ls] of said)
     for (const l of ls) {
-      alive.add(voiceKey(name, l.act, l.text)).add(voiceKey(name, undefined, l.text));
       const rest = nameRest(l.text);
-      if (rest) alive.add(voiceKey(name, l.act, rest)).add(voiceKey(name, undefined, rest));
+      for (const name of keptAs(who)) {
+        const old = who === BATI && name === BATI;
+        if (!(old && bothEggs(l.act, l.text))) alive.add(voiceKey(name, l.act, l.text)).add(voiceKey(name, undefined, l.text));
+        if (rest && !(old && bothEggs(l.act, rest))) alive.add(voiceKey(name, l.act, rest)).add(voiceKey(name, undefined, rest));
+      }
     }
   let removed = 0;
   for (const [k, file] of Object.entries(manifest)) {

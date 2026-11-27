@@ -82,6 +82,11 @@ export const users = pgTable(
     /** Fish Audio voice models made from the member's recordings (client decision 2026-10-07):
      *  their own voice (Saturn, singing) and the voice they gave Bati (a changed voice). */
     voiceSelfId: text('voice_self_id'),
+    /**
+     * M-R342 (2026-11-27): the MEMBER's own voice model (from the day-2 recording) — the voice_bati_* columns keep
+     * their old names, but {bati} no longer speaks in it (it speaks in its egg's fixed voice). It reads the member's
+     * 「きれい」 ダチ voice messages. Models made before M-R342 are the voice pitched up two semitones.
+     */
     voiceBatiId: text('voice_bati_id'),
     /** the kororin voice: the funny voice blown in on Saturn (story M-R41) */
     voiceKororinId: text('voice_kororin_id'),
@@ -89,7 +94,7 @@ export const users = pgTable(
     /** the recordings themselves (2026-10-09): the voice reference Seed-VC sings songs in */
     voiceSelfUrl: text('voice_self_url'),
     voiceBatiUrl: text('voice_bati_url'),
-    /** M-R246: {bati}'s voice from the egg recording — none | making | ready | failed (null = none) */
+    /** M-R246: the member's voice model from the day-2 recording — none | making | ready | failed (null = none) */
     voiceBatiState: text('voice_bati_state'),
     /** M-R247: the start-of-app agreement (terms, privacy, what photos and voice are used for): its version and when */
     consentVersion: text('consent_version'),

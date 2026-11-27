@@ -1,4 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
+import { batiFixedVoice, type BatiEggKind } from '@obolo/shared';
 import { apiError } from '../common/errors';
 import type { AppConfig } from '../config';
 import { createVoiceModel, deleteVoiceModel, textToSpeech } from './fish.client';
@@ -30,9 +31,20 @@ export function fishVoiceModels(cfg: Pick<AppConfig, 'FISH_API_KEY' | 'FISH_MODE
 }
 
 /**
- * THE default cute voice (client 2026-11-27): one constant, the config's FISH_DEFAULT_VOICE_ID — the shared {bati} voice
- * model made from design/voices/default-bati-source.* pitched up two semitones (scripts/make-default-bati-voice.ts).
- * It is {bati}'s voice for a member with no voice of their own, and the voice that reads the ダチ messages of a member
- * who is not recorded (dachi/cute-voice.service.ts). Another voice = that one variable; null = no such voice here.
+ * THE default cute voice (client 2026-11-27): one constant, the config's FISH_DEFAULT_VOICE_ID — the shared voice model
+ * made from design/voices/default-bati-source.* pitched up two semitones (scripts/make-default-bati-voice.ts).
+ * It reads the ダチ messages of a member who is not recorded (dachi/cute-voice.service.ts). M-R342: it is no longer
+ * {bati}'s voice (batiVoiceId below) — a constant of its own. Another voice = that one variable; null = no such voice here.
  */
 export const defaultCuteVoiceId = (cfg: Partial<Pick<AppConfig, 'FISH_DEFAULT_VOICE_ID'>>): string | null => cfg.FISH_DEFAULT_VOICE_ID || null;
+
+/** the two settings {bati}'s fixed voices come from */
+export type BatiVoiceIds = Partial<Pick<AppConfig, 'FISH_BATI_MOON_VOICE_ID' | 'FISH_BATI_SUN_VOICE_ID'>>;
+
+/**
+ * {bati}'s voice (M-R342, client 2026-11-27): the FIXED Fish voice of the egg it was born from — ♀ Moon / ♂ Sun, the
+ * server's FISH_BATI_MOON_VOICE_ID / FISH_BATI_SUN_VOICE_ID, else the shared constants (batiFixedVoice.ts). The same for
+ * every member (recorded or not, under 13 too) and for the 2nd / 3rd {bati} (each its own egg's). No egg known (no
+ * {bati} born yet): the Moon egg's. Never null: the voice exists whenever the voice service is connected.
+ */
+export const batiVoiceId = (cfg: BatiVoiceIds, egg?: BatiEggKind | null): string => batiFixedVoice(egg, { moon: cfg.FISH_BATI_MOON_VOICE_ID, sun: cfg.FISH_BATI_SUN_VOICE_ID });

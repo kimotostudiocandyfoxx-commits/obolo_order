@@ -35,7 +35,6 @@ export default function PreviewIndex() {
     { href: '/kakunin-5798f28713/play?day=8&at=order', label: '8日目：エクリプスの支払いから（デモ）' },
     { href: '/kakunin-5798f28713/puni-image', label: 'ぷにぷにキャラの試作（絵のキャラ版・メッシュ変形）' },
     { href: '/kakunin-5798f28713/bati-chat', label: 'バティとの会話だけ（D03-S008：5往復＋読み上げ。ログイン中は自分のバティで本番どおり）' },
-    { href: '/kakunin-5798f28713/bati-voice', label: '🎙 バティの声ためし（自分の声を録って、+1〜+4 に上げて聴く／その高さでバティの声を作る）' },
     { href: '/kakunin-5798f28713/robot', label: 'ロボット声のテスト（土星チュートリアル用：録音→ロボット声で再生）' },
     { href: '/kakunin-5798f28713/play?world=mars', label: '火星だけ（チュートリアルなし）' },
     { href: '/kakunin-5798f28713/play?world=mercury', label: '水星だけ（チュートリアルなし）' },

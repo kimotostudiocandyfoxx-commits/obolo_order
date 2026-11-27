@@ -604,7 +604,6 @@ export class SongService {
     let command: SongEditCommand | undefined = body.command;
     if (!command) {
       if ((await moderateText(body.message!)).flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'CONTENT_FLAGGED', 'This cannot be used');
-      const [u] = await this.db.write.select({ bati: users.voiceBatiId }).from(users).where(eq(users.id, userId));
       const ctx = {
         title: row.title,
         genre: design.genre,
@@ -614,7 +613,8 @@ export class SongService {
         instrumentalPrompt: design.instrumentalPrompt,
         phrases,
         mix,
-        hasBatiVoice: !!u?.bati,
+        // M-R342: {bati} sings in its egg's fixed voice — there whenever the voice service is (VoiceService.voiceId)
+        hasBatiVoice: this.voice.connected,
       };
       const history: ChatTurn[] = [...body.history.map((t) => ({ role: t.role === 'partner' ? ('assistant' as const) : ('user' as const), text: t.text })), { role: 'user', text: body.message! }];
       let raw: string;

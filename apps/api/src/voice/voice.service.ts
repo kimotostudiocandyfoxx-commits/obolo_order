@@ -1,7 +1,7 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { type LlmProvider, moderateText } from '@obolo/ai';
 import { LLM } from '../infra/tokens';
-import { batiDefaultVoice, defaultVoiceSilent, VOICE_MAX_BYTES, VOICE_MIME_TYPES, VOICE_SCRIPTS, VOICE_STYLES, type Me, type RegisterVoiceBody, type SpeakBody, type VoiceSlot } from '@obolo/shared';
+import { batiSpeakSpeed, defaultVoiceSilent, VOICE_MAX_BYTES, VOICE_MIME_TYPES, VOICE_SCRIPTS, VOICE_STYLES, type Me, type RegisterVoiceBody, type SpeakBody, type VoiceSlot } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { AppConfig, CONFIG } from '../config';
@@ -13,15 +13,17 @@ import { toMp3 } from './audio';
 import { canUseMedia } from './media-consent';
 import { activeBati } from '../look/batis';
 import { createVoiceModel, deleteVoiceModel, textToSpeech, type TtsOptions } from './fish.client';
-import { defaultCuteVoiceId } from './voice-models';
+import { batiVoiceId } from './voice-models';
 
 /** one dictated take is at most this long (the web's recorder stops at 45 s) */
 export const DICTATE_MAX_SECONDS = 50;
 
 /**
- * Member voices (client decision 2026-10-07): two Fish Audio voice models per member — their own
- * voice and the changed voice they give Bati. Read-aloud (Saturn, Bati's lines) uses Fish TTS
- * (model s2.1-pro); singing uses the same TTS with a leading [singing] tag (ComposeService.sing).
+ * Member voices (client decision 2026-10-07): Fish Audio voice models per member — their own voice ('self') and the
+ * funny voice of their kororins ('kororin'). Read-aloud (Saturn, Bati's lines) uses Fish TTS (model s2.1-pro); singing
+ * uses the same TTS with a leading [singing] tag (ComposeService.sing).
+ * M-R342 (client 2026-11-27): the 'bati' slot is no voice of the member's any more — {bati} speaks (and sings) in the
+ * fixed voice of its egg (batiVoiceId), for everyone; nothing can be registered for it.
  */
 @Injectable()
 export class VoiceService {
@@ -42,10 +44,14 @@ export class VoiceService {
     return !!this.cfg.FISH_API_KEY;
   }
 
-  /** The member's Fish voice model for this slot (throws when not registered). */
+  /**
+   * The Fish voice for this slot: the member's own model ('self' / 'kororin': throws when not registered), or — 'bati',
+   * M-R342 — the fixed voice of their active {bati}'s egg (always there).
+   */
   async voiceId(userId: string, slot: VoiceSlot): Promise<string> {
     this.key();
     const [u] = await this.db.write.select().from(users).where(eq(users.id, userId));
+    if (slot === 'bati') return batiVoiceId(this.cfg, u ? activeBati(u)?.egg : null);
     const ref = u?.[this.col(slot)];
     if (!ref) throw apiError(HttpStatus.CONFLICT, 'VOICE_NOT_REGISTERED', 'Register this voice first');
     return ref;
@@ -56,12 +62,16 @@ export class VoiceService {
     return textToSpeech(this.key(), this.cfg.FISH_MODEL, { ...o, referenceId });
   }
 
-  private col(slot: VoiceSlot) {
-    return slot === 'self' ? 'voiceSelfId' : slot === 'kororin' ? 'voiceKororinId' : 'voiceBatiId';
+  private col(slot: Exclude<VoiceSlot, 'bati'>) {
+    return slot === 'self' ? 'voiceSelfId' : 'voiceKororinId';
   }
 
   async register(userId: string, body: RegisterVoiceBody, origin: string): Promise<Me> {
     const key = this.key();
+    // M-R342: {bati}'s voice is fixed (its egg's) — no recording becomes it. (users.voice_bati_id is the member's own
+    // voice model now, made from the day-2 recording: BatiVoiceService, POST /voice/bati.)
+    const slot = body.slot;
+    if (slot === 'bati') throw apiError(HttpStatus.BAD_REQUEST, 'BATI_VOICE_FIXED', "The partner's voice is fixed; it cannot be registered");
     const raw = Buffer.from(body.audio.data, 'base64');
     if (raw.length < 5_000) throw apiError(HttpStatus.BAD_REQUEST, 'VOICE_TOO_SHORT', 'The recording is too short');
     let mp3: Buffer;
@@ -76,20 +86,20 @@ export class VoiceService {
     // M-R247: a voice model needs the start-of-app agreement on what the voice is used for
     // M-R248: and by age (under 13 never; 13〜15 with the guardian's consent)
     if (!canUseMedia(u)) throw apiError(HttpStatus.FORBIDDEN, 'CONSENT_REQUIRED', 'The voice cannot be used for this account');
-    const id = await createVoiceModel(key, { title: `obolo-${userId.slice(0, 8)}-${body.slot}`, audio: mp3, filename: `${body.slot}.mp3`, mime: 'audio/mpeg', text: body.text ?? VOICE_SCRIPTS[body.slot] });
-    const old = u[this.col(body.slot)];
+    const id = await createVoiceModel(key, { title: `obolo-${userId.slice(0, 8)}-${slot}`, audio: mp3, filename: `${slot}.mp3`, mime: 'audio/mpeg', text: body.text ?? VOICE_SCRIPTS[slot] });
+    const old = u[this.col(slot)];
     // the recording itself is kept too: songs are sung in it (Seed-VC reference, 2026-10-09)
     const sample = await this.media.storeAudio(userId, 'audio/mpeg', mp3, origin);
-    const urlCol = body.slot === 'self' ? 'voiceSelfUrl' : body.slot === 'kororin' ? 'voiceKororinUrl' : 'voiceBatiUrl';
+    const urlCol = slot === 'self' ? 'voiceSelfUrl' : 'voiceKororinUrl';
     const oldSample = u[urlCol];
     const [nu] = await this.db.write
       .update(users)
-      .set({ [this.col(body.slot)]: id, [urlCol]: sample.url, updatedAt: new Date() })
+      .set({ [this.col(slot)]: id, [urlCol]: sample.url, updatedAt: new Date() })
       .where(eq(users.id, userId))
       .returning();
     if (old && old !== id) void deleteVoiceModel(key, old);
     if (oldSample && oldSample !== sample.url) void this.media.removeByUrl(userId, oldSample).catch(() => undefined);
-    this.log.log(`voice ${body.slot} registered for ${userId}`);
+    this.log.log(`voice ${slot} registered for ${userId}`);
     return toMe(nu);
   }
 
@@ -149,6 +159,13 @@ export class VoiceService {
   async speak(userId: string, body: SpeakBody, origin: string): Promise<{ url: string; mediaId: string }> {
     const key = this.key();
     if ((await moderateText(body.text)).flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'CONTENT_FLAGGED', 'This cannot be read aloud');
+    if (body.slot === 'bati') {
+      // M-R342: {bati}'s fixed voice, under the same rule as a post read by {bati} (no voice at 0 mana for a member
+      // who is not recorded) — the caller falls back to the device's reading voice
+      const v = await this.readByBati(userId, body, origin);
+      if (!v) throw apiError(HttpStatus.CONFLICT, 'NO_VOICE_NOW', "The partner's voice is not available now");
+      return v;
+    }
     return this.readAloud(userId, body, origin, key);
   }
 
@@ -161,21 +178,16 @@ export class VoiceService {
   }
 
   /**
-   * Bati reads a post: the member's registered Bati voice, else the shared default voice
-   * (FISH_DEFAULT_VOICE_ID); null when neither exists (the caller falls back to the device voice).
+   * Bati reads a post (M-R342): in the fixed voice of the member's active {bati}'s egg, at {bati}'s speed; null when
+   * the voice service is off or the mana rule below says no voice (the caller falls back to the device voice).
    */
   async readByBati(userId: string, body: Omit<SpeakBody, 'slot'>, origin: string): Promise<{ url: string; mediaId: string } | null> {
     if (!this.cfg.FISH_API_KEY) return null;
     const [u] = await this.db.write.select().from(users).where(eq(users.id, userId));
-    // M-R248 / M-R250: the member's own {bati} voice only when it may be used; else the prepared voice for the egg ×
-    // personality (none chosen yet: FISH_DEFAULT_VOICE_ID)
-    // client 2026-11-27: a member who is not recorded hears the default voice only while there is mana (no voice at 0:
-    // the caller's fallback, the device's reading voice, costs nothing)
+    // client 2026-11-27 (kept as it was through M-R342): a member who is not recorded hears {bati}'s read-aloud only
+    // while there is mana (no voice at 0: the caller's fallback, the device's reading voice, costs nothing)
     if (u && defaultVoiceSilent({ recorded: canUseMedia(u), balance: await this.balance(userId) })) return null;
-    const r = u ? activeBati(u) : null;
-    const ref = (u && canUseMedia(u) ? u.voiceBatiId : null) ?? batiDefaultVoice(r?.egg, r?.personality).fish ?? defaultCuteVoiceId(this.cfg);
-    if (!ref) return null;
-    return this.readWith(ref, userId, { ...body, slot: 'bati' }, origin, this.key());
+    return this.readWith(batiVoiceId(this.cfg, u ? activeBati(u)?.egg : null), userId, { ...body, slot: 'bati' }, origin, this.key());
   }
 
   /** the member's mana now (stubbed in tests) */
@@ -186,10 +198,12 @@ export class VoiceService {
 
   private async readWith(ref: string, userId: string, body: SpeakBody, origin: string, key: string): Promise<{ url: string; mediaId: string }> {
     const style = VOICE_STYLES.find((s) => s.id === body.style);
+    // M-R342: {bati} speaks at its own speed (1.3×, the pitch stays), the reading style's speed on top
+    const speed = body.slot === 'bati' ? batiSpeakSpeed(style?.fish.speed ?? 1, this.cfg.BATI_VOICE_SPEED) : style?.fish.speed;
     const mp3 = await textToSpeech(key, this.cfg.FISH_MODEL, {
       text: style ? `${style.fish.tag} ${body.text}`.trim() : body.text,
       referenceId: ref,
-      ...(style ? { prosody: { speed: style.fish.speed, volume: 0 } } : {}),
+      ...(speed ? { prosody: { speed, volume: 0 } } : {}),
     });
     const m = await this.media.storeAudio(userId, 'audio/mpeg', mp3, origin);
     return { url: m.url, mediaId: m.id };

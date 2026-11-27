@@ -1,9 +1,10 @@
 /**
- * iPad feedback (2026-11-24): {bati}'s default voice — the voice every {bati} speaks in until the member's own (from the
- * egg recording, D03-S005) is made, then it switches by itself (BatiVoiceService.voiceRef).
+ * The default cute voice (FISH_DEFAULT_VOICE_ID). Made on the iPad feedback of 2026-11-24 as {bati}'s default voice;
+ * since M-R342 (2026-11-27) {bati} speaks in the fixed voice of its egg (shared batiFixedVoice.ts) and this voice only
+ * reads the ダチ voice messages of members who are not recorded (dachi/cute-voice.service.ts).
  *
  * One-off: the client's reference recording (design/voices/default-bati-source.<ext>, any format ffmpeg reads) is
- * converted exactly as the egg recording is — toMp3(…, BATI_VOICE_BASE_SEMITONES = +2, BATI_VOICE_MAX_SECONDS) — and
+ * converted — toMp3(…, BATI_VOICE_BASE_SEMITONES = +2, BATI_VOICE_MAX_SECONDS) — and
  * made into a private Fish Audio voice model (the same POST /model as the members' voices; paid, approved). The model
  * id is printed; set it as the GitHub variable FISH_DEFAULT_VOICE_ID and run "Deploy API".
  *
@@ -36,7 +37,7 @@ async function main() {
   const src = source();
   const maxSec = Number(process.env.MAX_SECONDS) || BATI_VOICE_MAX_SECONDS;
   const raw = readFileSync(src);
-  // the same conversion as the egg recording's model (BatiVoiceService.make): +2 semitones, speed kept, mono 44.1 kHz MP3
+  // +2 semitones, speed kept, mono 44.1 kHz MP3
   const audio = await toMp3(raw, BATI_VOICE_BASE_SEMITONES, maxSec);
   const out = resolve(ROOT, process.env.OUT || 'design/voices/default-bati-pitched.mp3');
   writeFileSync(out, audio);

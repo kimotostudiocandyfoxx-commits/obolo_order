@@ -34,7 +34,7 @@ export interface JobPayloads {
    * profile look change that paid for them (its costs are that making's), none = absorbed (the first look, the backfill)
    */
   'look.figures': { userId: string; origin: string; look?: string; paid?: { kind: 'profileLook'; job: string } };
-  /** M-R246: {bati}'s voice model made from the egg recording (BatiVoiceService) */
+  /** M-R246: the member's own voice model made from the day-2 recording (BatiVoiceService; M-R342: not {bati}'s voice) */
   'voice.bati': { userId: string; url: string; text?: string };
   /**
    * client 2026-11-25 (Mercury): a song's title read in its maker's own voice and kept (SongTitleVoiceService). `text`: the

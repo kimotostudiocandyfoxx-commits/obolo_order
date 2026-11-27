@@ -1,7 +1,7 @@
-import { BATI_VOICE_BASE_SEMITONES, BATI_VOICE_TUNING, batiVoicePitch, batiVoiceTuning, MEDIA_CONSENT_VERSION } from '@obolo/shared';
+import { BATI_FIXED_VOICES, MEDIA_CONSENT_VERSION } from '@obolo/shared';
 import { describe, expect, it, vi } from 'vitest';
 import { BatiVoiceService, canUseMedia, hasMediaConsent } from './bati-voice.service';
-import { fishVoiceModels } from './voice-models';
+import { batiVoiceId, defaultCuteVoiceId, fishVoiceModels } from './voice-models';
 import type { VoiceModels } from './voice-models';
 
 /** the API error's code ({ error: { code } }) */
@@ -10,7 +10,7 @@ const code = (e: unknown) => ((e as { getResponse?: () => { error?: { code?: str
 const U = 'a0000000-0000-4000-8000-000000000001';
 
 /** a service over a little world in memory: one user row, the media store, the queue and a fake voice-model provider */
-function world(o: { consent?: boolean; enabled?: boolean; age?: number | null; guardian?: boolean; defaultVoice?: string; speed?: number } = {}) {
+function world(o: { consent?: boolean; enabled?: boolean; age?: number | null; guardian?: boolean; speed?: number; moonVoice?: string; sunVoice?: string } = {}) {
   const user: Record<string, unknown> = {
     id: U,
     voiceBatiId: null,
@@ -53,9 +53,9 @@ function world(o: { consent?: boolean; enabled?: boolean; age?: number | null; g
       return `model-${models.made.length}`;
     }),
     remove: vi.fn(async (id: string) => void models.gone.push(id)),
-    speak: vi.fn(async (id: string, text: string) => Buffer.from(id.startsWith('model-') ? `tts:${text}` : `tts@${id}:${text}`)),
+    speak: vi.fn(async (id: string, text: string) => Buffer.from(`tts@${id}:${text}`)),
   };
-  const s = new BatiVoiceService({} as never, media as never, queue as never, models, { FISH_DEFAULT_VOICE_ID: o.defaultVoice, ...(o.speed ? { BATI_VOICE_SPEED: o.speed } : {}) });
+  const s = new BatiVoiceService({} as never, media as never, queue as never, models, { FISH_BATI_MOON_VOICE_ID: o.moonVoice, FISH_BATI_SUN_VOICE_ID: o.sunVoice, ...(o.speed ? { BATI_VOICE_SPEED: o.speed } : {}) });
   // ffmpeg stands in: the bytes marked with the semitones they were shifted by
   const shifts: number[] = [];
   s.convert = async (input, semitones) => {
@@ -70,8 +70,8 @@ function world(o: { consent?: boolean; enabled?: boolean; age?: number | null; g
 
 const take = (n = 1) => ({ mime: 'audio/webm', data: Buffer.from('v'.repeat(200 * n)).toString('base64') });
 
-describe('{bati} voice from the egg recording (M-R246 / M-R247)', () => {
-  it('needs the start-of-app consent: without it nothing is kept, no job, the default voice', async () => {
+describe('the member’s own voice from the day-2 recording (M-R246 / M-R247; M-R342: not {bati}’s voice any more)', () => {
+  it('needs the start-of-app consent: without it nothing is kept, no job', async () => {
     const w = world({ consent: false });
     const me = await w.s.record(U, { takes: [take()], seconds: 11 }, 'http://api');
     expect(me.voices.batiState).toBe('none');
@@ -100,20 +100,20 @@ describe('{bati} voice from the egg recording (M-R246 / M-R247)', () => {
     expect(w.jobs).toEqual([{ name: 'voice.bati', p: expect.objectContaining({ userId: U, url: w.user.voiceBatiUrl }) }]);
   });
 
-  it('the model is made from the recording pitched up 2 semitones, then becomes {bati}\'s voice', async () => {
+  it('M-R342: the model is made from the recording as it is (no pitch change); {bati} does not speak in it', async () => {
     const w = world();
     await w.s.record(U, { takes: [take()], seconds: 10, text: 'こんにちは' }, 'http://api');
     w.shifts.length = 0;
     await w.s.make(w.jobs[0].p as never);
-    expect(BATI_VOICE_BASE_SEMITONES).toBe(2);
-    expect(w.shifts).toEqual([2]);
-    expect(w.models.made[0].audio.toString().endsWith('|2')).toBe(true);
+    expect(w.shifts).toEqual([0]);
+    expect(w.models.made[0].audio.toString().endsWith('|0')).toBe(true);
     expect(w.models.made[0].text).toBe('こんにちは');
     expect(w.user).toMatchObject({ voiceBatiId: 'model-1', voiceBatiState: 'ready' });
-    expect(await w.s.speak(U, 'やぁ')).toEqual(Buffer.from('tts:やぁ'));
+    // {bati} keeps its egg's fixed voice (no {bati} yet: the Moon egg's)
+    expect(await w.s.speak(U, 'やぁ')).toEqual(Buffer.from(`tts@${BATI_FIXED_VOICES.moon}:やぁ`));
   });
 
-  it('〔声を消す〕 deletes the recording and the model; the default voice again', async () => {
+  it('〔声を消す〕 deletes the recording and the model; {bati}’s voice is not touched', async () => {
     const w = world();
     await w.s.record(U, { takes: [take()], seconds: 10 }, 'http://api');
     const url = w.user.voiceBatiUrl as string;
@@ -122,7 +122,7 @@ describe('{bati} voice from the egg recording (M-R246 / M-R247)', () => {
     expect(w.models.gone).toEqual(['model-1']);
     expect(w.removed).toContain(url);
     expect(me.voices).toMatchObject({ bati: false, batiState: 'none' });
-    expect(await w.s.speak(U, 'やぁ')).toBeNull();
+    expect(await w.s.speak(U, 'やぁ')).toEqual(Buffer.from(`tts@${BATI_FIXED_VOICES.moon}:やぁ`));
   });
 
   it('a deletion while the model is being made deletes the new model too', async () => {
@@ -175,52 +175,75 @@ describe('M-R248: children — by birth year', () => {
   });
 });
 
-describe('the 2nd / 3rd {bati}: the same base voice, a little changed by personality', () => {
-  it('the 1st is the base voice as it is (+2); the others follow the table', () => {
-    expect(batiVoiceTuning(1, 'king')).toEqual({ semitones: 0, speed: 1 });
-    expect(batiVoicePitch(1, 'king')).toBe(2);
-    expect(batiVoiceTuning(2, 'king')).toEqual(BATI_VOICE_TUNING.king);
-    expect(batiVoicePitch(3, 'amae')).toBe(2 + BATI_VOICE_TUNING.amae.semitones);
-    for (const t of Object.values(BATI_VOICE_TUNING)) {
-      expect(Math.abs(t.semitones)).toBeLessThanOrEqual(2);
-      expect(t.speed).toBeGreaterThan(0.85);
-      expect(t.speed).toBeLessThan(1.15);
-    }
+/** a {bati} record as kept in users.batis_json (only what the voice reads) */
+const bati = (id: string, egg: 'moon' | 'sun') => ({ id, name: id, egg, seed: 'カレー', seedKind: 'food', personality: 'genki', self: 'ぼく', call: '{neo}', catchphrase: '', intro: '', imageUrl: null, createdAt: new Date().toISOString() });
+
+describe('M-R342 (client 2026-11-27): every {bati} speaks in the fixed Fish voice of its egg', () => {
+  it('♀ the Moon egg: 活発なマスコットキャラ; ♂ the Sun egg: 元気な少年 — the ids are the defaults, the settings win', () => {
+    expect(batiVoiceId({}, 'moon')).toBe('270c409c18d14a60a81ad8c2f24007b9');
+    expect(batiVoiceId({}, 'sun')).toBe('ed07fac0ac144ba6b7f6b208d57ace05');
+    expect(batiVoiceId({ FISH_BATI_SUN_VOICE_ID: 'boy-2' }, 'sun')).toBe('boy-2');
+    expect(batiVoiceId({ FISH_BATI_SUN_VOICE_ID: 'boy-2' }, 'moon')).toBe(BATI_FIXED_VOICES.moon);
+    // no egg known (no {bati} born yet): the Moon egg's voice
+    expect(batiVoiceId({})).toBe(BATI_FIXED_VOICES.moon);
+    expect(batiVoiceId({}, null)).toBe(BATI_FIXED_VOICES.moon);
   });
 
-  describe('iPad feedback: the default {bati} voice (FISH_DEFAULT_VOICE_ID) until the member\'s own is made', () => {
-    it('no own voice yet: {bati} speaks in the default model; once the own model is made, in that — by itself', async () => {
-      const w = world({ defaultVoice: 'default-bati' });
-      expect(await w.s.speak(U, 'やぁ')).toEqual(Buffer.from('tts@default-bati:やぁ'));
-      await w.s.record(U, { takes: [take()], seconds: 10 }, 'http://api');
-      // still being made: the default voice
-      expect(await w.s.speak(U, 'やぁ')).toEqual(Buffer.from('tts@default-bati:やぁ'));
-      await w.s.make(w.jobs[0].p as never);
-      expect(await w.s.speak(U, 'やぁ')).toEqual(Buffer.from('tts:やぁ'));
-      // 〔声を消す〕: back to the default voice
-      await w.s.remove(U);
-      expect(await w.s.speak(U, 'やぁ')).toEqual(Buffer.from('tts@default-bati:やぁ'));
-    });
-    it('under 13 / no consent: never the own voice, the default one still', async () => {
-      const w = world({ age: 10, defaultVoice: 'default-bati' });
-      w.user.voiceBatiId = 'model-x';
-      expect(await w.s.speak(U, 'やぁ')).toEqual(Buffer.from('tts@default-bati:やぁ'));
-    });
-    it('no default set and no own voice: null (the Gemini voice); Fish off: null', async () => {
-      expect(await world().s.speak(U, 'やぁ')).toBeNull();
-      expect(await world({ enabled: false, defaultVoice: 'default-bati' }).s.speak(U, 'やぁ')).toBeNull();
-    });
+  it('the member’s own voice model is never {bati}’s voice: the egg’s, with a model made or not', async () => {
+    const w = world();
+    Object.assign(w.user, { batiFood: 'カレー', batiId: 'b1', batisJson: [bati('b1', 'sun')], voiceBatiId: 'model-x' });
+    expect(await w.s.speak(U, 'やぁ')).toEqual(Buffer.from(`tts@${BATI_FIXED_VOICES.sun}:やぁ`));
+    expect(w.s.voiceRef(w.user as never)).toBe(BATI_FIXED_VOICES.sun);
+    expect(await w.s.voiceOf(U)).toBe(BATI_FIXED_VOICES.sun);
+  });
+
+  it('the 2nd / 3rd {bati} (SYS-S003) speak in their own egg’s voice: swapping the one in the chat swaps the voice', async () => {
+    const w = world();
+    Object.assign(w.user, { batiFood: 'カレー', batiId: 'b1', batisJson: [bati('b1', 'moon'), bati('b2', 'sun'), bati('b3', 'moon')] });
+    expect(w.s.voiceRef(w.user as never)).toBe(BATI_FIXED_VOICES.moon);
+    w.user.batiId = 'b2';
+    expect(w.s.voiceRef(w.user as never)).toBe(BATI_FIXED_VOICES.sun);
+    w.user.batiId = 'b3';
+    expect(w.s.voiceRef(w.user as never)).toBe(BATI_FIXED_VOICES.moon);
+    // no pitch change for any of them (ffmpeg is not run on what {bati} says)
+    w.shifts.length = 0;
+    await w.s.speak(U, 'やぁ');
+    expect(w.shifts).toEqual([]);
+  });
+
+  it('a {bati} born before the list (no record): the egg answered on day 2; nothing recorded there: the Sun egg (legacyEgg)', async () => {
+    const w = world();
+    Object.assign(w.user, { batiFood: 'カレー', batiId: null, batisJson: null, onboardingJson: { birthYear: '1990', 'd2.f_egg': 'moon' } });
+    expect(w.s.voiceRef(w.user as never)).toBe(BATI_FIXED_VOICES.moon);
+    w.user.onboardingJson = { birthYear: '1990' };
+    expect(w.s.voiceRef(w.user as never)).toBe(BATI_FIXED_VOICES.sun);
+  });
+
+  it('under 13 / not recorded: the same voices', async () => {
+    const w = world({ age: 10 });
+    Object.assign(w.user, { batiFood: 'カレー', batiId: 'b1', batisJson: [bati('b1', 'sun')] });
+    expect(await w.s.speak(U, 'やぁ')).toEqual(Buffer.from(`tts@${BATI_FIXED_VOICES.sun}:やぁ`));
+  });
+
+  it('the voice service off: null (the caller’s Gemini voice)', async () => {
+    expect(await world({ enabled: false }).s.speak(U, 'やぁ')).toBeNull();
+  });
+
+  it('the default cute voice (ダチ messages of members who are not recorded) is a constant of its own', () => {
+    expect(defaultCuteVoiceId({ FISH_DEFAULT_VOICE_ID: 'cute' })).toBe('cute');
+    expect(defaultCuteVoiceId({})).toBeNull();
+    expect(batiVoiceId({ FISH_DEFAULT_VOICE_ID: 'cute' } as never, 'moon')).toBe(BATI_FIXED_VOICES.moon);
   });
 });
 
-describe('R14 (client 2026-11-25): {bati} speaks faster and punchier (BATI_VOICE_SPEED)', () => {
-  it('the speed goes to the TTS with every line: 1.2 by default, the setting when set, × the {bati}’s own', async () => {
-    const w = world({ defaultVoice: 'default-bati' });
+describe('M-R342: {bati} speaks at 1.3× with the pitch unchanged (BATI_VOICE_SPEED; R14 had 1.2)', () => {
+  it('the speed goes to the TTS with every line: 1.3 by default, the setting when set', async () => {
+    const w = world({ moonVoice: 'girl' });
     await w.s.speak(U, 'やぁ');
-    expect(w.models.speak).toHaveBeenLastCalledWith('default-bati', 'やぁ', 1.2);
-    const v = world({ defaultVoice: 'default-bati', speed: 1.35 });
+    expect(w.models.speak).toHaveBeenLastCalledWith('girl', 'やぁ', 1.3);
+    const v = world({ speed: 1.35 });
     await v.s.speak(U, 'やぁ');
-    expect(v.models.speak).toHaveBeenLastCalledWith('default-bati', 'やぁ', 1.35);
+    expect(v.models.speak).toHaveBeenLastCalledWith(BATI_FIXED_VOICES.moon, 'やぁ', 1.35);
     expect(v.s.speed(0.9)).toBe(1.22);
     expect(world({ speed: 2 }).s.speed(1.1)).toBe(2);
   });
@@ -232,10 +255,10 @@ describe('R14 (client 2026-11-25): {bati} speaks faster and punchier (BATI_VOICE
       return new Response(new Uint8Array([1, 2, 3]), { status: 200 });
     }) as never;
     try {
-      await fishVoiceModels({ FISH_API_KEY: 'k', FISH_MODEL: 's2.1-pro' }).speak('voice-1', 'こんにちは', 1.2);
+      await fishVoiceModels({ FISH_API_KEY: 'k', FISH_MODEL: 's2.1-pro' }).speak('voice-1', 'こんにちは', 1.3);
     } finally {
       globalThis.fetch = real;
     }
-    expect(JSON.parse(sent[0].body)).toMatchObject({ text: 'こんにちは', reference_id: 'voice-1', prosody: { speed: 1.2, volume: 0 } });
+    expect(JSON.parse(sent[0].body)).toMatchObject({ text: 'こんにちは', reference_id: 'voice-1', prosody: { speed: 1.3, volume: 0 } });
   });
 });

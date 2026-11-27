@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DEFAULT_MAKE_SETUP, type MakeSetup } from '@obolo/shared';
+import { BATI_FIXED_VOICES, BATI_VOICE_SPEED, DEFAULT_MAKE_SETUP, type MakeSetup } from '@obolo/shared';
 
 /**
  * All runtime configuration comes from environment variables (spec §8: secrets never committed).
@@ -132,10 +132,10 @@ const Env = z.object({
   SPELL_MODEL: z.string().default('gemini:gemini-2.5-flash?think=0,gemini:gemini-flash-latest?think=0'),
   SPELL_MODEL_TIMEOUT_MS: z.coerce.number().min(2_000).max(60_000).default(9_000),
   /**
-   * R14 (client 2026-11-25, iPad: 「バティの話すスピードが少し遅い」): how fast {bati} speaks in the Moon chat (Fish
-   * prosody.speed; the Gemini fallback's pitch-keeping tempo) — 1 = the voice as made; each {bati}'s own speed on top
+   * How fast {bati} speaks (R14: 1.2; M-R342, client 2026-11-27: 1.3 with the pitch unchanged) — Fish prosody.speed, and
+   * the Gemini fallback's pitch-keeping tempo; 1 = the voice as it is
    */
-  BATI_VOICE_SPEED: z.coerce.number().min(0.5).max(2).default(1.2),
+  BATI_VOICE_SPEED: z.coerce.number().min(0.5).max(2).default(BATI_VOICE_SPEED),
 
   /** Stripe (the Eclipse day 7, ¥88/month). Without the secret key the payment runs in demo mode
    *  (no charge) — once it is set, POST /me/order is refused and only a paid Checkout counts. */
@@ -228,12 +228,19 @@ const Env = z.object({
    */
   FISH_SING_GUIDE: bool(false),
   /**
-   * PLACEHOLDER (P-SAT-8): a shared Fish voice model id used as Bati's voice for members who have
-   * not registered one yet (the chat's answers, Saturn's read-aloud). Unset = Bati's chat answers use the Gemini
-   * voice for the egg and posts use the device's reading voice. Made from design/voices/default-bati-source.* (+2
-   * semitones) by .github/workflows/make-default-bati-voice.yml; set as the GitHub variable FISH_DEFAULT_VOICE_ID.
+   * The default cute voice: a shared Fish voice model id that reads the ダチ voice messages of members who are not
+   * recorded (and a recorded member's 「きれい」 version while they have no voice model). M-R342: it is NOT {bati}'s
+   * voice any more (FISH_BATI_*_VOICE_ID below). Made from design/voices/default-bati-source.* (+2 semitones) by
+   * .github/workflows/make-default-bati-voice.yml; set as the GitHub variable FISH_DEFAULT_VOICE_ID.
    */
   FISH_DEFAULT_VOICE_ID: secret(),
+  /**
+   * M-R342 (client 2026-11-27): {bati}'s fixed Fish voices by egg — ♀ the Moon egg 「活発なマスコットキャラ」, ♂ the Sun
+   * egg 「元気な少年」 (shared batiFixedVoice.ts; not secrets). Another voice = these variables (GitHub variables of the
+   * same names, deploy-api.yml); empty = the defaults.
+   */
+  FISH_BATI_MOON_VOICE_ID: secret().transform((v) => v ?? BATI_FIXED_VOICES.moon),
+  FISH_BATI_SUN_VOICE_ID: secret().transform((v) => v ?? BATI_FIXED_VOICES.sun),
 
   /** Cloud Run GPU service that makes Mercury instrumentals (gpu/music). Unset = not available yet. */
   MUSIC_URL: secret(),

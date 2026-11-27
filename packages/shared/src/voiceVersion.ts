@@ -10,7 +10,7 @@ import type { CuteVoiceRate } from './cuteVoice';
  *          (voiceTune.ts). Its cost is the small cost 'voiceMix' (our CPU seconds, the words, the mood), added up per
  *          member and taken a whole mana at a time (docs/マナの値段.md 3.).
  *  'clean' 「きれい」: the caption — the words heard from the take, as the member fixed them — is read by Fish in the
- *          member's own registered voice model (the one their {bati} imitates) when they have one, else by the default
+ *          member's own voice model (from the day-2 recording; M-R342: not {bati}'s voice) when they have one, else by the default
  *          cute voice. The recording is heard as words and then gone: it is neither kept nor sent. Priced per message
  *          on its own words (MakeKind 'cuteVoice', cuteVoiceMana — the small 「−0.3」 beside 〔送る〕), taken before the
  *          voice is made and given back when none came; with no mana the words go alone with one calm line.

@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable, Logger, type OnModuleInit } from '@nestjs/common';
-import { BATI_VOICE_BASE_SEMITONES, BATI_VOICE_MAX_SECONDS, BATI_VOICE_MIN_SECONDS, BATI_VOICE_SPEED, batiDefaultVoice, batiSpeakSpeed, batiVoiceTuning, type BatiVoiceBody, type Me } from '@obolo/shared';
+import { BATI_VOICE_MAX_SECONDS, BATI_VOICE_MIN_SECONDS, BATI_VOICE_SPEED, batiDefaultVoice, batiSpeakSpeed, type BatiVoiceBody, type Me } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { CONFIG, type AppConfig } from '../config';
@@ -7,12 +7,12 @@ import { Database } from '../db/db';
 import { users } from '../db/schema';
 import type { JobPayloads, JobQueue } from '../infra/queue';
 import { QUEUE } from '../infra/tokens';
-import { activeBati, batiList } from '../look/batis';
+import { activeBati } from '../look/batis';
 import { MediaService } from '../media/media.service';
 import { toMe } from '../users/users.service';
 import { toMp3 } from './audio';
 import { canUseMedia } from './media-consent';
-import { defaultCuteVoiceId, VOICE_MODELS, type VoiceModels } from './voice-models';
+import { batiVoiceId, VOICE_MODELS, type BatiVoiceIds, type VoiceModels } from './voice-models';
 
 export { canUseMedia, hasMediaConsent } from './media-consent';
 
@@ -20,16 +20,21 @@ type User = typeof users.$inferSelect;
 type Patch = Partial<Pick<User, 'voiceBatiId' | 'voiceBatiUrl' | 'voiceBatiState'>>;
 
 /**
- * {bati}'s voice from the egg recording (M-R246 / M-R247, D03-S005 「たまごに声を聞かせる」).
+ * Two things that share the day-2 scene (D03-S005 「声を聞かせる」, M-R246 / M-R247) and, since M-R342, nothing else:
+ *
+ * 1. The member's own voice model (users.voice_bati_id / voice_bati_url / voice_bati_state — the columns keep their old
+ *    names; they are the MEMBER's voice now, not {bati}'s). It reads the member's own 「きれい」 ダチ voice messages
+ *    (dachi/cute-voice.service.ts).
  *  - POST /voice/bati: the held takes (appended) are kept as one recording (media service, audio kind) and a queued job
- *    ('voice.bati') makes a private voice model from it pitched up BATI_VOICE_BASE_SEMITONES (+2). Shorter than
- *    BATI_VOICE_MIN_SECONDS → VOICE_TOO_SHORT (the egg asks for more: 「、、、もう少し、聞かせてやれ。」).
+ *    ('voice.bati') makes a private voice model from it AS IT IS (no pitch change; before M-R342 it was pitched up two
+ *    semitones — the models made then stay as they are). Shorter than BATI_VOICE_MIN_SECONDS → VOICE_TOO_SHORT
+ *    (「、、、もう少し、聞かせてやれ。」).
  *  - No start-of-app consent, not allowed by age (M-R248: under 13 never, 13〜15 with the guardian's consent), or no voice
- *    service: nothing is kept, no model is made — {bati} has the default voice.
- *    The job checks the consent again before it makes the model.
- *  - DELETE /voice/bati (〔声を消す〕): the recording and the model are deleted; back to the default voice.
- *  - speak(): a text in the member's {bati} voice; the 2nd / 3rd {bati} with its personality's small change.
- * The voice is used for {bati}'s voice only.
+ *    service: nothing is kept, no model is made. The job checks the consent again before it makes the model.
+ *  - DELETE /voice/bati (〔声を消す〕): the recording and the model are deleted.
+ *
+ * 2. {bati}'s voice (M-R342, client 2026-11-27): speak() reads a text in the FIXED Fish voice of the active {bati}'s egg
+ *    (♀ Moon / ♂ Sun), at BATI_VOICE_SPEED (1.3×) with the pitch as it is — the same for everyone.
  */
 @Injectable()
 export class BatiVoiceService implements OnModuleInit {
@@ -42,8 +47,8 @@ export class BatiVoiceService implements OnModuleInit {
     private readonly media: MediaService,
     @Inject(QUEUE) private readonly queue: JobQueue,
     @Inject(VOICE_MODELS) private readonly models: VoiceModels,
-    /** FISH_DEFAULT_VOICE_ID: the shared default {bati} voice model (iPad feedback; scripts/make-default-bati-voice.ts) */
-    @Inject(CONFIG) private readonly cfg: Partial<Pick<AppConfig, 'FISH_DEFAULT_VOICE_ID' | 'BATI_VOICE_SPEED'>> = {},
+    /** {bati}'s fixed voices by egg (FISH_BATI_MOON_VOICE_ID / FISH_BATI_SUN_VOICE_ID) and its speed */
+    @Inject(CONFIG) private readonly cfg: BatiVoiceIds & Partial<Pick<AppConfig, 'BATI_VOICE_SPEED'>> = {},
   ) {}
 
   onModuleInit() {
@@ -67,7 +72,7 @@ export class BatiVoiceService implements OnModuleInit {
   async record(userId: string, body: BatiVoiceBody, origin: string): Promise<Me> {
     const u = await this.row(userId);
     if (!u) throw apiError(HttpStatus.UNAUTHORIZED, 'UNAUTHENTICATED', 'User not found');
-    // without the agreement (or with no voice service here) nothing is kept: {bati} keeps the default voice
+    // without the agreement (or with no voice service here) nothing is kept
     if (!canUseMedia(u) || !this.models.enabled) {
       this.log.log(`bati voice not kept for ${userId}: ${!canUseMedia(u) ? 'no consent / age (M-R248)' : 'voice service off'}`);
       return toMe(u);
@@ -89,12 +94,12 @@ export class BatiVoiceService implements OnModuleInit {
     return toMe(nu);
   }
 
-  /** the job: the recording, +2 semitones, → a private voice model; it becomes {bati}'s voice */
+  /** the job: the recording as it is (M-R342: no pitch change) → the member's private voice model */
   async make(p: JobPayloads['voice.bati']): Promise<void> {
     const u = await this.row(p.userId);
     if (!u || u.voiceBatiUrl !== p.url) return; // deleted or recorded again meanwhile
     if (!canUseMedia(u)) {
-      // the agreement (and, by age, the guardian's) is required for a voice model: none is made, the default voice stays
+      // the agreement (and, by age, the guardian's) is required for a voice model: none is made
       this.log.warn(`bati voice model refused for ${p.userId}: no consent / age`);
       await this.save(p.userId, { voiceBatiState: 'none' });
       return;
@@ -102,8 +107,8 @@ export class BatiVoiceService implements OnModuleInit {
     try {
       const raw = await this.media.audioByUrl(p.userId, p.url);
       if (!raw) throw new Error('the recording is gone');
-      const audio = await this.convert(raw, BATI_VOICE_BASE_SEMITONES);
-      const id = await this.models.create({ title: `obolo-${p.userId.slice(0, 8)}-bati`, audio, filename: 'bati.mp3', mime: 'audio/mpeg', text: p.text });
+      const audio = await this.convert(raw, 0);
+      const id = await this.models.create({ title: `obolo-${p.userId.slice(0, 8)}-own`, audio, filename: 'own.mp3', mime: 'audio/mpeg', text: p.text });
       const now = await this.row(p.userId);
       if (!now || now.voiceBatiUrl !== p.url || !canUseMedia(now)) {
         // deleted while it was being made: the new model goes too
@@ -120,7 +125,7 @@ export class BatiVoiceService implements OnModuleInit {
     }
   }
 
-  /** 〔声を消す〕: the recording and the model are deleted; {bati} speaks in the default voice again */
+  /** 〔声を消す〕: the member's recording and voice model are deleted ({bati}'s voice is not theirs: it stays) */
   async remove(userId: string): Promise<Me> {
     const u = await this.row(userId);
     if (!u) throw apiError(HttpStatus.UNAUTHORIZED, 'UNAUTHENTICATED', 'User not found');
@@ -131,51 +136,40 @@ export class BatiVoiceService implements OnModuleInit {
   }
 
   /**
-   * The Fish voice model {bati} speaks in (iPad feedback): the member's own (from the egg recording, when it may be
-   * used) → the prepared one for the egg × personality (BATI_DEFAULT_VOICES.fish, none chosen yet) → the shared
-   * default {bati} voice (FISH_DEFAULT_VOICE_ID: the client's recording, +2 semitones). When the member's own model is
-   * made (make()), it is used from the next line on — no switch to flip. null: no Fish voice (the caller's fallback).
+   * The Fish voice {bati} speaks in (M-R342, client 2026-11-27): the FIXED voice of the active {bati}'s egg (♀ Moon /
+   * ♂ Sun: batiVoiceId) — for every member, recorded or not, and for the 2nd / 3rd {bati} (its own egg's). The member's
+   * own voice model is not {bati}'s voice any more. No {bati} yet: the Moon egg's voice.
    */
-  voiceRef(u: User | null): string | null {
-    if (!u) return defaultCuteVoiceId(this.cfg);
-    if (u.voiceBatiId && canUseMedia(u)) return u.voiceBatiId;
-    const r = activeBati(u);
-    return batiDefaultVoice(r?.egg, r?.personality).fish ?? defaultCuteVoiceId(this.cfg);
+  voiceRef(u: User | null): string {
+    return batiVoiceId(this.cfg, u ? activeBati(u)?.egg : null);
+  }
+
+  /** the Fish voice of this member's active {bati} (voiceRef) */
+  async voiceOf(userId: string): Promise<string> {
+    return this.voiceRef(await this.row(userId));
   }
 
   /**
-   * A text in {bati}'s Fish voice (MP3): the member's own, else the default model (voiceRef); null when there is none
-   * (the caller uses the Gemini voice). The 1st {bati} speaks in the model as made (+2); the 2nd / 3rd with their
-   * personality's pitch and speed on top.
+   * A text in {bati}'s Fish voice (MP3), at {bati}'s speed with the pitch as it is; null when the voice service is not
+   * connected (the caller uses the Gemini voice).
    */
   async speak(userId: string, text: string): Promise<Buffer | null> {
     if (!this.models.enabled) return null;
     const u = await this.row(userId);
-    const ref = this.voiceRef(u);
-    if (!u || !ref) return null;
-    const tune = this.tuning(u);
-    // R14 (client 2026-11-25: 「速く、歯切れよく」): Fish's own speed (prosody.speed keeps the pitch), × the {bati}'s own
-    const mp3 = await this.models.speak(ref, text, this.speed(tune.speed));
-    return tune.semitones ? this.convert(mp3, tune.semitones) : mp3;
+    if (!u) return null;
+    // M-R342: 1.3× — Fish's own speed (prosody.speed keeps the pitch)
+    return this.models.speak(this.voiceRef(u), text, this.speed());
   }
 
-  /** R14: the speed {bati} speaks at in the Moon chat (BATI_VOICE_SPEED × the {bati}'s own) */
+  /** the speed {bati} speaks at (BATI_VOICE_SPEED; `own`: a reading style's speed on top) */
   speed(own = 1): number {
     return batiSpeakSpeed(own, this.cfg.BATI_VOICE_SPEED ?? BATI_VOICE_SPEED);
   }
 
-  /** M-R250: the prepared voice for the member's active {bati} (egg × personality), when no own voice is used */
+  /** M-R250: the Gemini voice for the member's active {bati} (egg × personality), where the Fish voice cannot be made */
   async defaultVoice(userId: string) {
     const u = await this.row(userId);
     const r = u ? activeBati(u) : null;
     return batiDefaultVoice(r?.egg, r?.personality);
-  }
-
-  /** the active {bati}'s change on the base voice (its place among the member's {bati}, its personality) */
-  tuning(u: User): { semitones: number; speed: number } {
-    const r = activeBati(u);
-    if (!r) return { semitones: 0, speed: 1 };
-    const nth = batiList(u).findIndex((x) => x.id === r.id) + 1;
-    return batiVoiceTuning(nth, r.personality);
   }
 }

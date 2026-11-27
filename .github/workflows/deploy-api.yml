@@ -130,8 +130,9 @@ jobs:
             # PREMIUM_SPELL_WORDS sets its passphrases (separated by | — default 「上級魔法で」)
             echo 'MUSIC_RUNWARE_KEY=obolo-seedream-api-key:latest'
             # Fish Audio voices: switched on once the key is in Secret Manager (FISH_ENABLED=true).
-            # {bati}'s default voice until a member's own is made: the variable FISH_DEFAULT_VOICE_ID (env_vars below),
-            # the model id printed by the "Default Bati voice" workflow (make-default-bati-voice.yml)
+            # The default cute voice (ダチ messages of members who are not recorded): the variable FISH_DEFAULT_VOICE_ID
+            # (env_vars below), the model id printed by the "Default Bati voice" workflow (make-default-bati-voice.yml).
+            # {bati}'s own voice (M-R342) is fixed by its egg: FISH_BATI_MOON_VOICE_ID / FISH_BATI_SUN_VOICE_ID below
             if [ "${{ vars.FISH_ENABLED }}" = "true" ]; then
               echo 'FISH_API_KEY=obolo-fish-api-key:latest'
             fi
@@ -255,6 +256,10 @@ jobs:
             TESTER_EMAILS=${{ steps.testers.outputs.emails }}
             TESTER_ACCOUNT_IDS=${{ steps.testers.outputs.ids }}
             FISH_DEFAULT_VOICE_ID=${{ vars.FISH_DEFAULT_VOICE_ID }}
+            # M-R342 (client 2026-11-27): {bati}'s fixed Fish voices — the Moon egg 「活発なマスコットキャラ」, the Sun egg
+            # 「元気な少年」 (ids, not secrets; another voice = the variable of the same name)
+            FISH_BATI_MOON_VOICE_ID=${{ vars.FISH_BATI_MOON_VOICE_ID || '270c409c18d14a60a81ad8c2f24007b9' }}
+            FISH_BATI_SUN_VOICE_ID=${{ vars.FISH_BATI_SUN_VOICE_ID || 'ed07fac0ac144ba6b7f6b208d57ace05' }}
             # R17 (docs/マナの値段.md): the model of each picture use (a Runware AIR id or a Gemini image model) and the
             # pictures per round; the game tiers' chains. Empty = the defaults in apps/api/src/config.ts (R16's models)
             ART_MODEL=${{ vars.ART_MODEL || 'runware:400@2' }}

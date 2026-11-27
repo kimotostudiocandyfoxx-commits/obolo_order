@@ -35,9 +35,10 @@ export interface CuteVoiceMade {
  *
  *  - who: a member whose voice may not be used (canUseMedia false) — the default cute voice ('cute'); and, after the
  *    client tried the voice messages, a member who IS recorded and chose the 「きれい」 version (shared voiceVersion.ts,
- *    'clean'): the caption of their take is read in their own registered voice model (users.voice_bati_id — the one
- *    their {bati} imitates; BatiVoiceService.voiceRef's first choice) when they have one, else in the default cute
- *    voice. Their recording is not here: it was heard as words (voice-draft.service.ts) and is gone.
+ *    'clean'): the caption of their take is read in their own voice model (users.voice_bati_id — the column keeps its
+ *    old name: since M-R342 it is the member's voice model, made from the day-2 recording, and no longer {bati}'s
+ *    voice) when they have one, else in the default cute voice. A model made before M-R342 is their voice pitched up
+ *    two semitones; the ones made since are their voice as it is. Their recording is not here: it was heard as words (voice-draft.service.ts) and is gone.
  *  - the sound: picked from the words, or the one the member chose under 「おと」 ('none': the voice alone).
  *  - the mana: cuteVoiceMana(these words) at the live rates, taken BEFORE the voice is made (MakeKind 'cuteVoice', a
  *    'generation' row; the tenths wait as for every price below 1) and given back when no voice came.

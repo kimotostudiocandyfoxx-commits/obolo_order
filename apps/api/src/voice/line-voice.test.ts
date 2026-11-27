@@ -11,7 +11,7 @@ const NL: NameLines = {
   },
 };
 
-function setup(rows: { hash: string; url: string }[] = []) {
+function setup(rows: { hash: string; url: string }[] = [], o: { fish?: boolean; batiVoice?: string } = {}) {
   const kvData = new Map<string, string>();
   const kv = {
     get: async (k: string) => kvData.get(k) ?? null,
@@ -26,10 +26,10 @@ function setup(rows: { hash: string; url: string }[] = []) {
   };
   const queue = { register: vi.fn(), enqueue: vi.fn(async () => {}), getHandler: vi.fn(), close: vi.fn() };
   const db = { write: { select: () => ({ from: () => ({ where: async () => rows }) }) } };
-  const cfg = { GEMINI_API_KEY: 'x', NAME_LINES_URL: 'http://lines' };
+  const cfg = { GEMINI_API_KEY: 'x', NAME_LINES_URL: 'http://lines', ...(o.fish ? { FISH_API_KEY: 'f' } : {}) };
   vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify(NL))));
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const svc = new LineVoiceService(cfg as any, kv, queue as any, db as any, {} as any);
+  const svc = new LineVoiceService(cfg as any, kv, queue as any, db as any, {} as any, o.batiVoice ? ({ voiceOf: async () => o.batiVoice } as any) : undefined);
   return { svc, queue };
 }
 
@@ -57,8 +57,33 @@ describe('story lines with the member names', () => {
   });
 });
 
+describe('M-R342: {bati}’s story lines with names are read in the fixed voice of the member’s {bati}’s egg', () => {
+  const job = (q: ReturnType<typeof setup>['queue']) => (q.enqueue.mock.calls[0] as unknown as [string, { who: string; hash: string; spec: object; tempo: number; text: string }])[1];
+  it('the egg’s Fish voice instead of the list’s old Gemini voice, at the story’s tempo (1.3×, atempo)', async () => {
+    const { svc, queue } = setup([], { fish: true, batiVoice: 'egg-voice' });
+    await svc.get('u1', { names: { bati: 'モチ' }, keys: ['k2'] }, 'o');
+    expect(job(queue)).toMatchObject({ who: 'バティ', text: 'モチだよ', spec: { model: 'egg-voice' }, tempo: 1.3 });
+    expect(job(queue).spec).toEqual({ model: 'egg-voice' });
+  });
+  it('another egg (another {bati} in the chat) is another voice file; other speakers keep their voice', async () => {
+    const a = setup([], { fish: true, batiVoice: 'moon-voice' });
+    const b = setup([], { fish: true, batiVoice: 'sun-voice' });
+    await a.svc.get('u1', { names: { bati: 'モチ' }, keys: ['k2'] }, 'o');
+    await b.svc.get('u1', { names: { bati: 'モチ' }, keys: ['k2'] }, 'o');
+    expect(job(a.queue).hash).not.toBe(job(b.queue).hash);
+    const c = setup([], { fish: true, batiVoice: 'moon-voice' });
+    await c.svc.get('u1', { names: { neo: 'ミルク' }, keys: ['k1'] }, 'o');
+    expect(job(c.queue).spec).toEqual({ voice: 'Gacrux' });
+  });
+  it('no voice service: the line as listed (the Gemini voice)', async () => {
+    const { svc, queue } = setup([], { batiVoice: 'egg-voice' });
+    await svc.get('u1', { names: { bati: 'モチ' }, keys: ['k2'] }, 'o');
+    expect(job(queue).spec).toEqual({ voice: 'Leda', pitch: 3 });
+  });
+});
+
 describe('client 2026-11-24: {bati} speaks in the Moon chat (batiSays)', () => {
-  function says(own: Buffer | null) {
+  function says(own: Buffer | null, voice = { id: 'moon-voice' }) {
     const kvData = new Map<string, string>();
     const kv = {
       get: async (k: string) => kvData.get(k) ?? null,
@@ -72,15 +97,22 @@ describe('client 2026-11-24: {bati} speaks in the Moon chat (batiSays)', () => {
     const speak = vi.fn(async () => own);
     let n = 0;
     const media = { storeAudio: vi.fn(async () => ({ url: `https://cdn/v${++n}.mp3`, id: `m${n}` })) };
-    const s = new LineVoiceService({ GEMINI_API_KEY: undefined } as never, kv as never, { register: vi.fn() } as never, {} as never, media as never, { speak, defaultVoice: async () => null } as never);
-    return { s, kvData, speak, media };
+    const s = new LineVoiceService({ GEMINI_API_KEY: undefined } as never, kv as never, { register: vi.fn() } as never, {} as never, media as never, { speak, defaultVoice: async () => null, voiceOf: async () => voice.id } as never);
+    return { s, kvData, speak, media, voice };
   }
-  it('the Fish voice (own or default) is used, and the same words come from the cache the next time', async () => {
+  it('{bati}’s Fish voice is used, and the same words come from the cache the next time', async () => {
     const w = says(Buffer.from('mp3'));
     expect(await w.s.batiSays('u1', 'やっほー！', 'http://api')).toEqual({ url: 'https://cdn/v1.mp3' });
     expect(await w.s.batiSays('u1', 'やっほー！', 'http://api')).toEqual({ url: 'https://cdn/v1.mp3' });
     expect(w.speak).toHaveBeenCalledTimes(1);
     expect(w.media.storeAudio).toHaveBeenCalledTimes(1);
+  });
+  it('M-R342: another {bati} in the chat (another egg’s voice) reads the same words again', async () => {
+    const w = says(Buffer.from('mp3'));
+    expect(await w.s.batiSays('u1', 'やっほー！', 'http://api')).toEqual({ url: 'https://cdn/v1.mp3' });
+    w.voice.id = 'sun-voice';
+    expect(await w.s.batiSays('u1', 'やっほー！', 'http://api')).toEqual({ url: 'https://cdn/v2.mp3' });
+    expect(w.speak).toHaveBeenCalledTimes(2);
   });
   it('counts toward the day\'s read-aloud limit (300), Fish too', async () => {
     const w = says(Buffer.from('mp3'));
