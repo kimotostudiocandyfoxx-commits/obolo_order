@@ -1,0 +1,316 @@
+{
+  "usd_jpy": 160,
+  "spent_usd": 0.3828,
+  "per_model": {
+    "flux2-klein-4b": {
+      "pictures": 10,
+      "avg_usd": 0.0019,
+      "avg_jpy": 0.3
+    },
+    "flux2-klein-9b": {
+      "pictures": 10,
+      "avg_usd": 0.00299,
+      "avg_jpy": 0.48
+    },
+    "seedream-5-flash": {
+      "pictures": 10,
+      "avg_usd": 0.01926,
+      "avg_jpy": 3.08
+    },
+    "qwen-image-2-1-turbo": {
+      "pictures": 10,
+      "avg_usd": 0.01413,
+      "avg_jpy": 2.26
+    }
+  },
+  "chains": [
+    {
+      "subject": "bati",
+      "model": "flux2-klein-4b",
+      "steps": [
+        {
+          "step": "wings",
+          "file": "bati__flux2-klein-4b__1-wings.jpg",
+          "cost_usd": 0.0011,
+          "seconds": 2.9
+        },
+        {
+          "step": "colour",
+          "file": "bati__flux2-klein-4b__2-colour.jpg",
+          "cost_usd": 0.0021,
+          "seconds": 3.2
+        },
+        {
+          "step": "crown",
+          "file": "bati__flux2-klein-4b__3-crown.jpg",
+          "cost_usd": 0.0021,
+          "seconds": 2.8
+        },
+        {
+          "step": "scarf",
+          "file": "bati__flux2-klein-4b__4-scarf.jpg",
+          "cost_usd": 0.0021,
+          "seconds": 2.9
+        },
+        {
+          "step": "ref-sunglasses",
+          "file": "bati__flux2-klein-4b__5-ref-sunglasses.jpg",
+          "cost_usd": 0.0021,
+          "seconds": 5.5
+        }
+      ]
+    },
+    {
+      "subject": "bati",
+      "model": "flux2-klein-9b",
+      "steps": [
+        {
+          "step": "wings",
+          "file": "bati__flux2-klein-9b__1-wings.jpg",
+          "cost_usd": 0.00273,
+          "seconds": 3.0
+        },
+        {
+          "step": "colour",
+          "file": "bati__flux2-klein-9b__2-colour.jpg",
+          "cost_usd": 0.00273,
+          "seconds": 3.5
+        },
+        {
+          "step": "crown",
+          "file": "bati__flux2-klein-9b__3-crown.jpg",
+          "cost_usd": 0.00273,
+          "seconds": 3.1
+        },
+        {
+          "step": "scarf",
+          "file": "bati__flux2-klein-9b__4-scarf.jpg",
+          "cost_usd": 0.00273,
+          "seconds": 3.0
+        },
+        {
+          "step": "ref-sunglasses",
+          "file": "bati__flux2-klein-9b__5-ref-sunglasses.jpg",
+          "cost_usd": 0.00403,
+          "seconds": 5.3
+        }
+      ]
+    },
+    {
+      "subject": "bati",
+      "model": "seedream-5-flash",
+      "steps": [
+        {
+          "step": "wings",
+          "file": "bati__seedream-5-flash__1-wings.jpg",
+          "cost_usd": 0.01926,
+          "seconds": 11.7
+        },
+        {
+          "step": "colour",
+          "file": "bati__seedream-5-flash__2-colour.jpg",
+          "cost_usd": 0.01926,
+          "seconds": 13.8
+        },
+        {
+          "step": "crown",
+          "file": "bati__seedream-5-flash__3-crown.jpg",
+          "cost_usd": 0.01926,
+          "seconds": 14.3
+        },
+        {
+          "step": "scarf",
+          "file": "bati__seedream-5-flash__4-scarf.jpg",
+          "cost_usd": 0.01926,
+          "seconds": 13.3
+        },
+        {
+          "step": "ref-sunglasses",
+          "file": "bati__seedream-5-flash__5-ref-sunglasses.jpg",
+          "cost_usd": 0.01926,
+          "seconds": 17.1
+        }
+      ]
+    },
+    {
+      "subject": "bati",
+      "model": "qwen-image-2-1-turbo",
+      "steps": [
+        {
+          "step": "wings",
+          "file": "bati__qwen-image-2-1-turbo__1-wings.jpg",
+          "cost_usd": 0.014133,
+          "seconds": 9.1
+        },
+        {
+          "step": "colour",
+          "file": "bati__qwen-image-2-1-turbo__2-colour.jpg",
+          "cost_usd": 0.014133,
+          "seconds": 13.1
+        },
+        {
+          "step": "crown",
+          "file": "bati__qwen-image-2-1-turbo__3-crown.jpg",
+          "cost_usd": 0.014133,
+          "seconds": 11.6
+        },
+        {
+          "step": "scarf",
+          "file": "bati__qwen-image-2-1-turbo__4-scarf.jpg",
+          "cost_usd": 0.014133,
+          "seconds": 13.7
+        },
+        {
+          "step": "ref-sunglasses",
+          "file": "bati__qwen-image-2-1-turbo__5-ref-sunglasses.jpg",
+          "cost_usd": 0.014133,
+          "seconds": 14.6
+        }
+      ]
+    },
+    {
+      "subject": "member",
+      "model": "flux2-klein-4b",
+      "steps": [
+        {
+          "step": "hair",
+          "file": "member__flux2-klein-4b__1-hair.jpg",
+          "cost_usd": 0.0011,
+          "seconds": 1.9
+        },
+        {
+          "step": "cloak",
+          "file": "member__flux2-klein-4b__2-cloak.jpg",
+          "cost_usd": 0.0021,
+          "seconds": 2.3
+        },
+        {
+          "step": "ears",
+          "file": "member__flux2-klein-4b__3-ears.jpg",
+          "cost_usd": 0.0021,
+          "seconds": 3.0
+        },
+        {
+          "step": "glow",
+          "file": "member__flux2-klein-4b__4-glow.jpg",
+          "cost_usd": 0.0021,
+          "seconds": 3.3
+        },
+        {
+          "step": "ref-hood",
+          "file": "member__flux2-klein-4b__5-ref-hood.jpg",
+          "cost_usd": 0.0021,
+          "seconds": 4.5
+        }
+      ]
+    },
+    {
+      "subject": "member",
+      "model": "flux2-klein-9b",
+      "steps": [
+        {
+          "step": "hair",
+          "file": "member__flux2-klein-9b__1-hair.jpg",
+          "cost_usd": 0.00273,
+          "seconds": 2.5
+        },
+        {
+          "step": "cloak",
+          "file": "member__flux2-klein-9b__2-cloak.jpg",
+          "cost_usd": 0.00273,
+          "seconds": 3.5
+        },
+        {
+          "step": "ears",
+          "file": "member__flux2-klein-9b__3-ears.jpg",
+          "cost_usd": 0.00273,
+          "seconds": 3.5
+        },
+        {
+          "step": "glow",
+          "file": "member__flux2-klein-9b__4-glow.jpg",
+          "cost_usd": 0.00273,
+          "seconds": 4.9
+        },
+        {
+          "step": "ref-hood",
+          "file": "member__flux2-klein-9b__5-ref-hood.jpg",
+          "cost_usd": 0.00403,
+          "seconds": 7.3
+        }
+      ]
+    },
+    {
+      "subject": "member",
+      "model": "seedream-5-flash",
+      "steps": [
+        {
+          "step": "hair",
+          "file": "member__seedream-5-flash__1-hair.jpg",
+          "cost_usd": 0.01926,
+          "seconds": 11.1
+        },
+        {
+          "step": "cloak",
+          "file": "member__seedream-5-flash__2-cloak.jpg",
+          "cost_usd": 0.01926,
+          "seconds": 12.6
+        },
+        {
+          "step": "ears",
+          "file": "member__seedream-5-flash__3-ears.jpg",
+          "cost_usd": 0.01926,
+          "seconds": 11.5
+        },
+        {
+          "step": "glow",
+          "file": "member__seedream-5-flash__4-glow.jpg",
+          "cost_usd": 0.01926,
+          "seconds": 17.4
+        },
+        {
+          "step": "ref-hood",
+          "file": "member__seedream-5-flash__5-ref-hood.jpg",
+          "cost_usd": 0.01926,
+          "seconds": 14.0
+        }
+      ]
+    },
+    {
+      "subject": "member",
+      "model": "qwen-image-2-1-turbo",
+      "steps": [
+        {
+          "step": "hair",
+          "file": "member__qwen-image-2-1-turbo__1-hair.jpg",
+          "cost_usd": 0.014133,
+          "seconds": 11.7
+        },
+        {
+          "step": "cloak",
+          "file": "member__qwen-image-2-1-turbo__2-cloak.jpg",
+          "cost_usd": 0.014133,
+          "seconds": 13.1
+        },
+        {
+          "step": "ears",
+          "file": "member__qwen-image-2-1-turbo__3-ears.jpg",
+          "cost_usd": 0.014133,
+          "seconds": 11.8
+        },
+        {
+          "step": "glow",
+          "file": "member__qwen-image-2-1-turbo__4-glow.jpg",
+          "cost_usd": 0.014133,
+          "seconds": 14.1
+        },
+        {
+          "step": "ref-hood",
+          "file": "member__qwen-image-2-1-turbo__5-ref-hood.jpg",
+          "cost_usd": 0.014133,
+          "seconds": 15.8
+        }
+      ]
+    }
+  ]
+}
