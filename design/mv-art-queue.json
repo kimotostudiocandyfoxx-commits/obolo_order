@@ -10287,10 +10287,7 @@
     {
       "id": "p5-mars-user",
       "refs": [
-        "design/home/chibi-ref/user.jpg",
-        "/tmp/mv-bstyle-1.jpg",
-        "/tmp/mv-bstyle-2.jpg",
-        "/tmp/mv-bstyle-3.jpg"
+        "design/mv-art/out/p5-mars-user.jpg"
       ],
       "w": 1024,
       "h": 1024,
@@ -10299,15 +10296,12 @@
         512
       ],
       "always": false,
-      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding a small cute round flying saucer UFO whose colours and patterns are designed from the character's outfit, a soft projector beam glowing under it. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+      "prompt": "Edit the reference picture. Keep the character, the round flying saucer UFO, every colour, pattern, outline and the soft hand-drawn kawaii chibi style exactly the same. Only remove the glowing light beam under the UFO completely: there is no beam, no glow, no light cone and no sparkles below the saucer, only the plain solid pure white background. The bottom of the saucer has a clean outline. Centered, everything inside the frame with a margin, no shadow, no text."
     },
     {
       "id": "p5-mars-kimorin",
       "refs": [
-        "design/home/chibi-ref/kimorin.jpg",
-        "/tmp/mv-bstyle-1.jpg",
-        "/tmp/mv-bstyle-2.jpg",
-        "/tmp/mv-bstyle-3.jpg"
+        "design/mv-art/out/p5-mars-kimorin.jpg"
       ],
       "w": 1024,
       "h": 1024,
@@ -10316,15 +10310,12 @@
         512
       ],
       "always": false,
-      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding a small cute round flying saucer UFO whose colours and patterns are designed from the character's outfit, a soft projector beam glowing under it. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+      "prompt": "Edit the reference picture. Keep the character, the round flying saucer UFO, every colour, pattern, outline and the soft hand-drawn kawaii chibi style exactly the same. Only remove the glowing light beam under the UFO completely: there is no beam, no glow, no light cone and no sparkles below the saucer, only the plain solid pure white background. The bottom of the saucer has a clean outline. Centered, everything inside the frame with a margin, no shadow, no text."
     },
     {
       "id": "p5-mars-monban",
       "refs": [
-        "design/home/chibi-ref/monban.jpg",
-        "/tmp/mv-bstyle-1.jpg",
-        "/tmp/mv-bstyle-2.jpg",
-        "/tmp/mv-bstyle-3.jpg"
+        "design/mv-art/out/p5-mars-monban.jpg"
       ],
       "w": 1024,
       "h": 1024,
@@ -10333,15 +10324,12 @@
         512
       ],
       "always": false,
-      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding a small cute round flying saucer UFO whose colours and patterns are designed from the character's outfit, a soft projector beam glowing under it. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+      "prompt": "Edit the reference picture. Keep the character, the round flying saucer UFO, every colour, pattern, outline and the soft hand-drawn kawaii chibi style exactly the same. Only remove the glowing light beam under the UFO completely: there is no beam, no glow, no light cone and no sparkles below the saucer, only the plain solid pure white background. The bottom of the saucer has a clean outline. Centered, everything inside the frame with a margin, no shadow, no text."
     },
     {
       "id": "p5-mars-mikie",
       "refs": [
-        "design/home/chibi-ref/mikie.jpg",
-        "/tmp/mv-bstyle-1.jpg",
-        "/tmp/mv-bstyle-2.jpg",
-        "/tmp/mv-bstyle-3.jpg"
+        "design/mv-art/out/p5-mars-mikie.jpg"
       ],
       "w": 1024,
       "h": 1024,
@@ -10350,15 +10338,12 @@
         512
       ],
       "always": false,
-      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding a small cute round flying saucer UFO whose colours and patterns are designed from the character's outfit, a soft projector beam glowing under it. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+      "prompt": "Edit the reference picture. Keep the character, the round flying saucer UFO, every colour, pattern, outline and the soft hand-drawn kawaii chibi style exactly the same. Only remove the glowing light beam under the UFO completely: there is no beam, no glow, no light cone and no sparkles below the saucer, only the plain solid pure white background. The bottom of the saucer has a clean outline. Centered, everything inside the frame with a margin, no shadow, no text."
     },
     {
       "id": "p5-mars-brother",
       "refs": [
-        "design/home/chibi-ref/brother.jpg",
-        "/tmp/mv-bstyle-1.jpg",
-        "/tmp/mv-bstyle-2.jpg",
-        "/tmp/mv-bstyle-3.jpg"
+        "design/mv-art/out/p5-mars-brother.jpg"
       ],
       "w": 1024,
       "h": 1024,
@@ -10367,15 +10352,12 @@
         512
       ],
       "always": false,
-      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding a small cute round flying saucer UFO whose colours and patterns are designed from the character's outfit, a soft projector beam glowing under it. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+      "prompt": "Edit the reference picture. Keep the character, the round flying saucer UFO, every colour, pattern, outline and the soft hand-drawn kawaii chibi style exactly the same. Only remove the glowing light beam under the UFO completely: there is no beam, no glow, no light cone and no sparkles below the saucer, only the plain solid pure white background. The bottom of the saucer has a clean outline. Centered, everything inside the frame with a margin, no shadow, no text."
     },
     {
       "id": "p5-mars-sister",
       "refs": [
-        "design/home/chibi-ref/sister.jpg",
-        "/tmp/mv-bstyle-1.jpg",
-        "/tmp/mv-bstyle-2.jpg",
-        "/tmp/mv-bstyle-3.jpg"
+        "design/mv-art/out/p5-mars-sister.jpg"
       ],
       "w": 1024,
       "h": 1024,
@@ -10384,7 +10366,7 @@
         512
       ],
       "always": false,
-      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding a small cute round flying saucer UFO whose colours and patterns are designed from the character's outfit, a soft projector beam glowing under it. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+      "prompt": "Edit the reference picture. Keep the character, the round flying saucer UFO, every colour, pattern, outline and the soft hand-drawn kawaii chibi style exactly the same. Only remove the glowing light beam under the UFO completely: there is no beam, no glow, no light cone and no sparkles below the saucer, only the plain solid pure white background. The bottom of the saucer has a clean outline. Centered, everything inside the frame with a margin, no shadow, no text."
     },
     {
       "id": "p5-venus-user",
@@ -15645,5 +15627,12 @@
       "prompt": "A 5-heads-tall character in a deep-sea anime illustration style (cool blue light, glowing particles, soft caustic light on the clothes). Floating inside a big glass bubble with a handheld game console, calm smile. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
     }
   ],
-  "redo": []
+  "redo": [
+    "p5-mars-brother",
+    "p5-mars-kimorin",
+    "p5-mars-mikie",
+    "p5-mars-monban",
+    "p5-mars-sister",
+    "p5-mars-user"
+  ]
 }
