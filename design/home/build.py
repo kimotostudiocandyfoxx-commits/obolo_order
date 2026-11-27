@@ -320,9 +320,22 @@ for _k in ['sapon']+list(_SU):
     if _k in _ONK: continue
     for key in list(A):
         if key.startswith(f'su-{_k}-') or (_k=='sapon' and key.startswith('sap-')): A.pop(key,None)
+
+# the story cast's own posts (M-R344): data design/home/res/res.json, pictures out/re/<k>/, sounds design/home/res/<k>/
+_RE=json.load(open(H+'/res/res.json')); _REX={}
+_REON=[x for x in os.environ.get('RESON','').split(',') if x]
+for k,c in _RE.items():
+    if c['name'] not in _REON: continue
+    for f in sorted(_g.glob(f'{O}/re/{k}/*.jpg')):
+        im=Image.open(f).convert('RGB'); im.thumbnail((480,480)); A[f're-{k}-'+os.path.basename(f)[:-4]]=uri(im,70)
+    for f in sorted(_g.glob(f'{H}/res/{k}/*')):
+        bb=os.path.basename(f); mt={'mp3':'audio/mpeg'}.get(bb.rsplit('.',1)[-1])
+        if mt: A[f're-{k}-'+bb.rsplit('.',1)[0]]=f'data:{mt};base64,'+base64.b64encode(open(f,'rb').read()).decode()
+    ly=f'{H}/res/{k}/lyrics.json'
+    _REX[c['name']]=dict(k=k,p=f're-{k}-',name=c['name'],saturn=c['saturn'],jupiter=c['jupiter'],song=c['song'],radio=c['radio'],goods=c['goods'],book=c['book'],pages=c['pages'],game=c['game'],kind=c['gameKind'],goodsImg='goods',goodsVoice='goodsv',ly=json.load(open(ly)) if os.path.exists(ly) else [])
 for _k in os.environ.get('SAP_DROP','').split(','):
     A.pop(_k,None)
-t=open(H+'/template.html').read().replace('/*ASSETS*/{}',json.dumps(A)).replace('/*SUSHI*/{}',json.dumps({n:v for n,v in _SUX.items() if n in _ON},ensure_ascii=False)).replace("/*SUSHION*/['サーぽん']",json.dumps(_ON,ensure_ascii=False))
+t=open(H+'/template.html').read().replace('/*ASSETS*/{}',json.dumps(A)).replace('/*SUSHI*/{}',json.dumps({n:v for n,v in _SUX.items() if n in _ON},ensure_ascii=False)).replace('/*RESW*/{}',json.dumps(_REX,ensure_ascii=False)).replace("/*SUSHION*/['サーぽん']",json.dumps(_ON,ensure_ascii=False))
 if os.environ.get('PAGELINK'): t=t.replace('/*PAGELINK*/null',os.environ['PAGELINK'])
 if os.environ.get('PAGETITLE'): t=t.replace('<title>星のホーム</title>','<title>'+os.environ['PAGETITLE']+'</title>')
 open(os.environ.get('OUT_HTML') or H+'/home-inline.html','w').write(t); print(len(A),'assets',round(len(t)/1e6,2),'MB')
