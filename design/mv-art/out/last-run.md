@@ -1,44 +1,24 @@
-# UI art — 2026-11-27T23:48:35.099Z
+# UI art — 2026-11-27T23:58:52.654Z
 
-Seedream 5.0 Pro / 40枚 / 約289円
+Seedream 5.0 Pro / 20枚 / 約144円
 
-- ✅ re/bossg/book-1
-- ✅ re/bossg/book-2
-- ✅ re/bossg/book-3
-- ✅ re/bossg/dad
-- ✅ re/bossg/goods
-- ✅ re/brother/book-1
-- ✅ re/brother/book-2
-- ✅ re/brother/book-3
-- ✅ re/brother/dad
-- ✅ re/brother/goods
-- ✅ re/freezy/book-1
-- ✅ re/freezy/book-2
-- ✅ re/freezy/book-3
-- ✅ re/freezy/dad
-- ✅ re/freezy/goods
-- ✅ re/hatg/book-1
-- ✅ re/hatg/book-2
-- ✅ re/hatg/book-3
-- ✅ re/hatg/dad
-- ✅ re/hatg/goods
-- ✅ re/hipokin/book-1
-- ✅ re/hipokin/book-2
-- ✅ re/hipokin/book-3
-- ✅ re/hipokin/dad
-- ✅ re/hipokin/goods
-- ✅ re/kaiser/book-1
-- ✅ re/kaiser/book-2
-- ✅ re/kaiser/book-3
-- ✅ re/kaiser/dad
-- ✅ re/kaiser/goods
-- ✅ re/longg/book-1
-- ✅ re/longg/book-2
-- ✅ re/longg/book-3
-- ✅ re/longg/dad
-- ✅ re/longg/goods
-- ✅ re/sister/book-1
-- ✅ re/sister/book-2
-- ✅ re/sister/book-3
-- ✅ re/sister/dad
-- ✅ re/sister/goods
+- ✅ re/croco/book-1
+- ✅ re/croco/book-2
+- ✅ re/croco/book-3
+- ✅ re/croco/dad
+- ✅ re/croco/goods
+- ✅ re/kimorin/book-1
+- ✅ re/kimorin/book-2
+- ✅ re/kimorin/book-3
+- ✅ re/kimorin/dad
+- ✅ re/kimorin/goods
+- ✅ re/monban/book-1
+- ✅ re/monban/book-2
+- ✅ re/monban/book-3
+- ✅ re/monban/dad
+- ✅ re/monban/goods
+- ✅ re/onimonk/book-1
+- ✅ re/onimonk/book-2
+- ✅ re/onimonk/book-3
+- ✅ re/onimonk/dad
+- ✅ re/onimonk/goods
