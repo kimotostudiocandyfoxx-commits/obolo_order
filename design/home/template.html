@@ -724,6 +724,8 @@ button:focus-visible,.item:focus-visible,.home:focus-visible{outline:3px solid v
 .sapgm .gscr{position:relative;width:86%;margin:0 auto;aspect-ratio:1;border-radius:26px;background:radial-gradient(circle at 50% 40%,#bff3ff,#2a7fc4 70%,#123c78);box-shadow:inset 0 0 0 4px rgba(255,255,255,.5),0 14px 30px rgba(0,0,0,.35);overflow:hidden}
 .sapgm canvas{position:absolute;inset:6%;width:88%;height:88%;touch-action:none;cursor:pointer}.sapgm .gcnt{position:absolute;left:12px;top:10px;font:800 14px var(--f-body);color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.4)}
 .sapgm .ghint{position:absolute;left:0;right:0;bottom:4px;font-size:12px!important;text-align:center;font:800 14px var(--f-body);color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.5);transition:opacity .4s}
+.prof .ptop-back,.prof .phead .pback{z-index:30!important;touch-action:manipulation}
+.prof .ptop-back::before,.prof .phead .pback::before{content:"";position:absolute;inset:-14px}
 </style>
 <div class="switch" id="mode" role="toolbar" aria-label="絵のタッチ"><button type="button" data-m="anime" aria-pressed="true">アニメ版</button><button type="button" data-m="toy" aria-pressed="false">箱庭版</button></div>
 <div class="switch" id="satmode" role="toolbar" aria-label="土星の見せ方" hidden><button type="button" data-s="d">土星：今の版（真下に落ちる）</button><button type="button" data-s="e">奥行き版（床に沿って）</button></div>
@@ -1526,6 +1528,18 @@ function pastPop(name,j,b){const st=$('pstage');if(st.childElementCount)return;p
   let sw=null;document.addEventListener('pointerdown',ev=>{if(PROF&&PROF.name!==ME&&ev.target.closest('#prof')&&!ev.target.closest('#prec,.phead,#pbeach,#pgal,.pb2'))sw={x:ev.clientX,y:ev.clientY}});
   document.addEventListener('pointerup',ev=>{if(!sw||!PROF){sw=null;return}const dx=ev.clientX-sw.x,dy=ev.clientY-sw.y;sw=null;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)){const i=PDACHI.indexOf(PROF.name),nx=PDACHI[(i+(dx<0?1:-1)+PDACHI.length)%PDACHI.length];openProf(nx,PROF.pl)}});
   document.addEventListener('click',ev=>{if(ev.target.closest('#pback,#pback2'))closeProf();const by=ev.target.closest('.by2');if(by){ev.stopPropagation();openProf(by.textContent.replace(/^by\s*/,''))}},true);
+
+/* profile: the top-left back button reacts on the first touch, and a two-finger pinch also goes back home (M-R344) */
+(function(){const pr=$('prof');if(!pr)return;
+  ['pback2'].forEach(id=>{const b=$(id);if(!b)return;b.style.position='absolute';
+    b.addEventListener('pointerdown',e=>{e.stopPropagation()},true);
+    b.addEventListener('pointerup',e=>{e.stopPropagation();e.preventDefault();if(PROF)closeProf()},true)});
+  const pts=new Map();let d0=0;
+  pr.addEventListener('pointerdown',e=>{pts.set(e.pointerId,[e.clientX,e.clientY]);if(pts.size===2){const [a,b]=[...pts.values()];d0=Math.hypot(a[0]-b[0],a[1]-b[1])}},true);
+  pr.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))return;pts.set(e.pointerId,[e.clientX,e.clientY]);if(pts.size===2&&d0>0){const [a,b]=[...pts.values()];if(Math.hypot(a[0]-b[0],a[1]-b[1])<d0*.72){d0=0;pts.clear();if(PROF)closeProf()}}},true);
+  const up=e=>{pts.delete(e.pointerId);if(pts.size<2)d0=0};pr.addEventListener('pointerup',up,true);pr.addEventListener('pointercancel',up,true);
+  pr.addEventListener('wheel',e=>{if(e.ctrlKey&&e.deltaY>0&&PROF){e.preventDefault();closeProf()}},{passive:false});
+})();
 })();
 document.addEventListener('click',e=>{const b=e.target.closest('#tstyle button');if(!b)return;window.TST=b.dataset.t;document.querySelectorAll('#tstyle button').forEach(x=>x.setAttribute('aria-pressed',x===b))});
 document.addEventListener('click',e=>{const b=e.target.closest('#bstyle button');if(!b)return;window.BST=b.dataset.b;document.querySelectorAll('#bstyle button').forEach(x=>x.setAttribute('aria-pressed',x===b));render()});

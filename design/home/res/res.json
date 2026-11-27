@@ -1,0 +1,506 @@
+{
+ "brother": {
+  "name": "たこ焼きブラザー",
+  "voice": "f92df673645b4436ac0a8c3a0caff8db",
+  "ref": "design/mv-art/out/chibi-brother.jpg",
+  "end": "だZE",
+  "genre": "boombap",
+  "bpm": 92,
+  "saturn": "たこ焼きは、外はカリッ、中はトロッ！　これが宇宙の真理だZE!!",
+  "jupiter": "鉄板の、夕焼けだZE。",
+  "jupiterArt": "A beautiful painting of a lively Japanese summer festival street at sunset: a takoyaki stall with a glowing iron griddle full of round takoyaki, paper lanterns, warm orange sky, painterly brush strokes, like a fine art poster. No text.",
+  "song": "タコヤキ・サイファー",
+  "chops": [
+   "タコヤキ！",
+   "ZE！",
+   "クルッと回すZE！"
+  ],
+  "radio": "ブラザーの、たこ焼きまめちしきだZE",
+  "radioText": [
+   "よう、たこ焼きブラザーだZE！　たこ焼きまめちしき、いくZE！",
+   "ひとつめ。たこ焼きは、大阪で生まれたんだZE。",
+   "ふたつめ。くるっと回すのは、外をカリッと、中をトロッとさせるためだZE。",
+   "みっつめ。中のタコは、かめばかむほど、うまみが出るんだZE！",
+   "また聞きに来いよ、だZE！"
+  ],
+  "goods": "たこ焼きブラザーのキャップ",
+  "goodsPrompt": "Product photo of a cool black baseball cap with an embroidered cute chibi of the character in the reference picture, on a wooden table, soft daylight. Merchandise photo. No text.",
+  "goodsLine": "ブラザーのキャップだZE！　かぶって、ぶちかませ！",
+  "book": "ブラザーと まるい たこやき",
+  "pages": [
+   "ブラザーは、たこやきを くるっと まわすのが とくいだZE。",
+   "でも、さいしょは、ぜんぜん まるく ならなかったんだZE。",
+   "まいにち まわして、やっと まんまるに なったZE！ おしまい。"
+  ],
+  "bookPrompts": [
+   "The character proudly turning takoyaki on a griddle with picks, steam rising.",
+   "The character looking at lumpy, broken takoyaki, a bit sad, sweat drop.",
+   "The character holding up a perfectly round shiny takoyaki, cheering, sparkles. Happy ending."
+  ],
+  "game": "クルクルたこやき",
+  "gameKind": "spin",
+  "gameLine": "クルクルたこやき！　タップで、回すZE！"
+ },
+ "sister": {
+  "name": "たこ焼きシスター",
+  "voice": "0089dce5fefb4c6ba9b9f2f0debe1ddc",
+  "ref": "design/mv-art/out/chibi-sister.jpg",
+  "end": "だワ",
+  "genre": "lofi",
+  "bpm": 78,
+  "saturn": "声にはね、文字の何倍も、気持ちがのるのだワ。",
+  "jupiter": "夜の、湯気だワ。",
+  "jupiterArt": "A beautiful moody painting of a night alley in Japan, steam rising softly from a takoyaki griddle under red paper lanterns, rain-wet stones reflecting light, painterly, elegant, like a fine art poster. No text.",
+  "song": "ソースとマヨの夜",
+  "chops": [
+   "ソース…",
+   "マヨ…",
+   "だワ"
+  ],
+  "radio": "シスターの、たこ焼きの夜ばなしだワ",
+  "radioText": [
+   "こんばんは。たこ焼きシスターの、夜ばなしだワ。",
+   "ひとつめ。たこ焼きのソースは、甘くて、少しすっぱいのが、いいのだワ。",
+   "ふたつめ。青のりとかつお節は、香りの魔法なのだワ。",
+   "みっつめ。かつお節が踊るのは、湯気のせいなのだワ。生きているわけじゃ、ないのだワ。",
+   "おやすみなさい、だワ。"
+  ],
+  "goods": "たこ焼きシスターのハンカチ",
+  "goodsPrompt": "Product photo of an elegant folded silk handkerchief printed with a cute chibi of the character in the reference picture and small takoyaki patterns, on a velvet cloth, soft light. Merchandise photo. No text.",
+  "goodsLine": "シスターのハンカチだワ。そっと、持っていてほしいのだワ。",
+  "book": "シスターの ゆげの ドレス",
+  "pages": [
+   "シスターは、ゆげで できた ドレスが すきだワ。",
+   "かぜが ふくと、ドレスは きえて しまうのだワ。",
+   "だから まいばん、たこやきを やいて、また ドレスを つくるのだワ。 おしまい。"
+  ],
+  "bookPrompts": [
+   "The character wearing a soft dress made of white steam, standing by a takoyaki griddle at night.",
+   "A gust of wind blowing the steam dress away, the character holding her head, lanterns swaying.",
+   "The character smiling, cooking takoyaki again, new steam swirling into a dress, stars. Happy ending."
+  ],
+  "game": "ゆらゆらシスター",
+  "gameKind": "puff",
+  "gameLine": "ゆらゆらシスター。タップすると、ゆげが舞うのだワ。"
+ },
+ "kaiser": {
+  "name": "大根カイザー",
+  "voice": "c1779589576d42148e9e864e65d5b84a",
+  "ref": "design/mv-art/out/res/kaiser-ref2.jpg",
+  "end": "ダ",
+  "genre": "rock",
+  "bpm": 160,
+  "saturn": "大根おろしは、辛いのは先っぽ、甘いのは首のほうダ！",
+  "jupiter": "我が、大根畑ダ。",
+  "jupiterArt": "A beautiful painting of a vast daikon radish field under a huge swirling Jupiter in the sky, white radishes peeking out of dark soil with green leaves, dramatic light, painterly, like a fine art poster. No text.",
+  "song": "ダイコン・エンパイア",
+  "chops": [
+   "ダイコン！",
+   "カイザー！",
+   "ダ！"
+  ],
+  "radio": "カイザーの、大根まめちしきダ",
+  "radioText": [
+   "我こそは、大根カイザーダ！　大根まめちしき、聞くがいいダ！",
+   "ひとつめ。大根の首のほうは甘く、先っぽは辛いのダ。",
+   "ふたつめ。お刺身の下の白い糸は、大根の「つま」ダ。お寿司の仲間ダ。",
+   "みっつめ。大根の葉っぱは、栄養たっぷりダ。捨てるでないダ！",
+   "また来るがいいダ！"
+  ],
+  "goods": "大根カイザーのエプロン",
+  "goodsPrompt": "Product photo of a white cooking apron printed with a cute chibi of the character in the reference picture and a gold crown, hanging on a kitchen hook, soft daylight. Merchandise photo. No text.",
+  "goodsLine": "大根カイザーのエプロンダ！　これで、料理の皇帝ダ！",
+  "book": "カイザーと すしの つま",
+  "pages": [
+   "カイザーは、いばっている だいこんの おうさまダ。",
+   "でも、すしの したで、つまに なって みんなを ささえていたのダ。",
+   "「ささえるのも、カイザーの しごとダ！」 おしまい。"
+  ],
+  "bookPrompts": [
+   "The character standing proudly with a crown, arms crossed, in a radish field.",
+   "A plate of sashimi with fine white daikon tsuma strands underneath; the character small and smiling beside it.",
+   "The character laughing with sushi friends (a salmon block mascot, a shrimp mascot), sunset. Happy ending."
+  ],
+  "game": "ぶるんぶるんカイザー",
+  "gameKind": "jump",
+  "gameLine": "ぶるんぶるんカイザーダ！　タップで、跳ねるのダ！"
+ },
+ "freezy": {
+  "name": "フリージー",
+  "voice": "dd25aabce1894d94b5c3d1230efaeb68",
+  "ref": "apps/web/public/onboarding/freezy.webp",
+  "end": "だ",
+  "genre": "lofi",
+  "bpm": 82,
+  "saturn": "氷は、ゆっくり凍らせるほど、すき通るんだ。",
+  "jupiter": "俺の、氷の島だ。",
+  "jupiterArt": "A beautiful painting of a small ice island in a calm blue sea, glittering ice crystals, a soft green aurora in the sky, quiet and cold, painterly, like a fine art poster. No text.",
+  "song": "フローズン・ウェーブ",
+  "chops": [
+   "フリーズ！",
+   "こおり…",
+   "カチン！"
+  ],
+  "radio": "フリージーの、氷のまめちしき",
+  "radioText": [
+   "……フリージーだ。氷のまめちしき、話してやる。",
+   "ひとつめ。氷が水にうくのは、こおると、かさがふえるからだ。",
+   "ふたつめ。氷山は、九割が、水の中にかくれている。",
+   "みっつめ。雪のけっしょうは、どれも六つのかどがある。",
+   "……また来い。"
+  ],
+  "goods": "フリージーのかき氷カップ",
+  "goodsPrompt": "Product photo of a clear glass shaved-ice cup with a cute chibi of the character in the reference picture printed on it, filled with blue shaved ice, soft daylight. Merchandise photo. No text.",
+  "goodsLine": "俺のかき氷カップだ。……とけないうちに、食え。",
+  "book": "フリージーの とけない こおり",
+  "pages": [
+   "フリージーは、とけない こおりを さがしていた。",
+   "どんな こおりも、てに のせると とけて しまった。",
+   "でも、ともだちの こころに うつした こおりは、ずっと きれいなままだった。 おしまい。"
+  ],
+  "bookPrompts": [
+   "The character walking across a frozen island searching, holding a hand mirror.",
+   "An ice cube melting in the character's hand, droplets falling, a little sad.",
+   "The character and little friends looking into the hand mirror reflecting a sparkling ice crystal, aurora. Happy ending."
+  ],
+  "game": "カチコチフリージー",
+  "gameKind": "scatter",
+  "gameLine": "カチコチフリージーだ。タップすると、氷がはじける。"
+ },
+ "hipokin": {
+  "name": "ヒポキン",
+  "voice": "56dd91fba4d44070acb4c2dbf37090ed",
+  "ref": "apps/web/public/onboarding/hipokin.webp",
+  "end": "のだ",
+  "genre": "funk",
+  "bpm": 108,
+  "saturn": "カバは、じつは泳げない。水の底を、歩くのだ。",
+  "jupiter": "夕暮れの、川辺なのだ。",
+  "jupiterArt": "A beautiful cinematic painting of a family of hippos in an African river at golden sunset, water glistening, acacia trees silhouetted, painterly, like a fine art poster. No text.",
+  "song": "ヒポ・シネマ",
+  "chops": [
+   "ヒポ！",
+   "カット！",
+   "アクション！"
+  ],
+  "radio": "ヒポキンの、カバのまめちしき",
+  "radioText": [
+   "ヒポキンなのだ。カバのまめちしきを、上映するのだ。",
+   "ひとつめ。カバは泳げないのだ。水の底を、歩いているのだ。",
+   "ふたつめ。カバの赤いあせは、日やけ止めのかわりなのだ。",
+   "みっつめ。カバは、じつはクジラの、遠い親せきなのだ。",
+   "また、見に来るのだ。"
+  ],
+  "goods": "ヒポキンのポップコーンバケツ",
+  "goodsPrompt": "Product photo of a cinema popcorn bucket in red and white stripes with a cute chibi of the character in the reference picture printed on it, overflowing with popcorn, soft light. Merchandise photo. No text.",
+  "goodsLine": "ヒポキンのポップコーンバケツなのだ。映画のおともに、するのだ。",
+  "book": "ヒポキンの さいしょの えいが",
+  "pages": [
+   "ヒポキンは、えいがを とりたかったのだ。",
+   "でも、カメラが おもくて、もてなかったのだ。",
+   "ともだちと いっしょに もったら、さいこうの えいがが とれたのだ。 おしまい。"
+  ],
+  "bookPrompts": [
+   "The character in a suit dreaming of making a movie, a film clapperboard in hand.",
+   "The character struggling to lift a huge heavy old movie camera, sweat drops.",
+   "The character and animal friends carrying the camera together and filming at sunset. Happy ending."
+  ],
+  "game": "ドスンとヒポキン",
+  "gameKind": "jump",
+  "gameLine": "ドスンとヒポキンなのだ。タップで、跳ぶのだ。"
+ },
+ "bossg": {
+  "name": "ボスG",
+  "voice": "3c263006ce7d4fddb6fa9294ff770463",
+  "ref": "apps/web/public/onboarding/bossg.webp",
+  "end": "だ",
+  "genre": "boombap",
+  "bpm": 86,
+  "saturn": "ゴリラは、本当はとてもやさしい。胸をたたくのは、あいさつだ。",
+  "jupiter": "霧の森の、群れだ。",
+  "jupiterArt": "A beautiful painting of a gorilla family resting peacefully in a misty mountain forest, soft morning light through the trees, painterly, like a fine art poster. No text.",
+  "song": "ゴリラ・ボス・ビート",
+  "chops": [
+   "ボス！",
+   "ウホ！",
+   "ゴリラ！"
+  ],
+  "radio": "ボスGの、ゴリラのまめちしき",
+  "radioText": [
+   "ボスGだ。ゴリラのまめちしきを、話そう。",
+   "ひとつめ。ゴリラが胸をたたくのは、おこっているからじゃない。合図だ。",
+   "ふたつめ。ゴリラは、葉っぱや果物を食べる。肉は、ほとんど食べない。",
+   "みっつめ。群れは、背中の白いボスが、やさしく守っている。",
+   "また、来いよ。"
+  ],
+  "goods": "ボスGのゴールドチェーン",
+  "goodsPrompt": "Product photo of a chunky gold chain necklace with a pendant shaped like a cute chibi of the character in the reference picture, on black velvet, soft light. Merchandise photo. No text.",
+  "goodsLine": "ボスGのゴールドチェーンだ。……似合うぞ。",
+  "book": "ボスGの しずかな むね",
+  "pages": [
+   "ボスGは、むねを たたくと みんなが にげるのが かなしかった。",
+   "だから、そっと たたいて「こんにちは」と いってみた。",
+   "みんなが わらって、あつまって きた。 おしまい。"
+  ],
+  "bookPrompts": [
+   "The character drumming his chest while small animals run away, a little sad.",
+   "The character gently tapping his chest with a soft smile, a small heart above.",
+   "Small animals and friends gathering happily around the character in the forest. Happy ending."
+  ],
+  "game": "ドンドンボスG",
+  "gameKind": "snap",
+  "gameLine": "ドンドンボスGだ。タップしたところへ、行くぞ。"
+ },
+ "longg": {
+  "name": "ロングG",
+  "voice": "75fe8ad50d0d46238ff497e13b621520",
+  "ref": "apps/web/public/onboarding/longg.webp",
+  "end": "ぜ",
+  "genre": "lofi",
+  "bpm": 84,
+  "saturn": "いい音は、耳だけじゃなく、からだで聞くんだぜ。",
+  "jupiter": "音の、さざなみだぜ。",
+  "jupiterArt": "A beautiful painting of a vintage microphone on a stand on a quiet beach at dawn, gentle ripples of sound waves spreading over the calm sea, soft pastel light, painterly, like a fine art poster. No text.",
+  "song": "ロング・エコー",
+  "chops": [
+   "エコー…",
+   "ロング！",
+   "チェック、ワンツー"
+  ],
+  "radio": "ロングGの、音のまめちしき",
+  "radioText": [
+   "チェック、ワンツー。ロングGの、音のまめちしきだぜ。",
+   "ひとつめ。音は、一秒で、三百四十メートル進むんだぜ。",
+   "ふたつめ。クジラは、歌で、遠くの仲間と話してるんだぜ。",
+   "みっつめ。低い音ほど、遠くまでとどくんだぜ。",
+   "また、耳をすませに来いよ。"
+  ],
+  "goods": "ロングGのヘッドホン",
+  "goodsPrompt": "Product photo of stylish over-ear headphones with a cute chibi of the character in the reference picture printed on the ear cups, on a wooden desk, soft light. Merchandise photo. No text.",
+  "goodsLine": "ロングGのヘッドホンだぜ。いい音、聞いてくれよ。",
+  "book": "ロングGと やまびこ",
+  "pages": [
+   "ロングGは、やまに むかって「おーい」と さけんだぜ。",
+   "やまは、「おーい」と こたえて くれたぜ。",
+   "ロングGは、やまと ずっと おしゃべりしたんだぜ。 おしまい。"
+  ],
+  "bookPrompts": [
+   "The character shouting toward big mountains with hands around mouth, morning.",
+   "Sound wave rings coming back from the mountains, the character surprised and delighted.",
+   "The character sitting on a rock happily chatting with the mountains at sunset, music notes. Happy ending."
+  ],
+  "game": "エコーロングG",
+  "gameKind": "puff",
+  "gameLine": "エコーロングGだぜ。タップすると、音が広がるぜ。"
+ },
+ "hatg": {
+  "name": "ハットG",
+  "voice": "c5b4f9fa40de475a9c47c9ab22cfefc5",
+  "ref": "apps/web/public/onboarding/hatg.webp",
+  "end": "。",
+  "genre": "kawaii",
+  "bpm": 140,
+  "saturn": "照明ひとつで、同じ場所が、ちがう世界になる。推してる。",
+  "jupiter": "光の、雨。",
+  "jupiterArt": "A beautiful painting of colourful stage light beams shining through haze over a dark concert stage, glittering particles like rain, painterly, like a fine art poster. No text.",
+  "song": "ハット・ライツ",
+  "chops": [
+   "ライト！",
+   "ピカッ！",
+   "推してる。"
+  ],
+  "radio": "ハットGの、光のまめちしき",
+  "radioText": [
+   "ハットG。光のまめちしき。推してる。",
+   "ひとつめ。光は、一秒で、地球を七周半する。",
+   "ふたつめ。にじの色は、赤、だいだい、黄、緑、青、あい、むらさき。",
+   "みっつめ。ホタルの光は、ほとんど熱くない。",
+   "また来て。推してる。"
+  ],
+  "goods": "ハットGのバケットハット",
+  "goodsPrompt": "Product photo of a bright yellow bucket hat with a small embroidered cute chibi of the character in the reference picture, on a light background, soft daylight. Merchandise photo. No text.",
+  "goodsLine": "ハットGのバケットハット。推してる。",
+  "book": "ハットGと ひかりの いろ",
+  "pages": [
+   "ハットGは、くらい ぶたいが すきじゃなかった。",
+   "ライトを ひとつ つけたら、ぶたいが きらきら ひかった。",
+   "みんなが うたって、おどった。推してる。 おしまい。"
+  ],
+  "bookPrompts": [
+   "The character standing on a dark empty stage, holding a spray can, a little lonely.",
+   "The character switching on a big spotlight, the stage bursting into colourful light.",
+   "Friends singing and dancing in the colourful stage lights, the character smiling. Happy ending."
+  ],
+  "game": "ピカピカハットG",
+  "gameKind": "scatter",
+  "gameLine": "ピカピカハットG。タップで、光る。推してる。"
+ },
+ "croco": {
+  "name": "クロコパトラ",
+  "voice": "4e5cd0480914436ab3f8f286202fc0f3",
+  "ref": "docs/story-rewrite/design/crocopatra.jpg",
+  "end": "ですわ",
+  "genre": "lofi",
+  "bpm": 72,
+  "saturn": "ワニは、涙を流しながら、ごはんを食べますのよ。うそ泣きでは、ありませんわ。",
+  "jupiter": "夜の、書庫ですわ。",
+  "jupiterArt": "A beautiful painting of an ice library on a dark frozen plain under a starry sky, warm lanterns, glowing books floating like lights, quiet and magical, painterly, like a fine art poster. No text.",
+  "song": "マダム・ワルツ",
+  "chops": [
+   "マダム…",
+   "ですわ",
+   "ワニ…"
+  ],
+  "radio": "クロコパトラの、ワニのお話",
+  "radioText": [
+   "ごきげんよう。クロコパトラの、ワニのお話ですわ。",
+   "ひとつめ。ワニは、ごはんを食べながら、涙を流しますの。",
+   "ふたつめ。ワニは、恐竜の時代から、ずっと生きていますのよ。",
+   "みっつめ。お母さんワニは、赤ちゃんを、口に入れて運びますの。やさしいでしょう？",
+   "ごきげんよう。"
+  ],
+  "goods": "クロコパトラの扇子",
+  "goodsPrompt": "Product photo of an elegant folding fan in wine red and gold with a cute chibi of the character in the reference picture painted on it, opened on a satin cloth, soft light. Merchandise photo. No text.",
+  "goodsLine": "クロコパトラの扇子ですわ。優雅に、おあおぎになって。",
+  "book": "クロコパトラの なみだ",
+  "pages": [
+   "クロコパトラは、ごはんの ときに なみだが でますの。",
+   "みんなは「かなしいの？」と しんぱいしましたわ。",
+   "「おいしくて、うれしいのですわ」と わらいましたの。 おしまい。"
+  ],
+  "bookPrompts": [
+   "The character sitting at an elegant table eating, a single tear on her cheek.",
+   "Little animal friends looking worried at her.",
+   "The character laughing gracefully with the friends, fan open, warm candlelight. Happy ending."
+  ],
+  "game": "パクパククロコ",
+  "gameKind": "snap",
+  "gameLine": "パクパククロコですわ。タップしたところへ、まいりますわ。"
+ },
+ "onimonk": {
+  "name": "オニモンク",
+  "voice": "eed8bf943995481fb467fa1a5451b05b",
+  "ref": "design/mv-art/out/res/onimonk-ref2.jpg",
+  "end": "じゃ",
+  "genre": "chip",
+  "bpm": 136,
+  "saturn": "鬼はのう、じつは、福も連れてくるのじゃ。",
+  "jupiter": "深海の、灯りじゃ。",
+  "jupiterArt": "A beautiful painting of a deep sea city at night: glowing anglerfish lights, neon spiral shells and jellyfish lanterns in the dark blue water, mysterious, painterly, like a fine art poster. No text.",
+  "song": "オニ・ゲーム・ブギ",
+  "chops": [
+   "オニ！",
+   "ゲーム！",
+   "じゃ！"
+  ],
+  "radio": "オニモンクの、鬼と深海のまめちしき",
+  "radioText": [
+   "わしは、オニモンク。鬼と深海のまめちしきじゃ。",
+   "ひとつめ。節分の豆まきは、鬼を外へ、福を内へ、じゃ。",
+   "ふたつめ。深い海の生き物は、自分で光るものが多いのじゃ。",
+   "みっつめ。チョウチンアンコウの光は、えさをさそう、ちょうちんじゃ。",
+   "また、遊びに来るのじゃ。"
+  ],
+  "goods": "オニモンクのラジカセ型ストラップ",
+  "goodsPrompt": "Product photo of a small cute keychain strap shaped like a retro boombox with a TV screen, with a tiny chibi of the character in the reference picture on it, on a dark table, soft neon light. Merchandise photo. No text.",
+  "goodsLine": "オニモンクのラジカセ型ストラップじゃ。ぶら下げて、歩くのじゃ。",
+  "book": "オニモンクと まめまき",
+  "pages": [
+   "オニモンクは、まめまきの ひが にがてじゃった。",
+   "でも、こどもたちは、まめを なげずに、いっしょに あそぼうと いった。",
+   "オニモンクは、わらって ゲームを はじめたのじゃ。 おしまい。"
+  ],
+  "bookPrompts": [
+   "The character hiding behind a shoji door on Setsubun night, beans scattered on the floor, worried.",
+   "Children holding bean boxes but smiling and inviting him to play.",
+   "The character laughing and playing a retro game with the children around his boombox TV. Happy ending."
+  ],
+  "game": "ゲームオニモンク",
+  "gameKind": "spin",
+  "gameLine": "ゲームオニモンクじゃ。タップで、回るのじゃ。"
+ },
+ "monban": {
+  "name": "MONBAN",
+  "voice": "9600581739c44a9c8bd1401faae802ae",
+  "ref": "design/mv-art/out/chibi-monban.jpg",
+  "end": "…",
+  "genre": "boombap",
+  "bpm": 76,
+  "saturn": "門は…守るために…開くこともある…。",
+  "jupiter": "夜明けの…門だ…。",
+  "jupiterArt": "A beautiful painting of a grand golden gate of a fantasy city of spires at dawn, an armillary sphere above the gate, soft golden mist, majestic and quiet, painterly, like a fine art poster. No text.",
+  "song": "ゲート・キーパー",
+  "chops": [
+   "門…",
+   "異常なし…",
+   "MONBAN…"
+  ],
+  "radio": "MONBANの…門の話…",
+  "radioText": [
+   "……MONBANだ…。門の話を…する…。",
+   "ひとつめ…。神社の鳥居も…門の一つだ…。ここから先は…特別な場所…という印だ…。",
+   "ふたつめ…。城の門は…わざと曲がって作る…。敵が…まっすぐ入れないように…。",
+   "みっつめ…。門番は…開ける時を…知っている者のことだ…。",
+   "……また…来い…。"
+  ],
+  "goods": "MONBANの金の目のピンバッジ",
+  "goodsPrompt": "Product photo of a small enamel pin badge shaped like a black hood with one golden eye, inspired by the character in the reference picture, on dark velvet, soft light. Merchandise photo. No text.",
+  "goodsLine": "MONBANの…金の目の…ピンバッジだ…。",
+  "book": "MONBANの ながい よる",
+  "pages": [
+   "MONBANは、ひとばんじゅう もんの まえに たっていた。",
+   "ほしが ひとつ、もんの まえに おちてきた。",
+   "MONBANは、もんを あけて、ほしを そらへ かえしてあげた。 おしまい。"
+  ],
+  "bookPrompts": [
+   "The character standing guard before a golden gate under the night sky.",
+   "A tiny glowing star falling softly in front of the gate, the character looking at it.",
+   "The character opening the gate and releasing the star back into the sky, dawn light. Happy ending."
+  ],
+  "game": "まもれMONBAN",
+  "gameKind": "snap",
+  "gameLine": "まもれ…MONBAN…。タップしたところへ…行く…。"
+ },
+ "kimorin": {
+  "name": "KIMORIN⭐︎",
+  "voice": "58a927973cf94da0ab861b2e4c6dc411",
+  "ref": "design/home/chibi-ref/kimorin.jpg",
+  "end": "です",
+  "genre": "funk",
+  "bpm": 116,
+  "saturn": "私の発明は、すべて大正解です。ピンポン2.5が、そう言っています。",
+  "jupiter": "私の、自画像です。",
+  "jupiterArt": "A grand classical oil portrait painting of the character in the reference picture as a proud genius inventor, posing in a gilded frame style composition, warm museum light, painterly. No text.",
+  "song": "ピンポン・ジーニアス",
+  "chops": [
+   "ピンポン！",
+   "大正解！",
+   "KIMORIN！"
+  ],
+  "radio": "KIMORINの、発明まめちしき",
+  "radioText": [
+   "天才発明家、KIMORINです。発明まめちしきを、教えてさしあげます。",
+   "ひとつめ。付せんは、くっつかない失敗ののりから、生まれました。",
+   "ふたつめ。電子レンジは、ポケットのチョコがとけたことから、ひらめいたそうです。",
+   "みっつめ。失敗は、発明のたまごです。私は、失敗したことがありませんが。",
+   "ピンポン。大正解です。"
+  ],
+  "goods": "KIMORINのゴーグル",
+  "goodsPrompt": "Product photo of brass steampunk goggles with small fox-ear decorations inspired by the character in the reference picture, on a workbench with tools, warm light. Merchandise photo. No text.",
+  "goodsLine": "KIMORINのゴーグルです。これで、あなたも天才に、近づけます。",
+  "book": "KIMORINの だい はつめい",
+  "pages": [
+   "KIMORINは、なんでも せいこうする はつめいかです。",
+   "きょうの はつめいは、ぜんぶ ばくはつ しました。",
+   "「これは、ばくはつする はつめい です。せいこうです。」 おしまい。"
+  ],
+  "bookPrompts": [
+   "The character proudly presenting a strange invention on a workbench.",
+   "A comical cartoon puff of smoke from the invention, the character covered in soot with frizzy fur.",
+   "The character still proudly posing with a thumbs up in the smoke, a ping-pong button glowing. Happy ending."
+  ],
+  "game": "ピンポンKIMORIN",
+  "gameKind": "jump",
+  "gameLine": "ピンポンKIMORINです。タップで、跳びます。大正解です。"
+ }
+}
