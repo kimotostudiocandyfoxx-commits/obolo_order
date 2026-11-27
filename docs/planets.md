@@ -143,6 +143,20 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 - 絵：`public/planets/continents/<planet>/`（各32枚＝空 `sea.webp`・`me.webp`・大陸ごとに `-sky`・`-land`・`-shore`）。物語のブランチの `design/mv-art/out/`（`exp-<惑星>-*.jpg`・`isl-<惑星>-*.jpg`）から webp に（景色は 540×960、島は 320／じぶんの島 380 で透明）。島は試作の build.py と同じく、ふちにつながる白だけを抜いた。**海王星の島は白い背景ではなく深海の景色ごと描かれていた**ので、泡のドームのまわりだけを丸くぼかして残した（ドームの位置は円の検出、外れた6枚は目で測った値）。
 - タグ（07 §2 の終わり・05 の続き）：冥王星の雰囲気に 魔法・宇宙・冒険（`bookTags`、雰囲気は5つまで）、海王星の遊び方に レトロ・ドット絵（`gameTags`：スペルの画風 ドット絵・レトロ、題名の 8bit など）、天王星は 和モダン（絵の画風 和モダン がそのまま雰囲気に入る。言葉の 和モダン からも）。ゲームのスペルに レトロ（画風）を足し、本とゲームのスペルの案内（`packages/ai/src/prompts/spell.ts`）にも言葉を書いた。
 
+## 08 スシモン7体と、毎日ふえる推し・惑星の新しい順番（引き継ぎ planets-08-sushimon-and-roster.md、M-R341・M-R342）
+決まりごとは `docs/DECISIONS.md`「最初の旅は11日」。ここは星の家の側。
+- **順番**：星の切り替えの列・旅の日は 土星→木星→水星→火星→金星→冥王星→海王星→天王星。旅の 8〜10日目が冥王星・海王星・天王星（オーダー前）。
+- **推しの顔ぶれ**：`lib/planetTemplate/roster.ts`（`oshiOn(日)`：その日までに行った星の住人＋スシモン7体。`dachiOf`：KIMORIN⭐︎、オーダー後は MIKIE⭐︎DRILL も）。出る順は試作の ROSTER と同じ考え方（会ったばかりの住人3人 → スシモン → 前の住人）。
+- **絵**：物語の部屋の絵（design/mv-art/out）から、試作の build.py と同じ切り方で `public/planets/sample/` に：`fig-<星>-<key>.webp`（土星 kor4・木星 chibi4・水星 ship4・ほか p5-<星>）と `chibi-<key>.webp`。key＝sapon gari ebi uni ika shari kani kaiser freezy hipokin bossg longg hatg croco onimonk。`python3 scripts/planet-home/roster-figures.py <絵のフォルダ>`。物語の立ち絵（スシモン7体・オニモンク）は `scripts/planet-home/story-sprites-r341.py` → `public/onboarding/sushi-<key>.webp`・`onimonk.webp`。
+- **見本のホーム**（`/planets-preview/<星>?sample=1`、API なしのデモ）：ダチ2人＋推し18人（旅のあと・オーダーの姿）。`&day=3`〜`10` で、その日の顔ぶれ（KIMORIN⭐︎＋その日の推し）。
+- **物語の中のホーム**（3〜7日目、スイッチが入っている時）：住人の場所＝KIMORIN⭐︎（推されている）＋その日までの物語の人（その星の住人本人は除く）。{neo}の場所＝招待した人（いなければ MIKIE⭐︎DRILL：台本のト書きどおり）＋KIMORIN⭐︎＋その日の推し（土星 9・木星 10・水星 11・火星 12・金星 15）。
+- **まだ**：
+  - 本当の星の道（`/saturn` など、スイッチを入れた時）に推しを出すこと。今は本当のフィード（ダチ・推している人の作品）だけ。物語の人が来るには、その人たちの作品（下）が要る。
+  - 3章 スシモン7体の作品（8惑星ぶん：土星のひとこと・木星のアート・水星の曲・火星のMV・金星のラジオ・天王星のグッズ・冥王星の絵本・海王星のゲーム）と、住人の作品。今は見本の作品を持って来る。音・動画・絵は物語の部屋の design/home/sapon・design/home/sushi/<key>・design/mv-art/out/sapon・out/su/<key>（合わせて約20MB）。
+  - 冥王星の絵本の開き方（6ページ・読み上げ・速さ3つ・最後に飛ぶ）、海王星の7つのゲーム、4章の場面ごとの効果音。
+  - 8〜10日目を新しい家の形（住人の場所 → {neo}の場所 → 扉）で出すこと（台本がまだその形でない）。
+  - 大根カイザーの物語の立ち絵は前のまま（参照画像 kaiser-ref2 に合わせた立ち絵・表情はまだ）。
+
 ## 音（全惑星まとめて・物語の部屋 2026-11-25、M-R319「効果音は全惑星まとめて」）
 試作 `design/home/template.html` の音をそのまま Web Audio で作る（音のファイルは無し）。決まりは `lib/planetTemplate/sound.ts`（`sound.test.ts`）、鳴らすのは `lib/planetTemplate/sfx.ts`（`sfx.test.ts`、偽の AudioContext）。
 - 音の種類：鈴（`chime`）・シャボン玉のポッ（`popSound`）・ザバッ（`splash`）・シュッ（`whoosh`）・ピコピコ（`chip`）・花火のドン（`firework`、曲が流れている間は小さく）。▶ の音楽：土星＝クラブ（3つの型からランダム、124/128/120BPM）、木星＝森の夜祭り（太鼓・シェイカー・五音の弦、92/96/100BPM）。
@@ -225,7 +239,7 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 | `PLANET_HOMES_NEW` | ここに書いた星だけ。Web の `…_NEW` と同じ | 空 |
 | `PLANET_HOMES_OLD` | ここに書いた星は前のまま。Web の `…_OLD` と同じ | 空 |
 
-効く道：`/saturn` `/jupiter` `/mercury` `/mars` `/venus` `/uranus` `/neptune`、それと `/pluto`（冥王星には前の画面がないので、スイッチが入った時だけある。切っている間は今までどおり「見つかりません」）。太陽系の入口（`/` の `SolarSystem`）は道を変えない（冥王星は入口に無い：新しい家の星の切り替えから行く）。わくは前のまま：上の帯、ログインの壁、旅の鍵（金星・天王星・海王星の `PlanetGate`）。
+効く道：`/saturn` `/jupiter` `/mercury` `/mars` `/venus` `/uranus` `/neptune`、それと `/pluto`（冥王星には前の画面がないので、スイッチが入った時だけある。切っている間は今までどおり「見つかりません」）。太陽系の入口（`/` の `SolarSystem`）は道を変えない（冥王星は入口に無い：新しい家の星の切り替えから行く）。わくは前のまま：上の帯、ログインの壁、旅の鍵（`PlanetGate`。M-R341 から：冥王星は旅の8日目・海王星 9日目・天王星 10日目に、オーダーでなくても開く）。
 
 **スイッチを入れた星は、前の投稿の入口を閉じる**（物語の部屋 2026-11-27。切っている間は何も変わらない）：
 - Web：その星の道は新しい家だけを出す。土星の〔つぶやく〕〔器〕〔広場〕、木星・水星・火星の星の上の投稿、金星のブース（`?dj=1`・`?booth=1` も新しい家になる）は、画面に出ない。
@@ -242,8 +256,8 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 
 **はじめの旅（3〜7日目）**：スイッチを入れた星の日は、物語の中の星の画面が新しい家になる（物語 M-R330。`lib/onboarding/newHomeScenes.ts`・`components/onboarding/StoryNewHome.tsx`・`lib/planetTemplate/storyCast.ts`）。切っている間は、前の日のまま（`DAYn_BEFORE`、1字も変えていない）。
 - 台本は物語のブランチの今（`69eac32b`、2026-11-27）を取り込んだ：3〜7日目の星の場面（M-R330）は全部。`story-sync` は**新しい家の日**（`STORIES_NEW_HOMES`）と台本を照らし合わせる：0件。
-- **1場面だけ前のまま**：3日目 D04-S002b の終わりの、スシモンがロケットに乗る所（M-R336、11行。新しい話者7人の絵と声が要る）は取り込んでいない（`public/story/P02.json` のその場面だけ前の取り込みのまま。`docs/story-import/report.md`・`screens.md` は台本の今を数えている）。
-- 並ぶ人：その星の住人の場所（土星 たこ焼き兄妹・木星 大根カイザー・水星 フリージー・火星 ヒポキン・金星 ボスG）には KIMORIN⭐︎（推し。『プリプリ・ボカン』／「うんち。」／すね毛）・MONBAN（ダチ）と、見本の住人。{neo}の場所には、招待した人（いなければ MIKIE⭐︎DRILL）と KIMORIN⭐︎、その朝に飛ばしていれば{neo}の作品。
+- 3日目 D04-S002b の終わりの、スシモンがロケットに乗る所（M-R336、11行）は、引き継ぎ 08 で新しい家の版に入れた（立ち絵あり、声はまだ）。**1場面だけ前のまま**：2日目 D03-S005（M-R342 のバティの声の言葉。別の作業）。
+- 並ぶ人（M-R341・M-R342 で変えた。下の「08」）：その星の住人の場所には KIMORIN⭐︎（推し。『プリプリ・ボカン』／「うんち。」／すね毛）と、その日までの物語の人（見本の住人はなくした。MONBAN は台本にある土星だけ）。{neo}の場所には、招待した人（いなければ MIKIE⭐︎DRILL）と KIMORIN⭐︎、その日の推し、その朝に飛ばしていれば{neo}の作品。
 - 進むきっかけ：住人の場所＝〔次へ〕（前の土星と同じ。さわる・▶・空は自由）。{neo}の場所＝台本の「扉をタップする」：自分の場所を開くと〔次へ〕が出る。土星の{neo}のレコードは〔次へ〕（前は「全部聞くと進む」もあった）。
 - 場面の対応とスクリーンショット：`docs/handoff/shots/story-<日>-<星>[-neo][-door|-play].jpg`（390×844。`npx tsx apps/web/scripts/story-home-steps.ts` が場面の番号を出す → `/kakunin-…/play?day=N&i=<番号>`）。
 - まだ：新しい台詞の声（`public/story/voices/lines`、声の仕事はまだ回していない）。旅のあとの案内（`AfterScreens`）・2周目（`lap2`：`AtelierVisit`・`IslandWorks` が前の部品）・練習（`SaturnLesson` など。3〜7日目はもう呼ばない）は前のまま。

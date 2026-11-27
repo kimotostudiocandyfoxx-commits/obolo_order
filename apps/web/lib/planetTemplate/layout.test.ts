@@ -96,7 +96,8 @@ describe('3-4 the planet switch: the planet under the strip’s middle when the 
     expect(planetAtSlide('mercury', -80, W)).toBe('venus');
     expect(planetAtSlide('mercury', 40, W)).toBe('jupiter');
     expect(planetAtSlide('mercury', 2000, W)).toBe('saturn');
-    expect(planetAtSlide('mercury', -2000, W)).toBe('neptune');
+    // M-R341: the row is in the visiting order — its last planet is Uranus (day 10)
+    expect(planetAtSlide('mercury', -2000, W)).toBe('uranus');
   });
 });
 

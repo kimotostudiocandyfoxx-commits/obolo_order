@@ -11,7 +11,8 @@ import { FLY_READY_KINDS, KIND_HOME_PLANET } from './finds';
  * `store: null` = the planet has no store of works yet (Uranus goods: nothing makes them yet): its home opens with
  * your place and an empty sky, and the feed API answers with nothing until a store is wired in.
  */
-export const HOME_PLANETS = ['saturn', 'jupiter', 'mercury', 'mars', 'venus', 'uranus', 'pluto', 'neptune'] as const;
+// M-R341: in the order the planets are visited on the first journey (the planet switcher's row follows it; before: …venus, uranus, pluto, neptune)
+export const HOME_PLANETS = ['saturn', 'jupiter', 'mercury', 'mars', 'venus', 'pluto', 'neptune', 'uranus'] as const;
 export type HomePlanet = (typeof HOME_PLANETS)[number];
 export const isHomePlanet = (v: string): v is HomePlanet => (HOME_PLANETS as readonly string[]).includes(v);
 

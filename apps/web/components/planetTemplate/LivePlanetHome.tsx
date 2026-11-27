@@ -41,12 +41,15 @@ export function LivePlanetHome({
   planet,
   forced = false,
   emptyAsSample = true,
+  sampleDay,
   hrefOf,
   className = 'relative h-svh w-full overflow-hidden bg-[#04050d]',
 }: {
   planet: HomePlanet;
   forced?: boolean;
   emptyAsSample?: boolean;
+  /** M-R341: the sample cast as it is on this day of the first journey (3–10); none: all of the cast */
+  sampleDay?: number;
   hrefOf: (p: HomePlanet) => string;
   className?: string;
 }) {
@@ -56,7 +59,7 @@ export function LivePlanetHome({
   useEffect(() => {
     let live = true;
     const sample = (me: Me | null) => ({
-      view: templateSample(planet),
+      view: templateSample(planet, Date.now(), sampleDay ? { day: sampleDay } : {}),
       me: { name: me?.displayName || 'ミナト★', figure: ownFigure(me?.planetFigures, planet) ?? SAMPLE_OWN_FIGURE(planet), back: backOf(me), dance: me?.chibiPic ?? SAMPLE_DANCE, chibi: chibiOf(me, true) },
       sample: true,
     });
@@ -78,7 +81,7 @@ export function LivePlanetHome({
     return () => {
       live = false;
     };
-  }, [planet, forced]);
+  }, [planet, forced, sampleDay]);
 
   // the planet's own hooks (02 Mercury: its opener, the beach, the sky); the sample's songs and sky stay in the browser
   const hooks = useMemo(() => {

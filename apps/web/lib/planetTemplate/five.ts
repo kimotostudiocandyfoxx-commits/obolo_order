@@ -7,7 +7,8 @@ import type { TitleStyle } from './mercury';
  * drag, ▶ and the profile's skeleton. Only the vehicle (each person's figure on the planet), how a work opens (the
  * viewer) and the profile's middle (the shelf) are their own. The numbers and rules here (five.test.ts).
  */
-export const FIVE_PLANETS = ['mars', 'venus', 'uranus', 'pluto', 'neptune'] as const;
+// in the order they are visited (M-R341)
+export const FIVE_PLANETS = ['mars', 'venus', 'pluto', 'neptune', 'uranus'] as const;
 export type FivePlanet = (typeof FIVE_PLANETS)[number];
 export const isFivePlanet = (p: HomePlanet): p is FivePlanet => (FIVE_PLANETS as readonly string[]).includes(p);
 
