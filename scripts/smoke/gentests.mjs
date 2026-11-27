@@ -24,11 +24,11 @@ async function call(token, method, path, body, headers = {}) {
   if (!r.ok) throw new Error(`${path} ${r.status}`);
   return { j, s };
 }
-async function account(name) {
+async function account(name, birthYear = 1990) {
   // a random part too: two accounts made in the same millisecond had the same email (ALREADY_MEMBER stopped run 2)
   const email = `gentest+${name}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`;
   const inv = (await call('', 'POST', '/admin/invites', { email, inviterName: '木元' }, { 'x-admin-token': ADMIN })).j;
-  return (await call('', 'POST', `/invites/${inv.code}/accept`, { displayName: 'テスト' })).j.token;
+  return (await call('', 'POST', `/invites/${inv.code}/accept`, { displayName: 'テスト', birthYear })).j.token;
 }
 const img = (name, url) => out(`IMG ${name} ${url.startsWith('http') ? url : API + url}`);
 const safe = async (label, fn) => {
@@ -43,9 +43,8 @@ const safe = async (label, fn) => {
 // a) looks
 // the inputs are written in the table (test 1: the photo cases' おまかせ could only be read in this script)
 async function look(id, body, birthYear) {
-  const t = await account(`look-${id}`);
-  // M-R172: the look is drawn for the age band of the birth year asked on Day 1
-  if (birthYear) await safe('birthYear', () => call(t, 'PATCH', '/me', { birthYear }));
+  // M-R172: the look is drawn for the age band of the birth year (client 2026-11-27: the account is made with it; set once)
+  const t = await account(`look-${id}`, birthYear || 1990);
   const input = [birthYear ? `${new Date().getFullYear() - birthYear}歳` : '', body.animal, body.color, body.mood, body.hobby, body.photo ? '写真あり' : ''].filter(Boolean).join('・');
   const c = await safe(`look ${id}`, () => call(t, 'POST', '/me/look/candidates', body));
   if (!c) return out(`TABLE look | ${id}（${input}） | failed | -s`);

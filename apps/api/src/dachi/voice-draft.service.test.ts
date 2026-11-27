@@ -1,9 +1,10 @@
-import { VOICE_MIX_CAP_WORDS, type SendDachiMessageBody } from '@obolo/shared';
+import { VOICE_MIX_CAP_WORDS, VOICE_TUNE_DEFAULT, type SendDachiMessageBody, type VoiceTune } from '@obolo/shared';
 import { describe, expect, it } from 'vitest';
 import { MemoryKv } from '../infra/kv';
 import { costScope, featureOfPath } from '../wallet/cost-scope';
 import { DachiVoiceService, reachable } from './dachi-voice.service';
 import { DachiVoiceDraftService } from './voice-draft.service';
+import { NoVoiceError } from '../voice/voice-mix';
 
 const code = (e: unknown) => ((e as { getResponse?: () => { error?: { code?: string; message?: string } } }).getResponse?.().error ?? null);
 const U = 'a0000000-0000-4000-8000-000000000001';
@@ -11,27 +12,38 @@ const B = 'b0000000-0000-4000-8000-000000000002';
 const audio = Buffer.from('a recording');
 
 /** the draft service with ffmpeg, the database and the storage replaced (no real call of any kind) */
-function world(o: { cap?: number; allowed?: boolean; words?: string | Error; mood?: string; mixFails?: boolean } = {}) {
+function world(o: { cap?: number; allowed?: boolean; words?: string | Error; mood?: string; mixFails?: boolean; silent?: boolean; tune?: VoiceTune } = {}) {
   const stored: { id: string; url: string; data: Buffer }[] = [];
+  /** the last take kept clean and whole for 〔きいてみる〕 (apart from the voices: the tests of before count those) */
+  const takes: { id: string; url: string; data: Buffer }[] = [];
   const removed: string[] = [];
+  const cleaned: { tune: VoiceTune; maxSec?: number; input: string }[] = [];
+  const heardBy: string[] = [];
+  let tune: VoiceTune = o.tune ?? { ...VOICE_TUNE_DEFAULT };
   const mixes: { sound: string; soft?: boolean; feature?: string }[] = [];
   const asked: string[] = [];
   const media = {
     storeVoice: async (_u: string, _mime: string, data: Buffer) => {
+      if (data.toString().startsWith('heard:')) {
+        const t = { id: `t${takes.length}`, url: `https://r2/take-${takes.length}.mp3`, data };
+        takes.push(t);
+        return t;
+      }
       const m = { id: `a${stored.length}000000-0000-4000-8000-000000000000`, url: `https://r2/voice-${stored.length}.mp3`, data };
       stored.push(m);
       return m;
     },
     imageData: async (_u: string, id: string) => {
-      const m = stored.find((s) => s.id === id);
+      const m = [...stored, ...takes].find((s) => s.id === id);
       return m ? { data: m.data, mime: 'audio/mpeg' } : null;
     },
-    getOwned: async (_u: string, id: string) => stored.find((s) => s.id === id) ?? null,
+    getOwned: async (_u: string, id: string) => [...stored, ...takes].find((s) => s.id === id) ?? null,
     removeByUrl: async (_u: string, url: string) => void removed.push(url),
   };
   const llm = {
     name: 'gemini',
-    transcribe: async () => {
+    transcribe: async (b: Buffer) => {
+      heardBy.push(b.toString());
       if (o.words instanceof Error) throw o.words;
       return o.words ?? 'やったー！';
     },
@@ -40,7 +52,13 @@ function world(o: { cap?: number; allowed?: boolean; words?: string | Error; moo
   const s = new DachiVoiceDraftService({} as never, media as never, new MemoryKv(), { VOICE_MIX_DAILY_CAP: o.cap ?? 100 }, llm as never);
   const x = s as unknown as Record<string, unknown>;
   x.mayRecord = async () => o.allowed ?? true;
-  x.clean = async (b: Buffer) => ({ mp3: Buffer.concat([Buffer.from('clean:'), b]), seconds: 5 });
+  x.tuneOf = async () => tune;
+  x.saveTune = async (_u: string, t: VoiceTune) => void (tune = t);
+  x.clean = async (b: Buffer, t: VoiceTune, maxSec?: number) => {
+    if (o.silent) throw new NoVoiceError(0);
+    cleaned.push({ tune: t, maxSec, input: b.toString() });
+    return { mp3: Buffer.concat([Buffer.from('clean:'), b]), seconds: 5, heard: Buffer.concat([Buffer.from('heard:'), b]), made: { autotune: true, shape: 'rubberband' } };
+  };
   x.mix = async (v: Buffer, p: { sound: string; soft?: boolean }) => {
     if (o.mixFails) throw new Error('ffmpeg');
     mixes.push({ ...p, feature: costScope.get()?.feature });
@@ -48,7 +66,7 @@ function world(o: { cap?: number; allowed?: boolean; words?: string | Error; moo
   };
   const used = new Set<string>();
   x.inUse = async (id: string) => used.has(id);
-  return { s, stored, removed, mixes, asked, used };
+  return { s, stored, takes, removed, mixes, asked, used, cleaned, heardBy, allow: (yes: boolean) => void (x.mayRecord = async () => yes) };
 }
 
 describe('a ダチ voice message made ready (client 2026-11-27, the trial)', () => {
@@ -71,7 +89,7 @@ describe('a ダチ voice message made ready (client 2026-11-27, the trial)', () 
     await expect(w.s.draft(U, 'audio/mp4', audio, '')).rejects.toSatisfy((e) => code(e)?.code === 'VOICE_NOT_ALLOWED');
     expect(w.stored).toHaveLength(0);
     // not counted: the same member, once allowed, still has the day's whole cap
-    (w.s as unknown as Record<string, unknown>).mayRecord = async () => true;
+    w.allow(true);
     await expect(w.s.draft(U, 'audio/mp4', audio, '')).resolves.toBeTruthy();
   });
 
@@ -126,7 +144,75 @@ describe('a ダチ voice message made ready (client 2026-11-27, the trial)', () 
     w.used.add(b.mediaId);
     await w.s.discard(U, a.mediaId);
     await w.s.discard(U, b.mediaId);
-    expect(w.removed).toEqual([a.url]);
+    // (the first take kept for 〔きいてみる〕 went when the second came)
+    expect(w.removed).toEqual(['https://r2/take-0.mp3', a.url]);
+  });
+});
+
+describe('the member’s own voice settings (client 2026-11-27, shared voiceTune.ts)', () => {
+  it('a take is made in the member’s settings; the default is sample K', async () => {
+    const w = world();
+    await w.s.draft(U, 'audio/webm', audio, '');
+    expect(w.cleaned[0].tune).toEqual({ key: 6, speed: 1.8, tune: 0.6, cut: true });
+    const mine = world({ tune: { key: 0, speed: 1.2, tune: 0, cut: false } });
+    await mine.s.draft(U, 'audio/webm', audio, '');
+    expect(mine.cleaned[0].tune).toEqual({ key: 0, speed: 1.2, tune: 0, cut: false });
+  });
+
+  it('the words are heard from the clean, uncut take — not from the changed voice', async () => {
+    const w = world({ words: 'こんにちは' });
+    const d = await w.s.draft(U, 'audio/webm', audio, '');
+    expect(w.heardBy).toEqual(['heard:a recording']);
+    expect(d.text).toBe('こんにちは');
+    expect(w.stored[0].data.toString()).toBe('clean:a recording');
+  });
+
+  it('a take with nothing but silence: said as too short (VOICE_SILENT), nothing kept, never sent as it is', async () => {
+    const w = world({ silent: true });
+    const err = await w.s.draft(U, 'audio/webm', audio, '').catch((e: unknown) => e);
+    expect(code(err)?.code).toBe('VOICE_SILENT');
+    expect((err as { getStatus: () => number }).getStatus()).toBe(422);
+    expect([w.stored, w.takes]).toEqual([[], []]);
+  });
+
+  it('changed part by part, always inside the limits whatever is sent; 〔もとにもどす〕 is the default', async () => {
+    const w = world();
+    expect(await w.s.tune(U)).toEqual({ tune: VOICE_TUNE_DEFAULT, isDefault: true, hasTake: false });
+    expect((await w.s.setTune(U, { key: 4 })).tune).toEqual({ key: 4, speed: 1.8, tune: 0.6, cut: true });
+    expect((await w.s.setTune(U, { speed: 1.4, cut: false })).tune).toEqual({ key: 4, speed: 1.4, tune: 0.6, cut: false });
+    // far outside: the ends of the ranges (−6…+8, 1.0…2.0, 0…1)
+    expect((await w.s.setTune(U, { key: 99, speed: 9, tune: 5 })).tune).toEqual({ key: 8, speed: 2, tune: 1, cut: false });
+    expect((await w.s.setTune(U, { key: -99, speed: 0.1, tune: -3 })).tune).toEqual({ key: -6, speed: 1, tune: 0, cut: false });
+    expect(await w.s.setTune(U, { reset: true })).toMatchObject({ tune: VOICE_TUNE_DEFAULT, isDefault: true });
+    // the next take is made in them
+    await w.s.setTune(U, { key: 2 });
+    await w.s.draft(U, 'audio/webm', audio, '');
+    expect(w.cleaned.at(-1)?.tune.key).toBe(2);
+  });
+
+  it('〔きいてみる〕: the last take’s first seconds in the settings of now — one take kept per member, nothing new kept', async () => {
+    const w = world();
+    await expect(w.s.tunePreview(U)).rejects.toSatisfy((e) => code(e)?.code === 'NO_TAKE');
+    await w.s.draft(U, 'audio/webm', Buffer.from('first'), '');
+    await w.s.draft(U, 'audio/webm', Buffer.from('second'), '');
+    // the take before is gone; the voices themselves stay
+    expect(w.takes.map((t) => t.data.toString())).toEqual(['heard:first', 'heard:second']);
+    expect(w.removed).toEqual(['https://r2/take-0.mp3']);
+    expect((await w.s.tune(U)).hasTake).toBe(true);
+    await w.s.setTune(U, { key: -2, speed: 1.5 });
+    const kept = w.stored.length;
+    expect((await w.s.tunePreview(U)).toString()).toBe('clean:heard:second');
+    expect(w.cleaned.at(-1)).toEqual({ tune: { key: -2, speed: 1.5, tune: 0.6, cut: true }, maxSec: 12, input: 'heard:second' });
+    expect([w.stored.length, w.takes.length]).toEqual([kept, 2]);
+    // another member has no take of theirs
+    await expect(w.s.tunePreview(B)).rejects.toSatisfy((e) => code(e)?.code === 'NO_TAKE');
+  });
+
+  it('only a member who is recorded has them (the default cute voice of the others is not touched)', async () => {
+    const w = world();
+    w.allow(false);
+    await expect(w.s.setTune(U, { key: 0 })).rejects.toSatisfy((e) => code(e)?.code === 'VOICE_NOT_ALLOWED');
+    await expect(w.s.tunePreview(U)).rejects.toSatisfy((e) => code(e)?.code === 'VOICE_NOT_ALLOWED');
   });
 });
 

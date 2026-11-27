@@ -15,8 +15,9 @@ import { MicGlyph, SendGlyph } from './HoldMic';
  * The ダチ talk's mic (client 2026-11-27).
  *
  *  b. a tap starts the recording, a tap ends it — like the talk with {bati} (it used to record only while held).
- *  c. the TRIAL of the voice message: the take goes to the server, which cleans it, makes it 1.2× faster with the pitch
- *     kept, hears its words and picks a quiet sound for them (POST /dachi/voice). Before it is sent the member sees the
+ *  c. the voice message: the take goes to the server, which makes it ready in the member's voice settings (the default:
+ *     clean, the silences cut, a light pitch correction, 1.8× and +6 semitones — shared voiceTune.ts; changed by
+ *     talking to {bati}), hears its words and picks a quiet sound for them (POST /dachi/voice). Before it is sent the member sees the
  *     words as the caption (fixed in place: components/mic/VoiceText.tsx — the voice itself is not edited: 〔とりなおす〕),
  *     the sound under 「おと」 (the chips; the one in use is marked) and 〔▶ きいてみる〕.
  *
@@ -79,6 +80,8 @@ export function TapVoice({ onSend, disabled, left, right }: { onSend: (v: VoiceT
       } catch (e) {
         if (!alive.current) return;
         const code = e instanceof ApiError ? e.code : '';
+        // nothing but silence was left in the take (the server cuts the parts with no voice): as a take too short
+        if (code === 'VOICE_SILENT') return setTooShort(true);
         // the day's cap, not allowed, too fast: said as it is (the server's own calm line for the cap)
         if (code === 'VOICE_MIX_CAP' || code === 'VOICE_NOT_ALLOWED' || code === 'RATE_LIMITED') return setErr(code === 'VOICE_MIX_CAP' && e instanceof ApiError ? e.message : TAP_VOICE_WORDS.failed);
         // it could not be made ready: the take as it is (the voice message of before the trial)

@@ -54,7 +54,7 @@ const step = async (name, fn) => {
 
 const email = `smoke+${Date.now()}@example.com`;
 const inv = await req('POST', '/admin/invites', { email, inviterName: '木元' }, { 'x-admin-token': ADMIN });
-const acc = await req('POST', `/invites/${inv.code}/accept`, { displayName: 'スモーク' });
+const acc = await req('POST', `/invites/${inv.code}/accept`, { displayName: 'スモーク', birthYear: 1990 });
 token = acc.token;
 say(`user ${acc.user.id} day ${acc.user.journeyDay}`);
 

@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, Header, Headers, HttpCode, Inject, NotFoundException, Param, Post, Query, Req, StreamableFile, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Header, Headers, HttpCode, Inject, NotFoundException, Param, Post, Put, Query, Req, StreamableFile, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
-import { DACHI_SEND_PER_DAY, DACHI_SEND_PER_HOUR, KIMORIN_REPLIES_PER_DAY, DELIVERY_KINDS, DeliverBody, isCharacterThread, SendDachiMessageBody, VoicePreviewBody } from '@obolo/shared';
+import { DACHI_SEND_PER_DAY, DACHI_SEND_PER_HOUR, KIMORIN_REPLIES_PER_DAY, DELIVERY_KINDS, DeliverBody, isCharacterThread, SendDachiMessageBody, VoicePreviewBody, VoiceTuneBody } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
@@ -10,6 +10,7 @@ import { DachiLinkService } from './dachi-link.service';
 import { DachiService } from './dachi.service';
 import { DachiVoiceService } from './dachi-voice.service';
 import { DachiVoiceDraftService } from './voice-draft.service';
+import { CuteVoiceService } from './cute-voice.service';
 import { AccessService } from '../wallet/access.service';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -29,6 +30,7 @@ export class DachiController {
     @Inject(KV) private readonly kv: KvStore,
     private readonly access: AccessService,
     private readonly drafts: DachiVoiceDraftService,
+    private readonly cute: CuteVoiceService,
   ) {}
 
   @Get()
@@ -92,6 +94,15 @@ export class DachiController {
     return this.drafts.draft(userId, type, req.body, `${req.protocol}://${req.get('host')}`);
   }
 
+  /**
+   * client 2026-11-27 (shared/cuteVoice.ts): is this member's ダチ talk read by the default cute voice (a member who is
+   * not recorded, the voice service on), and the live price's two numbers — the talk shows 「−0.3」 before the send
+   */
+  @Get('voice/cute')
+  cuteVoice(@UserId() userId: string) {
+    return this.cute.info(userId);
+  }
+
   /** 〔▶ きいてみる〕: the mix with the chosen sound, as MP3 bytes (nothing kept) */
   @Post('voice/preview')
   @HttpCode(200)
@@ -100,6 +111,30 @@ export class DachiController {
   async voicePreview(@UserId() userId: string, @Body() body: unknown) {
     await rateLimit(this.kv, `dachi-voice-preview:${userId}`, 120, 3600);
     return new StreamableFile(await this.drafts.preview(userId, parseBody(VoicePreviewBody, body)));
+  }
+
+  // ── client 2026-11-27: the member's own voice settings (shared voiceTune.ts), changed by talking to {bati} ──
+
+  @Get('voice/tune')
+  voiceTune(@UserId() userId: string) {
+    return this.drafts.tune(userId);
+  }
+
+  /** the parts to change (clamped here whatever is sent), or `reset` */
+  @Put('voice/tune')
+  async setVoiceTune(@UserId() userId: string, @Body() body: unknown) {
+    await rateLimit(this.kv, `dachi-voice-tune:${userId}`, 120, 3600);
+    return this.drafts.setTune(userId, parseBody(VoiceTuneBody, body));
+  }
+
+  /** 〔きいてみる〕: the last take's first seconds in the settings of now, as MP3 bytes (nothing kept) */
+  @Post('voice/tune/preview')
+  @HttpCode(200)
+  @Header('content-type', 'audio/mpeg')
+  @Header('cache-control', 'no-store')
+  async voiceTunePreview(@UserId() userId: string) {
+    await rateLimit(this.kv, `dachi-voice-tune-preview:${userId}`, 40, 3600);
+    return new StreamableFile(await this.drafts.tunePreview(userId));
   }
 
   /** 〔けす〕 / a new take: the draft's file goes */

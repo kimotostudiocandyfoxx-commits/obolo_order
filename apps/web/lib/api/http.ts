@@ -135,13 +135,13 @@ export class HttpApi implements Api {
     return this.req<Awaited<ReturnType<Api['dachiVoiceDraft']>>>('POST', '/dachi/voice', undefined, blob);
   }
   /** an MP3 comes back (not JSON) */
-  async dachiVoicePreview(body: Parameters<Api['dachiVoicePreview']>[0]) {
+  private async mp3(path: string, body?: unknown) {
     const headers: Record<string, string> = { 'content-type': 'application/json' };
     const token = tokenStore.get();
     if (token) headers.authorization = `Bearer ${token}`;
     let res: Response;
     try {
-      res = await fetch(`${this.base}/dachi/voice/preview`, { method: 'POST', headers, body: JSON.stringify(body) });
+      res = await fetch(`${this.base}${path}`, { method: 'POST', headers, body: JSON.stringify(body ?? {}) });
     } catch {
       throw new ApiError(0, 'NETWORK', 'Network error');
     }
@@ -151,6 +151,21 @@ export class HttpApi implements Api {
       throw new ApiError(res.status, json?.error?.code ?? 'ERROR', json?.error?.message ?? res.statusText);
     }
     return res.blob();
+  }
+  dachiVoicePreview(body: Parameters<Api['dachiVoicePreview']>[0]) {
+    return this.mp3('/dachi/voice/preview', body);
+  }
+  voiceTune() {
+    return this.req<Awaited<ReturnType<Api['voiceTune']>>>('GET', '/dachi/voice/tune');
+  }
+  setVoiceTune(body: Parameters<Api['setVoiceTune']>[0]) {
+    return this.req<Awaited<ReturnType<Api['setVoiceTune']>>>('PUT', '/dachi/voice/tune', body);
+  }
+  voiceTunePreview() {
+    return this.mp3('/dachi/voice/tune/preview');
+  }
+  dachiCuteVoice() {
+    return this.req<Awaited<ReturnType<Api['dachiCuteVoice']>>>('GET', '/dachi/voice/cute');
   }
   async discardDachiVoice(mediaId: string) {
     await this.req<unknown>('DELETE', `/dachi/voice/${encodeURIComponent(mediaId)}`);
@@ -443,8 +458,8 @@ export class HttpApi implements Api {
   getInvite(code: string) {
     return this.req<Awaited<ReturnType<Api['getInvite']>>>('GET', `/invites/${encodeURIComponent(code)}`);
   }
-  acceptInvite(code: string, displayName: string) {
-    return this.req<Awaited<ReturnType<Api['acceptInvite']>>>('POST', `/invites/${encodeURIComponent(code)}/accept`, { displayName });
+  acceptInvite(code: string, displayName: string, birthYear?: number | null) {
+    return this.req<Awaited<ReturnType<Api['acceptInvite']>>>('POST', `/invites/${encodeURIComponent(code)}/accept`, { displayName, ...(birthYear ? { birthYear } : {}) });
   }
   completeLap2(chapter: number, answers?: Record<string, string>) {
     return this.req<Awaited<ReturnType<Api['completeLap2']>>>('POST', '/me/lap2/complete', { chapter, answers });

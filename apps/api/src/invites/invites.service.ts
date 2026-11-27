@@ -1,6 +1,6 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { idempotencyKey } from '@obolo/ledger';
-import type { InviteView, Locale, MyInviteView } from '@obolo/shared';
+import { validBirthYear, type InviteView, type Locale, type MyInviteView } from '@obolo/shared';
 import { and, desc, eq, gte, sql } from 'drizzle-orm';
 import { randomBytes } from 'node:crypto';
 import { AuthService } from '../auth/auth.service';
@@ -10,7 +10,7 @@ import { Database } from '../db/db';
 import { invites, users, wallets } from '../db/schema';
 import type { EmailSender } from '../infra/email';
 import { EMAIL } from '../infra/tokens';
-import { toMe } from '../users/users.service';
+import { birthYearRequired, toMe } from '../users/users.service';
 import { LedgerService } from '../wallet/ledger.service';
 import { MediaService } from '../media/media.service';
 
@@ -109,7 +109,10 @@ export class InvitesService {
   }
 
   /** Visitor tells OBOLON their name → the account is created and a session issued. */
-  async accept(code: string, displayName: string) {
+  async accept(code: string, displayName: string, birthYear?: number | null) {
+    // client 2026-11-27: no account is made without the year they were born (asked before day 1: the start screen, the
+    // seal) — refused before the invitation is touched, so it can be accepted again with the year
+    if (!validBirthYear(birthYear)) throw birthYearRequired();
     const created = await this.db.write.transaction(async (tx) => {
       const [inv] = await tx.select().from(invites).where(eq(invites.code, code)).for('update');
       if (!inv) throw apiError(HttpStatus.NOT_FOUND, 'INVITE_NOT_FOUND', 'Invitation not found');
@@ -132,6 +135,8 @@ export class InvitesService {
           invitedByName: inv.inviterName,
           invitedByMessage: inv.message,
           journeyDay: 1,
+          // the same field and form as PATCH /me and POST /me/consent keep it in (set once)
+          onboardingJson: { birthYear: String(birthYear) },
         })
         .returning();
       await tx.insert(wallets).values({ userId: u.id });

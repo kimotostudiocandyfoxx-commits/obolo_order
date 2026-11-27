@@ -41,6 +41,7 @@ export function TalkComposer({
   onVoice,
   hint,
   micPath = 'bati',
+  cost,
 }: {
   onSend: (text: string) => void | Promise<void>;
   placeholder: string;
@@ -58,6 +59,11 @@ export function TalkComposer({
   hint?: string;
   /** where this mic is (the diagnostics) */
   micPath?: MicPath;
+  /**
+   * client 2026-11-27: what sending these words takes, shown small beside 〔送る〕 before the send (「−0.3」; null = nothing
+   * — the ダチ talk of a member whose words are read by the default cute voice, shared/cuteVoice.ts)
+   */
+  cost?: (text: string) => { text: string; label: string } | null;
 }) {
   const [text, setText] = useState(initial);
   const [typing, setTyping] = useState(startTyping);
@@ -80,6 +86,12 @@ export function TalkComposer({
     setText('');
     await onSend(t);
   };
+  const price = text.trim() && cost ? cost(text.trim()) : null;
+  const priceTag = price && (
+    <span className="shrink-0 text-[10px] tracking-[0.08em] text-amber-200/70" aria-label={price.label} data-testid="composer-cost">
+      {price.text}
+    </span>
+  );
   const advice = mic.listening ? null : (mic.advice ?? (noMic ? micAdvice('unsupported', currentEnv()) : null));
   // the ring around the mic: the real loudness (the recorder), or a set size while the recogniser hears a voice
   // story chat 2026-11-27: the first take sent to the server says, once, that the voice is not kept
@@ -123,6 +135,7 @@ export function TalkComposer({
           placeholder={placeholder}
           className="h-11 min-w-0 flex-1 rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] backdrop-blur-[10px] px-4 text-[16px] font-bold text-[#f4f1ff] outline-none placeholder:text-[#b9bde6]/60"
         />
+        {priceTag}
         <button disabled={!text.trim() || disabled} aria-label="送る" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[#070b24] disabled:opacity-35" style={{ background: 'radial-gradient(circle at 35% 30%,#ffffff,#cdd8ff 55%,#9fb2ff)' }}>
           <SendGlyph />
         </button>
@@ -139,9 +152,12 @@ export function TalkComposer({
               <VoiceText value={text} edit={edit} interim={mic.interim} locked={mic.listening} className="text-[14px] font-bold leading-snug text-[#f4f1ff]" toolClass="mt-2" />
             </div>
             {text.trim() && !mic.listening && (
-              <button onClick={() => void go()} disabled={disabled} className="shrink-0 self-start rounded-full bg-[#dfe6ff] px-3 py-1.5 text-[13px] font-bold text-[#070b24] disabled:opacity-40">
-                送る
-              </button>
+              <div className="flex shrink-0 flex-col items-center gap-0.5 self-start">
+                <button onClick={() => void go()} disabled={disabled} className="rounded-full bg-[#dfe6ff] px-3 py-1.5 text-[13px] font-bold text-[#070b24] disabled:opacity-40">
+                  送る
+                </button>
+                {priceTag}
+              </div>
             )}
           </div>
           {text.trim() && !mic.listening && (

@@ -9,7 +9,7 @@ import { loadBluenaWorks, workCard, WORK_WORD, type BluenaWork } from '@/lib/dac
 import { Wave } from './HoldMic';
 import { TapVoice, type VoiceToSend } from './TapVoice';
 import { playClip, readyClip, type Clip } from '@/lib/voice/webVoice';
-import { DACHI_PAGE, DACHI_TEXT_MAX, linkDomain, TALK_FIXED_FACE_KEY, wordsAndLinks } from '@obolo/shared';
+import { CUTE_VOICE_WORDS, cuteVoiceMana, cuteVoiceMissWords, DACHI_PAGE, DACHI_TEXT_MAX, formatMana, linkDomain, TALK_FIXED_FACE_KEY, wordsAndLinks, type CuteVoiceInfo } from '@obolo/shared';
 import { DeviceButton } from '@/components/atelier/DeviceButton';
 import { GameById } from '@/components/atelier/GamePlay';
 import { BookById } from '@/components/atelier/BookRead';
@@ -27,6 +27,8 @@ import { castLook } from '@/lib/talk/demoLooks';
 import { characterLook, colorOf, DACHI_COLOR, PLACE_BG, SELF_COLOR, selfLook, selfTone } from '@/lib/talk/looks';
 
 
+/** this device: '0' = the words of a member who is not recorded go without the cute voice */
+const CUTE_KEY = 'obolo.dachi.cuteVoice';
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 const CHAR_NAME: Record<string, string> = { kimorin: 'KIMORIN⭐︎', mikie: 'MIKIE⭐︎DRILL' };
 const POLL_MS = 15_000;
@@ -72,6 +74,40 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
   const [works, setWorks] = useState<BluenaWork[] | null>(null);
   /** client 2026-11-24: the text field is open (the keyboard beside the mic) */
   const [typing, setTyping] = useState(false);
+  // client 2026-11-27 (shared/cuteVoice.ts): a member who is not recorded — their words are read by the default cute
+  // voice. Whether it is on here and the live price come from the server once; the switch is kept on this device.
+  const [note, setNote] = useState<string | null>(null);
+  const [cute, setCute] = useState<CuteVoiceInfo | null>(null);
+  const [cuteWanted, setCuteWanted] = useState(true);
+  useEffect(() => {
+    if (!me || me.mediaOk) return setCute(null);
+    try {
+      setCuteWanted(localStorage.getItem(CUTE_KEY) !== '0');
+    } catch {
+      /* private mode: on */
+    }
+    let live = true;
+    void getApi()
+      .dachiCuteVoice()
+      .then((c) => live && setCute(c))
+      .catch(() => undefined);
+    return () => void (live = false);
+  }, [me?.id, me?.mediaOk]);
+  const cuteOn = !!cute?.on && cuteWanted;
+  const toggleCute = () => {
+    const on = !cuteWanted;
+    setCuteWanted(on);
+    setNote(null);
+    try {
+      localStorage.setItem(CUTE_KEY, on ? '1' : '0');
+    } catch {
+      /* private mode */
+    }
+  };
+  const cuteCost = (t: string) => {
+    const mana = formatMana(cuteVoiceMana(t, cute?.rate));
+    return { text: CUTE_VOICE_WORDS.price(mana), label: CUTE_VOICE_WORDS.priceLabel(mana) };
+  };
   const [bar, setBar] = useState(0);
   const [keyboard, setKeyboard] = useState(false);
   /** R9: KIMORIN⭐︎'s answer is on its way (thinking … until its voice is ready) */
@@ -193,9 +229,14 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
   /** client 2026-11-24: words typed in the talk (the small keyboard beside the mic) */
   const sendText = async (text: string) => {
     setErr(null);
+    setNote(null);
     if (id === 'kimorin') setWaiting(true);
     try {
-      sent(await getApi().sendDachiMessage(id, { text }));
+      // client 2026-11-27: a member who is not recorded — the words are read by the default cute voice (the switch on);
+      // with no mana, or when it cannot be made, they go as words and one calm line says so (never an error)
+      const { cute: c, ...m } = await getApi().sendDachiMessage(id, { text, ...(cuteOn ? { spoken: true } : {}) });
+      if (c && 'miss' in c) setNote(cuteVoiceMissWords(c.miss));
+      sent(m);
     } catch (e) {
       setWaiting(false);
       setErr(e instanceof ApiError && e.code === 'CONTENT_FLAGGED' ? 'その言葉は、送れないみたい' : e instanceof ApiError ? e.message : String(e));
@@ -303,6 +344,11 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
         composer={
           day ? undefined : <div>
             {err && <p className="mb-1 text-center text-xs text-rose-300">{err}</p>}
+            {note && !err && (
+              <p className="mb-1 text-center text-xs text-[#b9bde6] [text-shadow:0_1px_4px_#000]" role="status" data-testid="cute-voice-note">
+                {note}
+              </p>
+            )}
             {msgs === null && <p className="mb-1 text-center text-xs text-white/40">…</p>}
             {typing ? (
               <TalkComposer key={bar} micPath="dachi" startTyping placeholder={`${name}に送る`} maxLength={DACHI_TEXT_MAX} onVoice={() => setTyping(false)} onState={(st) => setKeyboard(st.keyboard)} onSend={(t) => { void sendText(t); setBar((n) => n + 1); }} />
@@ -331,7 +377,24 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
                   }
                 />
               ) : (
-                <TalkComposer key={`w${bar}`} micPath="dachi" placeholder={`${name}に送る`} maxLength={DACHI_TEXT_MAX} side={left} onState={(st) => setKeyboard(st.keyboard)} onSend={(t) => { void sendText(t); setBar((n) => n + 1); }} />
+                <>
+                  {cute?.on && (
+                    <div className="mb-1.5 flex justify-center">
+                      <button
+                        type="button"
+                        onClick={toggleCute}
+                        aria-pressed={cuteOn}
+                        aria-label={cuteOn ? CUTE_VOICE_WORDS.toggleOn : CUTE_VOICE_WORDS.toggleOff}
+                        data-testid="cute-voice-toggle"
+                        className={`rounded-full border px-3 py-1 text-[11.5px] font-bold transition active:scale-95 ${cuteOn ? 'border-[#dfe6ff] bg-[#dfe6ff] text-[#070b24]' : 'border-[rgba(210,220,255,.3)] bg-[rgba(16,22,64,.46)] text-[#dfe6ff]'}`}
+                      >
+                        <span aria-hidden>{cuteOn ? '✓ ' : ''}🔊 </span>
+                        {CUTE_VOICE_WORDS.toggle}
+                      </button>
+                    </div>
+                  )}
+                  <TalkComposer key={`w${bar}`} micPath="dachi" placeholder={`${name}に送る`} maxLength={DACHI_TEXT_MAX} side={left} cost={cuteOn ? cuteCost : undefined} onState={(st) => setKeyboard(st.keyboard)} onSend={(t) => { void sendText(t); setBar((n) => n + 1); }} />
+                </>
               );
             })()
             )}

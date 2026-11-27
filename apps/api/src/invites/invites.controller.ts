@@ -31,9 +31,9 @@ export class InvitesController {
   @Post('invites/:code/accept')
   @HttpCode(200)
   async accept(@Param('code') code: string, @Body() body: unknown, @Ip() ip: string) {
-    const { displayName } = parseBody(AcceptInviteBody, body);
+    const { displayName, birthYear } = parseBody(AcceptInviteBody, body);
     await rateLimit(this.kv, `invite-accept:${ip}`, 20, 3600);
-    return this.invites.accept(checkCode(code), displayName);
+    return this.invites.accept(checkCode(code), displayName, birthYear);
   }
 
   @Get('invites')

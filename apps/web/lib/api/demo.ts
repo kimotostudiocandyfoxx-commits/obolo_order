@@ -212,6 +212,7 @@ import { demoUnfurl } from './demoUnfurl';
 import { tokenStore } from './token';
 import { ApiError, type Api, type Paid } from './types';
 import { afterLookStep, backLookStep, canLookStep, canLookStepBack, EMPTY_LOOK_STEPS, foodNameByRules, lookStepView, type LookPick4Result, type LookStepResult, type LookStepsInfo, type LookStepState, type LookStepWho } from '@obolo/shared';
+import { BIRTH_YEAR_REQUIRED_WORDS, clampVoiceTune, CUTE_VOICE_RATE, isDefaultVoiceTune, validBirthYear, VOICE_TUNE_DEFAULT } from '@obolo/shared';
 import { incantNorm, premiumRequest, songVoiceKey, songVoiceQuote, type IncantView, type SongVoiceQuoteView, type SongVoiceUseView, type SongVoiceVersion } from '@obolo/shared';
 
 /** R17: the passphrase's digests and lengths (its normalized forms) — the demo's only knowledge of it */
@@ -948,6 +949,8 @@ export class DemoApi implements Api {
 
   async consent(version: string, guardian = false, opts: { media?: boolean; birthYear?: number | null } = {}) {
     // M-R252: the year asked on the start screen is kept once (like updateMe); the branch without media stays so
+    // client 2026-11-27: no agreement without the birth year (as the API)
+    if (!this.s.users[this.uid()]?.birthYear && !validBirthYear(opts.birthYear)) throw new ApiError(428, 'BIRTH_YEAR_REQUIRED', BIRTH_YEAR_REQUIRED_WORDS);
     return this.patchMe((u) => {
       const birthYear = u.birthYear || opts.birthYear || null;
       const media = opts.media !== false;
@@ -1776,8 +1779,10 @@ export class DemoApi implements Api {
     return { code, inviterName: inv.inviterName, inviterMessage: inv.message ?? null, status: inv.status, expiresAt: new Date(Date.parse(inv.createdAt) + 14 * 86400_000).toISOString() };
   }
 
-  async acceptInvite(code: string, displayName: string) {
+  async acceptInvite(code: string, displayName: string, birthYear?: number | null) {
     await sleep(300);
+    // client 2026-11-27: no account without the birth year (as the API)
+    if (!validBirthYear(birthYear)) throw new ApiError(428, 'BIRTH_YEAR_REQUIRED', BIRTH_YEAR_REQUIRED_WORDS);
     const inv = code === DEMO_INVITE_CODE ? null : this.invites()[code];
     if (code !== DEMO_INVITE_CODE && !inv) throw new ApiError(404, 'INVITE_NOT_FOUND', 'not found');
     if (inv?.status === 'accepted') throw new ApiError(409, 'INVITE_USED', 'used');
@@ -1804,6 +1809,8 @@ export class DemoApi implements Api {
       butterfly: null,
       invitedByName: inv?.inviterName ?? 'MIKIE⭐︎DRILL',
       invitedByMessage: inv?.message ?? null,
+      birthYear,
+      child: isChild(birthYear),
       createdAt: now(),
     };
     this.s.users[id] = user;
@@ -2246,6 +2253,25 @@ export class DemoApi implements Api {
     const b = await getBlob(body.mediaId);
     if (!b) throw new ApiError(404, 'MEDIA_NOT_FOUND', 'not found');
     return b;
+  }
+  // demo: the voice settings are kept in this browser; there is no server to change a voice, so 〔きいてみる〕 has no take
+  async voiceTune() {
+    const tune = clampVoiceTune((this.s as { voiceTune?: unknown }).voiceTune);
+    return { tune, isDefault: isDefaultVoiceTune(tune), hasTake: false };
+  }
+  async setVoiceTune(body: Parameters<Api['setVoiceTune']>[0]) {
+    const now = (await this.voiceTune()).tune;
+    const tune = body.reset ? { ...VOICE_TUNE_DEFAULT } : clampVoiceTune(body, now);
+    (this.s as { voiceTune?: unknown }).voiceTune = tune;
+    this.save();
+    return { tune, isDefault: isDefaultVoiceTune(tune), hasTake: false };
+  }
+  async voiceTunePreview(): Promise<Blob> {
+    throw new ApiError(404, 'NO_TAKE', 'no take');
+  }
+  // demo: there is no voice service — the words of a member who is not recorded go as words (no switch, no price)
+  async dachiCuteVoice() {
+    return { on: false, rate: CUTE_VOICE_RATE };
   }
   async discardDachiVoice() {
     /* demo: the take stays on the device */

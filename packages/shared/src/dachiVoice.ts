@@ -3,6 +3,7 @@ import { DELIVERY_KINDS } from './schemas';
 import { TALK_FACES, type TalkBeat, type TalkFace, type TalkLook } from './talk';
 import type { ClipFile } from './clip';
 import { VOICE_SOUNDS, type VoiceSound } from './voiceSound';
+import type { CuteVoiceMiss } from './cuteVoice';
 
 /**
  * ダチの声のメッセージ (client decision M-R212). After {name} becomes dachi with {inviter} on Saturn (day 3,
@@ -229,6 +230,11 @@ export interface DachiMessageView {
   createdAt: string;
   /** R9: KIMORIN⭐︎'s answer to the message just sent (POST to the KIMORIN thread only) */
   reply?: DachiMessageView | null;
+  /**
+   * client 2026-11-27 (cuteVoice.ts; only on the answer to the send): the words were asked for in the cute voice —
+   * `mana` taken for it, or `miss` why they went as words only (a calm line, never an error)
+   */
+  cute?: { mana: number } | { miss: CuteVoiceMiss };
 }
 
 /** M-R234: the sender's expression with the message */
@@ -246,7 +252,9 @@ export const SendDachiMessageBody = z.union([
   }),
   z.object({ work: DachiWorkCard, face: SendFace }),
   // client 2026-11-24: words typed in the ダチ talk (the small keyboard beside the mic)
-  z.object({ text: z.string().trim().min(1).max(DACHI_TEXT_MAX), face: SendFace }),
+  // client 2026-11-27 (cuteVoice.ts): `spoken` — a member who is not recorded asks for the words to be read by the
+  // default cute voice (mana; with none, or when it cannot be made, the words go alone). Ignored for everyone else.
+  z.object({ text: z.string().trim().min(1).max(DACHI_TEXT_MAX), face: SendFace, spoken: z.boolean().optional() }),
   // Bluena's 📎: one of your own files (POST /media/files …/done), sent into the talk
   z.object({ fileId: z.string().uuid(), face: SendFace }),
 ]);
@@ -255,12 +263,12 @@ export type SendDachiMessageBody = z.infer<typeof SendDachiMessageBody>;
 /** a thread id: a user id (uuid) or a character */
 export const isCharacterThread = (id: string): id is DachiCharacter => (DACHI_CHARACTERS as readonly string[]).includes(id);
 
-/** client 2026-11-27: a recording made ready to send (POST /dachi/voice): cleaned, a little faster, heard as words */
+/** client 2026-11-27: a recording made ready to send (POST /dachi/voice): in the member's voice settings, heard as words */
 export interface DachiVoiceDraft {
   /** the cleaned voice (the member's own media, kind 'voice') */
   mediaId: string;
   url: string;
-  /** its length now (the recording ÷ VOICE_MIX_TEMPO) */
+  /** its length now (the recording in the member's voice settings: the silences cut, faster — voiceTune.ts) */
   seconds: number;
   /** the words heard ('' when none could be heard) */
   text: string;

@@ -22,6 +22,7 @@ import { choiceOf, detectOpen, pickOpen, type OpenAsk } from '@/lib/bluena/find'
 import { EDIT_EVENT, openInBluena, takeEdit } from '@/lib/bluena/edit';
 import { isStorageAsk, isStorageCancel, storageTierOf, STORAGE_LINES, type StorageTierPrice, type StorageView } from '@obolo/shared';
 import { ART_TITLE_LINES, artTitleTalk, songTitleTalk, type ArtTitleTalk } from '@obolo/shared';
+import { VOICE_TUNE_CHIPS, VOICE_TUNE_DEFAULT, VOICE_TUNE_LINES, voiceTuneTalk, voiceTuneWords } from '@obolo/shared';
 import { coverTalk, GAME_COVER_LINES, GOODS_LINES, goodsKindOf, MAKE_COST, pickArt, type GoodsArt, type GoodsKind } from '@obolo/shared';
 import { BATI_LOOK_LOCKED_LINE, BATI_REST_HINT, type BatiRest, BLUENA_LINES, formatMana, LOOK_LOCKED_LINE, gameTierFor, gameMakeKind, matchGameTemplate, type GameTemplateId, type GameTier } from '@obolo/shared';
 import { daysUntil, isOpen, KINDS, lockLine, openKinds, openLessons, type AtelierKind, type Lesson } from '@/lib/atelier/unlock';
@@ -136,7 +137,7 @@ type StorageAsk = { tiers: StorageTierPrice[]; plan: StorageView['plan']; gb?: n
 type GoodsAsk = { kind?: GoodsKind; art?: GoodsArt; arts: GoodsArt[]; said: string };
 /** story 2026-11-25: a game just made — its case: one of the member's arts, {bati} paints one, or the neon face */
 type CoverAsk = { game: Work; arts: GoodsArt[] };
-type Pending = { goods: GoodsAsk } | { cover: CoverAsk } | { storage: StorageAsk } | { kind: AtelierKind } | { gameTrial: { said: string } } | { radioName: string } | { tweak: Work } | { voiceSpell: VoiceAsk } | { voiceAgain: true } | { use: AtelierKind; materials: Work[] } | { plan: PlanAsk } | { craft: CraftAsk } | { after: Work } | { tool: ToolAsk; spell?: SavedSpell; forKind?: AtelierKind; content?: string } | null;
+type Pending = { goods: GoodsAsk } | { cover: CoverAsk } | { storage: StorageAsk } | { kind: AtelierKind } | { gameTrial: { said: string } } | { radioName: string } | { tweak: Work } | { voiceSpell: VoiceAsk } | { voiceAgain: true } | { voiceTune: true } | { use: AtelierKind; materials: Work[] } | { plan: PlanAsk } | { craft: CraftAsk } | { after: Work } | { tool: ToolAsk; spell?: SavedSpell; forKind?: AtelierKind; content?: string } | null;
 /** R12: {bati}'s tool out in the sky (the compass while it reads; the spell book open, or taking a spell in) */
 type ToolShow = { kind: 'compass'; phase: CompassPhase; leaving?: boolean; key: number } | { kind: 'book'; mode: BookMode; page: number; spells: SavedSpell[]; saving?: BookSaving; key: number } | null;
 
@@ -736,6 +737,51 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     const art = made.find((m) => m.work.kind === 'art')?.work;
     if (!art) return false;
     void retitle(art, t);
+    return true;
+  };
+  /**
+   * client 2026-11-27 (shared voiceTune.ts): the words about the member's own voice for ダチ voice messages — 「声の設定」
+   * says where they are, 「声を低くして」「もっとゆっくり」「オートチューンをなしに」「もとの声に近づけて」「間をつめないで」
+   * change them (kept on the server, inside its limits), 〔きいてみる〕 plays the last take in them, 〔もとにもどす〕 is the
+   * default. `inTalk`: the turn before was about them (short words count). With a song on the table the words must
+   * say they are about the voice settings — 「もっとゆっくり」 is the song's then. true: taken here.
+   */
+  const voiceTuneSend = (text: string, inTalk: boolean, songOnTable: boolean): boolean => {
+    const first = voiceTuneTalk(text, VOICE_TUNE_DEFAULT, inTalk);
+    // (asked at the default settings; the real ones are read below — whether the words are about the voice is the same)
+    if (!first && !voiceTuneTalk(text, { key: 0, speed: 1.4, tune: 0.4, cut: false }, inTalk)) return false;
+    if (songOnTable && !inTalk && !/(?:声|こえ|ボイス)の?(?:設定|せってい|加工)|ダチ|メッセージ|オートチューン|間を(?:つめ|詰め)/.test(text)) return false;
+    const chips = [VOICE_TUNE_CHIPS.preview, VOICE_TUNE_CHIPS.reset];
+    void (async () => {
+      setBusy(true);
+      try {
+        // a member who is not recorded has no voice of their own to set (the default cute voice reads their words)
+        if (!me?.mediaOk) return sayT(VOICE_TUNE_LINES.notRecorded);
+        const api = getApi();
+        const now = await api.voiceTune();
+        const t = voiceTuneTalk(text, now.tune, inTalk) ?? { do: 'open' as const };
+        if (t.do === 'preview') {
+          sayT(VOICE_TUNE_LINES.preview);
+          try {
+            const url = URL.createObjectURL(await api.voiceTunePreview());
+            const clip = await playClip(url);
+            void (clip ? clip.done : Promise.resolve()).then(() => URL.revokeObjectURL(url));
+          } catch (e) {
+            sayT(e instanceof ApiError && e.code === 'NO_TAKE' ? VOICE_TUNE_LINES.noTake : VOICE_TUNE_LINES.previewFailed);
+          }
+        } else if (t.do === 'open') sayT(VOICE_TUNE_LINES.open, { now: voiceTuneWords(now.tune) }, now.isDefault ? [VOICE_TUNE_CHIPS.preview] : chips);
+        else if (t.do === 'limit') sayT(VOICE_TUNE_LINES.limit, { now: voiceTuneWords(now.tune) }, chips);
+        else {
+          const r = await api.setVoiceTune(t.do === 'reset' ? { reset: true } : t.next);
+          sayT(t.do === 'reset' ? VOICE_TUNE_LINES.reset : VOICE_TUNE_LINES.changed, { now: voiceTuneWords(r.tune) }, r.isDefault ? [VOICE_TUNE_CHIPS.preview] : chips);
+        }
+        setPending({ voiceTune: true });
+      } catch {
+        sayT(VOICE_TUNE_LINES.failed);
+      } finally {
+        setBusy(false);
+      }
+    })();
     return true;
   };
   /** the song keeps the new title (its Mercury post and its reading in your voice follow: PATCH /compose/songs/:id/title) */
@@ -1763,6 +1809,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     if (!story && p && 'storage' in p && storageAnswer(text, p.storage)) return;
     if (!story && isStorageCancel(text)) return void storageCancel();
     if (!story && isStorageAsk(text)) return void storageExplain(text);
+    // client 2026-11-27: the member's own voice settings for ダチ voice messages (「声の設定」「声を低くして」 …)
+    if (!story && voiceTuneSend(text, !!(p && 'voiceTune' in p), !!(p && ('tweak' in p || 'plan' in p)))) return;
     // R12: {bati}'s compass and spell book (a link, their names, the answers to its questions, the offer)
     if (!story && toolSend(text, p)) return;
     // R13 fix: a spell still coming out (its lyrics being written) can be called off too

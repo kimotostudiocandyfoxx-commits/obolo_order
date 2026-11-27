@@ -1,11 +1,11 @@
 'use client';
 
 import { BIRTH_YEAR_KEY } from '@/components/onboarding/SealGate';
-import type { InviteView } from '@obolo/shared';
+import { BIRTH_YEAR_REQUIRED_WORDS, type InviteView } from '@obolo/shared';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import { agreedNow, agreeLocally, ConsentPanel, localConsent, sendLocalConsent } from '@/components/ConsentGate';
+import { agreedNow, agreeLocally, ConsentPanel, localBirthYear, localConsent, sendLocalConsent } from '@/components/ConsentGate';
 import { StoryPlayer } from '@/components/onboarding/StoryPlayer';
 import { TomorrowScreen } from '@/components/onboarding/TomorrowScreen';
 import { ApiError, getApi } from '@/lib/api';
@@ -28,11 +28,13 @@ export function InviteStory({ code }: { code: string }) {
   const [agreed, setAgreed] = useState<boolean | undefined>(undefined);
   useEffect(() => {
     if (status === 'loading') return;
-    setAgreed(agreedNow(me) || !!localConsent());
+    // client 2026-11-27: and never without the birth year (the account's, or the one chosen on this device) — a device
+    // that agreed with 〔答えない・分からない〕 before is asked again
+    setAgreed((agreedNow(me) || !!localConsent()) && (!!me?.birthYear || !!localBirthYear()));
     // agreed on this device before but not on the account yet (a reload in between): sent now
     if (me && !agreedNow(me) && localConsent()) void sendLocalConsent().then((u) => u && setMe(u));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, me?.consent?.version]);
+  }, [status, me?.consent?.version, me?.birthYear]);
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -76,7 +78,8 @@ export function InviteStory({ code }: { code: string }) {
           setMe(await api.updateMe({ displayName: name }));
           return;
         }
-        const r = await api.acceptInvite(code, name);
+        // client 2026-11-27: the account is made with the birth year (the server makes none without it)
+        const r = await api.acceptInvite(code, name, localBirthYear());
         signIn(r.token, r.user);
         // the agreement given at the start, now that the account exists — with the year asked there (M-R252: kept once
         // as the birth year, so the start screen's year is the one the age rules follow)
@@ -91,6 +94,11 @@ export function InviteStory({ code }: { code: string }) {
         }
       } catch (e) {
         if (e instanceof ApiError && (e.code === 'INVITE_USED' || e.code === 'ALREADY_MEMBER')) throw new Error(m.gate.used);
+        // no year on this device after all (its storage was cleared meanwhile): the start screen asks it again
+        if (e instanceof ApiError && e.code === 'BIRTH_YEAR_REQUIRED') {
+          setAgreed(false);
+          throw new Error(BIRTH_YEAR_REQUIRED_WORDS);
+        }
         throw new Error(m.gate.nameError);
       }
     },

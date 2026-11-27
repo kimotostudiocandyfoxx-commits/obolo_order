@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { BirthYear } from './birthYear';
 import { LOCALES, PLAZA_ICONS, PLAZA_NAME_MAX, SATURN_MAX_CHARS } from './config';
 import { NEO_FORM_IDS } from './neo';
 import { VOICE_STYLE_IDS } from './neoVoice';
@@ -37,7 +38,7 @@ export const UpdateProfileBody = z.object({
   /** the round ぷにぷに character (null = back to the plain ball) */
   look: PuniLook.nullable().optional(),
   /** asked once before the invitation is opened (M-R150); under CHILD_AGE the child settings apply. Set once. */
-  birthYear: z.number().int().min(1900).max(2100).optional(),
+  birthYear: BirthYear.optional(),
 });
 /** M-R150: under 15 (before high school) a member connects only with their dachi */
 export const CHILD_AGE = 15;
@@ -149,6 +150,11 @@ export const INVITE_CODE_RE = /^[A-Za-z0-9_-]{6,64}$/;
 /** Name told to OBOLON during the Day-1 story; becomes the display name. */
 export const AcceptInviteBody = z.object({
   displayName: z.string().trim().min(1).max(20),
+  /**
+   * client 2026-11-27: the year they were born, asked before day 1 — no account is made without it (the service answers
+   * BIRTH_YEAR_REQUIRED; optional here only so that the answer is that code and not a schema error)
+   */
+  birthYear: BirthYear.optional(),
 });
 export type AcceptInviteBody = z.infer<typeof AcceptInviteBody>;
 

@@ -22,6 +22,8 @@ import {
   type BatiVoiceState,
   MEDIA_CONSENT_VERSION,
   kororinOf,
+  BIRTH_YEAR_REQUIRED_WORDS,
+  birthYearOf,
 } from '@obolo/shared';
 import { and, eq, isNull, ne } from 'drizzle-orm';
 import { apiError } from '../common/errors';
@@ -54,6 +56,13 @@ export function day9At(u: typeof users.$inferSelect): number | null {
   if (u.batiEggAt) return u.batiEggAt.getTime();
   if (u.journeyDay === JOURNEY_PAYMENT && u.journeyCompletedAt) return u.journeyCompletedAt.getTime() + JOURNEY_WAIT_MS;
   return null;
+}
+
+/** client 2026-11-27 (shared birthYear.ts): the year is asked before anything else — 428, the web's start screen asks it */
+export const birthYearRequired = () => apiError(HttpStatus.PRECONDITION_REQUIRED, 'BIRTH_YEAR_REQUIRED', BIRTH_YEAR_REQUIRED_WORDS);
+/** the journey (a day finished, the next day begun, a members' day finished) never moves on for an account with no birth year */
+export function mustHaveBirthYear(u: Pick<typeof users.$inferSelect, 'onboardingJson'>): void {
+  if (!birthYearOf(u.onboardingJson)) throw birthYearRequired();
 }
 
 export function toMe(u: typeof users.$inferSelect): Me {
@@ -174,6 +183,8 @@ export class UsersService {
     if (noMedia) json['consent.media'] = '0';
     else delete json['consent.media'];
     if (!cur.birthYear && opts.birthYear) json.birthYear = String(opts.birthYear);
+    // client 2026-11-27: nobody agrees (and so goes on) without the year they were born — 〔答えない・分からない〕 is gone
+    if (!birthYearOf(json)) throw birthYearRequired();
     const [nu] = await this.db.write
       .update(users)
       .set({ consentVersion: version, consentAt: now, ...g, onboardingJson: json, updatedAt: now })
@@ -265,6 +276,7 @@ export class UsersService {
   async completeJourneyDay(userId: string, body: CompleteJourneyDayBody): Promise<Me> {
     const cur = await this.load(userId);
     if (cur.journeyDay !== body.day || cur.journeyCompletedAt) return toMe(cur);
+    mustHaveBirthYear(cur);
     const [u] = await this.db.write
       .update(users)
       .set({
@@ -288,6 +300,7 @@ export class UsersService {
     const cur = await this.load(userId);
     const story = (cur.onboardingJson ?? {}) as Record<string, string>;
     if (!activeMember(cur) || body.chapter !== lap2Done(story)) return toMe(cur);
+    mustHaveBirthYear(cur);
     const opens = lap2OpensAt(story);
     // the tester entrance: a tester never waits (users/tester.ts; nobody else)
     if (opens !== null && !isTester(cur) && Date.now() < opens - 120_000) throw apiError(HttpStatus.CONFLICT, 'NOT_YET', 'The next day has not opened yet');
@@ -315,6 +328,7 @@ export class UsersService {
   async advanceJourney(userId: string, skip: boolean): Promise<Me> {
     const cur = await this.load(userId);
     if (!cur.journeyCompletedAt || cur.journeyDay >= JOURNEY_DONE) return toMe(cur);
+    mustHaveBirthYear(cur);
     // the tester entrance: a tester never waits (users/tester.ts; nobody else)
     if (!isTester(cur) && !(skip && cur.journeyDay <= 1) && Date.now() < cur.journeyCompletedAt.getTime() + JOURNEY_WAIT_MS - 120_000) {
       throw apiError(HttpStatus.CONFLICT, 'NOT_YET', 'The next day has not opened yet');

@@ -4,7 +4,7 @@ import type { IncantBody, IncantView } from '@obolo/shared';
 import type { ArtTitleBody, ArtTitleView } from '@obolo/shared';
 import type { LyricsBody, LyricsView, SongLyrics, SongTweakBody, SongTweakResult, SongVoiceBody, SongVoiceQuoteView, SongVoiceUseView, SongVoiceVersion } from '@obolo/shared';
 import type { BookView, CompassSpell, GameBrokenBody, GameBuildBody, GameView, GoodsMakeBody, GoodsView, MoonCompassBody, NovelChapterBody, SaveSpellBody, SaveSpellResult, SavedSpell } from '@obolo/shared';
-import type { ClipFile, ClipStartBody, ClipUploadStart, ChangeResult, HomeOshi, HomePlanet, PlanetHomeView, AddVersionBody, CreateMoonWorkBody, DemoJobBody, MakeConfirm, MakeKind, SpellBody, SpellKind, SpellTag, SpellView, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiHistoryPage, DachiMessageView, DachiThreadView, DachiVoiceDraft, VoicePreviewBody, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView, MvEditBody, MvPicturesBody, MvRedrawBody } from '@obolo/shared';
+import type { ClipFile, ClipStartBody, ClipUploadStart, ChangeResult, HomeOshi, HomePlanet, PlanetHomeView, AddVersionBody, CreateMoonWorkBody, DemoJobBody, MakeConfirm, MakeKind, SpellBody, SpellKind, SpellTag, SpellView, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiHistoryPage, DachiMessageView, DachiThreadView, DachiVoiceDraft, CuteVoiceInfo, VoiceTuneBody, VoiceTuneView, VoicePreviewBody, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView, MvEditBody, MvPicturesBody, MvRedrawBody } from '@obolo/shared';
 import type {
   MembersDay,
   BuddyChatResponse,
@@ -263,7 +263,8 @@ export interface Api {
   starSaturnPost(id: string, on: boolean): Promise<{ starCount: number; starredByMe: boolean }>;
   // --- Invite-only onboarding
   getInvite(code: string): Promise<InviteView>;
-  acceptInvite(code: string, displayName: string): Promise<{ token: string; user: Me; isNew: boolean }>;
+  /** client 2026-11-27: with the birth year asked before day 1 — no account is made without it (BIRTH_YEAR_REQUIRED) */
+  acceptInvite(code: string, displayName: string, birthYear?: number | null): Promise<{ token: string; user: Me; isNew: boolean }>;
   completeJourneyDay(day: number, answers?: Record<string, string>): Promise<Me>;
   /** SYS-S002 from the settings: its flags (kept as sys.<key> in me.story) */
   saveSysStory(answers: Record<string, string>): Promise<Me>;
@@ -348,6 +349,18 @@ export interface Api {
   dachiVoicePreview(body: VoicePreviewBody): Promise<Blob>;
   /** 〔けす〕 / a new take: the draft's file goes */
   discardDachiVoice(mediaId: string): Promise<void>;
+  /**
+   * client 2026-11-27 (shared/cuteVoice.ts): is this member's ダチ talk read by the default cute voice (a member who is
+   * not recorded), and the live price's two numbers (cuteVoiceMana)
+   */
+  dachiCuteVoice(): Promise<CuteVoiceInfo>;
+  /**
+   * client 2026-11-27 (shared voiceTune.ts): the member's own voice settings for their recorded ダチ voice messages —
+   * read, changed (the parts given; `reset` = the default; clamped on the server), and the last take heard in them
+   */
+  voiceTune(): Promise<VoiceTuneView>;
+  setVoiceTune(body: VoiceTuneBody): Promise<VoiceTuneView>;
+  voiceTunePreview(): Promise<Blob>;
   /** Jupiter: 🦋 蝶を描いてもらう (2 painted candidates, 3 tries a day) */
   butterflyCandidates(body: PuniPicBody): Promise<PuniPicResult>;
   chooseButterfly(mediaId: string | null): Promise<Me>;
