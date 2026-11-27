@@ -184,6 +184,82 @@ describe('{bati} の進化 (D03-S005b)', () => {
   });
 });
 
+// {bati}'s round is open during day 2 of the journey and for an Obolo Order member — past day 2 a resident's is closed
+// even when it was never decided on day 2 (it could otherwise be stepped on for ever after)
+describe('{bati} の進化: who may', () => {
+  const locked = { response: { error: { code: 'BATI_LOOK_LOCKED' } } };
+
+  it('a resident past day 2 whose round was never decided: step, back and fix are refused (403), nothing charged or painted', async () => {
+    const t = make({ journeyDay: 2 });
+    await t.s.step('u', { who: 'bati', wish: '翼' }, 'https://x');
+    await t.s.step('u', { who: 'bati', wish: '王冠' }, 'https://x');
+    // day 2 passed without 〔{bati}の姿はこれだ〕
+    t.user.journeyDay = 3;
+    expect(stepsOf(t.user as never, 'bati')).toMatchObject({ used: 2, fixed: false });
+    await expect(t.s.step('u', { who: 'bati', wish: 'もう一回' }, 'https://x')).rejects.toMatchObject({ status: 403, ...locked });
+    await expect(t.s.back('u', 'bati')).rejects.toMatchObject({ status: 403, ...locked });
+    await expect(t.s.fix('u', 'bati', 'https://x')).rejects.toMatchObject({ status: 403, ...locked });
+    expect(t.charged).toEqual(['lookStep', 'lookStep']);
+    expect(t.prompts).toHaveLength(2);
+    expect(t.worn).toEqual([]);
+    expect(t.user.batiImageUrl).toBe('https://x/bati-born.png');
+    expect(stepsOf(t.user as never, 'bati')).toMatchObject({ used: 2, fixed: false, url: 'https://x/bati-1.png' });
+  });
+
+  it('day 2 lived to its end counts as past it; a later day and the finished journey too', async () => {
+    for (const day of [{ journeyDay: 2, done: true }, { journeyDay: 5, done: false }, { journeyDay: 9, done: false }]) {
+      const t = make({ journeyDay: day.journeyDay });
+      if (day.done) t.user.journeyCompletedAt = new Date();
+      await expect(t.s.step('u', { who: 'bati', wish: '翼' }, 'https://x')).rejects.toMatchObject(locked);
+      expect(t.charged).toEqual([]);
+    }
+  });
+
+  it('a round decided on day 2 stays decided: 〔fix〕 again answers as before, a step is refused with the lock', async () => {
+    const t = make({ journeyDay: 2 });
+    await t.s.step('u', { who: 'bati', wish: '王冠' }, 'https://x');
+    await t.s.fix('u', 'bati', 'https://x');
+    t.user.journeyDay = 4;
+    const again = await t.s.fix('u', 'bati', 'https://x');
+    expect(again.steps).toMatchObject({ fixed: true });
+    await expect(t.s.step('u', { who: 'bati', wish: 'もう一回' }, 'https://x')).rejects.toMatchObject(locked);
+    expect(t.worn).toEqual(['bati:https://x/bati-0.png']);
+  });
+
+  it('a member whose subscription ended is a resident again', async () => {
+    const t = make({ journeyDay: 9, member: true });
+    t.user.subscriptionStatus = 'canceled';
+    await expect(t.s.step('u', { who: 'bati', wish: '翼' }, 'https://x')).rejects.toMatchObject(locked);
+  });
+
+  it('an Obolo Order member steps, goes back and decides on any day', async () => {
+    const t = make({ journeyDay: 9, member: true });
+    await t.s.open('u', 'bati');
+    await t.s.step('u', { who: 'bati', wish: '翼' }, 'https://x');
+    await t.s.step('u', { who: 'bati', wish: '王冠' }, 'https://x');
+    const b = await t.s.back('u', 'bati');
+    expect(b.steps.url).toBe('https://x/bati-0.png');
+    const f = await t.s.fix('u', 'bati', 'https://x');
+    expect(f.steps.fixed).toBe(true);
+    expect(t.worn).toEqual(['bati:https://x/bati-0.png']);
+  });
+
+  it('one’s own round: a resident past day 2 with a look is refused step, back and fix (LOOK_LOCKED), confirmed by the day alone', async () => {
+    // never confirmed at the bowl of water, but day 2 is over: the look they have is the look (membership.ts lookConfirmed)
+    const t = make({ journeyDay: 2 });
+    t.user.avatarUrl = 'https://x/look.png';
+    t.user.onboardingJson = { 'steps.self': JSON.stringify({ used: 2, fixed: false, url: 'https://x/avatar-9.png', back: ['https://x/avatar-8.png'] }) };
+    t.user.journeyDay = 3;
+    const own = { status: 403, response: { error: { code: 'LOOK_LOCKED' } } };
+    await expect(t.s.step('u', { who: 'self', wish: '髪を青に' }, 'https://x')).rejects.toMatchObject(own);
+    await expect(t.s.back('u', 'self')).rejects.toMatchObject(own);
+    await expect(t.s.fix('u', 'self', 'https://x')).rejects.toMatchObject(own);
+    expect(t.charged).toEqual([]);
+    expect(t.worn).toEqual([]);
+    expect(t.user.avatarUrl).toBe('https://x/look.png');
+  });
+});
+
 describe('{name} の変身 (D03-S004)', () => {
   it('four first pictures (one charge), one chosen as the base, steps from it, then confirmed with the profile look’s mana', async () => {
     const t = make();

@@ -43,13 +43,15 @@ export const MOTION = {
    * figures in components/story/StoryTalk.tsx):
    *   still   MONBAN — no bob with the voice, no hop, no breathing; eyeLight: how bright the small light on his golden
    *           eye is (0–1; it never flares with the voice), eyeLayer: how much of the poses' painted eye glow is
-   *           left (0 = none)
+   *           left (0 = none); halo: the golden disc behind his head (components/story/Halo.tsx) — its opacity breathes
+   *           between opacity[0] and opacity[1] once every ms (kept faint: no strong glow; it never turns or moves),
+   *           dim: what is left of it while he stands back in the dark. prefers-reduced-motion: it does not breathe
    *   divine  OBOLON — no shaking: the orb floats floatPct % of its height up and down once every floatMs (very slow),
    *           its corona breathes between corona[0] and corona[1] (opacity) every coronaMs, and `motes` small lights
    *           drift up risePct % of the orb's height, one trip in about moteMs. prefers-reduced-motion: none of it moves
    */
   poise: {
-    still: { eyeLight: 0.45, eyeLayer: 0.12 },
+    still: { eyeLight: 0.45, eyeLayer: 0.12, halo: { opacity: [0.22, 0.32], ms: 9000, dim: 0.45 } },
     divine: { floatPct: 1.6, floatMs: 9000, corona: [0.55, 0.95], coronaMs: 7000, motes: 6, moteMs: 11000, risePct: 26 },
   },
   /** the ones not speaking step back into the dark */

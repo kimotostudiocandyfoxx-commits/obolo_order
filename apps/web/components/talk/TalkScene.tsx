@@ -11,6 +11,7 @@ import { Subtitle, SubtitleScrim, SUBTITLE_CSS, subtitleStyle } from '@/componen
 import { subtitlePieces } from '@/lib/story/subtitles';
 import { AmbientFront, AmbientSky } from '@/components/story/Ambient';
 import type { Planet } from '@/lib/story/ambient';
+import type { HaloSpec } from '@/components/story/Halo';
 import { unlockAudio } from '@/lib/onboarding/audio';
 import { playClip, stopClip, type Clip } from '@/lib/voice/webVoice';
 import { BARGE_FADE_MS, onBargeIn } from '@/lib/voice/barge';
@@ -57,6 +58,8 @@ export type TalkPerson = {
    * 'divine' only floats very slowly (Figure's `poise`)
    */
   poise?: 'still' | 'divine';
+  /** a disc of light behind their head, on their own front look (the story's MONBAN; components/story/Halo.tsx) */
+  halo?: HaloSpec;
   /** where their head is, down from the top of the row's height (0..1; default 0.16, the talk looks' headroom) */
   headAt?: number;
   /**
@@ -1353,6 +1356,8 @@ export function TalkScene({
                 calm={isGroup && !speaking && talkingId != null && (!directed || !!p.back)}
                 reduced={reduced}
                 poise={p.poise}
+                // (never behind a view of its own — the back in an over-the-shoulder, a 3/4 or side view)
+                halo={ag?.look || (ots && p.self) ? undefined : p.halo}
                 lit={speaking}
                 glow={isGroup && speaking && !directed ? p.color : undefined}
                 level={voice?.who === p.id && voice.level ? voice.level : speech?.who === p.id ? speech.level : undefined}

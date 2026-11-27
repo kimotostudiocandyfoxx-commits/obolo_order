@@ -685,6 +685,16 @@ body {
   .divine-corona { opacity: 0.8; }
   .divine-mote { display: none; }
 }
+/*
+ * MONBAN's golden halo (components/story/Halo.tsx, numbers in lib/story/motion.ts MOTION.poise.still.halo): a faint
+ * disc behind his head whose opacity breathes very slowly. Opacity only — it never turns, and he never bobs. With
+ * prefers-reduced-motion it is simply there.
+ */
+@keyframes stillHalo { 0%, 100% { opacity: var(--hmin, 0.22); } 50% { opacity: var(--hmax, 0.32); } }
+.still-halo { opacity: var(--hmax, 0.32); animation: stillHalo 9s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .still-halo { animation: none; }
+}
 @keyframes hop { 0%, 100% { transform: none; } 40% { transform: translateY(var(--hop, -2%)); } }
 /* the story's cinema (days 1–2, lib/story/motion.ts MOTION.cinema): the camera pushes onto a new speaker, then drifts closer */
 @keyframes cinePush { from { transform: translateX(var(--pan, 0)) scale(var(--from, 0.8)); opacity: 0.35; } 55% { opacity: 1; } to { transform: none; opacity: 1; } }

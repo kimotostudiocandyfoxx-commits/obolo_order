@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useAuth } from '@/lib/auth';
 import { getApi } from '@/lib/api';
-import { JOURNEY_DONE, type BatiCard, type Me } from '@obolo/shared';
+import { type BatiCard, type Me } from '@obolo/shared';
+import { pastLookRows, showPastLooks } from '@/lib/bati/pastLooks';
 import { BatiCardView, exportCard } from './BatiCard';
 import { SmallEgg } from './SmallEgg';
 import { BatiMemories } from './BatiMemories';
@@ -58,16 +59,16 @@ export function BatiShelf() {
   );
 }
 
-/** M-R223: from day 3 (Bluena received), the first shelf also lists the looks worn before — your own and {bati}'s */
-export function showPastLooks(me: Me): boolean {
-  return !!me.story?.['d3.f_d04_bluena'] || me.journeyDay >= JOURNEY_DONE;
-}
+export { showPastLooks };
 
 function PastLooks({ me, onMe }: { me: Me; onMe: (me: Me) => void }) {
   const [busy, setBusy] = useState(false);
   if (!showPastLooks(me)) return null;
-  const own = me.lookHistory ?? [];
-  const bati = me.bati?.looks ?? [];
+  // a row whose every tap the API would refuse is not shown (lib/bati/pastLooks.ts: a resident's {bati} look, and
+  // their own once confirmed, stay as they are until Obolo Order)
+  const can = pastLookRows(me);
+  const own = can.own ? (me.lookHistory ?? []) : [];
+  const bati = can.bati ? (me.bati?.looks ?? []) : [];
   if (own.length < 2 && bati.length < 2) return null;
   const wear = async (f: () => Promise<Me>) => {
     if (busy) return;
