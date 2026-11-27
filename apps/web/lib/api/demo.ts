@@ -24,7 +24,8 @@ import {
   type MoonWorkView,
   KIMORIN_WAIT_LINES,
   ruleBeats,
-  MIKIE_WELCOME,
+  MIKIE_ORDER_LINE_ID,
+  INVITER_WELCOME_TEXT,
   dachiLine,
   type DachiMessageView,
   type DachiThreadView,
@@ -2153,7 +2154,9 @@ export class DemoApi implements Api {
     return { to };
   }
   /**
-   * demo: what arrives in the ダチ threads — MIKIE⭐︎DRILL's welcome (the demo inviter recorded nothing), and KIMORIN⭐︎'s
+   * demo: what arrives in the ダチ threads — the inviter's welcome as a text message (the demo inviter recorded nothing;
+   * M-R343: no MIKIE⭐︎DRILL stand-in, and nothing when nobody invited), MIKIE⭐︎DRILL's own welcome once an Obolo Order
+   * (M-R342), and KIMORIN⭐︎'s
    * lines of the wait. For review the wait is short: the day's lines come 1 and 2 minutes after the day is finished
    * (the server puts them at night, shared kimorinSchedule).
    */
@@ -2166,7 +2169,9 @@ export class DemoApi implements Api {
       const l = dachiLine(id)!;
       list.push({ id: uid(), thread, lineId: id, fromMe: false, character: l.who, kind: 'voice', audioUrl: l.voice, seconds: null, text: l.text, work: null, createdAt: at });
     };
-    if (!sent.has('welcome')) line(MIKIE_WELCOME.id, this.s.dachiInviter && me.invitedByName ? 'demo-inviter' : 'mikie', this.s.dachiAt);
+    if (!sent.has('welcome') && this.s.dachiInviter && me.invitedByName)
+      list.push({ id: uid(), thread: 'demo-inviter', lineId: 'welcome', fromMe: false, character: null, kind: 'text', audioUrl: null, seconds: null, text: INVITER_WELCOME_TEXT, work: null, createdAt: this.s.dachiAt });
+    if (me.orderedAt && !sent.has(MIKIE_ORDER_LINE_ID) && !list.some((m) => m.thread === 'mikie')) line(MIKIE_ORDER_LINE_ID, 'mikie', now());
     const done = me.journeyCompletedAt ? Date.parse(me.journeyCompletedAt) : null;
     if (done && done >= Date.parse(this.s.dachiAt) - 86400_000) {
       KIMORIN_WAIT_LINES.filter((l) => l.day === me.journeyDay)
@@ -2192,7 +2197,8 @@ export class DemoApi implements Api {
     };
     const out: DachiThreadView[] = [];
     if (this.s.dachiInviter && me?.invitedByName) out.push(view('demo-inviter', 'dachi', me.invitedByName));
-    if (list.some((m) => m.thread === 'mikie')) out.push(view('mikie', 'mikie', 'MIKIE⭐︎DRILL'));
+    // M-R342: hers for an Obolo Order (or a browser of before in which she was written to)
+    if (list.some((m) => m.thread === 'mikie') && this.mikieShown(list)) out.push(view('mikie', 'mikie', 'MIKIE⭐︎DRILL'));
     out.push(view('kimorin', 'kimorin', 'KIMORIN⭐︎'));
     // R9: the last 7 days' messages, ranked as the server ranks them
     const week = Date.now() - 7 * 86_400_000;
@@ -2200,8 +2206,11 @@ export class DemoApi implements Api {
     for (const d of this.s.reviewDachi ?? []) out.push({ id: d.id, kind: 'dachi', name: d.name, pic: null, unread: !!d.unread, lastAt: d.lastAt, recent: d.recent, ...(d.stand ? { talk: { of: d.id, stand: d.stand } } : {}) });
     return rankDachi(out);
   }
+  private mikieShown(list: { thread: string; fromMe: boolean }[]) {
+    return !!this.s.users[this.uid()]?.orderedAt || list.some((m) => m.thread === 'mikie' && m.fromMe);
+  }
   private dachiThreadOk(thread: string) {
-    const ok = thread === 'kimorin' || !!this.s.reviewDachi?.some((d) => d.id === thread) || (!!this.s.dachiAt && (thread === 'mikie' || (thread === 'demo-inviter' && !!this.s.dachiInviter)));
+    const ok = thread === 'kimorin' || !!this.s.reviewDachi?.some((d) => d.id === thread) || (!!this.s.dachiAt && ((thread === 'mikie' && this.mikieShown(this.s.dachiMsgs ?? [])) || (thread === 'demo-inviter' && !!this.s.dachiInviter)));
     if (!ok) throw new ApiError(403, 'NOT_DACHI', 'Voice messages go only between ダチ');
   }
   async dachiMessages(thread: string, page: { before?: string; limit?: number } = {}) {

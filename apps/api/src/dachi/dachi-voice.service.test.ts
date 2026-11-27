@@ -1,6 +1,6 @@
-import { DACHI_TEXT_MAX, SendDachiMessageBody as SendBody, KIMORIN_PER_WAIT, KIMORIN_WAIT_LINES, kimorinDue, kimorinSchedule, MIKIE_WELCOME, type SendDachiMessageBody } from '@obolo/shared';
+import { INVITER_WELCOME_TEXT, MIKIE_ORDER_LINE_ID, DACHI_TEXT_MAX, SendDachiMessageBody as SendBody, KIMORIN_PER_WAIT, KIMORIN_WAIT_LINES, kimorinDue, kimorinSchedule, MIKIE_WELCOME, type SendDachiMessageBody } from '@obolo/shared';
 import { describe, expect, it } from 'vitest';
-import { DachiVoiceService, reachable, welcomeRow } from './dachi-voice.service';
+import { DachiVoiceService, mikieOrderRow, mikieThreadShown, reachable, welcomeRow } from './dachi-voice.service';
 
 /** the API error's code ({ error: { code } }) */
 const code = (e: unknown) => ((e as { getResponse?: () => { error?: { code?: string } } }).getResponse?.().error?.code ?? null);
@@ -11,7 +11,7 @@ type Row = Record<string, unknown> & { id: string; createdAt: Date; senderId: st
 function world(o: { llm?: unknown } = {}) {
   const follows = new Set<string>();
   const blocks = new Set<string>();
-  const people: Record<string, { journeyDay: number; journeyCompletedAt: Date | null; dachiAt: Date | null; displayName: string }> = {};
+  const people: Record<string, { journeyDay: number; journeyCompletedAt: Date | null; dachiAt: Date | null; displayName: string; orderedAt?: Date | null }> = {};
   const invitations: Record<string, { inviterId: string | null; voiceUrl: string | null; voiceMediaId: string | null; voiceSeconds: number | null }> = {};
   const rows: Row[] = [];
   const pushes: string[] = [];
@@ -38,6 +38,11 @@ function world(o: { llm?: unknown } = {}) {
     return m;
   };
   x.rows = async () => rows;
+  // MIKIE⭐︎DRILL's own thread with a member (her lines with no peer, the member's messages to her)
+  x.mikieThread = async (u: string) => {
+    const hers = rows.filter((r) => r.character === 'mikie' && !r.peerId && ((r.senderId === null && r.recipientId === u) || r.senderId === u));
+    return { any: hers.length > 0, mine: hers.some((r) => r.senderId === u) };
+  };
   // R9: the 7-day counts as SQL would group them (here from the rows in memory)
   x.weekCounts = async (u: string) => {
     const m = new Map<string, number>();
@@ -127,12 +132,51 @@ describe('the first voice message: {inviter}’s, else MIKIE⭐︎DRILL’s', ()
   it('{inviter} recorded a voice with the invitation: it comes from them', () => {
     expect(welcomeRow(A, at, { inviterId: B, inviterIsDachi: true, voiceUrl: 'https://cdn/v.webm', voiceMediaId: null, voiceSeconds: 5 })).toMatchObject({ senderId: B, recipientId: A, audioUrl: 'https://cdn/v.webm', lineId: 'welcome' });
   });
-  it('no voice recorded: MIKIE⭐︎DRILL’s welcome, in {inviter}’s thread', () => {
-    expect(welcomeRow(A, at, { inviterId: B, inviterIsDachi: true, voiceUrl: null, voiceMediaId: null, voiceSeconds: null })).toMatchObject({ senderId: null, character: 'mikie', peerId: B, lineId: MIKIE_WELCOME.id });
+  it('no voice recorded: {inviter}’s welcome as a text message, in their own thread (M-R343) — never MIKIE⭐︎DRILL’s', () => {
+    const row = welcomeRow(A, at, { inviterId: B, inviterIsDachi: true, voiceUrl: null, voiceMediaId: null, voiceSeconds: null });
+    expect(row).toMatchObject({ senderId: B, recipientId: A, lineId: 'welcome', kind: 'text', workJson: { text: 'ようこそ。……あなたのつぶやき、聞こえたよ。' } });
+    expect(row?.character ?? null).toBeNull();
+    expect(INVITER_WELCOME_TEXT).toBe('ようこそ。……あなたのつぶやき、聞こえたよ。');
   });
-  it('no inviter (an operator invitation), or not dachi with them: in MIKIE⭐︎DRILL’s own thread', () => {
-    expect(welcomeRow(A, at, null)).toMatchObject({ senderId: null, character: 'mikie', peerId: null });
-    expect(welcomeRow(A, at, { inviterId: B, inviterIsDachi: false, voiceUrl: 'https://cdn/v.webm', voiceMediaId: null, voiceSeconds: 5 })).toMatchObject({ character: 'mikie', peerId: null });
+  it('no inviter (an operator invitation), or not dachi with them: no welcome and no thread of MIKIE⭐︎DRILL’s (M-R342)', () => {
+    expect(welcomeRow(A, at, null)).toBeNull();
+    expect(welcomeRow(A, at, { inviterId: B, inviterIsDachi: false, voiceUrl: 'https://cdn/v.webm', voiceMediaId: null, voiceSeconds: 5 })).toBeNull();
+    expect(welcomeRow(A, at, { inviterId: null, inviterIsDachi: false, voiceUrl: null, voiceMediaId: null, voiceSeconds: null })).toBeNull();
+  });
+  it('MIKIE⭐︎DRILL becomes a ダチ with the Order: her thread and her welcome then, once (M-R342)', async () => {
+    expect(mikieOrderRow(A, at)).toMatchObject({ senderId: null, recipientId: A, character: 'mikie', peerId: null, lineId: MIKIE_ORDER_LINE_ID });
+    const w = world();
+    w.people[A] = { journeyDay: 5, journeyCompletedAt: null, dachiAt: new Date(), displayName: 'a', orderedAt: null };
+    // nobody invited, not an Obolo Order: KIMORIN⭐︎ only, and her thread cannot be opened or written to
+    expect((await w.s.threads(A)).map((t) => t.id)).toEqual(['kimorin']);
+    expect(w.rows.some((r) => r.character === 'mikie')).toBe(false);
+    await expect(w.s.messages(A, 'mikie')).rejects.toMatchObject({ response: { error: { code: 'NOT_DACHI' } } });
+    await expect(w.s.send(A, 'mikie', voice(A))).rejects.toThrow();
+    // the Eclipse: she is there, with her welcome, word for word; a second look adds nothing
+    w.people[A].orderedAt = new Date();
+    expect((await w.s.threads(A)).map((t) => t.id).sort()).toEqual(['kimorin', 'mikie']);
+    await w.s.threads(A);
+    expect(w.rows.filter((r) => r.character === 'mikie')).toHaveLength(1);
+    expect(w.s.toView(A, w.rows.find((r) => r.character === 'mikie') as never)).toMatchObject({ character: 'mikie', text: MIKIE_WELCOME.text, fromMe: false });
+  });
+  it('accounts of before: an untouched thread of hers is hidden until the Order; one the member wrote in stays', async () => {
+    expect(mikieThreadShown({ ordered: false, wroteToHer: false })).toBe(false);
+    expect(mikieThreadShown({ ordered: false, wroteToHer: true })).toBe(true);
+    expect(mikieThreadShown({ ordered: true, wroteToHer: false })).toBe(true);
+    const w = world();
+    w.people[A] = { journeyDay: 5, journeyCompletedAt: null, dachiAt: new Date(Date.now() - 864e5), displayName: 'a', orderedAt: null };
+    // her welcome of before (kept under 'welcome', in her own thread)
+    w.rows.push({ id: 'old', senderId: null, recipientId: A, character: 'mikie', peerId: null, lineId: 'welcome', kind: 'voice', audioUrl: null, createdAt: new Date(Date.now() - 864e5) } as never);
+    expect((await w.s.threads(A)).map((t) => t.id)).toEqual(['kimorin']);
+    expect(w.rows.find((r) => r.id === 'old')).toBeTruthy();
+    // the member wrote to her before: the talk stays, and they can go on
+    w.rows.push({ id: 'mine', senderId: A, recipientId: null, character: 'mikie', peerId: null, lineId: null, kind: 'text', workJson: { text: 'こんにちは' }, createdAt: new Date() } as never);
+    expect((await w.s.threads(A)).map((t) => t.id).sort()).toEqual(['kimorin', 'mikie']);
+    await expect(w.s.messages(A, 'mikie')).resolves.toBeTruthy();
+    // becoming an Obolo Order later adds no second welcome to a thread that is already there
+    w.people[A].orderedAt = new Date();
+    await w.s.threads(A);
+    expect(w.rows.filter((r) => r.character === 'mikie' && r.senderId === null)).toHaveLength(1);
   });
   it('MIKIE⭐︎DRILL’s line, word for word', () => {
     expect(MIKIE_WELCOME.text).toBe('ようこそ。……あなたのつぶやき、聞こえたわよ。');
@@ -140,13 +184,22 @@ describe('the first voice message: {inviter}’s, else MIKIE⭐︎DRILL’s', ()
 
   it('arrives once, when becoming dachi; shown with its words', async () => {
     const w = world();
+    w.dachi(A, B);
     w.people[A] = { journeyDay: 3, journeyCompletedAt: null, dachiAt: new Date(), displayName: 'a' };
-    w.invitations[A] = { inviterId: null, voiceUrl: null, voiceMediaId: null, voiceSeconds: null };
+    // {inviter} recorded no voice: their welcome as a text message (M-R343)
+    w.invitations[A] = { inviterId: B, voiceUrl: null, voiceMediaId: null, voiceSeconds: null };
     await w.s.arrive(A);
     await w.s.arrive(A);
     expect(w.rows.filter((r) => r.lineId === 'welcome')).toHaveLength(1);
     const v = w.s.toView(A, w.rows[0] as never);
-    expect(v).toMatchObject({ character: 'mikie', text: MIKIE_WELCOME.text, fromMe: false });
+    expect(v).toMatchObject({ character: null, kind: 'text', text: 'ようこそ。……あなたのつぶやき、聞こえたよ。', fromMe: false });
+    // nobody invited: nothing arrives, however often the threads are read
+    const n = world();
+    n.people[A] = { journeyDay: 3, journeyCompletedAt: null, dachiAt: new Date(), displayName: 'a' };
+    n.invitations[A] = { inviterId: null, voiceUrl: null, voiceMediaId: null, voiceSeconds: null };
+    await n.s.arrive(A);
+    await n.s.arrive(A);
+    expect(n.rows).toHaveLength(0);
   });
 
   it('{inviter}’s own recording, when they are dachi', async () => {
@@ -348,8 +401,7 @@ describe('R9: the Moon temple — ダチ ranked by the last 7 days', () => {
       [B, 3],
       ['kimorin', 2],
       [C, 1],
-      // MIKIE⭐︎DRILL's welcome came a month ago: listed, last
-      ['mikie', 0],
+      // (no MIKIE⭐︎DRILL before the Order: M-R342)
     ]);
   });
 });
@@ -371,7 +423,6 @@ describe('R10: the ダチ history and older messages', () => {
       ['kimorin', { kind: 'text', text: '……こんにちは。', fromMe: false }],
       [B, { kind: 'voice', text: '声のメッセージ', fromMe: false }],
       [C, { kind: 'work', text: 'うた', fromMe: true }],
-      ['mikie', { kind: 'voice', text: 'ようこそ。……あなたのつぶやき、聞こえたわよ。', fromMe: false }],
     ]);
     expect(page.next).toBeNull();
     // two at a time: the cursor goes on

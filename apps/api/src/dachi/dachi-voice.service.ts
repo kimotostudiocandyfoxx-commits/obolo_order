@@ -11,6 +11,8 @@ import {
   isCharacterThread,
   kimorinDue,
   MIKIE_WELCOME,
+  MIKIE_ORDER_LINE_ID,
+  INVITER_WELCOME_TEXT,
   DACHI_HISTORY_PAGE,
   historyOrder,
   historyPage,
@@ -73,12 +75,30 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 /** dachi = both follow each other (2 rows), no block either way, the other is still here and not suspended */
 export const reachable = (p: { follows: number; blocks: number; peerOk: boolean }) => p.follows === 2 && p.blocks === 0 && p.peerOk;
 
-/** the first message's source: {inviter}'s voice from the invitation, or MIKIE⭐︎DRILL's welcome (in {inviter}'s thread, or her own) */
-export function welcomeRow(userId: string, at: Date, inv: { inviterId: string | null; inviterIsDachi: boolean; voiceUrl: string | null; voiceMediaId: string | null; voiceSeconds: number | null } | null): NewRow {
-  if (inv?.inviterId && inv.inviterIsDachi && inv.voiceUrl) {
+/**
+ * The first message (D04-S005c), in {inviter}'s thread: their voice from the invitation, or — when they recorded none —
+ * their welcome as a text message (INVITER_WELCOME_TEXT). M-R342 / M-R343: no MIKIE⭐︎DRILL stand-in before Order — with
+ * no inviter (an operator invitation), or one who is not a ダチ, there is no welcome (null).
+ */
+export function welcomeRow(userId: string, at: Date, inv: { inviterId: string | null; inviterIsDachi: boolean; voiceUrl: string | null; voiceMediaId: string | null; voiceSeconds: number | null } | null): NewRow | null {
+  if (!inv?.inviterId || !inv.inviterIsDachi) return null;
+  if (inv.voiceUrl) {
     return { senderId: inv.inviterId, recipientId: userId, lineId: 'welcome', kind: 'voice', audioUrl: inv.voiceUrl, audioMediaId: inv.voiceMediaId, seconds: inv.voiceSeconds, createdAt: at };
   }
-  return { senderId: null, recipientId: userId, character: 'mikie', peerId: inv?.inviterId && inv.inviterIsDachi ? inv.inviterId : null, lineId: MIKIE_WELCOME.id, kind: 'voice', audioUrl: MIKIE_WELCOME.voice, createdAt: at };
+  return { senderId: inv.inviterId, recipientId: userId, lineId: 'welcome', kind: 'text', workJson: { text: INVITER_WELCOME_TEXT }, createdAt: at };
+}
+
+/** MIKIE⭐︎DRILL's welcome in her own thread, when the member has become Obolo Order (M-R342) */
+export function mikieOrderRow(userId: string, at: Date): NewRow {
+  return { senderId: null, recipientId: userId, character: 'mikie', peerId: null, lineId: MIKIE_ORDER_LINE_ID, kind: 'voice', audioUrl: MIKIE_WELCOME.voice, createdAt: at };
+}
+
+/**
+ * MIKIE⭐︎DRILL's thread is there for an Obolo Order, and for an account of before that already wrote to her (its
+ * messages are never taken away); an untouched thread of before is hidden until the member is an Obolo Order.
+ */
+export function mikieThreadShown(o: { ordered: boolean; wroteToHer: boolean }): boolean {
+  return o.ordered || o.wroteToHer;
 }
 
 /**
@@ -108,7 +128,7 @@ export class DachiVoiceService {
 
   protected async journey(userId: string) {
     const [u] = await this.db.read
-      .select({ journeyDay: users.journeyDay, journeyCompletedAt: users.journeyCompletedAt, dachiAt: users.dachiAt, displayName: users.displayName })
+      .select({ journeyDay: users.journeyDay, journeyCompletedAt: users.journeyCompletedAt, dachiAt: users.dachiAt, displayName: users.displayName, orderedAt: users.orderedAt })
       .from(users)
       .where(eq(users.id, userId));
     return u ?? null;
@@ -133,6 +153,12 @@ export class DachiVoiceService {
       .where(and(eq(invites.acceptedUserId, userId), eq(invites.status, 'accepted')))
       .limit(1);
     return i ?? null;
+  }
+
+  /** MIKIE⭐︎DRILL's own thread with this member: is anything in it (`any`), and did the member write to her (`mine`) */
+  protected async mikieThread(userId: string): Promise<{ any: boolean; mine: boolean }> {
+    const rows = await this.rows(this.where(userId, 'mikie'), 200);
+    return { any: rows.length > 0, mine: rows.some((r) => r.senderId === userId) };
   }
 
   protected async sentLines(userId: string): Promise<string[]> {
@@ -175,8 +201,11 @@ export class DachiVoiceService {
     if (!sent.includes('welcome')) {
       const inv = await this.invitation(userId);
       const inviterIsDachi = !!inv?.inviterId && (await this.areDachi(userId, inv.inviterId));
-      rows.push(welcomeRow(userId, u.dachiAt, inv ? { ...inv, inviterIsDachi } : null));
+      const w = welcomeRow(userId, u.dachiAt, inv ? { ...inv, inviterIsDachi } : null);
+      if (w) rows.push(w);
     }
+    // M-R342: MIKIE⭐︎DRILL becomes a ダチ with the Order — her welcome once, unless her thread is there from before
+    if (u.orderedAt && !sent.includes(MIKIE_ORDER_LINE_ID) && !(await this.mikieThread(userId)).any) rows.push(mikieOrderRow(userId, now));
     for (const { line, at } of kimorinDue({ userId, journeyDay: u.journeyDay, journeyCompletedAt: u.journeyCompletedAt, dachiAt: u.dachiAt, sent, now })) {
       rows.push({ senderId: null, recipientId: userId, character: 'kimorin', lineId: line.id, kind: 'voice', audioUrl: line.voice, createdAt: at });
     }
@@ -208,7 +237,7 @@ export class DachiVoiceService {
     return r.peerId ?? r.character ?? '';
   }
 
-  /** The drawer's conversations, from D04-S005c: {inviter} (or MIKIE⭐︎DRILL when there is none), KIMORIN⭐︎, then other dachi. */
+  /** The drawer's conversations, from D04-S005c: {inviter}, MIKIE⭐︎DRILL (an Obolo Order's: M-R342), KIMORIN⭐︎, then other dachi. */
   async threads(userId: string): Promise<DachiThreadView[]> {
     const u = await this.arrive(userId);
     // client 2026-11-24 (iPad, R7): KIMORIN⭐︎ is everyone's ダチ — listed before D04-S005c too (a tester who jumped days
@@ -242,7 +271,8 @@ export class DachiVoiceService {
     const out: DachiThreadView[] = [];
     const inviter = friends.find((f) => f.id === inv?.inviterId);
     if (inviter) out.push(view(inviter.id, 'dachi', inviter.displayName, inviter.pic));
-    if (last.has('mikie')) out.push(view('mikie', 'mikie', DACHI_CHARACTER_NAMES.mikie, null));
+    // M-R342: hers only for an Obolo Order (or an account of before that wrote to her)
+    if (last.has('mikie') && mikieThreadShown({ ordered: !!u.orderedAt, wroteToHer: recent.some((r) => r.senderId === userId && r.character === 'mikie') })) out.push(view('mikie', 'mikie', DACHI_CHARACTER_NAMES.mikie, null));
     out.push(view('kimorin', 'kimorin', DACHI_CHARACTER_NAMES.kimorin, null));
     const others = friends.filter((f) => f !== inviter).map((f) => view(f.id, 'dachi', f.displayName, f.pic));
     // R9: ranked by the last 7 days' messages (ties: the most recent), for the Moon temple's great hall and plain
@@ -269,10 +299,12 @@ export class DachiVoiceService {
   /** May `userId` use this thread? A character's: once dachi. A person's: only while you are dachi. */
   private async mustReach(userId: string, thread: string) {
     if (isCharacterThread(thread)) {
-      // KIMORIN⭐︎: always (everyone's ダチ); MIKIE⭐︎DRILL's: once dachi
+      // KIMORIN⭐︎: always (everyone's ダチ); MIKIE⭐︎DRILL's: once dachi and an Obolo Order
       if (thread === 'kimorin') return;
       const u = await this.journey(userId);
       if (!u?.dachiAt) throw apiError(HttpStatus.FORBIDDEN, 'NOT_DACHI', 'Not yet');
+      // M-R342: MIKIE⭐︎DRILL is a ダチ from the Order on (an account of before that wrote to her keeps its talk)
+      if (!mikieThreadShown({ ordered: !!u.orderedAt, wroteToHer: (await this.mikieThread(userId)).mine })) throw apiError(HttpStatus.FORBIDDEN, 'NOT_DACHI', 'Not yet');
       return;
     }
     if (!UUID_RE.test(thread) || !(await this.areDachi(userId, thread))) {

@@ -65,9 +65,20 @@ export const KIMORIN_WAIT_LINES: readonly DachiLine[] = [
   { id: 'k8', who: 'kimorin', day: 10, voice: null, text: '……明日で、旅が終わるそうですね。……いえ、べつに、さみしくは、ありません。' },
 ];
 
+/**
+ * M-R342 / M-R343 (client 2026-11-27): MIKIE⭐︎DRILL is a ダチ only once the member is an Obolo Order — no stand-in for
+ * the inviter before that.
+ *  - {inviter} recorded no voice: their welcome is this text message, in their own thread (the script's D04-S005c line).
+ *  - nobody invited: no welcome at all.
+ *  - on becoming Obolo Order: MIKIE⭐︎DRILL's thread appears with her welcome (MIKIE_WELCOME's words), kept under
+ *    MIKIE_ORDER_LINE_ID (her welcome of before was kept under 'welcome').
+ */
+export const INVITER_WELCOME_TEXT = 'ようこそ。……あなたのつぶやき、聞こえたよ。';
+export const MIKIE_ORDER_LINE_ID = 'mikie';
+
 export function dachiLine(id: string | null | undefined): DachiLine | undefined {
   if (!id) return undefined;
-  return id === MIKIE_WELCOME.id ? MIKIE_WELCOME : KIMORIN_WAIT_LINES.find((l) => l.id === id);
+  return id === MIKIE_WELCOME.id || id === MIKIE_ORDER_LINE_ID ? MIKIE_WELCOME : KIMORIN_WAIT_LINES.find((l) => l.id === id);
 }
 
 /**
