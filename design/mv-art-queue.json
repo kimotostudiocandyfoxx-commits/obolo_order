@@ -17785,6 +17785,1092 @@
    ],
    "always": false,
    "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a round orange crab mascot with small spikes on the top of the shell, a cream-white belly, two big claws and six thin legs, the face on the front of the shell); keep its shape exactly. No text, no letters. Page 6: Everyone on the other side of the rock celebrating with Kanibu, sunset. A happy ending."
+  },
+  {
+   "id": "res/onimonk-ref",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hipokin.webp"
+   ],
+   "always": false,
+   "prompt": "Character design of an original fantasy resident called Oni Monk, in the same semi-realistic dark fantasy 3D-CG look as the reference picture: a big friendly red-skinned oni (Japanese ogre) with two small horns, a kind big smile with small fangs, dark grey Buddhist monk robes with gold trim, and a retro game controller hanging on his neck instead of prayer beads, holding a little glowing paper lantern. Full body, standing, front view, centred. Plain solid pure white background, no text."
+  },
+  {
+   "id": "chibi-kaiser",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "apps/web/public/onboarding/kaiser-face.webp"
+   ],
+   "always": false,
+   "prompt": "A super-deformed 2-heads-tall chibi version of the character in the reference picture (a giant white daikon radish king with a stern wrinkled old face, a gold crown, leafy green daikon leaves like hair and a long white beard), keeping its look and signature items recognisable, drawn as a glossy cute 3D vinyl mini figure with soft studio lighting, cute pastel kawaii style, a friendly happy face. Jumping out joyfully with both arms up. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text."
+  },
+  {
+   "id": "kor4-kaiser",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/kaiser-face.webp",
+    "design/mv-art/out/kor4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "A round ball-shaped mascot (a perfect glossy sphere with no arms and no legs) in exactly the same style as the SECOND reference picture: soft cute anime mascot, glossy highlight top-left, the same simple face — two tiny shiny black dot eyes, a small ω-shaped cat mouth and soft round pink blush. Its colour and surface pattern are designed from the character in the FIRST reference picture (white radish with green leaves and gold), with one small signature item of it on top. It must still read as a round ball first. Front view, centered, filling about 80% of the frame. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "chibi4-kaiser",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "apps/web/public/onboarding/kaiser-face.webp",
+    "design/mv-art/out/chibi4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a giant white daikon radish king with a stern wrinkled old face, a gold crown, leafy green daikon leaves like hair and a long white beard), friendly happy face, dressed up as a butterfly: curly antennae and butterfly wings whose colours are designed from it (white radish with green leaves and gold). Flying gently and hugging a small framed painting. Front view, centered, the whole character and both wings inside the frame. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+  },
+  {
+   "id": "ship4-kaiser",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/kaiser-face.webp",
+    "design/mv-art/out/ship4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a small cute sailboat seen from the side with a sail shaped like a music note, hull and sail in its colours (white radish with green leaves and gold). Riding in the boat is a cute super-deformed chibi of the character in the FIRST reference picture (a giant white daikon radish king with a stern wrinkled old face, a gold crown, leafy green daikon leaves like hair and a long white beard), friendly happy face, carrying a big boombox. No water. Centered, everything inside the frame. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-mars-kaiser",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/kaiser-face.webp",
+    "design/mv-art/out/p5-mars-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a giant white daikon radish king with a stern wrinkled old face, a gold crown, leafy green daikon leaves like hair and a long white beard), friendly happy face, riding in a small round flying saucer UFO (in its colours, a glass dome). There is no light beam, no glow and no light cone under the saucer; its bottom has a clean outline. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-venus-kaiser",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/kaiser-face.webp",
+    "design/mv-art/out/p5-venus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a giant white daikon radish king with a stern wrinkled old face, a gold crown, leafy green daikon leaves like hair and a long white beard), friendly happy face, working as a radio DJ: sitting at a tiny cute radio DJ booth desk with a little mixer and an ON AIR lamp, wearing headphones and talking into a microphone, the booth floating on a small fluffy cloud. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-uranus-kaiser",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/kaiser-face.webp",
+    "design/mv-art/out/p5-uranus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a giant white daikon radish king with a stern wrinkled old face, a gold crown, leafy green daikon leaves like hair and a long white beard), friendly happy face, hanging from a bunch of balloons with a gift box in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-pluto-kaiser",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/kaiser-face.webp",
+    "design/mv-art/out/p5-pluto-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a giant white daikon radish king with a stern wrinkled old face, a gold crown, leafy green daikon leaves like hair and a long white beard), friendly happy face, riding on a big open flying book whose cover is in its colours, little glowing letters floating. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-neptune-kaiser",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/kaiser-face.webp",
+    "design/mv-art/out/p5-neptune-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a giant white daikon radish king with a stern wrinkled old face, a gold crown, leafy green daikon leaves like hair and a long white beard), friendly happy face, floating inside a big transparent bubble holding a game controller in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "chibi-freezy",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "apps/web/public/onboarding/freezy.webp"
+   ],
+   "always": false,
+   "prompt": "A super-deformed 2-heads-tall chibi version of the character in the reference picture (a shaggy creature with long black hair and a wooden-plank face with three golden eyes and a curly moustache, holding a round hand mirror, faint purple wisps), keeping its look and signature items recognisable, drawn as a glossy cute 3D vinyl mini figure with soft studio lighting, cute pastel kawaii style, a friendly happy face. Jumping out joyfully with both arms up. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text."
+  },
+  {
+   "id": "kor4-freezy",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/freezy.webp",
+    "design/mv-art/out/kor4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "A round ball-shaped mascot (a perfect glossy sphere with no arms and no legs) in exactly the same style as the SECOND reference picture: soft cute anime mascot, glossy highlight top-left, the same simple face — two tiny shiny black dot eyes, a small ω-shaped cat mouth and soft round pink blush. Its colour and surface pattern are designed from the character in the FIRST reference picture (black hair, brown wood and gold), with one small signature item of it on top. It must still read as a round ball first. Front view, centered, filling about 80% of the frame. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "chibi4-freezy",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "apps/web/public/onboarding/freezy.webp",
+    "design/mv-art/out/chibi4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a shaggy creature with long black hair and a wooden-plank face with three golden eyes and a curly moustache, holding a round hand mirror, faint purple wisps), friendly happy face, dressed up as a butterfly: curly antennae and butterfly wings whose colours are designed from it (black hair, brown wood and gold). Flying gently and hugging a small framed painting. Front view, centered, the whole character and both wings inside the frame. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+  },
+  {
+   "id": "ship4-freezy",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/freezy.webp",
+    "design/mv-art/out/ship4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a small cute sailboat seen from the side with a sail shaped like a music note, hull and sail in its colours (black hair, brown wood and gold). Riding in the boat is a cute super-deformed chibi of the character in the FIRST reference picture (a shaggy creature with long black hair and a wooden-plank face with three golden eyes and a curly moustache, holding a round hand mirror, faint purple wisps), friendly happy face, carrying a big boombox. No water. Centered, everything inside the frame. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-mars-freezy",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/freezy.webp",
+    "design/mv-art/out/p5-mars-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a shaggy creature with long black hair and a wooden-plank face with three golden eyes and a curly moustache, holding a round hand mirror, faint purple wisps), friendly happy face, riding in a small round flying saucer UFO (in its colours, a glass dome). There is no light beam, no glow and no light cone under the saucer; its bottom has a clean outline. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-venus-freezy",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/freezy.webp",
+    "design/mv-art/out/p5-venus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a shaggy creature with long black hair and a wooden-plank face with three golden eyes and a curly moustache, holding a round hand mirror, faint purple wisps), friendly happy face, working as a radio DJ: sitting at a tiny cute radio DJ booth desk with a little mixer and an ON AIR lamp, wearing headphones and talking into a microphone, the booth floating on a small fluffy cloud. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-uranus-freezy",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/freezy.webp",
+    "design/mv-art/out/p5-uranus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a shaggy creature with long black hair and a wooden-plank face with three golden eyes and a curly moustache, holding a round hand mirror, faint purple wisps), friendly happy face, hanging from a bunch of balloons with a gift box in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-pluto-freezy",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/freezy.webp",
+    "design/mv-art/out/p5-pluto-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a shaggy creature with long black hair and a wooden-plank face with three golden eyes and a curly moustache, holding a round hand mirror, faint purple wisps), friendly happy face, riding on a big open flying book whose cover is in its colours, little glowing letters floating. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-neptune-freezy",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/freezy.webp",
+    "design/mv-art/out/p5-neptune-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a shaggy creature with long black hair and a wooden-plank face with three golden eyes and a curly moustache, holding a round hand mirror, faint purple wisps), friendly happy face, floating inside a big transparent bubble holding a game controller in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "chibi-hipokin",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hipokin.webp"
+   ],
+   "always": false,
+   "prompt": "A super-deformed 2-heads-tall chibi version of the character in the reference picture (a hippopotamus gentleman in a black three-piece suit with a gold watch chain), keeping its look and signature items recognisable, drawn as a glossy cute 3D vinyl mini figure with soft studio lighting, cute pastel kawaii style, a friendly happy face. Jumping out joyfully with both arms up. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text."
+  },
+  {
+   "id": "kor4-hipokin",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hipokin.webp",
+    "design/mv-art/out/kor4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "A round ball-shaped mascot (a perfect glossy sphere with no arms and no legs) in exactly the same style as the SECOND reference picture: soft cute anime mascot, glossy highlight top-left, the same simple face — two tiny shiny black dot eyes, a small ω-shaped cat mouth and soft round pink blush. Its colour and surface pattern are designed from the character in the FIRST reference picture (grey hippo skin and a black suit), with one small signature item of it on top. It must still read as a round ball first. Front view, centered, filling about 80% of the frame. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "chibi4-hipokin",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hipokin.webp",
+    "design/mv-art/out/chibi4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a hippopotamus gentleman in a black three-piece suit with a gold watch chain), friendly happy face, dressed up as a butterfly: curly antennae and butterfly wings whose colours are designed from it (grey hippo skin and a black suit). Flying gently and hugging a small framed painting. Front view, centered, the whole character and both wings inside the frame. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+  },
+  {
+   "id": "ship4-hipokin",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hipokin.webp",
+    "design/mv-art/out/ship4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a small cute sailboat seen from the side with a sail shaped like a music note, hull and sail in its colours (grey hippo skin and a black suit). Riding in the boat is a cute super-deformed chibi of the character in the FIRST reference picture (a hippopotamus gentleman in a black three-piece suit with a gold watch chain), friendly happy face, carrying a big boombox. No water. Centered, everything inside the frame. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-mars-hipokin",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hipokin.webp",
+    "design/mv-art/out/p5-mars-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a hippopotamus gentleman in a black three-piece suit with a gold watch chain), friendly happy face, riding in a small round flying saucer UFO (in its colours, a glass dome). There is no light beam, no glow and no light cone under the saucer; its bottom has a clean outline. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-venus-hipokin",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hipokin.webp",
+    "design/mv-art/out/p5-venus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a hippopotamus gentleman in a black three-piece suit with a gold watch chain), friendly happy face, working as a radio DJ: sitting at a tiny cute radio DJ booth desk with a little mixer and an ON AIR lamp, wearing headphones and talking into a microphone, the booth floating on a small fluffy cloud. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-uranus-hipokin",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hipokin.webp",
+    "design/mv-art/out/p5-uranus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a hippopotamus gentleman in a black three-piece suit with a gold watch chain), friendly happy face, hanging from a bunch of balloons with a gift box in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-pluto-hipokin",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hipokin.webp",
+    "design/mv-art/out/p5-pluto-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a hippopotamus gentleman in a black three-piece suit with a gold watch chain), friendly happy face, riding on a big open flying book whose cover is in its colours, little glowing letters floating. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-neptune-hipokin",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hipokin.webp",
+    "design/mv-art/out/p5-neptune-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a hippopotamus gentleman in a black three-piece suit with a gold watch chain), friendly happy face, floating inside a big transparent bubble holding a game controller in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "chibi-bossg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "apps/web/public/onboarding/bossg.webp"
+   ],
+   "always": false,
+   "prompt": "A super-deformed 2-heads-tall chibi version of the character in the reference picture (a muscular black gorilla boss with thick gold chains and glowing blue tech armbands), keeping its look and signature items recognisable, drawn as a glossy cute 3D vinyl mini figure with soft studio lighting, cute pastel kawaii style, a friendly happy face. Jumping out joyfully with both arms up. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text."
+  },
+  {
+   "id": "kor4-bossg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/bossg.webp",
+    "design/mv-art/out/kor4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "A round ball-shaped mascot (a perfect glossy sphere with no arms and no legs) in exactly the same style as the SECOND reference picture: soft cute anime mascot, glossy highlight top-left, the same simple face — two tiny shiny black dot eyes, a small ω-shaped cat mouth and soft round pink blush. Its colour and surface pattern are designed from the character in the FIRST reference picture (black fur, gold chains and glowing blue), with one small signature item of it on top. It must still read as a round ball first. Front view, centered, filling about 80% of the frame. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "chibi4-bossg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "apps/web/public/onboarding/bossg.webp",
+    "design/mv-art/out/chibi4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a muscular black gorilla boss with thick gold chains and glowing blue tech armbands), friendly happy face, dressed up as a butterfly: curly antennae and butterfly wings whose colours are designed from it (black fur, gold chains and glowing blue). Flying gently and hugging a small framed painting. Front view, centered, the whole character and both wings inside the frame. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+  },
+  {
+   "id": "ship4-bossg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/bossg.webp",
+    "design/mv-art/out/ship4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a small cute sailboat seen from the side with a sail shaped like a music note, hull and sail in its colours (black fur, gold chains and glowing blue). Riding in the boat is a cute super-deformed chibi of the character in the FIRST reference picture (a muscular black gorilla boss with thick gold chains and glowing blue tech armbands), friendly happy face, carrying a big boombox. No water. Centered, everything inside the frame. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-mars-bossg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/bossg.webp",
+    "design/mv-art/out/p5-mars-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a muscular black gorilla boss with thick gold chains and glowing blue tech armbands), friendly happy face, riding in a small round flying saucer UFO (in its colours, a glass dome). There is no light beam, no glow and no light cone under the saucer; its bottom has a clean outline. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-venus-bossg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/bossg.webp",
+    "design/mv-art/out/p5-venus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a muscular black gorilla boss with thick gold chains and glowing blue tech armbands), friendly happy face, working as a radio DJ: sitting at a tiny cute radio DJ booth desk with a little mixer and an ON AIR lamp, wearing headphones and talking into a microphone, the booth floating on a small fluffy cloud. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-uranus-bossg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/bossg.webp",
+    "design/mv-art/out/p5-uranus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a muscular black gorilla boss with thick gold chains and glowing blue tech armbands), friendly happy face, hanging from a bunch of balloons with a gift box in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-pluto-bossg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/bossg.webp",
+    "design/mv-art/out/p5-pluto-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a muscular black gorilla boss with thick gold chains and glowing blue tech armbands), friendly happy face, riding on a big open flying book whose cover is in its colours, little glowing letters floating. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-neptune-bossg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/bossg.webp",
+    "design/mv-art/out/p5-neptune-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a muscular black gorilla boss with thick gold chains and glowing blue tech armbands), friendly happy face, floating inside a big transparent bubble holding a game controller in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "chibi-longg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "apps/web/public/onboarding/longg.webp"
+   ],
+   "always": false,
+   "prompt": "A super-deformed 2-heads-tall chibi version of the character in the reference picture (a gorilla with long blonde dreadlocks, round goggles and a colourful patterned robe, holding a big vintage microphone), keeping its look and signature items recognisable, drawn as a glossy cute 3D vinyl mini figure with soft studio lighting, cute pastel kawaii style, a friendly happy face. Jumping out joyfully with both arms up. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text."
+  },
+  {
+   "id": "kor4-longg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/longg.webp",
+    "design/mv-art/out/kor4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "A round ball-shaped mascot (a perfect glossy sphere with no arms and no legs) in exactly the same style as the SECOND reference picture: soft cute anime mascot, glossy highlight top-left, the same simple face — two tiny shiny black dot eyes, a small ω-shaped cat mouth and soft round pink blush. Its colour and surface pattern are designed from the character in the FIRST reference picture (blonde hair and a colourful patterned robe), with one small signature item of it on top. It must still read as a round ball first. Front view, centered, filling about 80% of the frame. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "chibi4-longg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "apps/web/public/onboarding/longg.webp",
+    "design/mv-art/out/chibi4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a gorilla with long blonde dreadlocks, round goggles and a colourful patterned robe, holding a big vintage microphone), friendly happy face, dressed up as a butterfly: curly antennae and butterfly wings whose colours are designed from it (blonde hair and a colourful patterned robe). Flying gently and hugging a small framed painting. Front view, centered, the whole character and both wings inside the frame. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+  },
+  {
+   "id": "ship4-longg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/longg.webp",
+    "design/mv-art/out/ship4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a small cute sailboat seen from the side with a sail shaped like a music note, hull and sail in its colours (blonde hair and a colourful patterned robe). Riding in the boat is a cute super-deformed chibi of the character in the FIRST reference picture (a gorilla with long blonde dreadlocks, round goggles and a colourful patterned robe, holding a big vintage microphone), friendly happy face, carrying a big boombox. No water. Centered, everything inside the frame. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-mars-longg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/longg.webp",
+    "design/mv-art/out/p5-mars-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a gorilla with long blonde dreadlocks, round goggles and a colourful patterned robe, holding a big vintage microphone), friendly happy face, riding in a small round flying saucer UFO (in its colours, a glass dome). There is no light beam, no glow and no light cone under the saucer; its bottom has a clean outline. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-venus-longg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/longg.webp",
+    "design/mv-art/out/p5-venus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a gorilla with long blonde dreadlocks, round goggles and a colourful patterned robe, holding a big vintage microphone), friendly happy face, working as a radio DJ: sitting at a tiny cute radio DJ booth desk with a little mixer and an ON AIR lamp, wearing headphones and talking into a microphone, the booth floating on a small fluffy cloud. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-uranus-longg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/longg.webp",
+    "design/mv-art/out/p5-uranus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a gorilla with long blonde dreadlocks, round goggles and a colourful patterned robe, holding a big vintage microphone), friendly happy face, hanging from a bunch of balloons with a gift box in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-pluto-longg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/longg.webp",
+    "design/mv-art/out/p5-pluto-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a gorilla with long blonde dreadlocks, round goggles and a colourful patterned robe, holding a big vintage microphone), friendly happy face, riding on a big open flying book whose cover is in its colours, little glowing letters floating. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-neptune-longg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/longg.webp",
+    "design/mv-art/out/p5-neptune-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a gorilla with long blonde dreadlocks, round goggles and a colourful patterned robe, holding a big vintage microphone), friendly happy face, floating inside a big transparent bubble holding a game controller in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "chibi-hatg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hatg.webp"
+   ],
+   "always": false,
+   "prompt": "A super-deformed 2-heads-tall chibi version of the character in the reference picture (a chubby black gorilla in a yellow bucket hat and sunglasses with a gold chain, holding a spray can with blue mist), keeping its look and signature items recognisable, drawn as a glossy cute 3D vinyl mini figure with soft studio lighting, cute pastel kawaii style, a friendly happy face. Jumping out joyfully with both arms up. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text."
+  },
+  {
+   "id": "kor4-hatg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hatg.webp",
+    "design/mv-art/out/kor4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "A round ball-shaped mascot (a perfect glossy sphere with no arms and no legs) in exactly the same style as the SECOND reference picture: soft cute anime mascot, glossy highlight top-left, the same simple face — two tiny shiny black dot eyes, a small ω-shaped cat mouth and soft round pink blush. Its colour and surface pattern are designed from the character in the FIRST reference picture (black fur, yellow hat and blue mist), with one small signature item of it on top. It must still read as a round ball first. Front view, centered, filling about 80% of the frame. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "chibi4-hatg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hatg.webp",
+    "design/mv-art/out/chibi4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a chubby black gorilla in a yellow bucket hat and sunglasses with a gold chain, holding a spray can with blue mist), friendly happy face, dressed up as a butterfly: curly antennae and butterfly wings whose colours are designed from it (black fur, yellow hat and blue mist). Flying gently and hugging a small framed painting. Front view, centered, the whole character and both wings inside the frame. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+  },
+  {
+   "id": "ship4-hatg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hatg.webp",
+    "design/mv-art/out/ship4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a small cute sailboat seen from the side with a sail shaped like a music note, hull and sail in its colours (black fur, yellow hat and blue mist). Riding in the boat is a cute super-deformed chibi of the character in the FIRST reference picture (a chubby black gorilla in a yellow bucket hat and sunglasses with a gold chain, holding a spray can with blue mist), friendly happy face, carrying a big boombox. No water. Centered, everything inside the frame. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-mars-hatg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hatg.webp",
+    "design/mv-art/out/p5-mars-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a chubby black gorilla in a yellow bucket hat and sunglasses with a gold chain, holding a spray can with blue mist), friendly happy face, riding in a small round flying saucer UFO (in its colours, a glass dome). There is no light beam, no glow and no light cone under the saucer; its bottom has a clean outline. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-venus-hatg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hatg.webp",
+    "design/mv-art/out/p5-venus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a chubby black gorilla in a yellow bucket hat and sunglasses with a gold chain, holding a spray can with blue mist), friendly happy face, working as a radio DJ: sitting at a tiny cute radio DJ booth desk with a little mixer and an ON AIR lamp, wearing headphones and talking into a microphone, the booth floating on a small fluffy cloud. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-uranus-hatg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hatg.webp",
+    "design/mv-art/out/p5-uranus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a chubby black gorilla in a yellow bucket hat and sunglasses with a gold chain, holding a spray can with blue mist), friendly happy face, hanging from a bunch of balloons with a gift box in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-pluto-hatg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hatg.webp",
+    "design/mv-art/out/p5-pluto-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a chubby black gorilla in a yellow bucket hat and sunglasses with a gold chain, holding a spray can with blue mist), friendly happy face, riding on a big open flying book whose cover is in its colours, little glowing letters floating. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-neptune-hatg",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hatg.webp",
+    "design/mv-art/out/p5-neptune-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a chubby black gorilla in a yellow bucket hat and sunglasses with a gold chain, holding a spray can with blue mist), friendly happy face, floating inside a big transparent bubble holding a game controller in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "chibi-croco",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "docs/story-rewrite/design/crocopatra.jpg"
+   ],
+   "always": false,
+   "prompt": "A super-deformed 2-heads-tall chibi version of the character in the reference picture (a crocodile lady in a long wine-red gown with a small tiara, holding a folding fan), keeping its look and signature items recognisable, drawn as a glossy cute 3D vinyl mini figure with soft studio lighting, cute pastel kawaii style, a friendly happy face. Jumping out joyfully with both arms up. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text."
+  },
+  {
+   "id": "kor4-croco",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "docs/story-rewrite/design/crocopatra.jpg",
+    "design/mv-art/out/kor4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "A round ball-shaped mascot (a perfect glossy sphere with no arms and no legs) in exactly the same style as the SECOND reference picture: soft cute anime mascot, glossy highlight top-left, the same simple face — two tiny shiny black dot eyes, a small ω-shaped cat mouth and soft round pink blush. Its colour and surface pattern are designed from the character in the FIRST reference picture (green scales and a wine-red gown), with one small signature item of it on top. It must still read as a round ball first. Front view, centered, filling about 80% of the frame. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "chibi4-croco",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "docs/story-rewrite/design/crocopatra.jpg",
+    "design/mv-art/out/chibi4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a crocodile lady in a long wine-red gown with a small tiara, holding a folding fan), friendly happy face, dressed up as a butterfly: curly antennae and butterfly wings whose colours are designed from it (green scales and a wine-red gown). Flying gently and hugging a small framed painting. Front view, centered, the whole character and both wings inside the frame. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+  },
+  {
+   "id": "ship4-croco",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "docs/story-rewrite/design/crocopatra.jpg",
+    "design/mv-art/out/ship4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a small cute sailboat seen from the side with a sail shaped like a music note, hull and sail in its colours (green scales and a wine-red gown). Riding in the boat is a cute super-deformed chibi of the character in the FIRST reference picture (a crocodile lady in a long wine-red gown with a small tiara, holding a folding fan), friendly happy face, carrying a big boombox. No water. Centered, everything inside the frame. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-mars-croco",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "docs/story-rewrite/design/crocopatra.jpg",
+    "design/mv-art/out/p5-mars-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a crocodile lady in a long wine-red gown with a small tiara, holding a folding fan), friendly happy face, riding in a small round flying saucer UFO (in its colours, a glass dome). There is no light beam, no glow and no light cone under the saucer; its bottom has a clean outline. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-venus-croco",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "docs/story-rewrite/design/crocopatra.jpg",
+    "design/mv-art/out/p5-venus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a crocodile lady in a long wine-red gown with a small tiara, holding a folding fan), friendly happy face, working as a radio DJ: sitting at a tiny cute radio DJ booth desk with a little mixer and an ON AIR lamp, wearing headphones and talking into a microphone, the booth floating on a small fluffy cloud. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-uranus-croco",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "docs/story-rewrite/design/crocopatra.jpg",
+    "design/mv-art/out/p5-uranus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a crocodile lady in a long wine-red gown with a small tiara, holding a folding fan), friendly happy face, hanging from a bunch of balloons with a gift box in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-pluto-croco",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "docs/story-rewrite/design/crocopatra.jpg",
+    "design/mv-art/out/p5-pluto-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a crocodile lady in a long wine-red gown with a small tiara, holding a folding fan), friendly happy face, riding on a big open flying book whose cover is in its colours, little glowing letters floating. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-neptune-croco",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "docs/story-rewrite/design/crocopatra.jpg",
+    "design/mv-art/out/p5-neptune-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a crocodile lady in a long wine-red gown with a small tiara, holding a folding fan), friendly happy face, floating inside a big transparent bubble holding a game controller in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "chibi-onimonk",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "design/mv-art/out/res/onimonk-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "A super-deformed 2-heads-tall chibi version of the character in the reference picture (a big friendly red-skinned oni (Japanese ogre) monk with two small horns, dark grey monk robes and a game controller hanging on his neck instead of prayer beads), keeping its look and signature items recognisable, drawn as a glossy cute 3D vinyl mini figure with soft studio lighting, cute pastel kawaii style, a friendly happy face. Jumping out joyfully with both arms up. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text."
+  },
+  {
+   "id": "kor4-onimonk",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/res/onimonk-ref.jpg",
+    "design/mv-art/out/kor4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "A round ball-shaped mascot (a perfect glossy sphere with no arms and no legs) in exactly the same style as the SECOND reference picture: soft cute anime mascot, glossy highlight top-left, the same simple face — two tiny shiny black dot eyes, a small ω-shaped cat mouth and soft round pink blush. Its colour and surface pattern are designed from the character in the FIRST reference picture (red skin, dark grey robes and a game controller), with one small signature item of it on top. It must still read as a round ball first. Front view, centered, filling about 80% of the frame. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "chibi4-onimonk",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "design/mv-art/out/res/onimonk-ref.jpg",
+    "design/mv-art/out/chibi4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a big friendly red-skinned oni (Japanese ogre) monk with two small horns, dark grey monk robes and a game controller hanging on his neck instead of prayer beads), friendly happy face, dressed up as a butterfly: curly antennae and butterfly wings whose colours are designed from it (red skin, dark grey robes and a game controller). Flying gently and hugging a small framed painting. Front view, centered, the whole character and both wings inside the frame. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+  },
+  {
+   "id": "ship4-onimonk",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/res/onimonk-ref.jpg",
+    "design/mv-art/out/ship4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a small cute sailboat seen from the side with a sail shaped like a music note, hull and sail in its colours (red skin, dark grey robes and a game controller). Riding in the boat is a cute super-deformed chibi of the character in the FIRST reference picture (a big friendly red-skinned oni (Japanese ogre) monk with two small horns, dark grey monk robes and a game controller hanging on his neck instead of prayer beads), friendly happy face, carrying a big boombox. No water. Centered, everything inside the frame. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-mars-onimonk",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/res/onimonk-ref.jpg",
+    "design/mv-art/out/p5-mars-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a big friendly red-skinned oni (Japanese ogre) monk with two small horns, dark grey monk robes and a game controller hanging on his neck instead of prayer beads), friendly happy face, riding in a small round flying saucer UFO (in its colours, a glass dome). There is no light beam, no glow and no light cone under the saucer; its bottom has a clean outline. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-venus-onimonk",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/res/onimonk-ref.jpg",
+    "design/mv-art/out/p5-venus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a big friendly red-skinned oni (Japanese ogre) monk with two small horns, dark grey monk robes and a game controller hanging on his neck instead of prayer beads), friendly happy face, working as a radio DJ: sitting at a tiny cute radio DJ booth desk with a little mixer and an ON AIR lamp, wearing headphones and talking into a microphone, the booth floating on a small fluffy cloud. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-uranus-onimonk",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/res/onimonk-ref.jpg",
+    "design/mv-art/out/p5-uranus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a big friendly red-skinned oni (Japanese ogre) monk with two small horns, dark grey monk robes and a game controller hanging on his neck instead of prayer beads), friendly happy face, hanging from a bunch of balloons with a gift box in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-pluto-onimonk",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/res/onimonk-ref.jpg",
+    "design/mv-art/out/p5-pluto-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a big friendly red-skinned oni (Japanese ogre) monk with two small horns, dark grey monk robes and a game controller hanging on his neck instead of prayer beads), friendly happy face, riding on a big open flying book whose cover is in its colours, little glowing letters floating. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-neptune-onimonk",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/res/onimonk-ref.jpg",
+    "design/mv-art/out/p5-neptune-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a big friendly red-skinned oni (Japanese ogre) monk with two small horns, dark grey monk robes and a game controller hanging on his neck instead of prayer beads), friendly happy face, floating inside a big transparent bubble holding a game controller in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
   }
  ],
  "redo": []
