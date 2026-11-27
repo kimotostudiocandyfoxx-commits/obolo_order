@@ -4,7 +4,7 @@ import { PLANET_FIGURES, type PlanetFigure } from '@obolo/shared';
 import { costScope, type CostCtx } from '../wallet/cost-scope';
 import { featureOfJob } from '../wallet/cost-scope';
 import { FIGURE_RUN_TRIES, FIGURE_TRIES, PlanetFiguresService, figuresOf, figuresToMake, triesKey, type FigureStore } from './figures.service';
-import { cutFailKey, cutKey, srcKey, wingsOf, WINGS_KEY } from './figures';
+import { cutFailKey, cutKey, srcKey, versionKey, wingsOf, WINGS_KEY } from './figures';
 
 vi.mock('../media/keying', async (orig) => ({ ...(await orig<typeof import('../media/keying')>()), chooseKey: async () => 'green' }));
 /** the cut-out ladder of the tests: passes at once, or does what `ladder.run` says (M-R326) */
@@ -285,5 +285,43 @@ describe('client 2026-11-25: the planet figures of a look (one job, all nine)', 
     expect(b.painted).toHaveLength(0);
     // done once
     expect((await b.s.recut('u1', 'https://api')).checked).toBe(0);
+  });
+
+  it('M-R328: a Mars figure painted with the old prompt (the light beam) is painted again once, through the ladder; a new one carries its prompt version', async () => {
+    const fresh = { avatarUrl: LOOK, chibiPicUrl: null, planetFigures: null as FigureStore | null };
+    const a = make(fresh);
+    await a.s.make({ userId: 'u1', origin: 'https://api' });
+    expect(fresh.planetFigures![LOOK][versionKey('mars')]).toBe('2');
+    expect(fresh.planetFigures![LOOK][versionKey('venus')]).toBeUndefined();
+    expect(await a.s.repaintOld('u1', 'https://api')).toEqual({ repainted: 0, failed: 0, painted: 0 });
+
+    const row = { avatarUrl: LOOK, chibiPicUrl: null, planetFigures: { [LOOK]: { mars: 'https://x/mars-beam.png', venus: 'https://x/venus.png' }, 'https://x/old-look.png': { mars: 'https://x/mars-old-look.png' } } as FigureStore };
+    const b = make(row);
+    expect(await b.s.repaintOld('u1', 'https://api')).toEqual({ repainted: 1, failed: 0, painted: 1 });
+    expect(b.painted.map((p) => p.f)).toEqual(['mars']);
+    expect(b.painted[0].prompt).toContain('No light beam, no glow and no sparkles under the saucer');
+    const e = row.planetFigures[LOOK];
+    expect(e.mars).not.toBe('https://x/mars-beam.png');
+    expect(e[versionKey('mars')]).toBe('2');
+    expect(e[srcKey('mars')]).toBeTruthy();
+    expect(b.removed).toEqual(['https://x/mars-beam.png']);
+    // only the look worn now; the other figures untouched; done once
+    expect(row.planetFigures['https://x/old-look.png']).toEqual({ mars: 'https://x/mars-old-look.png' });
+    expect(e.venus).toBe('https://x/venus.png');
+    expect(await b.s.repaintOld('u1', 'https://api')).toEqual({ repainted: 0, failed: 0, painted: 0 });
+
+    // the cut fails every retry: the figure of before stays, marked, and is not painted again
+    const bad = { avatarUrl: LOOK, chibiPicUrl: null, planetFigures: { [LOOK]: { mars: 'https://x/mars-beam.png' } } as FigureStore };
+    const c = make(bad);
+    ladder.run = async () => ({ ok: false, painted: 3, tries: [{ step: 'colour', failed: ['area'], reason: '' }] });
+    try {
+      expect(await c.s.repaintOld('u1', 'https://api')).toEqual({ repainted: 0, failed: 1, painted: 3 });
+    } finally {
+      ladder.run = null;
+    }
+    expect(bad.planetFigures[LOOK].mars).toBe('https://x/mars-beam.png');
+    expect(bad.planetFigures[LOOK][versionKey('mars')]).toBe('2x');
+    expect(bad.planetFigures[LOOK][cutFailKey('mars')]).toBe('colour:area');
+    expect(await c.s.repaintOld('u1', 'https://api')).toEqual({ repainted: 0, failed: 0, painted: 0 });
   });
 });

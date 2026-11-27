@@ -76,7 +76,7 @@
       "what": "chibi riding a UFO in their colours (M-R293)",
       "source": "story design/mv-art-queue.json p5-mars-user",
       "style_refs": ["bstyle"],
-      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding a small cute round flying saucer UFO whose colours and patterns are designed from the character's outfit, a soft projector beam glowing under it. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), riding a small cute round flying saucer UFO whose colours and patterns are designed from the character's outfit. No light beam, no glow and no sparkles under the saucer; the bottom of the saucer has a clean outline. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
     },
     {
       "id": "venus-dj",

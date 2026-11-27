@@ -10,7 +10,9 @@ import { users } from '../db/schema';
 import type { KvStore } from '../infra/kv';
 import { KV } from '../infra/tokens';
 import { FIGURE_TRIES, PlanetFiguresService, triesKey } from './figures.service';
-import { cutKey, WINGS_KEY } from './figures';
+import { cutKey, versionKey, WINGS_KEY } from './figures';
+import { PLANET_FIGURE_PROMPT_VERSION } from '@obolo/ai';
+import { costScope } from '../wallet/cost-scope';
 import { LookService } from './look.service';
 
 /** a figure of the look worn now that is not made and still has tries left */
@@ -126,6 +128,36 @@ export class ChibiBackfillController {
   }
 
   /**
+   * M-R328 backfill (admin token only): the Mars figures painted with the old prompt (a light beam under the saucer)
+   * are painted again with the prompt of now — the look worn now only, through the cut-out's checks and retries,
+   * `limit` members at a time (default 10, at most 100), oldest first. The operators' one-off: absorbed ('figures',
+   * no mana). Idempotent ('mars#v' is kept beside the figure). Run again until `members` is 0.
+   *   curl -X POST -H "x-admin-token: …" "https://<api>/admin/figures-repaint?limit=10"
+   */
+  @Post('figures-repaint')
+  @HttpCode(200)
+  async repaint(@Headers('x-admin-token') token: string | undefined, @Ip() ip: string, @Req() req: Request, @Query('limit') limit?: string) {
+    await rateLimit(this.kv, `admin:${ip}`, 120, 600);
+    assertAdmin(this.cfg, token);
+    const n = Math.max(1, Math.min(100, Number(limit) || 10));
+    const rows = await this.db.read
+      .select({ id: users.id })
+      .from(users)
+      .where(and(isNotNull(users.avatarUrl), isNull(users.deletedAt), oldPrompt(sql`(${users.planetFigures} -> ${users.avatarUrl})`)))
+      .orderBy(users.createdAt)
+      .limit(n);
+    const origin = `${req.protocol}://${req.get('host')}`;
+    const total = { members: rows.length, repainted: 0, failed: 0, painted: 0 };
+    for (const r of rows) {
+      // the operators' repaint: booked like the absorbed figures of before
+      const got = await costScope.run({ feature: 'figures', userId: r.id }, () => this.figures.repaintOld(r.id, origin)).catch(() => null);
+      if (!got) continue;
+      for (const k of ['repainted', 'failed', 'painted'] as const) total[k] += got[k];
+    }
+    return total;
+  }
+
+  /**
    * M-R326, before the live planet screens become the new homes (docs/planets.md "新しい家への切り替え"): what of the
    * existing data is not ready yet — read only, admin token only. Every count should reach 0 (or be understood) by
    * running the backfills in the order docs/planets.md gives (.github/workflows/planets-backfill.yml).
@@ -167,6 +199,12 @@ export class ChibiBackfillController {
       cutFailures: await one(
         sql`SELECT count(*) AS n FROM users u, ${looks}, jsonb_each_text(e.value) k WHERE u.deleted_at IS NULL AND u.planet_figures IS NOT NULL AND k.key LIKE '%#cutfail' AND (e.value ->> replace(k.key, '#cutfail', '')) IS NULL`,
       ),
+      /** M-R328: figures of the look worn now painted with an old prompt (Mars: the light beam; POST /admin/figures-repaint) */
+      oldPrompt: await one(sql`SELECT count(*) AS n FROM users u WHERE u.deleted_at IS NULL AND u.avatar_url IS NOT NULL AND ${oldPrompt(sql`(u.planet_figures -> u.avatar_url)`)}`),
+      /** … and of the other kept looks (painted again only when that look is worn and the backfill runs) */
+      oldPromptOtherLooks: await one(
+        sql`SELECT count(*) AS n FROM users u, ${looks} WHERE u.deleted_at IS NULL AND u.planet_figures IS NOT NULL AND e.key IS DISTINCT FROM u.avatar_url AND ${oldPrompt(sql`e.value`)}`,
+      ),
       /** Jupiter figures whose wing cut is not measured (POST /admin/wings-backfill) */
       wingsNotMeasured: await one(
         sql`SELECT count(*) AS n FROM users u, ${looks} WHERE u.deleted_at IS NULL AND u.planet_figures IS NOT NULL AND (e.value ->> 'jupiter') IS NOT NULL AND (e.value ->> ${WINGS_KEY}) IS NULL`,
@@ -179,11 +217,19 @@ export class ChibiBackfillController {
           WHERE p.planet = 'mercury' AND p.kind = 'song' AND p.deleted_at IS NULL AND s.deleted_at IS NULL AND u.deleted_at IS NULL AND u.voice_self_id IS NOT NULL
             AND ${sql.raw(fold('p.title'))} <> '' AND (s.design_json -> 'titleVoice' ->> 'text') IS DISTINCT FROM ${sql.raw(fold('p.title'))}`,
     );
-    const left = Object.values(worksWithoutTags).reduce((a, b) => a + b, 0) + figures.membersMissing + figures.membersToRecut + figures.wingsNotMeasured + songsWithoutTitleVoice;
+    const left = Object.values(worksWithoutTags).reduce((a, b) => a + b, 0) + figures.membersMissing + figures.membersToRecut + figures.oldPrompt + figures.wingsNotMeasured + songsWithoutTitleVoice;
     return { ready: left === 0, membersWithLook: members, worksWithoutTags, figures, songsWithoutTitleVoice };
   }
 }
 
+/** a figure in `entry` (one look's figures) painted with an older prompt than PLANET_FIGURE_PROMPT_VERSION (figures.ts figuresToRepaint, in SQL) */
+const oldPrompt = (entry: ReturnType<typeof sql>) =>
+  sql.join(
+    (Object.entries(PLANET_FIGURE_PROMPT_VERSION) as [string, number][]).map(
+      ([f, v]) => sql`((${entry} ->> ${f}) IS NOT NULL AND COALESCE(substring((${entry} ->> ${versionKey(f as never)}) from '^[0-9]+')::int, 1) < ${v})`,
+    ),
+    sql` OR `,
+  );
 /** a figure of any kept look that has no 'f#cut' mark */
 const toRecutOf = (store: ReturnType<typeof sql>) =>
   sql`EXISTS (SELECT 1 FROM jsonb_each(${store}) e WHERE ${sql.raw(PLANET_FIGURES.map((f) => `((e.value ->> '${f}') IS NOT NULL AND (e.value ->> '${cutKey(f)}') IS NULL)`).join(' OR '))})`;

@@ -44,6 +44,13 @@ export const PLANET_FIGURE_BACKGROUND: Record<PlanetFigureStyle, 'key' | 'white'
   neptune: 'white',
 };
 
+/**
+ * The version of a figure's prompt, kept beside the figure it painted ('f#v' in planet_figures) so a changed prompt's
+ * figures can be counted and painted again once. Mars 2 (client decision M-R328): no light under the saucer — the
+ * beam was cut straight or broke the cut-out; the touch and the pattern are as before. No entry: version 1.
+ */
+export const PLANET_FIGURE_PROMPT_VERSION: Partial<Record<PlanetFigureStyle, number>> = { mars: 2 };
+
 /** the lab's default slot words (runware_planet_avatar.py) */
 export const FIGURE_SLOTS = {
   pattern: "the character's outfit colours",
@@ -105,7 +112,7 @@ function figurePrompt(style: PlanetFigureStyle, key: string, keyName: string, sl
         WHITE_END
       );
     case 'mars':
-      return STYLE_2_4 + CHIBI_OF_FIRST + "riding a small cute round flying saucer UFO whose colours and patterns are designed from the character's outfit, a soft projector beam glowing under it. Centered, everything inside the frame with a margin. " + WHITE_END;
+      return STYLE_2_4 + CHIBI_OF_FIRST + "riding a small cute round flying saucer UFO whose colours and patterns are designed from the character's outfit. No light beam, no glow and no sparkles under the saucer; the bottom of the saucer has a clean outline. Centered, everything inside the frame with a margin. " + WHITE_END;
     case 'venus':
       return (
         STYLE_2_4 +

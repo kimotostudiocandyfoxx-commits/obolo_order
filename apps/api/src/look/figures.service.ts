@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger, Optional } from '@nestjs/common';
-import { BUTTERFLY_STYLE_CELLS, PLANET_FIGURE_BACKGROUND, PLANET_FIGURE_REFS, planetFigurePrompt, type BackgroundRemover, type GeneratedImage, type ImageProvider, type LlmProvider } from '@obolo/ai';
+import { BUTTERFLY_STYLE_CELLS, PLANET_FIGURE_BACKGROUND, PLANET_FIGURE_PROMPT_VERSION, PLANET_FIGURE_REFS, planetFigurePrompt, type BackgroundRemover, type GeneratedImage, type ImageProvider, type LlmProvider } from '@obolo/ai';
 import { FIGURE_PAINTER, type PlanetFigure } from '@obolo/shared';
 import { eq, sql } from 'drizzle-orm';
 import { readFile } from 'node:fs/promises';
@@ -13,7 +13,7 @@ import { cutByModel, cutLadder, inspectCut, ladderRecord, llmCutJudge, recutStor
 import { chooseKey, KEY_WORDS, KEYS, type KeyName } from '../media/keying';
 import { MediaService } from '../media/media.service';
 import { costScope } from '../wallet/cost-scope';
-import { CUT_VERSION, cutFailKey, cutKey, FIGURE_CONCURRENCY, FIGURE_RUN_TRIES, FIGURE_SIDE, FIGURE_TRIES, figuresOf, figuresToMake, figuresToRecut, srcKey, triesKey, wingsToMeasure, encodeWings, WINGS_KEY, type FigureStore } from './figures';
+import { CUT_VERSION, cutFailKey, cutKey, FIGURE_CONCURRENCY, FIGURE_RUN_TRIES, FIGURE_SIDE, FIGURE_TRIES, figuresOf, figuresToMake, figuresToRecut, figuresToRepaint, srcKey, triesKey, versionKey, wingsToMeasure, encodeWings, WINGS_KEY, type FigureStore } from './figures';
 import { measureWings } from './wings';
 
 export { FIGURE_CONCURRENCY, FIGURE_RUN_TRIES, FIGURE_TRIES, figuresOf, figuresToMake, triesKey, type FigureStore };
@@ -177,7 +177,7 @@ export class PlanetFiguresService {
             const kept = await this.media.storeImage(p.userId, 'avatar', cut.source.mime, cut.source.data, p.origin).catch(() => null);
             // 03 §1: the butterfly's wing cut, measured on the cut-out picture (kept with it; 'none': the default cut)
             const wings: Record<string, string> = f === 'jupiter' ? { [WINGS_KEY]: encodeWings(await measureWings(png).catch(() => null)) } : {};
-            await this.patch(p.userId, of, { [f]: m.url, [cutKey(f)]: `${CUT_VERSION}:${cut.step}`, ...(kept ? { [srcKey(f)]: kept.url } : {}), ...wings });
+            await this.patch(p.userId, of, { [f]: m.url, [cutKey(f)]: `${CUT_VERSION}:${cut.step}`, ...(kept ? { [srcKey(f)]: kept.url } : {}), ...versionOf(f), ...wings });
             if (f === 'saturnChibi') {
               const now = await this.row(p.userId);
               if (now?.avatarUrl === of) await this.setChibi(p.userId, m.url);
@@ -215,6 +215,46 @@ export class PlanetFiguresService {
       await this.patch(userId, look, { [WINGS_KEY]: encodeWings(w) });
     }
     return { measured, fallback };
+  }
+
+  /**
+   * M-R328 backfill (the operators' one-off, absorbed: 'figures'): the figures of the look worn now that were painted
+   * with an older prompt (Mars: the light under the saucer) are painted again with the prompt of now, through the
+   * cut-out's checks and retries (at most three paintings). One that passes replaces the figure; one whose cut fails
+   * every retry leaves the figure of before and is marked ('f#v' <n>x) so it is not painted again.
+   */
+  async repaintOld(userId: string, origin: string): Promise<{ repainted: number; failed: number; painted: number }> {
+    const out = { repainted: 0, failed: 0, painted: 0 };
+    const u = await this.row(userId);
+    const of = u?.avatarUrl;
+    const todo = figuresToRepaint(u?.planetFigures, of, PLANET_FIGURE_PROMPT_VERSION);
+    if (!u || !of || !todo.length) return out;
+    const src = await this.lookPicture(userId, of);
+    if (!src) return out;
+    const key = await chooseKey(src.data);
+    for (const f of todo) {
+      const v = PLANET_FIGURE_PROMPT_VERSION[f]!;
+      const before = u.planetFigures?.[of] ?? {};
+      const cut = await this.paint(f, src, key, async () => true).catch((e) => {
+        this.log.warn(`figure ${f} of ${userId}: the repaint failed (${String(e)})`);
+        return null;
+      });
+      // the painter was down: left for the next run
+      if (!cut) continue;
+      out.painted += cut.painted;
+      if (!cut.ok) {
+        out.failed++;
+        this.log.error(`figure ${f} of ${userId}: the repaint's cut-out failed every retry (${ladderRecord(cut.tries)}); the figure of before stays`);
+        await this.patch(userId, of, { [versionKey(f)]: `${v}x`, [cutFailKey(f)]: ladderRecord(cut.tries) });
+        continue;
+      }
+      const m = await this.media.storeImage(userId, 'avatar', 'image/png', cut.png, origin);
+      const kept = await this.media.storeImage(userId, 'avatar', cut.source.mime, cut.source.data, origin).catch(() => null);
+      await this.patch(userId, of, { [f]: m.url, [cutKey(f)]: `${CUT_VERSION}:${cut.step}`, [versionKey(f)]: String(v), ...(kept ? { [srcKey(f)]: kept.url } : {}) });
+      for (const old of [before[f], before[srcKey(f)]]) if (old) await this.media.removeByUrl(userId, old).catch(() => undefined);
+      out.repainted++;
+    }
+    return out;
   }
 
   /**
@@ -291,6 +331,8 @@ export class PlanetFiguresService {
   }
 }
 
+/** the prompt version kept beside a figure just painted (M-R328) */
+const versionOf = (f: PlanetFigure): Record<string, string> => (PLANET_FIGURE_PROMPT_VERSION[f] ? { [versionKey(f)]: String(PLANET_FIGURE_PROMPT_VERSION[f]) } : {});
 const mimeOf = (data: Buffer) => (data[0] === 0x89 ? 'image/png' : data[0] === 0xff ? 'image/jpeg' : 'image/webp');
 /** what a kept painting was painted on, from its border: one of the key colours when the border is that saturated colour, else plain */
 async function backgroundOf(painting: Buffer): Promise<CutBackground> {

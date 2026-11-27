@@ -23,6 +23,18 @@ export const srcKey = (f: PlanetFigure) => `${f}#src`;
 export const cutKey = (f: PlanetFigure) => `${f}#cut`;
 export const cutFailKey = (f: PlanetFigure) => `${f}#cutfail`;
 export const CUT_VERSION = '2';
+/**
+ * M-R328: the version of the prompt a figure was painted with ('f#v'; none: 1) — a figure whose prompt changed
+ * (PLANET_FIGURE_PROMPT_VERSION: Mars 2, no light under the saucer) is painted again once by the operators' backfill.
+ * '<n>x': painted again, but its cut failed every retry — the figure of before stays (not tried again).
+ */
+export const versionKey = (f: PlanetFigure) => `${f}#v`;
+/** the figures of `look` painted with an older prompt than `versions` asks (and not tried yet) */
+export const figuresToRepaint = (store: FigureStore | null | undefined, look: string | null | undefined, versions: Partial<Record<PlanetFigure, number>>): PlanetFigure[] => {
+  const e = look ? store?.[look] : undefined;
+  if (!e) return [];
+  return PLANET_FIGURES.filter((f) => e[f] && versions[f] && parseInt(e[versionKey(f)] ?? '1', 10) < versions[f]!);
+};
 /** the figures of every kept look that were cut before the checked cut (the re-cut backfill) */
 export const figuresToRecut = (store: FigureStore | null | undefined): { look: string; figure: PlanetFigure; url: string; src?: string }[] =>
   Object.entries(store ?? {}).flatMap(([look, e]) => PLANET_FIGURES.filter((f) => e[f] && !e[cutKey(f)]).map((f) => ({ look, figure: f, url: e[f], ...(e[srcKey(f)] ? { src: e[srcKey(f)] } : {}) })));
