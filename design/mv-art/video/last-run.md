@@ -1,6 +1,5 @@
-# MV video — 2026-11-23T04:52:20.886Z
+# MV video — 2026-11-27T02:50:08.547Z
 
-2 clips / about $0.65
+1 clips / about $0.07
 
-- ✅ iida-intro-burst
-- ✅ iida-intro-burst-rev
+- ✅ sapon-dad
