@@ -390,6 +390,24 @@
    "always": false,
    "cameraFixed": true,
    "prompt": "The big salmon swims gently forward in place through the deep blue sea, its tail and fins sway smoothly, scales shimmer, sun rays from the surface ripple softly, small bubbles rise. Calm, seamless, the same painterly style, no cuts, no text."
+  },
+  {
+   "id": "su-gari-dad",
+   "image": "design/mv-art/out/su/gari/dad.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "always": false,
+   "cameraFixed": true,
+   "prompt": "The young ginger leaves sway gently in the warm evening breeze, petals and light particles drift slowly, the sunset glow shimmers softly. Calm, seamless, the same painterly style, no cuts, no text."
+  },
+  {
+   "id": "su-ebi-dad",
+   "image": "design/mv-art/out/su/ebi/dad.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "always": false,
+   "cameraFixed": true,
+   "prompt": "The old spiny lobster slowly moves its long antennae, small fish swim past, light rays from the surface ripple softly, bubbles rise. Calm, seamless, the same painterly style, no cuts, no text."
   }
  ],
  "redo": []
