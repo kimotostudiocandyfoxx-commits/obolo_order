@@ -1815,7 +1815,7 @@ function play(){
   T(()=>{raf3=requestAnimationFrame(step);spawn(PATH.pop+22);spawn(PATH.pop+69);spawn(PATH.pop+116);SV.iv=setInterval(()=>spawn(),2600)},850);
 }
 function stopPlay(){SPIN=false;if(SV){SV.t.forEach(clearTimeout);clearInterval(SV.iv);if(SV.stopOrbit)SV.stopOrbit();SV=null;hvOff()}const pa0=$('party');if(pa0){pa0.classList.remove('inhv');$('phone').insertBefore(pa0,$('fw')||$('spinwrap'))}if(playing&&playing!==true)clearTimeout(playing);playing=null;clubStop();const w=$('spinwrap');if(w)w.classList.remove('on');const pa=$('party');if(pa)pa.classList.remove('on');$('phone').classList.remove('partying');$('needle').classList.remove('on');setCta(false)}
-$('switch').innerHTML=Object.entries(P).map(([k,c])=>`<button type="button" data-k="${k}">${c.name}</button>`).join('');
+$('switch').innerHTML=DAYPL.filter(k=>P[k]).map(k=>[k,P[k]]).map(([k,c])=>`<button type="button" data-k="${k}">${c.name}</button>`).join('');
 $('mode').onclick=e=>{const m=e.target.dataset.m;if(m){mode=m;render()}};
 $('satmode').onclick=e=>{const s=e.target.dataset.s;if(s){SATMODE=s;try{localStorage.setItem('obolo-satmode',s)}catch(x){}render()}};
 $('switch').onclick=e=>{const k=e.target.dataset.k;if(k){cur=k;render()}};
