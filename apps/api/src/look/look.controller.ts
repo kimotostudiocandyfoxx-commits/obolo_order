@@ -74,8 +74,8 @@ export class LookController {
 
   @Post('look/steps/back')
   @HttpCode(200)
-  stepBack(@UserId() userId: string, @Body() body: unknown) {
-    return this.steps.back(userId, parseBody(LookWhoBody, body).who);
+  stepBack(@UserId() userId: string, @Body() body: unknown, @Headers('x-admin-token') token?: string) {
+    return this.steps.back(userId, parseBody(LookWhoBody, body).who, this.admin(token));
   }
 
   @Post('look/steps/fix')

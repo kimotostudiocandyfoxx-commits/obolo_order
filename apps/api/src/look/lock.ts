@@ -41,6 +41,15 @@ export function batiLookLockedOf(u: Row): boolean {
   return !activeMember(u);
 }
 
+/**
+ * {bati}'s step round (steps.service.ts: step / back / fix) is open while day 2 is still being lived — the day its look
+ * is decided (D03-S005b) — and for an Obolo Order member. Past day 2 a resident's round is closed whether or not it was
+ * ever decided: one that was left open on day 2 can't be stepped on later for free (BATI_LOOK_LOCKED)
+ */
+export function batiRoundLockedOf(u: Row): boolean {
+  return !activeMember(u) && lookConfirmed({ journeyDay: u.journeyDay, journeyCompletedAt: u.journeyCompletedAt, confirmed: false });
+}
+
 /** 403 BATI_LOOK_LOCKED with {bati}'s words (PLACEHOLDER line, BATI_LOOK_LOCKED_LINE; {self}: its 一人称) */
 export function batiLookLocked(u: Row) {
   return apiError(HttpStatus.FORBIDDEN, 'BATI_LOOK_LOCKED', BATI_LOOK_LOCKED_LINE.replace('{self}', activeBati(u)?.self || 'ボク'));

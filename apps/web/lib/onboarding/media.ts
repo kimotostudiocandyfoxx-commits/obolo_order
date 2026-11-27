@@ -88,9 +88,17 @@ export const filmParts = (id: string, n: number): MotionId[] => Array.from({ len
 /**
  * Pictures replaced under the same name: a version on the URL, because the browsers keep /onboarding for a day (and a
  * week stale). 2026-11-27: OBOLON's new look (the client's own picture, design/refs/2026-11-27-story/05) — his
- * cut-out, and the nine stills he floats in (the same orb laid over the painted one).
+ * cut-out, and the nine stills he floats in (the same orb laid over the painted one); MONBAN repainted (design/cast/,
+ * scripts/cast/build.py) — his standing picture, the four poses and the back view (monban-close and monban-halo are new
+ * names).
  */
 const REPLACED: Record<string, number> = {
+  monban: 2,
+  'monban-back': 2,
+  'monban-x-arms': 2,
+  'monban-x-point': 2,
+  'monban-x-stop': 2,
+  'monban-x-talk': 2,
   obolon: 2,
   'obolon-pit': 2,
   's/d2-hall-kimorin': 2,
@@ -106,6 +114,11 @@ const REPLACED: Record<string, number> = {
 const ver = (name: string) => (REPLACED[name] ? `?v=${REPLACED[name]}` : '');
 /** Character images shown over the motions (transparent WebP). */
 export const spriteUrl = (name: string) => `${MEDIA_BASE}/${name}.webp${ver(name)}`;
+/** a picture's path under /onboarding as written in a manifest (lib/story/views.json), with its version when replaced */
+export const versioned = (url: string) => {
+  const name = url.match(/^\/onboarding\/(.+)\.(?:webp|jpg)$/)?.[1];
+  return name && REPLACED[name] ? `${url}?v=${REPLACED[name]}` : url;
+};
 /** Still background images (JPEG). */
 export const stillUrl = (name: string) => `${MEDIA_BASE}/${name}.jpg${ver(name)}`;
 /**

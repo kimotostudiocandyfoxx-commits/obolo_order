@@ -1,3 +1,4 @@
+import { versioned } from '@/lib/onboarding/media';
 import VIEWS from './views.json';
 
 /**
@@ -11,7 +12,11 @@ type View = { src: string; same?: string };
 type Character = { name?: string; front?: View; views?: Partial<Record<'q3' | 'side' | 'back', View | string>> };
 const M = VIEWS as unknown as { characters?: Record<string, Character>; speakers?: Record<string, string> };
 
-const srcOf = (v?: View | string) => (typeof v === 'string' ? v : v?.src);
+// (a view repainted under the same name carries its version: /onboarding is cached for a day)
+const srcOf = (v?: View | string) => {
+  const src = typeof v === 'string' ? v : v?.src;
+  return src ? versioned(src) : src;
+};
 
 /** a person's views by their sprite, then their speaker name (undefined: none made) */
 export function viewsOf(...keys: (string | undefined)[]): { back?: string; side?: string; q3?: string } | undefined {

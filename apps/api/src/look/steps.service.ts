@@ -29,7 +29,7 @@ import { toMe } from '../users/users.service';
 import { canUseMedia } from '../voice/media-consent';
 import { LedgerService } from '../wallet/ledger.service';
 import { livePrices } from '../wallet/price-book';
-import { lookConfirmedOf, lookLocked, lookLockedOf } from './lock';
+import { batiLookLocked, batiRoundLockedOf, lookConfirmedOf, lookLocked, lookLockedOf } from './lock';
 import { LookService } from './look.service';
 
 type Row = typeof users.$inferSelect;
@@ -69,6 +69,9 @@ export function stepsOf(u: Pick<Row, 'onboardingJson'>, who: LookStepWho): LookS
  *    every step); one's own look is confirmed with it (the profile look's mana, 'profileLook': the first one through
  *    LookService.confirmFirstLook, a member's later one as a normal charge).
  *  - `open`: an Obolo Order member starts a new round from the look worn now (a resident's stays as it is: LOOK_LOCKED).
+ *  - who may: {bati}'s round (step / back / fix) is open during day 2 of the journey and for an Obolo Order member — past
+ *    day 2 a resident's is closed even if it was never decided (403 BATI_LOOK_LOCKED); one's own round (step / base /
+ *    back / fix) is closed for a resident once the look is confirmed (403 LOOK_LOCKED).
  * While a round is open the pictures of its steps are only kept on the round (the screen shows them); nothing else of the
  * account changes until it is decided.
  */
@@ -111,6 +114,15 @@ export class LookStepsService {
     if (lookConfirmedOf(u) && s.fixed) throw apiError(HttpStatus.CONFLICT, 'LOOK_STEPS_DONE', 'この姿は、もう決まっています');
   }
 
+  /**
+   * {bati}'s round is open during day 2 (the day its look is decided) and for an Obolo Order member; past day 2 a
+   * resident's is closed, decided or not (lock.ts batiRoundLockedOf)
+   */
+  private batiOpen(u: Row, unlimited: boolean) {
+    if (unlimited) return;
+    if (batiRoundLockedOf(u)) throw batiLookLocked(u);
+  }
+
   async info(userId: string): Promise<LookStepsInfo> {
     const u = await this.user(userId);
     const p = await livePrices();
@@ -128,6 +140,7 @@ export class LookStepsService {
     const wish = body.wish.trim();
     if (!wish && !body.image) throw apiError(HttpStatus.BAD_REQUEST, 'VALIDATION_FAILED', 'Say how to change it, or send a picture');
     if (who === 'self') this.selfOpen(u, s, unlimited);
+    else this.batiOpen(u, unlimited);
     if (!canLookStep(s)) throw apiError(HttpStatus.CONFLICT, 'LOOK_STEPS_DONE', '、、、今日の魔法は、ここまでだ。');
     const from = s.url ?? this.worn(u, who);
     if (!from) throw apiError(HttpStatus.CONFLICT, who === 'bati' ? 'NO_BATI' : 'NO_LOOK', 'Nothing to change yet');
@@ -230,9 +243,12 @@ export class LookStepsService {
   }
 
   /** 〔↶ ひとつ前の姿にもどす〕 (M-R338): the picture before the last step again; the steps used and their mana stay */
-  async back(userId: string, who: LookStepWho): Promise<LookStepResult> {
+  async back(userId: string, who: LookStepWho, unlimited = false): Promise<LookStepResult> {
     const u = await this.user(userId);
     const s = stepsOf(u, who);
+    // (a closed round is not moved either: its picture would only be worn through `fix`, refused the same way)
+    if (who === 'self') this.selfOpen(u, s, unlimited);
+    else this.batiOpen(u, unlimited);
     if (!canLookStepBack(s)) throw apiError(HttpStatus.CONFLICT, 'LOOK_STEPS_NO_BACK', 'もう前の姿はない');
     const next = backLookStep(s);
     const nu = await this.save(userId, who, next);
@@ -246,6 +262,7 @@ export class LookStepsService {
     if (s.fixed) return { who, steps: lookStepView(s, this.worn(u, who)), mana: 0, me: toMe(u) };
     let mana = 0;
     if (who === 'bati') {
+      this.batiOpen(u, unlimited);
       if (!u.batiImageUrl) throw apiError(HttpStatus.CONFLICT, 'NO_BATI', 'Not hatched yet');
       if (s.url && s.url !== u.batiImageUrl) await this.look.wearBati(userId, u, s.url, origin, true);
     } else {

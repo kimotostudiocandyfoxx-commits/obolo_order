@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { spriteUrl } from '@/lib/onboarding/media';
 import { MOTION } from '@/lib/story/motion';
+import { Halo, type HaloSpec } from './Halo';
 import LAYERS from '@/lib/story/sprite-layers.json';
 import MOUTHS from '@/lib/story/sprite-mouths.json';
 
@@ -39,6 +41,19 @@ export interface CharSpec {
   poise?: 'still' | 'divine';
   /** the expression shown when none is set (a cast with no plain standing picture: kaiser1 has only its -x- poses) */
   rest?: string;
+  /**
+   * a disc of light behind the head, a layer of its own (onboarding/<file>.webp): its centre in the standing picture
+   * (x, y: 0–1) and its diameter as a share of the picture's height. The poses share the standing picture's canvas
+   * (scripts/cast/build.py), so one place fits them all
+   */
+  halo?: { file: string; x: number; y: number; size: number };
+  /**
+   * a painting of its own for the cinema close-up (days 1–2): shown instead of the standing picture pushed in.
+   * height: how tall it is drawn (% of the screen), face: where the face is in it (0–1 from the top — it lands at
+   * MOTION.cinema.faceAt), halo: the halo's place in this picture, fade: from where (0–1 down the picture) it fades
+   * out — the painting ends at the chest
+   */
+  close?: { file: string; height: number; face: number; fade: number; halo?: { x: number; y: number; size: number } };
 }
 
 /** the expression / pose pictures made so far (onboarding/<char>-x-<expr>.webp, lib/story/expression.ts) */
@@ -59,8 +74,23 @@ const MONBAN_FACES = facesOf('monban-x', ['talk', 'point', 'arms', 'stop']);
 const FRIEND = ['talk', 'joy', 'shock'];
 
 const CHAR: Record<string, CharSpec> = {
-  // MONBAN's glowing eye is placed on the standing picture; on the pose pictures the eye is painted in
-  monban: { bottom: 8, height: 74, face: 0.24, tint: '#c99a4a', eye: [0.507, 0.225], faces: MONBAN_FACES, poise: 'still' },
+  // MONBAN, repainted 2026-11-27 (design/cast/ → scripts/cast/build.py, which prints these numbers): the figure fills
+  // its picture (top 0.9%, feet 98.9%), the polished-gold eye is at (0.5, 0.103) in the standing picture and every pose
+  // (the same canvas, the eye in the middle column). height 62 keeps him as tall on screen as the old picture at 74
+  // (that one had 16% of headroom). eye: the small light on the metal of the eye, on the standing picture only.
+  // halo: the golden disc behind the hood, as in the client's design (design/story/refs/client/monban.jpg: its centre
+  // on the hood's brow, its outer ring about a third of his height across). close: the close-up painting, for the cinema
+  monban: {
+    bottom: 9,
+    height: 62,
+    face: 0.12,
+    tint: '#c99a4a',
+    eye: [0.5, 0.103],
+    faces: MONBAN_FACES,
+    poise: 'still',
+    halo: { file: 'monban-halo', x: 0.5, y: 0.057, size: 0.38 },
+    close: { file: 'monban-close', height: 74, face: 0.29, fade: 0.8, halo: { x: 0.503, y: 0.138, size: 0.96 } },
+  },
   'kimorin-sun': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e', faces: KIMORIN_FACES },
   // KIMORIN before the dragon (no wing) and at the gate (sunglasses on, no eye glow)
   'kimorin-n': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e', faces: facesOf('kimorin-n', POSES) },
@@ -102,6 +132,11 @@ const CHAR: Record<string, CharSpec> = {
 const CINE_BACK = 'blur(18px) brightness(0.4) saturate(0.8)';
 const DEFAULT: CharSpec = { bottom: 12, height: 58, face: 0.25, tint: '#b08a4a' };
 export const charSpec = (name: string): CharSpec => CHAR[name] ?? (name.startsWith('@') ? { bottom: 30, height: 34, face: 0.45, tint: '#9a7ac8' } : DEFAULT);
+/** the halo behind a character's head, placed on its standing picture and poses (the row: components/story/StoryTalk.tsx) */
+export const haloOf = (name: string): HaloSpec | undefined => {
+  const h = CHAR[name]?.halo;
+  return h ? { src: spriteUrl(h.file), x: h.x, y: h.y, size: h.size } : undefined;
+};
 
 /** Which picture on stage is the one who speaks. */
 const SPEAKER: Record<string, string[]> = {
@@ -248,7 +283,8 @@ export function Cast({
           <Character
             key={name}
             name={name}
-            url={face ? `/onboarding/${face}.webp` : url}
+            // (spriteUrl: a repainted pose carries its version, lib/onboarding/media.ts REPLACED)
+            url={face ? spriteUrl(face) : url}
             posed={!!face}
             lit={!speaking || speaking === name}
             bust={bust && speaking === name}
@@ -290,9 +326,16 @@ const layersOf = (url: string): string[] => {
 type MouthBox = { x: number; y: number; w: number; h: number };
 const mouthBoxOf = (url: string): MouthBox | undefined => (MOUTHS as Record<string, MouthBox>)[stemOf(url) ?? ''];
 
-function Character({ name, url, posed, lit, bust, hidden, talking, level, react, style, className, scale = 1, flip = false, cinema = false, shot = null }: { shot?: 'punch' | 'push' | null; name: string; url: string; posed?: boolean; lit: boolean; bust: boolean; hidden: boolean; talking: boolean; level?: () => number; react?: Reaction; style: CSSProperties; className: string; scale?: number; flip?: boolean; cinema?: boolean }) {
+function Character({ name, url: standing, posed: inPose, lit, bust, hidden, talking, level, react, style, className, scale = 1, flip = false, cinema = false, shot = null }: { shot?: 'punch' | 'push' | null; name: string; url: string; posed?: boolean; lit: boolean; bust: boolean; hidden: boolean; talking: boolean; level?: () => number; react?: Reaction; style: CSSProperties; className: string; scale?: number; flip?: boolean; cinema?: boolean }) {
   const base = charSpec(name);
-  const spec = { ...base, height: base.height * scale };
+  const C = MOTION.cinema;
+  // the cinema close-up of one who has a close-up painting: that picture, drawn at its own size with the face where
+  // the cinema puts faces — instead of the standing picture pushed in 2.5×
+  const close = cinema && bust ? base.close : undefined;
+  const url = close ? spriteUrl(close.file) : standing;
+  const posed = !!inPose || !!close;
+  const spec = close ? { ...base, bottom: 100 - C.faceAt - close.height * (1 - close.face), height: close.height, face: close.face } : { ...base, height: base.height * scale };
+  const halo: HaloSpec | undefined = base.halo ? { src: spriteUrl(base.halo.file), ...(close ? (close.halo ?? base.halo) : base.halo) } : undefined;
   const shut = useBlink(!!spec.eye && !posed);
   const parts = layersOf(url);
   const layer = (k: string) => (parts.includes(k) ? url.replace(/\.webp(\?.*)?$/, `-${k}.webp$1`) : null);
@@ -331,9 +374,8 @@ function Character({ name, url, posed, lit, bust, hidden, talking, level, react,
   // the bust-up: the same picture, bigger, its face near the upper third of the screen
   // cinema (days 1–2): much closer — the face nearly fills the width where the picture allows — and the face set at
   // MOTION.cinema.faceAt % from the top (its place on screen, worked out from where it stands)
-  const C = MOTION.cinema;
   const own = name.startsWith('@') && name !== '@egg';
-  const zoom = bust ? (cinema ? Math.min(spec.bustMax ? spec.bustMax * C.smallBoost : own ? 1.3 : C.zoom, C.zoom) * (shot === 'punch' ? C.punch.zoom : 1) : Math.min(spec.bustMax ?? 1.75, 62 / (spec.height * Math.max(0.35, 1 - spec.face * 1.6)))) : 1;
+  const zoom = bust ? (cinema ? (close ? 1 : Math.min(spec.bustMax ? spec.bustMax * C.smallBoost : own ? 1.3 : C.zoom, C.zoom)) * (shot === 'punch' ? C.punch.zoom : 1) : Math.min(spec.bustMax ?? 1.75, 62 / (spec.height * Math.max(0.35, 1 - spec.face * 1.6)))) : 1;
   const faceY = 100 - spec.bottom - spec.height * (1 - spec.face);
   const lift = bust ? (cinema ? `${((C.faceAt - faceY) / spec.height) * 100}%` : `${-12 - (spec.face - 0.2) * 40}%`) : '0';
   // each time this one takes the floor in cinema: the camera pushes onto them (from the side they stood on)
@@ -401,13 +443,16 @@ function Character({ name, url, posed, lit, bust, hidden, talking, level, react,
         <div className={`relative h-full ${divine ? 'divine-float' : ''}`} style={{ ...life, ...(divine ? { ['--float' as string]: `${P.divine.floatPct}%`, animationDuration: `${P.divine.floatMs}ms` } : {}), ...(talking && !lips && !spec.poise ? { animation: 'lipBob 0.22s ease-in-out infinite' } : {}) }}>
           {divine && <DivineAura lit={lit} talking={talking} />}
           <div key={url} className={`relative h-full ${divine ? '' : 'drop-shadow-[0_18px_40px_rgba(0,0,0,0.6)]'} ${posed && !spec.poise ? 'animate-[poseIn_0.28s_cubic-bezier(.2,1.4,.4,1)]' : ''}`} style={{ filter: dim, ...(flip ? { transform: 'scaleX(-1)' } : {}) }}>
+            {/* the halo: behind the picture (its place in the close-up painting is that picture's own), dimmed with him
+                when he steps back */}
+            {halo && <Halo at={halo} lit={lit} />}
             {layer('tail') && (
               // the tail feathers sway on their own, behind the body
               // eslint-disable-next-line @next/next/no-img-element
               <img src={layer('tail')!} alt="" draggable={false} className={`absolute inset-0 ${img}`} style={{ transformOrigin: '50% 78%', animation: MOTION.tail.deg ? `tailSway ${MOTION.tail.period}ms ease-in-out infinite` : undefined, ['--tail' as string]: `${MOTION.tail.deg}deg` }} />
             )}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={layer('body') ?? url} alt="" draggable={false} className={`relative ${img} ${own && !name.startsWith('@bati') && !isCutOut(url) ? 'rounded-[2rem] border-2 border-amber-200/50' : ''}`} />
+            <img src={layer('body') ?? url} alt="" draggable={false} className={`relative ${img} ${own && !name.startsWith('@bati') && !isCutOut(url) ? 'rounded-[2rem] border-2 border-amber-200/50' : ''}`} style={close ? { WebkitMaskImage: `linear-gradient(to bottom, #000 ${close.fade * 100}%, transparent)`, maskImage: `linear-gradient(to bottom, #000 ${close.fade * 100}%, transparent)` } : undefined} />
             {mouth && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -423,8 +468,8 @@ function Character({ name, url, posed, lit, bust, hidden, talking, level, react,
               <img src={shutLayer} alt="" draggable={false} className={`absolute inset-0 ${img}`} style={{ opacity: talking && !open ? 1 : 0 }} />
             )}
             {layer('eyes') && (
-              // KIMORIN's eye slits: a glow that breathes (the sunglasses poses have none). MONBAN's eye does not glow
-              // (client 2026-11-27: metallic gold with a small light) — its glow layer stays faint and still
+              // KIMORIN's eye slits: a glow that breathes (the sunglasses poses have none). A 'still' one's would stay faint
+              // and still (MONBAN's repainted poses have no glow layer at all: the eye is polished metal, client 2026-11-27)
               // eslint-disable-next-line @next/next/no-img-element
               <img src={layer('eyes')!} alt="" draggable={false} className={`absolute inset-0 ${img}`} style={spec.poise === 'still' ? { opacity: P.still.eyeLayer } : { animation: `eyeGlow ${MOTION.eyes.period}ms ease-in-out infinite`, ['--eyeMin' as string]: `${MOTION.eyes.min}`, ['--eyeMax' as string]: `${MOTION.eyes.max}` }} />
             )}

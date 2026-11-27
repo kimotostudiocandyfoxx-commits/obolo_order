@@ -78,7 +78,10 @@ CAST = {
     'mikie': dict(name='MIKIE⭐︎DRILL', front='onboarding/mikie.webp', key='blue', head=0.30,
                   desc='a small smiling woman with a black bob haircut and round black sunglasses, a loose hot-pink blouse, a colourful '
                        'flower-print skirt, beige flat shoes; her right arm is a silver hook and her left arm is a golden-silver gatling gun'),
-    'monban': dict(name='MONBAN', front='onboarding/monban.webp', key='magenta', head=0.22, views=('back',),
+    # repainted 2026-11-27 (design/cast/, design/cast-art-queue.json): the front AND the back are cut by
+    # scripts/cast/build.py from the same set of paintings (`made`: build here only measures that file, it never cuts the
+    # old view painting over it)
+    'monban': dict(name='MONBAN', front='onboarding/monban.webp', key='green', head=0.17, views=('back',), made=('back',),
                    desc='a tall hooded figure in a long black robe with fine gold patterns, face hidden in the dark hood'),
     'talk-user': dict(name='{neo}', front='talk/user/stand.webp', key='blue', head=0.30, views=('back',),
                       desc='a black-and-white cartoon boy with black hair, round black glasses, a white T-shirt, a black open jacket, black '
@@ -245,6 +248,12 @@ def cmd_build(a):
                 entry['views'][v] = {'src': '/' + c['front'], 'same': 'front', 'w': front.width, 'h': front.height, 'padX': 0,
                                      **metrics(fa, c['head'])}
         for v in c.get('views', VIEWS) if cid in CAST else ():
+            if v in c.get('made', ()):
+                rel, path = stem_paths(c, v)
+                im = Image.open(path).convert('RGBA')
+                entry['views'][v] = {'src': '/' + rel, 'w': im.width, 'h': im.height, 'padX': (im.width - front.width) // 2,
+                                     **metrics(np.asarray(im)[:, :, 3], c['head']), 'by': 'scripts/cast/build.py'}
+                continue
             k = KEEP.get(cid, {}).get(v)
             if not k:
                 continue
@@ -260,7 +269,7 @@ def cmd_build(a):
             al = np.asarray(im)[:, :, 3]
             entry['views'][v] = {'src': '/' + rel, 'w': im.width, 'h': im.height, 'padX': (im.width - front.width) // 2,
                                  **metrics(al, c['head']), 'try': k, **({'flipped': True} if flip else {})}
-        if not any('try' in e for e in entry['views'].values()):
+        if not any('try' in e or 'by' in e for e in entry['views'].values()):
             continue  # nothing painted yet (or a sphere): no contact sheet
         # contact sheet: front | 3/4 | side | back, over grey
         H = 520

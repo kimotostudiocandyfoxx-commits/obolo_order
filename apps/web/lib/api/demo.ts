@@ -72,6 +72,7 @@ import {
   LOOK_LOCKED_LINE,
   BATI_LOOK_LOCKED_LINE,
   profileLookLocked,
+  lookConfirmed,
   CHARGE_ERROR_WORDS,
   confirmKey,
   spellEdit,
@@ -2671,6 +2672,7 @@ export class DemoApi implements Api {
   async lookStep(body: Parameters<Api['lookStep']>[0]): Promise<LookStepResult> {
     const s = this.stepRound(body.who);
     if (body.who === 'self' && s.fixed) demoUnlocked(this.s.users[this.uid()]);
+    if (body.who === 'bati') demoBatiRoundOpen(this.s.users[this.uid()]);
     if (!canLookStep(s)) throw new ApiError(409, 'LOOK_STEPS_DONE', '、、、今日の魔法は、ここまでだ。');
     const from = s.url ?? this.wornOf(body.who);
     if (!from) throw new ApiError(409, body.who === 'bati' ? 'NO_BATI' : 'NO_LOOK', 'nothing to change yet');
@@ -2702,6 +2704,7 @@ export class DemoApi implements Api {
   }
   async lookStepBack(who: LookStepWho): Promise<LookStepResult> {
     const s = this.stepRound(who);
+    if (who === 'bati') demoBatiRoundOpen(this.s.users[this.uid()]);
     if (!canLookStepBack(s)) throw new ApiError(409, 'LOOK_STEPS_NO_BACK', 'もう前の姿はない');
     const next = backLookStep(s);
     this.saveRound(who, next);
@@ -2713,6 +2716,7 @@ export class DemoApi implements Api {
     let me = this.s.users[this.uid()];
     if (!s.fixed) {
       if (who === 'bati') {
+        demoBatiRoundOpen(me);
         if (s.url && s.url !== this.wornOf('bati')) me = this.wearBati(s.url, true);
       } else if (s.url && s.url !== me.avatarUrl) {
         this.charge('profileLook');
@@ -3129,6 +3133,10 @@ function demoLookLocked(u: Me): boolean {
 /** client 2026-11-27 (M-R338), like the API: {bati}'s look stays as decided on day 2 until Obolo Order */
 function demoBatiUnlocked(u: Me) {
   if (!isActiveMember(u)) throw new ApiError(403, 'BATI_LOOK_LOCKED', BATI_LOOK_LOCKED_LINE.replace('{self}', u.bati?.self || 'ボク'));
+}
+/** like the API (lock.ts batiRoundLockedOf): {bati}'s step round is open during day 2 and for a member; closed past day 2 */
+function demoBatiRoundOpen(u: Me) {
+  if (!isActiveMember(u) && lookConfirmed({ journeyDay: u.journeyDay, journeyCompletedAt: u.journeyCompletedAt, confirmed: false })) demoBatiUnlocked(u);
 }
 function demoUnlocked(u: Me) {
   if (demoLookLocked(u)) throw new ApiError(403, 'LOOK_LOCKED', LOOK_LOCKED_LINE.replace('{neo}', u.displayName || 'きみ').replace('{self}', 'ボク'));

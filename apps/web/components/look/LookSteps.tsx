@@ -34,7 +34,7 @@ type Ref = { mime: 'image/jpeg'; data: string; url: string };
 const words = (e: unknown, fallback: string) => {
   const x = e as { code?: string; message?: string } | null;
   if (x?.code === 'NO_MANA') return 'マナジェムが、光らなくなった……';
-  if (x?.code === 'MODERATION' || x?.code === 'LOOK_LOCKED' || x?.code === 'LOOK_STEPS_DONE') return x.message || fallback;
+  if (x?.code === 'MODERATION' || x?.code === 'LOOK_LOCKED' || x?.code === 'BATI_LOOK_LOCKED' || x?.code === 'LOOK_STEPS_DONE') return x.message || fallback;
   // nothing was taken and nothing counted: the picture could not be made, or not cut cleanly (never shown badly cut)
   if (x?.code === 'LOOK_CUT_FAILED' || x?.code === 'LOOK_STEP_FAILED') return AGAIN;
   if (x?.code === 'PHOTO_NOT_ALLOWED') return 'ここでは、画像は使えません';

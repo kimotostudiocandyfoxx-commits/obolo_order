@@ -2,6 +2,7 @@
 
 import { talkExpression, talkPose, type TalkExpression, type TalkFace, type TalkLook, type TalkMotion } from '@obolo/shared';
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { Halo, type HaloSpec } from '@/components/story/Halo';
 
 /**
  * One speaker standing in the side-by-side talk, made to look alive from still pictures (M-R235 — no video):
@@ -44,6 +45,7 @@ export function Figure({
   calm = false,
   reduced = false,
   poise,
+  halo,
   lit = false,
   glow,
   level,
@@ -74,6 +76,8 @@ export function Figure({
    * slowly (talk-divine, 9 s; not with reduced motion)
    */
   poise?: 'still' | 'divine';
+  /** a disc of light behind the head (the story's MONBAN): placed in the picture's own fractions; not chest up */
+  halo?: HaloSpec;
   /** steps forward (the one speaking in a group) */
   lit?: boolean;
   glow?: string;
@@ -181,7 +185,7 @@ export function Figure({
                     </div>
                   )}
                   <div className="h-full" style={prev ? { animation: 'talk-fadein .2s linear' } : undefined}>
-                    <Picture faceAt={faceBox(look)} expr={expr} img={img} chest={chest} height={height} shut={shut} open={open || yawn} sway={false} breath={breath} />
+                    <Picture faceAt={faceBox(look)} expr={expr} img={img} chest={chest} height={height} shut={shut} open={open || yawn} sway={false} breath={breath} halo={halo} />
                   </div>
                 </div>
               </div>
@@ -193,7 +197,7 @@ export function Figure({
   );
 }
 
-function Picture({ expr, img, chest, height, shut, open, sway, breath, faceAt }: { faceAt?: { x: number; y: number; w: number; h: number }; expr: TalkExpression | null; img: (src: string, s?: CSSProperties) => React.ReactNode; chest: boolean; height: number; shut: boolean; open: boolean; sway: boolean; breath: number }) {
+function Picture({ expr, img, chest, height, shut, open, sway, breath, faceAt, halo }: { halo?: HaloSpec; faceAt?: { x: number; y: number; w: number; h: number }; expr: TalkExpression | null; img: (src: string, s?: CSSProperties) => React.ReactNode; chest: boolean; height: number; shut: boolean; open: boolean; sway: boolean; breath: number }) {
   // chest up: the figure down to a little below the face, as tall as the box
   const fb = (expr?.kind === 'image' ? (expr.eyesBox ?? expr.mouthBox) : undefined) ?? faceAt;
   const crop = fb ? Math.min(1, Math.max(0.42, fb.y + fb.h + 0.26)) : 0.52;
@@ -218,7 +222,8 @@ function Picture({ expr, img, chest, height, shut, open, sway, breath, faceAt }:
   const hideBase = fullBlink || fullMouth;
   return (
     <div className="relative" style={box}>
-      {img(expr.url, { height: '100%', opacity: hideBase ? 0 : 1, WebkitMaskImage: sway ? under : undefined, maskImage: sway ? under : undefined })}
+      {halo && !chest && <Halo at={halo} />}
+      {img(expr.url, { position: 'relative', height: '100%', opacity: hideBase ? 0 : 1, WebkitMaskImage: sway ? under : undefined, maskImage: sway ? under : undefined })}
       {sway && <div className="absolute inset-0" style={{ ...top, WebkitMaskImage: mask, maskImage: mask }}>{img(expr.url, { height: '100%' })}</div>}
       {/* the parts move with the top, so they stay on the face */}
       <div className="absolute inset-0" style={top}>
