@@ -18914,6 +18914,824 @@
    ],
    "always": false,
    "prompt": "Edit the reference picture: the same long golden space ticket with a rocket in the middle, the same gold, light and style. Change only the stamp row: along the bottom there are now exactly 8 empty star-shaped stamp slots in one even row (for Saturn, Jupiter, Mercury, Mars, Venus, Pluto, Neptune and Uranus), each with a tiny faint planet mark inside. Centered, the whole ticket inside the frame, dark space background, no text, no letters."
+  },
+  {
+   "id": "re/brother/dad",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [],
+   "always": false,
+   "prompt": "A beautiful painting of a lively Japanese summer festival street at sunset: a takoyaki stall with a glowing iron griddle full of round takoyaki, paper lanterns, warm orange sky, painterly brush strokes, like a fine art poster. No text."
+  },
+  {
+   "id": "re/brother/goods",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/chibi-brother.jpg"
+   ],
+   "always": false,
+   "prompt": "Product photo of a cool black baseball cap with an embroidered cute chibi of the character in the reference picture, on a wooden table, soft daylight. Merchandise photo. No text."
+  },
+  {
+   "id": "re/brother/book-1",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/chibi-brother.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (たこ焼きブラザー), friendly face, keep its look recognisable. No text, no letters. Page 1: The character proudly turning takoyaki on a griddle with picks, steam rising."
+  },
+  {
+   "id": "re/brother/book-2",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/chibi-brother.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (たこ焼きブラザー), friendly face, keep its look recognisable. No text, no letters. Page 2: The character looking at lumpy, broken takoyaki, a bit sad, sweat drop."
+  },
+  {
+   "id": "re/brother/book-3",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/chibi-brother.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (たこ焼きブラザー), friendly face, keep its look recognisable. No text, no letters. Page 3: The character holding up a perfectly round shiny takoyaki, cheering, sparkles. Happy ending."
+  },
+  {
+   "id": "re/sister/dad",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [],
+   "always": false,
+   "prompt": "A beautiful moody painting of a night alley in Japan, steam rising softly from a takoyaki griddle under red paper lanterns, rain-wet stones reflecting light, painterly, elegant, like a fine art poster. No text."
+  },
+  {
+   "id": "re/sister/goods",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/chibi-sister.jpg"
+   ],
+   "always": false,
+   "prompt": "Product photo of an elegant folded silk handkerchief printed with a cute chibi of the character in the reference picture and small takoyaki patterns, on a velvet cloth, soft light. Merchandise photo. No text."
+  },
+  {
+   "id": "re/sister/book-1",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/chibi-sister.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (たこ焼きシスター), friendly face, keep its look recognisable. No text, no letters. Page 1: The character wearing a soft dress made of white steam, standing by a takoyaki griddle at night."
+  },
+  {
+   "id": "re/sister/book-2",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/chibi-sister.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (たこ焼きシスター), friendly face, keep its look recognisable. No text, no letters. Page 2: A gust of wind blowing the steam dress away, the character holding her head, lanterns swaying."
+  },
+  {
+   "id": "re/sister/book-3",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/chibi-sister.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (たこ焼きシスター), friendly face, keep its look recognisable. No text, no letters. Page 3: The character smiling, cooking takoyaki again, new steam swirling into a dress, stars. Happy ending."
+  },
+  {
+   "id": "re/kaiser/dad",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [],
+   "always": false,
+   "prompt": "A beautiful painting of a vast daikon radish field under a huge swirling Jupiter in the sky, white radishes peeking out of dark soil with green leaves, dramatic light, painterly, like a fine art poster. No text."
+  },
+  {
+   "id": "re/kaiser/goods",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/res/kaiser-ref2.jpg"
+   ],
+   "always": false,
+   "prompt": "Product photo of a white cooking apron printed with a cute chibi of the character in the reference picture and a gold crown, hanging on a kitchen hook, soft daylight. Merchandise photo. No text."
+  },
+  {
+   "id": "re/kaiser/book-1",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/res/kaiser-ref2.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (大根カイザー), friendly face, keep its look recognisable. No text, no letters. Page 1: The character standing proudly with a crown, arms crossed, in a radish field."
+  },
+  {
+   "id": "re/kaiser/book-2",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/res/kaiser-ref2.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (大根カイザー), friendly face, keep its look recognisable. No text, no letters. Page 2: A plate of sashimi with fine white daikon tsuma strands underneath; the character small and smiling beside it."
+  },
+  {
+   "id": "re/kaiser/book-3",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/res/kaiser-ref2.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (大根カイザー), friendly face, keep its look recognisable. No text, no letters. Page 3: The character laughing with sushi friends (a salmon block mascot, a shrimp mascot), sunset. Happy ending."
+  },
+  {
+   "id": "re/freezy/dad",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [],
+   "always": false,
+   "prompt": "A beautiful painting of a small ice island in a calm blue sea, glittering ice crystals, a soft green aurora in the sky, quiet and cold, painterly, like a fine art poster. No text."
+  },
+  {
+   "id": "re/freezy/goods",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/freezy.webp"
+   ],
+   "always": false,
+   "prompt": "Product photo of a clear glass shaved-ice cup with a cute chibi of the character in the reference picture printed on it, filled with blue shaved ice, soft daylight. Merchandise photo. No text."
+  },
+  {
+   "id": "re/freezy/book-1",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/freezy.webp"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (フリージー), friendly face, keep its look recognisable. No text, no letters. Page 1: The character walking across a frozen island searching, holding a hand mirror."
+  },
+  {
+   "id": "re/freezy/book-2",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/freezy.webp"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (フリージー), friendly face, keep its look recognisable. No text, no letters. Page 2: An ice cube melting in the character's hand, droplets falling, a little sad."
+  },
+  {
+   "id": "re/freezy/book-3",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/freezy.webp"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (フリージー), friendly face, keep its look recognisable. No text, no letters. Page 3: The character and little friends looking into the hand mirror reflecting a sparkling ice crystal, aurora. Happy ending."
+  },
+  {
+   "id": "re/hipokin/dad",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [],
+   "always": false,
+   "prompt": "A beautiful cinematic painting of a family of hippos in an African river at golden sunset, water glistening, acacia trees silhouetted, painterly, like a fine art poster. No text."
+  },
+  {
+   "id": "re/hipokin/goods",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hipokin.webp"
+   ],
+   "always": false,
+   "prompt": "Product photo of a cinema popcorn bucket in red and white stripes with a cute chibi of the character in the reference picture printed on it, overflowing with popcorn, soft light. Merchandise photo. No text."
+  },
+  {
+   "id": "re/hipokin/book-1",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hipokin.webp"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (ヒポキン), friendly face, keep its look recognisable. No text, no letters. Page 1: The character in a suit dreaming of making a movie, a film clapperboard in hand."
+  },
+  {
+   "id": "re/hipokin/book-2",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hipokin.webp"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (ヒポキン), friendly face, keep its look recognisable. No text, no letters. Page 2: The character struggling to lift a huge heavy old movie camera, sweat drops."
+  },
+  {
+   "id": "re/hipokin/book-3",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hipokin.webp"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (ヒポキン), friendly face, keep its look recognisable. No text, no letters. Page 3: The character and animal friends carrying the camera together and filming at sunset. Happy ending."
+  },
+  {
+   "id": "re/bossg/dad",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [],
+   "always": false,
+   "prompt": "A beautiful painting of a gorilla family resting peacefully in a misty mountain forest, soft morning light through the trees, painterly, like a fine art poster. No text."
+  },
+  {
+   "id": "re/bossg/goods",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/bossg.webp"
+   ],
+   "always": false,
+   "prompt": "Product photo of a chunky gold chain necklace with a pendant shaped like a cute chibi of the character in the reference picture, on black velvet, soft light. Merchandise photo. No text."
+  },
+  {
+   "id": "re/bossg/book-1",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/bossg.webp"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (ボスG), friendly face, keep its look recognisable. No text, no letters. Page 1: The character drumming his chest while small animals run away, a little sad."
+  },
+  {
+   "id": "re/bossg/book-2",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/bossg.webp"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (ボスG), friendly face, keep its look recognisable. No text, no letters. Page 2: The character gently tapping his chest with a soft smile, a small heart above."
+  },
+  {
+   "id": "re/bossg/book-3",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/bossg.webp"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (ボスG), friendly face, keep its look recognisable. No text, no letters. Page 3: Small animals and friends gathering happily around the character in the forest. Happy ending."
+  },
+  {
+   "id": "re/longg/dad",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [],
+   "always": false,
+   "prompt": "A beautiful painting of a vintage microphone on a stand on a quiet beach at dawn, gentle ripples of sound waves spreading over the calm sea, soft pastel light, painterly, like a fine art poster. No text."
+  },
+  {
+   "id": "re/longg/goods",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/longg.webp"
+   ],
+   "always": false,
+   "prompt": "Product photo of stylish over-ear headphones with a cute chibi of the character in the reference picture printed on the ear cups, on a wooden desk, soft light. Merchandise photo. No text."
+  },
+  {
+   "id": "re/longg/book-1",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/longg.webp"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (ロングG), friendly face, keep its look recognisable. No text, no letters. Page 1: The character shouting toward big mountains with hands around mouth, morning."
+  },
+  {
+   "id": "re/longg/book-2",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/longg.webp"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (ロングG), friendly face, keep its look recognisable. No text, no letters. Page 2: Sound wave rings coming back from the mountains, the character surprised and delighted."
+  },
+  {
+   "id": "re/longg/book-3",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/longg.webp"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (ロングG), friendly face, keep its look recognisable. No text, no letters. Page 3: The character sitting on a rock happily chatting with the mountains at sunset, music notes. Happy ending."
+  },
+  {
+   "id": "re/hatg/dad",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [],
+   "always": false,
+   "prompt": "A beautiful painting of colourful stage light beams shining through haze over a dark concert stage, glittering particles like rain, painterly, like a fine art poster. No text."
+  },
+  {
+   "id": "re/hatg/goods",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hatg.webp"
+   ],
+   "always": false,
+   "prompt": "Product photo of a bright yellow bucket hat with a small embroidered cute chibi of the character in the reference picture, on a light background, soft daylight. Merchandise photo. No text."
+  },
+  {
+   "id": "re/hatg/book-1",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hatg.webp"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (ハットG), friendly face, keep its look recognisable. No text, no letters. Page 1: The character standing on a dark empty stage, holding a spray can, a little lonely."
+  },
+  {
+   "id": "re/hatg/book-2",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hatg.webp"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (ハットG), friendly face, keep its look recognisable. No text, no letters. Page 2: The character switching on a big spotlight, the stage bursting into colourful light."
+  },
+  {
+   "id": "re/hatg/book-3",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/hatg.webp"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (ハットG), friendly face, keep its look recognisable. No text, no letters. Page 3: Friends singing and dancing in the colourful stage lights, the character smiling. Happy ending."
+  },
+  {
+   "id": "re/croco/dad",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [],
+   "always": false,
+   "prompt": "A beautiful painting of an ice library on a dark frozen plain under a starry sky, warm lanterns, glowing books floating like lights, quiet and magical, painterly, like a fine art poster. No text."
+  },
+  {
+   "id": "re/croco/goods",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "docs/story-rewrite/design/crocopatra.jpg"
+   ],
+   "always": false,
+   "prompt": "Product photo of an elegant folding fan in wine red and gold with a cute chibi of the character in the reference picture painted on it, opened on a satin cloth, soft light. Merchandise photo. No text."
+  },
+  {
+   "id": "re/croco/book-1",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "docs/story-rewrite/design/crocopatra.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (クロコパトラ), friendly face, keep its look recognisable. No text, no letters. Page 1: The character sitting at an elegant table eating, a single tear on her cheek."
+  },
+  {
+   "id": "re/croco/book-2",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "docs/story-rewrite/design/crocopatra.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (クロコパトラ), friendly face, keep its look recognisable. No text, no letters. Page 2: Little animal friends looking worried at her."
+  },
+  {
+   "id": "re/croco/book-3",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "docs/story-rewrite/design/crocopatra.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (クロコパトラ), friendly face, keep its look recognisable. No text, no letters. Page 3: The character laughing gracefully with the friends, fan open, warm candlelight. Happy ending."
+  },
+  {
+   "id": "re/onimonk/dad",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [],
+   "always": false,
+   "prompt": "A beautiful painting of a deep sea city at night: glowing anglerfish lights, neon spiral shells and jellyfish lanterns in the dark blue water, mysterious, painterly, like a fine art poster. No text."
+  },
+  {
+   "id": "re/onimonk/goods",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/res/onimonk-ref2.jpg"
+   ],
+   "always": false,
+   "prompt": "Product photo of a small cute keychain strap shaped like a retro boombox with a TV screen, with a tiny chibi of the character in the reference picture on it, on a dark table, soft neon light. Merchandise photo. No text."
+  },
+  {
+   "id": "re/onimonk/book-1",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/res/onimonk-ref2.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (オニモンク), friendly face, keep its look recognisable. No text, no letters. Page 1: The character hiding behind a shoji door on Setsubun night, beans scattered on the floor, worried."
+  },
+  {
+   "id": "re/onimonk/book-2",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/res/onimonk-ref2.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (オニモンク), friendly face, keep its look recognisable. No text, no letters. Page 2: Children holding bean boxes but smiling and inviting him to play."
+  },
+  {
+   "id": "re/onimonk/book-3",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/res/onimonk-ref2.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (オニモンク), friendly face, keep its look recognisable. No text, no letters. Page 3: The character laughing and playing a retro game with the children around his boombox TV. Happy ending."
+  },
+  {
+   "id": "re/monban/dad",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [],
+   "always": false,
+   "prompt": "A beautiful painting of a grand golden gate of a fantasy city of spires at dawn, an armillary sphere above the gate, soft golden mist, majestic and quiet, painterly, like a fine art poster. No text."
+  },
+  {
+   "id": "re/monban/goods",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/chibi-monban.jpg"
+   ],
+   "always": false,
+   "prompt": "Product photo of a small enamel pin badge shaped like a black hood with one golden eye, inspired by the character in the reference picture, on dark velvet, soft light. Merchandise photo. No text."
+  },
+  {
+   "id": "re/monban/book-1",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/chibi-monban.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (MONBAN), friendly face, keep its look recognisable. No text, no letters. Page 1: The character standing guard before a golden gate under the night sky."
+  },
+  {
+   "id": "re/monban/book-2",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/chibi-monban.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (MONBAN), friendly face, keep its look recognisable. No text, no letters. Page 2: A tiny glowing star falling softly in front of the gate, the character looking at it."
+  },
+  {
+   "id": "re/monban/book-3",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/chibi-monban.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (MONBAN), friendly face, keep its look recognisable. No text, no letters. Page 3: The character opening the gate and releasing the star back into the sky, dawn light. Happy ending."
+  },
+  {
+   "id": "re/kimorin/dad",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/home/chibi-ref/kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "A grand classical oil portrait painting of the character in the reference picture as a proud genius inventor, posing in a gilded frame style composition, warm museum light, painterly. No text."
+  },
+  {
+   "id": "re/kimorin/goods",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/home/chibi-ref/kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "Product photo of brass steampunk goggles with small fox-ear decorations inspired by the character in the reference picture, on a workbench with tools, warm light. Merchandise photo. No text."
+  },
+  {
+   "id": "re/kimorin/book-1",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/home/chibi-ref/kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (KIMORIN⭐︎), friendly face, keep its look recognisable. No text, no letters. Page 1: The character proudly presenting a strange invention on a workbench."
+  },
+  {
+   "id": "re/kimorin/book-2",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/home/chibi-ref/kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (KIMORIN⭐︎), friendly face, keep its look recognisable. No text, no letters. Page 2: A comical cartoon puff of smoke from the invention, the character covered in soot with frizzy fur."
+  },
+  {
+   "id": "re/kimorin/book-3",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/home/chibi-ref/kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (KIMORIN⭐︎), friendly face, keep its look recognisable. No text, no letters. Page 3: The character still proudly posing with a thumbs up in the smoke, a ping-pong button glowing. Happy ending."
   }
  ],
  "redo": []
