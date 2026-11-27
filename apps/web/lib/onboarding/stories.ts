@@ -1,10 +1,10 @@
 import { DAY1 } from './day1';
 import { DAY2 } from './day2';
-import { DAY3 } from './day3';
-import { DAY4 } from './day4';
-import { DAY5 } from './day5';
-import { DAY6 } from './day6';
-import { DAY7 } from './day7';
+import { DAY3, DAY3_NEW_HOME } from './day3';
+import { DAY4, DAY4_NEW_HOME } from './day4';
+import { DAY5, DAY5_NEW_HOME } from './day5';
+import { DAY6, DAY6_NEW_HOME } from './day6';
+import { DAY7, DAY7_NEW_HOME } from './day7';
 import { DAY8 } from './day8';
 import type { Step } from './script';
 
@@ -45,6 +45,20 @@ export const STORIES: Record<number, DayStory> = {
   7: { steps: DAY7, auth: true },
   // the Sun: the Eclipse is a choice inside the story (pay → ORDER, or stay a resident); no countdown after it
   8: { steps: DAY8, auth: true },
+};
+
+/**
+ * story 2026-11-27 (M-R330): the days as they play once every planet has its new home — the script of now is written
+ * for these (apps/web/scripts/story-sync.ts checks them). With the switch off (the default) STORIES plays the days'
+ * steps of before, unchanged.
+ */
+export const STORIES_NEW_HOMES: Record<number, DayStory> = {
+  ...STORIES,
+  3: { ...STORIES[3], steps: DAY3_NEW_HOME },
+  4: { ...STORIES[4], steps: DAY4_NEW_HOME },
+  5: { ...STORIES[5], steps: DAY5_NEW_HOME },
+  6: { ...STORIES[6], steps: DAY6_NEW_HOME },
+  7: { ...STORIES[7], steps: DAY7_NEW_HOME },
 };
 
 /** Days shown only on the preview pages (none now: Venus is day 7 of the first journey since draft 21). */

@@ -7,7 +7,9 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { walk, type Scene } from '../lib/story/parse';
-import { STORIES } from '../lib/onboarding/stories';
+// story 2026-11-27 (M-R330): the script is written for the new planet homes — the days checked are the ones played with the
+// planets' switch on (STORIES_NEW_HOMES). With the switch off the days 3–7 play their steps of before (not checked here).
+import { STORIES_NEW_HOMES as STORIES } from '../lib/onboarding/stories';
 import { SCENE_DAY } from '../lib/onboarding/sceneDays';
 import { AFTER_DAYS } from '../lib/onboarding/after';
 import { SYS002_ALONE } from '../lib/onboarding/sys002';
@@ -55,7 +57,7 @@ function lessonLines(day: number): L[] {
   return out;
 }
 
-const out: string[] = ['# 台本と画面の台詞の照合', '', `台本：public/story（${idx.parts.join('・')}）／画面：lib/onboarding/dayN.ts・after.ts と各星の練習（SaturnLesson など）の台詞`, ''];
+const out: string[] = ['# 台本と画面の台詞の照合', '', `台本：public/story（${idx.parts.join('・')}）／画面：lib/onboarding/dayN.ts・after.ts と各星の練習（SaturnLesson など）の台詞。3〜7日目は、新しい星の家に切りかえた時の台詞（lib/onboarding/newHomeScenes.ts）と照合する`, ''];
 let total = 0;
 // SYS-S002's last line (KIMORIN back from his mother) plays on whichever day he appears next (lib/onboarding/kimorinBack.ts)
 const ANY_DAY = new Set(['KIMORIN|' + norm('……母に言いましたが、聞く耳を持ちません。調査は、続けます。')]);

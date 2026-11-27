@@ -262,7 +262,20 @@ export type Step =
    * inviter's and KIMORIN's kororins falling in (D04-S005c). The visitor touches the rolling kororins; 〔次へ〕 goes on,
    * and on {neo}'s record hearing them all goes on by itself. Nothing is saved.
    */
-  | { t: 'home'; planet: 'saturn'; place: 'takoyaki' | 'neo' }
+  | {
+      t: 'home';
+      /**
+       * story 2026-11-27 (M-R330): with the planet's switch on (lib/planetHomes.ts) the step shows the NEW home
+       * (components/planetTemplate, lib/planetTemplate/storyCast) — Saturn's two places, and on Jupiter / Mercury / Mars /
+       * Venus the resident's place (`host`) and {neo}'s (`neo`). Switch off: only Saturn's steps exist (the home of before).
+       */
+      planet: 'saturn' | 'jupiter' | 'mercury' | 'mars' | 'venus';
+      place: 'takoyaki' | 'host' | 'neo';
+      /** what lets the story go on: 〔次へ〕 (the default), or opening {neo}'s own place (`door`: then 〔次へ〕 appears) */
+      until?: 'next' | 'door';
+      /** the flag that says {neo}'s work of this morning flew (then it is in {neo}'s own place) */
+      sent?: { key: string; value: string };
+    }
   /**
    * D04-S005c (M-R263): {neo}'s record's colour, chosen on the first arrival — the record full screen and the six colours
    * (RECORD_COLOURS); picking one turns the record that colour (saved: PUT /planet-home/saturn/colour) and remembers

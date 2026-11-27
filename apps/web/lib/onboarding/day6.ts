@@ -1,4 +1,6 @@
 import type { Step } from './script';
+import { PLANET_HOMES_ENV, planetHomeIsNew } from '../planetHomes';
+import { D6_NEW, D6_STUDIOS, D6_STUDIOS_FROM, replaceStretch, withNewHomes } from './newHomeScenes';
 import { kimorinBack } from './kimorinBack';
 
 /**
@@ -13,7 +15,7 @@ import { kimorinBack } from './kimorinBack';
  *    {bati} a little see-through (not for f_join_early), the Mars stamp, the fifth slot (Venus), the ticket's star map and
  *    the locked curtain of the Mars Theater (M-R203/M-R204), back to the Moon to sleep. Nothing is made on Mars (M-R208).
  */
-export const DAY6: Step[] = [
+export const DAY6_BEFORE: Step[] = [
   // D07-S001 月の朝／映像が作れる
   { t: 'scene', id: 'D07-S001' },
   { t: 'bgm', track: 'moon' },
@@ -214,3 +216,12 @@ export const DAY6: Step[] = [
   { t: 'caption', text: 'また明日' }, // 〔完了画面：7日目まで24時間のカウントダウン〕 (TomorrowScreen)
   { t: 'end' },
 ];
+
+/**
+ * story 2026-11-27 (M-R330): the day on the planet's NEW home — the script of now, word for word (story-sync checks
+ * this one). Played only when the planet's switch is on (lib/planetHomes.ts, off by default).
+ */
+export const DAY6_NEW_HOME: Step[] = withNewHomes(replaceStretch(DAY6_BEFORE, 'D07-S002', D6_STUDIOS, { from: D6_STUDIOS_FROM }), D6_NEW);
+
+/** the day as played: its steps of before, unchanged, until mars's switch is on */
+export const DAY6: Step[] = planetHomeIsNew('mars', PLANET_HOMES_ENV) ? DAY6_NEW_HOME : DAY6_BEFORE;
