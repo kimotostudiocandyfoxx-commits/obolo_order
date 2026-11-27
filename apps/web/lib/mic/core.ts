@@ -208,6 +208,21 @@ export function faultOfApi(e: unknown): MicFault {
 export type MicAdvice = { text: string; action: 'check' | 'keys' | 'retry' };
 
 const openIn = (env: MicEnv) => (env.os === 'ios' ? 'Safari' : 'Chrome');
+/** story chat 2026-11-27: out of an app's own browser (LINE, Instagram …) — iPhone says Safari, every other phone 「ブラウザで開く」 */
+const leaveApp = (env: MicEnv) => (env.os === 'ios' ? 'Safariで開く' : 'ブラウザで開く');
+/** story chat 2026-11-27: said once, the first time a take is sent to the server to be made into words (POST /voice/dictate keeps nothing) */
+export const RECORD_NOTICE = '声は、文字にするためだけに使って、保存しないよ';
+const RECORD_NOTICE_KEY = 'obolo.mic.recordNotice';
+/** true the first time on this device (and marks it said) */
+export function recordNoticeOnce(store: Pick<Storage, 'getItem' | 'setItem'> | null = typeof localStorage === 'undefined' ? null : localStorage): boolean {
+  try {
+    if (!store || store.getItem(RECORD_NOTICE_KEY)) return false;
+    store.setItem(RECORD_NOTICE_KEY, '1');
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 /**
  * PROVISIONAL wording (story chat to confirm): one short line per failure, saying what to do on this phone.
@@ -216,7 +231,7 @@ const openIn = (env: MicEnv) => (env.os === 'ios' ? 'Safari' : 'Chrome');
 export function micAdvice(fault: MicFault, env: MicEnv): MicAdvice {
   switch (fault) {
     case 'denied':
-      if (env.inApp) return { text: `このアプリの中では、マイクが使えないよ。メニューから「${openIn(env)}で開く」をえらんでね`, action: 'check' };
+      if (env.inApp) return { text: `このアプリの中では、マイクが使えないよ。メニューから「${leaveApp(env)}」をえらんでね`, action: 'check' };
       if (env.os === 'ios') {
         if (env.standalone) return { text: 'マイクが許可されていないよ。iPhoneの「設定」→「Safari」→「マイク」を「許可」にして、アプリを開き直してね', action: 'check' };
         if (env.browser === 'safari') return { text: 'マイクが許可されていないよ。iPhoneの「設定」→「Safari」→「マイク」を「許可」にして、ページを開き直してね', action: 'check' };
@@ -229,7 +244,7 @@ export function micAdvice(fault: MicFault, env: MicEnv): MicAdvice {
     case 'busy':
       return { text: 'マイクを、ほかのアプリが使っているみたい。通話や録音のアプリを閉じて、もう一度ためしてね', action: 'check' };
     case 'unsupported':
-      if (env.inApp) return { text: `このアプリの中では、マイクが使えないよ。メニューから「${openIn(env)}で開く」をえらんでね`, action: 'keys' };
+      if (env.inApp) return { text: `このアプリの中では、マイクが使えないよ。メニューから「${leaveApp(env)}」をえらんでね`, action: 'keys' };
       return { text: `このブラウザでは、マイクが使えないよ。${openIn(env)}で開くか、キーボードで打ってね`, action: 'keys' };
     case 'silent':
       return { text: '声が入っていなかったよ。マイクに近づいて、もう一度話してね', action: 'check' };
@@ -249,7 +264,7 @@ export function micAdvice(fault: MicFault, env: MicEnv): MicAdvice {
  * not allowed). iOS 18 moved the browsers under 「設定」→「アプリ」.
  */
 export function allowSteps(env: MicEnv): string[] {
-  if (env.inApp) return ['右上か右下のメニュー（︙ や …）をひらく', `「${openIn(env)}で開く」（「ブラウザで開く」）をえらぶ`, 'ひらいたページで、もう一度マイクをためす'];
+  if (env.inApp) return ['右上か右下のメニュー（︙ や …）をひらく', `「${leaveApp(env)}」をえらぶ`, 'ひらいたページで、もう一度マイクをためす'];
   if (env.os === 'ios') {
     const app = env.browser === 'safari' ? 'Safari' : BROWSER_NAME[env.browser];
     return ['iPhoneの「設定」をひらく', `「アプリ」→「${app}」をえらぶ（古いiPhoneは「設定」→「${app}」）`, env.browser === 'safari' ? '「マイク」を「許可」にする' : '「マイク」をオンにする', 'このページを開き直して、もう一度ためす'];

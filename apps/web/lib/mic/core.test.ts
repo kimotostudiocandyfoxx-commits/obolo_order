@@ -214,7 +214,7 @@ describe('the line that says what to do', () => {
   it('an in-app browser: open it in Safari (iPhone) / Chrome (Android)', () => {
     expect(micAdvice('denied', env('iosLine')).text).toContain('Safariで開く');
     expect(micAdvice('unsupported', env('iosInstagram')).text).toContain('Safariで開く');
-    expect(micAdvice('denied', env('androidLine')).text).toContain('Chromeで開く');
+    expect(micAdvice('denied', env('androidLine')).text).toContain('「ブラウザで開く」');
   });
   it('the other faults say their own thing', () => {
     expect(micAdvice('no-device', env('iosSafari')).text).toContain('見つからない');
@@ -303,5 +303,25 @@ describe('the diagnostics are limited on the page', () => {
     expect(ok('story:busy', 63_000)).toBe(false);
     // the window moves on
     expect(ok('story:busy', 700_000)).toBe(true);
+  });
+});
+
+import { micAdvice as adviceOf, RECORD_NOTICE, recordNoticeOnce } from './core';
+describe('story chat 2026-11-27: wording', () => {
+  it("leaving an app's own browser: Safari on iPhone, 「ブラウザで開く」 elsewhere", () => {
+    const base = { browser: 'other', inApp: true, standalone: false } as const;
+    const ios = JSON.stringify(adviceOf('denied', { ...base, os: 'ios' } as never));
+    const android = JSON.stringify(adviceOf('denied', { ...base, os: 'android' } as never));
+    expect(ios).toContain('「Safariで開く」');
+    expect(android).toContain('「ブラウザで開く」');
+    expect(android).not.toContain('Chromeで開く');
+  });
+  it('the not-kept notice is said once per device', () => {
+    const m = new Map<string, string>();
+    const store = { getItem: (k: string) => m.get(k) ?? null, setItem: (k: string, v: string) => void m.set(k, v) };
+    expect(RECORD_NOTICE).toBe('声は、文字にするためだけに使って、保存しないよ');
+    expect(recordNoticeOnce(store)).toBe(true);
+    expect(recordNoticeOnce(store)).toBe(false);
+    expect(recordNoticeOnce(null)).toBe(false);
   });
 });
