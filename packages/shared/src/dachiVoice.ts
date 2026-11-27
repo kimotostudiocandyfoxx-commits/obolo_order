@@ -263,12 +263,12 @@ export type SendDachiMessageBody = z.infer<typeof SendDachiMessageBody>;
 /** a thread id: a user id (uuid) or a character */
 export const isCharacterThread = (id: string): id is DachiCharacter => (DACHI_CHARACTERS as readonly string[]).includes(id);
 
-/** client 2026-11-27: a recording made ready to send (POST /dachi/voice): cleaned, a little faster, heard as words */
+/** client 2026-11-27: a recording made ready to send (POST /dachi/voice): in the member's voice settings, heard as words */
 export interface DachiVoiceDraft {
   /** the cleaned voice (the member's own media, kind 'voice') */
   mediaId: string;
   url: string;
-  /** its length now (the recording ÷ VOICE_MIX_TEMPO) */
+  /** its length now (the recording in the member's voice settings: the silences cut, faster — voiceTune.ts) */
   seconds: number;
   /** the words heard ('' when none could be heard) */
   text: string;

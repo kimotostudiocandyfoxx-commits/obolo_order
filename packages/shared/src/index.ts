@@ -20,6 +20,7 @@ export * from './flying';
 export * from './dachiVoice';
 export * from './voiceSound';
 export * from './cuteVoice';
+export * from './voiceTune';
 export * from './micDiag';
 export * from './batiPersona';
 export * from './batiVariants';

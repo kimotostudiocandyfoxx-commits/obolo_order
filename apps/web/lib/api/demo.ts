@@ -211,7 +211,7 @@ import { demoUnfurl } from './demoUnfurl';
 import { tokenStore } from './token';
 import { ApiError, type Api, type Paid } from './types';
 import { afterLookStep, backLookStep, canLookStep, canLookStepBack, EMPTY_LOOK_STEPS, foodNameByRules, lookStepView, type LookPick4Result, type LookStepResult, type LookStepsInfo, type LookStepState, type LookStepWho } from '@obolo/shared';
-import { BIRTH_YEAR_REQUIRED_WORDS, CUTE_VOICE_RATE, validBirthYear } from '@obolo/shared';
+import { BIRTH_YEAR_REQUIRED_WORDS, clampVoiceTune, CUTE_VOICE_RATE, isDefaultVoiceTune, validBirthYear, VOICE_TUNE_DEFAULT } from '@obolo/shared';
 import { incantNorm, premiumRequest, songVoiceKey, songVoiceQuote, type IncantView, type SongVoiceQuoteView, type SongVoiceUseView, type SongVoiceVersion } from '@obolo/shared';
 
 /** R17: the passphrase's digests and lengths (its normalized forms) — the demo's only knowledge of it */
@@ -2252,6 +2252,21 @@ export class DemoApi implements Api {
     const b = await getBlob(body.mediaId);
     if (!b) throw new ApiError(404, 'MEDIA_NOT_FOUND', 'not found');
     return b;
+  }
+  // demo: the voice settings are kept in this browser; there is no server to change a voice, so 〔きいてみる〕 has no take
+  async voiceTune() {
+    const tune = clampVoiceTune((this.s as { voiceTune?: unknown }).voiceTune);
+    return { tune, isDefault: isDefaultVoiceTune(tune), hasTake: false };
+  }
+  async setVoiceTune(body: Parameters<Api['setVoiceTune']>[0]) {
+    const now = (await this.voiceTune()).tune;
+    const tune = body.reset ? { ...VOICE_TUNE_DEFAULT } : clampVoiceTune(body, now);
+    (this.s as { voiceTune?: unknown }).voiceTune = tune;
+    this.save();
+    return { tune, isDefault: isDefaultVoiceTune(tune), hasTake: false };
+  }
+  async voiceTunePreview(): Promise<Blob> {
+    throw new ApiError(404, 'NO_TAKE', 'no take');
   }
   // demo: there is no voice service — the words of a member who is not recorded go as words (no switch, no price)
   async dachiCuteVoice() {

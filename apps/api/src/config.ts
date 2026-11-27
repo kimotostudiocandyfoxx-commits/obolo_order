@@ -299,6 +299,13 @@ const Env = z.object({
   DACHI_DAILY_CAP_FREE: z.coerce.number().min(1).default(200),
   /** client 2026-11-27 (the trial): ダチ voice messages one member may have made ready a day (about ¥0.03 each) */
   VOICE_MIX_DAILY_CAP: z.coerce.number().min(1).default(100),
+  /**
+   * client 2026-11-27 (sample K, voice/voice-mix.ts): the Python that has praat-parselmouth for the light pitch
+   * correction of a ダチ voice message (the API image: /opt/voice/bin/python), and how long it may take before the
+   * message goes on without it (ms)
+   */
+  VOICE_TUNE_PYTHON: z.string().default('python3'),
+  VOICE_TUNE_TIMEOUT_MS: z.coerce.number().min(500).max(60_000).default(8000),
   /** M-R208: web searches {bati} may make for one member a day (each ~1–5 yen), and for everyone together (cost ceiling) */
   BUDDY_SEARCH_DAILY: z.coerce.number().default(30),
   BUDDY_SEARCH_GLOBAL_DAILY: z.coerce.number().default(5000),

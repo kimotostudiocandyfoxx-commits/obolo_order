@@ -55,8 +55,7 @@ export interface VoiceSoundPick {
 /** the words gave no mood: the weakest うれしい — not "none" (client 2026-11-27) */
 export const VOICE_SOUND_FALLBACK: VoiceSoundPick = { sound: 'ureshii', soft: true };
 
-/** the faster voice (the pitch kept: ffmpeg atempo) */
-export const VOICE_MIX_TEMPO = 1.2;
+// (how the voice itself is made — the speed, the key, the pitch correction, the silences cut — is voiceTune.ts)
 /** PLACEHOLDER: how many voice messages one member may have made ready a day (each costs about ¥0.03) */
 export const VOICE_MIX_DAILY_CAP = 100;
 /** past the day's cap (the `n`-th of today, counted from 1) */

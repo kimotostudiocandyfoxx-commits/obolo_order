@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, Header, Headers, HttpCode, Inject, NotFoundException, Param, Post, Query, Req, StreamableFile, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Header, Headers, HttpCode, Inject, NotFoundException, Param, Post, Put, Query, Req, StreamableFile, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
-import { DACHI_SEND_PER_DAY, DACHI_SEND_PER_HOUR, KIMORIN_REPLIES_PER_DAY, DELIVERY_KINDS, DeliverBody, isCharacterThread, SendDachiMessageBody, VoicePreviewBody } from '@obolo/shared';
+import { DACHI_SEND_PER_DAY, DACHI_SEND_PER_HOUR, KIMORIN_REPLIES_PER_DAY, DELIVERY_KINDS, DeliverBody, isCharacterThread, SendDachiMessageBody, VoicePreviewBody, VoiceTuneBody } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
@@ -111,6 +111,30 @@ export class DachiController {
   async voicePreview(@UserId() userId: string, @Body() body: unknown) {
     await rateLimit(this.kv, `dachi-voice-preview:${userId}`, 120, 3600);
     return new StreamableFile(await this.drafts.preview(userId, parseBody(VoicePreviewBody, body)));
+  }
+
+  // ── client 2026-11-27: the member's own voice settings (shared voiceTune.ts), changed by talking to {bati} ──
+
+  @Get('voice/tune')
+  voiceTune(@UserId() userId: string) {
+    return this.drafts.tune(userId);
+  }
+
+  /** the parts to change (clamped here whatever is sent), or `reset` */
+  @Put('voice/tune')
+  async setVoiceTune(@UserId() userId: string, @Body() body: unknown) {
+    await rateLimit(this.kv, `dachi-voice-tune:${userId}`, 120, 3600);
+    return this.drafts.setTune(userId, parseBody(VoiceTuneBody, body));
+  }
+
+  /** 〔きいてみる〕: the last take's first seconds in the settings of now, as MP3 bytes (nothing kept) */
+  @Post('voice/tune/preview')
+  @HttpCode(200)
+  @Header('content-type', 'audio/mpeg')
+  @Header('cache-control', 'no-store')
+  async voiceTunePreview(@UserId() userId: string) {
+    await rateLimit(this.kv, `dachi-voice-tune-preview:${userId}`, 40, 3600);
+    return new StreamableFile(await this.drafts.tunePreview(userId));
   }
 
   /** 〔けす〕 / a new take: the draft's file goes */
