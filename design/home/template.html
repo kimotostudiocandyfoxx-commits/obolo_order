@@ -1327,15 +1327,17 @@ function makeG5(o,i,slot){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight
 const SAPON={saturn:'サーモン食べると若返り効果があるポン！',jupiter:'お父さんだポン。',song:'サーモン・トランス',radio:'サーぽんのサーモンまめちしきラジオ',goods:'サーぽんのマグカップ',book:'サーぽんの オレンジいろ',game:'ぷるぷるサーぽん',
   pages:['サーぽんは、オレンジいろの からだが じまんだポン。','でも ある日、ふしぎに おもったポン。「どうして ぼくは オレンジなんだポン？」','うみの おとうさんに、ききに いったポン。「おとうさーん！」','おとうさんは いいました。「うみで ちいさな エビを たくさん たべると、からだが オレンジに なるんだよ」','「えっ！ ぼくの おかげっすか！？」と、えびすけ。','「ぼくの オレンジは、みんなと つながってる いろだポン！」 おしまい。']};
 const SAPLY=[[3.48, "サーモン！"], [13.91, "サーモン、サーモン！"], [16.52, "サーモン！"], [17.39, "サーモン、サーモン！"], [20.0, "サーモン！"], [20.87, "サーモン、サーモン！"], [23.48, "サーモン！"], [24.35, "サーモン、サーモン！"], [26.96, "サーモン！"], [27.83, "♪"], [29.57, "サーモーン！"], [33.04, "サーモーン！"], [41.74, "サーモン、サーモン！"], [44.35, "サーモン！"], [45.22, "サーモン、サーモン！"], [47.83, "サーモン！"], [48.7, "サーモン、サーモン！"], [51.3, "サーモン！"], [53.91, "サーモン！"]];
-let NAR=null;
-function stopNarr(){if(NAR){const n=NAR;NAR=null;n.onended=null;try{n.pause()}catch(e){}}}
-function narr(k,rate,onend){stopNarr();if(!A[k])return;try{const au=new Audio(A[k]);au.preservesPitch=au.mozPreservesPitch=au.webkitPreservesPitch=true;au.playbackRate=rate||1;au.onended=()=>{if(NAR===au){NAR=null;onend&&onend()}};NAR=au;au.play().catch(()=>{})}catch(e){}}
+let NAR=null,NAREL=null;
+function stopNarr(){if(NAREL){NAREL.onended=null;try{NAREL.pause()}catch(e){}}NAR=null}
+/* one audio element, first played inside the tap itself so phones allow it; later lines reuse it */
+function narr(k,rate,onend){stopNarr();if(!A[k])return;try{if(!NAREL)NAREL=new Audio();const au=NAREL;au.preservesPitch=au.mozPreservesPitch=au.webkitPreservesPitch=true;au.src=A[k];au.defaultPlaybackRate=au.playbackRate=rate||1;
+  au.onended=()=>{NAR=null;onend&&onend()};NAR=au;const p=au.play();if(p)p.catch(()=>{});if(BEAT&&AC){const bg=BEAT.out.gain,t0=AC.currentTime;bg.cancelScheduledValues(t0);bg.setTargetAtTime(.16,t0,.04)}}catch(e){}}
 const BSPD=[['ゆっくり',.8],['ふつう',1],['はやい',1.3]];
 function sapBook(into){const v=document.createElement('div');v.className='vw bkv sapbk live';v.style.top='16%';let p=0,auto=null,sp=1;
   try{const x=+localStorage.getItem('sapBookSpeed');if(BSPD.some(b=>b[1]===x))sp=x}catch(e){}
-  const read=(first)=>{clearTimeout(auto);const go=()=>narr('sap-page'+(p+1),sp,()=>{if(p<5)auto=setTimeout(()=>{p++;pageFlip();draw();read()},1200)});if(first&&A['sap-bookv'])narr('sap-bookv',sp,()=>setTimeout(go,300));else go()};
+  const read=(first)=>{clearTimeout(auto);const go=()=>narr('sap-page'+(p+1),sp,()=>{if(p<5)auto=setTimeout(()=>{p++;pageFlip();draw();read()},1200)});if(first&&A['sap-bookv'])narr('sap-bookv',sp,()=>setTimeout(go,250));else go()};
   const draw=()=>{v.innerHTML=`<div class="book"><div class="pg l" style="background-image:url(${A['sap-book-'+(p+1)]||''})"></div><div class="pg r">${p===0?`<h4>${SAPON.book}</h4>`:''}<p class="sp">${SAPON.pages[p]}</p><span class="pno">${p+1} / 6</span></div></div><div class="bknav"><button type="button" class="bkp" aria-label="まえのページ" ${p?'':'disabled'}>‹</button><div class="bkspd" role="group" aria-label="読む速さ">${BSPD.map(([l,r])=>`<button type="button" class="spd" data-r="${r}" aria-pressed="${r===sp}">${l}</button>`).join('')}</div><button type="button" class="bkn" aria-label="つぎのページ">${p<5?'›':'↺'}</button></div>`};
-  draw();setTimeout(()=>read(true),450);
+  draw();read(true);
   v.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;e.stopPropagation();
     if(b.classList.contains('spd')){sp=+b.dataset.r;try{localStorage.setItem('sapBookSpeed',String(sp))}catch(e2){}if(NAR)NAR.playbackRate=sp;v.querySelectorAll('.spd').forEach(x=>x.setAttribute('aria-pressed',String(+x.dataset.r===sp)));return}
     if(b.classList.contains('bkp'))p=Math.max(0,p-1);else p=p<5?p+1:0;pageFlip();draw();read()});
@@ -1362,9 +1364,9 @@ function poyo(k){const c=getAC();if(!c)return;const t0=c.currentTime+.005,o=c.cr
 function sapViewer(into,pl){const c=G5[pl],ttl=t=>{const st=TSTYLE[t]||{f:"'Dela Gothic One'"};return `<div class="ttl2" style="font-family:${st.f},var(--f-body)">${[...t].map(ch=>`<span class="${chk(ch)}">${ch}</span>`).join('')}</div>`};let v=document.createElement('div'),stop=()=>{};
   if(c.t==='mv'){v.className='vw mvv';v.style.top='12%';v.innerHTML=`<div class="scr"><video src="${A['sap-mv']||''}" poster="${A['sap-dad']||''}" muted loop playsinline autoplay></video></div>${ttl(SAPON.song)}`;if(!A['sap-mv'])setTimeout(()=>toast('🎬 動くMVは「星のホーム2」で見られるよ'),600);playSong('sap-song');stop=()=>stopSong();setTimeout(()=>{const vd=v.querySelector('video');if(vd)vd.play().catch(()=>{})},50)}
   if(c.t==='radio'){v.className='vw rdv';v.style.top='14%';v.innerHTML=`<div class="disc2" style="background-image:url(${A['sap-radio']||''})"></div><span class="air">ON AIR</span><div class="wave">${Array.from({length:15},(_,i)=>`<b style="height:${10+((i*7)%5)*6}px;animation-delay:${(i%5)*.08}s"></b>`).join('')}</div>${ttl(SAPON.radio)}`;if(!A['sap-radiov'])setTimeout(()=>toast('📻 このラジオは「星のホーム2」で聞けるよ'),600);setTimeout(()=>{playSong('sap-radiov');if(SONG&&SONG.loop!==undefined)SONG.loop=false;if(SONG&&SONG.__el)SONG.__el.loop=false},400);stop=()=>stopSong()}
-  if(c.t==='goods'){setTimeout(()=>narr('sap-mugv',1),350);stop=()=>stopNarr();v.className='vw gdv sapmug';v.style.top='16%';v.innerHTML=`<div class="mug"><img alt="サーぽんのマグカップ" src="${A['sap-mug']||''}"></div>${ttl(SAPON.goods)}`}
+  if(c.t==='goods'){narr('sap-mugv',1);stop=()=>stopNarr();v.className='vw gdv sapmug';v.style.top='16%';v.innerHTML=`<div class="mug"><img alt="サーぽんのマグカップ" src="${A['sap-mug']||''}"></div>${ttl(SAPON.goods)}`}
   if(c.t==='book'){v=sapBook(into);stop=()=>v.__stop()}
-  if(c.t==='game'){v=sapGame(into);setTimeout(()=>narr('sap-gamev',1),350);stop=()=>{stopNarr();v.__stop&&v.__stop()}}
+  if(c.t==='game'){v=sapGame(into);narr('sap-gamev',1);stop=()=>{stopNarr();v.__stop&&v.__stop()}}
   into.appendChild(v);requestAnimationFrame(()=>requestAnimationFrame(()=>v.classList.add('on')));
   return {close(){stop();v.classList.remove('on');setTimeout(()=>v.remove(),300)}}}
 
