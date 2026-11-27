@@ -186,7 +186,8 @@ export const SPELL_DICTIONARY: Entry[] = [
   // planets 2-1 (M-R317): the touches Jupiter's forests gather by (ゆめかわの花畑・和モダンの庭・レトロポップ広場)
   e('ゆめかわ', 'yume-kawaii dreamy pastel kawaii style', 'style', /ゆめかわ|夢かわ|ゆめかわいい/, PIC),
   e('和モダン', 'modern Japanese wa style, flat washi patterns', 'style', /和モダン|和風モダン/, PIC),
-  e('レトロ', 'retro showa-era illustration', 'style', /レトロ|昭和/, PIC),
+  // 07: a game's look can be retro too (Neptune's レトロゲームのドーム)
+  e('レトロ', 'retro showa-era illustration', 'style', /レトロ|昭和/, PICG),
   e('ポップ', 'pop art style, bold outlines and flat bright colors', 'style', /ポップアート|ポップな絵|ポップ(?!コーン)/, PIC),
   e('やわらかい色', 'soft pastel colors', 'color', /やわらかい色|パステル|淡い/, PICG),
   e('あざやかな色', 'vivid colors', 'color', /あざやか|鮮やか|カラフル/, PICG),

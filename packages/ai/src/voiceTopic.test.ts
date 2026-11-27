@@ -54,6 +54,15 @@ describe('M-R317: the art spell knows ゆめかわ・和モダン・レトロ・
   });
 });
 
+describe('07: the words the five skies gather by reach the spells', () => {
+  it('a game can be retro / pixel art, a novel names magic, space or adventure', () => {
+    expect(spellFrom('game', 'レトロなドット絵のシューティング').filter((t) => t.group === 'style').map((t) => t.ja)).toEqual(expect.arrayContaining(['ドット絵']));
+    expect(spellFrom('game', 'レトロなシューティング').map((t) => t.ja)).toContain('レトロ');
+    expect(spellSystem('game')).toMatch(/ドット絵.*レトロ/);
+    expect(spellSystem('novel')).toMatch(/魔法.*宇宙.*冒険/);
+  });
+});
+
 describe('Venus (story 2026-11-25): a radio show’s topic from the text model, the word rules as the fallback', () => {
   it('asks once, small and at temperature 0, with the title (and the talk when there is one); the topic only', async () => {
     const seen: ChatRequest[] = [];

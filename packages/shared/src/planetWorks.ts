@@ -101,6 +101,8 @@ const MOOD_RULES: [RegExp, string[]][] = [
   [/夏|なつ|花火|かき氷/, ['夏']],
   [/祭|まつり|盆おどり|盆踊/, ['祭り']],
   [/和風|和モダン|着物|神社|鳥居|和楽器|風鈴/, ['和風']],
+  // 07: Uranus's 和モダン堂 gathers 和モダン as well as 和風
+  [/和モダン|和風モダン/, ['和モダン']],
   [/雨|しずく|梅雨/, ['雨']],
   [/やさし|優し|ほっこり/, ['やさしい']],
   [/やわらかい色|パステル|淡い/, ['パステル']],
@@ -313,7 +315,9 @@ export function goodsTags(kind: string | null | undefined, artSpell?: readonly S
 /** 05 冥王星 物語: the genre, then the length and the feeling */
 export const PLANET_STORY_GENRES = ['ファンタジー', '恋愛', 'ホラー', '日常', 'SF', 'ミステリー'] as const;
 export const PLANET_STORY_LENGTHS = ['短い', '中くらい', '長い'] as const;
-export const PLANET_STORY_FEELINGS = ['泣ける', '笑える', 'こわい', 'やさしい', 'わくわく'] as const;
+export const PLANET_STORY_FEELINGS = ['泣ける', '笑える', 'こわい', 'やさしい', 'わくわく', '魔法', '宇宙', '冒険'] as const;
+/** at most this many moods on a book: its length and up to four feelings / worlds */
+export const STORY_MOODS_MAX = 5;
 /** the book spell's genre (spell.ts BOOK genres) → the planet's */
 const STORY_GENRE_OF: Record<string, string> = { ファンタジー: 'ファンタジー', 冒険: 'ファンタジー', ミステリー: 'ミステリー', SF: 'SF', 学園もの: '日常', 日常: '日常', ちょっと怖い: 'ホラー' };
 const STORY_WORD_GENRES: [RegExp, string][] = [
@@ -330,6 +334,10 @@ const STORY_FEELING_OF: [RegExp, string][] = [
   [/怖|こわ|ホラー|おばけ/, 'こわい'],
   [/やさし|優し|ほっこり|あったか|温か|しっとり/, 'やさしい'],
   [/わくわく|ワクワク|ドキドキ|どきどき|冒険/, 'わくわく'],
+  // 07: Pluto's towers and ships gather a book's world too (ファンタジーの塔 魔法・SFの天文台 宇宙・冒険の本の船 冒険)
+  [/魔法|まほう|魔女|魔術|呪文|魔法使い/, '魔法'],
+  [/宇宙|うちゅう|銀河|惑星|ロケット|星の海|宇宙船/, '宇宙'],
+  [/冒険|ぼうけん|宝さがし|宝探し|旅立ち|海賊|探検/, '冒険'],
 ];
 /**
  * a book's length by the characters of its chapters (a chapter is ~1500–2500): up to 5000 短い, up to 12000 中くらい,
@@ -341,7 +349,7 @@ export function storyLength(chars: number, spellLength?: string | null): (typeof
 }
 /**
  * 2-1 Pluto: a book's genre from its spell (its genre talisman; else the words of its world / hero / mood; else 日常),
- * its length from the chapters written (`chars`) and its feelings from the spell's words. At most four moods.
+ * its length from the chapters written (`chars`) and its feelings (and its world: 魔法・宇宙・冒険, 07) from the spell's words. At most five moods.
  */
 export function bookTags(spell: readonly SpellTag[] | null | undefined, chars = 0): WorkTags {
   const tags = spell ?? [];
@@ -350,12 +358,12 @@ export function bookTags(spell: readonly SpellTag[] | null | undefined, chars = 
   const main = genreTag ? STORY_GENRE_OF[genreTag.ja] : (STORY_WORD_GENRES.find(([re]) => words.some((w) => re.test(w)))?.[1] ?? '日常');
   const moods: string[] = [storyLength(chars, tags.find((t) => t.group === 'length')?.ja)];
   for (const [re, m] of STORY_FEELING_OF) if (!moods.includes(m) && words.some((w) => re.test(w))) moods.push(m);
-  return { main, moods: moods.slice(0, 4), bpm: null };
+  return { main, moods: moods.slice(0, STORY_MOODS_MAX), bpm: null };
 }
 
 /** 05 海王星 ゲーム: the genre, then how it is played */
 export const PLANET_GAME_GENRES = ['アクション', 'パズル', 'レース', 'リズム', 'シューティング', 'クイズ'] as const;
-export const PLANET_GAME_STYLES = ['ひとりで', 'みんなで', 'すぐ終わる', 'じっくり'] as const;
+export const PLANET_GAME_STYLES = ['ひとりで', 'みんなで', 'すぐ終わる', 'じっくり', 'レトロ', 'ドット絵'] as const;
 /** the game spell's genre (spell.ts GAME genres) → the planet's */
 const GAME_GENRE_OF: Record<string, string> = { 集める: 'アクション', よける: 'アクション', ジャンプ: 'アクション', タップ: 'アクション', ブロックくずし: 'アクション', シューティング: 'シューティング', パズル: 'パズル', クイズ: 'クイズ' };
 /** words that name a genre the spell has no talisman for (a race, a rhythm game) */
@@ -381,6 +389,9 @@ export function gameTags(spell: readonly SpellTag[] | null | undefined, title = 
   const slow = main === 'パズル' || main === 'クイズ' || has(/むずかしい|ライフ3つ|ハイスコア/);
   if (quick) moods.push('すぐ終わる');
   else if (slow) moods.push('じっくり');
+  // 07: Neptune's レトロゲームのドーム — a retro look (the spell's レトロ / 8bit words) and pixel art (ドット絵)
+  if (has(/レトロ|昭和|ファミコン|8bit|8ビット|8-bit/i)) moods.push('レトロ');
+  if (has(/ドット|ピクセル|pixel|8bit|8ビット|8-bit/i)) moods.push('ドット絵');
   return { main, moods, bpm: null };
 }
 

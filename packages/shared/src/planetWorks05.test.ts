@@ -15,6 +15,7 @@ import {
   radioTags,
   songTags,
   storyLength,
+  workScore,
 } from './planetWorks';
 import { spellFrom } from './spell';
 import type { SpellTag } from './spell';
@@ -98,5 +99,24 @@ describe('handoff 05 「作品のタグ」 (2-1 for Mars, Venus, Uranus, Pluto, 
       expect(PLANET_GAME_GENRES).toContain(g.main);
       for (const m of g.moods) expect(PLANET_GAME_STYLES).toContain(m);
     }
+  });
+
+  it('07: Pluto’s moods gather 魔法・宇宙・冒険, Neptune’s レトロ・ドット絵, Uranus’s 和モダン', () => {
+    const fantasy = bookTags(spellFrom('novel', '魔法の森で猫が冒険する、わくわくする話'), 1800);
+    expect(fantasy.moods).toEqual(expect.arrayContaining(['魔法', '冒険', 'わくわく']));
+    expect(bookTags([t('SF', 'genre'), t('宇宙船', 'theme')]).moods).toContain('宇宙');
+    expect(bookTags([t('冒険', 'genre')]).moods).toEqual(['中くらい', 'わくわく', '冒険']);
+    expect(bookTags([t('切ない', 'mood'), t('おもしろい', 'mood'), t('やさしい', 'mood'), t('魔女', 'hero'), t('冒険', 'genre')]).moods.length).toBeLessThanOrEqual(5);
+    expect(gameTags([t('シューティング', 'genre'), t('ドット絵', 'style'), t('レトロ', 'style')]).moods).toEqual(['ひとりで', 'レトロ', 'ドット絵']);
+    expect(gameTags([t('ジャンプ', 'genre')], '8bitダンジョン').moods).toEqual(expect.arrayContaining(['レトロ', 'ドット絵']));
+    expect(gameTags([t('パズル', 'genre')]).moods).not.toContain('レトロ');
+    for (const m of ['レトロ', 'ドット絵']) expect(PLANET_GAME_STYLES).toContain(m);
+    for (const m of ['魔法', '宇宙', '冒険']) expect(PLANET_STORY_FEELINGS).toContain(m);
+    const wa = goodsTags('マグカップ', [t('和モダン', 'style'), t('花', 'theme')]);
+    expect(wa.moods[0]).toBe('和モダン');
+    // words alone (a theme, no style) bring 和モダン and 和風
+    expect(goodsTags('トート', [t('和モダン', 'theme')]).moods).toEqual(expect.arrayContaining(['和モダン', '和風']));
+    // Uranus's 和モダン堂 (rule m: 和風, 和モダン) and Neptune's retro dome take them
+    expect(workScore(wa, { g: [], m: ['和風', '和モダン'] })).toBeGreaterThanOrEqual(2);
   });
 });

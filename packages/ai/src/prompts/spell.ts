@@ -41,9 +41,9 @@ const KIND_RULES: Record<SpellKind, string> = {
   video: 'A video spell: the pictures\' subject as themes, 1 style, a mood, colour and light; purpose / scenes / length / camera / transition / caption only when the user says them (the app fills the rest).',
   look: "An avatar look: what to wear (wear), a style and colours that fit what the user wants.",
   bati: "The buddy's outfit: what to wear (wear), a style and colours that fit what the user wants.",
-  novel: 'A novel spell: 1 world (where), 1 hero, 1 genre, 1 mood, 1 length, and up to 3 theme tags for what it is about. Keep the user\'s own world and hero words.',
+  novel: 'A novel spell: 1 world (where), 1 hero, 1 genre, 1 mood, 1 length, and up to 3 theme tags for what it is about (name 魔法 magic, 宇宙 space or 冒険 adventure as a theme when the story is about it). Keep the user\'s own world and hero words.',
   chapter: "A chapter spell: what happens next (event), its mood, a character who joins (hero), what it is about (theme). Keep the user's own idea in their words.",
-  game: 'A game spell: 1 genre (collect / dodge / runner / shooter / tap / breakout / quiz / puzzle), 1 hero, rules, 1 goal, 1 level, a colour and a style that fit.',
+  game: 'A game spell: 1 genre (collect / dodge / runner / shooter / tap / breakout / quiz / puzzle), 1 hero, rules, 1 goal, 1 level, a colour and a style that fit (ドット絵 pixel art, レトロ retro … when the user wants that look).',
 };
 
 /** the system prompt: one coherent spell for the request (fresh), or the spell made again / changed by the words */
