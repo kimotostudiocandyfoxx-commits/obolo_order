@@ -879,7 +879,14 @@ const SD=()=>(SATMODE==='d'||SATMODE==='e')&&mode==='anime',SE=()=>SATMODE==='e'
 const S7=()=>SATMODE==='c'&&!!A['bg7-saturn']&&mode==='anime',S7G={rec:[.71,.46]};
 const S6=()=>SATMODE==='b'&&!!A['bg6-saturn']&&mode==='anime',S6G={floor:.7,spk:.15,rec:[.762,.427]};
 function s6Walls(){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,w=S6G.spk*W;return{L:w*.9,R:W-w*.9,F:S6G.floor*H}}let rolls=[],raf=0,heard=[],RECLBL=[.47,.69],SPIN=false,NEEDLE=[.6,.52],QUEUE=[],MAXB=window.KMAX||16,NB=0;
-const CHB=n=>n===ME?'user':SUSHI[n]?SUSHI[n].k:n==='KIMORIN⭐︎'?'kimorin':n==='MONBAN'?'monban':n==='たこ焼きブラザー'?'brother':n==='たこ焼きシスター'?'sister':n==='MIKIE⭐︎DRILL'?'mikie':'user';
+/* M-R341: who visits each home. Planets in visiting order; every planet you visit adds its residents as oshi. Sushimon (7) from day 3. */
+const DAYPL=['saturn','jupiter','mercury','mars','venus','pluto','neptune','uranus'];
+const RESG=[['たこ焼きブラザー','たこ焼きシスター'],['大根カイザー'],['フリージー'],['ヒポキン'],['ボスG','ロングG','ハットG'],['クロコパトラ'],['オニモンク'],['MONBAN']];
+const NAMEK={'サーぽん':'sapon','ガリみ♡':'gari','えびすけ':'ebi','ウニまる':'uni','いかチョロ':'ika','しゃりお':'shari','かにぶぅ':'kani','大根カイザー':'kaiser','フリージー':'freezy','ヒポキン':'hipokin','ボスG':'bossg','ロングG':'longg','ハットG':'hatg','クロコパトラ':'croco','オニモンク':'onimonk'};
+const SUSHI_ALL=['サーぽん','ガリみ♡','えびすけ','ウニまる','いかチョロ','しゃりお','かにぶぅ'];
+function ROSTER(pl){const d=Math.max(0,DAYPL.indexOf(pl)),res=RESG.slice(0,d+1).flat().reverse(),on=SUSHI_ON,rest=SUSHI_ALL.filter(n=>!on.includes(n));
+  return [...on.map(n=>({n,k:'oshi'})),...res.slice(0,res.length>3?3:res.length).map(n=>({n,k:'oshi'})),{n:'KIMORIN⭐︎',k:'dachi'},...rest.map(n=>({n,k:'oshi'})),...res.slice(3).map(n=>({n,k:'oshi'})),...OSHIX()]}
+const CHB=n=>n===ME?'user':NAMEK[n]?NAMEK[n]:n==='KIMORIN⭐︎'?'kimorin':n==='MONBAN'?'monban':n==='たこ焼きブラザー'?'brother':n==='たこ焼きシスター'?'sister':n==='MIKIE⭐︎DRILL'?'mikie':'user';
 const BALL=k=>A['ball-'+(k==='mine'?'mine':k==='oshi'?'oshi':'dachi')]||A['puni-gray'];
 const KOROS=[
  {c:'pearl',f:'omega',n:'しろもち'},{c:'gold',f:'smile',n:'きんぴか'},{c:'pink',f:'wink',n:'もも'},{c:'mint',f:'sleepy',n:'みんと'},
@@ -893,8 +900,8 @@ const SHADES={
 function shadesSVG(sh){return `<svg class="face" viewBox="0 0 100 100" aria-hidden="true">${SHADES[sh||'round']}</svg>`}
 const KPRE=()=>A['kor3-01']?'kor3-':'kor2-',KN=()=>{let n=0;while(A[KPRE()+String(n+1).padStart(2,'0')])n++;return n||16},KOR2=new Proxy([],{get:(o,k)=>k==='map'?(f=>Array.from({length:KN()},(_,i)=>KPRE()+String(i+1).padStart(2,'0')).map(f)):(/^\d+$/.test(k)?KPRE()+String(+k+1).padStart(2,'0'):o[k])});
 const HAS2=()=>!!(A['kor2-01']||A['kor3-01']);
-const K4N=n=>({'KIMORIN⭐︎':'kimorin','MONBAN':'monban','MIKIE⭐︎DRILL':'mikie','たこ焼きブラザー':'brother','たこ焼きシスター':'sister'})[n]||(SUSHI[n]&&SUSHI[n].k)||(n===ME?'user':null);
-const K4SG={kimorin:1,mikie:1,sapon:1,gari:1,ebi:1,uni:1,ika:1,shari:1,kani:1};
+const K4N=n=>({'KIMORIN⭐︎':'kimorin','MONBAN':'monban','MIKIE⭐︎DRILL':'mikie','たこ焼きブラザー':'brother','たこ焼きシスター':'sister'})[n]||NAMEK[n]||(n===ME?'user':null);
+const K4SG={kimorin:1,mikie:1,sapon:1,gari:1,ebi:1,uni:1,ika:1,shari:1,kani:1,kaiser:1,freezy:1,hipokin:1,bossg:1,longg:1,hatg:1,croco:1,onimonk:1,monban:1,brother:1,sister:1};
 function faceSVG(f,sh){
   const eye=(x)=>`<ellipse cx="${x}" cy="52" rx="5.2" ry="6.2"/><circle class="hl" cx="${x-1.6}" cy="49.6" r="1.8"/>`;
   const E={omega:eye(36)+eye(64),smile:'<path class="ln" d="M30 53 q6 -7 12 0 M58 53 q6 -7 12 0"/>',
@@ -915,8 +922,8 @@ function korPicker(done){
 }
 function setupRoll(){setTimeout(()=>{if(cur!=='saturn'||!CONT.saturn)return;predecode(['exp-saturn-sea',...CONT.saturn.flatMap(c=>['isl-saturn-'+c.k,'exp-saturn-'+c.k]),'isl-saturn-me'])},1200);
   const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,F=H*.86,L=W*.04,Rw=W*.96;
-  const base=[{n:ME,k:'mine'},...SUSHI_ON.map(n=>({n,k:'oshi'})),...OSHIX(),...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'れい',k:'oshi'}];
-  const total=window.KTOTAL||24,rest=base.slice(1),all=[base[0]];for(let i=1;i<total;i++)all.push(rest[(i-1)%rest.length]);
+  const base=[{n:ME,k:'mine'},...ROSTER(cur)];
+  const total=Math.min(window.KTOTAL||99,base.length),rest=base.slice(1),all=[base[0]];for(let i=1;i<total;i++)all.push(rest[(i-1)%rest.length]);
   const mb=(S7()||SD())?8:MAXB;QUEUE=all.slice(mb);rolls=[];all.slice(0,mb).forEach((o,i)=>rolls.push(makeBall(o,i,i)));
   if(SE())startSim3D();else startSim();
 }
@@ -1326,7 +1333,7 @@ const G5SP={mars:'ufo',venus:'radio',uranus:'balloon',pluto:'book',neptune:'bubb
 const G5IMG=(pl,n)=>(n!==ME&&CHB(n)==='user'&&!PEOPLE.some(p=>p.n===n)&&A['sp2-'+G5SP[pl]])||A['p5-'+pl+'-'+CHB(n)]||A['chibi-'+CHB(n)]||'';
 let GF=[],GQ=[],Graf=0,GOPEN=null,GV=null,GNB=0;
 function stopG5(){cancelAnimationFrame(Graf);GF=[];GQ=[];if(GV)stopG5play();if(GOPEN)GOPEN.close()}
-function setupG5(){setTimeout(()=>{if(!CONT[cur])return;predecode(['exp-'+cur+'-sea',...CONT[cur].flatMap(c=>['isl-'+cur+'-'+c.k,'exp-'+cur+'-'+c.k]),'isl-'+cur+'-me'])},1200);const base=[...SUSHI_ON.map(n=>({n,k:'oshi'})),...OSHIX(),...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'れい',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'}];
+function setupG5(){setTimeout(()=>{if(!CONT[cur])return;predecode(['exp-'+cur+'-sea',...CONT[cur].flatMap(c=>['isl-'+cur+'-'+c.k,'exp-'+cur+'-'+c.k]),'isl-'+cur+'-me'])},1200);const base=[...ROSTER(cur)];
   GF=[];GQ=base.slice(8);base.slice(0,8).forEach((o,i)=>GF.push(makeG5(o,i,i)));let last=performance.now();const ph=$('phone');
   const step=now=>{const dt=Math.min(.05,(now-last)/1000);last=now;const W=ph.clientWidth,H=ph.clientHeight,ts=now/1000;
     for(const b of GF){if(b.gone||b.drag)continue;b.t+=dt;const tx=(b.cx+Math.sin(b.t*b.w1+b.p1)*b.ax)*W,ty=(b.cy+Math.sin(b.t*b.w2+b.p2)*b.ay)*H+Math.sin(ts*2+b.i)*3;b.x+=(tx-b.x)*Math.min(1,dt*3);b.y+=(ty-b.y)*Math.min(1,dt*3);
@@ -1571,7 +1578,7 @@ function playSong(k){const c=getAC(),buf=VBUF[k];stopSong();if(c&&buf&&buf!=='lo
   if(A[k]){const au=VEL.length?VEL[VEL.length-1]:new Audio();try{au.pause();au.src=A[k];au.loop=true;au.currentTime=0;au.play().catch(()=>{});SONG={stop:()=>au.pause(),__el:au}}catch(e){}return au.duration&&isFinite(au.duration)?au.duration:60}return 60}
 const OSHIX=()=>[...oshi].filter(n=>!PEOPLE.some(p=>p.n===n)&&!['たこ焼きブラザー','nana','れい','みお'].includes(n)).map(n=>({n,k:'oshi'}));
 function setupMer(){setTimeout(()=>{if(cur!=='mercury')return;predecode(['exp-mercury-sea',...CONT.mercury.flatMap(c=>['isl-mercury-'+c.k,'exp-mercury-'+c.k]),'isl-mercury-me'])},1200);
-  const base=[...SUSHI_ON.map(n=>({n,k:'oshi'})),...OSHIX(),...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'れい',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'}];
+  const base=[...ROSTER(cur)];
   SH=[];SHQ=base.slice(MMAX);base.slice(0,MMAX).forEach((o,i)=>SH.push(makeSh(o,i,i)));
   let last=performance.now();const ph=$('phone');
   const step=now=>{const dt=Math.min(.05,(now-last)/1000);last=now;const W=ph.clientWidth,H=ph.clientHeight,ts=now/1000;
@@ -1650,7 +1657,7 @@ const JSLOT=[[.22,.47,.52,.05,.015,0],[.5,.44,.5,.05,.015,0],[.13,.6,.82,.05,.02
 const JART=['夕焼けの町','屋根の上のねこ','ラーメン','さくら通り','月と海'];
 function stopJup(){cancelAnimationFrame(BFraf);BF=[];BFQ=[];if(JV)stopJ();if(JOPEN)JOPEN.close()}
 function setupJup(){setTimeout(()=>{if(cur!=='jupiter')return;predecode(['exp-jupiter-sea',...CONT.jupiter.flatMap(c=>['isl-jupiter-'+c.k,'exp-jupiter-'+c.k]),'isl-jupiter-me'])},1200);
-  const base=[...SUSHI_ON.map(n=>({n,k:'oshi'})),...OSHIX(),...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'れい',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'},{n:'みお',k:'oshi'}];
+  const base=[...ROSTER(cur)];
   BF=[];BFQ=base.slice(JMAX);base.slice(0,JMAX).forEach((o,i)=>BF.push(makeBf(o,i,i)));
   let last=performance.now();const ph=$('phone');
   const step=now=>{const dt=Math.min(.05,(now-last)/1000);last=now;const W=ph.clientWidth,H=ph.clientHeight,ts=now/1000;

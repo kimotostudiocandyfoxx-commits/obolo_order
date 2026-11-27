@@ -34,7 +34,7 @@ for f in sorted(os.listdir(H+'/kororin')):
     if f.endswith('.webp'): im=Image.open(H+'/kororin/'+f).convert('RGBA'); im.thumbnail((200,200)); A['kor-'+f[:-5]]=uri(im,86)
 for f in sorted(os.listdir(H+'/puni')):
     if f.endswith('.png'): im=Image.open(H+'/puni/'+f).convert('RGBA'); im.thumbnail((200,200)); A['puni-'+f[:-4]]=uri(im,88)
-for k in 'user kimorin monban mikie brother sister sapon gari ebi uni ika shari kani'.split():
+for k in 'user kimorin monban mikie brother sister sapon gari ebi uni ika shari kani kaiser freezy hipokin bossg longg hatg croco onimonk'.split():
     f=f'{O}/chibi-{k}.jpg'
     if os.path.exists(f): kk=key(Image.open(f)); kk.thumbnail((300,300)); A['chibi-'+k]=uri(kk,86)
     f2=f.replace('/chibi-','/chibi2-')
@@ -99,7 +99,7 @@ for n in range(1,5):
 for n in range(1,6):
     f=f'{H}/songs/song-{n}.mp3'
     if os.path.exists(f): A[f'song-{n}']='data:audio/mpeg;base64,'+base64.b64encode(open(f,'rb').read()).decode()
-for k in 'user kimorin monban mikie brother sister sapon gari ebi uni ika shari kani'.split():
+for k in 'user kimorin monban mikie brother sister sapon gari ebi uni ika shari kani kaiser freezy hipokin bossg longg hatg croco onimonk'.split():
     f=f'{O}/chibi3-{k}.jpg'
     if os.path.exists(f): kk=key(Image.open(f)); kk.thumbnail((260,260)); A['chibi3-'+k]=uri(kk,86)
     f=f'{O}/chibi4-{k}.jpg'
@@ -134,7 +134,7 @@ def unwhite(im):
     clear=out|hole
     al=Image.fromarray(((~clear)*255).astype('uint8')).filter(_F.MinFilter(3)).filter(_F.GaussianBlur(1.0))
     o=im.convert('RGBA'); o.putalpha(al); bb=o.getbbox(); return o.crop(bb) if bb else o
-for k in 'user kimorin monban mikie brother sister sapon gari ebi uni ika shari kani'.split():
+for k in 'user kimorin monban mikie brother sister sapon gari ebi uni ika shari kani kaiser freezy hipokin bossg longg hatg croco onimonk'.split():
     f=f'{O}/kor4-{k}.jpg'
     if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((220,220),Image.LANCZOS); A['kor4-'+k]=uri(o,88)
     for n in (1,2):
@@ -203,7 +203,7 @@ for pl in ['mars','venus','uranus','pluto','neptune']:
     for key,k2 in [('main',f'bg5-{pl}'),('hv',f'bg5-{pl}-hv'),('prof',f'bg5-{pl}-prof')]:
         f=f'{O}/home5-{pl}-{key}.jpg'
         if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A[k2]=uri(im,76)
-    for k in 'user kimorin monban mikie brother sister sapon gari ebi uni ika shari kani'.split():
+    for k in 'user kimorin monban mikie brother sister sapon gari ebi uni ika shari kani kaiser freezy hipokin bossg longg hatg croco onimonk'.split():
         f=f'{O}/p5-{pl}-{k}.jpg'
         if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((220,220),Image.LANCZOS); A[f'p5-{pl}-{k}']=uri(o,84)
 for k in ['saturn','jupiter','mercury','mars','venus','uranus','pluto','neptune']:
@@ -319,7 +319,7 @@ _ONK={('sapon' if n=='サーぽん' else _SUX[n]['k']) for n in _ON}
 for _k in ['sapon']+list(_SU):
     if _k in _ONK: continue
     for key in list(A):
-        if key.endswith('-'+_k) or key.startswith(f'su-{_k}-') or (_k=='sapon' and key.startswith('sap-')): A.pop(key,None)
+        if key.startswith(f'su-{_k}-') or (_k=='sapon' and key.startswith('sap-')): A.pop(key,None)
 for _k in os.environ.get('SAP_DROP','').split(','):
     A.pop(_k,None)
 t=open(H+'/template.html').read().replace('/*ASSETS*/{}',json.dumps(A)).replace('/*SUSHI*/{}',json.dumps({n:v for n,v in _SUX.items() if n in _ON},ensure_ascii=False)).replace("/*SUSHION*/['サーぽん']",json.dumps(_ON,ensure_ascii=False))
