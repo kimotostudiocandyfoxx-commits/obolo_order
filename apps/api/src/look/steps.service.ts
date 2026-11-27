@@ -2,7 +2,9 @@ import { HttpStatus, Inject, Injectable, Logger, Optional } from '@nestjs/common
 import { lookPick4Prompt, lookStepPrompt, moderateLookWish, type GeneratedImage, type ImageProvider, type LlmProvider } from '@obolo/ai';
 import {
   afterLookStep,
+  backLookStep,
   canLookStep,
+  canLookStepBack,
   EMPTY_LOOK_STEPS,
   LOOK_PICK4_HEADS,
   lookStepView,
@@ -32,6 +34,10 @@ import { LookService } from './look.service';
 
 type Row = typeof users.$inferSelect;
 
+/** the screen's words when a picture could not be made or cut cleanly (nothing taken, nothing counted) */
+export const LOOK_AGAIN = 'うまく描けなかった……もういちど';
+class CutFailed extends Error {}
+
 /** where a round is kept on the account (onboardingJson): the steps used, decided or not, the picture it has now */
 export const stepsKey = (who: LookStepWho) => `steps.${who}`;
 
@@ -40,7 +46,8 @@ export function stepsOf(u: Pick<Row, 'onboardingJson'>, who: LookStepWho): LookS
   if (!raw) return { ...EMPTY_LOOK_STEPS };
   try {
     const s = JSON.parse(raw) as Partial<LookStepState>;
-    return { used: Number(s.used) || 0, fixed: !!s.fixed, url: typeof s.url === 'string' ? s.url : null };
+    const back = Array.isArray(s.back) ? s.back.filter((x): x is string | null => x === null || typeof x === 'string') : [];
+    return { used: Number(s.used) || 0, fixed: !!s.fixed, url: typeof s.url === 'string' ? s.url : null, back };
   } catch {
     return { ...EMPTY_LOOK_STEPS };
   }
@@ -87,7 +94,7 @@ export class LookStepsService {
 
   private async save(userId: string, who: LookStepWho, s: LookStepState): Promise<Row> {
     const cur = await this.user(userId);
-    const j = { ...((cur.onboardingJson ?? {}) as Record<string, string>), [stepsKey(who)]: JSON.stringify({ used: s.used, fixed: s.fixed, url: s.url ?? null }) };
+    const j = { ...((cur.onboardingJson ?? {}) as Record<string, string>), [stepsKey(who)]: JSON.stringify({ used: s.used, fixed: s.fixed, url: s.url ?? null, back: s.back ?? [] }) };
     const [nu] = await this.db.write.update(users).set({ onboardingJson: j, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
     return nu;
   }
@@ -145,13 +152,16 @@ export class LookStepsService {
       const key = await chooseKey(src);
       const on = await onKey(src, key);
       const img = await this.painter.generate(lookStepPrompt(who, wish, ref.length > 0, KEY_WORDS[key]), s.used, [on, ...ref]);
-      const png = await this.look.cut(img, 768, key);
-      const kind = who === 'bati' ? 'bati' : 'avatar';
-      url = (png ? await this.media.storeImage(userId, kind, 'image/png', png, origin) : await this.media.storeImage(userId, kind, img.mime, img.data, origin)).url;
+      const cut = await this.look.cutOrNothing(img, 768, key, `look step (${who}) of ${userId}`);
+      // client 2026-11-27: no try cut it cleanly — a badly cut picture is never shown: the step's mana goes back, the step
+      // does not count, and the screen asks to try again (logged at error level by cutOrNothing, with every step's checks)
+      if (!cut.png) throw new CutFailed(cut.record);
+      url = (await this.media.storeImage(userId, who === 'bati' ? 'bati' : 'avatar', 'image/png', cut.png, origin)).url;
     } catch (e) {
       await fee.refund();
+      if (e instanceof CutFailed) throw apiError(HttpStatus.BAD_GATEWAY, 'LOOK_CUT_FAILED', LOOK_AGAIN);
       this.log.warn(`look step failed (${who}): ${String(e)}`);
-      throw apiError(HttpStatus.BAD_GATEWAY, 'LOOK_STEP_FAILED', 'うまく変わらなかった……もう一度');
+      throw apiError(HttpStatus.BAD_GATEWAY, 'LOOK_STEP_FAILED', LOOK_AGAIN);
     }
     // the round as it is now (another tap may have moved it meanwhile: counted from the account, not from the start)
     const now = stepsOf(await this.user(userId), who);
@@ -192,8 +202,10 @@ export class LookStepsService {
         this.log.warn(`look pick4 failed: ${String(r.reason)}`);
         continue;
       }
-      const png = await this.look.cut(r.value, 768, key);
-      const m = png ? await this.media.storeImage(userId, 'avatar', 'image/png', png, origin) : await this.media.storeImage(userId, 'avatar', r.value.mime, r.value.data, origin);
+      // a picture no try cut cleanly is left out (never shown badly cut); none at all: the mana goes back
+      const cut = await this.look.cutOrNothing(r.value, 768, key, `look pick4 of ${userId}`);
+      if (!cut.png) continue;
+      const m = await this.media.storeImage(userId, 'avatar', 'image/png', cut.png, origin);
       candidates.push({ id: m.id, url: m.url });
     }
     if (!candidates.length) {
@@ -215,6 +227,16 @@ export class LookStepsService {
     const next: LookStepState = { used: 0, fixed: false, url: m.url };
     await this.save(userId, 'self', next);
     return { who: 'self', steps: lookStepView(next, u.avatarUrl), mana: 0 };
+  }
+
+  /** 〔↶ ひとつ前の姿にもどす〕 (M-R338): the picture before the last step again; the steps used and their mana stay */
+  async back(userId: string, who: LookStepWho): Promise<LookStepResult> {
+    const u = await this.user(userId);
+    const s = stepsOf(u, who);
+    if (!canLookStepBack(s)) throw apiError(HttpStatus.CONFLICT, 'LOOK_STEPS_NO_BACK', 'もう前の姿はない');
+    const next = backLookStep(s);
+    const nu = await this.save(userId, who, next);
+    return { who, steps: lookStepView(next, this.worn(nu, who)), mana: 0 };
   }
 
   /** 〔{bati}の姿はこれだ〕 / 〔この姿にする〕: the round is decided and its picture worn */

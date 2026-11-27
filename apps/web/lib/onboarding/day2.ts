@@ -425,6 +425,7 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'OBOLON', text: 'まずは、、、{bati}の姿からだ。' },
   { t: 'say', who: 'OBOLON', text: '決まりは、ひとつだけ。、、、今の姿から、どう変えるか、を伝えろ。' },
   { t: 'say', who: 'OBOLON', text: 'それさえ守れば、、、どんな姿にも、なれる。' },
+  { t: 'say', who: 'OBOLON', text: '魔法は、、、8回まで、唱えられる。変えたい所を、、、1か所ずつ、変えていくのがいい。' }, // M-R338
   { t: 'sprite', image: null },
   {
     t: 'evolve',
@@ -467,6 +468,7 @@ export const DAY2: Step[] = [
   { t: 'label', id: 'look-change' },
   { t: 'sprite', image: ['obolon', '@me'] },
   { t: 'say', who: 'OBOLON', text: 'ここからは、、、{bati}の時と、同じだ。今の姿から、どう変えるか、を伝えろ。' },
+  { t: 'say', who: 'OBOLON', text: '8回まで、、、変身できる。変えたい所を、、、1か所ずつ、変えていくのがいい。' }, // M-R338
   { t: 'sprite', image: null },
   {
     t: 'evolve',
@@ -477,9 +479,8 @@ export const DAY2: Step[] = [
     example: '髪を銀色にして',
     limit: { t: 'say', who: 'OBOLON', text: '、、、今日の魔法は、ここまでだ。' },
   },
-  // 〔画面〕 after the look is shown big: it is the profile now, and what it took (PLACEHOLDER: {neo} is named in the next
-  // scene — until then the name told on day 1 is shown)
-  { t: 'notice', text: `この姿が、{me}のプロフィールになった｜マナジェム −${formatMana(MAKE_COST.profileLook)}（表情・後ろ姿・星ごとの姿を作る分）` },
+  // 〔画面〕 after the film and the look shown big (inside the step): it is the profile now, and what it took (M-R338's words)
+  { t: 'notice', text: `この姿が、あなたのプロフィールになった｜マナジェム −${formatMana(MAKE_COST.profileLook)}（表情・後ろ姿・星ごとの姿を作る分）` },
   { t: 'label', id: 'look-done' },
 
   // KIMORIN's dragon after the visitor's look (he had been waiting with his arms spread): うんちピンポンくん's magic
@@ -531,20 +532,15 @@ export const DAY2: Step[] = [
   { t: 'neoname', placeholder: '秘密結社用の名前', submit: 'この名前にする' },
   { t: 'notice', text: '名前は、あとでいつでも変えられます' },
   { t: 'say', who: 'OBOLON', text: '{neo}、、、いい名前だ。' },
-  // M-R223: {bati}'s look inside the chat (four cards in four touches, a tap pops it into one, a wish brings a new four,
-  // 〔前に戻す〕), until decided; then OBOLON says {bati} looks things up, and {neo} asks freely (1〜2 rounds)
-  { t: 'scene', id: 'D03-S008' }, // {bati}の見た目／調べるのが得意な{bati}
+  // M-R338: the looks are decided already; OBOLON says {bati} looks things up, and {neo} asks freely (1〜2 rounds)
+  { t: 'scene', id: 'D03-S008' }, // 調べるのが得意な{bati}
   { t: 'still', image: 's/moon-temple' },
   { t: 'sprite', image: '@bati' },
   { t: 'face', who: '@bati', expr: 'sparkle' },
-  { t: 'say', who: 'バティ', text: 'ねえ、{neo}！　次は、ボクの番！　ボクの見た目も、{neo}の好きにして！' },
-  // the cards; 「これで、決まり？」〔これで決まり〕(ok)〔もうちょっと変える〕(more: another four, until decided) — f_d03_bati_look
-  { t: 'batilook', ask: { t: 'say', who: 'バティ', text: 'これで、決まり？' }, ok: 'これで決まり', more: 'もうちょっと変える' },
-  { t: 'face', who: '@bati', expr: 'smile' },
-  { t: 'se', sound: 'sparkle' },
-  { t: 'say', who: 'バティ', text: 'やったー！　ボク、この姿、気に入った！' },
-  // (the script's 〔画面〕 note here — 「{neo}と{bati}の見た目は、あとでも変えられます…」 — is left out: {neo}'s look was decided at the bowl
-  // of water and stays until Obolo Order (client 2026-11-25 / 11-27); told to the story chat)
+  // M-R338: {bati}'s look was decided at the bowl of water (D03-S005b) — the free four-card restyle is gone
+  { t: 'say', who: 'バティ', text: 'ねえ、{neo}！　ボクたち、新しい姿になったね！' },
+  { t: 'set', key: 'f_d03_bati_look', value: 'true' },
+  { t: 'notice', text: '{neo}と{bati}の姿は、しばらくこのまま。Obolo Orderになったら、マナを使って、今の姿から変えられます' },
   { t: 'sprite', image: ['obolon', '@bati'] },
   { t: 'say', who: 'OBOLON', text: '、、、{neo}。もう一つ、教えておく。' },
   { t: 'say', who: 'OBOLON', text: '{bati}は、、、マナの力で、調べるのが、得意だ。' },

@@ -852,6 +852,16 @@ body {
 @keyframes lookCast { 0%, 100% { filter: brightness(1) drop-shadow(0 0 26px rgba(255, 220, 150, 0.45)); } 50% { filter: brightness(1.5) drop-shadow(0 0 44px rgba(190, 225, 255, 0.9)); } }
 @keyframes lookArrive { from { opacity: 0; transform: scale(0.94); filter: brightness(1.8) blur(3px); } to { opacity: 1; transform: none; } }
 
+/* D03-S004's film drawn with light (components/look/LookSteps FixFilm, 8 s): the water rises, light spirals, it clears */
+@keyframes filmWater { 0% { transform: translateY(100%); opacity: 0.9; } 30%, 62% { transform: translateY(0); opacity: 0.95; } 80%, 100% { transform: translateY(0); opacity: 0; } }
+@keyframes filmSpiral { 0%, 22% { opacity: 0; transform: translate(-50%, -30%) rotate(0deg) scale(0.6); } 40% { opacity: 0.85; } 62% { opacity: 0.85; transform: translate(-50%, -62%) rotate(540deg) scale(1); } 76%, 100% { opacity: 0; transform: translate(-50%, -70%) rotate(720deg) scale(1.1); } }
+@keyframes filmSurface { 0%, 68% { opacity: 0; transform: translateY(10px) scale(0.97); } 86%, 100% { opacity: 1; transform: none; } }
+@keyframes lookBoom { 0% { transform: scale(0.2); opacity: 0; } 70% { transform: scale(1.06); opacity: 1; } 100% { transform: scale(1); } }
+.film-water { background: linear-gradient(to top, rgba(120, 170, 230, 0.75), rgba(190, 225, 255, 0.5) 45%, rgba(255, 240, 200, 0.25) 80%, transparent); filter: blur(6px); animation: filmWater 8s ease-in-out both; }
+.film-spiral { border-radius: 9999px; background: conic-gradient(from 0deg, transparent 0 10%, rgba(255, 236, 190, 0.7) 18%, transparent 30% 44%, rgba(190, 225, 255, 0.6) 52%, transparent 64% 80%, rgba(255, 236, 190, 0.5) 88%, transparent); -webkit-mask: radial-gradient(closest-side, transparent 18%, #000 30%, transparent 62%); mask: radial-gradient(closest-side, transparent 18%, #000 30%, transparent 62%); filter: blur(5px); animation: filmSpiral 8s ease-in-out both; }
+.film-surface { animation: filmSurface 8s ease-out both; }
+.look-boom { animation: lookBoom 0.9s cubic-bezier(0.2, 1.4, 0.4, 1) both; }
+
 /* a few motes of light drifting up (three sparse layers of dots) */
 .mystic-motes {
   pointer-events: none;
@@ -923,4 +933,6 @@ body {
   .voice-magic > button.rounded-full::before, .voice-magic > button.rounded-full::after,
   .voice-magic > div.mb-3 > p, .voice-magic > [data-testid='voice-choice-line'] { animation: none; }
   .look-rise { opacity: 0.5; }
+  .film-water, .film-spiral, .film-surface, .look-boom { animation: none; }
+  .film-water, .film-spiral { opacity: 0; }
 }

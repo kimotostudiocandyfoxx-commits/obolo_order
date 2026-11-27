@@ -915,6 +915,19 @@ export const BATI_VARIANTS: Record<string, BatiVariantSet> = {
     galcool: "ねえ、{neo}。覚えておいてほしいことがあったら、『覚えといて』って言ってね！",
     galkansai: "ねえ、{neo}。覚えておいてほしいことがあったら、『覚えといて』って言ってね！",
   },
+  // M-R338: D03-S008's first line (the looks were decided at the bowl of water)
+  "ねえ、{neo}！　ボクたち、新しい姿になったね！": {
+    teinei: "ねえ、{neo}さん！　{self}たち、新しい姿になりマシタね！",
+    kansai: "ねえ、{neo}！　{self}たち、新しい姿になったなぁ！",
+    cool: "……{neo}。{self}たち、新しい姿になったな。",
+    mellow: "ねえ、{neo}。{self}たち、新しい姿になったねぇ。",
+    amae: "ねえ、{neo}！　{self}たち、新しい姿になったね！",
+    gal: "ねえ、{neo}っち！　{self}たち、新しい姿になったね！",
+    galfuwa: "ねえ、{neo}ちゃん！　{self}たち、新しい姿になったね〜！",
+    galane: "ねえ、{neo}！　{self}たち、新しい姿になったね！",
+    galcool: "ねえ、{neo}。{self}たち、新しい姿になったね。",
+    galkansai: "ねえ、{neo}！　{self}たち、新しい姿になったやん！",
+  },
   "ねえ、{neo}！　次は、ボクの番！　ボクの見た目も、{neo}の好きにして！": {
     teinei: "ねえ、{neo}さん！　次は、{self}の番デス！　{self}の見た目も、{neo}さんの好きにして！",
     kansai: "ねえ、{neo}！　次は、{self}の番！　{self}の見た目も、{neo}の好きにして！",

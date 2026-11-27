@@ -23,7 +23,7 @@ import { EDIT_EVENT, openInBluena, takeEdit } from '@/lib/bluena/edit';
 import { isStorageAsk, isStorageCancel, storageTierOf, STORAGE_LINES, type StorageTierPrice, type StorageView } from '@obolo/shared';
 import { ART_TITLE_LINES, artTitleTalk, type ArtTitleTalk } from '@obolo/shared';
 import { coverTalk, GAME_COVER_LINES, GOODS_LINES, goodsKindOf, MAKE_COST, pickArt, type GoodsArt, type GoodsKind } from '@obolo/shared';
-import { BATI_REST_HINT, type BatiRest, BLUENA_LINES, formatMana, LOOK_LOCKED_LINE, gameTierFor, gameMakeKind, matchGameTemplate, type GameTemplateId, type GameTier } from '@obolo/shared';
+import { BATI_LOOK_LOCKED_LINE, BATI_REST_HINT, type BatiRest, BLUENA_LINES, formatMana, LOOK_LOCKED_LINE, gameTierFor, gameMakeKind, matchGameTemplate, type GameTemplateId, type GameTier } from '@obolo/shared';
 import { daysUntil, isOpen, KINDS, lockLine, openKinds, openLessons, type AtelierKind, type Lesson } from '@/lib/atelier/unlock';
 import { historyOf, recentRequest } from './carry';
 import { usePartner } from '@/lib/partner';
@@ -984,8 +984,10 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     // R12 (client): not open yet → the kind by name and the day it opens (「絵は、4日目から作れるようになるよ。」)
     if (!isOpen(kind, day)) return setMsgs((m) => [...m, { id: uid(), who: 'bati', text: lockLine(kind, day, batiVoice?.personality ?? 'genki') }]);
     // client 2026-11-25: a resident's own look stays as it is once confirmed (day 2's night) until they join the Order —
-    // {bati} says so instead of offering a spell (PLACEHOLDER line, LOOK_LOCKED_LINE); {bati}'s own dress-up stays open
+    // {bati} says so instead of offering a spell (PLACEHOLDER line, LOOK_LOCKED_LINE)
     if (kind === 'look' && me?.lookLocked) return setMsgs((m) => [...m, { id: uid(), who: 'bati', text: tline(LOOK_LOCKED_LINE) }]);
+    // client 2026-11-27 (M-R338): {bati}'s look too stays as decided on day 2 until Obolo Order (PLACEHOLDER line)
+    if (kind === 'bati' && me && !isActiveMember(me)) return setMsgs((m) => [...m, { id: uid(), who: 'bati', text: tline(BATI_LOOK_LOCKED_LINE) }]);
     // R12: only the kind named (「画像を作りたい」) → what was asked for a few turns ago (「空飛ぶクジラが…」)
     if (isBare(content)) {
       const r = recentRequest(msgsRef.current);

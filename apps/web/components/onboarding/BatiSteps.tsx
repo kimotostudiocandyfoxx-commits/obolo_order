@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { demoBati, eggSvg } from '@/lib/look';
-import type { BatiEggKind } from '@obolo/shared';
+import { formatMana, type BatiEggKind } from '@obolo/shared';
 import { eggFile } from '@/lib/onboarding/egg';
 import { VoiceField } from './StoryExtras';
 import { EggMark } from '@/components/look/LookSteps';
@@ -49,19 +49,23 @@ export function EggStep({ onEgg, submit = 'これにする' }: { onEgg: (food: s
  * The egg hatches on the last picture of its cracking film (the same film-like egg, QA 5 N28 / QA 6 R9): no second
  * wobble, only the light breathing until {bati} is made, a white flash, and {bati} comes out.
  */
-export function HatchStep({ food, egg, onHatch, onDone }: { food: string; egg?: BatiEggKind; onHatch: () => Promise<string>; onDone: (url: string) => void }) {
+export function HatchStep({ food, egg, onHatch, onDone, fallback }: { food: string; egg?: BatiEggKind; onHatch: () => Promise<string | { url: string; mana?: number }>; onDone: (url: string) => void; /** the neutral stand-in when nothing was drawn in time (client 2026-11-27: a food character, never an old animal body) */ fallback?: string }) {
   const [url, setUrl] = useState<string | null>(null);
   const [stage, setStage] = useState<'wobble' | 'flash' | 'born'>('wobble');
+  // client 2026-11-27: the birth picture's mana, small, like every other charge (none for the stand-in)
+  const [mana, setMana] = useState(0);
   useEffect(() => {
     let live = true;
     const started = Date.now();
     // never stuck in the light: a failure or a very slow drawing hatches the drawn stand-in
-    Promise.race([onHatch().catch(() => ''), new Promise<string>((r) => setTimeout(() => r(''), 80_000))]).then((u) => {
+    Promise.race([onHatch().catch(() => ''), new Promise<string>((r) => setTimeout(() => r(''), 80_000))]).then((got) => {
+      const u = typeof got === 'string' ? got : got.url;
+      if (typeof got !== 'string' && got.mana) setMana(got.mana);
       const wait = Math.max(0, 3200 - (Date.now() - started));
       setTimeout(() => {
         if (!live) return;
         // not drawn in time: the egg's own plain body stands in (the real one lands on the account later)
-        setUrl(u || (egg ? `/onboarding/bati-stand-${eggFile(egg)}.webp` : demoBati(food)));
+        setUrl(u || fallback || (egg ? `/onboarding/bati-stand-${eggFile(egg)}.webp` : demoBati(food)));
         setStage('flash');
         setTimeout(() => live && setStage('born'), 700);
       }, wait);
@@ -107,6 +111,9 @@ export function HatchStep({ food, egg, onHatch, onDone }: { food: string; egg?: 
       {/* no sudden light (QA 14 R52): a soft rise to less than half white */}
       {stage === 'flash' && <span className="pointer-events-none absolute inset-0 animate-[softFlash_0.9s_ease-out_both] bg-white" />}
       <p className={`relative tracking-[0.3em] text-amber-100 [text-shadow:0_0_8px_#000] ${egg && stage !== 'born' ? 'mt-auto mb-[16svh]' : ''}`}>{stage === 'born' || egg ? '' : 'たまごが動いている……'}</p>
+      {stage === 'born' && mana > 0 && (
+        <p data-testid="birth-mana" className="pt-safe absolute left-4 top-14 animate-[fadeIn_0.6s_ease-out] text-[10px] tracking-[0.12em] text-amber-200/60 [font-family:'Shippori_Mincho','Hiragino_Mincho_ProN','Yu_Mincho','Noto_Serif_JP',serif]">マナジェム −{formatMana(mana)}</p>
+      )}
       {stage === 'born' && <p className="animate-pulse text-xs text-white/60">タップ</p>}
     </button>
   );

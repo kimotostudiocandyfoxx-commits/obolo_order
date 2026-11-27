@@ -169,7 +169,7 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
       evolve('self'),
       at((s) => s.t === 'video' && s.motion === 'd2-dragon'),
       t.indexOf('neoname'),
-      t.indexOf('batilook'),
+      say('ねえ、{neo}！　ボクたち、新しい姿になったね！'),
       t.indexOf('batitalk'),
     ];
     expect(order.every((x, k, a) => x > -1 && (k === 0 || x > a[k - 1])), JSON.stringify(order)).toBe(true);
@@ -196,16 +196,24 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
     const k = steps.findIndex((s) => s.t === 'evolve' && s.who === 'self');
     expect(steps[k + 1]).toMatchObject({ t: 'notice' });
     const told = steps[k + 1];
-    expect(told.t === 'notice' && told.text).toContain(`マナジェム −${formatMana(MAKE_COST.profileLook)}（表情・後ろ姿・星ごとの姿を作る分）`);
+    expect(told.t === 'notice' && told.text).toBe(`この姿が、あなたのプロフィールになった｜マナジェム −${formatMana(MAKE_COST.profileLook)}（表情・後ろ姿・星ごとの姿を作る分）`);
+    // OBOLON says the eight (M-R338) before each round
+    expect(steps[steps.findIndex((s) => s.t === 'evolve' && s.who === 'bati') - 2]).toEqual({ t: 'say', who: 'OBOLON', text: '魔法は、、、8回まで、唱えられる。変えたい所を、、、1か所ずつ、変えていくのがいい。' });
+    expect(steps[k - 2]).toEqual({ t: 'say', who: 'OBOLON', text: '8回まで、、、変身できる。変えたい所を、、、1か所ずつ、変えていくのがいい。' });
     expect(steps.slice(steps.findIndex((s) => s.t === 'scene' && s.id === 'D03-S009')).some((s) => s.t === 'notice')).toBe(false);
   });
-  it("M-R223: {bati}'s look in the chat (four cards, until decided), then OBOLON's lookups, then the free questions", () => {
+  it("M-R338: no restyle in the chat any more — the looks stay until Obolo Order; then OBOLON's lookups and the free questions", () => {
     const t = kinds(steps);
     expect(t).not.toContain('magic');
-    const look = steps.find((s): s is Extract<Step, { t: 'batilook' }> => s.t === 'batilook');
-    expect(look).toEqual({ t: 'batilook', ask: { t: 'say', who: 'バティ', text: 'これで、決まり？' }, ok: 'これで決まり', more: 'もうちょっと変える' });
+    expect(t).not.toContain('batilook');
+    expect(JSON.stringify(steps)).not.toMatch(/これで、決まり？|ボクの見た目も、\{neo\}の好きにして|この姿、気に入った/);
+    const k = steps.findIndex((s) => s.t === 'scene' && s.id === 'D03-S008');
+    const first = steps.slice(k).find((s) => s.t === 'say');
+    expect(first).toEqual({ t: 'say', who: 'バティ', text: 'ねえ、{neo}！　ボクたち、新しい姿になったね！' });
+    expect(steps.slice(k).find((s) => s.t === 'notice')).toEqual({ t: 'notice', text: '{neo}と{bati}の姿は、しばらくこのまま。Obolo Orderになったら、マナを使って、今の姿から変えられます' });
+    expect(steps.some((s) => s.t === 'set' && s.key === 'f_d03_bati_look' && s.value === 'true')).toBe(true);
     const research = steps.findIndex((s) => s.t === 'say' && s.text === '{bati}は、、、マナの力で、調べるのが、得意だ。');
-    expect(t.indexOf('batilook')).toBeLessThan(research);
+    expect(research).toBeGreaterThan(k);
     expect(research).toBeLessThan(t.indexOf('batitalk'));
     const wait = steps.findIndex((s) => s.t === 'say' && s.text === '今日は、、、月で、好きに過ごせ。{bati}と、いくらでも、話していい。');
     expect(wait).toBeGreaterThan(t.indexOf('batitalk'));

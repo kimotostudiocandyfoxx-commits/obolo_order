@@ -272,6 +272,11 @@ export function Cast({
 }
 
 /** the parts a layered pose has (scripts/sprite-layers.py writes the list) */
+/**
+ * the visitor's own picture is a transparent cut-out (client 2026-11-27: the looks made step by step are stored as PNG
+ * cut-outs) — no rounded frame round it; the old opaque portraits (JPEG / WebP) keep theirs
+ */
+export const isCutOut = (url: string) => /\.png(?:$|[?#])/i.test(url) || url.startsWith('data:image/png');
 const stemOf = (url: string) => url.match(/\/onboarding\/([^/]+)\.webp(?:\?.*)?$/)?.[1];
 const layersOf = (url: string): string[] => {
   const stem = stemOf(url);
@@ -402,7 +407,7 @@ function Character({ name, url, posed, lit, bust, hidden, talking, level, react,
               <img src={layer('tail')!} alt="" draggable={false} className={`absolute inset-0 ${img}`} style={{ transformOrigin: '50% 78%', animation: MOTION.tail.deg ? `tailSway ${MOTION.tail.period}ms ease-in-out infinite` : undefined, ['--tail' as string]: `${MOTION.tail.deg}deg` }} />
             )}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={layer('body') ?? url} alt="" draggable={false} className={`relative ${img} ${own && !name.startsWith('@bati') ? 'rounded-[2rem] border-2 border-amber-200/50' : ''}`} />
+            <img src={layer('body') ?? url} alt="" draggable={false} className={`relative ${img} ${own && !name.startsWith('@bati') && !isCutOut(url) ? 'rounded-[2rem] border-2 border-amber-200/50' : ''}`} />
             {mouth && (
               // eslint-disable-next-line @next/next/no-img-element
               <img

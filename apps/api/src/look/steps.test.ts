@@ -10,7 +10,7 @@ async function pic(fill = '#e05050') {
   return sharp(dot).png().toBuffer();
 }
 
-function make(o: { member?: boolean; journeyDay?: number; balance?: number; fail?: boolean; confirmed?: boolean } = {}) {
+function make(o: { member?: boolean; journeyDay?: number; balance?: number; fail?: boolean; confirmed?: boolean; /** the cut-out fails every retry */ badCut?: boolean } = {}) {
   const user: Record<string, unknown> = {
     id: 'u',
     email: 'u@example.com',
@@ -76,7 +76,7 @@ function make(o: { member?: boolean; journeyDay?: number; balance?: number; fail
   const confirmed: boolean[] = [];
   const look = {
     // the shared checked cut-out (media/cutting.ts cutLadder) is LookService.cut: every picture of a round goes through it
-    cut: async (img: { data: Buffer }, _out: number, key: string) => (cuts.push(key), img.data),
+    cutOrNothing: async (img: { data: Buffer }, _out: number, key: string) => (cuts.push(key), o.badCut ? { png: null, record: 'colour:vision|model:vision|repaint:vision|repaint2:vision' } : { png: img.data, record: '' }),
     wearBati: async (_u: string, _cur: unknown, url: string) => (worn.push(`bati:${url}`), (user.batiImageUrl = url), {}),
     wearLook: async (_u: string, url: string) => (worn.push(`self:${url}`), (user.avatarUrl = url), {}),
     confirmFirstLook: async (_u: string, _o: string, atFix: boolean) => {
@@ -112,6 +112,24 @@ describe('{bati} の進化 (D03-S005b)', () => {
     expect(t.worn).toEqual([]);
   });
 
+  it('〔↶ ひとつ前の姿にもどす〕: the picture before again — nothing painted, nothing given back, the count stays', async () => {
+    const t = make();
+    await expect(t.s.back('u', 'bati')).rejects.toMatchObject({ response: { error: { code: 'LOOK_STEPS_NO_BACK' } } });
+    await t.s.step('u', { who: 'bati', wish: '翼' }, 'https://x');
+    await t.s.step('u', { who: 'bati', wish: '王冠' }, 'https://x');
+    const b = await t.s.back('u', 'bati');
+    expect(b).toMatchObject({ mana: 0, steps: { used: 2, left: 6, url: 'https://x/bati-0.png', canBack: true } });
+    const b2 = await t.s.back('u', 'bati');
+    // back to the look it was born with (the one worn)
+    expect(b2.steps).toMatchObject({ used: 2, url: 'https://x/bati-born.png', canBack: false });
+    expect(t.charged).toEqual(['lookStep', 'lookStep']);
+    expect(t.refunded).toEqual([]);
+    expect(t.prompts).toHaveLength(2);
+    // deciding now wears nothing new
+    await t.s.fix('u', 'bati', 'https://x');
+    expect(t.worn).toEqual([]);
+  });
+
   it('eight steps at most: the ninth is refused, nothing charged, nothing painted', async () => {
     const t = make();
     for (let k = 0; k < LOOK_STEP_MAX; k++) await t.s.step('u', { who: 'bati', wish: `その${k}` }, 'https://x');
@@ -130,6 +148,21 @@ describe('{bati} の進化 (D03-S005b)', () => {
     expect(t.refunded).toEqual(['lookStep']);
     expect(t.balance()).toBe(88);
     expect(stepsOf(t.user as never, 'bati').used).toBe(0);
+  });
+
+  it('a picture no try cut cleanly is never shown: the mana goes back, the step does not count, 「もういちど」', async () => {
+    const t = make({ badCut: true });
+    await expect(t.s.step('u', { who: 'bati', wish: '翼' }, 'https://x')).rejects.toMatchObject({ response: { error: { code: 'LOOK_CUT_FAILED', message: 'うまく描けなかった……もういちど' } } });
+    expect(t.charged).toEqual(['lookStep']);
+    expect(t.refunded).toEqual(['lookStep']);
+    expect(t.balance()).toBe(88);
+    expect(stepsOf(t.user as never, 'bati')).toMatchObject({ used: 0, url: null });
+    expect(t.stored).toEqual([]);
+    // the four first pictures the same: none cut cleanly → nothing shown, the mana back
+    const four = await t.s.pick4('u', { wish: '銀色の髪の旅人' }, 'https://x');
+    expect(four).toEqual({ candidates: [], mana: 0 });
+    expect(t.refunded).toEqual(['lookStep', 'lookPick4']);
+    expect(t.balance()).toBe(88);
   });
 
   it('no mana: refused before anything is painted', async () => {

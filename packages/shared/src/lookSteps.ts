@@ -32,6 +32,8 @@ export interface LookStepState {
   used: number;
   fixed: boolean;
   url?: string | null;
+  /** the pictures before the one it has now, oldest first (null: the look worn when the round began) — 〔↶ ひとつ前の姿にもどす〕 */
+  back?: (string | null)[];
 }
 export const EMPTY_LOOK_STEPS: LookStepState = { used: 0, fixed: false, url: null };
 
@@ -50,7 +52,17 @@ export function canLookStep(s: Pick<LookStepState, 'used' | 'fixed'>, max: numbe
 /** the round after one step painted `url` (throws when no step is left: the caller refuses before painting) */
 export function afterLookStep(s: LookStepState, url: string, max: number = LOOK_STEP_MAX): LookStepState {
   if (!canLookStep(s, max)) throw new Error('LOOK_STEPS_DONE');
-  return { used: clampUsed(s.used, max) + 1, fixed: false, url };
+  return { used: clampUsed(s.used, max) + 1, fixed: false, url, back: [...(s.back ?? []), s.url ?? null] };
+}
+
+/** 〔↶ ひとつ前の姿にもどす〕 (M-R338) may be pressed: something changed in this round and it is not decided */
+export const canLookStepBack = (s: Pick<LookStepState, 'fixed' | 'back'>): boolean => !s.fixed && (s.back?.length ?? 0) > 0;
+
+/** one picture back: the look before the last step (the steps used and their mana do not come back) */
+export function backLookStep(s: LookStepState): LookStepState {
+  if (!canLookStepBack(s)) throw new Error('LOOK_STEPS_NO_BACK');
+  const back = s.back ?? [];
+  return { ...s, url: back[back.length - 1], back: back.slice(0, -1) };
 }
 
 /**
@@ -129,6 +141,8 @@ export interface LookStepView {
   fixed: boolean;
   /** the picture it has now */
   url: string | null;
+  /** 〔↶ ひとつ前の姿にもどす〕 is there */
+  canBack?: boolean;
 }
 /** what the screen is told after anything that moved a round */
 export interface LookStepResult {
@@ -153,4 +167,5 @@ export const lookStepView = (s: LookStepState, worn: string | null, max: number 
   left: lookStepsLeft(s.used, max),
   fixed: !!s.fixed,
   url: s.url ?? worn,
+  canBack: canLookStepBack(s),
 });

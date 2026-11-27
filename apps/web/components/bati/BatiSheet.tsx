@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { BATI_ROLE_LABELS, BATI_ROLES, BATI_PERSONALITIES, batiDefaultCall, normalizeBatiPersonality, type Me } from '@obolo/shared';
+import { BATI_ROLE_LABELS, BATI_ROLES, BATI_PERSONALITIES, batiDefaultCall, formatMana, MAKE_COST, normalizeBatiPersonality, type Me } from '@obolo/shared';
 import { ApiError, getApi } from '@/lib/api';
 import { BatiCardView, exportCard } from './BatiCard';
 import { SmallEgg } from './SmallEgg';
@@ -117,6 +117,27 @@ export function BatiSettings({ me, onMe }: { me: Me; onMe: (m: Me) => void }) {
       {b.card && (
         <div className="flex flex-col items-center gap-3">
           <BatiCardView card={b.card} egg={!!me.batiEgg} eggGrowth={me.batiEgg?.growth ?? 0} onExport={() => void exportCard(b.card!)} />
+          {/* client 2026-11-27: the painter failed at the birth (a stand-in, nothing was taken) — the real picture, for the normal price */}
+          {b.stand && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={async () => {
+                setBusy(true);
+                setErr(null);
+                try {
+                  onMe(await getApi().batiBirthRetry());
+                } catch (e) {
+                  setErr(e instanceof ApiError && e.code === 'NO_MANA' ? e.message : 'うまく描けなかった……もういちど');
+                } finally {
+                  setBusy(false);
+                }
+              }}
+              className="rounded-full border border-amber-200/50 px-4 py-2 text-xs tracking-wider text-amber-100 disabled:opacity-40"
+            >
+              {busy ? '……' : `生まれた時の絵を、描いてもらう（マナ −${formatMana(MAKE_COST.batiBirth)}）`}
+            </button>
+          )}
           {/* M-R222: 「覚えてること」 (only what was asked in the chat), forget one or all */}
           <BatiMemories me={me} onMe={onMe} />
         </div>

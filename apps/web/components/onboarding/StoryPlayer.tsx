@@ -114,7 +114,7 @@ interface Props {
   /** 'evolve' step decided ({bati}'s look / one's own): the account changed — the caller reads it again */
   onLookFixed?: (who: 'bati' | 'self') => void;
   /** Day 4 'hatch' step: resolves with the Bati picture. */
-  onHatch?: () => Promise<string>;
+  onHatch?: () => Promise<string | { url: string; /** the mana the birth picture took (shown small) */ mana?: number }>;
   /** Day 4 'batiname' step. */
   onBatiName?: (name: string) => Promise<void>;
   /** The Eclipse day's 'order' step: the payment. `ordered` = already paid. */
@@ -1883,6 +1883,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           image={step.who === 'bati' ? v.batiImage : v.look}
           egg={step.who === 'bati' ? eggOf(stateRef.current.answers, v.story) : undefined}
           noImage={v.mediaOk === false}
+          film={step.who === 'self'}
           onSaid={(t) => addLine({ id: `es${i}-${Date.now()}`, kind: 'me', text: t })}
           onLimit={() => addLine({ id: `el${i}`, kind: 'them', who: step.limit.who, text: step.limit.text })}
           onStep={(url, used) => {
@@ -1965,6 +1966,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           food={v.batiFood ?? ''}
           egg={eggOf(stateRef.current.answers, v.story)}
           onHatch={() => (onHatch ? onHatch() : Promise.resolve(''))}
+          fallback="/onboarding/bati-stand-food.webp"
           onDone={(url) => {
             remember('batiImage', url);
             run(iRef.current + 1);
