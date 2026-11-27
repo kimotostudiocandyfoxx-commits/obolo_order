@@ -4,8 +4,9 @@ import { decideBatiPersona, decideBatiWish, moderateLookWish, rewriteBatiLines, 
 import { readdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import sharp from 'sharp';
-import { cutoutWhite } from '../media/cutout';
-import { chooseKey, cutoutChecked, cutoutKey, KEY_WORDS, moveToKey, onKey, type KeyName } from '../media/keying';
+import type { BackgroundRemover } from '@obolo/ai';
+import { cutLadder, cutPicture, ladderRecord, llmCutJudge } from '../media/cutting';
+import { chooseKey, cutoutKey, KEY_WORDS, moveToKey, onKey, rankKeys, rekeyPrompt, type KeyName } from '../media/keying';
 import { ageBand, BATI_SEED_QUESTION, BATI_WISH_REFUSE, batiEggState, BATI_RESTYLE_TOUCHES, LOOK_HISTORY_MAX, BATI_MAX, BATI_SCRIPT_LINES, batiSeedKind, type BatiEggKind, type BatiNewHatchBody, type BatiSpeechBody, BATI_FACES, BATI_MAGIC_PER_DAY, BATI_RESTYLE_PER_DAY, type BatiRestyleResult, type BatiFace, JOURNEY_DONE, type MakeKind, type MakeConfirm, type SpellTag, spellKey, spellPrompt, type StickerArtBody, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type PuniPicBody, type PuniPicResult, type RefineLookBody, SELF_TALK_FACES, TALK_FACES, type TalkExpression, type TalkFace, type TalkLook } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import { apiError } from '../common/errors';
@@ -15,7 +16,7 @@ import { alreadyStarted } from '../wallet/confirmed';
 import { buddyProfiles, users } from '../db/schema';
 import type { KvStore } from '../infra/kv';
 import type { JobQueue } from '../infra/queue';
-import { BATI_IMAGES, BUDDY_LLM, IMAGES, KORORIN_IMAGES, KV, LLM, LOOK_IMAGES, QUEUE } from '../infra/tokens';
+import { BATI_IMAGES, BUDDY_LLM, CUTOUT_MODEL, IMAGES, KORORIN_IMAGES, KV, LLM, LOOK_IMAGES, QUEUE } from '../infra/tokens';
 import { CONFIG, type AppConfig } from '../config';
 import { activeBati, batiList, columnsOf, keepLook, lookHistory, type BatiRecord } from './batis';
 import { MediaService } from '../media/media.service';
@@ -148,6 +149,8 @@ export class LookService {
     @Optional() @Inject(CONFIG) private readonly cfg?: Partial<AppConfig>,
     /** client 2026-11-25: the member's figures on every home planet, made after each look */
     @Optional() private readonly figures?: PlanetFiguresService,
+    /** M-R326: the background-removal model of the cut-out's checks and first retry (CUTOUT_MODEL; none: those are skipped) */
+    @Optional() @Inject(CUTOUT_MODEL) private readonly cutModel?: BackgroundRemover | null,
   ) {
     this.queue.register('bati.lines', ({ userId, batiId }) => this.writeLines(userId, batiId));
     this.queue.register('bati.paint', ({ userId, origin }) => this.paintBati(userId, origin).then(() => undefined));
@@ -666,8 +669,10 @@ export class LookService {
         continue;
       }
       try {
-        const png = await cutoutWhite(r.value.data, 512, undefined, kind === 'puni');
-        const m = await this.media.storeImage(userId, 'avatar', 'image/png', png, origin);
+        // M-R325 / M-R326: cut and checked; a candidate whose cut fails (also by the model) is not offered
+        const cut = await cutLadder({ first: { ...r.value, background: 'plain' }, out: 512, kind: 'figure', opt: { noShadow: kind === 'puni' }, model: this.cutModel, judge: llmCutJudge(this.llm) });
+        if (!cut.ok) throw new Error(`the cut-out failed its checks (${ladderRecord(cut.tries)})`);
+        const m = await this.media.storeImage(userId, 'avatar', 'image/png', cut.png, origin);
         candidates.push({ id: m.id, url: m.url });
       } catch (e) {
         this.log.warn(`puni pic cutout failed: ${String(e)}`);
@@ -816,12 +821,30 @@ export class LookService {
   }
 
   /**
-   * A painting on `key` cut out (media/keying.ts); when the character came out too near the key, its background is
-   * painted again on the key farthest from its colours (one more edit) and the cleaner cut kept. Null: nothing to cut.
+   * A painting on `key` cut out and checked (M-R325 / M-R326, media/cutting.ts cutLadder): the colour cut, then the
+   * background-removal model's cut, then its background painted again on the key farthest from its colours (one edit,
+   * the re-key of before) — the first that passes the checks. When none does the colour cut is still handed back, as
+   * before the checks (these pictures have no stand-in yet; logged for the operators). Null: nothing to cut.
    */
   private async cut(img: GeneratedImage, out: number, key: KeyName): Promise<Buffer | null> {
-    const r = await cutoutChecked(img.data, out, key, async (_to, prompt) => (await this.looks.generate(prompt, 0, [img])).data).catch(() => null);
-    return r?.png ?? null;
+    const r = await cutLadder({
+      first: { ...img, background: key },
+      out,
+      kind: 'figure',
+      model: this.cutModel,
+      judge: llmCutJudge(this.llm),
+      repaint: async (n) => {
+        if (n !== 1) return null;
+        const ranked = (await rankKeys(img.data).catch(() => [])).filter((x) => x.key !== key);
+        const to = ranked[0]?.key ?? (key === 'magenta' ? 'green' : 'magenta');
+        return { ...(await this.looks.generate(rekeyPrompt(to), 0, [img])), background: to };
+      },
+    }).catch(() => null);
+    if (r?.ok) return r.png;
+    if (r) this.log.error(`cut-out failed every retry (${ladderRecord(r.tries)}): the colour cut is used`);
+    return cutPicture(img.data, out, key)
+      .then((c) => c.png)
+      .catch(() => null);
   }
 
   /**

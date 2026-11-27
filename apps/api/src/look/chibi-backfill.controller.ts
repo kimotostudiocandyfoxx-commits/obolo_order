@@ -1,4 +1,4 @@
-import { Controller, Headers, HttpCode, Inject, Ip, Post, Query, Req } from '@nestjs/common';
+import { Controller, Get, Headers, HttpCode, Inject, Ip, Post, Query, Req } from '@nestjs/common';
 import type { Request } from 'express';
 import { PLANET_FIGURES } from '@obolo/shared';
 import { and, isNotNull, isNull, or, sql } from 'drizzle-orm';
@@ -10,7 +10,7 @@ import { users } from '../db/schema';
 import type { KvStore } from '../infra/kv';
 import { KV } from '../infra/tokens';
 import { FIGURE_TRIES, PlanetFiguresService, triesKey } from './figures.service';
-import { WINGS_KEY } from './figures';
+import { cutKey, WINGS_KEY } from './figures';
 import { LookService } from './look.service';
 
 /** a figure of the look worn now that is not made and still has tries left */
@@ -93,4 +93,98 @@ export class ChibiBackfillController {
     }
     return { members: rows.length, measured, fallback };
   }
+
+  /**
+   * M-R325 / M-R326 backfill (admin token only): the figures cut before the checked cut are cut again WITHOUT painting
+   * and checked — `limit` members at a time (default 20, at most 200), oldest first. With the painting kept (figures
+   * made from M-R325 on) the whole new cut runs on it; of older figures only the cut PNG is left: their inner gaps go,
+   * whites the old cut ate cannot be restored (counted in `eaten` / `failed`; those keep the picture of before, marked
+   * for a new painting). No painter is called; the background-removal model and the vision check are (absorbed:
+   * 'figures'), when configured. Run again until `members` is 0.
+   *   curl -X POST -H "x-admin-token: …" "https://<api>/admin/figures-recut?limit=20"
+   */
+  @Post('figures-recut')
+  @HttpCode(200)
+  async recut(@Headers('x-admin-token') token: string | undefined, @Ip() ip: string, @Req() req: Request, @Query('limit') limit?: string) {
+    await rateLimit(this.kv, `admin:${ip}`, 120, 600);
+    assertAdmin(this.cfg, token);
+    const n = Math.max(1, Math.min(200, Number(limit) || 20));
+    const rows = await this.db.read
+      .select({ id: users.id })
+      .from(users)
+      .where(and(isNull(users.deletedAt), isNotNull(users.planetFigures), toRecut))
+      .orderBy(users.createdAt)
+      .limit(n);
+    const origin = `${req.protocol}://${req.get('host')}`;
+    const total = { members: rows.length, checked: 0, changed: 0, holes: 0, failed: 0, eaten: 0 };
+    for (const r of rows) {
+      const got = await this.figures.recut(r.id, origin).catch(() => null);
+      if (!got) continue;
+      for (const k of ['checked', 'changed', 'holes', 'failed', 'eaten'] as const) total[k] += got[k];
+    }
+    return total;
+  }
+
+  /**
+   * M-R326, before the live planet screens become the new homes (docs/planets.md "新しい家への切り替え"): what of the
+   * existing data is not ready yet — read only, admin token only. Every count should reach 0 (or be understood) by
+   * running the backfills in the order docs/planets.md gives (.github/workflows/planets-backfill.yml).
+   *   curl -H "x-admin-token: …" "https://<api>/admin/planets-readiness"
+   */
+  @Get('planets-readiness')
+  async readiness(@Headers('x-admin-token') token: string | undefined, @Ip() ip: string) {
+    await rateLimit(this.kv, `admin:${ip}`, 120, 600);
+    assertAdmin(this.cfg, token);
+    const one = async (q: ReturnType<typeof sql>) => Number(((await this.db.read.execute(q)) as unknown as { rows: { n: string | number }[] }).rows[0]?.n ?? 0);
+    const untagged = (kind: string, table: string, extra = '') =>
+      one(sql`SELECT count(*) AS n FROM ${sql.raw(table)} t WHERE t.deleted_at IS NULL ${sql.raw(extra)} AND NOT EXISTS (SELECT 1 FROM planet_work_meta pm WHERE pm.kind = ${kind} AND pm.work_id = t.id)`);
+    const anyFigure = (cond: (f: string) => string) => sql.raw(PLANET_FIGURES.map((f) => `(${cond(f)})`).join(' OR '));
+    const looks = sql`jsonb_each(u.planet_figures) e`;
+    const worksWithoutTags = {
+      saturn_post: await untagged('saturn_post', 'saturn_posts', 'AND t.reply_to_id IS NULL'),
+      jupiter_post: await untagged('jupiter_post', 'jupiter_posts'),
+      planet_post: await untagged('planet_post', 'planet_posts'),
+      radio_show: await untagged('radio_show', 'radio_shows'),
+      goods: await untagged('goods', 'goods'),
+      book: await untagged('book', 'books'),
+      game: await untagged('game', 'games'),
+    };
+    const members = await one(sql`SELECT count(*) AS n FROM users u WHERE u.deleted_at IS NULL AND u.avatar_url IS NOT NULL`);
+    const figures = {
+      /** members with a look whose figures are not all made (of the look worn now) */
+      membersMissing: await one(
+        sql`SELECT count(*) AS n FROM users u WHERE u.deleted_at IS NULL AND u.avatar_url IS NOT NULL AND (${anyFigure((f) => `(u.planet_figures -> u.avatar_url ->> '${f}') IS NULL`)})`,
+      ),
+      /** … of which none at all */
+      membersWithNone: await one(sql`SELECT count(*) AS n FROM users u WHERE u.deleted_at IS NULL AND u.avatar_url IS NOT NULL AND (u.planet_figures -> u.avatar_url) IS NULL`),
+      /** members with a figure cut before the checked cut (POST /admin/figures-recut) */
+      membersToRecut: await one(sql`SELECT count(*) AS n FROM users u WHERE u.deleted_at IS NULL AND u.planet_figures IS NOT NULL AND ${toRecutOf(sql`u.planet_figures`)}`),
+      /** figures of before that fail the checks after the re-cut: shown as they are, to be painted again */
+      figuresToRepaint: await one(
+        sql`SELECT count(*) AS n FROM users u, ${looks}, jsonb_each_text(e.value) k WHERE u.deleted_at IS NULL AND u.planet_figures IS NOT NULL AND k.key LIKE '%#cut' AND k.value LIKE 'x%'`,
+      ),
+      /** paintings whose cut failed every retry and are not shown (M-R326) */
+      cutFailures: await one(
+        sql`SELECT count(*) AS n FROM users u, ${looks}, jsonb_each_text(e.value) k WHERE u.deleted_at IS NULL AND u.planet_figures IS NOT NULL AND k.key LIKE '%#cutfail' AND (e.value ->> replace(k.key, '#cutfail', '')) IS NULL`,
+      ),
+      /** Jupiter figures whose wing cut is not measured (POST /admin/wings-backfill) */
+      wingsNotMeasured: await one(
+        sql`SELECT count(*) AS n FROM users u, ${looks} WHERE u.deleted_at IS NULL AND u.planet_figures IS NOT NULL AND (e.value ->> 'jupiter') IS NOT NULL AND (e.value ->> ${WINGS_KEY}) IS NULL`,
+      ),
+    };
+    const fold = (x: string) => `btrim(regexp_replace(${x}, E'[ \\t\\r\\n]+', ' ', 'g'), ' ')`;
+    /** Mercury songs of members with a voice whose title is not read in it (POST /admin/title-voice-backfill) */
+    const songsWithoutTitleVoice = await one(
+      sql`SELECT count(*) AS n FROM planet_posts p JOIN songs s ON s.id = p.source_id JOIN users u ON u.id = s.user_id
+          WHERE p.planet = 'mercury' AND p.kind = 'song' AND p.deleted_at IS NULL AND s.deleted_at IS NULL AND u.deleted_at IS NULL AND u.voice_self_id IS NOT NULL
+            AND ${sql.raw(fold('p.title'))} <> '' AND (s.design_json -> 'titleVoice' ->> 'text') IS DISTINCT FROM ${sql.raw(fold('p.title'))}`,
+    );
+    const left = Object.values(worksWithoutTags).reduce((a, b) => a + b, 0) + figures.membersMissing + figures.membersToRecut + figures.wingsNotMeasured + songsWithoutTitleVoice;
+    return { ready: left === 0, membersWithLook: members, worksWithoutTags, figures, songsWithoutTitleVoice };
+  }
 }
+
+/** a figure of any kept look that has no 'f#cut' mark */
+const toRecutOf = (store: ReturnType<typeof sql>) =>
+  sql`EXISTS (SELECT 1 FROM jsonb_each(${store}) e WHERE ${sql.raw(PLANET_FIGURES.map((f) => `((e.value ->> '${f}') IS NOT NULL AND (e.value ->> '${cutKey(f)}') IS NULL)`).join(' OR '))})`;
+const toRecut = toRecutOf(sql`${users.planetFigures}`);

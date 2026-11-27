@@ -4,14 +4,16 @@ import { PLANET_FIGURES, type PlanetFigure } from '@obolo/shared';
 import { costScope, type CostCtx } from '../wallet/cost-scope';
 import { featureOfJob } from '../wallet/cost-scope';
 import { FIGURE_RUN_TRIES, FIGURE_TRIES, PlanetFiguresService, figuresOf, figuresToMake, triesKey, type FigureStore } from './figures.service';
-import { wingsOf, WINGS_KEY } from './figures';
+import { cutFailKey, cutKey, srcKey, wingsOf, WINGS_KEY } from './figures';
 
-vi.mock('../media/keying', async (orig) => ({
-  ...(await orig<typeof import('../media/keying')>()),
-  chooseKey: async () => 'green',
-  cutoutChecked: async () => ({ png: Buffer.from('cut-key'), key: 'green', clearance: 1 }),
+vi.mock('../media/keying', async (orig) => ({ ...(await orig<typeof import('../media/keying')>()), chooseKey: async () => 'green' }));
+/** the cut-out ladder of the tests: passes at once, or does what `ladder.run` says (M-R326) */
+const ladder: { run: null | ((a: { first: unknown; kind: string; repaint?: (n: 1 | 2) => Promise<unknown> }) => Promise<unknown>) } = { run: null };
+vi.mock('../media/cutting', async (orig) => ({
+  ...(await orig<typeof import('../media/cutting')>()),
+  cutLadder: async (a: { first: unknown; kind: string; repaint?: (n: 1 | 2) => Promise<unknown> }) =>
+    ladder.run ? ladder.run(a) : { ok: true, png: Buffer.from('cut'), how: 'plain', step: 'colour', source: a.first, tries: [], painted: 1 },
 }));
-vi.mock('../media/cutout', () => ({ cutoutWhite: async () => Buffer.from('cut-white') }));
 
 const LOOK = 'https://x/look.png';
 /** which figure a prompt paints (the words each style is known by) */
@@ -52,13 +54,13 @@ function make(row: { avatarUrl: string | null; chibiPicUrl: string | null; plane
   let n = 0;
   const removed: string[] = [];
   Object.assign(s, {
-    log: { warn: () => undefined },
+    log: { warn: () => undefined, error: () => undefined },
     looks: painter('look'),
     chibiPainter: painter('runware:400@4'),
     ballPainter: painter('alibaba:qwen-image@2.1-turbo'),
     planetPainter: painter('alibaba:qwen-image@2.1-turbo'),
     media: {
-      storeImage: async () => ({ url: `https://x/fig-${++n}.png` }),
+      storeImage: async (_u: string, _k: string, mime: string) => ({ url: `https://x/fig-${++n}.${mime === 'image/png' ? 'png' : 'jpg'}` }),
       bytesByUrl: async () => Buffer.from([0x89, 0x50]),
       removeByUrl: async (_u: string, url: string) => void removed.push(url),
     },
@@ -176,5 +178,112 @@ describe('client 2026-11-25: the planet figures of a look (one job, all nine)', 
     expect(b.painted).toHaveLength(0);
     // measured once: never again
     expect(await b.s.measureMissingWings('u1')).toEqual({ measured: 0, fallback: 0 });
+  });
+
+  it('M-R325 / M-R326: the painting is kept beside its figure; a cut that fails every retry is not shown, the figure of before stays, and it is recorded', async () => {
+    const row = { avatarUrl: LOOK, chibiPicUrl: 'https://x/chibi-before.png', planetFigures: null as FigureStore | null };
+    const { s, painted } = make(row);
+    // the Saturn chibi's cut fails all the way (two repaints asked for on the key colour); the others pass at once
+    ladder.run = async (a) => {
+      if (a.kind !== 'saturnChibi') return { ok: true, png: Buffer.from('cut'), how: 'plain', step: 'colour', source: a.first, tries: [], painted: 1 };
+      await a.repaint!(1);
+      await a.repaint!(2);
+      return { ok: false, painted: 3, tries: [{ step: 'colour', failed: ['shape'], reason: '' }, { step: 'model', failed: ['area'], reason: '' }, { step: 'repaint', failed: ['vision'], reason: 'a hand is missing' }, { step: 'repaint2', failed: ['fringe'], reason: '' }] };
+    };
+    try {
+      await s.make({ userId: 'u1', origin: 'https://api' });
+    } finally {
+      ladder.run = null;
+    }
+    const e = row.planetFigures![LOOK];
+    // not shown: no figure, the mini figure of before stays
+    expect(e.saturnChibi).toBeUndefined();
+    expect(row.chibiPicUrl).toBe('https://x/chibi-before.png');
+    expect(e[cutFailKey('saturnChibi')]).toBe('colour:shape|model:area|repaint:vision|repaint2:fringe');
+    // three paintings, each counted; the repaints were asked on the key colour
+    const chibi = painted.filter((p) => p.f === 'saturnChibi');
+    expect(chibi).toHaveLength(FIGURE_TRIES);
+    expect(e[triesKey('saturnChibi')]).toBe(String(FIGURE_TRIES));
+    // a figure normally on white is asked on the key colour when painted again
+    expect(painted.find((p) => p.f === 'mars')!.prompt).toContain('pure white background');
+    // the others: shown, their painting kept, marked as cut by the checked cut
+    expect(e.mars).toMatch(/\.png$/);
+    expect(e[srcKey('mars')]).toMatch(/\.jpg$/);
+    expect(e[cutKey('mars')]).toBe('2:colour');
+    expect(Object.keys(figuresOf(row.planetFigures, LOOK))).toHaveLength(8);
+    // never painted again (its tries are spent)
+    await s.make({ userId: 'u1', origin: 'https://api' });
+    expect(painted.filter((p) => p.f === 'saturnChibi')).toHaveLength(FIGURE_TRIES);
+  });
+
+  it('M-R326: a repaint is asked on the key colour, also for a figure normally painted on white', async () => {
+    const row = { avatarUrl: LOOK, chibiPicUrl: null, planetFigures: null as FigureStore | null };
+    const { s, painted } = make(row);
+    ladder.run = async (a) => {
+      const again = a.kind === 'mercury' ? await a.repaint!(1) : null;
+      return { ok: true, png: Buffer.from('cut'), how: 'key', step: again ? 'repaint' : 'colour', source: again ?? a.first, tries: [], painted: again ? 2 : 1 };
+    };
+    try {
+      await s.make({ userId: 'u1', origin: 'https://api' });
+    } finally {
+      ladder.run = null;
+    }
+    const boat = painted.filter((p) => p.f === 'mercury').map((p) => p.prompt);
+    expect(boat).toHaveLength(2);
+    expect(boat[0]).toContain('Plain solid pure white background');
+    expect(boat[1]).not.toContain('pure white background');
+    expect(boat[1]).toContain('pure chroma-key green (#00FF00)');
+    expect(row.planetFigures![LOOK][cutKey('mercury')]).toBe('2:repaint');
+    expect(row.planetFigures![LOOK][triesKey('mercury')]).toBe('2');
+  });
+
+  it('M-R325 backfill: a figure of before is cut again without painting — its gap goes; one that fails the checks stays as it is, marked', async () => {
+    const S = 300;
+    const INK = '#3a2a2a';
+    const svg = (body: string) => sharp(Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${S}" height="${S}"><rect width="${S}" height="${S}" fill="#fff"/>${body}</svg>`)).png().toBuffer();
+    /** the cut of before: only the white connected to the border went */
+    const oldCut = async (src: Buffer) => {
+      const { data, info } = await sharp(src).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+      const W = info.width;
+      const seen = new Uint8Array(W * info.height);
+      const stack = [0];
+      seen[0] = 1;
+      while (stack.length) {
+        const i = stack.pop()!;
+        data[i * 4 + 3] = 0;
+        for (const j of [i - 1, i + 1, i - W, i + W]) {
+          if (j < 0 || j >= seen.length || seen[j] || Math.abs((j % W) - (i % W)) > 1) continue;
+          if (data[j * 4] > 227 && data[j * 4 + 1] > 227 && data[j * 4 + 2] > 227) (seen[j] = 1), stack.push(j);
+        }
+      }
+      return sharp(data, { raw: { width: W, height: info.height, channels: 4 } }).png().toBuffer();
+    };
+    const body = `<circle cx="120" cy="160" r="80" fill="#f4a3c4" stroke="${INK}" stroke-width="6"/>`;
+    const arm = `<circle cx="225" cy="160" r="40" fill="none" stroke="#f4a3c4" stroke-width="18"/><circle cx="225" cy="160" r="50" fill="none" stroke="${INK}" stroke-width="5"/><circle cx="225" cy="160" r="30" fill="none" stroke="${INK}" stroke-width="5"/>`;
+    const withGap = await oldCut(await svg(body + arm));
+    // eaten by the old cut: the outline is open and the white body is gone
+    const eaten = await oldCut(await svg(`<circle cx="150" cy="160" r="110" fill="#fff" stroke="${INK}" stroke-width="6" stroke-dasharray="664 27" transform="rotate(-80 150 160)"/><circle cx="150" cy="255" r="12" fill="#f4a3c4" stroke="${INK}" stroke-width="4"/>`));
+    const row = {
+      avatarUrl: LOOK,
+      chibiPicUrl: null,
+      planetFigures: { [LOOK]: { mars: 'https://x/mars.png', venus: 'https://x/venus.png', pluto: 'https://x/pluto.png', [cutKey('pluto')]: '2:colour' } } as FigureStore,
+    };
+    const b = make(row);
+    (b.s as unknown as { media: { bytesByUrl: unknown } }).media.bytesByUrl = async (_u: string, url: string) => (url.includes('mars') ? withGap : eaten);
+    const got = await b.s.recut('u1', 'https://api');
+    expect(got).toEqual({ checked: 2, changed: 1, holes: 1, failed: 1, eaten: 1 });
+    const e = row.planetFigures[LOOK];
+    // the gap went: a new picture, the old one removed; marked as re-cut
+    expect(e.mars).not.toBe('https://x/mars.png');
+    expect(e[cutKey('mars')]).toBe('r2');
+    expect(b.removed).toEqual(['https://x/mars.png']);
+    // the eaten one cannot be restored: the figure of before stays, marked for a new painting
+    expect(e.venus).toBe('https://x/venus.png');
+    expect(e[cutKey('venus')]).toMatch(/^x2:.*area/);
+    // already cut by the checked cut: not touched; nothing is ever painted
+    expect(e[cutKey('pluto')]).toBe('2:colour');
+    expect(b.painted).toHaveLength(0);
+    // done once
+    expect((await b.s.recut('u1', 'https://api')).checked).toBe(0);
   });
 });

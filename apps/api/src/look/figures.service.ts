@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger, Optional } from '@nestjs/common';
-import { BUTTERFLY_STYLE_CELLS, PLANET_FIGURE_BACKGROUND, PLANET_FIGURE_REFS, planetFigurePrompt, type GeneratedImage, type ImageProvider } from '@obolo/ai';
+import { BUTTERFLY_STYLE_CELLS, PLANET_FIGURE_BACKGROUND, PLANET_FIGURE_REFS, planetFigurePrompt, type BackgroundRemover, type GeneratedImage, type ImageProvider, type LlmProvider } from '@obolo/ai';
 import { FIGURE_PAINTER, type PlanetFigure } from '@obolo/shared';
 import { eq, sql } from 'drizzle-orm';
 import { readFile } from 'node:fs/promises';
@@ -8,12 +8,12 @@ import sharp from 'sharp';
 import { Database } from '../db/db';
 import { users } from '../db/schema';
 import type { JobPayloads, JobQueue } from '../infra/queue';
-import { LOOK_IMAGES, PLANET_CHIBI_IMAGES, QUEUE, SATURN_BALL_IMAGES, SATURN_CHIBI_IMAGES } from '../infra/tokens';
-import { cutoutWhite } from '../media/cutout';
-import { chooseKey, cutoutChecked, KEY_WORDS, type KeyName } from '../media/keying';
+import { CUTOUT_MODEL, LLM, LOOK_IMAGES, PLANET_CHIBI_IMAGES, QUEUE, SATURN_BALL_IMAGES, SATURN_CHIBI_IMAGES } from '../infra/tokens';
+import { cutByModel, cutLadder, inspectCut, ladderRecord, llmCutJudge, recutStored, type CutBackground, type LadderResult, type Painting } from '../media/cutting';
+import { chooseKey, KEY_WORDS, KEYS, type KeyName } from '../media/keying';
 import { MediaService } from '../media/media.service';
 import { costScope } from '../wallet/cost-scope';
-import { FIGURE_CONCURRENCY, FIGURE_RUN_TRIES, FIGURE_SIDE, FIGURE_TRIES, figuresOf, figuresToMake, triesKey, wingsToMeasure, encodeWings, WINGS_KEY, type FigureStore } from './figures';
+import { CUT_VERSION, cutFailKey, cutKey, FIGURE_CONCURRENCY, FIGURE_RUN_TRIES, FIGURE_SIDE, FIGURE_TRIES, figuresOf, figuresToMake, figuresToRecut, srcKey, triesKey, wingsToMeasure, encodeWings, WINGS_KEY, type FigureStore } from './figures';
 import { measureWings } from './wings';
 
 export { FIGURE_CONCURRENCY, FIGURE_RUN_TRIES, FIGURE_TRIES, figuresOf, figuresToMake, triesKey, type FigureStore };
@@ -57,6 +57,9 @@ export class PlanetFiguresService {
     @Optional() @Inject(SATURN_CHIBI_IMAGES) private readonly chibiPainter?: ImageProvider,
     @Optional() @Inject(SATURN_BALL_IMAGES) private readonly ballPainter?: ImageProvider,
     @Optional() @Inject(PLANET_CHIBI_IMAGES) private readonly planetPainter?: ImageProvider,
+    /** M-R326: the background-removal model (the shape check, the first retry) and the cheap vision model (the last check) */
+    @Optional() @Inject(CUTOUT_MODEL) private readonly cutModel?: BackgroundRemover | null,
+    @Optional() @Inject(LLM) private readonly llm?: LlmProvider,
   ) {
     this.queue.register('look.figures', (p) => this.make(p));
     // M-R262: a Saturn mini figure task still in a queue makes the figures of the look worn now
@@ -105,14 +108,28 @@ export class PlanetFiguresService {
     return { data, mime: data[0] === 0x89 ? 'image/png' : data[0] === 0xff ? 'image/jpeg' : 'image/webp' };
   }
 
-  /** one figure painted and cut out: the look first, then the style references (the lab's order) */
-  private async paint(f: PlanetFigure, look: GeneratedImage, key: KeyName): Promise<Buffer> {
+  /**
+   * One figure painted, cut out and checked (M-R325 / M-R326, media/cutting.ts cutLadder): the look first, then the style
+   * references (the lab's order). A cut that fails a check is retried by the background-removal model's cut, then the
+   * figure is painted again on the key colour away from the look's own colours, and once more — `mayPaint` is asked
+   * before each of those paintings (the figure's tries). Not ok: nothing may be shown.
+   */
+  private async paint(f: PlanetFigure, look: GeneratedImage, key: KeyName, mayPaint: () => Promise<boolean>): Promise<LadderResult> {
     const refs = PLANET_FIGURE_REFS[f] === 'bstyle' ? await bstyle() : PLANET_FIGURE_REFS[f] === 'kstyle' ? [await kstyle()] : [];
-    const img = await this.painter(f).generate(planetFigurePrompt(f, KEY_WORDS[key], key), 0, [look, ...refs]);
-    if (PLANET_FIGURE_BACKGROUND[f] === 'white') return cutoutWhite(img.data, FIGURE_SIDE);
-    const r = await cutoutChecked(img.data, FIGURE_SIDE, key, async (_to, prompt) => (await this.looks.generate(prompt, 0, [img])).data);
-    if (!r) throw new Error('cut-out failed');
-    return r.png;
+    const one = async (onKey: boolean): Promise<Painting> => {
+      const img = await this.painter(f).generate(planetFigurePrompt(f, KEY_WORDS[key], key, undefined, onKey), 0, [look, ...refs]);
+      return { ...img, background: onKey || PLANET_FIGURE_BACKGROUND[f] === 'key' ? key : 'plain' };
+    };
+    return cutLadder({
+      first: await one(false),
+      out: FIGURE_SIDE,
+      kind: f,
+      opt: { bigHoles: f === 'neptune' },
+      model: this.cutModel,
+      judge: llmCutJudge(this.llm),
+      repaint: async () => ((await mayPaint()) ? one(true) : null),
+      onTry: (t) => this.log.warn(`figure ${f}: cut-out ${t.step} failed its checks (${t.failed.join(', ') || t.reason}${t.failed.length && t.reason ? `: ${t.reason}` : ''})`),
+    });
   }
 
   /**
@@ -137,12 +154,30 @@ export class PlanetFiguresService {
           // counted before the painting: a crash or a queue retry never paints more than FIGURE_TRIES
           tries = { ...tries, [triesKey(f)]: String(n + 1) };
           await this.patch(p.userId, of, { [triesKey(f)]: String(n + 1) });
+          const count = async () => {
+            const k = Number(tries[triesKey(f)] ?? 0);
+            if (k >= FIGURE_TRIES) return false;
+            tries = { ...tries, [triesKey(f)]: String(k + 1) };
+            await this.patch(p.userId, of, { [triesKey(f)]: String(k + 1) });
+            return true;
+          };
           try {
-            const png = await this.paint(f, src, key);
+            const cut = await this.paint(f, src, key, count);
+            if (!cut.ok) {
+              // M-R326: three failed retries — nothing is shown (the figure of before stays, or the app's stand-in);
+              // recorded for the operators (GET /admin/planets-readiness counts them)
+              const record = ladderRecord(cut.tries);
+              this.log.error(`figure ${f} of ${p.userId}: the cut-out failed every retry and is not shown (${record})`);
+              await this.patch(p.userId, of, { [cutFailKey(f)]: record });
+              return;
+            }
+            const png = cut.png;
             const m = await this.media.storeImage(p.userId, 'avatar', 'image/png', png, p.origin);
+            // M-R325: the painting is kept too, so a later cut-out can cut it again without painting
+            const kept = await this.media.storeImage(p.userId, 'avatar', cut.source.mime, cut.source.data, p.origin).catch(() => null);
             // 03 §1: the butterfly's wing cut, measured on the cut-out picture (kept with it; 'none': the default cut)
             const wings: Record<string, string> = f === 'jupiter' ? { [WINGS_KEY]: encodeWings(await measureWings(png).catch(() => null)) } : {};
-            await this.patch(p.userId, of, { [f]: m.url, ...wings });
+            await this.patch(p.userId, of, { [f]: m.url, [cutKey(f)]: `${CUT_VERSION}:${cut.step}`, ...(kept ? { [srcKey(f)]: kept.url } : {}), ...wings });
             if (f === 'saturnChibi') {
               const now = await this.row(p.userId);
               if (now?.avatarUrl === of) await this.setChibi(p.userId, m.url);
@@ -181,4 +216,97 @@ export class PlanetFiguresService {
     }
     return { measured, fallback };
   }
+
+  /**
+   * M-R325 / M-R326 backfill: the figures of every kept look that were cut before the checked cut — cut again WITHOUT
+   * painting, and checked like a new one. With the painting kept ('f#src', from M-R325 on) the whole new cut runs on
+   * it (colour, then the model). Of older figures only the cut PNG exists: its inner holes are removed (recutStored);
+   * whites the old cut ate cannot be restored. Either way the result is checked: one that passes replaces the figure
+   * ('f#cut' r…), one that fails leaves the figure of before as it is and marks it ('f#cut' x…: to be painted again).
+   */
+  async recut(userId: string, origin: string): Promise<{ checked: number; changed: number; holes: number; failed: number; eaten: number }> {
+    const u = await this.row(userId);
+    const out = { checked: 0, changed: 0, holes: 0, failed: 0, eaten: 0 };
+    const judge = llmCutJudge(this.llm);
+    for (const t of figuresToRecut(u?.planetFigures)) {
+      const f = t.figure;
+      const opt = { bigHoles: f === 'neptune' };
+      const stored = await this.media.bytesByUrl(userId, t.url).catch(() => null);
+      // the picture could not be read this time: left for the next run
+      if (!stored) continue;
+      out.checked++;
+      let png: Buffer | null = null;
+      let mark = '';
+      const src = t.src ? await this.media.bytesByUrl(userId, t.src).catch(() => null) : null;
+      if (src) {
+        // the painting is kept: cut again from it (its background is found from its border: a key colour is saturated)
+        const background = await backgroundOf(src);
+        const r = await cutLadder({ first: { data: src, mime: mimeOf(src), background }, out: FIGURE_SIDE, kind: f, opt, model: this.cutModel, judge });
+        if (r.ok) {
+          png = r.png;
+          mark = `r${CUT_VERSION}:${r.step}`;
+        } else mark = `x${CUT_VERSION}:${ladderRecord(r.tries)}`;
+      } else {
+        // only the cut PNG: the holes of a white background go; a key-coloured one is only checked (each key tried)
+        const backgrounds: CutBackground[] = PLANET_FIGURE_BACKGROUND[f] === 'white' ? ['plain'] : (Object.keys(KEYS) as KeyName[]);
+        const failed = new Set<string>();
+        for (const background of backgrounds) {
+          const r = await recutStored(png ?? stored, background, opt);
+          if (r.png) {
+            png = r.png;
+            out.holes += r.holesRemoved;
+          }
+          if (r.eaten) out.eaten++;
+          // the shape check: the model cuts the picture as it was painted (the cut part is the background again)
+          const flat = this.cutModel
+            ? await sharp(Buffer.from(r.result.work.before), { raw: { width: r.result.work.W, height: r.result.work.H, channels: 4 } }).removeAlpha().png().toBuffer()
+            : null;
+          const other = flat && this.cutModel ? await cutByModel(flat, 'image/png', this.cutModel, FIGURE_SIDE, background, opt).catch(() => null) : undefined;
+          // the stored picture is already framed: the kind's own range is of the painting, not of this
+          const i = await inspectCut(r.result, { background, kind: 'figure', other, judge });
+          for (const c of i.failed) failed.add(c);
+          // one model call and one look are enough: the other keys only look for their own colour left inside
+          if (backgrounds.length > 1 && !i.failed.length) continue;
+        }
+        mark = failed.size ? `x${CUT_VERSION}:${[...failed].join('+')}` : `r${CUT_VERSION}`;
+        if (failed.size) png = null;
+      }
+      if (mark.startsWith('x')) {
+        out.failed++;
+        this.log.warn(`figure ${f} of ${userId}: the re-cut fails its checks (${mark}); the figure of before stays`);
+      }
+      const patch: Record<string, string> = { [cutKey(f)]: mark };
+      if (png) {
+        const m = await this.media.storeImage(userId, 'avatar', 'image/png', png, origin);
+        patch[f] = m.url;
+        if (f === 'jupiter') patch[WINGS_KEY] = encodeWings(await measureWings(png).catch(() => null));
+        out.changed++;
+        await this.patch(userId, t.look, patch);
+        const now = await this.row(userId);
+        if (f === 'saturnChibi' && now?.avatarUrl === t.look) await this.setChibi(userId, m.url);
+        else await this.media.removeByUrl(userId, t.url).catch(() => undefined);
+      } else await this.patch(userId, t.look, patch);
+    }
+    return out;
+  }
+}
+
+const mimeOf = (data: Buffer) => (data[0] === 0x89 ? 'image/png' : data[0] === 0xff ? 'image/jpeg' : 'image/webp');
+/** what a kept painting was painted on, from its border: one of the key colours when the border is that saturated colour, else plain */
+async function backgroundOf(painting: Buffer): Promise<CutBackground> {
+  const { data, info } = await sharp(painting).removeAlpha().resize(64, 64, { fit: 'fill' }).raw().toBuffer({ resolveWithObject: true });
+  const sum = [0, 0, 0];
+  let n = 0;
+  for (let y = 0; y < info.height; y++)
+    for (let x = 0; x < info.width; x++) {
+      if (x > 1 && y > 1 && x < info.width - 2 && y < info.height - 2) continue;
+      for (let c = 0; c < 3; c++) sum[c] += data[(y * info.width + x) * 3 + c];
+      n++;
+    }
+  const [r, g, b] = sum.map((v) => v / n);
+  for (const k of Object.keys(KEYS) as KeyName[]) {
+    const K = KEYS[k];
+    if (Math.max(Math.abs(r - K[0]), Math.abs(g - K[1]), Math.abs(b - K[2])) < 90) return k;
+  }
+  return 'plain';
 }

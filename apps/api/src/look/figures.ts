@@ -12,6 +12,20 @@ export const FIGURE_SIDE = 768;
 /** a member's figures per look: look URL → { figure → URL, 'figure#tries' → n } */
 export type FigureStore = Record<string, Record<string, string>>;
 export const triesKey = (f: PlanetFigure) => `${f}#tries`;
+/**
+ * M-R325 / M-R326, kept beside each figure:
+ *  'f#src'      the painting the figure was cut from (kept from M-R325 on: a later cut-out can cut it again without painting)
+ *  'f#cut'      how it was cut: CUT_VERSION (the checked cut), 'r…' (a figure of before, re-cut from its cut PNG and
+ *               checked), 'x…:checks' (a figure of before that fails the checks: shown as it is, to be painted again)
+ *  'f#cutfail'  a painting whose cut failed every retry and is not shown ("colour:shape|model:area|…"): for the operators
+ */
+export const srcKey = (f: PlanetFigure) => `${f}#src`;
+export const cutKey = (f: PlanetFigure) => `${f}#cut`;
+export const cutFailKey = (f: PlanetFigure) => `${f}#cutfail`;
+export const CUT_VERSION = '2';
+/** the figures of every kept look that were cut before the checked cut (the re-cut backfill) */
+export const figuresToRecut = (store: FigureStore | null | undefined): { look: string; figure: PlanetFigure; url: string; src?: string }[] =>
+  Object.entries(store ?? {}).flatMap(([look, e]) => PLANET_FIGURES.filter((f) => e[f] && !e[cutKey(f)]).map((f) => ({ look, figure: f, url: e[f], ...(e[srcKey(f)] ? { src: e[srcKey(f)] } : {}) })));
 
 /** the figures of one look, without the counters */
 export function figuresOf(store: FigureStore | null | undefined, look: string | null | undefined): PlanetFigures {

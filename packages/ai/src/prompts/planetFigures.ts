@@ -69,8 +69,16 @@ export function saturnChibiPrompt(key: string): string {
   );
 }
 
-/** the prompt of one figure; `key` / `keyName` only for the ones on the key colour */
-export function planetFigurePrompt(style: PlanetFigureStyle, key = 'pure chroma-key green (#00FF00)', keyName = 'green', slots = FIGURE_SLOTS): string {
+/**
+ * the prompt of one figure; `key` / `keyName` only for the ones on the key colour. `onKey` (M-R326): a figure that is
+ * normally painted on white is asked on the key colour instead — the cut-out's retry when the white cut failed its checks.
+ */
+export function planetFigurePrompt(style: PlanetFigureStyle, key = 'pure chroma-key green (#00FF00)', keyName = 'green', slots = FIGURE_SLOTS, onKey = false): string {
+  const p = figurePrompt(style, key, keyName, slots);
+  if (!onKey || PLANET_FIGURE_BACKGROUND[style] === 'key') return p;
+  return p.replace('Plain solid pure white background, no shadow, no text.', `On ${keyedBackground(key)} (nothing on the character or its vehicle is ${keyName}), no shadow, no ground. No text.`);
+}
+function figurePrompt(style: PlanetFigureStyle, key: string, keyName: string, slots: typeof FIGURE_SLOTS): string {
   const { pattern, accessory, top } = slots;
   switch (style) {
     case 'saturnChibi':
