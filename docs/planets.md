@@ -241,8 +241,8 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 **何も無い人の新しい家**（B7）：本当の星の道では、作品が1つも無く、だれも来ていない人には、**自分の場所だけ**を出す（見本の顔ぶれは出さない。`liveHomeShows`・`emptyHome`）。見比べ用の `/planets-preview/<星>` と、物語の中は、今までどおり見本・台本の顔ぶれ。
 
 **はじめの旅（3〜7日目）**：スイッチを入れた星の日は、物語の中の星の画面が新しい家になる（物語 M-R330。`lib/onboarding/newHomeScenes.ts`・`components/onboarding/StoryNewHome.tsx`・`lib/planetTemplate/storyCast.ts`）。切っている間は、前の日のまま（`DAYn_BEFORE`、1字も変えていない）。
-- 台本（物語のブランチ `f733ae6a`＝M-R334 まで。M-R330 を含む）を取り込んだ。`story-sync` は**新しい家の日**（`STORIES_NEW_HOMES`）と台本を照らし合わせる：0件。
-- 物語のブランチの M-R336（`c0bb5ea7`：3日目にスシモンがロケットに乗る・2日目の「8回まで」）は**まだ取り込んでいない**（新しい話者7人の絵と声が要る）。
+- 台本は物語のブランチの今（`69eac32b`、2026-11-27）を取り込んだ：3〜7日目の星の場面（M-R330）は全部。`story-sync` は**新しい家の日**（`STORIES_NEW_HOMES`）と台本を照らし合わせる：0件。
+- **1場面だけ前のまま**：3日目 D04-S002b の終わりの、スシモンがロケットに乗る所（M-R336、11行。新しい話者7人の絵と声が要る）は取り込んでいない（`public/story/P02.json` のその場面だけ前の取り込みのまま。`docs/story-import/report.md`・`screens.md` は台本の今を数えている）。
 - 並ぶ人：その星の住人の場所（土星 たこ焼き兄妹・木星 大根カイザー・水星 フリージー・火星 ヒポキン・金星 ボスG）には KIMORIN⭐︎（推し。『プリプリ・ボカン』／「うんち。」／すね毛）・MONBAN（ダチ）と、見本の住人。{neo}の場所には、招待した人（いなければ MIKIE⭐︎DRILL）と KIMORIN⭐︎、その朝に飛ばしていれば{neo}の作品。
 - 進むきっかけ：住人の場所＝〔次へ〕（前の土星と同じ。さわる・▶・空は自由）。{neo}の場所＝台本の「扉をタップする」：自分の場所を開くと〔次へ〕が出る。土星の{neo}のレコードは〔次へ〕（前は「全部聞くと進む」もあった）。
 - 場面の対応とスクリーンショット：`docs/handoff/shots/story-<日>-<星>[-neo][-door|-play].jpg`（390×844。`npx tsx apps/web/scripts/story-home-steps.ts` が場面の番号を出す → `/kakunin-…/play?day=N&i=<番号>`）。

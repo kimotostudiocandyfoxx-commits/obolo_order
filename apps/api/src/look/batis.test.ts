@@ -36,10 +36,11 @@ function make(over: Record<string, unknown> = {}, llmAnswer?: string) {
   const jobs: string[] = [];
   /** the charges taken whole (the birth picture, client 2026-11-27) */
   const whole: { kind: string; key: string }[] = [];
+  const charged: string[] = [];
   const queue = { register: () => undefined, enqueue: async (name: string) => void jobs.push(name) };
   const llm = llmAnswer === undefined ? { name: 'mock', chat: async () => '' } : { name: 'fake', chat: async () => llmAnswer };
-  const s = new LookService(db as never, media as never, looks as never, looks as never, { name: 'mock' } as never, new MemoryKv(), { charge: async () => ({ refund: async () => undefined }), chargeWhole: async (_db: unknown, _u: string, kind: string, key: string) => (whole.push({ kind, key }), { price: 0, taken: 0, waiting: 0, repeat: false }) } as never, queue as never, llm as never);
-  return { s, user, prompts, jobs, whole };
+  const s = new LookService(db as never, media as never, looks as never, looks as never, { name: 'mock' } as never, new MemoryKv(), { charge: async (_db: unknown, _u: string, kind: string) => (charged.push(kind), { refund: async () => void charged.push(`refund:${kind}`) }), chargeWhole: async (_db: unknown, _u: string, kind: string, key: string) => (whole.push({ kind, key }), { price: 0, taken: 0, waiting: 0, repeat: false }) } as never, queue as never, llm as never);
+  return { s, user, prompts, jobs, whole, charged };
 }
 
 /** a born {bati}, as the list keeps it */
@@ -61,15 +62,46 @@ describe("the first {bati}: the personality from the favourite food (M-R217)", (
     void user;
   });
 
-  it('M-R334: the sentence as said → only the food’s name is kept (the card, the seed); the birth picture is charged once', async () => {
-    const { s, user, whole } = make();
+  it('M-R334: the sentence as said → only the food’s name is kept; the birth picture is charged once, when the real picture is there', async () => {
+    const { s, user, whole, prompts } = make();
+    // the checked cut-out passes (its own tests: expressions-cut.test.ts)
+    (s as unknown as { cutOrNothing: unknown }).cutOrNothing = async (img: { data: Buffer }) => ({ png: img.data, record: '' });
     const me = await s.egg('u', { food: 'ゼロ時零分カレーだよ。', egg: 'moon' });
     expect(me.bati?.food).toBe('カレー');
     expect(me.bati?.card?.seed).toBe('カレー');
     expect(user.batiFood).toBe('カレー');
+    // nothing is taken at the egg
+    expect(whole).toEqual([]);
+    const born = await s.hatch('u', 'https://x');
+    expect(born.bati?.imageUrl).toBe('https://x/m.png');
+    expect(born.bati?.stand).toBe(false);
+    expect(prompts[0]).toContain('IS "カレー" itself');
+    expect(whole).toEqual([{ kind: 'batiBirth', key: `make:batiBirth:${me.bati?.id}` }]);
+    // a second call paints nothing and takes nothing
+    await s.hatch('u', 'https://x');
     expect(whole).toHaveLength(1);
-    expect(whole[0].kind).toBe('batiBirth');
-    expect(whole[0].key).toBe(`make:batiBirth:${me.bati?.id}`);
+  });
+
+  it('client 2026-11-27: the painter fails twice → the neutral food stand-in, nothing charged; the member has it painted later for the normal price', async () => {
+    const { s, whole, prompts, charged } = make();
+    let bad = true;
+    (s as unknown as { cutOrNothing: unknown }).cutOrNothing = async (img: { data: Buffer }) => (bad ? { png: null, record: 'colour:vision' } : { png: img.data, record: '' });
+    await s.egg('u', { food: 'カレー', egg: 'sun' });
+    const born = await s.hatch('u', 'https://x');
+    // two tries, then the stand-in (a stored picture, marked) — never an old animal body edited
+    expect(prompts).toHaveLength(2);
+    expect(born.bati?.stand).toBe(true);
+    expect(born.bati?.imageUrl).toBeTruthy();
+    expect(whole).toEqual([]);
+    expect(charged).toEqual([]);
+    // later: still failing → the price is given back; then it works → charged once, the stand-in is gone
+    await expect(s.retryBirth('u', 'https://x')).rejects.toMatchObject({ response: { error: { code: 'BIRTH_RETRY_FAILED' } } });
+    expect(charged).toEqual(['batiBirth', 'refund:batiBirth']);
+    bad = false;
+    const again = await s.retryBirth('u', 'https://x');
+    expect(again.bati?.stand).toBe(false);
+    expect(charged).toEqual(['batiBirth', 'refund:batiBirth', 'batiBirth']);
+    await expect(s.retryBirth('u', 'https://x')).rejects.toMatchObject({ response: { error: { code: 'NO_STAND_IN' } } });
   });
 
   it('the first is never rare (the bright group, M-R230); an unfit seed is asked again', async () => {

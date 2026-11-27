@@ -20,6 +20,9 @@ import { fileToReference } from '@/lib/look';
  */
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 
+/** the one short line when a picture could not be made or cut cleanly (the API's LOOK_AGAIN) */
+const AGAIN = 'うまく描けなかった……もういちど';
+
 export interface StepLine {
   name: string;
   text: string;
@@ -32,6 +35,8 @@ const words = (e: unknown, fallback: string) => {
   const x = e as { code?: string; message?: string } | null;
   if (x?.code === 'NO_MANA') return 'マナジェムが、光らなくなった……';
   if (x?.code === 'MODERATION' || x?.code === 'LOOK_LOCKED' || x?.code === 'LOOK_STEPS_DONE') return x.message || fallback;
+  // nothing was taken and nothing counted: the picture could not be made, or not cut cleanly (never shown badly cut)
+  if (x?.code === 'LOOK_CUT_FAILED' || x?.code === 'LOOK_STEP_FAILED') return AGAIN;
   if (x?.code === 'PHOTO_NOT_ALLOWED') return 'ここでは、画像は使えません';
   return fallback;
 };
@@ -47,6 +52,8 @@ export function LookStepsPanel({
   image,
   egg,
   noImage = false,
+  film = false,
+  fixNote = false,
   onSaid,
   onLimit,
   onStep,
@@ -68,6 +75,10 @@ export function LookStepsPanel({
   egg?: BatiEggKind;
   /** no picture may be sent (M-R250) */
   noImage?: boolean;
+  /** D03-S004: deciding plays the film of the bowl of water (~8 s, 〔スキップ〕) and shows the decided look full screen */
+  film?: boolean;
+  /** a member's later change: what deciding a changed look takes, small under the button */
+  fixNote?: boolean;
   /** what was said, as said (the chat's bubble) */
   onSaid?: (text: string) => void;
   onLimit?: () => void;
@@ -80,7 +91,7 @@ export function LookStepsPanel({
   const [view, setView] = useState<LookStepView | null>(null);
   const [wish, setWish] = useState('');
   const [ref, setRef] = useState<Ref | null>(null);
-  const [phase, setPhase] = useState<'ask' | 'cast' | 'shown'>('ask');
+  const [phase, setPhase] = useState<'ask' | 'cast' | 'shown' | 'film' | 'reveal'>('ask');
   const [said, setSaid] = useState('');
   const [took, setTook] = useState<number | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -150,23 +161,48 @@ export function LookStepsPanel({
       setPhase('shown');
       if (r.steps.url) onStep?.(r.steps.url, r.steps.used);
     } catch (e) {
-      setErr(words(e, 'うまく変わらなかった……もう一度'));
+      setErr(words(e, AGAIN));
       setPhase(used > 0 ? 'shown' : 'ask');
     }
     setBusy(false);
   };
 
-  const decide = async () => {
+  const goBack = async () => {
     if (busy) return;
     setBusy(true);
     setErr(null);
     try {
+      const r = await getApi().lookStepBack(who);
+      setView(r.steps);
+      setTook(null);
+      if (r.steps.url) onStep?.(r.steps.url, r.steps.used);
+    } catch {
+      setErr('うまく戻せなかった……もういちど');
+    }
+    setBusy(false);
+  };
+
+  // decided: (the film of the bowl of water →) the round is closed and the look worn → (the look full screen →) on
+  const settle = async () => {
+    try {
       const r = await getApi().lookStepFix(who);
-      finish({ url: r.steps.url, used: r.steps.used, mana: r.mana });
+      const done = { url: r.steps.url, used: r.steps.used, mana: r.mana };
+      if (!film) return finish(done);
+      if (r.steps.url) setView(r.steps);
+      setPhase('reveal');
+      setTimeout(() => finish(done), 2800);
     } catch (e) {
-      setErr(words(e, 'うまく決められなかった……もう一度'));
+      setErr(words(e, 'うまく決められなかった……もういちど'));
+      setPhase(used > 0 ? 'shown' : 'ask');
       setBusy(false);
     }
+  };
+  const decide = () => {
+    if (busy) return;
+    setBusy(true);
+    setErr(null);
+    if (film) return setPhase('film');
+    void settle();
   };
 
   if (!view || !picture) {
@@ -179,6 +215,18 @@ export function LookStepsPanel({
       </Veil>
     );
   }
+
+  if (phase === 'film') return <FixFilm picture={picture} onDone={() => void settle()} />;
+  if (phase === 'reveal')
+    return (
+      // 決めた姿が、背景のない大きな絵になって、画面いっぱいに、ドーンと出る
+      <div className="absolute inset-0 z-[30] flex items-center justify-center overflow-hidden bg-black/85">
+        <span aria-hidden className="absolute inset-0 animate-[fadeIn_0.4s_ease-out] bg-[radial-gradient(circle,rgba(255,220,140,0.38),transparent_62%)]" />
+        <span aria-hidden className="mystic-motes absolute inset-0" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={picture} alt="" className="look-boom relative max-h-[86svh] w-[92vw] max-w-lg object-contain" style={{ filter: 'drop-shadow(0 0 46px rgba(255,214,140,0.7))' }} />
+      </div>
+    );
 
   return (
     <Veil>
@@ -202,6 +250,12 @@ export function LookStepsPanel({
           style={{ filter: 'drop-shadow(0 0 26px rgba(255,220,150,0.45))' }}
         />
         {who === 'bati' && egg && <EggMark egg={egg} className="absolute right-[12%] top-[8%]" />}
+        {/* M-R338: small, at the picture's corner, over the two choices — the look before the last step (the count and the mana stay) */}
+        {phase === 'shown' && view.canBack && (
+          <button type="button" disabled={busy} onClick={() => void goBack()} data-testid="look-step-back" className="absolute bottom-1 left-[6%] rounded-full border border-white/20 bg-black/45 px-2.5 py-1 text-[10px] tracking-wider text-white/70 backdrop-blur-sm disabled:opacity-40" style={{ fontFamily: SERIF }}>
+            ↶ ひとつ前の姿にもどす
+          </button>
+        )}
         {phase === 'cast' && <span aria-hidden className="look-rise absolute inset-x-[10%] bottom-0 top-0 rounded-[45%]" />}
       </div>
 
@@ -225,6 +279,7 @@ export function LookStepsPanel({
               <Gold disabled={busy} onClick={decide}>
                 {busy ? '……' : ok}
               </Gold>
+              {fixNote && who === 'self' && used > 0 && <p className="-mt-1 text-center text-[10px] tracking-[0.12em] text-amber-200/60">この姿にすると　マナ −{formatMana(info?.prices.fix ?? MAKE_COST.profileLook)}</p>}
               {choices.again && (
                 <Plain disabled={busy} onClick={() => (setErr(null), setPhase('ask'))}>
                   {more}
@@ -283,6 +338,46 @@ export function LookStepsPanel({
         </div>
       </div>
     </Veil>
+  );
+}
+
+/**
+ * D03-S004 〔映像（映画の場面・約8秒）〕 drawn with light (no painted film yet): the water of the bowl rises and wraps the
+ * visitor, light spirals up inside it, it clears, and the still surface shows the decided look. 〔スキップ〕 at the
+ * corner; for those who ask for less motion it is a short still.
+ */
+function FixFilm({ picture, onDone }: { picture: string; onDone: () => void }) {
+  const done = useRef(false);
+  const end = () => {
+    if (done.current) return;
+    done.current = true;
+    onDone();
+  };
+  useEffect(() => {
+    const calm = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const t = setTimeout(end, calm ? 1800 : 8000);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return (
+    <div data-testid="look-fix-film" className="absolute inset-0 z-[30] overflow-hidden bg-[#03040c]">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/onboarding/s/d2-moon-in.jpg" alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover opacity-35" />
+      <span aria-hidden className="mystic-motes absolute inset-0" />
+      {/* the water rises and wraps us */}
+      <span aria-hidden className="film-water absolute inset-x-0 bottom-0 h-full" />
+      {/* light spirals up inside the water */}
+      <span aria-hidden className="film-spiral absolute left-1/2 top-1/2 h-[120vmax] w-[120vmax]" />
+      {/* it clears: the still surface, the decided look on it */}
+      <div className="film-surface absolute inset-x-0 bottom-[14svh] flex flex-col items-center">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={picture} alt="" className="max-h-[46svh] max-w-[70vw] object-contain" style={{ filter: 'drop-shadow(0 0 30px rgba(190,225,255,0.6))' }} />
+        <span aria-hidden className="look-water -mt-3 h-[8svh] w-[80vw] max-w-md rounded-[50%]" />
+      </div>
+      <button type="button" onClick={end} className="pb-safe absolute bottom-4 right-4 rounded-full border border-white/25 bg-black/40 px-3 py-1 text-[11px] tracking-widest text-white/60">
+        スキップ
+      </button>
+    </div>
   );
 }
 
@@ -376,7 +471,7 @@ export function LookPick4Panel({
   if (phase === 'failed')
     return (
       <Sheet>
-        <p className="text-center text-amber-100">{err || '器の水が、うまく描けなかった。もう一度'}</p>
+        <p className="text-center text-amber-100">{err || AGAIN}</p>
         <div className="mt-4 flex flex-col gap-2">
           <Gold onClick={() => (last.current ? void draw(last.current) : setPhase('ask'))}>もう一度</Gold>
           <Plain onClick={() => setPhase('forms')}>用意された8つの姿から選ぶ</Plain>

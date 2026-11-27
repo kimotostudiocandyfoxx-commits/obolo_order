@@ -308,6 +308,8 @@ export interface Api {
   /** the four first pictures of one's own look (from the photo, or from the wish when no photo may be used) */
   lookPick4(body: { photo?: { mime: 'image/jpeg' | 'image/png' | 'image/webp'; data: string }; wish?: string; via?: 'folder' | 'camera' }): Promise<import('@obolo/shared').LookPick4Result>;
   lookStepBase(mediaId: string): Promise<import('@obolo/shared').LookStepResult>;
+  /** 〔↶ ひとつ前の姿にもどす〕: the picture before the last step again (the count and the mana stay) */
+  lookStepBack(who: import('@obolo/shared').LookStepWho): Promise<import('@obolo/shared').LookStepResult>;
   /** the round is decided: the picture is worn (one's own look is confirmed with it) */
   lookStepFix(who: import('@obolo/shared').LookStepWho): Promise<import('@obolo/shared').LookStepResult & { me: Me }>;
   /** an Obolo Order member starts a new round from the look worn now */
@@ -434,6 +436,8 @@ export interface Api {
   batiRole(role: BatiRole, id?: string): Promise<Me>;
   /** The egg hatches: the Bati image is generated (can take a while). */
   batiHatch(): Promise<Me>;
+  /** client 2026-11-27: the stand-in {bati} gets its real birth picture (the normal price; given back when it fails again) */
+  batiBirthRetry(): Promise<Me>;
   batiName(name: string): Promise<Me>;
   /** Bati's six expressions from the hatched picture (once; M-R139) */
   batiFaces(): Promise<Me>;
