@@ -1,10 +1,6 @@
-# UI art — 2026-11-27T01:22:20.979Z
+# UI art — 2026-11-27T01:47:15.876Z
 
-Seedream 5.0 Pro / 6枚 / 約43円
+Seedream 5.0 Pro / 2枚 / 約14円
 
-- ✅ p5-mars-brother
-- ✅ p5-mars-kimorin
-- ✅ p5-mars-mikie
-- ✅ p5-mars-monban
-- ✅ p5-mars-sister
-- ✅ p5-mars-user
+- ✅ home-sp-ufo
+- ✅ home2-sp-ufo
