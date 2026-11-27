@@ -7981,14 +7981,17 @@
     },
     {
       "id": "home-sp-ufo",
-      "prompt": "Cute 3D vinyl art-toy style game sprite, glossy rounded shapes, soft lighting, pastel colours with a small neon accent: a tiny round UFO with a glass dome, a small round cute pilot face inside, and a soft light beam underneath. Centered, the whole object inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "prompt": "Edit the reference picture. Keep the little round UFO, its glass dome, the tiny pilot, every colour and the style exactly the same. Only remove any light beam, glow, light cone or sparkles under the saucer completely; the bottom of the saucer has a clean outline and below it there is only the plain solid bright chroma-key green background (#00FF00). Centered, the whole object inside the frame with a margin, no shadow, no text.",
       "w": 1024,
       "h": 1024,
       "size": [
         720,
         720
       ],
-      "always": false
+      "always": false,
+      "refs": [
+        "design/mv-art/out/home-sp-ufo.jpg"
+      ]
     },
     {
       "id": "home-sp-radio",
@@ -8157,14 +8160,17 @@
     },
     {
       "id": "home2-sp-ufo",
-      "prompt": "Game sprite: a small round UFO with a glass dome and a tiny pilot silhouette, retro 1980s cel anime style with neon glow. Centered, the whole object inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "prompt": "Edit the reference picture. Keep the little round UFO, its glass dome, the tiny pilot, every colour and the style exactly the same. Only remove any light beam, glow, light cone or sparkles under the saucer completely; the bottom of the saucer has a clean outline and below it there is only the plain solid bright chroma-key green background (#00FF00). Centered, the whole object inside the frame with a margin, no shadow, no text.",
       "w": 1024,
       "h": 1024,
       "size": [
         720,
         720
       ],
-      "always": false
+      "always": false,
+      "refs": [
+        "design/mv-art/out/home2-sp-ufo.jpg"
+      ]
     },
     {
       "id": "home2-sp-radio",
@@ -15627,5 +15633,8 @@
       "prompt": "A 5-heads-tall character in a deep-sea anime illustration style (cool blue light, glowing particles, soft caustic light on the clothes). Floating inside a big glass bubble with a handheld game console, calm smile. It is the character in the reference picture: keep the face, hairstyle, outfit design, outfit colours and signature items exactly recognisable. Full body, the whole figure inside the frame with a margin, centered. Plain solid pure white background, no shadow, no ground, no text, no logo."
     }
   ],
-  "redo": []
+  "redo": [
+    "home-sp-ufo",
+    "home2-sp-ufo"
+  ]
 }
