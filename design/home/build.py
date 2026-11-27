@@ -34,7 +34,7 @@ for f in sorted(os.listdir(H+'/kororin')):
     if f.endswith('.webp'): im=Image.open(H+'/kororin/'+f).convert('RGBA'); im.thumbnail((200,200)); A['kor-'+f[:-5]]=uri(im,86)
 for f in sorted(os.listdir(H+'/puni')):
     if f.endswith('.png'): im=Image.open(H+'/puni/'+f).convert('RGBA'); im.thumbnail((200,200)); A['puni-'+f[:-4]]=uri(im,88)
-for k in 'user kimorin monban mikie brother sister'.split():
+for k in 'user kimorin monban mikie brother sister sapon'.split():
     f=f'{O}/chibi-{k}.jpg'
     if os.path.exists(f): kk=key(Image.open(f)); kk.thumbnail((300,300)); A['chibi-'+k]=uri(kk,86)
     f2=f.replace('/chibi-','/chibi2-')
@@ -84,7 +84,7 @@ for n in range(1,5):
 for n in range(1,6):
     f=f'{H}/songs/song-{n}.mp3'
     if os.path.exists(f): A[f'song-{n}']='data:audio/mpeg;base64,'+base64.b64encode(open(f,'rb').read()).decode()
-for k in 'user kimorin monban mikie brother sister'.split():
+for k in 'user kimorin monban mikie brother sister sapon'.split():
     f=f'{O}/chibi3-{k}.jpg'
     if os.path.exists(f): kk=key(Image.open(f)); kk.thumbnail((260,260)); A['chibi3-'+k]=uri(kk,86)
     f=f'{O}/chibi4-{k}.jpg'
@@ -119,7 +119,7 @@ def unwhite(im):
     clear=out|hole
     al=Image.fromarray(((~clear)*255).astype('uint8')).filter(_F.MinFilter(3)).filter(_F.GaussianBlur(1.0))
     o=im.convert('RGBA'); o.putalpha(al); bb=o.getbbox(); return o.crop(bb) if bb else o
-for k in 'user kimorin monban mikie brother sister'.split():
+for k in 'user kimorin monban mikie brother sister sapon'.split():
     f=f'{O}/kor4-{k}.jpg'
     if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((220,220),Image.LANCZOS); A['kor4-'+k]=uri(o,88)
     for n in (1,2):
@@ -188,7 +188,7 @@ for pl in ['mars','venus','uranus','pluto','neptune']:
     for key,k2 in [('main',f'bg5-{pl}'),('hv',f'bg5-{pl}-hv'),('prof',f'bg5-{pl}-prof')]:
         f=f'{O}/home5-{pl}-{key}.jpg'
         if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A[k2]=uri(im,76)
-    for k in 'user kimorin monban mikie brother sister'.split():
+    for k in 'user kimorin monban mikie brother sister sapon'.split():
         f=f'{O}/p5-{pl}-{k}.jpg'
         if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((220,220),Image.LANCZOS); A[f'p5-{pl}-{k}']=uri(o,84)
 for k in ['saturn','jupiter','mercury','mars','venus','uranus','pluto','neptune']:
@@ -206,6 +206,15 @@ for f in sorted(_g.glob(f'{O}/exp-*.jpg')):
 for nm in ['map','sea','edm','hiphop','ballad','rock','chill','citypop','anison','jazz','matsuri','rain']+[k+'-pier' for k in ['edm','hiphop','ballad','rock','chill','citypop','anison','jazz','matsuri','rain']]:
     f=f'{O}/exp-mercury-{nm}.jpg'
     if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A[f'exp-mercury-{nm}']=uri(im,76)
+
+# Sapon (M-R333): the first oshi's works on every planet (pictures in out/sapon/, sounds and the MV loop in design/home/sapon/)
+for f in sorted(_g.glob(f'{O}/sapon/*.jpg')):
+    k='sap-'+os.path.basename(f)[:-4]; im=Image.open(f).convert('RGB'); im.thumbnail((720,720)); A[k]=uri(im,80)
+f=f'{O}/sushi/salmon-ref2.jpg'
+if os.path.exists(f): o=unwhite(Image.open(f)); bb=o.getbbox(); o=o.crop(bb) if bb else o; o.thumbnail((600,600),Image.LANCZOS); A['sap-game']=uri(o,88)
+for f in sorted(_g.glob(H+'/sapon/*')):
+    b=os.path.basename(f); k='sap-'+b.rsplit('.',1)[0]; mt={'mp3':'audio/mpeg','mp4':'video/mp4'}.get(b.rsplit('.',1)[1])
+    if mt: A[k]=f'data:{mt};base64,'+base64.b64encode(open(f,'rb').read()).decode()
 VD=os.environ.get('VOICE_DIR')
 if VD:
     for n in range(1,6):

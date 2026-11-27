@@ -704,6 +704,13 @@ button:focus-visible,.item:focus-visible,.home:focus-visible{outline:3px solid v
 
 .pagelink{display:block;width:fit-content;margin:6px auto 10px;padding:7px 14px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);color:#fff;font:800 12px var(--f-body);text-decoration:none}
 .pagelink[hidden]{display:none}
+.sapbk .book{position:relative}.sapbk .pg.r .sp{font-size:15px;line-height:1.7}.sapbk .pno{position:absolute;right:10px;bottom:8px;font-size:11px;opacity:.6}
+.bknav{display:flex;justify-content:space-between;margin-top:10px}.bknav button{width:46px;height:46px;border-radius:50%;border:0;background:rgba(255,255,255,.9);font:800 24px var(--f-body);color:#5a3d8a;box-shadow:0 4px 10px rgba(0,0,0,.25)}.bknav button[disabled]{opacity:.35}
+.sapmug .mug{width:78%;margin:0 auto;border-radius:22px;overflow:hidden;box-shadow:0 14px 30px rgba(0,0,0,.35)}.sapmug .mug img{display:block;width:100%}
+.mvv .scr video{width:100%;height:100%;object-fit:cover;display:block}
+.sapgm .gscr{position:relative;width:86%;margin:0 auto;aspect-ratio:1;border-radius:26px;background:radial-gradient(circle at 50% 40%,#bff3ff,#2a7fc4 70%,#123c78);box-shadow:inset 0 0 0 4px rgba(255,255,255,.5),0 14px 30px rgba(0,0,0,.35);overflow:hidden}
+.sapgm canvas{position:absolute;inset:6%;width:88%;height:88%;touch-action:none;cursor:pointer}.sapgm .gcnt{position:absolute;left:12px;top:10px;font:800 14px var(--f-body);color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.4)}
+.sapgm .ghint{position:absolute;left:0;right:0;bottom:12px;text-align:center;font:800 14px var(--f-body);color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.5);transition:opacity .4s}
 </style>
 <div class="switch" id="mode" role="toolbar" aria-label="絵のタッチ"><button type="button" data-m="anime" aria-pressed="true">アニメ版</button><button type="button" data-m="toy" aria-pressed="false">箱庭版</button></div>
 <div class="switch" id="satmode" role="toolbar" aria-label="土星の見せ方" hidden><button type="button" data-s="d">土星：今の版（真下に落ちる）</button><button type="button" data-s="e">奥行き版（床に沿って）</button></div>
@@ -859,7 +866,7 @@ const SD=()=>(SATMODE==='d'||SATMODE==='e')&&mode==='anime',SE=()=>SATMODE==='e'
 const S7=()=>SATMODE==='c'&&!!A['bg7-saturn']&&mode==='anime',S7G={rec:[.71,.46]};
 const S6=()=>SATMODE==='b'&&!!A['bg6-saturn']&&mode==='anime',S6G={floor:.7,spk:.15,rec:[.762,.427]};
 function s6Walls(){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,w=S6G.spk*W;return{L:w*.9,R:W-w*.9,F:S6G.floor*H}}let rolls=[],raf=0,heard=[],RECLBL=[.47,.69],SPIN=false,NEEDLE=[.6,.52],QUEUE=[],MAXB=window.KMAX||16,NB=0;
-const CHB=n=>n===ME?'user':n==='KIMORIN⭐︎'?'kimorin':n==='MONBAN'?'monban':n==='たこ焼きブラザー'?'brother':n==='たこ焼きシスター'?'sister':n==='MIKIE⭐︎DRILL'?'mikie':'user';
+const CHB=n=>n===ME?'user':n==='サーぽん'?'sapon':n==='KIMORIN⭐︎'?'kimorin':n==='MONBAN'?'monban':n==='たこ焼きブラザー'?'brother':n==='たこ焼きシスター'?'sister':n==='MIKIE⭐︎DRILL'?'mikie':'user';
 const BALL=k=>A['ball-'+(k==='mine'?'mine':k==='oshi'?'oshi':'dachi')]||A['puni-gray'];
 const KOROS=[
  {c:'pearl',f:'omega',n:'しろもち'},{c:'gold',f:'smile',n:'きんぴか'},{c:'pink',f:'wink',n:'もも'},{c:'mint',f:'sleepy',n:'みんと'},
@@ -873,8 +880,8 @@ const SHADES={
 function shadesSVG(sh){return `<svg class="face" viewBox="0 0 100 100" aria-hidden="true">${SHADES[sh||'round']}</svg>`}
 const KPRE=()=>A['kor3-01']?'kor3-':'kor2-',KN=()=>{let n=0;while(A[KPRE()+String(n+1).padStart(2,'0')])n++;return n||16},KOR2=new Proxy([],{get:(o,k)=>k==='map'?(f=>Array.from({length:KN()},(_,i)=>KPRE()+String(i+1).padStart(2,'0')).map(f)):(/^\d+$/.test(k)?KPRE()+String(+k+1).padStart(2,'0'):o[k])});
 const HAS2=()=>!!(A['kor2-01']||A['kor3-01']);
-const K4N=n=>({'KIMORIN⭐︎':'kimorin','MONBAN':'monban','MIKIE⭐︎DRILL':'mikie','たこ焼きブラザー':'brother','たこ焼きシスター':'sister'})[n]||(n===ME?'user':null);
-const K4SG={kimorin:1,mikie:1};
+const K4N=n=>({'KIMORIN⭐︎':'kimorin','MONBAN':'monban','MIKIE⭐︎DRILL':'mikie','たこ焼きブラザー':'brother','たこ焼きシスター':'sister','サーぽん':'sapon'})[n]||(n===ME?'user':null);
+const K4SG={kimorin:1,mikie:1,sapon:1};
 function faceSVG(f,sh){
   const eye=(x)=>`<ellipse cx="${x}" cy="52" rx="5.2" ry="6.2"/><circle class="hl" cx="${x-1.6}" cy="49.6" r="1.8"/>`;
   const E={omega:eye(36)+eye(64),smile:'<path class="ln" d="M30 53 q6 -7 12 0 M58 53 q6 -7 12 0"/>',
@@ -895,7 +902,7 @@ function korPicker(done){
 }
 function setupRoll(){setTimeout(()=>{if(cur!=='saturn'||!CONT.saturn)return;predecode(['exp-saturn-sea',...CONT.saturn.flatMap(c=>['isl-saturn-'+c.k,'exp-saturn-'+c.k]),'isl-saturn-me'])},1200);
   const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,F=H*.86,L=W*.04,Rw=W*.96;
-  const base=[{n:ME,k:'mine'},...OSHIX(),...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'れい',k:'oshi'}];
+  const base=[{n:ME,k:'mine'},{n:'サーぽん',k:'oshi'},...OSHIX(),...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'れい',k:'oshi'}];
   const total=window.KTOTAL||24,rest=base.slice(1),all=[base[0]];for(let i=1;i<total;i++)all.push(rest[(i-1)%rest.length]);
   const mb=(S7()||SD())?8:MAXB;QUEUE=all.slice(mb);rolls=[];all.slice(0,mb).forEach((o,i)=>rolls.push(makeBall(o,i,i)));
   if(SE())startSim3D();else startSim();
@@ -993,8 +1000,8 @@ function pop(r){
     d.style.left=x+'px';d.style.top=y+'px';d.style.setProperty('--dx',Math.cos(ang)*dist+'px');d.style.setProperty('--dy',Math.sin(ang)*dist+'px');sky.appendChild(d);setTimeout(()=>{d.style.display='none'},700)}
   const c=document.createElement('div');c.className='chibi';c.style.left=x+'px';c.style.top=y+'px';
   c.innerHTML=`<img alt="" src="${A['chibi-'+CHB(r.o.n)]||''}">`;sky.appendChild(c);
-  popSound();const vk='voice-'+String(r.i%5+1).padStart(2,'0');if(A[vk])setTimeout(()=>playVoice(vk),300);
-  const card=P.saturn.card(r.i),b=document.createElement('div');b.className='bub';b.innerHTML=`${card.cap}<small class="by2">by ${r.o.n}</small>`;
+  const SP=r.o.n==='サーぽん';popSound();const vk=SP?'sap-saturn':'voice-'+String(r.i%5+1).padStart(2,'0');if(A[vk])setTimeout(()=>playVoice(vk),300);
+  const card=SP?{cap:SAPON.saturn}:P.saturn.card(r.i),b=document.createElement('div');b.className='bub';b.innerHTML=`${card.cap}<small class="by2">by ${r.o.n}</small>`;
   const pw=$('phone').clientWidth;b.style.left=Math.max(pw*.24,Math.min(pw*.76,x))+'px';b.style.top=(y-118)+'px';setTimeout(()=>sky.appendChild(b),260);
   setTimeout(()=>{b.style.display='none';c.classList.add('wave')},2300);
   setTimeout(()=>{const ph=$('phone');c.classList.add('away');const RL=S7()?S7G.rec:S6()?S6G.rec:RECLBL;c.style.left=(RL[0]*ph.clientWidth)+'px';c.style.top=(RL[1]*ph.clientHeight)+'px';heard.push(r.o)},2900);
@@ -1306,7 +1313,7 @@ const G5SP={mars:'ufo',venus:'radio',uranus:'balloon',pluto:'book',neptune:'bubb
 const G5IMG=(pl,n)=>(n!==ME&&CHB(n)==='user'&&!PEOPLE.some(p=>p.n===n)&&A['sp2-'+G5SP[pl]])||A['p5-'+pl+'-'+CHB(n)]||A['chibi-'+CHB(n)]||'';
 let GF=[],GQ=[],Graf=0,GOPEN=null,GV=null,GNB=0;
 function stopG5(){cancelAnimationFrame(Graf);GF=[];GQ=[];if(GV)stopG5play();if(GOPEN)GOPEN.close()}
-function setupG5(){setTimeout(()=>{if(!CONT[cur])return;predecode(['exp-'+cur+'-sea',...CONT[cur].flatMap(c=>['isl-'+cur+'-'+c.k,'exp-'+cur+'-'+c.k]),'isl-'+cur+'-me'])},1200);const base=[...OSHIX(),...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'れい',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'}];
+function setupG5(){setTimeout(()=>{if(!CONT[cur])return;predecode(['exp-'+cur+'-sea',...CONT[cur].flatMap(c=>['isl-'+cur+'-'+c.k,'exp-'+cur+'-'+c.k]),'isl-'+cur+'-me'])},1200);const base=[{n:'サーぽん',k:'oshi'},...OSHIX(),...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'れい',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'}];
   GF=[];GQ=base.slice(8);base.slice(0,8).forEach((o,i)=>GF.push(makeG5(o,i,i)));let last=performance.now();const ph=$('phone');
   const step=now=>{const dt=Math.min(.05,(now-last)/1000);last=now;const W=ph.clientWidth,H=ph.clientHeight,ts=now/1000;
     for(const b of GF){if(b.gone||b.drag)continue;b.t+=dt;const tx=(b.cx+Math.sin(b.t*b.w1+b.p1)*b.ax)*W,ty=(b.cy+Math.sin(b.t*b.w2+b.p2)*b.ay)*H+Math.sin(ts*2+b.i)*3;b.x+=(tx-b.x)*Math.min(1,dt*3);b.y+=(ty-b.y)*Math.min(1,dt*3);
@@ -1315,7 +1322,43 @@ function makeG5(o,i,slot){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight
   e.innerHTML=`<img alt="" src="${G5IMG(cur,o.n)}"><span class="nm">${o.n}</span>`;$('sky').appendChild(e);const ai=(i*2+o.n.length)%5+1;
   const b={o,e,i,ai,slot,sc:S[2],cx:S[0],cy:S[1],ax:S[3],ay:S[4],w1:.4+((i*17)%7)*.05,w2:.6+((i*11)%5)*.07,p1:i*1.7,p2:i*2.3,t:0,x:W*(i%2?1.1:-.1),y:H*.6,gone:false};
   dragify(b,e,()=>popG5(b),()=>dropFloat(b,[[.44,.5],[.62,.82],[.83,1.22]],[.53,.74],[.06,.94,.36,.9]));return b}
-function viewer(into,pl,o){const c=G5[pl],title=o.title||c.titles[o.ai-1],st=TSTYLE[title]||{f:"'Dela Gothic One'"},tt=`<div class="ttl2" style="font-family:${st.f},var(--f-body)">${[...title].map(ch=>`<span class="${chk(ch)}">${ch}</span>`).join('')}</div>`,art=A['jart-'+o.ai]||'';
+
+/* Sapon (M-R332/333): everyone's first oshi. Its works on each planet. */
+const SAPON={saturn:'サーモン食べると若返り効果があるポン！',jupiter:'お父さんだポン。',song:'サーモン・トランス',radio:'サーぽんのサーモンまめちしきラジオ',goods:'サーぽんのマグカップ',book:'サーぽんの オレンジいろ',game:'ぷるぷるサーぽん',
+  pages:['サーぽんは、オレンジいろの からだが じまんだポン。','でも ある日、ふしぎに おもったポン。「どうして ぼくは オレンジなんだポン？」','うみの おとうさんに、ききに いったポン。「おとうさーん！」','おとうさんは いいました。「うみで ちいさな エビを たくさん たべると、からだが オレンジに なるんだよ」','「えっ！ ぼくの おかげっすか！？」と、えびすけ。','「ぼくの オレンジは、みんなと つながってる いろだポン！」 おしまい。']};
+LYRICS['sap-song']=[[3.48, "サーモン！"], [13.91, "サーモン、サーモン！"], [16.52, "サーモン！"], [17.39, "サーモン、サーモン！"], [20.0, "サーモン！"], [20.87, "サーモン、サーモン！"], [23.48, "サーモン！"], [24.35, "サーモン、サーモン！"], [26.96, "サーモン！"], [27.83, "♪"], [29.57, "サーモーン！"], [33.04, "サーモーン！"], [41.74, "サーモン、サーモン！"], [44.35, "サーモン！"], [45.22, "サーモン、サーモン！"], [47.83, "サーモン！"], [48.7, "サーモン、サーモン！"], [51.3, "サーモン！"], [53.91, "サーモン！"]];
+function sapBook(into){const v=document.createElement('div');v.className='vw bkv sapbk';v.style.top='16%';let p=0;
+  const draw=()=>{v.innerHTML=`<div class="book"><div class="pg l" style="background-image:url(${A['sap-book-'+(p+1)]||''})"></div><div class="pg r">${p===0?`<h4>${SAPON.book}</h4>`:''}<p class="sp">${SAPON.pages[p]}</p><span class="pno">${p+1} / 6</span></div></div><div class="bknav"><button type="button" class="bkp" aria-label="まえのページ" ${p?'':'disabled'}>‹</button><button type="button" class="bkn" aria-label="つぎのページ">${p<5?'›':'↺'}</button></div>`};
+  draw();v.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;e.stopPropagation();if(b.classList.contains('bkp'))p=Math.max(0,p-1);else p=p<5?p+1:0;pageFlip();draw()});return v}
+function pageFlip(){const c=getAC();if(!c)return;const n=c.sampleRate*.18,b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2)*.5;const s=c.createBufferSource(),f=c.createBiquadFilter();f.type='bandpass';f.frequency.value=2400;s.buffer=b;s.connect(f);f.connect(c.destination);s.start()}
+/* Neptune: tap Sapon and the place you touched wobbles ("ぽよよん") */
+function sapGame(into){const v=document.createElement('div');v.className='vw gmv sapgm';v.style.top='10%';
+  v.innerHTML=`<div class="gscr"><canvas width="600" height="600" aria-label="サーぽんをタップしてね"></canvas><div class="gcnt">ぷるぷる 0</div><div class="ghint">サーぽんを タップしてね</div></div><div class="ttl2">${SAPON.game}</div>`;
+  const cv=v.querySelector('canvas'),gl=cv.getContext('webgl',{premultipliedAlpha:false});let hits=[],raf2=0,cnt=0;
+  if(!gl){return v}
+  const vs='attribute vec2 p;varying vec2 u;void main(){u=p*.5+.5;u.y=1.-u.y;gl_Position=vec4(p,0,1);}';
+  const fs='precision mediump float;varying vec2 u;uniform sampler2D t;uniform vec4 h[6];void main(){vec2 q=u;for(int i=0;i<6;i++){vec4 k=h[i];if(k.w<=0.)continue;vec2 d=q-k.xy;float r=length(d);float a=k.z*exp(-r*r/0.025)*sin(k.w*28.)*exp(-k.w*3.2);q-=d*a*6.;}gl_FragColor=texture2D(t,q);}';
+  const sh=(ty,src)=>{const s=gl.createShader(ty);gl.shaderSource(s,src);gl.compileShader(s);return s},pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,vs));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,fs));gl.linkProgram(pr);gl.useProgram(pr);
+  const bf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,bf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);const lp=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(lp);gl.vertexAttribPointer(lp,2,gl.FLOAT,false,0,0);
+  const tx=gl.createTexture(),im=new Image();im.onload=()=>{gl.bindTexture(gl.TEXTURE_2D,tx);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,im);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);frame()};im.src=A['sap-game']||A['chibi-sapon']||'';
+  const hl=gl.getUniformLocation(pr,'h');let last=performance.now();
+  function frame(){const now=performance.now(),dt=(now-last)/1000;last=now;hits.forEach(k=>k.t+=dt);hits=hits.filter(k=>k.t<1.6);const arr=new Float32Array(24);hits.slice(-6).forEach((k,i)=>arr.set([k.x,k.y,k.a,k.t],i*4));gl.uniform4fv(hl,arr);
+    gl.viewport(0,0,cv.width,cv.height);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);raf2=requestAnimationFrame(frame)}
+  cv.addEventListener('pointerdown',e=>{e.stopPropagation();const r=cv.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;hits.push({x,y,a:.09,t:.0001});cnt++;v.querySelector('.gcnt').textContent='ぷるぷる '+cnt;v.querySelector('.ghint').style.opacity='0';poyo(.8+Math.random()*.4)});
+  v.__stop=()=>cancelAnimationFrame(raf2);return v}
+function poyo(k){const c=getAC();if(!c)return;const t0=c.currentTime+.005,o=c.createOscillator(),g=c.createGain(),lf=c.createOscillator(),lg=c.createGain();o.type='sine';
+  o.frequency.setValueAtTime(520*k,t0);o.frequency.exponentialRampToValueAtTime(260*k,t0+.45);lf.frequency.value=14;lg.gain.setValueAtTime(70*k,t0);lg.gain.exponentialRampToValueAtTime(4,t0+.5);lf.connect(lg);lg.connect(o.frequency);
+  g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(.35,t0+.012);g.gain.exponentialRampToValueAtTime(.0001,t0+.55);o.connect(g);g.connect(c.destination);o.start(t0);lf.start(t0);o.stop(t0+.6);lf.stop(t0+.6)}
+function sapViewer(into,pl){const c=G5[pl],ttl=t=>{const st=TSTYLE[t]||{f:"'Dela Gothic One'"};return `<div class="ttl2" style="font-family:${st.f},var(--f-body)">${[...t].map(ch=>`<span class="${chk(ch)}">${ch}</span>`).join('')}</div>`};let v=document.createElement('div'),stop=()=>{};
+  if(c.t==='mv'){v.className='vw mvv';v.style.top='12%';v.innerHTML=`<div class="scr"><video src="${A['sap-mv']||''}" poster="${A['sap-dad']||''}" muted loop playsinline autoplay></video></div>${ttl(SAPON.song)}`;playSong('sap-song');stop=()=>stopSong();setTimeout(()=>{const vd=v.querySelector('video');if(vd)vd.play().catch(()=>{})},50)}
+  if(c.t==='radio'){v.className='vw rdv';v.style.top='14%';v.innerHTML=`<div class="disc2" style="background-image:url(${A['sap-radio']||''})"></div><span class="air">ON AIR</span><div class="wave">${Array.from({length:15},(_,i)=>`<b style="height:${10+((i*7)%5)*6}px;animation-delay:${(i%5)*.08}s"></b>`).join('')}</div>${ttl(SAPON.radio)}`;setTimeout(()=>{playSong('sap-radio');if(SONG&&SONG.loop!==undefined)SONG.loop=false;if(SONG&&SONG.__el)SONG.__el.loop=false},400);stop=()=>stopSong()}
+  if(c.t==='goods'){v.className='vw gdv sapmug';v.style.top='16%';v.innerHTML=`<div class="mug"><img alt="サーぽんのマグカップ" src="${A['sap-mug']||''}"></div>${ttl(SAPON.goods)}`}
+  if(c.t==='book'){v=sapBook(into)}
+  if(c.t==='game'){v=sapGame(into);stop=()=>{v.__stop&&v.__stop()}}
+  into.appendChild(v);requestAnimationFrame(()=>requestAnimationFrame(()=>v.classList.add('on')));
+  return {close(){stop();v.classList.remove('on');setTimeout(()=>v.remove(),300)}}}
+
+function viewer(into,pl,o){if(o.n==='サーぽん')return sapViewer(into,pl);const c=G5[pl],title=o.title||c.titles[o.ai-1],st=TSTYLE[title]||{f:"'Dela Gothic One'"},tt=`<div class="ttl2" style="font-family:${st.f},var(--f-body)">${[...title].map(ch=>`<span class="${chk(ch)}">${ch}</span>`).join('')}</div>`,art=A['jart-'+o.ai]||'';
   const v=document.createElement('div');let stop=()=>{};
   if(c.t==='mv'){v.className='vw mvv';v.style.top='12%';v.innerHTML=`<div class="scr"><i style="background-image:url(${art})"></i></div>${tt}`;playSong('song-'+o.ai);stop=()=>stopSong()}
   if(c.t==='radio'){v.className='vw rdv';v.style.top='14%';v.innerHTML=`<div class="disc2" style="background-image:url(${art})"></div><span class="air">ON AIR</span><div class="wave">${Array.from({length:15},(_,i)=>`<b style="height:${10+((i*7)%5)*6}px;animation-delay:${(i%5)*.08}s"></b>`).join('')}</div>${tt}`;const vk='voice-'+String(o.ai).padStart(2,'0');setTimeout(()=>{if(A[vk])playVoice(vk)},500)}
@@ -1458,7 +1501,7 @@ function playSong(k){const c=getAC(),buf=VBUF[k];stopSong();if(c&&buf&&buf!=='lo
   if(A[k]){const au=VEL.length?VEL[VEL.length-1]:new Audio();try{au.pause();au.src=A[k];au.loop=true;au.currentTime=0;au.play().catch(()=>{});SONG={stop:()=>au.pause(),__el:au}}catch(e){}return au.duration&&isFinite(au.duration)?au.duration:60}return 60}
 const OSHIX=()=>[...oshi].filter(n=>!PEOPLE.some(p=>p.n===n)&&!['たこ焼きブラザー','nana','れい','みお'].includes(n)).map(n=>({n,k:'oshi'}));
 function setupMer(){setTimeout(()=>{if(cur!=='mercury')return;predecode(['exp-mercury-sea',...CONT.mercury.flatMap(c=>['isl-mercury-'+c.k,'exp-mercury-'+c.k]),'isl-mercury-me'])},1200);
-  const base=[...OSHIX(),...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'れい',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'}];
+  const base=[{n:'サーぽん',k:'oshi'},...OSHIX(),...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'れい',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'}];
   SH=[];SHQ=base.slice(MMAX);base.slice(0,MMAX).forEach((o,i)=>SH.push(makeSh(o,i,i)));
   let last=performance.now();const ph=$('phone');
   const step=now=>{const dt=Math.min(.05,(now-last)/1000);last=now;const W=ph.clientWidth,H=ph.clientHeight,ts=now/1000;
@@ -1496,8 +1539,9 @@ function popSh(s){if(s.gone||MBUSY||MPLAY)return;s.gone=true;const ph=$('phone')
   s.e.classList.add('front');s.e.classList.remove('left');ph.classList.add('dim2');splash();
   ph.classList.add('zoomart');document.querySelector('.dock').classList.add('busy');s.e.style.transform=`translate3d(${W*.5}px,${H*.84}px,0) scale(2.15)`;
   let kt=null,vn=null;
-  tm.push(setTimeout(()=>{playSong('song-'+s.ji);vn=vinyl(sky,A['jart-'+s.ji]||'','50%','38%','80%');vn.el.style.zIndex='9';lyricsStart(sky,'song-'+s.ji,'60%')},450));
-  tm.push(setTimeout(()=>{const k='stitle-'+s.ji;if(A[k])playVoice(k);kt=kinTitle(sky,{top:'6%',label:'',noby:1,title:MSONG[s.ji-1],by:s.o.n,c:'#38c8ff',c2:'#bdf0ff',g:'rgba(56,200,255,.6)'})},2200));
+  const SP=s.o.n==='サーぽん',sk=SP?'sap-song':'song-'+s.ji;
+  tm.push(setTimeout(()=>{playSong(sk);vn=vinyl(sky,(SP?A['sap-jacket']:A['jart-'+s.ji])||'','50%','38%','80%');vn.el.style.zIndex='9';lyricsStart(sky,sk,'60%')},450));
+  tm.push(setTimeout(()=>{const k=SP?'sap-stitle':'stitle-'+s.ji;if(A[k])playVoice(k);kt=kinTitle(sky,{top:'6%',label:'',noby:1,title:SP?SAPON.song:MSONG[s.ji-1],by:s.o.n,c:'#38c8ff',c2:'#bdf0ff',g:'rgba(56,200,255,.6)'})},2200));
   function close(){if(closed)return;closed=true;tm.forEach(clearTimeout);stopSong();if(kt)kt.out();if(vn)vn.out();ph.classList.remove('dim2','zoomart');document.querySelector('.dock').classList.remove('busy');
     s.e.style.transition='transform .35s ease-in,opacity .3s';s.e.style.transform=`translate3d(${W*MISLE[0]}px,${H*MISLE[1]}px,0) scale(.2)`;s.e.style.opacity='0';
     setTimeout(()=>{s.e.remove()},380);MBUSY=null;
@@ -1536,7 +1580,7 @@ const JSLOT=[[.22,.47,.52,.05,.015,0],[.5,.44,.5,.05,.015,0],[.13,.6,.82,.05,.02
 const JART=['夕焼けの町','屋根の上のねこ','ラーメン','さくら通り','月と海'];
 function stopJup(){cancelAnimationFrame(BFraf);BF=[];BFQ=[];if(JV)stopJ();if(JOPEN)JOPEN.close()}
 function setupJup(){setTimeout(()=>{if(cur!=='jupiter')return;predecode(['exp-jupiter-sea',...CONT.jupiter.flatMap(c=>['isl-jupiter-'+c.k,'exp-jupiter-'+c.k]),'isl-jupiter-me'])},1200);
-  const base=[...OSHIX(),...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'れい',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'},{n:'みお',k:'oshi'}];
+  const base=[{n:'サーぽん',k:'oshi'},...OSHIX(),...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'れい',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'},{n:'みお',k:'oshi'}];
   BF=[];BFQ=base.slice(JMAX);base.slice(0,JMAX).forEach((o,i)=>BF.push(makeBf(o,i,i)));
   let last=performance.now();const ph=$('phone');
   const step=now=>{const dt=Math.min(.05,(now-last)/1000);last=now;const W=ph.clientWidth,H=ph.clientHeight,ts=now/1000;
@@ -1564,8 +1608,8 @@ function popBf(b){if(b.gone||JBUSY||JV)return;b.gone=true;JBUSY=true;const sky=$
   const tag=document.createElement('div');tag.className='whotag';tag.textContent=b.o.n;
   requestAnimationFrame(()=>requestAnimationFrame(()=>{f.style.left=(pw*.15)+'px';f.style.top=(phh*.93)+'px';f.style.transform='scale(.9)'}));
   setTimeout(()=>{tag.style.left=(pw*.15)+'px';tag.style.top=(phh*.955)+'px';sky.appendChild(tag)},360);
-  const tk='vtitle-'+b.ai,title=JART[b.ai-1];let art=null;const tm=[];
-  tm.push(setTimeout(()=>{art=openArt(sky,{img:A['jart-'+b.ai]||'',title});popSound();if(A[tk])playVoice(tk)},120));
+  const SP=b.o.n==='サーぽん',tk=SP?'sap-dadv':'vtitle-'+b.ai,title=SP?SAPON.jupiter:JART[b.ai-1];let art=null;const tm=[];
+  tm.push(setTimeout(()=>{art=openArt(sky,{img:(SP?A['sap-dad']:A['jart-'+b.ai])||'',title});popSound();if(A[tk])playVoice(tk)},120));
   let closed=false;
   function close(){if(closed)return;closed=true;tm.forEach(clearTimeout);JOPEN=null;if(art)art.close();tag.remove();
     setTimeout(()=>{ph.classList.remove('zoomart');document.querySelector('.dock').classList.remove('busy');f.style.transition='left .5s ease-in,top .5s ease-in,transform .5s,opacity .5s';f.style.left=(JTREE[0]*pw)+'px';f.style.top=(JTREE[1]*phh)+'px';f.style.transform='scale(.25)';f.style.opacity='0';b.e.remove();JBUSY=false},200);
@@ -1607,7 +1651,7 @@ const VEL=[];let VELi=0,VEL_ON=false;
 document.addEventListener('pointerdown',()=>{if(VEL_ON)return;VEL_ON=true;for(let n=0;n<3;n++){const a=new Audio();a.preload='auto';a.src=SILENT;a.play().then(()=>a.pause()).catch(()=>{});VEL.push(a)}},{passive:true});
 function playEl(src){if(VEL.length<2)return false;const a=VEL[VELi++%(VEL.length-1)];try{a.pause();a.src=src;a.currentTime=0;a.play().catch(()=>{});return true}catch(e){return false}}
 function decodeOne(c,k){return Promise.race([fetch(A[k]).then(r=>r.arrayBuffer()).then(b=>new Promise((ok,ng)=>c.decodeAudioData(b,ok,ng))),new Promise((_,ng)=>setTimeout(()=>ng('timeout'),5000))])}
-function loadVoices(){const c=getAC();if(!c)return;const ks=[1,2,3,4,5].map(n=>'voice-'+String(n).padStart(2,'0')).concat([1,2,3,4,5].flatMap(n=>['vtitle-'+n,'stitle-'+n]),[1,2,3,4,5].map(n=>'song-'+n));for(const k of ks){if(!A[k]||VBUF[k])continue;VBUF[k]='loading';
+function loadVoices(){const c=getAC();if(!c)return;const ks=[1,2,3,4,5].map(n=>'voice-'+String(n).padStart(2,'0')).concat([1,2,3,4,5].flatMap(n=>['vtitle-'+n,'stitle-'+n]),[1,2,3,4,5].map(n=>'song-'+n),['sap-saturn','sap-dadv','sap-stitle','sap-song','sap-radio']);for(const k of ks){if(!A[k]||VBUF[k])continue;VBUF[k]='loading';
   VPROM[k]=DQ=DQ.then(()=>decodeOne(c,k)).then(buf=>{VBUF[k]=buf}).catch(()=>{VBUF[k]=null})}}
 // decoding starts on the first tap (after the context is resumed)
 document.addEventListener('pointerdown',()=>{getAC();loadVoices()},{once:false,passive:true});
