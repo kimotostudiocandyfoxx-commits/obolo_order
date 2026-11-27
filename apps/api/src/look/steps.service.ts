@@ -32,6 +32,10 @@ import { LookService } from './look.service';
 
 type Row = typeof users.$inferSelect;
 
+/** the screen's words when a picture could not be made or cut cleanly (nothing taken, nothing counted) */
+export const LOOK_AGAIN = 'うまく描けなかった……もういちど';
+class CutFailed extends Error {}
+
 /** where a round is kept on the account (onboardingJson): the steps used, decided or not, the picture it has now */
 export const stepsKey = (who: LookStepWho) => `steps.${who}`;
 
@@ -145,13 +149,16 @@ export class LookStepsService {
       const key = await chooseKey(src);
       const on = await onKey(src, key);
       const img = await this.painter.generate(lookStepPrompt(who, wish, ref.length > 0, KEY_WORDS[key]), s.used, [on, ...ref]);
-      const png = await this.look.cut(img, 768, key);
-      const kind = who === 'bati' ? 'bati' : 'avatar';
-      url = (png ? await this.media.storeImage(userId, kind, 'image/png', png, origin) : await this.media.storeImage(userId, kind, img.mime, img.data, origin)).url;
+      const cut = await this.look.cutOrNothing(img, 768, key, `look step (${who}) of ${userId}`);
+      // client 2026-11-27: no try cut it cleanly — a badly cut picture is never shown: the step's mana goes back, the step
+      // does not count, and the screen asks to try again (logged at error level by cutOrNothing, with every step's checks)
+      if (!cut.png) throw new CutFailed(cut.record);
+      url = (await this.media.storeImage(userId, who === 'bati' ? 'bati' : 'avatar', 'image/png', cut.png, origin)).url;
     } catch (e) {
       await fee.refund();
+      if (e instanceof CutFailed) throw apiError(HttpStatus.BAD_GATEWAY, 'LOOK_CUT_FAILED', LOOK_AGAIN);
       this.log.warn(`look step failed (${who}): ${String(e)}`);
-      throw apiError(HttpStatus.BAD_GATEWAY, 'LOOK_STEP_FAILED', 'うまく変わらなかった……もう一度');
+      throw apiError(HttpStatus.BAD_GATEWAY, 'LOOK_STEP_FAILED', LOOK_AGAIN);
     }
     // the round as it is now (another tap may have moved it meanwhile: counted from the account, not from the start)
     const now = stepsOf(await this.user(userId), who);
@@ -192,8 +199,10 @@ export class LookStepsService {
         this.log.warn(`look pick4 failed: ${String(r.reason)}`);
         continue;
       }
-      const png = await this.look.cut(r.value, 768, key);
-      const m = png ? await this.media.storeImage(userId, 'avatar', 'image/png', png, origin) : await this.media.storeImage(userId, 'avatar', r.value.mime, r.value.data, origin);
+      // a picture no try cut cleanly is left out (never shown badly cut); none at all: the mana goes back
+      const cut = await this.look.cutOrNothing(r.value, 768, key, `look pick4 of ${userId}`);
+      if (!cut.png) continue;
+      const m = await this.media.storeImage(userId, 'avatar', 'image/png', cut.png, origin);
       candidates.push({ id: m.id, url: m.url });
     }
     if (!candidates.length) {

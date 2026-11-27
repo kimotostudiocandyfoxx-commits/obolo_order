@@ -138,6 +138,14 @@ export class LookController {
     return this.look.hatch(userId, origin(req));
   }
 
+  /** client 2026-11-27: the stand-in {bati} gets its real birth picture (the normal price; given back when it fails again) */
+  @Post('bati/birth/retry')
+  @HttpCode(200)
+  async retryBirth(@UserId() userId: string, @Req() req: Request) {
+    await rateLimit(this.kv, `hatch:${userId}`, 4, 60);
+    return this.look.retryBirth(userId, origin(req));
+  }
+
   /** the NEO look standing without a background (M-R149), drawn once per look */
   @Post('look/standee')
   @HttpCode(200)

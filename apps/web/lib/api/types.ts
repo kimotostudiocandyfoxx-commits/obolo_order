@@ -432,6 +432,8 @@ export interface Api {
   batiRole(role: BatiRole, id?: string): Promise<Me>;
   /** The egg hatches: the Bati image is generated (can take a while). */
   batiHatch(): Promise<Me>;
+  /** client 2026-11-27: the stand-in {bati} gets its real birth picture (the normal price; given back when it fails again) */
+  batiBirthRetry(): Promise<Me>;
   batiName(name: string): Promise<Me>;
   /** Bati's six expressions from the hatched picture (once; M-R139) */
   batiFaces(): Promise<Me>;

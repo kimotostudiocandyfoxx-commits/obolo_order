@@ -746,6 +746,9 @@ export class HttpApi implements Api {
   batiRole(role: BatiRole, id?: string) {
     return this.req<Me>('POST', '/me/bati/role', { role, id });
   }
+  batiBirthRetry() {
+    return this.req<Awaited<ReturnType<Api['batiBirthRetry']>>>('POST', '/me/bati/birth/retry');
+  }
   batiHatch() {
     return this.req<Awaited<ReturnType<Api['batiHatch']>>>('POST', '/me/bati/hatch');
   }

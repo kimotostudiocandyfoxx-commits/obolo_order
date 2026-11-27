@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { afterLookStep, BATI_BIRTH_MODEL, canLookStep, eggMark, EMPTY_LOOK_STEPS, foodNameByRules, LOOK_STEP_MAX, LOOK_STEP_MODEL, LookStepBody, lookStepChoices, lookStepsLeft, lookStepsMana, lookStepView, type LookStepState } from './lookSteps';
-import { DEFAULT_COST_RATES, estimateJpy, MAKE_COST, MAKE_COST_ESTIMATE, manaFor10 } from './manaPrice';
+import { CUT_CHECK_USD, DEFAULT_COST_RATES, estimateJpy, MAKE_COST, MAKE_COST_ESTIMATE, manaFor10, pictureUsd } from './manaPrice';
 
 describe('the step counter (進化 / 変身 あと◯回)', () => {
   it('counts down from 8 and stops at 0', () => {
@@ -37,22 +37,26 @@ describe('the step counter (進化 / 変身 あと◯回)', () => {
 });
 
 describe('the mana of the steps', () => {
-  it('one step is 0.4 mana on FLUX.2 klein 4B (the client’s number), by the price rule', () => {
+  it('one step is 0.6 mana on FLUX.2 klein 4B — the picture, the word check and the cut-out check — by the price rule', () => {
     expect(LOOK_STEP_MODEL).toBe('runware:400@4');
-    expect(MAKE_COST.lookStep).toBe(0.4);
+    expect(MAKE_COST.lookStep).toBe(0.6);
+    expect(MAKE_COST_ESTIMATE.lookStep.usd).toBeCloseTo(pictureUsd(LOOK_STEP_MODEL, true) + 0.0005 + CUT_CHECK_USD, 9);
     expect(MAKE_COST.lookStep).toBe(manaFor10(estimateJpy(MAKE_COST_ESTIMATE.lookStep, DEFAULT_COST_RATES)));
-    expect(lookStepsMana(8, MAKE_COST.lookStep)).toBe(3.2);
-    expect(lookStepsMana(3, MAKE_COST.lookStep)).toBe(1.2);
+    expect(lookStepsMana(8, MAKE_COST.lookStep)).toBe(4.8);
+    expect(lookStepsMana(3, MAKE_COST.lookStep)).toBe(1.8);
   });
   it('the four first pictures, the birth picture and the confirmation come from their models’ costs', () => {
     expect(BATI_BIRTH_MODEL).toBe('bytedance:seedream@5.0-flash');
     for (const k of ['lookPick4', 'batiBirth', 'profileLook'] as const) expect(MAKE_COST[k]).toBe(manaFor10(estimateJpy(MAKE_COST_ESTIMATE[k], DEFAULT_COST_RATES)));
-    expect(MAKE_COST.lookPick4).toBe(1.7);
+    // four pictures, each cut out and checked
+    expect(MAKE_COST.lookPick4).toBe(2.2);
+    expect(MAKE_COST_ESTIMATE.lookPick4.usd).toBeCloseTo(4 * (pictureUsd('runware:400@4', true) + CUT_CHECK_USD) + 0.0005, 9);
     expect(MAKE_COST.batiBirth).toBe(3.6);
     expect(MAKE_COST.profileLook).toBe(28.1);
   });
   it('the whole of day 2 fits the 88-mana gem', () => {
     const all = MAKE_COST.batiBirth + 8 * MAKE_COST.lookStep + MAKE_COST.lookPick4 + 8 * MAKE_COST.lookStep + MAKE_COST.profileLook;
+    expect(Math.round(all * 10) / 10).toBe(43.5);
     expect(all).toBeLessThan(88);
   });
 });

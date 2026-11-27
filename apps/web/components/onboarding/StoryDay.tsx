@@ -1,7 +1,7 @@
 'use client';
 
 import { batiLineVoiceOf } from '@/lib/onboarding/batiLine';
-import { JOURNEY_PAYMENT } from '@obolo/shared';
+import { JOURNEY_PAYMENT, MAKE_COST } from '@obolo/shared';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { StoryPlayer, type StoryProgress } from '@/components/onboarding/StoryPlayer';
 import { ApiError, getApi } from '@/lib/api';
@@ -268,8 +268,11 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
           setMe(u);
           // Bati's expressions are drawn meanwhile (a minute or so; the plain picture stands in until then)
           if (u.bati?.imageUrl && !u.bati.faces) void getApi().batiFaces().then(setMe).catch(() => undefined);
-          // if generation failed, a drawn Bati keeps the story going
-          return u.bati?.imageUrl ?? '';
+          // if generation failed, a drawn Bati keeps the story going. Client 2026-11-27: the first {bati}'s birth picture
+          // takes its mana from the gem (shown small) — not the stand-in's
+          const charged = day === 2 && !!u.bati?.imageUrl && !u.bati.stand;
+          const mana = charged ? await getApi().manaPrices().then((p) => p.batiBirth).catch(() => MAKE_COST.batiBirth) : 0;
+          return { url: u.bati?.imageUrl ?? '', mana };
         } catch {
           return '';
         }

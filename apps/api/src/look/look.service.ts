@@ -66,6 +66,9 @@ let kororinSheet: Promise<GeneratedImage> | null = null;
 /** client 2026-11-27: the style sheet of a newborn {bati} (design/refs/2026-11-27-story/09: food characters, no watermark) */
 let batiSheet: Promise<{ data: Buffer; mime: string }> | undefined;
 const batiStyle = () => (batiSheet ??= readFile(resolve(__dirname, '../../assets/bati-style-food.jpg')).then((data) => ({ data, mime: 'image/jpeg' })));
+/** client 2026-11-27: the neutral stand-in of a newborn {bati} (a food character of the style test, cut out; assets/bati-stand-food.png) */
+let batiStand: Promise<Buffer> | undefined;
+const batiStandIn = () => (batiStand ??= readFile(resolve(__dirname, '../../assets/bati-stand-food.png')));
 const BATI_DIR = resolve(__dirname, '../../assets/bati');
 const BATI_GREY: [number, number, number] = [128, 128, 128];
 /*
@@ -790,13 +793,6 @@ export class LookService {
       })
       .where(eq(users.id, userId))
       .returning();
-    // client 2026-11-27: the birth picture's mana from the gem (one per {bati} born; a balance short of it never stops
-    // the story: the rest waits with the tenths)
-    try {
-      await this.ledger.chargeWhole(this.db, userId, 'batiBirth', `make:batiBirth:${rec.id}`, rec.id);
-    } catch (e) {
-      this.log.warn(`bati birth charge failed: ${String(e)}`);
-    }
     // which egg: its body types (kept beside the account until the hatching)
     await this.kv.set(`bati:egg:${userId}`, egg, TRY_TTL);
     if (persona.rare) await this.queue.enqueue('bati.lines', { userId, batiId: rec.id }, { dedupeKey: `bati-lines-${rec.id}` }).catch(() => undefined);
@@ -919,7 +915,7 @@ export class LookService {
    * back). When no try passes NOTHING is kept, as the ladder is meant (the planet figures' way): `png` is null, the
    * caller leaves the picture out, and it is logged as an error with every step and the checks it failed (`record`).
    */
-  private async cutOrNothing(img: GeneratedImage, out: number, key: KeyName, what: string): Promise<{ png: Buffer | null; record: string }> {
+  async cutOrNothing(img: GeneratedImage, out: number, key: KeyName, what: string): Promise<{ png: Buffer | null; record: string }> {
     const r = await this.ladder(img, out, key, what);
     if (r?.ok) return { png: r.png, record: '' };
     const record = (r && ladderRecord(r.tries)) || 'error';
@@ -1047,7 +1043,6 @@ export class LookService {
   private async paintBati(userId: string, origin: string) {
     const u = await this.user(userId);
     if (!u.batiFood || u.batiImageUrl) return u;
-    const body = await this.batiBody(activeBati(u)?.egg ?? (await this.kv.get(`bati:egg:${userId}`)) ?? 'sun');
     let url: string | null = null;
     for (let k = 0; k < 2 && !url; k++) {
       try {
@@ -1056,11 +1051,11 @@ export class LookService {
         this.log.warn(`bati generation failed (${k + 1}): ${String(e)}`);
       }
     }
+    // client 2026-11-27: the painter failed twice — a neutral food character in the new style stands in (never one of the
+    // old animal bodies), nothing is charged, and the member may have the real picture painted later (retryBirth)
     let stand = false;
-    if (!url && body) {
-      const png = await cutoutKey(body.grey, 768, BATI_GREY)
-        .then((r) => r.png)
-        .catch(() => null);
+    if (!url) {
+      const png = await batiStandIn().catch(() => null);
       if (png) url = (await this.media.storeImage(userId, 'bati', 'image/png', png, origin)).url;
       stand = !!url;
     }
@@ -1075,8 +1070,7 @@ export class LookService {
     // the picture it is born with is kept on its record (the reference for every later painting, M-R215)
     const list = (cur.batisJson ?? []).map((r) => (r.id === cur.batiId && !stand ? { ...r, imageUrl: url, bornImageUrl: r.bornImageUrl ?? url } : r));
     const [nu] = await this.db.write.update(users).set({ batiImageUrl: url, onboardingJson: j, batisJson: list, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
-    // the plain body is only a stand-in: painted again in the background
-    if (stand) await this.queue.enqueue('bati.repaint', { userId, origin }, { dedupeKey: `bati-repaint-${userId}` }).catch(() => undefined);
+    if (!stand) await this.chargeBirth(userId, nu);
     return nu;
   }
 
@@ -1089,8 +1083,58 @@ export class LookService {
     const key: KeyName = 'blue';
     const style = await batiStyle().catch(() => null);
     const img = await this.birth.generate(batiCharacterPrompt(u.batiFood ?? '', paintKind(activeBati(u)?.seedKind), KEY_WORDS[key], !!style), variant, style ? [style] : []);
-    const png = await this.cut(img, 768, key);
-    return (png ? await this.media.storeImage(userId, 'bati', 'image/png', png, origin) : await this.media.storeImage(userId, 'bati', img.mime, img.data, origin)).url;
+    // the shared checked cut-out; a picture no try cut cleanly is never shown (the caller paints again, then the stand-in)
+    const cut = await this.cutOrNothing(img, 768, key, `bati birth of ${userId}`);
+    if (!cut.png) throw new Error(`cut-out failed (${cut.record})`);
+    return (await this.media.storeImage(userId, 'bati', 'image/png', cut.png, origin)).url;
+  }
+
+  /**
+   * client 2026-11-27: the birth picture's mana from the gem — taken once the real picture is there (never for the
+   * stand-in), one charge per {bati} (the same key never takes twice); a balance short of it never stops the story (the
+   * rest waits with the tenths). Only the first {bati} (day 2): the grown eggs' births are not charged.
+   */
+  private async chargeBirth(userId: string, u: typeof users.$inferSelect) {
+    const r = activeBati(u);
+    if (!r || paintKind(r.seedKind) !== 'food') return;
+    try {
+      await this.ledger.chargeWhole(this.db, userId, 'batiBirth', `make:batiBirth:${r.id}`, r.id);
+    } catch (e) {
+      this.log.warn(`bati birth charge failed: ${String(e)}`);
+    }
+  }
+
+  /**
+   * client 2026-11-27: the stand-in {bati} (the painter failed twice at the birth, nothing was charged) gets its real
+   * birth picture when the member asks — the normal price, taken first (402 NO_MANA stops it) and given back when the
+   * painter fails again. Its expressions are made again from the new picture.
+   */
+  async retryBirth(userId: string, origin: string): Promise<Me> {
+    const u = await this.user(userId);
+    const j0 = (u.onboardingJson ?? {}) as Record<string, string>;
+    if (!u.batiFood || !j0['bati.stand']) throw apiError(HttpStatus.CONFLICT, 'NO_STAND_IN', 'This Bati has its own picture');
+    const first = paintKind(activeBati(u)?.seedKind) === 'food';
+    const fee = first ? await this.ledger.charge(this.db, userId, 'batiBirth') : { refund: async () => undefined };
+    let url: string | null = null;
+    for (let k = 0; k < 2 && !url; k++) {
+      try {
+        url = await this.paintBorn(userId, u, origin, 7 + k);
+      } catch (e) {
+        this.log.warn(`bati birth retry failed (${k + 1}): ${String(e)}`);
+      }
+    }
+    if (!url) {
+      await fee.refund();
+      throw apiError(HttpStatus.BAD_GATEWAY, 'BIRTH_RETRY_FAILED', 'うまく描けなかった……もういちど');
+    }
+    const cur = await this.user(userId);
+    const j = { ...((cur.onboardingJson ?? {}) as Record<string, string>) };
+    delete j['bati.stand'];
+    delete j['bati.faces'];
+    const list = (cur.batisJson ?? []).map((r) => (r.id === cur.batiId ? { ...r, imageUrl: url, bornImageUrl: url } : r));
+    const [nu] = await this.db.write.update(users).set({ batiImageUrl: url, onboardingJson: j, batisJson: list, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
+    await this.queue.enqueue('bati.faces', { userId, origin }, { dedupeKey: `bati-faces-${userId}-${url}` }).catch(() => undefined);
+    return toMe(nu);
   }
 
   /** the stand-in body replaced by the real picture (a few tries, a minute apart); the faces are made again from it */

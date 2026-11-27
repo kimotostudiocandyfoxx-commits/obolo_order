@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { BatiLook } from '@/components/bati/BatiLook';
-import { LOOK_LOCKED_LINE } from '@obolo/shared';
+import { isActiveMember, LOOK_LOCKED_LINE } from '@obolo/shared';
+import { LookStepsPanel } from '@/components/look/LookSteps';
 import { batiLine, batiLineVoiceOf } from '@/lib/onboarding/batiLine';
 
 /**
@@ -59,9 +60,89 @@ export function RoomIcon({ id, className = 'h-[18px] w-[18px]' }: { id: 'dress' 
 }
 
 export function RoomSheet({ mode, onClose, onDone, name }: { mode: RoomMode; onClose: () => void; onDone: (line: string) => void; /** the name {bati} calls you (the story's {neo} when no account: the review page) */ name?: string }) {
-  // M-R223: {bati}'s look is the four cards in four touches (components/bati/BatiLook), as in the story
-  if (mode === 'bati') return <BatiLookSheet onClose={onClose} onDone={onDone} />;
+  const { me } = useAuth();
+  // client 2026-11-27: an Obolo Order member changes {bati} (進化) and their own look (変身) step by step — the same round
+  // as day 2 (shared lookSteps.ts): each step from the look it has now, 8 a round, the mana per step
+  if (me && isActiveMember(me)) return <StepsRoom mode={mode} onClose={onClose} onDone={onDone} />;
+  // a resident: the looks decided on day 2 stay as they are until Obolo Order — {bati} says so. (No account — the review
+  // page — keeps the four cards of the story.)
+  if (mode === 'bati') return me ? <LockedSheet onClose={onClose} /> : <BatiLookSheet onClose={onClose} onDone={onDone} />;
   return <MeSheet onClose={onClose} onDone={onDone} name={name} />;
+}
+
+/** PLACEHOLDER (story chat): {bati}'s words when a resident asks to change {bati}'s look after day 2 ({self}: its 一人称) */
+export const BATI_LOOK_LOCKED_LINE = '{self}の姿は、もう決まったよ。Obolo Orderに入ったら、また進化できるからね！';
+
+function LockedSheet({ onClose }: { onClose: () => void }) {
+  const { me } = useAuth();
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60" onClick={onClose}>
+      <div className="card w-full max-w-xl rounded-b-none px-4 pb-[calc(20px+env(safe-area-inset-bottom))] pt-4" onClick={(e) => e.stopPropagation()}>
+        {me?.bati?.imageUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={me.bati.imageUrl} alt="" className="mx-auto h-40 w-40 object-contain" />
+        )}
+        <p className="mx-auto mt-3 max-w-[22rem] rounded-2xl bg-white/10 px-4 py-2.5 text-center text-[14px] leading-relaxed">{batiLine(BATI_LOOK_LOCKED_LINE, batiLineVoiceOf(me?.bati))}</p>
+        <button className="btn btn-ghost mt-3 h-11 w-full" onClick={onClose}>
+          とじる
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/** an Obolo Order member's round: opened from the look worn now (POST /me/look/steps/open), then the day-2 panel */
+function StepsRoom({ mode, onClose, onDone }: { mode: RoomMode; onClose: () => void; onDone: (line: string) => void }) {
+  const { me, setMe } = useAuth();
+  const who = mode === 'bati' ? ('bati' as const) : ('self' as const);
+  const [ready, setReady] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  useEffect(() => {
+    let live = true;
+    getApi()
+      .lookStepOpen(who)
+      .then(() => live && setReady(true))
+      .catch((e) => live && setErr(e instanceof ApiError && e.code === 'LOOK_LOCKED' ? e.message : LINES.failed));
+    return () => {
+      live = false;
+    };
+  }, [who]);
+  const bati = me?.bati?.name || 'バティ';
+  return (
+    <div className="fixed inset-0 z-50 bg-[#05060f]">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/onboarding/s/d2-moon-in.jpg" alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover opacity-60" />
+      {ready ? (
+        <LookStepsPanel
+          who={who}
+          counter={who === 'bati' ? '進化' : '変身'}
+          ok={who === 'bati' ? `${bati}の姿はこれだ` : 'この姿にする'}
+          more={who === 'bati' ? '進化させる' : '変身させる'}
+          example={who === 'bati' ? '翼を生やして' : '髪を銀色にして'}
+          limit={{ name: bati, text: batiLine(LINES.limit, batiLineVoiceOf(me?.bati)), face: me?.bati?.imageUrl ?? undefined }}
+          image={who === 'bati' ? me?.bati?.imageUrl : me?.avatarUrl}
+          egg={who === 'bati' ? me?.bati?.egg : undefined}
+          noImage={me?.mediaOk === false}
+          fixNote
+          onDone={({ used }) => {
+            void getApi()
+              .me()
+              .then((u) => u && setMe(u))
+              .catch(() => undefined);
+            if (used > 0) onDone(LINES[mode].done);
+            onClose();
+          }}
+        />
+      ) : (
+        <p className="absolute inset-x-6 top-[42svh] text-center text-sm leading-relaxed text-amber-100/80">{err ?? '……'}</p>
+      )}
+      <button className="pt-safe absolute right-3 top-3 z-30 grid h-10 w-10 place-items-center rounded-full bg-black/40 text-white/70" onClick={onClose} aria-label="閉じる">
+        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" aria-hidden>
+          <path d="M6 6l12 12M18 6 6 18" />
+        </svg>
+      </button>
+    </div>
+  );
 }
 
 function BatiLookSheet({ onClose, onDone }: { onClose: () => void; onDone: (line: string) => void }) {

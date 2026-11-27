@@ -2625,14 +2625,8 @@ export class DemoApi implements Api {
 
   // M-R215 / M-R217: the personality by the rules alone (no model), the card, the small egg
   async batiEgg(food: string, egg?: BatiEggKind) {
-    // M-R334: the food's name only is kept (the rules; the API asks its model); the birth picture's mana from the gem
-    const me = this.patchMe((u) => demoBatiEgg(u, foodNameByRules(food), egg ?? 'sun'));
-    try {
-      this.charge('batiBirth');
-    } catch {
-      /* a balance short of it never stops the story */
-    }
-    return me;
+    // M-R334: the food's name only is kept (the rules; the API asks its model)
+    return this.patchMe((u) => demoBatiEgg(u, foodNameByRules(food), egg ?? 'sun'));
   }
 
   // --- client 2026-11-27 (story M-R334): the look changed step by step, like the API (LookStepsService), in this browser
@@ -2719,8 +2713,22 @@ export class DemoApi implements Api {
     return { who, steps: lookStepView(next, this.wornOf(who)), mana: 0 };
   }
 
+  async batiBirthRetry() {
+    // the demo's {bati} is never a stand-in
+    return this.s.users[this.uid()];
+  }
+
   async batiHatch() {
     await new Promise((r) => setTimeout(r, 2500));
+    // client 2026-11-27: the birth picture's mana from the gem, once the picture is there (a short balance never stops the story)
+    const first = this.s.users[this.uid()];
+    if (first.bati && !first.bati.imageUrl && (first.batis ?? []).length <= 1) {
+      try {
+        this.charge('batiBirth');
+      } catch {
+        /* never stops the story */
+      }
+    }
     this.patchMe((u) => (u.bati ? { bati: { ...u.bati, imageUrl: u.bati.imageUrl ?? demoBati(u.bati.food) } } : {}));
     return this.patchMe(demoBatiSync);
   }
