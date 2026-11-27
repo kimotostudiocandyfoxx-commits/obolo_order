@@ -1,6 +1,6 @@
 'use client';
 
-import { ruleBeats, talkChunks, talkPlain, talkRuns, talkSentences, type TalkMark, type TalkIn, type TalkShape, type MarkedKind, type TalkBeat, type TalkFace, type TalkLook, type TalkMotion, VOICE_VERSION_WORDS } from '@obolo/shared';
+import { ruleBeats, talkChunks, talkPlain, talkRuns, talkSentences, type TalkMark, type TalkIn, type TalkShape, type MarkedKind, type TalkBeat, type TalkFace, type TalkLook, type TalkMotion } from '@obolo/shared';
 import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Figure, TALK_CSS, type FigureState } from './Figure';
 import { AppThreads, HereThreads, type TalkThread } from './TalkThreads';
@@ -94,11 +94,6 @@ export type TalkItem = {
   voiceMs?: number;
   /** a voice message: a play button in the bubble (the speaker's mouth moves while it plays) */
   voice?: { url: string | null; seconds: number | null; /** client 2026-11-27: the voice alone, when `url` has a quiet sound mixed in (〔おとをけす〕) */ plainUrl?: string | null };
-  /**
-   * client 2026-11-27 (after trying it): YOUR OWN voice message in a ダチ talk — it is not played back to its sender. No
-   * play control: the caption as the bubble's words, and a small quiet mark that a voice was sent (its length).
-   */
-  voiceSent?: { seconds: number | null };
   chips?: { label: string; onPick: () => void; disabled?: boolean }[];
   /** under the words: the pages looked up, a map, a note */
   extra?: ReactNode;
@@ -625,7 +620,7 @@ export function TalkScene({
   // before the first play starts (the very first paint), already only up to the line it starts from
   const pending = !seen.current && !loading && unreadFrom != null && unreadFrom >= 0 && unreadFrom < items.length ? Math.max(0, unreadFrom - 1) : null;
   const upTo = cursor ?? pending;
-  const said = (it: TalkItem) => !!(it.text || it.card || it.voice || it.voiceSent || it.chips?.length || it.extra || it.relics?.length);
+  const said = (it: TalkItem) => !!(it.text || it.card || it.voice || it.chips?.length || it.extra || it.relics?.length);
   const visible = (upTo == null ? items : items.slice(0, upTo + 1)).filter(said);
   // M-R244: a long utterance is shown as several bubbles in a row (the words unchanged; the cuts from the same call as
   // the faces, else every ~60 characters at a sentence end); while it is said, its bubbles come one by one
@@ -756,7 +751,7 @@ export function TalkScene({
   const pastRows: SpiralRow[] = drawer
     ? visible.map((it, k) => {
         const t = toneFor(byId.get(it.who));
-        return { id: it.id, at: new Date(Date.now() - (visible.length - k) * 60_000).toISOString(), color: t.line, title: talkPlain(it.text) || (it.voice || it.voiceSent ? '♪ 声' : (it.card?.label ?? it.relicLabel ?? '')), sub: it.name ?? byId.get(it.who)?.name };
+        return { id: it.id, at: new Date(Date.now() - (visible.length - k) * 60_000).toISOString(), color: t.line, title: talkPlain(it.text) || (it.voice ? '♪ 声' : (it.card?.label ?? it.relicLabel ?? '')), sub: it.name ?? byId.get(it.who)?.name };
       })
     : [];
   // <html data-sidetalk>: you stand in the row here (NeoSpeaking's big figure from below stays away)
@@ -1435,7 +1430,7 @@ export function TalkScene({
             const it = u.item;
             const who = byId.get(it.who);
             const live = speech?.id === it.id && outNow != null;
-            const view: TalkItem = { ...it, text: u.text, ...(u.first ? {} : { name: undefined }), ...(u.last ? {} : { card: undefined, chips: undefined, extra: undefined, mark: undefined, voice: undefined, voiceSent: undefined, relics: undefined }) };
+            const view: TalkItem = { ...it, text: u.text, ...(u.first ? {} : { name: undefined }), ...(u.last ? {} : { card: undefined, chips: undefined, extra: undefined, mark: undefined, voice: undefined, relics: undefined }) };
             return (
               <Bubble
                 item={view}
@@ -1468,7 +1463,7 @@ export function TalkScene({
           const who = byId.get(it.who);
           const live = speech?.id === it.id && outNow != null;
           // one utterance: its name over the first bubble, its card, choices, ★ on the last
-          const view: TalkItem = { ...it, text: u.text, ...(u.first ? {} : { name: undefined }), ...(u.last ? {} : { card: undefined, chips: undefined, extra: undefined, mark: undefined, voice: undefined, voiceSent: undefined, relics: undefined }) };
+          const view: TalkItem = { ...it, text: u.text, ...(u.first ? {} : { name: undefined }), ...(u.last ? {} : { card: undefined, chips: undefined, extra: undefined, mark: undefined, voice: undefined, relics: undefined }) };
           return (
             <Bubble
               key={u.key}
@@ -1761,7 +1756,7 @@ function Bubble({
   );
   // R12: only relics (a file, a work, a lone URL): no bubble, they float on the sender's side
   const relics = item.relics?.length ? <RelicCluster mine={mine} fan={item.relicFan}>{item.relics}</RelicCluster> : null;
-  if (relics && !item.text && !item.voice && !item.voiceSent && !item.card && !item.extra && !item.chips?.length && !clamp) {
+  if (relics && !item.text && !item.voice && !item.card && !item.extra && !item.chips?.length && !clamp) {
     return (
       <div className={`${passive ? 'pointer-events-none' : 'pointer-events-auto'} relative flex max-w-full flex-col ${mine ? 'items-end self-end' : center ? 'items-center self-center' : 'items-start self-start'}`} data-relic-line>
         {named && (
@@ -1806,14 +1801,6 @@ function Bubble({
               <Marked text={item.text} upto={shown} />
               {shown != null && <i className="ml-0.5 inline-block h-[1em] w-[6px] rounded-[2px] align-[-2px] opacity-50" style={{ background: 'currentColor', animation: 'talk-caret .8s steps(2) infinite' }} />}
               {item.live && <i className="ml-0.5 inline-block h-[1em] w-[6px] rounded-[2px] align-[-2px] opacity-50" style={{ background: 'currentColor', animation: 'talk-caret .8s steps(2) infinite' }} />}
-            </p>
-          )}
-          {item.voiceSent && (
-            // your own voice: sent, not played back — a quiet mark, no control
-            <p className={`flex items-center gap-1 text-[10.5px] font-medium opacity-55 ${item.text ? 'mt-1' : ''}`} data-testid="voice-sent-mark">
-              <span aria-hidden>🎙</span>
-              {VOICE_VERSION_WORDS.sent}
-              {item.voiceSent.seconds != null && <span>・{Math.max(1, Math.round(item.voiceSent.seconds))}秒</span>}
             </p>
           )}
           {item.card && !clamp && (

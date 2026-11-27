@@ -219,24 +219,24 @@ describe('sending words with 〔こえをつける〕', () => {
     expect(await thrown.s.send(U, B, { text: 'うん', spoken: true })).toMatchObject({ kind: 'text', cute: { miss: 'failed' } });
   });
 
-  it('the default cute voice is not the member’s own voice: a member who is not recorded hears their message as before', async () => {
+  it('a member who is not recorded hears their own message in the cute voice', async () => {
     const w = talk({ speak: async () => made });
     const mine = await w.s.send(U, B, { text: 'やったー！', spoken: true });
     expect(mine).toMatchObject({ fromMe: true, audioUrl: 'https://r2/mix-ureshii.mp3' });
-    expect(mine.sentVoice).toBeUndefined();
+    expect(mine).not.toHaveProperty('sentVoice');
   });
 
-  it('「きれい」: sent as a voice message the SENDER does not hear; the sound chosen rides along; the 「そのまま」 draft of the same take goes', async () => {
+  it('「きれい」: sent as a voice message both sides play (the sender hears it only now, after the send); the sound chosen rides along; the 「そのまま」 draft of the same take goes', async () => {
     const asked: unknown[] = [];
     const w = talk({ speak: async (_u, t, _o, chosen) => (asked.push([t, chosen]), { ...made, tts: 'clean' }) });
     const drop = 'd1111111-1111-4111-8111-111111111111';
     const mine = await w.s.send(U, B, { text: 'あした、あそぼう', spoken: true, sound: 'ureshii', soft: true, drop });
     expect(asked).toEqual([['あした、あそぼう', { sound: 'ureshii', soft: true }]]);
     expect(w.rows[0]).toMatchObject({ kind: 'voice', audioMediaId: 'mix0', workJson: { text: 'あした、あそぼう', tts: 'clean' } });
-    // the sender: the words, the mana, a mark that a voice went — no audio
-    expect(mine).toMatchObject({ kind: 'voice', fromMe: true, audioUrl: null, sentVoice: true, text: 'あした、あそぼう', cute: { mana: 0.2 } });
-    expect(mine.sound).toBeUndefined();
-    // the receiver hears it
+    // the sender: the words, the mana, and the voice to play
+    expect(mine).toMatchObject({ kind: 'voice', fromMe: true, audioUrl: 'https://r2/mix-ureshii.mp3', sound: { plainUrl: 'https://r2/cute-0.mp3' }, text: 'あした、あそぼう', cute: { mana: 0.2 } });
+    expect(mine).not.toHaveProperty('sentVoice');
+    // the receiver hears the same
     expect(w.s.toView(B, w.rows[0] as never)).toMatchObject({ audioUrl: 'https://r2/mix-ureshii.mp3', sound: { plainUrl: 'https://r2/cute-0.mp3' } });
     expect(w.dropped).toEqual([drop]);
     // with no mana the words go alone with the calm line — and the recording's draft is still not kept

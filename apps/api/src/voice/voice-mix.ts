@@ -1,7 +1,9 @@
 import { spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import { mkdtemp, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
+import { Logger } from '@nestjs/common';
 import { semitoneRatio, VOICE_SOUND_PARTS, VOICE_TUNE_DEFAULT, type VoiceMood, type VoiceSoundPick, type VoiceTune } from '@obolo/shared';
 
 /**
@@ -9,7 +11,9 @@ import { semitoneRatio, VOICE_SOUND_PARTS, VOICE_TUNE_DEFAULT, type VoiceMood, t
  * ready on our own machine (no paid model):
  *
  *  1. cleanVoice — sample K, the default the client chose by ear (the member's own settings change it: voiceTune.ts):
- *       a. clean      ffmpeg: rumble out (100 Hz), a strong noise removal that follows the noise, a gate
+ *       a. clean      ffmpeg, the client's "sample 3" (2026-11-27, late): at 48 kHz mono, rumble out (100 Hz), RNNoise
+ *                     (arnndn with assets/voice-clean/std.rnnn), a light noise removal that follows the noise, a gate.
+ *                     Without the model file or the arnndn filter: the chain of before (CLEAN_FFT) — never a failure.
  *       b. the cut    ffmpeg silenceremove: the silence before the first word goes, a pause longer than 0.28 s
  *                     becomes 0.14 s (SILENCE_CUT; 「間をつめる」)
  *       c. autotune   assets/voice-tune/autotune.py (python3 + praat-parselmouth): every pitch point pulled toward
@@ -18,9 +22,10 @@ import { semitoneRatio, VOICE_SOUND_PARTS, VOICE_TUNE_DEFAULT, type VoiceMood, t
  *       d. the shape  ffmpeg rubberband: 1.8× faster and +2 semitones (formants not kept: the approved sound; the key
  *                     was +6 until the client tried it), then one loudness (−16 LUFS). Without the rubberband filter: asetrate + atempo (the same speed and
  *                     pitch, a rougher sound).
- *     The words are heard from (a) — clean, uncut, at the speed and pitch it was said in (`heard`), so the caption
- *     does not depend on the settings. heardVoice is (a) alone, for the 「きれい」 version (shared voiceVersion.ts):
- *     the take is heard as words and nothing of it is kept.
+ *     The words are heard from the take cleaned the way of before (CLEAN_FFT: no RNNoise — what the speech model has
+ *     been given since the start, so the new clean-up cannot change the captions), uncut, at the speed and pitch it
+ *     was said in (`heard`): the caption does not depend on the settings. heardVoice is that alone, for the 「きれい」
+ *     version (shared voiceVersion.ts): the take is heard as words and nothing of it is kept.
  *  2. mixVoice — a small sound that fits the words, far under the voice, pushed down further while the voice sounds
  *     (a side-chain compressor keyed by the voice), a short lead-in, a 1.5 s fade at the end.
  *
@@ -28,6 +33,8 @@ import { semitoneRatio, VOICE_SOUND_PARTS, VOICE_TUNE_DEFAULT, type VoiceMood, t
  * pure functions (tested without running ffmpeg); the sounds are apps/api/assets/voice-sounds (made once by
  * scripts/make-voice-sounds.mjs).
  */
+
+const log = new Logger('VoiceMix');
 
 /** MP3, mono, constant bit rate: the length of a file is its bytes (mp3Seconds) */
 export const MIX_KBPS = 96;
@@ -60,13 +67,31 @@ const n = (v: number, d = 3) => String(Math.round(v * 10 ** d) / 10 ** d);
 /** the length of a constant-bit-rate MP3 from its size */
 export const mp3Seconds = (bytes: number, kbps: number = MIX_KBPS): number => Math.round(((bytes * 8) / (kbps * 1000)) * 100) / 100;
 
-/** a. the clean-up (sample K): the rumble cut (Hz), the noise removal (dB taken away, the floor, tracking on), the gate */
+/**
+ * a. the clean-up — "sample 3", approved by the client's ear on 2026-11-27 (late): the rumble cut (Hz), RNNoise at
+ * 48 kHz (the rate it was trained at) with all of its output (`rnnMix`), then a light noise removal that follows the
+ * noise (dB taken away, the floor) and a gate.
+ */
 export const CLEAN = {
+  highpassHz: 100,
+  rnnRate: 48000,
+  rnnMix: 1,
+  denoiseDb: 12,
+  noiseFloorDb: -50,
+  gate: { threshold: 0.008, ratio: 3, attackMs: 8, releaseMs: 200 },
+} as const;
+/**
+ * the clean-up of before (sample K's): a strong noise removal and a gate, no RNNoise. Still used (1) when the model
+ * file is missing or this ffmpeg has no arnndn filter, and (2) for the file the words are heard from.
+ */
+export const CLEAN_FFT = {
   highpassHz: 100,
   denoiseDb: 24,
   noiseFloorDb: -45,
   gate: { threshold: 0.012, ratio: 2, attackMs: 10, releaseMs: 250 },
 } as const;
+/** RNNoise's model (src/voice or dist/voice → apps/api/assets/voice-clean/std.rnnn; its README says where it is from) */
+export const CLEAN_MODEL = resolve(__dirname, '../../assets/voice-clean/std.rnnn');
 /**
  * b. 「間をつめる」 (the client may still tune it or drop it: `on` is the default for a member who has not chosen).
  * Below `thresholdDb` is silence: all of it before the first word but `startKeepSec`; a pause longer than
@@ -80,9 +105,25 @@ export const MIN_VOICE_SEC = 0.3;
 /** the cut and the autotune work on plain PCM (mono, 16 bit) */
 const WAV_BYTES_PER_SEC = MIX_RATE * 2;
 
-export function cleanFilter(): string {
-  const g = CLEAN.gate;
-  return [`highpass=f=${CLEAN.highpassHz}`, `afftdn=nr=${CLEAN.denoiseDb}:nf=${CLEAN.noiseFloorDb}:tn=1`, `agate=threshold=${g.threshold}:ratio=${g.ratio}:attack=${g.attackMs}:release=${g.releaseMs}`].join(',');
+/**
+ * A file's path as the value of a filter's option inside a filter graph. Two rounds of escaping (ffmpeg-filters,
+ * "Notes on filtergraph escaping"): for the option's value ':' and '\\' (and a quote), then for the graph every
+ * character that means something there (\ ' , ; [ ]). The arguments go to ffmpeg without a shell: no third round.
+ */
+export function filterPath(path: string): string {
+  return path.replace(/[\\:']/g, '\\$&').replace(/[\\',;[\]]/g, '\\$&');
+}
+const gateFilter = (g: { threshold: number; ratio: number; attackMs: number; releaseMs: number }) => `agate=threshold=${g.threshold}:ratio=${g.ratio}:attack=${g.attackMs}:release=${g.releaseMs}`;
+/** the clean-up of before (no model) */
+export function fftCleanFilter(): string {
+  const c = CLEAN_FFT;
+  return [`highpass=f=${c.highpassHz}`, `afftdn=nr=${c.denoiseDb}:nf=${c.noiseFloorDb}:tn=1`, gateFilter(c.gate)].join(',');
+}
+/** a. `model`: RNNoise's model file — the approved chain, at 48 kHz mono; null: the clean-up of before */
+export function cleanFilter(model: string | null = CLEAN_MODEL): string {
+  if (!model) return fftCleanFilter();
+  const c = CLEAN;
+  return [`aresample=${c.rnnRate}`, 'aformat=channel_layouts=mono', `highpass=f=${c.highpassHz}`, `arnndn=m=${filterPath(model)}:mix=${c.rnnMix}`, `afftdn=nr=${c.denoiseDb}:nf=${c.noiseFloorDb}:tn=1`, gateFilter(c.gate)].join(',');
 }
 export function cutFilter(): string {
   const c = SILENCE_CUT;
@@ -114,15 +155,22 @@ const IN_ARGS = ['-hide_banner', '-loglevel', 'error', '-y'];
 
 /**
  * ffmpeg's arguments for a + b: the recording at `src` → `heard` (clean and whole: an MP3 for the words) and `voice`
- * (the same, the silences cut when `cut`: a WAV for the next steps)
+ * (clean, the silences cut when `cut`: a WAV for the next steps). With `model` the voice is cleaned by the approved
+ * chain and the words' file by the one of before (two branches of one run); with null both are the one of before.
  */
-export function prepareArgs(src: string, heard: string, voice: string, cut: boolean = SILENCE_CUT.on): string[] {
-  const graph = `[0:a]${cleanFilter()},aresample=${MIX_RATE},aformat=sample_fmts=s16:channel_layouts=mono,asplit=2[h][v0];[v0]${cut ? cutFilter() : 'anull'}[v]`;
+export function prepareArgs(src: string, heard: string, voice: string, cut: boolean = SILENCE_CUT.on, model: string | null = CLEAN_MODEL): string[] {
+  const pcm = `aresample=${MIX_RATE},aformat=sample_fmts=s16:channel_layouts=mono`;
+  const cutNow = cut ? cutFilter() : 'anull';
+  const graph = model
+    ? `[0:a]asplit=2[a][b];[a]${fftCleanFilter()},${pcm}[h];[b]${cleanFilter(model)},${pcm},${cutNow}[v]`
+    : `[0:a]${fftCleanFilter()},${pcm},asplit=2[h][v0];[v0]${cutNow}[v]`;
   return [...IN_ARGS, '-t', String(MIX_MAX_INPUT_SEC), '-i', src, '-filter_complex', graph, '-map', '[h]', '-b:a', `${MIX_KBPS}k`, '-map_metadata', '-1', '-f', 'mp3', heard, '-map', '[v]', '-c:a', 'pcm_s16le', '-f', 'wav', voice];
 }
-/** ffmpeg's arguments for a alone: the recording at `src` → clean and whole (MP3 on stdout), to be heard as words */
+/**
+ * ffmpeg's arguments for the words alone: the recording at `src` → clean (the way of before) and whole (MP3 on stdout)
+ */
 export function hearArgs(src: string): string[] {
-  return [...IN_ARGS, '-t', String(MIX_MAX_INPUT_SEC), '-i', src, '-af', `${cleanFilter()},aresample=${MIX_RATE}`, ...OUT_ARGS];
+  return [...IN_ARGS, '-t', String(MIX_MAX_INPUT_SEC), '-i', src, '-af', `${fftCleanFilter()},aresample=${MIX_RATE}`, ...OUT_ARGS];
 }
 /** ffmpeg's arguments for d: the WAV at `src` → the voice as it is sent (MP3 on stdout) */
 export function shapeArgs(src: string, tune: Pick<VoiceTune, 'key' | 'speed'>, rubberband = true): string[] {
@@ -184,6 +232,33 @@ export function mixArgs(voice: string, dir: string, plan: MixPlan): string[] {
 
 /** where the committed library is (src/voice or dist/voice → apps/api/assets/voice-sounds) */
 export const VOICE_SOUNDS_DIR = resolve(__dirname, '../../assets/voice-sounds');
+
+/**
+ * Can the approved clean-up run here: the model file is there and this ffmpeg has the arnndn filter. Looked at once
+ * (the first take), said once in the log when it cannot. `null`: the clean-up of before.
+ */
+export function rnnModel(model: string = CLEAN_MODEL, filters: () => Promise<string> = ffmpegFilters): Promise<string | null> {
+  if (!existsSync(model)) return Promise.resolve(null);
+  return filters().then(
+    (list) => (/^\s*\S+\s+arnndn\s/m.test(list) ? model : null),
+    () => null,
+  );
+}
+function ffmpegFilters(): Promise<string> {
+  return new Promise<string>((ok, no) => {
+    const p = spawn('ffmpeg', ['-hide_banner', '-filters']);
+    let out = '';
+    p.stdout.on('data', (d: Buffer) => (out += d.toString()));
+    p.on('error', no);
+    p.on('close', (code) => (code === 0 ? ok(out) : no(new Error(`ffmpeg ${code}`))));
+  });
+}
+let modelHere: Promise<string | null> | undefined;
+const cleanModel = (): Promise<string | null> =>
+  (modelHere ??= rnnModel().then((m) => {
+    if (!m) log.warn(`the RNNoise clean-up cannot run here (${existsSync(CLEAN_MODEL) ? 'this ffmpeg has no arnndn filter' : `no model at ${CLEAN_MODEL}`}): voice messages are cleaned the way of before`);
+    return m;
+  }));
 
 function run(args: string[], stdout = true): Promise<Buffer> {
   return new Promise<Buffer>((ok, no) => {
@@ -247,13 +322,19 @@ export interface CleanVoice {
   seconds: number;
   /** the take clean and whole — uncut, at the speed and pitch it was said in (MP3): what the words are heard from */
   heard: Buffer;
-  /** how it was made: whether the autotune ran (false: off, failed or late) and which filter changed the speed and key */
-  made: { autotune: boolean; shape: 'rubberband' | 'atempo' };
+  /**
+   * how it was made: the clean-up ('rnn': the approved chain; 'fft': the one of before — no model, no arnndn filter, or
+   * the approved one failed on this take), whether the autotune ran (false: off, failed or late) and which filter
+   * changed the speed and key
+   */
+  made: { clean: 'rnn' | 'fft'; autotune: boolean; shape: 'rubberband' | 'atempo' };
 }
 export interface CleanOptions {
   /** config VOICE_TUNE_PYTHON / VOICE_TUNE_TIMEOUT_MS */
   python?: string;
   timeoutMs?: number;
+  /** RNNoise's model file (left out: the committed one, when it can run here); null: the clean-up of before */
+  model?: string | null;
 }
 
 /** a recording (webm / mp4 … from the browser) → the voice in these settings */
@@ -261,7 +342,16 @@ export async function cleanVoice(input: Buffer, tune: VoiceTune = VOICE_TUNE_DEF
   return withFile(input, async (src, dir) => {
     const heardFile = join(dir, 'heard.mp3');
     const voice = join(dir, 'voice.wav');
-    await run(prepareArgs(src, heardFile, voice, tune.cut), false);
+    const model = o.model === undefined ? await cleanModel() : o.model;
+    let clean: CleanVoice['made']['clean'] = model ? 'rnn' : 'fft';
+    await run(prepareArgs(src, heardFile, voice, tune.cut, model), false).catch((e: unknown) => {
+      if (!model) throw e;
+      // the approved clean-up failed on this take (a model that cannot be read, a filter that is not there after
+      // all): the one of before — a message is never lost for its clean-up. A take nothing can read fails again.
+      log.warn(`the RNNoise clean-up failed, cleaning the way of before: ${String(e).slice(0, 200)}`);
+      clean = 'fft';
+      return run(prepareArgs(src, heardFile, voice, tune.cut, null), false);
+    });
     const left = Math.max(0, ((await stat(voice)).size - 44) / WAV_BYTES_PER_SEC);
     if (left < MIN_VOICE_SEC) throw new NoVoiceError(Math.round(left * 100) / 100);
     const tuned = join(dir, 'tuned.wav');
@@ -275,11 +365,11 @@ export async function cleanVoice(input: Buffer, tune: VoiceTune = VOICE_TUNE_DEF
     });
     // a tenth of a second is about 1.2 kB; less is no sound at all
     if (mp3.length < 1000) throw new Error(`ffmpeg made no sound (${mp3.length} bytes)`);
-    return { mp3, seconds: mp3Seconds(mp3.length), heard: await readFile(heardFile), made: { autotune: tunedOk, shape } };
+    return { mp3, seconds: mp3Seconds(mp3.length), heard: await readFile(heardFile), made: { clean, autotune: tunedOk, shape } };
   });
 }
 
-/** a recording → clean and whole (MP3), only to be heard as words: step a alone, nothing cut or changed */
+/** a recording → clean (the way of before) and whole (MP3), only to be heard as words: nothing cut or changed */
 export async function heardVoice(input: Buffer): Promise<Buffer> {
   const mp3 = await withFile(input, (src) => run(hearArgs(src)));
   if (mp3.length < 1000) throw new Error(`ffmpeg made no sound (${mp3.length} bytes)`);

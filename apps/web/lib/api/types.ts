@@ -4,7 +4,7 @@ import type { IncantBody, IncantView } from '@obolo/shared';
 import type { ArtTitleBody, ArtTitleView } from '@obolo/shared';
 import type { LyricsBody, LyricsView, SongLyrics, SongTweakBody, SongTweakResult, SongVoiceBody, SongVoiceQuoteView, SongVoiceUseView, SongVoiceVersion } from '@obolo/shared';
 import type { BookView, CompassSpell, GameBrokenBody, GameBuildBody, GameView, GoodsMakeBody, GoodsView, MoonCompassBody, NovelChapterBody, SaveSpellBody, SaveSpellResult, SavedSpell } from '@obolo/shared';
-import type { ClipFile, ClipStartBody, ClipUploadStart, ChangeResult, HomeOshi, HomePlanet, PlanetHomeView, AddVersionBody, CreateMoonWorkBody, DemoJobBody, MakeConfirm, MakeKind, SpellBody, SpellKind, SpellTag, SpellView, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiHistoryPage, DachiMessageView, DachiThreadView, DachiVoiceDraft, CuteVoiceInfo, VoiceTuneBody, VoiceTuneView, VoiceVersion, VoiceVersionView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView, MvEditBody, MvPicturesBody, MvRedrawBody } from '@obolo/shared';
+import type { ClipFile, ClipStartBody, ClipUploadStart, ChangeResult, HomeOshi, HomePlanet, PlanetHomeView, AddVersionBody, CreateMoonWorkBody, DemoJobBody, MakeConfirm, MakeKind, SpellBody, SpellKind, SpellTag, SpellView, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiHistoryPage, DachiMessageView, DachiThreadView, DachiVoiceDraft, CuteVoiceInfo, VoiceTuneBody, VoiceTuneView, VoicePreviewBody, VoiceVersion, VoiceVersionView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView, MvEditBody, MvPicturesBody, MvRedrawBody } from '@obolo/shared';
 import type {
   MembersDay,
   BuddyChatResponse,
@@ -344,10 +344,11 @@ export interface Api {
    * client 2026-11-27: a take made ready to send (POST /dachi/voice) in the version the member sends — 「そのまま」: the
    * recording in their voice settings, kept as a draft; 「きれい」: heard as words only, nothing kept (shared
    * voiceVersion.ts). `as`: the other version of the same take (the button on the draft card). Heard as words, a sound
-   * picked from them. `seconds`: the recording's length (the demo has no server to measure it). There is nothing to
-   * listen to: the sender does not hear their own voice.
+   * picked from them. `seconds`: the recording's length (the demo has no server to measure it).
    */
   dachiVoiceDraft(blob: Blob, seconds: number, as?: VoiceVersion): Promise<DachiVoiceDraft>;
+  /** 〔▶ きいてみる〕: the 「そのまま」 draft with the chosen sound (an MP3; nothing is kept). Not for 「きれい」 (no file). */
+  dachiVoicePreview(body: VoicePreviewBody): Promise<Blob>;
   /** the version button: remembered on the server for the next takes */
   setDachiVoiceVersion(version: VoiceVersion): Promise<VoiceVersionView>;
   /** 〔とりなおす〕 / the other version chosen: the draft's file goes */
@@ -359,7 +360,7 @@ export interface Api {
   dachiCuteVoice(): Promise<CuteVoiceInfo>;
   /**
    * client 2026-11-27 (shared voiceTune.ts): the member's own voice settings for their recorded ダチ voice messages —
-   * read and changed (the parts given; `reset` = the default; clamped on the server). Not heard: {bati} says them
+   * read and changed (the parts given; `reset` = the default; clamped on the server). {bati} says them in words; they are heard on the next voice message
    */
   voiceTune(): Promise<VoiceTuneView>;
   setVoiceTune(body: VoiceTuneBody): Promise<VoiceTuneView>;

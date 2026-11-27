@@ -15,7 +15,9 @@ import type { CuteVoiceRate } from './cuteVoice';
  *          on its own words (MakeKind 'cuteVoice', cuteVoiceMana — the small 「−0.3」 beside 〔送る〕), taken before the
  *          voice is made and given back when none came; with no mana the words go alone with one calm line.
  *
- * The SENDER never hears either version (no listening before the send, no play control on their own bubble).
+ * Listening (client 2026-11-27, late: the sender hears their own voice again): 「そのまま」 can be heard on the draft card
+ * before the send (〔▶ きいてみる〕); 「きれい」 cannot — it is the paid voice, made only at the send — and the card says so
+ * in one line (`cleanLater`). After the send both play in the talk, for the sender as for the receiver.
  * A member who is not recorded has no choice to make: their words are read by the cute voice as before (cuteVoice.ts).
  */
 export const VOICE_VERSIONS = ['asis', 'clean'] as const;
@@ -64,6 +66,6 @@ export const VOICE_VERSION_WORDS = {
   noWords: 'ことばが聞きとれなかったよ。ことばを入れるか、「そのまま」で送ってね',
   /** the other version could not be made ready */
   failed: 'いまは、きりかえられなかったみたい',
-  /** the sender's own voice bubble: sent, not played back */
-  sent: '声を送ったよ',
+  /** 「きれい」 has no 〔▶ きいてみる〕: the voice is made (and paid for) at the send, and heard in the talk after it */
+  cleanLater: '送ったあとで、聞けるよ',
 } as const;

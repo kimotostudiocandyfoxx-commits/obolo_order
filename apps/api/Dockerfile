@@ -17,12 +17,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg fonts-no
 # client 2026-11-27 (sample K, src/voice/voice-mix.ts): the light pitch correction of a ダチ voice message is Praat
 # (praat-parselmouth, a wheel: nothing is compiled) run as a subprocess — its own small Python environment.
 # ffmpeg's rubberband filter (the speed and the key) is part of Debian's ffmpeg (the build log says so below); without
-# it the chain uses asetrate + atempo by itself.
+# it the chain uses asetrate + atempo by itself. The clean-up's RNNoise step is ffmpeg's arnndn filter with the model in
+# apps/api/assets/voice-clean (shipped with the other assets); without the filter the chain cleans the way of before.
 RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-venv \
   && python3 -m venv /opt/voice \
   && /opt/voice/bin/pip install --no-cache-dir praat-parselmouth==0.4.7 \
   && /opt/voice/bin/python -c "import parselmouth" \
   && (ffmpeg -hide_banner -filters | grep rubberband || echo "NOTE: this ffmpeg has no rubberband filter - the voice chain uses asetrate + atempo") \
+  && (ffmpeg -hide_banner -filters | grep arnndn || echo "NOTE: this ffmpeg has no arnndn filter - the voice chain cleans without RNNoise") \
   && rm -rf /var/lib/apt/lists/* /root/.cache
 ENV VOICE_TUNE_PYTHON=/opt/voice/bin/python
 WORKDIR /app

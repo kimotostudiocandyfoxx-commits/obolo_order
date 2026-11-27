@@ -7,7 +7,8 @@ import { cuteVoiceMana, CUTE_VOICE_WORDS, formatMana, type CuteVoiceRate, type D
  *  - 「そのまま」: the made-ready recording (its draft's media id), with its caption and its sound.
  *  - 「きれい」: the caption itself — the server reads it as the voice (the member's own voice model, else the cute
  *    voice). The recording is not sent; a 「そのまま」 draft made from the same take is named so that it is thrown away.
- *  - The sender never hears either: their own voice bubble has no play control — the words and a quiet mark.
+ *  - Both sides play a voice message in the talk, the sender too (the client took "the sender does not hear their own
+ *    voice" back the same day, before it was released).
  */
 export type VoiceToSend =
   | { mediaId: string; seconds: number; caption?: string; sound?: VoiceSound; soft?: boolean }
@@ -37,6 +38,12 @@ export function voiceSendBody(v: VoiceToSend): SendDachiMessageBody {
   return { ...v, seconds: Math.max(0.1, Math.round(v.seconds * 10) / 10) };
 }
 
+/**
+ * 〔▶ きいてみる〕 on the draft card: only the 「そのまま」 draft can be heard before the send (its file is there). 「きれい」
+ * is the paid voice, made at the send — nothing is made just to listen; the card says so in one line instead.
+ */
+export const canPreview = (d: DraftNow): d is DraftNow & { mediaId: string } => !!d.mediaId && !(d.ready && d.version === 'clean');
+
 /** the small price beside 〔送る〕 for 「きれい」 (the app's 「−0.3」); null: nothing to read yet */
 export function cleanCost(caption: string, rate: CuteVoiceRate): { text: string; label: string } | null {
   if (!caption.trim()) return null;
@@ -44,13 +51,8 @@ export function cleanCost(caption: string, rate: CuteVoiceRate): { text: string;
   return { text: CUTE_VOICE_WORDS.price(mana), label: CUTE_VOICE_WORDS.priceLabel(mana) };
 }
 
-/**
- * a voice message in the talk: a play control — or, for YOUR OWN voice (the server gives no audio for it: `sentVoice`),
- * only the mark that it was sent. The default cute voice of a member who is not recorded is not their own voice: it
- * plays as before.
- */
-export function voicePartOf(m: Pick<DachiMessageView, 'kind' | 'fromMe' | 'audioUrl' | 'seconds' | 'sound' | 'sentVoice'>): { voice?: { url: string | null; seconds: number | null; plainUrl?: string | null }; voiceSent?: { seconds: number | null } } {
+/** a voice message in the talk: the same play control for the one who sent it and the one who got it */
+export function voicePartOf(m: Pick<DachiMessageView, 'kind' | 'audioUrl' | 'seconds' | 'sound'>): { voice?: { url: string | null; seconds: number | null; plainUrl?: string | null } } {
   if (m.kind !== 'voice') return {};
-  if (m.fromMe && m.sentVoice) return { voiceSent: { seconds: m.seconds } };
   return { voice: { url: m.audioUrl, seconds: m.seconds, plainUrl: m.sound?.plainUrl } };
 }

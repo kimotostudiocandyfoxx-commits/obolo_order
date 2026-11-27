@@ -11,8 +11,9 @@ import { z } from 'zod';
  * sample K; the client, after trying it, made it +2 (the rest of the chain as it was). A member who saved settings of
  * their own keeps them (they are kept whole); 「もとにもどす」 is this default.
  *
- * The SENDER never hears their own voice (client 2026-11-27, after trying it: most people dislike their own recording):
- * there is nothing to listen to here — {bati} says the new settings in words.
+ * There is no trial of the settings here (the "last take" that was kept for one is not kept any more): {bati} says the
+ * new settings in words, and the member hears them on the next voice message they send — on its draft card before
+ * the send, and in the talk after it (client 2026-11-27, late: the sender hears their own voice again).
  *
  * Kept per member in users.onboarding_json['voice.dachi'] (a JSON string; no migration), clamped on the server. They
  * apply to the member's own recorded voice only — never to the default cute voice of a member who is not recorded.
@@ -82,7 +83,8 @@ export interface VoiceTuneView {
 // ───────────────────────────── the words to {bati} ─────────────────────────────
 
 /**
- * what the words mean: the settings asked about, set back, asked to be heard (they cannot be: `listen`), or changed to
+ * what the words mean: the settings asked about, set back, asked to be heard (not here — on the next voice message:
+ * `listen`), or changed to
  * `next` (`what`: the parts that moved)
  */
 export type VoiceTuneTalk = { do: 'open' } | { do: 'limit' } | { do: 'reset' } | { do: 'listen' } | { do: 'set'; next: VoiceTune; what: (keyof VoiceTune)[] } | null;
@@ -104,7 +106,7 @@ const ON = /オン|あり|つけて|かけて|入れて|いれて|ほしい|欲�
 
 /**
  * The words about the voice settings. `inTalk`: the turn before was about them, so short words count too (「もっとゆっくり」
- * 「もとにもどす」; 「きいてみたい」 gets the line that one's own voice is not played back); outside it the words must name the voice (声 / オートチューン / 間をつめる …) — 「もっと
+ * 「もとにもどす」; 「きいてみたい」 gets the line that the settings are heard on the next voice message); outside it the words must name the voice (声 / オートチューン / 間をつめる …) — 「もっと
  * ゆっくり」 alone may be about a song. null: not about the voice settings.
  */
 export function voiceTuneTalk(said: string, now: VoiceTune = VOICE_TUNE_DEFAULT, inTalk = false): VoiceTuneTalk {
@@ -184,8 +186,8 @@ export const VOICE_TUNE_LINES = {
   limit: 'これ以上は、変えられないみたい。いまは「{now}」だよ。',
   /** 「もとにもどす」 */
   reset: 'さいしょの設定にもどしたよ。いまは「{now}」。',
-  /** 「きいてみたい」: one's own voice is not played back — it is for the ダチ to hear */
-  noListen: 'じぶんの声は、ここでは流さないんだ。ダチに送って、どう聞こえたか聞いてみてね。いまは「{now}」だよ。',
+  /** 「きいてみたい」: no trial here — the settings apply from the next voice message, and it can be heard there */
+  noListen: 'つぎにダチへ送る声から、この設定になるよ。送る前にも、送ったあとにも聞けるから、そこで聞いてみてね。いまは「{now}」だよ。',
   /** the change could not be kept */
   failed: 'ごめん、うまく変えられなかった。もう一回、言ってみて。',
   /** a member who is not recorded: there is no voice of their own to set */

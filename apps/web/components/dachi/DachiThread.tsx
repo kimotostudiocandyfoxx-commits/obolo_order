@@ -62,8 +62,7 @@ export type DachiThreadProps = {
 /**
  * One ダチ conversation (M-R212), in the same look as the {bati} chat (components/story/Chat.tsx bubbles and message bar):
  * voice messages and Bluena work cards. A tap starts the take, a tap ends it; it is made ready on the server and sent
- * from its draft card (TapVoice.tsx). Client 2026-11-27, after trying it: the sender does not hear their own voice —
- * not on the card, and not here (their own voice bubbles show the words and a small mark, no play control). Block and report are in the menu at the top right (a person's thread only). Messages go only
+ * from its draft card (TapVoice.tsx), where it can be heard first; here both sides play a voice bubble, the sender too. Block and report are in the menu at the top right (a person's thread only). Messages go only
  * between dachi — the server refuses anything else. No live calls here (a later members' feature).
  */
 export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone, place = 'moon', day, banner, onBack, onDevice }: DachiThreadProps) {
@@ -315,7 +314,7 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
       // M-R238: from the words (a character's line), else the sender's own face with it, else the rules
       face: m.faces ? undefined : (m.face ?? undefined),
       faces: m.faces,
-      // your own voice is not played back to you: the words and a quiet mark (lib/dachi/voiceSend.ts)
+      // a voice bubble plays for both sides, the sender too (lib/dachi/voiceSend.ts)
       ...voicePartOf(m),
       mark: { kind: 'dachi_message' as const, id: m.id },
       ...(relics.length ? { relics, relicLabel: g.length > 1 ? `${label}ほか${g.length - 1}つ` : label, relicFan: g.every((i) => parts[i].m.file?.kind === 'photo') } : {}),

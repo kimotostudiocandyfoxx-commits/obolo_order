@@ -15,6 +15,7 @@ import {
   voiceVersionOf,
   type DachiVoiceDraft,
   type VoiceMood,
+  type VoicePreviewBody,
   type VoiceSoundPick,
   type VoiceTune,
   type VoiceTuneBody,
@@ -49,10 +50,13 @@ import { costScope } from '../wallet/cost-scope';
  *  mixFor  — the mix that is sent, kept beside the clean voice (the receiver's 〔おとをけす〕 plays the clean one).
  *  discard — a draft thrown away (〔とりなおす〕, the other version chosen): its file goes.
  *
- * The SENDER never hears their own take (client, after trying it): there is no listening here — the two endpoints that
- * played it back (the draft's mix, the settings' trial on the last take) refuse now, and the "last take" kept for that
- * trial is no longer kept. What was kept of it on 2026-11-27 goes: per member at their next take or settings turn
- * (forgetTake), and for everyone by the admin's one-off sweep (sweepTakes).
+ *  preview — the 「そのまま」 draft with a chosen sound, as bytes (〔▶ きいてみる〕): nothing is kept. Never for 「きれい」:
+ *            there is no file, and its voice is the paid one, made only at the send.
+ *
+ * The sender hears their own voice (client 2026-11-27, late — "the sender does not hear it" was that evening's decision,
+ * taken back before it was released): on the draft card (preview) and in the talk. What stays gone is the voice
+ * settings' trial on the "last take", and the last take itself: what was kept of it on 2026-11-27 goes per member at
+ * their next take or settings turn (forgetTake), and for everyone by the admin's one-off sweep (sweepTakes).
  *
  * Who: only a member whose voice may be used (canUseMedia — never under 13; the web sends words instead and nothing is
  * recorded). How many: VOICE_MIX_DAILY_CAP a day. What it costs (our CPU seconds, the words, the mood — a few hundredths
@@ -233,6 +237,18 @@ export class DachiVoiceDraftService {
     const v = await this.media.imageData(userId, mediaId, 'voice');
     if (!v) throw apiError(HttpStatus.NOT_FOUND, 'MEDIA_NOT_FOUND', 'Recording not found');
     return v.data;
+  }
+
+  /** 〔▶ きいてみる〕: the mix as it would be sent (MP3 bytes; 'none' = the made-ready voice itself). Nothing is kept. */
+  async preview(userId: string, b: VoicePreviewBody): Promise<Buffer> {
+    const voice = await this.voiceBytes(userId, b.mediaId);
+    if (b.sound === 'none') return voice;
+    try {
+      return (await this.mix(voice, { sound: b.sound, soft: b.soft })).mp3;
+    } catch (e) {
+      this.log.warn(`preview mix failed: ${String(e)}`);
+      throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'BAD_AUDIO', 'Could not mix this recording');
+    }
   }
 
   /**

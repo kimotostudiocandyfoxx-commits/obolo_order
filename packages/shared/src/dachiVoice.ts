@@ -232,12 +232,6 @@ export interface DachiMessageView {
    * alone, for 〔おとをけす〕
    */
   sound?: { mood: VoiceSound; plainUrl: string } | null;
-  /**
-   * client 2026-11-27 (after trying it): YOUR OWN voice message — the recording, or your words read in your voice
-   * model. It is not played back to its sender: `audioUrl` is null and there is no `sound`; the talk shows the caption
-   * and a small quiet mark that a voice was sent. (The receiver's view carries the voice as ever.)
-   */
-  sentVoice?: boolean;
   /** a 📎 file (a picture, a film, a sound, a document); opened through GET /media/files/:id */
   file?: ClipFile | null;
   /** M-R234: the sender's expression, decided when it was sent */
@@ -296,7 +290,7 @@ export const isCharacterThread = (id: string): id is DachiCharacter => (DACHI_CH
  * client 2026-11-27: a take made ready to send (POST /dachi/voice). As 「そのまま」 ('asis'): the recording in the
  * member's voice settings, kept as a draft. As 「きれい」 ('clean'): heard as words only — nothing of it is kept. The
  * member's remembered version decides (`?as=` asks for the other one, for the button on the draft card). There is no
- * URL in it: the sender does not hear the take.
+ * URL in it: 〔▶ きいてみる〕 asks for the 「そのまま」 draft with its sound (POST /dachi/voice/preview, VoicePreviewBody).
  */
 export interface DachiVoiceDraft {
   /** which version this draft was made as */
@@ -313,3 +307,6 @@ export interface DachiVoiceDraft {
   /** whether 「きれい」 can be chosen, in whose voice, and its live price (the small 「−0.3」 beside 〔送る〕) */
   clean: VoiceCleanInfo;
 }
+/** POST /dachi/voice/preview (〔▶ きいてみる〕): the 「そのまま」 draft with the sound chosen now ('none': the voice alone) */
+export const VoicePreviewBody = z.object({ mediaId: z.string().uuid(), sound: z.enum(VOICE_SOUNDS), soft: z.boolean().optional() });
+export type VoicePreviewBody = z.infer<typeof VoicePreviewBody>;

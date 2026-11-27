@@ -1,6 +1,6 @@
 import { CUTE_VOICE_RATE, cuteVoiceMana, SendDachiMessageBody } from '@obolo/shared';
 import { describe, expect, it } from 'vitest';
-import { cleanCost, voicePartOf, voiceSendBody, voiceToSend } from './voiceSend';
+import { canPreview, cleanCost, voicePartOf, voiceSendBody, voiceToSend } from './voiceSend';
 
 const ID = 'a1111111-1111-4111-8111-111111111111';
 
@@ -41,20 +41,30 @@ describe('what the draft card sends (client 2026-11-27: 「そのまま」 / 「
   });
 });
 
-describe('a voice message in the talk: the sender does not hear their own', () => {
+describe('a voice message in the talk: both sides play it', () => {
   const base = { kind: 'voice' as const, seconds: 6.3 };
-  it('your own voice (the recording, or 「きれい」): no play control — only the mark that it was sent', () => {
-    const mine = voicePartOf({ ...base, fromMe: true, audioUrl: null, sentVoice: true });
-    expect(mine).toEqual({ voiceSent: { seconds: 6.3 } });
-    expect(mine.voice).toBeUndefined();
-  });
-  it('the other one’s voice plays as ever, with the voice alone for 〔おとをけす〕', () => {
-    expect(voicePartOf({ ...base, fromMe: false, audioUrl: 'https://r2/mix.mp3', sound: { mood: 'ureshii', plainUrl: 'https://r2/v.mp3' } })).toEqual({ voice: { url: 'https://r2/mix.mp3', seconds: 6.3, plainUrl: 'https://r2/v.mp3' } });
-  });
-  it('the default cute voice of a member who is not recorded is not their own voice: it plays as before', () => {
-    expect(voicePartOf({ ...base, fromMe: true, audioUrl: 'https://r2/cute.mp3' })).toEqual({ voice: { url: 'https://r2/cute.mp3', seconds: 6.3, plainUrl: undefined } });
+  it('your own voice (the recording, or 「きれい」) has the same play control as the other one’s, with the voice alone for 〔おとをけす〕', () => {
+    const view = { ...base, audioUrl: 'https://r2/mix.mp3', sound: { mood: 'ureshii' as const, plainUrl: 'https://r2/v.mp3' } };
+    const part = { voice: { url: 'https://r2/mix.mp3', seconds: 6.3, plainUrl: 'https://r2/v.mp3' } };
+    expect(voicePartOf({ ...view, fromMe: true } as never)).toEqual(part);
+    expect(voicePartOf({ ...view, fromMe: false } as never)).toEqual(part);
+    expect(voicePartOf({ ...base, audioUrl: 'https://r2/v.mp3' })).toEqual({ voice: { url: 'https://r2/v.mp3', seconds: 6.3, plainUrl: undefined } });
   });
   it('words, works and files have no voice part', () => {
-    expect(voicePartOf({ kind: 'text', fromMe: true, audioUrl: null, seconds: null })).toEqual({});
+    expect(voicePartOf({ kind: 'text', audioUrl: null, seconds: null })).toEqual({});
+  });
+});
+
+describe('〔▶ きいてみる〕 before the send', () => {
+  it('「そのまま」 (and a take the server could not make ready): the draft’s file can be heard', () => {
+    expect(canPreview({ version: 'asis', mediaId: 'm1', seconds: 5, ready: true })).toBe(true);
+    expect(canPreview({ version: 'asis', mediaId: 'm1', seconds: 5, ready: false })).toBe(true);
+  });
+  it('「きれい」: no listening — the paid voice is made only at the send (also when a 「そのまま」 draft of the take is still there)', () => {
+    expect(canPreview({ version: 'clean', mediaId: null, seconds: 0, ready: true })).toBe(false);
+    expect(canPreview({ version: 'clean', mediaId: 'm1', seconds: 5, ready: true })).toBe(false);
+  });
+  it('「そのまま」 still being made (no file yet): nothing to hear', () => {
+    expect(canPreview({ version: 'asis', mediaId: null, seconds: 0, ready: true })).toBe(false);
   });
 });

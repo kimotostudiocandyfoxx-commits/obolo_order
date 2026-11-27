@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, Headers, HttpCode, HttpStatus, Inject, NotFoundException, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Header, Headers, HttpCode, HttpStatus, Inject, NotFoundException, Param, Post, Put, Query, Req, StreamableFile, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
-import { DACHI_SEND_PER_DAY, DACHI_SEND_PER_HOUR, KIMORIN_REPLIES_PER_DAY, DELIVERY_KINDS, DeliverBody, isCharacterThread, isVoiceVersion, SendDachiMessageBody, VoiceTuneBody, VoiceVersionBody, type DachiVoiceDraft, type VoiceVersionView } from '@obolo/shared';
+import { DACHI_SEND_PER_DAY, DACHI_SEND_PER_HOUR, KIMORIN_REPLIES_PER_DAY, DELIVERY_KINDS, DeliverBody, isCharacterThread, isVoiceVersion, SendDachiMessageBody, VoicePreviewBody, VoiceTuneBody, VoiceVersionBody, type DachiVoiceDraft, type VoiceVersionView } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { apiError } from '../common/errors';
 import { rateLimit } from '../common/rate-limit';
@@ -119,17 +119,25 @@ export class DachiController {
   }
 
   /**
-   * client 2026-11-27 (after trying it): the SENDER does not hear their own voice. The two endpoints that played it back
-   * — the draft's mix (〔▶ きいてみる〕) and the settings' trial on the last take — refuse for everyone (410), whatever an
-   * older page asks: it is not only the buttons that are gone.
+   * 〔▶ きいてみる〕 on the draft card: the 「そのまま」 draft with the chosen sound, as MP3 bytes (nothing kept). Client
+   * 2026-11-27, late: the sender hears their own voice again (this refused with 410 for one evening, never released).
+   * There is no preview of 「きれい」: that voice is the paid one, made only at the send.
    */
   @Post('voice/preview')
-  voicePreview(): never {
-    throw apiError(HttpStatus.GONE, 'VOICE_NOT_PLAYED', 'Your own voice message is not played back');
+  @HttpCode(200)
+  @Header('content-type', 'audio/mpeg')
+  @Header('cache-control', 'no-store')
+  async voicePreview(@UserId() userId: string, @Body() body: unknown) {
+    await rateLimit(this.kv, `dachi-voice-preview:${userId}`, 120, 3600);
+    return new StreamableFile(await this.drafts.preview(userId, parseBody(VoicePreviewBody, body)));
   }
+  /**
+   * The settings' trial on the "last take" stays gone (410, whatever an older page asks): no take is kept for it. The
+   * member hears a new setting on the next voice message they send.
+   */
   @Post('voice/tune/preview')
   voiceTunePreview(): never {
-    throw apiError(HttpStatus.GONE, 'VOICE_NOT_PLAYED', 'Your own voice message is not played back');
+    throw apiError(HttpStatus.GONE, 'VOICE_NOT_PLAYED', 'There is no trial of the voice settings: they are heard on the next voice message');
   }
 
   // ── client 2026-11-27: the member's own voice settings (shared voiceTune.ts), changed by talking to {bati} ──

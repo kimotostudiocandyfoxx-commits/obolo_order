@@ -743,8 +743,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
    * client 2026-11-27 (shared voiceTune.ts): the words about the member's own voice for ダチ voice messages — 「声の設定」
    * says where they are, 「声を低くして」「もっとゆっくり」「オートチューンをなしに」「もとの声に近づけて」「間をつめないで」
    * change them (kept on the server, inside its limits), 〔もとにもどす〕 is the default. {bati} says the new settings in
-   * words: nothing is played — the sender does not hear their own voice (client, after trying it); 「きいてみたい」 gets
-   * one line that says so. `inTalk`: the turn before was about them (short words count). With a song on the table the words must
+   * words: nothing is played here (there is no trial on a kept take); 「きいてみたい」 gets one line — the settings apply
+   * from the next voice message, heard on its draft card and in the talk. `inTalk`: the turn before was about them (short words count). With a song on the table the words must
    * say they are about the voice settings — 「もっとゆっくり」 is the song's then. true: taken here.
    */
   const voiceTuneSend = (text: string, inTalk: boolean, songOnTable: boolean): boolean => {

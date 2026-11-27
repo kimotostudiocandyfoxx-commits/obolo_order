@@ -8,7 +8,8 @@ import { ApiError, getApi } from '@/lib/api';
 import { useRecorder } from '@/lib/useRecorder';
 import { useDictation } from '@/lib/useDictation';
 import { bargeIn } from '@/lib/voice/barge';
-import { cleanCost, voiceToSend, type VoiceToSend } from '@/lib/dachi/voiceSend';
+import { canPreview, cleanCost, voiceToSend, type VoiceToSend } from '@/lib/dachi/voiceSend';
+import { playClip, type Clip } from '@/lib/voice/webVoice';
 import { MicGlyph, SendGlyph } from './HoldMic';
 
 /**
@@ -19,8 +20,10 @@ import { MicGlyph, SendGlyph } from './HoldMic';
  *     a quiet sound for them. Before it is sent the member sees the words as the caption (fixed in place:
  *     components/mic/VoiceText.tsx — the voice itself is not edited: 〔とりなおす〕) and the sound under 「おと」 (the chips;
  *     the one in use is marked).
- *  d. after the client tried it (2026-11-27): the SENDER does not hear their own voice — there is no 〔▶ きいてみる〕 on
- *     the card (and none in the talk for their own bubbles). The sound is chosen without hearing.
+ *  d. 〔▶ きいてみる〕 plays the take as it would be sent, with the sound chosen now (POST /dachi/voice/preview, nothing
+ *     kept) — for 「そのまま」 only. 「きれい」 is the paid voice, made at the send: nothing is made just to listen, one
+ *     small line says it can be heard after the send. (For one evening of 2026-11-27 the sender did not hear their
+ *     own voice at all; the client took that back before it was released.)
  *  e. one button chooses between two versions, remembered on the server (shared voiceVersion.ts):
  *       「そのまま」 — the recording made ready in the member's voice settings (the default: clean, the silences cut, a
  *                    light pitch correction, 1.8× and +2 semitones — shared voiceTune.ts; changed by talking to {bati});
@@ -45,6 +48,8 @@ export const TAP_VOICE_WORDS = {
   caption: 'ことば',
   noWords: '（ことばは、聞きとれなかったよ。声だけ送れるよ）',
   voiceFixed: '声は、とりなおしで直せるよ',
+  preview: 'きいてみる',
+  stop: 'とめる',
   retake: 'とりなおす',
   send: '送る',
   type: '文字で直す',
@@ -215,8 +220,8 @@ export function TapVoice({ onSend, disabled, left, right }: { onSend: (v: VoiceT
 }
 
 /**
- * the take made ready: its caption, its sound, the version button, then 〔送る〕 or 〔とりなおす〕. Nothing here plays the
- * take: the sender does not hear their own voice.
+ * the take made ready: its caption, its sound, the version button, a listen (「そのまま」 only), then 〔送る〕 or
+ * 〔とりなおす〕
  */
 function DraftCard({ draft, busy, switching, err, onDrop, onChoose, onSend }: { draft: Draft; busy: boolean; switching: boolean; err: string | null; onDrop: () => void; onChoose: (v: VoiceVersion) => void; onSend: (v: VoiceToSend) => void }) {
   const [caption, setCaption] = useState(draft.text);
@@ -229,11 +234,69 @@ function DraftCard({ draft, busy, switching, err, onDrop, onChoose, onSend }: { 
   // the caption can be said again at the caret (the words only: the voice stays the take)
   const mic = useDictation({ field, value: caption, onChange: setCaption, maxLength: DACHI_TEXT_MAX, path: 'dachi', caret: typing ? undefined : edit });
 
+  const clean = draft.ready && draft.version === 'clean';
+  // 〔▶ きいてみる〕: the 「そのまま」 draft with the sound chosen now (asked for once per sound, kept while the card is
+  // open). Never for 「きれい」: that voice is made, and paid for, only at the send.
+  const listenable = canPreview(draft);
+  const [playing, setPlaying] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const clip = useRef<Clip | null>(null);
+  const urls = useRef(new Map<string, string>());
+  const asked = useRef(0);
+  const stop = () => {
+    asked.current++;
+    clip.current?.stop();
+    clip.current = null;
+    setPlaying(false);
+    setLoading(false);
+  };
+  useEffect(
+    () => () => {
+      asked.current++;
+      clip.current?.stop();
+      for (const u of urls.current.values()) URL.revokeObjectURL(u);
+    },
+    [],
+  );
+  // the other version chosen, or its file made new: what was playing stops
+  useEffect(() => stop(), [draft.version, draft.mediaId]);
+  const listen = async () => {
+    if (playing || loading) return stop();
+    const mediaId = draft.mediaId;
+    if (!listenable || !mediaId) return;
+    const mine = ++asked.current;
+    const mood: VoiceSound = draft.ready ? sound : 'none';
+    const key = `${mediaId}:${mood}:${mood === 'ureshii' && soft ? 1 : 0}`;
+    let url = urls.current.get(key);
+    if (!url) {
+      setLoading(true);
+      const api = getApi();
+      try {
+        const mp3 = await api.dachiVoicePreview({ mediaId, sound: mood, soft: mood === 'ureshii' && soft }).catch((e: unknown) => {
+          // the mix could not be made: the voice alone is still worth hearing
+          if (mood === 'none') throw e;
+          return api.dachiVoicePreview({ mediaId, sound: 'none' });
+        });
+        url = URL.createObjectURL(mp3);
+        urls.current.set(key, url);
+      } catch {
+        if (mine === asked.current) setLoading(false);
+        return;
+      }
+      if (mine !== asked.current) return;
+      setLoading(false);
+    }
+    const c = await playClip(url);
+    if (!c || mine !== asked.current) return c?.stop();
+    clip.current = c;
+    setPlaying(true);
+    void c.done.then(() => mine === asked.current && setPlaying(false));
+  };
   const pick = (s: VoiceSound) => {
+    stop();
     setSound(s);
     setSoft(false);
   };
-  const clean = draft.ready && draft.version === 'clean';
   const out = voiceToSend(draft, caption, sound, soft);
   const cost = clean ? cleanCost(caption, draft.clean.rate) : null;
   const other: VoiceVersion = draft.version === 'clean' ? 'asis' : 'clean';
@@ -318,16 +381,30 @@ function DraftCard({ draft, busy, switching, err, onDrop, onChoose, onSend }: { 
 
         {err && <p className="mt-2 text-center text-xs text-rose-300">{err}</p>}
         <div className="mt-3 flex items-center gap-2">
-          <button type="button" onClick={onDrop} disabled={busy} className="h-10 shrink-0 rounded-full border border-white/15 px-3 text-[13px] text-white/75 disabled:opacity-40">
+          {listenable ? (
+            <button type="button" onClick={() => void listen()} disabled={switching} data-testid="voice-preview" className="flex h-10 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-full border border-[rgba(210,220,255,.35)] px-3 text-[13px] font-bold text-[#f4f1ff] disabled:opacity-40">
+              {loading ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" /> : <span aria-hidden>{playing ? '❚❚' : '▶'}</span>}
+              {playing || loading ? TAP_VOICE_WORDS.stop : TAP_VOICE_WORDS.preview}
+              <span className="font-normal text-[#b9bde6]">{Math.max(1, Math.round(draft.seconds))}秒</span>
+            </button>
+          ) : (
+            // 「きれい」: nothing is made just to listen — it is heard in the talk after the send
+            <p className="min-w-0 flex-1 text-center text-[11px] leading-snug text-[#b9bde6]/90" data-testid="voice-preview-later">
+              {clean ? VOICE_VERSION_WORDS.cleanLater : ''}
+            </p>
+          )}
+          <button type="button" onClick={() => (stop(), onDrop())} disabled={busy} className="h-10 shrink-0 rounded-full border border-white/15 px-3 text-[13px] text-white/75 disabled:opacity-40">
             {TAP_VOICE_WORDS.retake}
           </button>
           {/* 「きれい」: the price of these words, small, before the send (the app's 「−0.3」) */}
-          <span className="min-w-0 flex-1 text-right text-[10px] tracking-[0.08em] text-amber-200/70" aria-label={cost?.label} data-testid="voice-cost">
-            {cost?.text}
-          </span>
+          {cost && (
+            <span className="shrink-0 text-right text-[10px] tracking-[0.08em] text-amber-200/70" aria-label={cost.label} data-testid="voice-cost">
+              {cost.text}
+            </span>
+          )}
           <button
             type="button"
-            onClick={() => out && onSend(out)}
+            onClick={() => out && (stop(), onSend(out))}
             disabled={busy || switching || mic.listening || !out}
             data-testid="voice-send"
             className="flex h-10 shrink-0 items-center gap-1 rounded-full px-3.5 text-[13px] font-bold text-[#2b1b06] transition active:scale-95 disabled:opacity-40"

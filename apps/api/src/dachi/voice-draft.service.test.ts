@@ -1,4 +1,4 @@
-import { VOICE_MIX_CAP_WORDS, VOICE_TUNE_DEFAULT, VOICE_TUNE_KEY, VOICE_VERSION_KEY, type SendDachiMessageBody, type VoiceTune } from '@obolo/shared';
+import { VOICE_MIX_CAP_WORDS, VOICE_TUNE_DEFAULT, VOICE_TUNE_KEY, VOICE_VERSION_KEY, VoicePreviewBody, type SendDachiMessageBody, type VoiceTune } from '@obolo/shared';
 import { describe, expect, it } from 'vitest';
 import { MemoryKv } from '../infra/kv';
 import { costScope, featureOfPath } from '../wallet/cost-scope';
@@ -61,7 +61,7 @@ function world(o: { cap?: number; allowed?: boolean; words?: string | Error; moo
   x.clean = async (b: Buffer, t: VoiceTune) => {
     if (o.silent) throw new NoVoiceError(0);
     cleaned.push({ tune: t, input: b.toString() });
-    return { mp3: Buffer.concat([Buffer.from('clean:'), b]), seconds: 5, heard: Buffer.concat([Buffer.from('heard:'), b]), made: { autotune: true, shape: 'rubberband' } };
+    return { mp3: Buffer.concat([Buffer.from('clean:'), b]), seconds: 5, heard: Buffer.concat([Buffer.from('heard:'), b]), made: { clean: 'rnn', autotune: true, shape: 'rubberband' } };
   };
   x.mix = async (v: Buffer, p: { sound: string; soft?: boolean }) => {
     if (o.mixFails) throw new Error('ffmpeg');
@@ -78,7 +78,7 @@ describe('a ダチ voice message made ready (client 2026-11-27, the trial)', () 
     const w = world({ words: 'きょうも、おつかれさま', mood: 'otsukare' });
     const d = await w.s.draft(U, 'audio/mp4; codecs=mp4a', audio, 'https://api');
     expect(d).toEqual({ version: 'asis', mediaId: w.stored[0].id, seconds: 5, text: 'きょうも、おつかれさま', sound: 'otsukare', soft: false });
-    // nothing in it can be played: the sender does not hear the take
+    // no URL in it: 〔▶ きいてみる〕 asks for the bytes (preview)
     expect(JSON.stringify(d)).not.toContain('http');
     expect(w.stored[0].data.toString()).toBe('clean:a recording');
     expect(w.asked).toEqual(['きょうも、おつかれさま']);
@@ -119,21 +119,47 @@ describe('a ダチ voice message made ready (client 2026-11-27, the trial)', () 
     await expect(w.s.draft(U, 'audio/webm', Buffer.alloc(3 * 1024 * 1024 + 1), '')).rejects.toSatisfy((e) => code(e)?.code === 'TOO_LARGE');
   });
 
-  it('the sender does not hear the take: the draft’s mix and the settings’ trial are refused for everyone (410), nothing is played back', () => {
+  it('〔▶ きいてみる〕: the 「そのまま」 draft with the chosen sound as bytes — nothing kept; only the member’s own draft', async () => {
+    const w = world();
+    const d = await w.s.draft(U, 'audio/webm', audio, '');
+    expect((await w.s.preview(U, { mediaId: d.mediaId!, sound: 'oyasumi' })).toString()).toBe('mix:oyasumi:clean:a recording');
+    expect((await w.s.preview(U, { mediaId: d.mediaId!, sound: 'ureshii', soft: true })).toString()).toBe('mix:ureshii:clean:a recording');
+    // 'none': the made-ready voice itself
+    expect((await w.s.preview(U, { mediaId: d.mediaId!, sound: 'none' })).toString()).toBe('clean:a recording');
+    expect(w.stored).toHaveLength(1);
+    await expect(w.s.preview(U, { mediaId: B, sound: 'oyasumi' })).rejects.toSatisfy((e) => code(e)?.code === 'MEDIA_NOT_FOUND');
+    // a mix that cannot be made says so (the card then plays the voice alone)
+    const bad = world({ mixFails: true });
+    const d2 = await bad.s.draft(U, 'audio/webm', audio, '');
+    await expect(bad.s.preview(U, { mediaId: d2.mediaId!, sound: 'oyasumi' })).rejects.toSatisfy((e) => code(e)?.code === 'BAD_AUDIO');
+    // through the controller: an MP3, counted against the hour's limit
+    const c = new DachiController({} as never, {} as never, {} as never, new MemoryKv(), {} as never, w.s, {} as never);
+    const file = await c.voicePreview(U, { mediaId: d.mediaId, sound: 'oyasumi' });
+    expect(file.getStream().read().toString()).toBe('mix:oyasumi:clean:a recording');
+    await expect(c.voicePreview(U, { mediaId: 'not an id', sound: 'oyasumi' })).rejects.toBeTruthy();
+  });
+
+  it('「きれい」 has nothing to listen to before the send: no file in its draft, and no paid voice is made for a preview', async () => {
+    const w = world({ kept: { [VOICE_VERSION_KEY]: 'clean' } });
+    const d = await w.s.draft(U, 'audio/webm', audio, '', { cleanOn: true });
+    expect(d).toMatchObject({ version: 'clean', mediaId: null });
+    expect(w.stored).toHaveLength(0);
+    // the preview's body needs a draft's file: there is none to name
+    expect(VoicePreviewBody.safeParse({ mediaId: d.mediaId, sound: 'ureshii' }).success).toBe(false);
+  });
+
+  it('the voice settings’ trial on the last take stays gone (410 for everyone), and no take is kept for it', () => {
     const c = new DachiController({} as never, {} as never, {} as never, new MemoryKv(), {} as never, world().s, {} as never);
-    for (const call of [() => c.voicePreview(), () => c.voiceTunePreview()]) {
-      let err: unknown;
-      try {
-        call();
-      } catch (e) {
-        err = e;
-      }
-      expect(code(err)?.code).toBe('VOICE_NOT_PLAYED');
-      expect((err as { getStatus: () => number }).getStatus()).toBe(410);
+    let err: unknown;
+    try {
+      c.voiceTunePreview();
+    } catch (e) {
+      err = e;
     }
-    // and the service has nothing left that gives a take back
+    expect(code(err)?.code).toBe('VOICE_NOT_PLAYED');
+    expect((err as { getStatus: () => number }).getStatus()).toBe(410);
     const s = world().s as unknown as Record<string, unknown>;
-    for (const gone of ['preview', 'tunePreview', 'lastTake', 'keepTake']) expect(s[gone]).toBeUndefined();
+    for (const gone of ['tunePreview', 'lastTake', 'keepTake']) expect(s[gone]).toBeUndefined();
   });
 
   it('the mix that is sent is a second file, and its cost is the member’s small cost (voiceMix), not the absorbed ダチ talk', async () => {
@@ -144,6 +170,7 @@ describe('a ダチ voice message made ready (client 2026-11-27, the trial)', () 
     expect(w.mixes).toEqual([{ sound: 'ureshii', soft: true, feature: 'voiceMix' }]);
     expect(featureOfPath('/dachi/voice')).toBe('voiceMix');
     expect(featureOfPath('/dachi/voice?as=asis')).toBe('voiceMix');
+    expect(featureOfPath('/dachi/voice/preview')).toBe('voiceMix');
     expect(featureOfPath('/dachi/threads/x/messages')).toBe('dachi');
     // a mix that cannot be made is no mix (the voice goes alone)
     const bad = world({ mixFails: true });
@@ -336,20 +363,18 @@ describe('sending it: the caption and the sound ride with the voice', () => {
     expect(old.rows[0].workJson).toBeUndefined();
   });
 
-  it('the SENDER does not hear their own voice: their view of it has no audio — the words and a mark that it was sent', async () => {
+  it('the sender plays their own voice like the receiver: the same audio and the voice alone in both views', async () => {
     const w = talk();
     const mine = await w.s.send(U, B, body({ caption: 'やったー！', sound: 'ureshii' }));
-    expect(mine).toMatchObject({ kind: 'voice', fromMe: true, audioUrl: null, sentVoice: true, text: 'やったー！', seconds: 6.3 });
-    expect(mine.sound).toBeUndefined();
-    expect(JSON.stringify(mine)).not.toContain('r2/');
+    const audio = { audioUrl: 'https://r2/mix-ureshii.mp3', sound: { mood: 'ureshii', plainUrl: 'https://r2/a1111111-1111-4111-8111-111111111111.mp3' } };
+    expect(mine).toMatchObject({ kind: 'voice', fromMe: true, text: 'やったー！', seconds: 6.3, ...audio });
+    expect(mine).not.toHaveProperty('sentVoice');
     // read again later (the thread's list): the same
-    expect(w.s.toView(U, w.rows[0] as never)).toMatchObject({ audioUrl: null, sentVoice: true });
-    // the receiver hears it as ever
-    expect(heard(w)).toMatchObject({ fromMe: false, audioUrl: 'https://r2/mix-ureshii.mp3', sound: { plainUrl: 'https://r2/a1111111-1111-4111-8111-111111111111.mp3' } });
-    expect(heard(w).sentVoice).toBeUndefined();
-    // a voice with no caption and no sound: the same rule
+    expect(w.s.toView(U, w.rows[0] as never)).toMatchObject({ fromMe: true, ...audio });
+    expect(heard(w)).toMatchObject({ fromMe: false, ...audio });
+    // a voice with no caption and no sound: the voice itself, for both
     const plain = talk();
-    expect(await plain.s.send(U, B, body())).toMatchObject({ audioUrl: null, sentVoice: true, text: null });
+    expect(await plain.s.send(U, B, body())).toMatchObject({ fromMe: true, audioUrl: 'https://r2/a1111111-1111-4111-8111-111111111111.mp3', text: null });
   });
 
   it('a caption that would not pass as typed words is not sent', async () => {

@@ -1,13 +1,43 @@
 import { VOICE_MOODS, VOICE_SOUND_PARTS, VOICE_TUNE_DEFAULT } from '@obolo/shared';
 import { spawnSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { AUTOTUNE, autotuneArgs, cleanFilter, cleanVoice, cutFilter, hearArgs, heardVoice, MIX, mixArgs, mixPlan, mp3Seconds, NoVoiceError, prepareArgs, shapeArgs, shapeFilter, SILENCE_CUT, VOICE_SOUNDS_DIR } from './voice-mix';
+import { AUTOTUNE, autotuneArgs, CLEAN_MODEL, cleanFilter, cleanVoice, cutFilter, fftCleanFilter, filterPath, hearArgs, rnnModel, heardVoice, MIX, mixArgs, mixPlan, mp3Seconds, NoVoiceError, prepareArgs, shapeArgs, shapeFilter, SILENCE_CUT, VOICE_SOUNDS_DIR } from './voice-mix';
 
 describe('the ダチ voice message made ready (client 2026-11-27, sample K)', () => {
-  it('a. clean: rumble out at 100 Hz, the strong noise removal that follows the noise, the gate — the approved chain', () => {
-    expect(cleanFilter()).toBe('highpass=f=100,afftdn=nr=24:nf=-45:tn=1,agate=threshold=0.012:ratio=2:attack=10:release=250');
+  const FFT = 'highpass=f=100,afftdn=nr=24:nf=-45:tn=1,agate=threshold=0.012:ratio=2:attack=10:release=250';
+  it('a. clean — the client’s "sample 3": at 48 kHz mono, rumble out at 100 Hz, RNNoise, a light noise removal, the gate', () => {
+    expect(cleanFilter('/app/assets/voice-clean/std.rnnn')).toBe('aresample=48000,aformat=channel_layouts=mono,highpass=f=100,arnndn=m=/app/assets/voice-clean/std.rnnn:mix=1,afftdn=nr=12:nf=-50:tn=1,agate=threshold=0.008:ratio=3:attack=8:release=200');
+    // the committed model is the default, and it is in the repository (302903 bytes, RNNoise's own header)
+    expect(cleanFilter()).toBe(cleanFilter(CLEAN_MODEL));
+    expect(CLEAN_MODEL.replace(/\\/g, '/')).toMatch(/apps\/api\/assets\/voice-clean\/std\.rnnn$/);
+    expect(readFileSync(CLEAN_MODEL).length).toBe(302903);
+    expect(readFileSync(CLEAN_MODEL, 'utf8').split('\n')[0]).toBe('rnnoise-nu model file version 1');
+  });
+
+  it('a. without the model: the clean-up of before (the strong noise removal and its gate), unchanged', () => {
+    expect(cleanFilter(null)).toBe(FFT);
+    expect(fftCleanFilter()).toBe(FFT);
+  });
+
+  it('the model’s path inside the filter graph: every character that means something there is escaped (twice: the option, the graph)', () => {
+    expect(filterPath('/app/assets/voice-clean/std.rnnn')).toBe('/app/assets/voice-clean/std.rnnn');
+    expect(filterPath('C:\\api\\std.rnnn')).toBe('C\\\\:\\\\\\\\api\\\\\\\\std.rnnn');
+    expect(filterPath('/a,b;c[d]/std.rnnn')).toBe('/a\\,b\\;c\\[d\\]/std.rnnn');
+    expect(filterPath("/it's/std.rnnn")).toBe("/it\\\\\\'s/std.rnnn");
+    expect(cleanFilter('/o:d/std.rnnn')).toContain('arnndn=m=/o\\\\:d/std.rnnn:mix=1,');
+  });
+
+  it('can the approved clean-up run here: the model file there AND the arnndn filter in this ffmpeg — else the one of before', async () => {
+    const filters = (list: string) => async () => list;
+    const WITH = ' TSC afftdn            A->A       Denoise audio samples using FFT.\n TSC arnndn            A->A       Reduce noise from speech using Recurrent Neural Networks.\n';
+    expect(await rnnModel(CLEAN_MODEL, filters(WITH))).toBe(CLEAN_MODEL);
+    expect(await rnnModel(CLEAN_MODEL, filters(' TSC afftdn            A->A       Denoise audio samples using FFT.\n'))).toBeNull();
+    expect(await rnnModel('/no/such/std.rnnn', filters(WITH))).toBeNull();
+    // ffmpeg itself not answering is "cannot", not an error
+    expect(await rnnModel(CLEAN_MODEL, () => Promise.reject(new Error('no ffmpeg')))).toBeNull();
   });
 
   it('b. 「間をつめる」: the silence before the first word goes, a pause over 0.28 s becomes 0.14 s (−40 dB) — on by default', () => {
@@ -16,25 +46,40 @@ describe('the ダチ voice message made ready (client 2026-11-27, sample K)', ()
     expect(VOICE_TUNE_DEFAULT.cut).toBe(true);
   });
 
-  it('one ffmpeg run gives the words’ file (clean, UNCUT, as it was said) and the voice for the next steps (cut)', () => {
-    const a = prepareArgs('/tmp/x/in', '/tmp/x/heard.mp3', '/tmp/x/voice.wav');
+  it('one ffmpeg run gives the words’ file (cleaned the way of before, UNCUT, as it was said) and the voice for the next steps (the approved clean-up, cut)', () => {
+    const M = '/app/assets/voice-clean/std.rnnn';
+    const a = prepareArgs('/tmp/x/in', '/tmp/x/heard.mp3', '/tmp/x/voice.wav', true, M);
     // at most a minute of the recording, read from a file
     expect(a.slice(0, 8)).toEqual(['-hide_banner', '-loglevel', 'error', '-y', '-t', '62', '-i', '/tmp/x/in']);
     const graph = a[a.indexOf('-filter_complex') + 1];
-    expect(graph).toBe(`[0:a]${cleanFilter()},aresample=44100,aformat=sample_fmts=s16:channel_layouts=mono,asplit=2[h][v0];[v0]${cutFilter()}[v]`);
-    // the cut is only on the voice's branch: the words are heard from the whole take
-    expect(graph.split(';')[0]).not.toContain('silenceremove');
+    const pcm = 'aresample=44100,aformat=sample_fmts=s16:channel_layouts=mono';
+    expect(graph).toBe(`[0:a]asplit=2[a][b];[a]${FFT},${pcm}[h];[b]${cleanFilter(M)},${pcm},${cutFilter()}[v]`);
+    // the words are heard from what the speech model has always been given: no RNNoise, no cut on that branch
+    const [, heard, voice] = graph.split(';');
+    expect(heard).not.toMatch(/arnndn|silenceremove/);
+    expect(voice).toMatch(/arnndn=.*silenceremove=/);
     expect(a.slice(a.indexOf('[h]'))).toEqual(['[h]', '-b:a', '96k', '-map_metadata', '-1', '-f', 'mp3', '/tmp/x/heard.mp3', '-map', '[v]', '-c:a', 'pcm_s16le', '-f', 'wav', '/tmp/x/voice.wav']);
     // 「間はそのまま」: nothing is cut
-    const whole = prepareArgs('in', 'h', 'v', false);
+    const whole = prepareArgs('in', 'h', 'v', false, M);
+    expect(whole[whole.indexOf('-filter_complex') + 1]).toMatch(/,anull\[v\]$/);
+    // the default is the committed model
+    expect(prepareArgs('in', 'h', 'v')).toEqual(prepareArgs('in', 'h', 'v', true, CLEAN_MODEL));
+  });
+
+  it('without the model the run is the one of before, to the letter: one clean-up for both files', () => {
+    const a = prepareArgs('/tmp/x/in', '/tmp/x/heard.mp3', '/tmp/x/voice.wav', true, null);
+    const graph = a[a.indexOf('-filter_complex') + 1];
+    expect(graph).toBe(`[0:a]${FFT},aresample=44100,aformat=sample_fmts=s16:channel_layouts=mono,asplit=2[h][v0];[v0]${cutFilter()}[v]`);
+    expect(graph).not.toContain('arnndn');
+    const whole = prepareArgs('in', 'h', 'v', false, null);
     expect(whole[whole.indexOf('-filter_complex') + 1]).toMatch(/\[v0\]anull\[v\]$/);
   });
 
-  it('「きれい」: the take is only heard as words — step a alone (clean, whole, as it was said), no file beside it', () => {
+  it('「きれい」: the take is only heard as words — cleaned the way of before, whole, as it was said, no file beside it', () => {
     const a = hearArgs('/tmp/x/in');
     expect(a.slice(0, 8)).toEqual(['-hide_banner', '-loglevel', 'error', '-y', '-t', '62', '-i', '/tmp/x/in']);
-    expect(a[a.indexOf('-af') + 1]).toBe(`${cleanFilter()},aresample=44100`);
-    expect(a.join(' ')).not.toMatch(/silenceremove|rubberband|atempo|asetrate/);
+    expect(a[a.indexOf('-af') + 1]).toBe(`${FFT},aresample=44100`);
+    expect(a.join(' ')).not.toMatch(/arnndn|silenceremove|rubberband|atempo|asetrate/);
     expect(a.at(-1)).toBe('pipe:1');
   });
 
@@ -87,6 +132,7 @@ describe('the ダチ voice message made ready (client 2026-11-27, sample K)', ()
 /** the real tools, when this machine has them (CI and the API image do; nothing is called over the network) */
 const has = (cmd: string, args: string[]) => spawnSync(cmd, args, { encoding: 'utf8' }).status === 0;
 const FFMPEG = has('ffmpeg', ['-version']);
+const ARNNDN = FFMPEG && /\sarnndn\s/.test(spawnSync('ffmpeg', ['-hide_banner', '-filters'], { encoding: 'utf8' }).stdout);
 const PARSELMOUTH = has(AUTOTUNE.python, ['-c', 'import parselmouth']);
 /** a made-up take: `voiced` seconds of a wobbling tone, a second of silence, the tone again — or silence alone */
 const take = (voiced: boolean) =>
@@ -114,6 +160,45 @@ describe.skipIf(!FFMPEG)('the chain run for real (ffmpeg on this machine)', () =
     await expect(cleanVoice(take(false))).rejects.toBeInstanceOf(NoVoiceError);
   }, 30_000);
 
+  it.skipIf(!ARNNDN)('the approved clean-up runs with the committed model — also from a path full of characters a filter graph reads', async () => {
+    const r = await cleanVoice(take(true), { ...VOICE_TUNE_DEFAULT, tune: 0 });
+    expect(r.made.clean).toBe('rnn');
+    expect(mp3Seconds(r.heard.length)).toBeGreaterThan(5.8);
+    const dir = mkdtempSync(join(tmpdir(), 'obolo-rnn-'));
+    try {
+      const odd = join(dir, "o:d,d [x];'y");
+      mkdirSync(odd);
+      copyFileSync(CLEAN_MODEL, join(odd, 'std.rnnn'));
+      const o = await cleanVoice(take(true), { ...VOICE_TUNE_DEFAULT, tune: 0 }, { model: join(odd, 'std.rnnn') });
+      expect(o.made.clean).toBe('rnn');
+      expect(o.seconds).toBe(r.seconds);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+    // silence is still no message with the stronger clean-up (the −40 dB cut on the cleaned voice)
+    await expect(cleanVoice(take(false), VOICE_TUNE_DEFAULT, { model: CLEAN_MODEL })).rejects.toBeInstanceOf(NoVoiceError);
+  }, 30_000);
+
+  it('the approved clean-up missing or failing never loses the message: the one of before', async () => {
+    // no model (or no arnndn filter): asked for the way of before
+    const before = await cleanVoice(take(true), { ...VOICE_TUNE_DEFAULT, tune: 0 }, { model: null });
+    expect(before.made.clean).toBe('fft');
+    expect(before.seconds).toBeGreaterThan(1.8);
+    // a model ffmpeg cannot read (the same as a filter that is not there): the run fails, the one of before follows
+    const dir = mkdtempSync(join(tmpdir(), 'obolo-rnn-'));
+    try {
+      writeFileSync(join(dir, 'bad.rnnn'), 'not a model');
+      const r = await cleanVoice(take(true), { ...VOICE_TUNE_DEFAULT, tune: 0 }, { model: join(dir, 'bad.rnnn') });
+      expect(r.made.clean).toBe('fft');
+      expect(r.seconds).toBe(before.seconds);
+      expect(mp3Seconds(r.heard.length)).toBeGreaterThan(5.8);
+      // and silence is still silence on that road
+      await expect(cleanVoice(take(false), VOICE_TUNE_DEFAULT, { model: join(dir, 'bad.rnnn') })).rejects.toBeInstanceOf(NoVoiceError);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  }, 30_000);
+
   it('the autotune failing or late never loses the message: the chain goes on without it', async () => {
     const missing = await cleanVoice(take(true), VOICE_TUNE_DEFAULT, { python: '/no/such/python' });
     expect(missing.made.autotune).toBe(false);
@@ -129,7 +214,7 @@ describe.skipIf(!FFMPEG)('the chain run for real (ffmpeg on this machine)', () =
   it.skipIf(!PARSELMOUTH)('with praat-parselmouth: the autotune runs, and the voice is as long as without it', async () => {
     const tuned = await cleanVoice(take(true), VOICE_TUNE_DEFAULT);
     const plain = await cleanVoice(take(true), { ...VOICE_TUNE_DEFAULT, tune: 0 });
-    expect(tuned.made).toEqual({ autotune: true, shape: 'rubberband' });
+    expect(tuned.made).toMatchObject({ autotune: true, shape: 'rubberband' });
     expect(Math.abs(tuned.seconds - plain.seconds)).toBeLessThan(0.15);
   }, 30_000);
 });

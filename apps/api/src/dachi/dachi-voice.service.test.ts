@@ -71,8 +71,9 @@ describe('ダチの声のメッセージ: who may write (M-R212)', () => {
     const w = world();
     w.dachi(A, B);
     const m = await w.s.send(A, B, voice(A));
-    // client 2026-11-27: the sender does not hear their own voice — no audio in their view, the receiver's has it
-    expect(m).toMatchObject({ fromMe: true, kind: 'voice', audioUrl: null, sentVoice: true, seconds: 4.2 });
+    // the sender plays their own voice like the receiver: the same audio in both views
+    expect(m).toMatchObject({ fromMe: true, kind: 'voice', audioUrl: expect.stringContaining('https://cdn/'), seconds: 4.2 });
+    expect(m).not.toHaveProperty('sentVoice');
     expect(w.s.toView(B, w.rows.at(-1) as never)).toMatchObject({ fromMe: false, kind: 'voice', audioUrl: expect.stringContaining('https://cdn/'), seconds: 4.2 });
     await w.s.send(B, A, { work: { kind: 'song', title: 'うた', text: '' } });
     expect(w.rows.at(-1)).toMatchObject({ senderId: B, recipientId: A, kind: 'work' });
@@ -131,6 +132,12 @@ describe('the first voice message: {inviter}’s, else MIKIE⭐︎DRILL’s', ()
   const at = new Date('2026-11-01T10:00:00Z');
   it('{inviter} recorded a voice with the invitation: it comes from them', () => {
     expect(welcomeRow(A, at, { inviterId: B, inviterIsDachi: true, voiceUrl: 'https://cdn/v.webm', voiceMediaId: null, voiceSeconds: 5 })).toMatchObject({ senderId: B, recipientId: A, audioUrl: 'https://cdn/v.webm', lineId: 'welcome' });
+    // both play it: the member it is for, and the inviter in their own view of the thread (their own voice)
+    const row = { ...welcomeRow(A, at, { inviterId: B, inviterIsDachi: true, voiceUrl: 'https://cdn/v.webm', voiceMediaId: null, voiceSeconds: 5 })!, id: 'w0', createdAt: at };
+    const w = world();
+    expect(w.s.toView(A, row as never)).toMatchObject({ fromMe: false, kind: 'voice', audioUrl: 'https://cdn/v.webm', seconds: 5 });
+    expect(w.s.toView(B, row as never)).toMatchObject({ fromMe: true, kind: 'voice', audioUrl: 'https://cdn/v.webm', seconds: 5 });
+    expect(w.s.toView(B, row as never)).not.toHaveProperty('sentVoice');
   });
   it('no voice recorded: {inviter}’s welcome as a text message, in their own thread (M-R343) — never MIKIE⭐︎DRILL’s', () => {
     const row = welcomeRow(A, at, { inviterId: B, inviterIsDachi: true, voiceUrl: null, voiceMediaId: null, voiceSeconds: null });

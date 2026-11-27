@@ -98,7 +98,7 @@ describe('the words to {bati} about the voice settings', () => {
     expect(set('声を低くして、もっとゆっくり、オートチューンはなしで')).toEqual({ key: 0, speed: 1.6, tune: 0, cut: true });
   });
 
-  it('〔もとにもどす〕; 「きいてみる」 is answered in words (the sender never hears their own voice: no chip, nothing played)', () => {
+  it('〔もとにもどす〕; 「きいてみる」 is answered in words (no trial of the settings: no chip, nothing played — they are heard on the next voice message)', () => {
     expect(set('声の設定をもとにもどして')).toBe('reset');
     expect(set('声をリセット')).toBe('reset');
     expect(set(VOICE_TUNE_CHIPS.reset, D, true)).toBe('reset');

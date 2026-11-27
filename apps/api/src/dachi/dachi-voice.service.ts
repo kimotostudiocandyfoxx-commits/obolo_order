@@ -59,12 +59,6 @@ type NewRow = typeof dachiMessages.$inferInsert;
 const fileOf = (j: unknown): ClipFile | null => (j && typeof j === 'object' && (j as { file?: unknown }).file && typeof (j as { file: { id?: unknown } }).file.id === 'string' ? (j as { file: ClipFile }).file : null);
 const fileWords = (f: ClipFile | null) => (f ? `${CLIP_WORD[f.kind]}「${f.name}」` : 'ファイル');
 const textOf = (j: unknown): string | null => (j && typeof j === 'object' && typeof (j as { text?: unknown }).text === 'string' ? (j as { text: string }).text : null);
-/**
- * client 2026-11-27 (after trying it): the SENDER does not hear their own voice — the recording, or their words read as
- * the 「きれい」 version. Their own view of such a row carries no audio. Not so for 'cute': the default cute voice that
- * reads the words of a member who is not recorded is not their voice, and their flow stays as it was.
- */
-const ownVoiceHidden = (j: unknown): boolean => !(j && typeof j === 'object' && (j as { tts?: unknown }).tts === 'cute');
 /** client 2026-11-27: the sound mixed into a voice (work_json { sound }): the mood, and the voice alone for 〔おとをけす〕 */
 const soundOf = (j: unknown): { mood: VoiceSound; plainUrl: string } | null => {
   const s = j && typeof j === 'object' ? (j as { sound?: { mood?: unknown; plainUrl?: unknown } }).sound : null;
@@ -478,21 +472,20 @@ export class DachiVoiceService {
 
   toView(userId: string, r: Row): DachiMessageView {
     const line = r.senderId ? undefined : dachiLine(r.lineId);
-    // the sender's own voice is not played back to them: no audio in their view of it (the receiver's has it)
-    const hidden = r.kind === 'voice' && r.senderId === userId && ownVoiceHidden(r.workJson);
+    // the sender plays their own voice messages like the receiver does (client 2026-11-27, late: the "sender does not
+    // hear their own voice" of that evening was taken back before it was released): the same audio in both views
     return {
       id: r.id,
       fromMe: r.senderId === userId,
       character: r.senderId ? null : ((r.character as DachiCharacter | null) ?? null),
       kind: r.kind === 'work' ? 'work' : r.kind === 'text' ? 'text' : r.kind === 'file' ? 'file' : 'voice',
       // a character's voice comes from the line data (filled in when the voice is made), so no migration is needed then
-      audioUrl: line ? line.voice : hidden ? null : (r.audioUrl ?? null),
+      audioUrl: line ? line.voice : (r.audioUrl ?? null),
       seconds: r.seconds ?? null,
       text: line?.text ?? textOf(r.workJson),
       work: r.kind === 'work' ? cardOf(r.workJson) : null,
       ...(r.kind === 'file' ? { file: fileOf(r.workJson) } : {}),
-      ...(r.kind === 'voice' && !hidden && soundOf(r.workJson) ? { sound: soundOf(r.workJson) } : {}),
-      ...(hidden ? { sentVoice: true } : {}),
+      ...(r.kind === 'voice' && soundOf(r.workJson) ? { sound: soundOf(r.workJson) } : {}),
       face: faceOf(r.workJson),
       // M-R238: a line with words gets its sentences' faces by the rules (no call: the characters' lines are fixed)
       ...(line?.text ? { faces: ruleBeats(line.text) } : textOf(r.workJson) ? { faces: ruleBeats(textOf(r.workJson)!) } : {}),

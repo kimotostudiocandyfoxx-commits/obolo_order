@@ -2217,9 +2217,7 @@ export class DemoApi implements Api {
     this.dachiThreadOk(thread);
     const all = this.dachiArrive()
       .filter((m) => m.thread === thread && (!page.before || m.createdAt < page.before))
-      .map(({ thread: _t, lineId: _l, read, ...m }) => ({ ...m, read: m.fromMe || !!read }))
-      // client 2026-11-27: your own voice is not played back to you (also one kept in this browser before that)
-      .map((m) => (m.fromMe && m.kind === 'voice' ? { ...m, audioUrl: null, sound: undefined, sentVoice: true } : m));
+      .map(({ thread: _t, lineId: _l, read, ...m }) => ({ ...m, read: m.fromMe || !!read }));
     return page.limit ? all.slice(-page.limit) : all;
   }
   async dachiHistory(cursor?: string | null) {
@@ -2236,11 +2234,12 @@ export class DemoApi implements Api {
     await sleep(300);
     const m: DachiMessageView =
       'mediaId' in body
-        ? // client 2026-11-27: your own voice is not played back to you (no audio in your view: `sentVoice`)
-          { id: uid(), fromMe: true, character: null, kind: 'voice', audioUrl: null, sentVoice: true, seconds: Math.round(body.seconds * 10) / 10, text: body.caption || null, work: null, face: body.face ?? null, createdAt: now() }
+        ? // the sender plays their own voice bubble too (the demo has no mix: the take itself, also as the voice alone)
+          { id: uid(), fromMe: true, character: null, kind: 'voice', audioUrl: `idb:${body.mediaId}`, seconds: Math.round(body.seconds * 10) / 10, text: body.caption || null, work: null, face: body.face ?? null, createdAt: now(), ...(body.sound && body.sound !== 'none' ? { sound: { mood: body.sound, plainUrl: `idb:${body.mediaId}` } } : {}) }
         : 'text' in body && body.spoken && this.s.users[this.uid()]?.mediaOk
-          ? // 「きれい」 in the demo: no voice service — the bubble a read voice would leave, with the price it would cost
-            { id: uid(), fromMe: true, character: null, kind: 'voice', audioUrl: null, sentVoice: true, seconds: null, text: body.text, work: null, face: body.face ?? null, createdAt: now(), cute: { mana: cuteVoiceMana(body.text) } }
+          ? // 「きれい」 in the demo: no voice service — the bubble a read voice would leave (nothing in it to play), with
+            // the price it would cost
+            { id: uid(), fromMe: true, character: null, kind: 'voice', audioUrl: null, seconds: null, text: body.text, work: null, face: body.face ?? null, createdAt: now(), cute: { mana: cuteVoiceMana(body.text) } }
         : 'text' in body
           ? { id: uid(), fromMe: true, character: null, kind: 'text', audioUrl: null, seconds: null, text: body.text, work: null, face: body.face ?? null, createdAt: now() }
           : 'fileId' in body
@@ -2271,6 +2270,13 @@ export class DemoApi implements Api {
     if (version === 'clean') return { version, mediaId: null, seconds: 0, text: '（デモ）こんにちは', sound: 'ureshii' as const, soft: true, clean };
     const { id } = await this.uploadVoice(blob);
     return { version, mediaId: id, seconds: Math.round(seconds * 10) / 10, text: '（デモ）こんにちは', sound: 'ureshii' as const, soft: true, clean };
+  }
+  // 〔▶ きいてみる〕 in the demo: the take as it is (no server to mix a sound into it)
+  async dachiVoicePreview(body: Parameters<Api['dachiVoicePreview']>[0]) {
+    await sleep(300);
+    const b = await getBlob(body.mediaId);
+    if (!b) throw new ApiError(404, 'MEDIA_NOT_FOUND', 'not found');
+    return b;
   }
   async setDachiVoiceVersion(version: VoiceVersion) {
     (this.s as { voiceVersion?: unknown }).voiceVersion = version;
