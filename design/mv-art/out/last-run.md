@@ -1,28 +1,44 @@
-# UI art — 2026-11-25T18:02:00.931Z
+# UI art — 2026-11-27T00:32:06.602Z
 
-Seedream 5.0 Pro / 24枚 / 約173円
+Seedream 5.0 Pro / 40枚 / 約85円
 
-- ✅ exp-pluto-laugh
-- ✅ isl-pluto-love
-- ✅ isl-uranus-acst
-- ✅ isl-uranus-me
-- ✅ isl-uranus-mono
-- ✅ isl-uranus-mug
-- ✅ isl-uranus-neko
-- ✅ isl-uranus-retro
-- ✅ isl-uranus-sticker
-- ✅ isl-uranus-tee
-- ✅ isl-uranus-tote
-- ✅ isl-uranus-wa
-- ✅ isl-uranus-yume
-- ✅ isl-venus-anime
-- ✅ isl-venus-asa
-- ✅ isl-venus-chat
-- ✅ isl-venus-game
-- ✅ isl-venus-koi
-- ✅ isl-venus-me
-- ✅ isl-venus-nemui
-- ✅ isl-venus-night
-- ✅ isl-venus-oshi
-- ✅ isl-venus-school
-- ✅ isl-venus-warai
+- ✅ fig/mars-a-kimorin
+- ✅ fig/mars-a-mikie
+- ✅ fig/mars-a-sister
+- ✅ fig/mars-a-user
+- ✅ fig/mars-b-kimorin
+- ✅ fig/mars-b-mikie
+- ✅ fig/mars-b-sister
+- ✅ fig/mars-b-user
+- ✅ fig/mars-c-kimorin
+- ✅ fig/mars-c-mikie
+- ✅ fig/mars-c-sister
+- ✅ fig/mars-c-user
+- ✅ fig/mercury-a-kimorin
+- ✅ fig/mercury-a-mikie
+- ✅ fig/mercury-a-sister
+- ✅ fig/mercury-a-user
+- ✅ fig/mercury-b-kimorin
+- ✅ fig/mercury-b-mikie
+- ✅ fig/mercury-b-sister
+- ✅ fig/mercury-b-user
+- ✅ fig/mercury-c-kimorin
+- ✅ fig/mercury-c-mikie
+- ✅ fig/mercury-c-sister
+- ✅ fig/mercury-c-user
+- ✅ fig/uranus-a-kimorin
+- ✅ fig/uranus-a-mikie
+- ✅ fig/uranus-a-sister
+- ✅ fig/uranus-a-user
+- ✅ fig/venus-a-kimorin
+- ✅ fig/venus-a-mikie
+- ✅ fig/venus-a-sister
+- ✅ fig/venus-a-user
+- ✅ fig/venus-b-kimorin
+- ✅ fig/venus-b-mikie
+- ✅ fig/venus-b-sister
+- ✅ fig/venus-b-user
+- ✅ fig/venus-c-kimorin
+- ✅ fig/venus-c-mikie
+- ✅ fig/venus-c-sister
+- ✅ fig/venus-c-user
