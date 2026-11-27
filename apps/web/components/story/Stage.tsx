@@ -31,6 +31,12 @@ export interface CharSpec {
   bustMax?: number;
   /** pictures for expressions: name → file (onboarding/<file>.webp) */
   faces?: Record<string, string>;
+  /**
+   * how the figure holds itself (client 2026-11-27, lib/story/motion.ts MOTION.poise): 'still' never bobs, hops or
+   * breathes — MONBAN stands like a statue while he speaks; 'divine' floats very slowly inside a breathing corona
+   * with a few motes of light — OBOLON. Without it: the usual hop, breath and bob of a mouthless speaker
+   */
+  poise?: 'still' | 'divine';
   /** the expression shown when none is set (a cast with no plain standing picture: kaiser1 has only its -x- poses) */
   rest?: string;
 }
@@ -54,7 +60,7 @@ const FRIEND = ['talk', 'joy', 'shock'];
 
 const CHAR: Record<string, CharSpec> = {
   // MONBAN's glowing eye is placed on the standing picture; on the pose pictures the eye is painted in
-  monban: { bottom: 8, height: 74, face: 0.24, tint: '#c99a4a', eye: [0.507, 0.225], faces: MONBAN_FACES },
+  monban: { bottom: 8, height: 74, face: 0.24, tint: '#c99a4a', eye: [0.507, 0.225], faces: MONBAN_FACES, poise: 'still' },
   'kimorin-sun': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e', faces: KIMORIN_FACES },
   // KIMORIN before the dragon (no wing) and at the gate (sunglasses on, no eye glow)
   'kimorin-n': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e', faces: facesOf('kimorin-n', POSES) },
@@ -69,9 +75,10 @@ const CHAR: Record<string, CharSpec> = {
   'kimorin-3': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
   'kimorin-8': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
   'kimorin-dragon': { bottom: 14, height: 70, face: 0.2, tint: '#7a2a20' },
-  obolon: { bottom: 38, height: 28, face: 0.5, tint: '#d8b56a', bustMax: 1.35 },
+  // the client's own picture (design/refs/2026-11-27-story/05): a pitch-black orb in a thin white corona
+  obolon: { bottom: 38, height: 28, face: 0.5, tint: '#cfd3e6', bustMax: 1.35, poise: 'divine' },
   // at the launch pit, lower and smaller: clear of MONBAN's halo in the still behind (QA 7, R3)
-  'obolon-pit': { bottom: 22, height: 21, face: 0.5, tint: '#d8b56a', bustMax: 1.8 },
+  'obolon-pit': { bottom: 22, height: 21, face: 0.5, tint: '#cfd3e6', bustMax: 1.8, poise: 'divine' },
   'takoyaki-brother': { bottom: 10, height: 60, face: 0.25, tint: '#d36a2a', faces: madeFaces('takoyaki-brother-x', FRIEND) },
   'takoyaki-sister': { bottom: 10, height: 60, face: 0.25, tint: '#d35a8a', faces: madeFaces('takoyaki-sister-x', FRIEND) },
   'daikon-kaiser': { bottom: 8, height: 70, face: 0.2, tint: '#7aa84a', faces: madeFaces('daikon-kaiser-x', FRIEND) },
@@ -265,7 +272,7 @@ export function Cast({
 }
 
 /** the parts a layered pose has (scripts/sprite-layers.py writes the list) */
-const stemOf = (url: string) => url.match(/\/onboarding\/([^/]+)\.webp$/)?.[1];
+const stemOf = (url: string) => url.match(/\/onboarding\/([^/]+)\.webp(?:\?.*)?$/)?.[1];
 const layersOf = (url: string): string[] => {
   const stem = stemOf(url);
   return (stem && (LAYERS as Record<string, string[]>)[stem]) || [];
@@ -283,7 +290,7 @@ function Character({ name, url, posed, lit, bust, hidden, talking, level, react,
   const spec = { ...base, height: base.height * scale };
   const shut = useBlink(!!spec.eye && !posed);
   const parts = layersOf(url);
-  const layer = (k: string) => (parts.includes(k) ? url.replace(/\.webp$/, `-${k}.webp`) : null);
+  const layer = (k: string) => (parts.includes(k) ? url.replace(/\.webp(\?.*)?$/, `-${k}.webp$1`) : null);
   const mouth = layer('mouth');
   const mouthBox = mouthBoxOf(url);
   // a pose painted with the mouth open (joy, shock): a closed-mouth patch instead, shown while the voice is quiet
@@ -373,16 +380,22 @@ function Character({ name, url, posed, lit, bust, hidden, talking, level, react,
           ? `reactTremble ${MOTION.react.tremble.ms}ms linear 8`
           : react === 'stare'
             ? `reactStare ${MOTION.react.stare.ms}ms ease-out forwards`
-            : !talking && MOTION.breath.amount
-              ? `breathe ${MOTION.breath.period}ms ease-in-out infinite`
-              : undefined,
+            : spec.poise
+              ? undefined
+              : !talking && MOTION.breath.amount
+                ? `stageBreathe ${MOTION.breath.period}ms ease-in-out infinite`
+                : undefined,
   };
+  const divine = spec.poise === 'divine';
+  const P = MOTION.poise;
   return (
     <div className={`pointer-events-none absolute z-[4] aspect-auto ${className}`} style={box} aria-hidden data-bust={bust ? name : undefined}>
       <div key={`c${push}${shot ?? ''}`} className="relative h-full" style={camera}>
-      <div key={hop} className="relative h-full" style={hop ? { animation: `hop ${MOTION.hop.ms}ms cubic-bezier(.3,1.5,.5,1)`, ['--hop' as string]: `${-MOTION.hop.height}%` } : undefined}>
-        <div className="relative h-full" style={{ ...life, ...(talking && !lips ? { animation: 'lipBob 0.22s ease-in-out infinite' } : {}) }}>
-          <div key={url} className={`relative h-full drop-shadow-[0_18px_40px_rgba(0,0,0,0.6)] ${posed ? 'animate-[poseIn_0.28s_cubic-bezier(.2,1.4,.4,1)]' : ''}`} style={{ filter: dim, ...(flip ? { transform: 'scaleX(-1)' } : {}) }}>
+      <div key={hop} className="relative h-full" style={hop && !spec.poise ? { animation: `hop ${MOTION.hop.ms}ms cubic-bezier(.3,1.5,.5,1)`, ['--hop' as string]: `${-MOTION.hop.height}%` } : undefined}>
+        {/* a mouthless speaker bobs with the voice — never the poised ones (MONBAN stands still, OBOLON floats slowly) */}
+        <div className={`relative h-full ${divine ? 'divine-float' : ''}`} style={{ ...life, ...(divine ? { ['--float' as string]: `${P.divine.floatPct}%`, animationDuration: `${P.divine.floatMs}ms` } : {}), ...(talking && !lips && !spec.poise ? { animation: 'lipBob 0.22s ease-in-out infinite' } : {}) }}>
+          {divine && <DivineAura lit={lit} talking={talking} />}
+          <div key={url} className={`relative h-full ${divine ? '' : 'drop-shadow-[0_18px_40px_rgba(0,0,0,0.6)]'} ${posed && !spec.poise ? 'animate-[poseIn_0.28s_cubic-bezier(.2,1.4,.4,1)]' : ''}`} style={{ filter: dim, ...(flip ? { transform: 'scaleX(-1)' } : {}) }}>
             {layer('tail') && (
               // the tail feathers sway on their own, behind the body
               // eslint-disable-next-line @next/next/no-img-element
@@ -405,25 +418,69 @@ function Character({ name, url, posed, lit, bust, hidden, talking, level, react,
               <img src={shutLayer} alt="" draggable={false} className={`absolute inset-0 ${img}`} style={{ opacity: talking && !open ? 1 : 0 }} />
             )}
             {layer('eyes') && (
-              // KIMORIN's eye slits: a glow that breathes (the sunglasses poses have none)
+              // KIMORIN's eye slits: a glow that breathes (the sunglasses poses have none). MONBAN's eye does not glow
+              // (client 2026-11-27: metallic gold with a small light) — its glow layer stays faint and still
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={layer('eyes')!} alt="" draggable={false} className={`absolute inset-0 ${img}`} style={{ animation: `eyeGlow ${MOTION.eyes.period}ms ease-in-out infinite`, ['--eyeMin' as string]: `${MOTION.eyes.min}`, ['--eyeMax' as string]: `${MOTION.eyes.max}` }} />
+              <img src={layer('eyes')!} alt="" draggable={false} className={`absolute inset-0 ${img}`} style={spec.poise === 'still' ? { opacity: P.still.eyeLayer } : { animation: `eyeGlow ${MOTION.eyes.period}ms ease-in-out infinite`, ['--eyeMin' as string]: `${MOTION.eyes.min}`, ['--eyeMax' as string]: `${MOTION.eyes.max}` }} />
             )}
           </div>
           {spec.eye && !posed && (
             <span
-              className="absolute h-[3.2%] w-[7%] -translate-x-1/2 -translate-y-1/2 rounded-full transition-opacity duration-100"
+              // a small light on the metal of the eye — it does not flare with the voice (client 2026-11-27)
+              className="absolute h-[1.1%] w-[2.4%] -translate-x-1/2 -translate-y-1/2 rounded-full transition-opacity duration-300"
               style={{
                 left: `${spec.eye[0] * 100}%`,
                 top: `${spec.eye[1] * 100}%`,
-                background: 'radial-gradient(circle, rgba(255,236,170,0.95) 0%, rgba(255,190,80,0.55) 40%, transparent 72%)',
-                opacity: shut ? 0 : talking ? 1 : lit ? 0.55 : 0.2,
+                background: 'radial-gradient(circle, rgba(255,244,210,0.9) 0%, rgba(255,206,120,0.35) 45%, transparent 75%)',
+                opacity: shut ? 0 : lit ? P.still.eyeLight : 0.15,
               }}
             />
           )}
         </div>
       </div>
       </div>
+    </div>
+  );
+}
+
+/**
+ * OBOLON's light (client 2026-11-27: 神々しく、ゆっくり — no shaking; a very few mystical lights): behind the orb a thin
+ * white corona that breathes slowly, and a handful of small motes drifting up around it. All CSS (globals.css
+ * .divine-*): transform and opacity only; with prefers-reduced-motion nothing moves and the motes are not shown.
+ */
+function DivineAura({ lit, talking }: { lit: boolean; talking: boolean }) {
+  const P = MOTION.poise.divine;
+  // placed after mounting (random places would differ between the server's HTML and the browser)
+  const [motes, setMotes] = useState<{ x: number; y: number; size: number; dur: number; delay: number; sway: number }[]>([]);
+  useEffect(() => {
+    setMotes(
+      Array.from({ length: P.motes }, (_, k) => {
+        // spread round the orb (never over the face): an angle each, a little outside the ring
+        const a = ((k + Math.random() * 0.7) / P.motes) * Math.PI * 2;
+        const r = 36 + Math.random() * 16;
+        return { x: 50 + Math.cos(a) * r, y: 50 + Math.sin(a) * r * 0.9, size: 1.6 + Math.random() * 1.8, dur: P.moteMs * (0.8 + Math.random() * 0.5), delay: -Math.random() * P.moteMs, sway: (Math.random() - 0.5) * 2 };
+      }),
+    );
+  }, [P.motes, P.moteMs]);
+  return (
+    <div className="pointer-events-none absolute inset-0" style={{ opacity: lit ? 1 : 0.35, transition: 'opacity 400ms ease', containerType: 'size' }} aria-hidden data-divine>
+      {/* the corona: a soft ring of white light just outside the orb's edge (the orb is 61% of the picture) */}
+      <span
+        className="divine-corona absolute inset-0 rounded-full"
+        style={{
+          background: 'radial-gradient(circle closest-side, transparent 58%, rgba(255,255,255,0.5) 61.5%, rgba(226,232,255,0.2) 70%, rgba(200,210,255,0.07) 84%, transparent 100%)',
+          animationDuration: `${P.coronaMs}ms`,
+          ['--cmin' as string]: `${talking ? P.corona[0] + 0.15 : P.corona[0]}`,
+          ['--cmax' as string]: `${P.corona[1]}`,
+        }}
+      />
+      {motes.map((m, k) => (
+        <span
+          key={k}
+          className="divine-mote absolute block rounded-full bg-white"
+          style={{ left: `${m.x}%`, top: `${m.y}%`, width: m.size, height: m.size, boxShadow: '0 0 6px 1.5px rgba(235,240,255,0.75)', animationDuration: `${m.dur}ms`, animationDelay: `${m.delay}ms`, ['--sway' as string]: `${m.sway * 10}px`, ['--rise' as string]: `${-P.risePct}cqh` }}
+        />
+      ))}
     </div>
   );
 }
