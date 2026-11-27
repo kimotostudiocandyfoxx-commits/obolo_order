@@ -15,7 +15,7 @@ import { MicCheck } from '@/components/mic/MicCheck';
 
 export const metadata: Metadata = {
   title: 'Obolo Order',
-  description: 'A social solar system connected by sound — 音でつながる、ひとつの太陽系',
+  description: '完全招待制宇宙秘密結社',
   applicationName: 'Obolo Order',
   appleWebApp: { capable: true, title: 'Obolo Order', statusBarStyle: 'black-translucent' },
   // client 2026-11-27: the golden eclipse (the client's own picture) as the app icon and as the picture a shared link shows
@@ -25,10 +25,10 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: 'Obolo Order',
     title: 'Obolo Order',
-    description: '音でつながる、ひとつの太陽系',
+    description: '完全招待制宇宙秘密結社',
     images: [{ url: '/og.jpg', width: 1200, height: 630, alt: 'Obolo Order' }],
   },
-  twitter: { card: 'summary_large_image', title: 'Obolo Order', description: '音でつながる、ひとつの太陽系', images: ['/og.jpg'] },
+  twitter: { card: 'summary_large_image', title: 'Obolo Order', description: '完全招待制宇宙秘密結社', images: ['/og.jpg'] },
 };
 
 export const viewport: Viewport = {

@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Obolo Order',
     short_name: 'Obolo',
-    description: 'A social solar system connected by sound',
+    description: '完全招待制宇宙秘密結社',
     start_url: '/',
     display: 'standalone',
     orientation: 'portrait',
