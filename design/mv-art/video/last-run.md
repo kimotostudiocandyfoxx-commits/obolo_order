@@ -1,5 +1,6 @@
-# MV video — 2026-11-27T02:50:08.547Z
+# MV video — 2026-11-27T07:20:34.888Z
 
-1 clips / about $0.07
+2 clips / about $0.07
 
-- ✅ sapon-dad
+- ✅ su-ebi-dad
+- ✅ su-gari-dad
