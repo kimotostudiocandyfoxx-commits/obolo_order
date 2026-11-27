@@ -1,25 +1,44 @@
-# UI art — 2026-11-27T02:47:43.252Z
+# UI art — 2026-11-27T07:11:36.393Z
 
-Seedream 5.0 Pro / 21枚 / 約159円
+Seedream 5.0 Pro / 40枚 / 約302円
 
-- ✅ chibi-sapon
-- ✅ chibi4-sapon
-- ✅ kor4-sapon
-- ✅ p5-mars-sapon
-- ✅ p5-neptune-sapon
-- ✅ p5-pluto-sapon
-- ✅ p5-uranus-sapon
-- ✅ p5-venus-sapon
-- ✅ sapon/book-1
-- ✅ sapon/book-2
-- ✅ sapon/book-3
-- ✅ sapon/book-4
-- ✅ sapon/book-5
-- ✅ sapon/book-6
-- ✅ sapon/dad
-- ✅ sapon/jacket
-- ✅ sapon/mug
-- ✅ sapon/radio
-- ✅ ship4-sapon
-- ✅ sushi/salmon-ref2
-- ✅ sushi/salmon-sheet2
+- ✅ chibi-ebi
+- ✅ chibi-gari
+- ✅ chibi-uni
+- ✅ chibi4-ebi
+- ✅ chibi4-gari
+- ✅ kor4-ebi
+- ✅ kor4-gari
+- ✅ kor4-uni
+- ✅ p5-mars-ebi
+- ✅ p5-mars-gari
+- ✅ p5-neptune-ebi
+- ✅ p5-neptune-gari
+- ✅ p5-pluto-ebi
+- ✅ p5-pluto-gari
+- ✅ p5-uranus-ebi
+- ✅ p5-uranus-gari
+- ✅ p5-venus-ebi
+- ✅ p5-venus-gari
+- ✅ ship4-ebi
+- ✅ ship4-gari
+- ✅ su/ebi/book-1
+- ✅ su/ebi/book-2
+- ✅ su/ebi/book-3
+- ✅ su/ebi/book-4
+- ✅ su/ebi/book-5
+- ✅ su/ebi/book-6
+- ✅ su/ebi/dad
+- ✅ su/ebi/goods
+- ✅ su/ebi/jacket
+- ✅ su/ebi/radio
+- ✅ su/gari/book-1
+- ✅ su/gari/book-2
+- ✅ su/gari/book-3
+- ✅ su/gari/book-4
+- ✅ su/gari/book-5
+- ✅ su/gari/book-6
+- ✅ su/gari/dad
+- ✅ su/gari/goods
+- ✅ su/gari/jacket
+- ✅ su/gari/radio
