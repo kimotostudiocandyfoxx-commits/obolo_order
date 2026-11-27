@@ -426,6 +426,24 @@
    "always": false,
    "cameraFixed": true,
    "prompt": "The firefly squids softly pulse with blue light in the night water, gentle waves roll, stars twinkle. Calm, seamless, the same painterly style, no cuts, no text."
+  },
+  {
+   "id": "su-shari-dad",
+   "image": "design/mv-art/out/su/shari/dad.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "always": false,
+   "cameraFixed": true,
+   "prompt": "The ripe golden rice sways in the evening breeze across the terraces, warm sunlight shimmers, a few birds fly far away. Calm, seamless, the same painterly style, no cuts, no text."
+  },
+  {
+   "id": "su-kani-dad",
+   "image": "design/mv-art/out/su/kani/dad.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "always": false,
+   "cameraFixed": true,
+   "prompt": "Snowflakes fall gently, the snow crab slowly moves its legs, small waves roll onto the snowy beach. Calm, seamless, the same painterly style, no cuts, no text."
   }
  ],
  "redo": []
