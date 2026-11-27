@@ -5,8 +5,9 @@ import type { Step } from '../script';
 export { MIKIE_DRILL } from './mars';
 
 /**
- * What an Obolo Order plays after day 8 (shared LAP2): the three days after joining (lib/onboarding/after.ts —
- * 天王星, 冥王星, 海王星 + the end), one a day. Replaces the old second journey's chapters.
+ * What an Obolo Order of the eight-day journey plays after it (shared LAP2, lap2Applies): the three days after joining
+ * (lib/onboarding/after.ts — 天王星, 冥王星, 海王星 + the end), one a day. Since M-R341 everyone else visits the three
+ * planets on days 8–10 of the first journey (lib/onboarding/outer.ts) and has no days after joining.
  */
 export const LAP2_STEPS: Step[][] = AFTER_DAYS;
 if (LAP2_STEPS.length !== LAP2.length) throw new Error('LAP2_STEPS out of step with LAP2');
@@ -22,7 +23,7 @@ export function lap2Steps(chapter: number): Step[] {
  */
 export type L2What =
   // after joining (P05m)
-  | 'm-goods' | 'm-publish-goods' | 'm-shop'
+  | 'm-goods' | 'm-publish-goods' | 'm-shop' | 'm-shop-locked'
   | 'm-story-seed' | 'm-story-cards' | 'm-story-write' | 'm-picturebook' | 'm-publish-book'
   | 'm-nagare' | 'm-game-seed' | 'm-game-cards' | 'm-game-play' | 'm-publish-game'
   // the old second journey's screens

@@ -17,6 +17,7 @@
  * is the fallback. In a line `{self}` is the 一人称; `{neo}` / `{name}` carry the style's honorific after them
  * ({neo}さん, {neo}殿, {neo}さま) so a custom 呼び方 can replace both.
  */
+import { JOURNEY_DONE, JOURNEY_PAYMENT } from './journey';
 
 /** the six common styles (M-R225) */
 export const BATI_COMMON_IDS = ['genki', 'teinei', 'kansai', 'cool', 'mellow', 'amae'] as const;
@@ -40,27 +41,29 @@ export type BatiEggKind = 'moon' | 'sun';
 /** {bati} at most (M-R215 / M-R217): one is in the chat at a time; once three are born no new egg comes */
 export const BATI_MAX = 3;
 /**
- * M-R231: the small eggs hatch on the mornings of the app's day 9 (the 2nd: the day after the first journey ends, never
- * on day 8's eclipse) and day 16 (the 3rd, 「ねがいの子」) — for members and residents alike. Free, never sold.
+ * M-R231: the small eggs hatch on the morning after the first journey ends (the 2nd: never on the eclipse's own day) and
+ * seven days later (the 3rd, 「ねがいの子」) — for members and residents alike. Free, never sold. As app days: 12 and 19
+ * since the journey is eleven days (M-R341; 9 and 16 while it was eight — the real time after the journey's end is the
+ * same: its wait, then a week).
  */
-export const BATI_EGG_DAY = { 2: 9, 3: 16 } as const;
+export const BATI_EGG_DAY = { 2: JOURNEY_DONE, 3: JOURNEY_DONE + 7 } as const;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 export interface BatiEggInput {
   /** {bati} born so far */
   born: number;
-  /** the first journey's day (1–8 to play; 9 = done) */
+  /** the first journey's day (1–11 to play; 12 = done) */
   journeyDay: number;
-  /** when day 9 opens (ms; the first journey's last day finished + the day's wait); null = not yet known */
+  /** when the day after the journey opens (ms; the first journey's last day finished + the day's wait); null = not yet known */
   day9At: number | null;
   now?: number;
 }
 
-/** the app's day for the eggs: the journey's day up to 8, then 9 from `day9At` and one more every 24 h */
+/** the app's day for the eggs: the journey's day up to its last (the Sun), then JOURNEY_DONE from `day9At` and one more every 24 h */
 export function batiAppDay(i: BatiEggInput): number {
   const now = i.now ?? Date.now();
-  if (i.day9At !== null && now >= i.day9At) return 9 + Math.floor((now - i.day9At) / DAY_MS);
-  return Math.min(i.journeyDay, 8);
+  if (i.day9At !== null && now >= i.day9At) return JOURNEY_DONE + Math.floor((now - i.day9At) / DAY_MS);
+  return Math.min(i.journeyDay, JOURNEY_PAYMENT);
 }
 
 /**
@@ -78,7 +81,7 @@ export function batiEggState(i: BatiEggInput): { nth: 2 | 3; day: number; ready:
     day,
     ready: app >= day,
     growth: Math.min(1, Math.max(0, (app - from) / (day - from))),
-    readyAt: i.day9At !== null ? new Date(i.day9At + (day - 9) * DAY_MS).toISOString() : null,
+    readyAt: i.day9At !== null ? new Date(i.day9At + (day - JOURNEY_DONE) * DAY_MS).toISOString() : null,
   };
 }
 

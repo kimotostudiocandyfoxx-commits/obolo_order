@@ -428,11 +428,11 @@ export const PLATE_AMBIENT: Record<string, StillAmbient> = {
 
 /** per scene: a scene whose place is not its still's (the members' days stand in other planets' stills) */
 export const SCENE_AMBIENT: Record<string, AmbientPatch & { planet?: Planet }> = {
-  // Pluto's day: Uranus's field before the rocket, then Pluto's own plain (after.ts): Pluto's air over both
+  // Pluto's day (day 8 since M-R341, outer.ts; the day after joining of before, after.ts): Pluto's air over its stills
   'M-PLUTO-S001': { planet: 'pluto' },
   'M-PLUTO-S002': { planet: 'pluto' },
-  // Neptune's morning still is the Pluto ice plain of the day before (after.ts: s/pluto-plain)
-  'M-NEPTUNE-S001': { planet: 'pluto' },
+  // Neptune's morning: the Moon temple, then the sunken city (outer.ts); the days after joining of before open it on the
+  // Pluto ice plain of the day before (after.ts: s/pluto-plain) — Pluto's air there
 };
 
 /** the still's key from a still id ('s/moon-temple'), a file ('/onboarding/s/moon-temple.jpg') or a plate ('plate-moon-temple') */

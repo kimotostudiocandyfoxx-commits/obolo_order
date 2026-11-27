@@ -1,7 +1,7 @@
 import { kimorinBack } from './kimorinBack';
 import type { Step } from './script';
 import { PLANET_HOMES_ENV, planetHomeIsNew } from '../planetHomes';
-import { D4_NEW, withNewHomes } from './newHomeScenes';
+import { D4_NEW, OSHI_NOTES, withNewHomes } from './newHomeScenes';
 
 /**
  * DAY 4 【月 → 木星】 — the simple version (M-R208/M-R210/M-R211; wip/P03/c01.md D05-S001〜S007, c02.md D05-S002〜S009;
@@ -236,7 +236,7 @@ export const DAY4_BEFORE: Step[] = [
  * story 2026-11-27 (M-R330): the day on the planet's NEW home — the script of now, word for word (story-sync checks
  * this one). Played only when the planet's switch is on (lib/planetHomes.ts, off by default).
  */
-export const DAY4_NEW_HOME: Step[] = withNewHomes(DAY4_BEFORE, D4_NEW);
+export const DAY4_NEW_HOME: Step[] = withNewHomes(DAY4_BEFORE, D4_NEW, OSHI_NOTES[4]);
 
 /** the day as played: its steps of before, unchanged, until jupiter's switch is on */
 export const DAY4: Step[] = planetHomeIsNew('jupiter', PLANET_HOMES_ENV) ? DAY4_NEW_HOME : DAY4_BEFORE;

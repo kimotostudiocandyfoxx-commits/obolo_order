@@ -1,47 +1,51 @@
 import { formatMana, MAKE_COST } from '@obolo/shared';
 import type { Step } from './script';
 import { kimorinBack } from './kimorinBack';
+import { M_END } from './outer';
 
 /**
- * DAY 8 【金星 → 地球 → 太陽】 — the simple version (M-R198〜M-R204; script P04/c02.md・c03.md, D08-S001〜S011).
- * Venus morning: {bati} is fading, the mana gem is empty → back to Earth. OBOLON 「、、、おかえり。」, MONBAN explains
+ * DAY 11 【天王星 → 地球 → 太陽】 — the simple version (M-R198〜M-R204; script P04/c02.md・c03.md, D08-S001〜S011: the
+ * scene ids keep their D08). It was day 8 until M-R341 (2026-11-27): the three outer planets are days 8–10 now
+ * (lib/onboarding/outer.ts), so the morning is on Uranus with MONBAN (before: on Venus with ボスG).
+ * Uranus morning: {bati} is fading, the mana gem is empty → back to Earth. OBOLON 「、、、おかえり。」, MONBAN explains
  * the Eclipse (¥88 a month is the mana that wells up in you), KIMORIN's questions about money, then he storms off.
  * The choice is made here at the Earth temple (D08-S003): 〔今は、住人のままでいる〕 ends the first journey as a
  * resident (D08-S005 → 〔宇宙の地図へ〕); 〔エクリプスを受ける〕 → the payment by the visitor's own hand (D08-S006,
  * EclipsePay) → 〔通信：火星シアターの扉が、開いた〕 → the rocket (KIMORIN jumps in: 「……母は、とっくに、Obolo Orderでした。」)
- * → into the Sun (D08-S007) → 「わかりやすく、言う。」 (D08-S009) → the Eclipse (D08-S011) → 最初の旅、おわり.
+ * → into the Sun (D08-S007) → 「わかりやすく、言う。」 (D08-S009) → the Eclipse (D08-S011) → 最初の旅、おわり → M-END-S001
+ * (「ここから先は、自由に」: the letter from the HQ, read by KIMORIN — the end of the day for everyone who took the Eclipse).
  * People who already became Obolo Order (f_join_early = 'true', M-R199/M-R202/M-R204): {bati} is bright in the
  * morning, a short おかえり, no decision and no payment screen, straight to the rocket of D08-S006.
  * People who heard the explanation at the HQ before but did not join (f_ej_heard = 'true'): a short おかえり → D08-S003.
  * No riddle book, no records I〜III, no FilmReel recap in the simple version (M-R198).
  */
-export const DAY8: Step[] = [
+export const DAY11: Step[] = [
   // D08-S001 地球へ帰る
   { t: 'scene', id: 'D08-S001' },
   { t: 'bgm', track: 'morning' },
-  { t: 'caption', text: '8日目' },
-  { t: 'still', image: 's/venus-stage' }, // 金星の朝。巨大なレコードの星が、ゆっくり回っている。ロケットが待っている。切符は五つのスタンプで金色
-  { t: 'sprite', image: ['bossg', 'kimorin-sun'] },
-  { t: 'say', who: 'ボスG', text: 'おはよう。……星めぐりは、ひと巡りだ。' },
+  { t: 'caption', text: '11日目' },
+  { t: 'still', image: 's/uranus-field' }, // 天王星の朝。雲の上の町の、横倒しの輪が、ゆっくり回っている。ロケットが待っている。切符は八つのスタンプで金色
+  { t: 'sprite', image: ['monban', 'kimorin-sun'] },
+  { t: 'say', who: 'MONBAN', text: '起きたか…。星めぐりは…ひと巡りだ…。' },
   { t: 'branch', key: 'f_join_early', cases: { true: 'morning-early' }, otherwise: 'morning-weak' },
   { t: 'label', id: 'morning-weak' },
-  { t: 'sprite', image: ['bossg', '@bati-weak'] }, // Bluenaの光から、{bati}が出てくる。光が、うすい。体が、きのうより、透けている
+  { t: 'sprite', image: ['monban', '@bati-weak'] }, // Bluenaの光から、{bati}が出てくる。光が、うすい。体が、きのうより、透けている
   { t: 'say', who: 'バティ', text: '……{neo}、おはよ……。なんだか、力が、出ないや……。' },
   // {neo}の手もとで、マナジェムが、光らなくなっている
-  { t: 'say', who: 'ボスG', text: '……マナジェムの中身が、空だな。旅で、使いきったんだ。' },
+  { t: 'say', who: 'MONBAN', text: '……マナジェムの中身が…空だ…。旅で…使いきった…。' },
   { t: 'goto', id: 'morning-both' },
   { t: 'label', id: 'morning-early' },
-  { t: 'sprite', image: ['bossg', '@bati'] }, // {bati}の光は、明るい
+  { t: 'sprite', image: ['monban', '@bati'] }, // {bati}の光は、明るい
   { t: 'say', who: 'バティ', text: 'おはよ、{neo}！　きょうも、元気！' },
-  { t: 'say', who: 'ボスG', text: '……マナが、湧いているな。もう、結社の一員か。' },
+  { t: 'say', who: 'MONBAN', text: '……マナが…湧いているな…。もう、結社の一員か。' },
   { t: 'label', id: 'morning-both' },
-  { t: 'sprite', image: ['bossg', 'kimorin-sun'] },
-  { t: 'say', who: 'ボスG', text: '地球の結社に、帰れ。' },
-  ...kimorinBack(8), // SYS-S002: once, if he walked out
+  { t: 'sprite', image: ['monban', 'kimorin-sun'] },
+  { t: 'say', who: 'MONBAN', text: '地球の結社に…帰れ…。' },
+  ...kimorinBack(11), // SYS-S002: once, if he walked out
   { t: 'say', who: 'KIMORIN', text: '……では、問いただしに参りましょう。この結社の、本当の狙いを。' },
   { t: 'action', label: 'ロケットで地球に帰る' },
   { t: 'sprite', image: null },
-  { t: 'se', sound: 'whoosh' }, // ロケットが、金星から飛び立つ
+  { t: 'se', sound: 'whoosh' }, // ロケットが、天王星から飛び立つ
   { t: 'still', image: 's/rocket-space' },
   { t: 'clock', on: true },
   { t: 'bgm', track: 'space' },
@@ -123,7 +127,7 @@ export const DAY8: Step[] = [
   { t: 'scene', id: 'D08-S003' },
   { t: 'label', id: 'decide' },
   { t: 'bgm', track: 'earth-decide' },
-  { t: 'ticket', flip: true }, // 金色の切符の裏の星図。土星〜金星を通って太陽の印まで。その外で錠の天王星と海王星、いちばん外の暗い冥王星
+  { t: 'ticket', flip: true, unlock: 'all' }, // 金色の切符の裏の星図。金の線は、土星、木星、水星、火星、金星、冥王星、海王星、天王星を通って、太陽の印まで
   { t: 'say', who: 'OBOLON', text: '、、、{neo}。決めるのは、お前だ。' },
   { t: 'say', who: 'MONBAN', text: '……エクリプスを受けなくても、お前は、住人のままだ…。それも、道だ…。' },
   { t: 'say', who: 'MONBAN', text: '……払えるなら、今から、エクリプスを始める…。太陽へは、俺が送る…。' },
@@ -140,7 +144,7 @@ export const DAY8: Step[] = [
   { t: 'sprite', image: null },
   { t: 'bgm', track: 'farewell' },
   { t: 'notice', text: '住人のまま、いつでも星に戻れます。作ったもの・届けたもの・my場所・金星の番組・声のコロリンは、ずっとそのままです' },
-  { t: 'notice', text: 'Obolo Order（会員）には、いつでもなれます。地球の神殿でMONBANに話しかけると、エクリプスを受けられます。なると、{bati}にまたマナが湧き、天王星・冥王星・海王星が、一つずつ開きます' },
+  { t: 'notice', text: 'Obolo Order（会員）には、いつでもなれます。地球の神殿でMONBANに話しかけると、エクリプスを受けられます。なると、{bati}にまたマナが湧きます' }, // the script's note still ends 「…湧き、天王星・冥王星・海王星が、一つずつ開きます」: no longer true since M-R341 (they are days 8–10), so that clause is not shown — the story session is asked for the new words
   { t: 'caption', text: '最初の旅、おわり' },
   { t: 'action', label: '宇宙の地図へ' },
   { t: 'end' },
@@ -150,7 +154,7 @@ export const DAY8: Step[] = [
   { t: 'bgm', track: 'earth-decide' },
   { t: 'loop', motion: '28-l' }, // 地球の神殿。光の柱の中に、OBOLON。そばに、MONBAN
   { t: 'say', who: 'OBOLON', text: '、、、来たか。' },
-  { t: 'ticket', flip: true },
+  { t: 'ticket', flip: true, unlock: 'all' },
   { t: 'goto', id: 'decide-choice' },
 
   // D08-S003 (pay) → D08-S006 エクリプスを始める（支払いは本人の手で）
@@ -253,16 +257,20 @@ export const DAY8: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'これで、{neo}も私も、Obolo Order……ということで、よろしいのですね？' },
   { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
   { t: 'say', who: 'OBOLON', text: '、、、そうだ。' },
-  { t: 'ticket', flip: true }, // {neo}の金色の切符が、ひとりでに裏返る。錠の印の三つの星。いちばん近い天王星の錠が、かちり、と小さく光る
-  { t: 'say', who: 'OBOLON', text: '錠の星は、、、一つずつ、開く。' },
+  { t: 'ticket', flip: true, unlock: 'all' }, // {neo}の金色の切符が、ひとりでに裏返る。星図の八つの星が、いっせいに、金色に光る
+  { t: 'say', who: 'OBOLON', text: 'これで、、、どの星へも、好きな順で、行ける。' },
   { t: 'say', who: 'KIMORIN', text: '……明日から、新しい星へ、、、ですね。' },
   { t: 'sprite', image: null },
   { t: 'bgm', track: null, fade: 4 }, // 音楽が、ゆっくり消えていく。白い光の中に、金色の輪だけが残る
   // 〔テロップ：最初の旅、おわり〕 only once (M-R205): someone who stayed a resident saw it then
+  // (the answer is kept under the day it was given on: d11 now, d8 for the accounts of the eight-day journey)
+  { t: 'branch', key: 'd11.f_d08_decide', cases: { '今は、住人のままでいる': 'fin-seen' }, otherwise: 'fin?' },
+  { t: 'label', id: 'fin?' },
   { t: 'branch', key: 'd8.f_d08_decide', cases: { '今は、住人のままでいる': 'fin-seen' }, otherwise: 'fin' },
   { t: 'label', id: 'fin' },
   { t: 'caption', text: '最初の旅、おわり' },
   { t: 'label', id: 'fin-seen' },
-  // 〔完了画面：次のお話（天王星）まで24時間のカウントダウン〕 is the player's / TomorrowScreen's
+  // M-END-S001 どこへでも — （11日目、エクリプスのあと）: every planet is open, in any order
+  ...M_END,
   { t: 'end' },
 ];

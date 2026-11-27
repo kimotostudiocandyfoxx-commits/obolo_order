@@ -1,6 +1,6 @@
 import type { Step } from './script';
 import { PLANET_HOMES_ENV, planetHomeIsNew } from '../planetHomes';
-import { D6_NEW, D6_STUDIOS, D6_STUDIOS_FROM, replaceStretch, withNewHomes } from './newHomeScenes';
+import { D6_NEW, D6_STUDIOS, D6_STUDIOS_FROM, OSHI_NOTES, replaceStretch, withNewHomes } from './newHomeScenes';
 import { kimorinBack } from './kimorinBack';
 
 /**
@@ -221,7 +221,7 @@ export const DAY6_BEFORE: Step[] = [
  * story 2026-11-27 (M-R330): the day on the planet's NEW home — the script of now, word for word (story-sync checks
  * this one). Played only when the planet's switch is on (lib/planetHomes.ts, off by default).
  */
-export const DAY6_NEW_HOME: Step[] = withNewHomes(replaceStretch(DAY6_BEFORE, 'D07-S002', D6_STUDIOS, { from: D6_STUDIOS_FROM }), D6_NEW);
+export const DAY6_NEW_HOME: Step[] = withNewHomes(replaceStretch(DAY6_BEFORE, 'D07-S002', D6_STUDIOS, { from: D6_STUDIOS_FROM }), D6_NEW, OSHI_NOTES[6]);
 
 /** the day as played: its steps of before, unchanged, until mars's switch is on */
 export const DAY6: Step[] = planetHomeIsNew('mars', PLANET_HOMES_ENV) ? DAY6_NEW_HOME : DAY6_BEFORE;

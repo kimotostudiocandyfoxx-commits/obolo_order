@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { BirthYear } from './birthYear';
+import { JOURNEY_DONE, JOURNEY_PAYMENT } from './journey';
 import { LOCALES, PLAZA_ICONS, PLAZA_NAME_MAX, SATURN_MAX_CHARS } from './config';
 import { NEO_FORM_IDS } from './neo';
 import { VOICE_STYLE_IDS } from './neoVoice';
@@ -174,7 +175,7 @@ export const AdminCreateInviteBody = CreateInviteBody.extend({
 export type AdminCreateInviteBody = z.infer<typeof AdminCreateInviteBody>;
 
 export const CompleteJourneyDayBody = z.object({
-  day: z.number().int().min(1).max(9),
+  day: z.number().int().min(1).max(JOURNEY_DONE),
   /** Answers given in the story (e.g. "want to go to space?"). */
   answers: z.record(z.string().max(40), z.string().max(100)).optional(),
 });
@@ -296,7 +297,7 @@ export const LookRestoreBody = z.object({ url: z.string().trim().min(1).max(2000
 export type LookRestoreBody = z.infer<typeof LookRestoreBody>;
 
 /** Operator testing (/lab, admin token): move the logged-in account to a journey day. */
-export const JumpJourneyBody = z.object({ day: z.number().int().min(1).max(10) });
+export const JumpJourneyBody = z.object({ day: z.number().int().min(1).max(JOURNEY_DONE) });
 export type JumpJourneyBody = z.infer<typeof JumpJourneyBody>;
 
 /** the members' days (shared LAP2: 天王星・冥王星・海王星) as a jump target: 'm1' = the first of them to play */
@@ -304,14 +305,15 @@ export const MEMBERS_DAYS = ['m1', 'm2', 'm3'] as const;
 export type MembersDay = (typeof MEMBERS_DAYS)[number];
 
 /**
- * The tester entrance (POST /me/tester/jump): a journey day 1–8 (from its start, no wait) or a members' day m1–m3
- * (an Obolo Order whose earlier members' days are done and the wait over).
+ * The tester entrance (POST /me/tester/jump): a journey day 1–11 (from its start, no wait; 8–10 the outer planets, 11
+ * the Sun — M-R341) or a members' day m1–m3 (the days after joining of the eight-day journey of before, kept for its
+ * accounts: an Obolo Order whose earlier members' days are done and the wait over).
  */
-export const TesterJumpBody = z.object({ day: z.union([z.number().int().min(1).max(8), z.enum(MEMBERS_DAYS)]) });
+export const TesterJumpBody = z.object({ day: z.union([z.number().int().min(1).max(JOURNEY_PAYMENT), z.enum(MEMBERS_DAYS)]) });
 export type TesterJumpBody = z.infer<typeof TesterJumpBody>;
 
 /** Operator testing (/lab, admin token) to a members' day — POST /me/journey/jump with day 'm1' | 'm2' | 'm3' */
-export const AdminJumpBody = z.object({ day: z.union([z.number().int().min(1).max(10), z.enum(MEMBERS_DAYS)]) });
+export const AdminJumpBody = z.object({ day: z.union([z.number().int().min(1).max(JOURNEY_DONE), z.enum(MEMBERS_DAYS)]) });
 export type AdminJumpBody = z.infer<typeof AdminJumpBody>;
 
 /** Day 9: the embedded Stripe Checkout finished — the server checks the session and records the order. */

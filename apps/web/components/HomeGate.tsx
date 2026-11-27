@@ -22,10 +22,11 @@ const SERIF = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 /**
  * Everything in front of the solar system (client decision 2026-10-04):
  *   guest            → email entry (invited → Day 1, member → continue)
- *   day 1–6, playing → that day's story (Day 1 = /invite story)
- *   day finished     → "〇〇、また明日。" 24 h countdown (or 明日まで待てない)
- *   day 7            → the Eclipse day: story with the ¥88/month payment inside, then "また明日" too
- *   day 9, ORDER     → the second journey (once per visit, until it is done; components/lap2) → the solar system
+ *   day 1–10, playing → that day's story (Day 1 = /invite story; 8–10 the outer planets, M-R341)
+ *   day finished      → "〇〇、また明日。" 24 h countdown (or 明日まで待てない)
+ *   day 11            → the Eclipse day: story with the ¥88/month payment inside, then "また明日" too
+ *   day 12 (done), ORDER of the eight-day journey → its days after joining (once per visit, until they are done;
+ *                        components/lap2 — lap2Done is "all" for everyone else) → the solar system
  */
 export function HomeGate({ children }: { children: ReactNode }) {
   const { status, me, setMe } = useAuth();
@@ -35,7 +36,7 @@ export function HomeGate({ children }: { children: ReactNode }) {
 
   const day = me.journeyDay;
   if (day >= JOURNEY_DONE) {
-    // M-R231: a member's day 16 — the egg scene (SYS-S003, the 3rd) first thing that morning, then the Moon home
+    // M-R231: a member's 3rd egg (a week after the journey) — the egg scene (SYS-S003, the 3rd) first thing that morning, then the Moon home
     if (isActiveMember(me) && me.batiEgg?.nth === 3 && eggReady(me)) return <EggMorningGate>{children}</EggMorningGate>;
     if (isActiveMember(me) && lap2Done(me.story) < LAP2_DONE) return <Lap2Gate>{children}</Lap2Gate>;
     return <>{children}</>;

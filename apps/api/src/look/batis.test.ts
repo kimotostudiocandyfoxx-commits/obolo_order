@@ -262,12 +262,15 @@ describe('「ねがいの子」 (M-R230) and the days the eggs hatch (M-R231)', 
     for (const w of ['恋人になってくれる子', '有名な俳優にそっくりな子', 'ドラえもんみたいな子'])
       await expect(s.hatchNew('u', { egg: 'sun', seed: w })).rejects.toMatchObject({ response: { error: { code: 'WISH_REFUSED', message: 'それは、ちょっとむずかしいかも！　ほかの言い方で、教えて！' } } });
   });
-  it('day 9 opens a day after the first journey ends; the egg grows every day before it', () => {
+  it('the day after opens a day after the first journey ends (the Sun: day 11); the egg grows every day before it', () => {
     const { user } = make({ batiFood: 'カレー', batiName: 'ポン', batiImageUrl: 'https://x/b1.png', batiId: 'b1', batisJson: [born('b1', 'ポン')], journeyDay: 5 });
     const a = toMe(user as never).batiEgg!;
     expect(a).toMatchObject({ nth: 2, ready: false, readyAt: null });
-    expect(a.growth).toBeCloseTo(3 / 7);
+    expect(a.growth).toBeCloseTo(3 / 10);
+    // days 8–10 (the outer planets, M-R341) are journey days: finishing one is not the journey's end
     Object.assign(user, { journeyDay: 8, journeyCompletedAt: new Date(Date.now() - 25 * 3_600_000) });
+    expect(toMe(user as never).batiEgg?.ready).toBe(false);
+    Object.assign(user, { journeyDay: 11, journeyCompletedAt: new Date(Date.now() - 25 * 3_600_000) });
     expect(toMe(user as never).batiEgg?.ready).toBe(true);
     Object.assign(user, { journeyCompletedAt: new Date(Date.now() - 3_600_000) });
     expect(toMe(user as never).batiEgg?.ready).toBe(false);
@@ -278,7 +281,7 @@ import { UsersService } from '../users/users.service';
 
 describe('M-R231: an account already past the journey with no day 9 saved', () => {
   it('starts counting from its first open after the update: the 2nd egg the next morning, not at once', async () => {
-    const { user } = make({ batiFood: 'カレー', batiName: 'ポン', batiImageUrl: 'https://x/b1.png', batiId: 'b1', batisJson: [born('b1', 'ポン')], journeyDay: 9, deletedAt: null });
+    const { user } = make({ batiFood: 'カレー', batiName: 'ポン', batiImageUrl: 'https://x/b1.png', batiId: 'b1', batisJson: [born('b1', 'ポン')], journeyDay: 12, deletedAt: null });
     expect(toMe(user as never).batiEgg?.ready).toBe(false);
     const db = {
       write: {

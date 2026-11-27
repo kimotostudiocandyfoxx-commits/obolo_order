@@ -130,18 +130,18 @@ describe('POST /me/tester/* guards', () => {
     await expect(c.jump('u1', { day: 99 }, { protocol: 'https', get: () => 'h' } as never)).rejects.toMatchObject({ status: 403 });
   });
 
-  it('jump takes days 1–8 and the members’ days m1–m3 only', async () => {
-    for (const day of [1, 8, 'm1', 'm2', 'm3']) expect(TesterJumpBody.safeParse({ day }).success).toBe(true);
-    for (const day of [0, 9, 10, -1, 2.5, 'm0', 'm4', '3', null]) expect(TesterJumpBody.safeParse({ day }).success).toBe(false);
+  it('jump takes days 1–11 and the members’ days m1–m3 only', async () => {
+    for (const day of [1, 8, 9, 10, 11, 'm1', 'm2', 'm3']) expect(TesterJumpBody.safeParse({ day }).success).toBe(true);
+    for (const day of [0, 12, 13, -1, 2.5, 'm0', 'm4', '3', null]) expect(TesterJumpBody.safeParse({ day }).success).toBe(false);
     const { s } = make(row());
     const c = new TesterController(s);
-    await expect(c.jump('u1', { day: 9 }, { protocol: 'https', get: () => 'h' } as never)).rejects.toMatchObject({ status: 400 });
+    await expect(c.jump('u1', { day: 12 }, { protocol: 'https', get: () => 'h' } as never)).rejects.toMatchObject({ status: 400 });
   });
 });
 
 describe('〔最初から〕 (POST /me/tester/reset)', () => {
   it('goes back to before day 1, keeping the account, the birth year and the dachi; twice is the same as once', async () => {
-    const { s, state } = make(row({ orderedAt: new Date(), journeyDay: 9, dachiAt: new Date('2026-11-02T00:00:00Z') } as Partial<Row>));
+    const { s, state } = make(row({ orderedAt: new Date(), journeyDay: 12, dachiAt: new Date('2026-11-02T00:00:00Z') } as Partial<Row>));
     const once = await s.reset('u1');
     expect(once.journeyDay).toBe(1);
     expect(once.journeyCompletedAt).toBeNull();

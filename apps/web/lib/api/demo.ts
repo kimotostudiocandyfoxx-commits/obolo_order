@@ -64,6 +64,7 @@ import {
   type AtelierLayout,
   BUDDY_FREE_DAILY_MESSAGES,
   JOURNEY_DONE,
+  JOURNEY_EIGHT_KEY,
   JOURNEY_PAYMENT,
   JOURNEY_WAIT_MS,
   MEMBERS_DAYS,
@@ -789,7 +790,7 @@ export class DemoApi implements Api {
   async me() {
     let u = this.s.users[this.uid()];
     // M-R231: past the first journey with no day 9 saved: it starts now — the 2nd egg the next morning
-    if (u?.bati && u.journeyDay >= 9 && !u.story?.['eggs.day9'])
+    if (u?.bati && u.journeyDay >= JOURNEY_DONE && !u.story?.['eggs.day9'])
       u = this.patchMe((x) => ({ story: { ...(x.story ?? {}), 'eggs.day9': new Date(Date.now() + 24 * 3_600_000).toISOString() } }));
     // the egg's day is worked out each time (it grows every day)
     return withTalk(u?.bati ? { ...u, batiEgg: demoEggOf(u) } : u);
@@ -1843,7 +1844,7 @@ export class DemoApi implements Api {
       // what was made today, for the next days' stories (like the server's onboardingJson)
       const story = { ...(u.story ?? {}), ...Object.fromEntries(Object.entries(answers ?? {}).map(([k, v]) => [`d${day}.${k}`, v])) };
       // M-R231: the first journey's last day done — the app's day 9 (the 2nd egg's morning) opens after the day's wait
-      if (day === 8 && !story['eggs.day9']) story['eggs.day9'] = new Date(Date.now() + 24 * 3_600_000).toISOString();
+      if (day === JOURNEY_PAYMENT && !story['eggs.day9']) story['eggs.day9'] = new Date(Date.now() + 24 * 3_600_000).toISOString();
       // client 2026-11-25: the night of day 2 confirms the profile look — its full price from the gem, once (like the API)
       if (day === 2 && !story['look.confirmed']) {
         story['look.confirmed'] = u.avatarUrl ?? '-';
@@ -1879,7 +1880,7 @@ export class DemoApi implements Api {
   async jumpJourney(day: number | MembersDay) {
     if (typeof day === 'string') {
       const n = MEMBERS_DAYS.indexOf(day);
-      return this.patchMe((u) => ({ journeyDay: JOURNEY_DONE, journeyCompletedAt: null, orderedAt: u.orderedAt ?? now(), story: { ...(u.story ?? {}), 'l2.done': String(n), 'l2.at': new Date(Date.now() - JOURNEY_WAIT_MS - 60_000).toISOString() } }));
+      return this.patchMe((u) => ({ journeyDay: JOURNEY_DONE, journeyCompletedAt: null, orderedAt: u.orderedAt ?? now(), story: { ...(u.story ?? {}), [JOURNEY_EIGHT_KEY]: '1', 'l2.done': String(n), 'l2.at': new Date(Date.now() - JOURNEY_WAIT_MS - 60_000).toISOString() } }));
     }
     return this.patchMe(() => ({ journeyDay: day, journeyCompletedAt: null, ...(day <= JOURNEY_PAYMENT ? { orderedAt: null } : {}) }));
   }

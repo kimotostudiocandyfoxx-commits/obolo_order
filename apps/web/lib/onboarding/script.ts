@@ -23,8 +23,18 @@ export type Speaker =
   | 'バティ'
   | 'うんちピンポンくん'
   | 'コロリン'
-  /** Uranus's resident (M-R195, the client's own design; no picture in the app yet) */
+  /** Pluto's resident since M-R341 (Uranus's before: M-R195, the client's own design) */
   | 'クロコパトラ'
+  /** Neptune's resident (M-R341; the client's picture, onboarding/onimonk.webp) */
+  | 'オニモンク'
+  /** the seven Sushimon who board the rocket on day 3 (M-R336, D04-S002b; onboarding/sushi-<key>.webp) */
+  | 'サーぽん'
+  | 'ガリみ♡'
+  | 'えびすけ'
+  | 'ウニまる'
+  | 'いかチョロ'
+  | 'しゃりお'
+  | 'かにぶぅ'
   /** the inviter's stand-in on Saturn when nobody invited you: her welcome voice message (D04-S005c, M-R212) */
   | 'MIKIE⭐︎DRILL'
   /** a voice not seen yet (（声）「おい。」) */
@@ -185,7 +195,11 @@ export type Step =
    * The space ticket with its four stamp slots; `stamp` presses that planet's stamp, `flip` shows the star map on the back
    * (both wait for a tap). With neither it is the scene itself — `dest` its 本日の目的地 — and stays until the next scene.
    */
-  | { t: 'ticket'; stamp?: 'saturn' | 'jupiter' | 'mercury' | 'mars' | 'venus'; flip?: boolean; dest?: string }
+  /**
+   * `unlock` (M-R341, with `flip`): on the star map the lock of that outer planet comes off (Pluto day 8, Neptune day 9,
+   * Uranus day 10 — the ones before it are open already); 'all' = every star open and gold (the Eclipse day)
+   */
+  | { t: 'ticket'; stamp?: 'saturn' | 'jupiter' | 'mercury' | 'mars' | 'venus'; flip?: boolean; dest?: string; unlock?: 'pluto' | 'neptune' | 'uranus' | 'all' }
   /** The day's 88 minutes (M-R22): on from the first rocket departure, off in the temples of Earth and the Moon. */
   | { t: 'clock'; on: boolean }
   /** Bluena projects (open) or closes the square screen: MONBAN at the HQ gate. */

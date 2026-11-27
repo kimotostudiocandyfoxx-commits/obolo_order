@@ -164,12 +164,15 @@ describe('KIMORIN⭐︎ during the waits (M-R214)', () => {
   // finished day 3 at 15:00 JST
   const done3 = new Date('2026-11-03T06:00:00Z');
 
-  it('the lines are the client’s words: two for the waits of days 3–5, one for days 6 and 7', () => {
+  it('the lines are the client’s words: two for the waits of days 3–5, one for day 6 and for the journey’s last night (day 10 since M-R341)', () => {
     expect(KIMORIN_WAIT_LINES).toHaveLength(8);
     expect(KIMORIN_WAIT_LINES[6].text).toBe('明日は、金星。……電子レンジの次は、何でしょうね。私の推理では、、、言いません。');
     expect(KIMORIN_WAIT_LINES[5].text).toContain('？　私の');
     for (const d of [3, 4, 5]) expect(KIMORIN_WAIT_LINES.filter((l) => l.day === d)).toHaveLength(2);
-    for (const d of [6, 7]) expect(KIMORIN_WAIT_LINES.filter((l) => l.day === d)).toHaveLength(1);
+    for (const d of [6, 10]) expect(KIMORIN_WAIT_LINES.filter((l) => l.day === d)).toHaveLength(1);
+    // M-R341: 「……明日で、旅が終わるそうですね。」 is said the night before the Eclipse (day 11), not after Venus any more
+    expect(KIMORIN_WAIT_LINES.find((l) => l.id === 'k8')?.day).toBe(10);
+    for (const d of [7, 8, 9]) expect(KIMORIN_WAIT_LINES.filter((l) => l.day === d)).toHaveLength(0);
   });
 
   it('at night (Japan time), inside the 24 h wait, at most two, the same for the same person', () => {
@@ -212,7 +215,7 @@ describe('KIMORIN⭐︎ during the waits (M-R214)', () => {
     // dachi on day 3 (D04-S005c), before finishing it
     w.people[A].journeyCompletedAt = null;
     w.people[A].dachiAt = new Date(now.getTime());
-    for (let day = 3; day <= 7; day++) {
+    for (let day = 3; day <= 10; day++) {
       w.people[A].journeyDay = day;
       w.people[A].journeyCompletedAt = new Date(now.getTime() + H);
       // read the threads every hour through the wait

@@ -2,28 +2,33 @@ import { PLANET_HOMES, type HomePlanet, type HomeRel, type HomeWork, type Planet
 import { FIVE, isFivePlanet, sampleArtIndex, sampleGoodsKind, sampleOpening } from './five';
 import { SAMPLE_ARTS } from './jupiter';
 import { SAMPLE_SONGS, sampleSongUrl } from './mercury';
+import { dachiOf, oshiOn, ROSTER_LAST_DAY } from './roster';
 
 /**
- * The preview's sample home (/planets-preview/<planet>?sample=1, and when the app runs without the API): the story
- * team's cast with their figures on every planet (the prototype's pictures, public/planets/sample/), ten people so the
- * queue shows. Names and pictures are the prototype's; nothing is written.
+ * The preview's sample home (/planets-preview/<planet>?sample=1, and when the app runs without the API): the story's
+ * cast with their figures on every planet (the story team's pictures, public/planets/sample/). Names and pictures are
+ * the prototype's; nothing is written.
+ *
+ * M-R341 / M-R342 (handoff planets-08): only the story's cast comes — the ダチ KIMORIN⭐︎ (and MIKIE⭐︎DRILL once an Obolo
+ * Order) and the oshi of the day (lib/planetTemplate/roster.ts: 9 on day 3 … 18 on day 10). The sample people of before
+ * (ユウキ, nana, れい, ショウ, ミオ) are gone. Without a day: the journey done as an Obolo Order (both ダチ, all 18 oshi).
  */
-const CAST: [name: string, pic: string, rel: HomeRel][] = [
-  ['MIKIE⭐︎DRILL', 'mikie', 'dachi'],
-  ['KIMORIN⭐︎', 'kimorin', 'dachi'],
-  ['MONBAN', 'monban', 'dachi'],
-  ['たこ焼きブラザー', 'brother', 'oshi'],
-  ['たこ焼きシスター', 'sister', 'dachi'],
-  ['ユウキ', 'kimorin', 'dachi'],
-  ['nana', 'sister', 'oshi'],
-  ['れい', 'monban', 'oshi'],
-  ['ショウ', 'brother', 'dachi'],
-  ['ミオ', 'mikie', 'oshi'],
-];
+export interface SampleCast {
+  /** the first journey's day whose roster comes (3–10); none: all eighteen */
+  day?: number;
+  /** an Obolo Order: MIKIE⭐︎DRILL is a ダチ too (default: true without a day, false with one) */
+  ordered?: boolean;
+}
+export function sampleCast(o: SampleCast = {}): [name: string, pic: string, rel: HomeRel][] {
+  const ordered = o.ordered ?? o.day === undefined;
+  // MIKIE⭐︎DRILL first when she is there (the newest arrival, as the sample always had her)
+  return [...dachiOf(ordered).reverse().map((p): [string, string, HomeRel] => [p.name, p.pic, 'dachi']), ...oshiOn(o.day ?? ROSTER_LAST_DAY).map((p): [string, string, HomeRel] => [p.name, p.pic, 'oshi'])];
+}
 const WORDS = ['明日もがんばるZE', 'うまいラーメン見つけた', 'ねむい…でも楽しい', '新曲できたかも', '空がきれいだった', 'たこ焼き食べたい。', 'きょうは晴れ'];
 export const SAMPLE_OWN_FIGURE = (planet: HomePlanet) => `/planets/sample/fig-${planet}-user.webp`;
 
-export function templateSample(planet: HomePlanet, now = Date.now()): PlanetHomeView {
+export function templateSample(planet: HomePlanet, now = Date.now(), cast: SampleCast = {}): PlanetHomeView {
+  const CAST = sampleCast(cast);
   const cfg = PLANET_HOMES[planet];
   const kind = cfg.store ?? 'saturn_post';
   const at = (h: number) => new Date(now - h * 3600_000).toISOString();

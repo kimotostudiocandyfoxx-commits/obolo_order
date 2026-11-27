@@ -12,15 +12,15 @@ import {
 } from './access';
 import { BATI_PERSONALITY_IDS, hasBannedBatiWord } from './batiPersona';
 
-const resident = { member: false, journeyDay: 9, journeyCompletedAt: null, balance: 0 };
-const member = { member: true, journeyDay: 9, journeyCompletedAt: null, balance: 0 };
+const resident = { member: false, journeyDay: 12, journeyCompletedAt: null, balance: 0 };
+const member = { member: true, journeyDay: 12, journeyCompletedAt: null, balance: 0 };
 
 describe('R18 access at 0 mana', () => {
   it('the first journey never stops (day 8 finished = past it)', () => {
     expect(onFirstJourney({ journeyDay: 3 })).toBe(true);
-    expect(onFirstJourney({ journeyDay: 8, journeyCompletedAt: null })).toBe(true);
-    expect(onFirstJourney({ journeyDay: 8, journeyCompletedAt: new Date() })).toBe(false);
-    expect(onFirstJourney({ journeyDay: 9 })).toBe(false);
+    expect(onFirstJourney({ journeyDay: 11, journeyCompletedAt: null })).toBe(true);
+    expect(onFirstJourney({ journeyDay: 11, journeyCompletedAt: new Date() })).toBe(false);
+    expect(onFirstJourney({ journeyDay: 12 })).toBe(false);
     expect(outOfMana({ ...resident, journeyDay: 5 })).toBe(false);
   });
   it('a non-member past the journey at 0 is out of mana; with mana or as a member not', () => {

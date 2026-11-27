@@ -72,7 +72,7 @@ export default function LabPage() {
               {me.orderedAt ? '・支払い済み' : ''}
             </p>
             <div className="mt-2 flex flex-wrap gap-1.5">
-              {([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 'm1', 'm2', 'm3'] as const).map((d) => (
+              {([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 'm1', 'm2', 'm3'] as const).map((d) => (
                 <button
                   key={d}
                   disabled={!admin || busy}

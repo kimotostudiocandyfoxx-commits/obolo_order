@@ -61,7 +61,8 @@ export const KIMORIN_WAIT_LINES: readonly DachiLine[] = [
   { id: 'k5', who: 'kimorin', day: 5, voice: null, text: '私の曲、また聴いてしまいました。……三回。いえ、四回。' },
   { id: 'k6', who: 'kimorin', day: 5, voice: null, text: '島に、また何か、生えていませんか？　私のには、生えていました。' },
   { id: 'k7', who: 'kimorin', day: 6, voice: null, text: '明日は、金星。……電子レンジの次は、何でしょうね。私の推理では、、、言いません。' },
-  { id: 'k8', who: 'kimorin', day: 7, voice: null, text: '……明日で、旅が終わるそうですね。……いえ、べつに、さみしくは、ありません。' },
+  // M-R341: the journey's last night is day 10's now (the Eclipse is day 11) — the words are true only there
+  { id: 'k8', who: 'kimorin', day: 10, voice: null, text: '……明日で、旅が終わるそうですね。……いえ、べつに、さみしくは、ありません。' },
 ];
 
 export function dachiLine(id: string | null | undefined): DachiLine | undefined {

@@ -8,7 +8,7 @@ const row = (over: Record<string, unknown>) => ({
   email: 'a@example.com',
   handle: 'h',
   displayName: 'A',
-  journeyDay: 8,
+  journeyDay: 11,
   orderedAt: first,
   subscriptionStatus: 'canceled',
   stripeSubscriptionId: 'sub_old',

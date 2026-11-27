@@ -3,6 +3,8 @@ import { randomUUID } from 'node:crypto';
 import {
   EMPTY_ATELIER,
   JOURNEY_DONE,
+  JOURNEY_EIGHT_KEY,
+  planetIsOpen,
   nextJourneyDay,
   JOURNEY_PAYMENT,
   JOURNEY_WAIT_MS,
@@ -47,8 +49,9 @@ function batiFaces(j: Record<string, string> | null): Partial<Record<string, str
 }
 
 /**
- * When the app's day 9 opens (M-R231): kept in users.bati_egg_at when the first journey's last day is finished (+ the
- * day's wait); before that, day 8 finished → its wait. An account already past the journey with none saved gets it on
+ * When the day after the first journey opens (M-R231; "day 9" while the journey was eight days, app day 12 since
+ * M-R341): kept in users.bati_egg_at when the first journey's last day is finished (+ the day's wait); before that, the
+ * Sun day finished → its wait. An account already past the journey with none saved gets it on
  * its first open after this update (getMe: + the day's wait — the 2nd egg the next morning, not at once); until then
  * null (not yet).
  */
@@ -229,16 +232,19 @@ export class UsersService {
     return toMe(u);
   }
 
-  /** Uranus: your atelier; only ORDER members have one (the second journey). */
+  /**
+   * Uranus: your atelier. M-R341: Uranus is visited on the first journey's day 10, before becoming Obolo Order — the
+   * atelier opens with the planet (planetIsOpen), a member or not (before: ORDER members only).
+   */
   async getAtelier(userId: string): Promise<AtelierLayout> {
     const u = await this.load(userId);
-    if (!activeMember(u)) throw apiError(HttpStatus.FORBIDDEN, 'ORDER_REQUIRED', 'The atelier opens for ORDER members');
+    if (!activeMember(u) && !planetIsOpen('uranus', u.journeyDay)) throw apiError(HttpStatus.FORBIDDEN, 'ORDER_REQUIRED', 'The atelier opens with Uranus (day 10)');
     return u.atelierJson ?? EMPTY_ATELIER;
   }
 
   async saveAtelier(userId: string, layout: AtelierLayout): Promise<AtelierLayout> {
     const u = await this.load(userId);
-    if (!activeMember(u)) throw apiError(HttpStatus.FORBIDDEN, 'ORDER_REQUIRED', 'The atelier opens for ORDER members');
+    if (!activeMember(u) && !planetIsOpen('uranus', u.journeyDay)) throw apiError(HttpStatus.FORBIDDEN, 'ORDER_REQUIRED', 'The atelier opens with Uranus (day 10)');
     await this.db.write.update(users).set({ atelierJson: layout, updatedAt: new Date() }).where(eq(users.id, userId));
     return layout;
   }
@@ -271,7 +277,7 @@ export class UsersService {
 
   /**
    * The story of `day` was finished. Idempotent; never moves the journey backwards.
-   * Day 8 (the Sun) ends paid (ORDER) or not (a resident, draft 21); either way the journey is then done.
+   * The Sun day (11 since M-R341) ends paid (ORDER) or not (a resident, draft 21); either way the journey is then done.
    */
   async completeJourneyDay(userId: string, body: CompleteJourneyDayBody): Promise<Me> {
     const cur = await this.load(userId);
@@ -281,7 +287,7 @@ export class UsersService {
       .update(users)
       .set({
         journeyCompletedAt: new Date(),
-        // M-R231: the first journey's last day done — day 9 (the 2nd egg's morning) opens after the day's wait
+        // M-R231: the first journey's last day done — the day after (the 2nd egg's morning) opens after the day's wait
         ...(body.day === JOURNEY_PAYMENT && !cur.batiEggAt ? { batiEggAt: new Date(Date.now() + JOURNEY_WAIT_MS) } : {}),
         onboardingJson: { ...cur.onboardingJson, ...Object.fromEntries(Object.entries(body.answers ?? {}).map(([k, v]) => [`d${body.day}.${k}`, v])) },
         updatedAt: new Date(),
@@ -292,7 +298,8 @@ export class UsersService {
   }
 
   /**
-   * A day after joining was finished (Obolo Order only; shared LAP2: 天王星・冥王星・海王星). Days go in order and
+   * A day after joining was finished (Obolo Order only; shared LAP2: 天王星・冥王星・海王星 — since M-R341 only for the
+   * accounts of the eight-day journey: for everyone else lap2Done is "all", so this changes nothing). Days go in order and
    * never back; finishing one again (a replay) keeps what was made then. Each day opens 24 h after the one before
    * was finished (`l2.at`, no skipping: M-R199); a couple of minutes' grace covers a phone clock that runs fast.
    */
@@ -342,8 +349,8 @@ export class UsersService {
   }
 
   /**
-   * Operator testing: put the account on `day` (story from the start, no countdown). Days up to 9
-   * also forget the order so the Day 9 payment can be tried again (the Stripe customer is kept).
+   * Operator testing: put the account on `day` (story from the start, no countdown). Days up to the Sun day
+   * also forget the order so its payment can be tried again (the Stripe customer is kept).
    */
   async jumpJourney(userId: string, day: number): Promise<Me> {
     const [u] = await this.db.write
@@ -369,6 +376,8 @@ export class UsersService {
     if (!cur.orderedAt) await this.markOrdered(userId, { subscriptionStatus: 'demo' });
     const story = { ...((await this.load(userId)).onboardingJson ?? {}) } as Record<string, string>;
     story['l2.done'] = String(n - 1);
+    // M-R341: the members' days exist only for the accounts of the eight-day journey — the jump makes this one of them
+    story[JOURNEY_EIGHT_KEY] = '1';
     // finished "a day ago": the next day is open now (lap2OpensAt); for the first, no wait at all
     story['l2.at'] = new Date(Date.now() - LAP2_WAIT_MS - 60_000).toISOString();
     const [u] = await this.db.write

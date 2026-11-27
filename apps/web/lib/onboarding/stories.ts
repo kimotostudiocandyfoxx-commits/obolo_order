@@ -5,12 +5,13 @@ import { DAY4, DAY4_NEW_HOME } from './day4';
 import { DAY5, DAY5_NEW_HOME } from './day5';
 import { DAY6, DAY6_NEW_HOME } from './day6';
 import { DAY7, DAY7_NEW_HOME } from './day7';
-import { DAY8 } from './day8';
+import { DAY8, DAY9, DAY10 } from './outer';
+import { DAY11 } from './day11';
 import type { Step } from './script';
 
 /**
- * Scripted journey days (eight-day first journey, story draft 21). Days without a script show the
- * placeholder JourneyDayScreen.
+ * Scripted journey days (eleven-day first journey since M-R341: 8 Pluto, 9 Neptune, 10 Uranus, 11 the Sun). Days
+ * without a script show the placeholder JourneyDayScreen.
  */
 export interface DayStory {
   steps: Step[];
@@ -43,8 +44,12 @@ export const STORIES: Record<number, DayStory> = {
   5: { steps: DAY5, auth: true },
   6: { steps: DAY6, auth: true },
   7: { steps: DAY7, auth: true },
-  // the Sun: the Eclipse is a choice inside the story (pay → ORDER, or stay a resident); no countdown after it
+  // M-R341: the three outer planets, before becoming Obolo Order (lib/onboarding/outer.ts)
   8: { steps: DAY8, auth: true },
+  9: { steps: DAY9, auth: true },
+  10: { steps: DAY10, auth: true },
+  // the Sun: the Eclipse is a choice inside the story (pay → ORDER, or stay a resident); no countdown after it
+  11: { steps: DAY11, auth: true },
 };
 
 /**

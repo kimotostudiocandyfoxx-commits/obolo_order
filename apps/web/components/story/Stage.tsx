@@ -125,6 +125,16 @@ const CHAR: Record<string, CharSpec> = {
   mikie: { bottom: 8, height: 52, face: 0.22, tint: '#d0408a' },
   // Uranus's madam, the crocodile lady in the wine-red gown (M-R251 review)
   crocopatra: { bottom: 8, height: 64, face: 0.12, tint: '#8a2a3a' },
+  // Neptune's resident, the oni monk with the boombox (M-R341; the client's picture, out/res/onimonk-ref2.jpg)
+  onimonk: { bottom: 6, height: 72, face: 0.14, tint: '#2a6a9a' },
+  // the seven Sushimon (M-R336): small mascots, like うんちピンポンくん
+  'sushi-sapon': { bottom: 10, height: 24, face: 0.4, tint: '#f08a4a', bustMax: 1.4 },
+  'sushi-gari': { bottom: 10, height: 24, face: 0.4, tint: '#f0b0a0', bustMax: 1.4 },
+  'sushi-ebi': { bottom: 10, height: 24, face: 0.4, tint: '#f09a5a', bustMax: 1.4 },
+  'sushi-uni': { bottom: 10, height: 24, face: 0.4, tint: '#8a5a2a', bustMax: 1.4 },
+  'sushi-ika': { bottom: 10, height: 24, face: 0.4, tint: '#e8d0d8', bustMax: 1.4 },
+  'sushi-shari': { bottom: 10, height: 24, face: 0.4, tint: '#e8e0c8', bustMax: 1.4 },
+  'sushi-kani': { bottom: 10, height: 24, face: 0.4, tint: '#e0703a', bustMax: 1.4 },
   // her cat, Mii-chan (MIKIE⭐︎'s Bati)
   mii: { bottom: 10, height: 26, face: 0.4, tint: '#c8a070', bustMax: 1.4 },
 };
@@ -155,6 +165,14 @@ const SPEAKER: Record<string, string[]> = {
   ハットG: ['hatg'],
   ロングG: ['longg'],
   クロコパトラ: ['crocopatra'],
+  オニモンク: ['onimonk'],
+  サーぽん: ['sushi-sapon'],
+  'ガリみ♡': ['sushi-gari'],
+  えびすけ: ['sushi-ebi'],
+  ウニまる: ['sushi-uni'],
+  いかチョロ: ['sushi-ika'],
+  しゃりお: ['sushi-shari'],
+  かにぶぅ: ['sushi-kani'],
 };
 /** The one speaking is not among the pictures on stage (in the video, or off screen). */
 export const OFFSTAGE = '__offstage__';

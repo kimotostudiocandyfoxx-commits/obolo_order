@@ -831,6 +831,20 @@ export const BATI_VARIANTS: Record<string, BatiVariantSet> = {
     galcool: "〈{neo}のお話〉——ここに、かたちを。",
     galkansai: "〈{neo}のお話〉——ここに、かたちを。",
   },
+  // M-R336 (D04-S002b, the Sushimon board the rocket): written here in each style like the lines around it — provisional
+  // until the story chat checks them
+  "{neo}！　みんな、{neo}の作るもの、見たいんだって！": {
+    teinei: "{neo}さん！　みんな、{neo}さんの作るもの、見たいんデスって！",
+    kansai: "{neo}！　みんな、{neo}の作るもん、見たいんやって！",
+    cool: "{neo}。みんな、{neo}の作るもの、見たいんだって。",
+    mellow: "{neo}。みんな、{neo}の作るもの、見たいんだってぇ。",
+    amae: "{neo}！　みんな、{neo}の作るもの、見たいんだって！",
+    gal: "{neo}っち！　みんな、{neo}っちの作るもの、見たいんだって！",
+    galfuwa: "{neo}ちゃん！　みんな、{neo}ちゃんの作るもの、見たいんだって〜！",
+    galane: "{neo}！　みんな、{neo}の作るもの、見たいんだって！",
+    galcool: "{neo}。みんな、{neo}の作るもの、見たいんだって。",
+    galkansai: "{neo}！　みんな、{neo}の作るもん、見たいんやって！",
+  },
   "……{neo}の声で、遊べた！": {
     teinei: "……{neo}さんの声で、遊べた！",
     kansai: "……{neo}の声で、遊べた！",

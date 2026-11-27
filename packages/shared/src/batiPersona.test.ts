@@ -240,23 +240,28 @@ describe('M-R230: the first {bati} from the bright group; the second from all; t
 
 import { batiAppDay, batiEggState } from './batiPersona';
 
-describe('M-R231: the eggs hatch on the mornings of day 9 and day 16', () => {
+describe('M-R231: the eggs hatch the morning after the journey ends and a week later (app days 12 and 19 since M-R341)', () => {
   const H = 3_600_000;
   const now = Date.parse('2026-12-01T09:00:00Z');
-  it('the app day: the journey day up to 8, then 9 from day 9 and one more each day', () => {
+  it('the app day: the journey day up to 11, then 12 from the day after and one more each day', () => {
     expect(batiAppDay({ born: 1, journeyDay: 4, day9At: null, now })).toBe(4);
-    expect(batiAppDay({ born: 1, journeyDay: 8, day9At: now + H, now })).toBe(8);
-    expect(batiAppDay({ born: 1, journeyDay: 9, day9At: now - H, now })).toBe(9);
-    expect(batiAppDay({ born: 1, journeyDay: 9, day9At: now - 7 * 24 * H, now })).toBe(16);
+    expect(batiAppDay({ born: 1, journeyDay: 9, day9At: null, now })).toBe(9);
+    expect(batiAppDay({ born: 1, journeyDay: 11, day9At: now + H, now })).toBe(11);
+    expect(batiAppDay({ born: 1, journeyDay: 12, day9At: now - H, now })).toBe(12);
+    expect(batiAppDay({ born: 1, journeyDay: 12, day9At: now - 7 * 24 * H, now })).toBe(19);
   });
-  it('the 2nd on day 9 (never day 8), the 3rd on day 16; growing every day; none after three', () => {
-    expect(batiEggState({ born: 1, journeyDay: 8, day9At: now + H, now })).toMatchObject({ nth: 2, day: 9, ready: false });
-    expect(batiEggState({ born: 1, journeyDay: 9, day9At: now - H, now })).toMatchObject({ nth: 2, ready: true, growth: 1 });
-    expect(batiEggState({ born: 1, journeyDay: 5, day9At: null, now })?.growth).toBeCloseTo(3 / 7);
-    expect(batiEggState({ born: 2, journeyDay: 9, day9At: now - 6 * 24 * H, now })).toMatchObject({ nth: 3, day: 16, ready: false });
-    expect(batiEggState({ born: 2, journeyDay: 9, day9At: now - 7 * 24 * H, now })?.ready).toBe(true);
-    expect(batiEggState({ born: 2, journeyDay: 9, day9At: now - 3 * 24 * H, now })?.growth).toBeCloseTo(3 / 7);
-    expect(batiEggState({ born: 3, journeyDay: 9, day9At: now, now })).toBeNull();
+  it('the 2nd the day after the journey (never on the eclipse day), the 3rd a week later; growing every day; none after three', () => {
+    expect(batiEggState({ born: 1, journeyDay: 11, day9At: now + H, now })).toMatchObject({ nth: 2, day: 12, ready: false });
+    // days 8–10 (the outer planets) are journey days: no egg on them
+    expect(batiEggState({ born: 1, journeyDay: 9, day9At: null, now })).toMatchObject({ nth: 2, ready: false });
+    expect(batiEggState({ born: 1, journeyDay: 12, day9At: now - H, now })).toMatchObject({ nth: 2, ready: true, growth: 1 });
+    expect(batiEggState({ born: 1, journeyDay: 5, day9At: null, now })?.growth).toBeCloseTo(3 / 10);
+    expect(batiEggState({ born: 2, journeyDay: 12, day9At: now - 6 * 24 * H, now })).toMatchObject({ nth: 3, day: 19, ready: false });
+    expect(batiEggState({ born: 2, journeyDay: 12, day9At: now - 7 * 24 * H, now })?.ready).toBe(true);
+    expect(batiEggState({ born: 2, journeyDay: 12, day9At: now - 3 * 24 * H, now })?.growth).toBeCloseTo(3 / 7);
+    expect(batiEggState({ born: 3, journeyDay: 12, day9At: now, now })).toBeNull();
     expect(batiEggState({ born: 0, journeyDay: 2, day9At: null, now })).toBeNull();
+    // the real time is as before: ready at the day after the journey, the 3rd seven days on
+    expect(batiEggState({ born: 2, journeyDay: 12, day9At: now, now })?.readyAt).toBe(new Date(now + 7 * 24 * H).toISOString());
   });
 });

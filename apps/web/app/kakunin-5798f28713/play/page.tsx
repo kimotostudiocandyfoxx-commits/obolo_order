@@ -9,7 +9,7 @@ import { VenusDj } from '@/components/dj/VenusDj';
 import { MercuryWorld } from '@/components/mercury/MercuryWorld';
 import { KororinWorld } from '@/components/saturn/KororinWorld';
 import { DemoDay, previewMade } from '@/components/onboarding/DemoDay';
-import { neoForm } from '@obolo/shared';
+import { neoForm, JOURNEY_PAYMENT } from '@obolo/shared';
 import { getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { demoBati } from '@/lib/look';
@@ -44,11 +44,11 @@ function PreviewPlay() {
   const q = useSearchParams();
   // day=sys002: SYS-S002 on its own (becoming Obolo Order early, from the settings) — with day 4's names and Bati
   const sys = q.get('day') === 'sys002';
-  // day=m1|m2|m3: after joining (played with day 8's names, Bati and works)
+  // day=m1|m2|m3: the days after joining of the eight-day journey of before (played with the Sun day's names, Bati and works)
   const afterN = Number(/^m([1-3])$/.exec(q.get('day') ?? '')?.[1] ?? 0);
-  // day=9egg | 16egg (M-R231): the morning of the app's day 9 / 16 — SYS-S003, the 2nd / the 3rd {bati} (played with day 8's names)
+  // day=9egg | 16egg (M-R231): the morning of the app's day 9 / 16 — SYS-S003, the 2nd / the 3rd {bati} (played with the Sun day's names)
   const eggN = q.get('day') === '9egg' ? 2 : q.get('day') === '16egg' ? 3 : 0;
-  const day = sys ? 4 : afterN || eggN ? 8 : Number(q.get('day'));
+  const day = sys ? 4 : afterN || eggN ? JOURNEY_PAYMENT : Number(q.get('day'));
   const at = q.get('at');
   const [ended, setEnded] = useState(false);
   const [neo, setNeo] = useState<string | undefined>(undefined);

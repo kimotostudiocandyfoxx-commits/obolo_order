@@ -10,7 +10,7 @@ import { getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { madeFrom } from '@/lib/onboarding/made';
 import { labelIndex } from '@/lib/onboarding/script';
-import { DAY8 } from '@/lib/onboarding/day8';
+import { DAY11 } from '@/lib/onboarding/day11';
 import { realLessonApi } from '@/lib/onboarding/lessonApi';
 import { solvedSealsOn, knownSealsOn, stampsOn } from './StoryExtras';
 import { StoryPlayer } from './StoryPlayer';
@@ -66,7 +66,7 @@ export function EclipseReturn() {
   const day = JOURNEY_PAYMENT;
   return (
     <StoryPlayer
-      steps={DAY8}
+      steps={DAY11}
       vars={{
         name: me.displayName,
         inviter: me.invitedByName ?? '',
@@ -85,7 +85,7 @@ export function EclipseReturn() {
       lessonApi={realLessonApi}
       seals={{ known: knownSealsOn(day + 1), solved: solvedSealsOn(day + 1, false) }}
       stamps={stampsOn(day)}
-      initial={{ i: labelIndex(DAY8, 'resume'), name: me.displayName, answers: {} }}
+      initial={{ i: labelIndex(DAY11, 'resume'), name: me.displayName, answers: {} }}
       onProgress={() => undefined}
       onName={async () => undefined}
       ordered={!!me.orderedAt}

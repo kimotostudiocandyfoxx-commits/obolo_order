@@ -7,7 +7,7 @@ import { PLANET_COLOR, PLANET_GLYPH, PLANET_KIND, PLANET_NAME } from '@/lib/find
 import { Glyph } from './glyphs';
 import { PlanetMark } from './PlanetMark';
 
-/** a planet can be made for today (グッズ・物語・ゲーム: after the journey — PROVISIONAL, nothing is made there yet) */
+/** a planet can be made for today (M-R341: 物語 day 8 · ゲーム day 9 · グッズ day 10, like the planets before them) */
 export function planetOpen(p: BluenaPlanet, day: number | null | undefined): boolean {
   const k = PLANET_KIND[p];
   if (k) return isOpen(k, day);

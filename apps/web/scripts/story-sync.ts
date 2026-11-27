@@ -11,7 +11,6 @@ import { walk, type Scene } from '../lib/story/parse';
 // planets' switch on (STORIES_NEW_HOMES). With the switch off the days 3–7 play their steps of before (not checked here).
 import { STORIES_NEW_HOMES as STORIES } from '../lib/onboarding/stories';
 import { SCENE_DAY } from '../lib/onboarding/sceneDays';
-import { AFTER_DAYS } from '../lib/onboarding/after';
 import { SYS002_ALONE } from '../lib/onboarding/sys002';
 import { SYS003 } from '../lib/onboarding/sys003';
 
@@ -57,7 +56,7 @@ function lessonLines(day: number): L[] {
   return out;
 }
 
-const out: string[] = ['# 台本と画面の台詞の照合', '', `台本：public/story（${idx.parts.join('・')}）／画面：lib/onboarding/dayN.ts・after.ts と各星の練習（SaturnLesson など）の台詞。3〜7日目は、新しい星の家に切りかえた時の台詞（lib/onboarding/newHomeScenes.ts）と照合する`, ''];
+const out: string[] = ['# 台本と画面の台詞の照合', '', `台本：public/story（${idx.parts.join('・')}）／画面：lib/onboarding/dayN.ts・outer.ts と各星の練習（SaturnLesson など）の台詞。8〜10日目（冥王星・海王星・天王星、M-R341）は lib/onboarding/outer.ts、11日目（エクリプス）は day11.ts。3〜7日目は、新しい星の家に切りかえた時の台詞（lib/onboarding/newHomeScenes.ts）と照合する`, ''];
 let total = 0;
 // SYS-S002's last line (KIMORIN back from his mother) plays on whichever day he appears next (lib/onboarding/kimorinBack.ts)
 const ANY_DAY = new Set(['KIMORIN|' + norm('……母に言いましたが、聞く耳を持ちません。調査は、続けます。')]);
@@ -98,13 +97,14 @@ function section(title: string, inSection: (id: string) => boolean, app: L[]) {
   if (extra.length) out.push('画面にあって台本にない：', ...extra.map((l) => `- ${l.who}「${l.text.replace(/\n/g, '／')}」`), '');
 }
 
-for (let day = 1; day <= 8; day++) {
+// M-R341: eleven days — 8 冥王星 (M-PLUTO) · 9 海王星 (M-NEPTUNE) · 10 天王星 (M-URANUS) · 11 the Sun (D08 + M-END); SCENE_DAY
+// puts the M- scenes on their days. (The days after joining of the eight-day journey of before, lib/onboarding/after.ts,
+// keep the words of before for its accounts and are not checked: the script no longer has them.)
+for (let day = 1; day <= 11; day++) {
   section(`${day}日目`, (id) => id !== 'SYS-S002' && SCENE_DAY(id) === day, [...sayLines(STORIES[day]?.steps ?? []), ...lessonLines(day)]);
 }
 // SYS-S002 (joining early) plays only from the settings, days 4 (after Jupiter) to 7 (M-R274) — lib/onboarding/sys002.ts
 section('先にObolo Order（SYS-S002・設定から）', (id) => id === 'SYS-S002', sayLines(SYS002_ALONE));
-// after joining (P05m: M-URANUS / M-PLUTO / M-NEPTUNE / M-END) — lib/onboarding/after.ts
-section('会員後', (id) => id.startsWith('M-'), sayLines(AFTER_DAYS));
 // SYS-S003 (the grown egg, 88 days on) plays from the Moon whenever the egg is ready — lib/onboarding/sys003.ts
 section('たまごが、育った（SYS-S003）', (id) => id === 'SYS-S003', sayLines(SYS003));
 writeFileSync(join(ROOT, 'docs/story-import/sync.md'), out.join('\n') + '\n');

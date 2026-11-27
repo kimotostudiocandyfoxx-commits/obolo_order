@@ -1,19 +1,19 @@
 'use client';
 
-import { neoForm } from '@obolo/shared';
+import { neoForm, JOURNEY_PAYMENT } from '@obolo/shared';
 import { useEffect, useState } from 'react';
 import { DemoDay } from '@/components/onboarding/DemoDay';
 import { madeFrom } from '@/lib/onboarding/made';
 import { STORIES } from '@/lib/onboarding/stories';
 
 /**
- * The testers' link (client 2026-10-26: 15〜20歳の人に、一周目を通しで遊んでもらう). Day 1 → day 8 in order with
+ * The testers' link (client 2026-10-26: 15〜20歳の人に、一周目を通しで遊んでもらう). Day 1 → day 11 in order with
  * no server and no 24-hour wait: the name, the NEO, the Bati and what each day made carry over to the next
  * day, kept only in this browser. Nothing is sent or paid (the Eclipse payment is a demo). Separate from
  * the review pages (/kakunin-…), with no link to them.
  */
 const KEY = 'obolo.tester.v1';
-const LAST = 8; // draft 21: Venus is day 7, the Sun day 8
+const LAST = JOURNEY_PAYMENT; // M-R341: 8 Pluto, 9 Neptune, 10 Uranus, the Sun day 11
 
 interface Journey {
   day: number;

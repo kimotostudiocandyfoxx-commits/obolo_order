@@ -48,7 +48,7 @@ function memDb(tables: Map<unknown, Record<string, unknown>[]>) {
   return { db, inserted };
 }
 
-const user = { id: 'u1', email: 'a@b.c', locale: 'ja', batiName: 'ポポ', displayName: 'ネオ', batiFood: null, orderedAt: null, subscriptionStatus: 'none', journeyDay: 9, journeyCompletedAt: null };
+const user = { id: 'u1', email: 'a@b.c', locale: 'ja', batiName: 'ポポ', displayName: 'ネオ', batiFood: null, orderedAt: null, subscriptionStatus: 'none', journeyDay: 12, journeyCompletedAt: null };
 const cfg = { BUDDY_FREE_DAILY: 30, BUDDY_OVERAGE_ENABLED: false, BATI_DAILY_CAP_MEMBER: 300, DACHI_DAILY_CAP_FREE: 200, BUDDY_SEARCH_DAILY: 30, BUDDY_SEARCH_GLOBAL_DAILY: 5000, BUDDY_DRAW_DAILY: 10 } as AppConfig;
 /** {bati}'s model: down (a reply that reaches it shows the gate let it through) */
 const llm = { name: 'down', chat: async () => Promise.reject(new Error('down')), stream: async () => Promise.reject(new Error('down')) };
@@ -67,8 +67,8 @@ function buddy(st: SpendState) {
   return { s, kv, inserted };
 }
 
-const resident: SpendState = { member: false, journeyDay: 9, journeyCompletedAt: null, balance: 0 };
-const member: SpendState = { member: true, journeyDay: 9, journeyCompletedAt: null, balance: 0 };
+const resident: SpendState = { member: false, journeyDay: 12, journeyCompletedAt: null, balance: 0 };
+const member: SpendState = { member: true, journeyDay: 12, journeyCompletedAt: null, balance: 0 };
 
 describe("R18: {bati}'s chat at 0 mana", () => {
   it('a non-member at 0: the gentle line once a day (kept in the talk, nothing spent), then a calm refusal', async () => {

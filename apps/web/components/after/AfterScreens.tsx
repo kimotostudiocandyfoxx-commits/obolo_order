@@ -10,9 +10,11 @@ import { getApi } from '@/lib/api';
 import { realLessonApi, type LessonApi } from '@/lib/onboarding/lessonApi';
 import type { StoryVars } from '@/lib/onboarding/script';
 import { Glyph } from '@/components/bluena/glyphs';
+import { LineIcon } from '@/components/LineIcon';
 
 /**
- * The making screens of the days after joining (lib/onboarding/after.ts, script P05m): goods on Uranus, a story on
+ * The making screens of the outer planets' days — days 8–10 of the first journey since M-R341 (lib/onboarding/outer.ts),
+ * and the days after joining of the eight-day journey's accounts (lib/onboarding/after.ts); script P05m: goods on Uranus, a story on
  * Pluto, a little game on Neptune — made in the Moon atelier (AtelierScreen), kept in Bluena, shown on the planet.
  * The real makers are not built yet, so these are the simplest honest versions with what exists:
  * - goods: one of your own works from the journey on a goods mock-up (no new picture, no order, no payment);
@@ -23,7 +25,7 @@ import { Glyph } from '@/components/bluena/glyphs';
  * 〔公開する〕 is shown, and says plainly that nobody else sees it yet. No character lines here: they are the story's.
  */
 export type AfterWhat =
-  | 'm-goods' | 'm-publish-goods' | 'm-shop'
+  | 'm-goods' | 'm-publish-goods' | 'm-shop' | 'm-shop-locked'
   | 'm-story-seed' | 'm-story-cards' | 'm-story-write' | 'm-picturebook' | 'm-publish-book'
   | 'm-nagare' | 'm-game-seed' | 'm-game-cards' | 'm-game-play' | 'm-publish-game';
 
@@ -250,21 +252,27 @@ function PublishGoods({ v, onDone }: { v: StoryVars; onDone: Done }) {
   );
 }
 
-function ShopTag({ onDone }: { onDone: Done }) {
+/** the script's screen when the locked 〔購入〕 is pressed (M-URANUS-S002, M-R341) */
+export const SHOP_LOCKED_NOTE = '本物のグッズの注文は、Obolo Orderになってからできます。見て回るのと、お店に並べるのは、いまもできます';
+
+function ShopTag({ locked = false, onDone }: { /** not an Obolo Order yet: 〔購入〕 with a lock, pressing it tells why */ locked?: boolean; onDone: Done }) {
   const [buy, setBuy] = useState(false);
   return (
     <div className="absolute inset-0 z-[12] flex items-end justify-center bg-black/40 px-4 pb-[calc(20px+env(safe-area-inset-bottom))]">
       <div className="w-full max-w-sm animate-[fadeUp_0.4s_ease-out] rounded-2xl bg-[#fbf6ea] p-4 text-amber-950 shadow-2xl">
         <p className="text-center text-[15px] font-bold">たこ焼き柄のトートバッグ</p>
         <p className="mt-2 rounded-lg bg-amber-900/10 px-2 py-1 text-center text-[12px]">受注生産：注文が入ってから作って届けます</p>
-        {buy ? (
+        {buy && locked ? (
+          <p data-testid="shop-locked-note" className="mt-3 text-[12px] leading-relaxed text-amber-900/80">{SHOP_LOCKED_NOTE}</p>
+        ) : buy ? (
           <p className="mt-3 text-[12px] leading-relaxed text-amber-900/80">購入の手続きは、まだ開いていません。開いたら、商品代・送料・合計・届け先の地域・届くまでの目安が出ます。月額88円とは別の料金です。住所はこの手続きの中だけで入力します</p>
         ) : (
-          <button onClick={() => setBuy(true)} className="mt-3 w-full rounded-full bg-amber-900 py-2.5 text-[14px] font-bold text-amber-50">
+          <button onClick={() => setBuy(true)} data-testid="shop-buy" data-locked={locked ? '1' : undefined} className={`mt-3 flex w-full items-center justify-center gap-1.5 rounded-full py-2.5 text-[14px] font-bold text-amber-50 ${locked ? 'bg-amber-900/55' : 'bg-amber-900'}`}>
+            {locked && <LineIcon id="lock" className="h-4 w-4" />}
             購入
           </button>
         )}
-        <button onClick={() => onDone({ f_m_uranus_order: buy ? 'unavailable' : 'none' })} className="mt-2 w-full py-1.5 text-[12px] text-amber-900/60">
+        <button onClick={() => onDone({ f_m_uranus_order: buy && !locked ? 'unavailable' : 'none' })} className="mt-2 w-full py-1.5 text-[12px] text-amber-900/60">
           とじる
         </button>
       </div>
@@ -772,6 +780,9 @@ export function AfterStep({ what, vars: v, answers, lessonApi, onDone }: { what:
       return <PublishGoods v={v} onDone={onDone} />;
     case 'm-shop':
       return <ShopTag onDone={onDone} />;
+    case 'm-shop-locked':
+      // M-R341 (day 10, before the Eclipse): 〔購入〕 wears a lock until Obolo Order; someone who joined early has it open
+      return <ShopTag locked={answers.f_join_early !== 'true' && v.story?.f_join_early !== 'true'} onDone={onDone} />;
     case 'm-story-seed':
       return <Seed v={v} kind="story" how={answers.f_m_pluto_story ?? 'talk'} onDone={onDone} />;
     case 'm-story-cards':

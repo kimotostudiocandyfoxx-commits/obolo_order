@@ -80,7 +80,7 @@ describe('POST /billing/portal (P-BILL-4)', () => {
 });
 
 describe('membership ends with the subscription (P-BILL-4)', () => {
-  const base = { id: 'u1', email: 'a@example.com', orderedAt: new Date(), journeyDay: 8, stripeCustomerId: 'cus_1', displayName: 'A' };
+  const base = { id: 'u1', email: 'a@example.com', orderedAt: new Date(), journeyDay: 11, stripeCustomerId: 'cus_1', displayName: 'A' };
   const live = { STRIPE_SECRET_KEY: 'sk_test_x', STRIPE_PUBLISHABLE_KEY: 'pk_test_x' };
 
   it('activeMember: canceled / unpaid close it; past_due and demo keep it; testers keep it', () => {
@@ -111,7 +111,7 @@ describe('membership ends with the subscription (P-BILL-4)', () => {
 
 describe('mana gems (P-BILL-1)', () => {
   const live = { STRIPE_SECRET_KEY: 'sk_test_x', STRIPE_PUBLISHABLE_KEY: 'pk_test_x', STRIPE_WEBHOOK_SECRET: 'whsec_x' };
-  const member = { id: 'u1', email: 'a@example.com', displayName: 'A', orderedAt: new Date(), journeyDay: 9, subscriptionStatus: 'active', stripeCustomerId: 'cus_1' };
+  const member = { id: 'u1', email: 'a@example.com', displayName: 'A', orderedAt: new Date(), journeyDay: 12, subscriptionStatus: 'active', stripeCustomerId: 'cus_1' };
   const paidSession = (over: Record<string, unknown> = {}) => ({
     id: 'cs_gem_1',
     mode: 'payment',

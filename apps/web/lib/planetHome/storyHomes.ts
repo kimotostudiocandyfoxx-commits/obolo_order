@@ -4,7 +4,8 @@ import type { HomeWork, PlanetHomeView } from '@obolo/shared';
  * 星のホーム inside the story (D04-S005 / D04-S005c, M-R257 / M-R259): the scripted places — nothing is loaded or written
  * (PlanetHome `view` + `seeds`). The kororins' words are the script's (the lines said after the step, word for word).
  *  - takoyaki: the takoyaki siblings' own flashy record — MONBAN's kororin (their dachi) and KIMORIN's two (whom the
- *    sister pushes), and a few others'
+ *    sister pushes). M-R342: the three sample kororins of before (ゴリラ 5454, サーモン, むらさき) are gone — only the
+ *    story's cast is on a home
  *  - neo: {neo}'s new record — {neo}'s own kororin (when flown this morning, f_d04_fly = fly), the inviter's (or
  *    MIKIE⭐︎DRILL's) and KIMORIN's arriving
  */
@@ -36,9 +37,6 @@ export function takoyakiRecord(now = Date.now()): PlanetHomeView {
       w('tk-monban', 'MONBAN', 'dachi', '♪……今日も、異常なし…。♪', 30, now, '/puni-test/gray.png', CHIBI('monban')),
       w('tk-kimorin-1', 'KIMORIN⭐︎', 'oshi', '♪うんち。♪', 20, now, '/puni-test/green.png', CHIBI('kimorin')),
       w('tk-kimorin-2', 'KIMORIN⭐︎', 'oshi', '♪うんち。♪', 19, now, '/puni-test/green.png', CHIBI('kimorin')),
-      w('tk-a', 'ゴリラ 5454', 'oshi', '♪バナナ、うまい。♪', 90, now, '/puni-test/gorilla.png'),
-      w('tk-b', 'サーモン', 'dachi', '♪おかえり。おかえり。♪', 120, now, '/puni-test/salmon.png'),
-      w('tk-c', 'むらさき', 'oshi', '♪ねむい…でも楽しい。♪', 200, now, '/puni-test/purple.png'),
     ],
     far: [],
   };

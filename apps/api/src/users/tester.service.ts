@@ -7,6 +7,7 @@ import {
   LAP2_WAIT_MS,
   MEMBERS_DAYS,
   batiPersonaByRules,
+  lap2Applies,
   lap2Done,
   lap2OpensAt,
   type Me,
@@ -109,8 +110,10 @@ export class TesterService {
   }
 
   /**
-   * 〔次の日へ〕: the next day now, from its start — finished or not, the wait skipped. 1 → … → 8 (the Sun) → 会員1 →
-   * 会員2 → 会員3; after the last members' day nothing is left (unchanged). An order made early is kept.
+   * 〔次の日へ〕: the next day now, from its start — finished or not, the wait skipped. 1 → … → 10 (the outer planets:
+   * M-R341) → 11 (the Sun) → the journey done as an Obolo Order (a demo order, no charge); then nothing is left
+   * (unchanged). An account of the eight-day journey (JOURNEY_EIGHT_KEY: the 〔会員N〕 jump makes one) goes on through
+   * 会員1 → 会員2 → 会員3 as before. An order made early is kept.
    */
   async next(userId: string, origin: string): Promise<Me> {
     const u = await this.guard(userId);
@@ -123,9 +126,17 @@ export class TesterService {
       return toMe(nu);
     }
     if (u.journeyDay === JOURNEY_PAYMENT || !u.orderedAt) {
-      this.note(userId, 'next', 'day=m1');
+      if (lap2Applies(story)) {
+        this.note(userId, 'next', 'day=m1');
+        await this.ensureBati(userId, origin);
+        return this.users.jumpMembersDay(userId, 1);
+      }
+      this.note(userId, 'next', 'day=done');
       await this.ensureBati(userId, origin);
-      return this.users.jumpMembersDay(userId, 1);
+      const early = u.orderedAt;
+      await this.users.jumpJourney(userId, JOURNEY_DONE);
+      if (!early || !(await this.user(userId)).orderedAt) await this.users.markOrdered(userId, { subscriptionStatus: 'demo' });
+      return this.users.getMe(userId);
     }
     const done = lap2Done(story);
     if (done >= LAP2_DONE) {

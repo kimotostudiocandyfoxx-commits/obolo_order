@@ -8,7 +8,7 @@ import { useAuth } from '@/lib/auth';
 
 /**
  * The tester entrance (docs/本番の状態.md 「テスターの入口」): a small pill at the right edge, only for an account on the
- * server's allowlist (Me.tester). Its panel opens everything, jumps to a day (1–8, the members' days) with no wait,
+ * server's allowlist (Me.tester). Its panel opens everything, jumps to a day (1–11; the members' days of the eight-day journey of before) with no wait,
  * skips to the next day, starts over, and goes straight to the Moon atelier / {bati}'s talk / the ダチ. Hidden while a
  * talk's keyboard is up (<html data-typing>), so it never sits over the input. Everything goes through the real API
  * (POST /me/tester/*): the daily caps stay on.
@@ -33,10 +33,11 @@ function where(me: Me): string {
   if (me.journeyDay < JOURNEY_DONE) return `${me.journeyDay}日目${me.journeyCompletedAt ? '（おわり・つぎ待ち）' : ''}`;
   if (!me.orderedAt) return '旅のあと（住人）';
   const done = lap2Done(me.story);
-  return done >= LAP2_DONE ? '会員の日・ぜんぶおわり' : `会員${done + 1}`;
+  return done >= LAP2_DONE ? '旅のあと（Obolo Order）' : `会員${done + 1}（前の8日の旅の人の日）`;
 }
 
-const DAYS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
+// M-R341: 8 冥王星 · 9 海王星 · 10 天王星 · 11 the Sun (the Eclipse)
+const DAYS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] as const;
 const MEMBERS: { id: MembersDay; label: string }[] = [
   { id: 'm1', label: '会員1' },
   { id: 'm2', label: '会員2' },

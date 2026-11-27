@@ -5,7 +5,7 @@ import { DAY4 } from '../onboarding/day4';
 import { DAY5 } from '../onboarding/day5';
 import { DAY6 } from '../onboarding/day6';
 import { DAY7 } from '../onboarding/day7';
-import { DAY8 } from '../onboarding/day8';
+import { DAY11 as DAY8 } from '../onboarding/day11';
 import type { Step } from '../onboarding/script';
 import { stageOf } from '../onboarding/stage';
 import { AMBIENT, ambientFor, PLATE_AMBIENT, plateKey, planetOf, PLANETS, SCENE_AMBIENT, STILL_AMBIENT, stillKey } from './ambient';

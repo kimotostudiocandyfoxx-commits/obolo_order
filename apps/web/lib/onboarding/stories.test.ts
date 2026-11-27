@@ -29,10 +29,11 @@ describe('all day scripts', () => {
     });
   }
 
-  it('the first journey is eight days (draft 21); only day 1 can skip the wait (明日まで待てない; M-R269: not D03-S009 any more)', () => {
-    expect(Object.keys(STORIES).map(Number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+  it('the first journey is eleven days (M-R341: 8 Pluto, 9 Neptune, 10 Uranus, 11 the Sun); only day 1 can skip the wait (明日まで待てない; M-R269: not D03-S009 any more)', () => {
+    expect(Object.keys(STORIES).map(Number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+    expect(JOURNEY_PAYMENT).toBe(11);
     const labels = Object.fromEntries(Object.entries(STORIES).map(([d, s]) => [d, s.skipLabel]));
-    expect(labels).toEqual({ 1: DEFAULT_SKIP_LABEL, 2: undefined, 3: undefined, 4: undefined, 5: undefined, 6: undefined, 7: undefined, 8: undefined });
+    expect(labels).toEqual({ 1: DEFAULT_SKIP_LABEL, 2: undefined, 3: undefined, 4: undefined, 5: undefined, 6: undefined, 7: undefined, 8: undefined, 9: undefined, 10: undefined, 11: undefined });
     expect(DEFAULT_SKIP_LABEL).toBe('明日まで待てない');
     expect(STORIES[JOURNEY_PAYMENT].steps.some((s) => s.t === 'order')).toBe(true);
   });
@@ -306,8 +307,8 @@ describe('Venus (day 7)', () => {
   });
 });
 
-describe('the Sun day (8, draft 21)', () => {
-  const steps = STORIES[8].steps;
+describe('the Sun day (11 since M-R341; 8 in draft 21)', () => {
+  const steps = STORIES[JOURNEY_PAYMENT].steps;
   it('〔エクリプスを受ける〕 leads to the payment; 〔今は、住人のままでいる〕 ends the journey as a resident', () => {
     const c = steps.findIndex((s) => s.t === 'choice' && s.key === 'f_d08_decide');
     const opts = steps[c].t === 'choice' ? steps[c].options : [];

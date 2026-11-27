@@ -7,7 +7,7 @@
  *  - Non-members past the first journey (residents, ended subscriptions): every small cost draws mana as for members; at
  *    0 mana, making and talking to {bati} stop — {bati} says the no-mana line once a day, then keeps quiet (the chat's
  *    mic / typing show a calm hint). Viewing and listening to their own works, past talks and ダチ stay open.
- *  - During the first journey (days 1–8, not yet finished) nothing stops: the story must be finishable (the first gem
+ *  - During the first journey (days 1–11, not yet finished; eleven days since M-R341) nothing stops: the story must be finishable (the first gem
  *    is sized for it); what the gem cannot cover is absorbed, as in R17.
  *  - ダチ chat: free for everyone, even at 0 mana (the network effect). Its costs are not charged: recorded under the
  *    feature 'dachi' and reported as an unrecovered marketing cost. Non-members get a soft daily cap
@@ -29,14 +29,14 @@ export type BatiRest = 'noMana' | 'tired';
 export interface SpendState {
   /** an Obolo Order member right now (isActiveMember) */
   member: boolean;
-  /** the first journey's day (1–8 to play; 9 = done) and whether today's story was finished */
+  /** the first journey's day (1–11 to play; 12 = done) and whether today's story was finished */
   journeyDay: number;
   journeyCompletedAt?: Date | string | null;
   /** the wallet's mana */
   balance: number;
 }
 
-/** still on the first journey: day 1–8, day 8 not finished yet */
+/** still on the first journey: day 1–11, the Sun day (11) not finished yet */
 export function onFirstJourney(s: Pick<SpendState, 'journeyDay' | 'journeyCompletedAt'>): boolean {
   if (s.journeyDay >= JOURNEY_DONE) return false;
   return !(s.journeyDay >= JOURNEY_PAYMENT && !!s.journeyCompletedAt);

@@ -4,7 +4,8 @@ import { describe, expect, it } from 'vitest';
 import { AFTER_DAYS } from './after';
 import { labelIndex } from './script';
 
-describe('the days after joining (P05m)', () => {
+// M-R341: these days stay only for the accounts of the eight-day journey (shared lap2Applies), with the words of before
+describe('the days after joining of the eight-day journey (P05m as it was before M-R341)', () => {
   it('one step list per LAP2 day', () => {
     expect(AFTER_DAYS.length).toBe(LAP2.length);
   });

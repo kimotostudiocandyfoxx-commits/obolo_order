@@ -53,10 +53,10 @@ describe('02 §1 Mercury’s ships: the sea lanes of MSLOT (back 2, middle 3, fr
     expect(cfg.motion.max).toBe(7);
     expect(templateConfig('jupiter').motion).toBe(driftMotion);
     const people = peopleOf(templateSample('mercury'));
-    expect(people.length).toBe(10);
+    expect(people.length).toBe(20);
     const c = seat(people, cfg.motion.max);
     expect(c.seats).toHaveLength(7);
-    expect(c.queue).toHaveLength(3);
+    expect(c.queue).toHaveLength(13);
   });
 
   it('a ship starts in its lane at the prototype’s place, sails left or right (odd slots left), faster when nearer', () => {

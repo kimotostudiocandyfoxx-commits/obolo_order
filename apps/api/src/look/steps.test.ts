@@ -207,7 +207,7 @@ describe('{bati} の進化: who may', () => {
   });
 
   it('day 2 lived to its end counts as past it; a later day and the finished journey too', async () => {
-    for (const day of [{ journeyDay: 2, done: true }, { journeyDay: 5, done: false }, { journeyDay: 9, done: false }]) {
+    for (const day of [{ journeyDay: 2, done: true }, { journeyDay: 5, done: false }, { journeyDay: 12, done: false }]) {
       const t = make({ journeyDay: day.journeyDay });
       if (day.done) t.user.journeyCompletedAt = new Date();
       await expect(t.s.step('u', { who: 'bati', wish: '翼' }, 'https://x')).rejects.toMatchObject(locked);
@@ -227,13 +227,13 @@ describe('{bati} の進化: who may', () => {
   });
 
   it('a member whose subscription ended is a resident again', async () => {
-    const t = make({ journeyDay: 9, member: true });
+    const t = make({ journeyDay: 12, member: true });
     t.user.subscriptionStatus = 'canceled';
     await expect(t.s.step('u', { who: 'bati', wish: '翼' }, 'https://x')).rejects.toMatchObject(locked);
   });
 
   it('an Obolo Order member steps, goes back and decides on any day', async () => {
-    const t = make({ journeyDay: 9, member: true });
+    const t = make({ journeyDay: 12, member: true });
     await t.s.open('u', 'bati');
     await t.s.step('u', { who: 'bati', wish: '翼' }, 'https://x');
     await t.s.step('u', { who: 'bati', wish: '王冠' }, 'https://x');
@@ -298,7 +298,7 @@ describe('{name} の変身 (D03-S004)', () => {
     await expect(r.s.open('u', 'self')).rejects.toMatchObject({ response: { error: { code: 'LOOK_LOCKED' } } });
     expect(r.charged).toEqual([]);
 
-    const m = make({ confirmed: true, journeyDay: 9, member: true });
+    const m = make({ confirmed: true, journeyDay: 12, member: true });
     const o = await m.s.open('u', 'self');
     expect(o.steps).toMatchObject({ used: 0, left: 8, fixed: false, url: 'https://x/look.png' });
     await m.s.step('u', { who: 'self', wish: 'マントを着せて' }, 'https://x');
@@ -323,7 +323,7 @@ describe('{name} の変身 (D03-S004)', () => {
     expect(t.refunded).toEqual(['lookStep', 'lookStep']);
 
     // an Obolo Order member decides a new look, wearing it fails: the profile look's mana goes back, the round stays open
-    const m = make({ confirmed: true, journeyDay: 9, member: true });
+    const m = make({ confirmed: true, journeyDay: 12, member: true });
     await m.s.open('u', 'self');
     await m.s.step('u', { who: 'self', wish: 'マントを着せて' }, 'https://x');
     const look = (m.s as unknown as { look: { wearLook: unknown } }).look;

@@ -1,4 +1,5 @@
 import type { HomePlanet, HomeWork, PlanetHomeView } from '@obolo/shared';
+import { oshiOn, rosterDayOf } from './roster';
 import { templateSample } from './sample';
 
 /**
@@ -6,9 +7,14 @@ import { templateSample } from './sample';
  * cast's figures and works (lib/planetTemplate/sample.ts — nothing is loaded or written).
  *  - `host` (Saturn: `takoyaki`): the resident's own place — たこ焼き兄妹's record, 大根カイザー's tree, フリージー's island,
  *    ヒポキン's studio, ボスG's booth. Around it: KIMORIN⭐︎ (whom the resident pushes: 『プリプリ・ボカン』 / 「うんち。」 /
- *    すね毛) and their dachi MONBAN, and a few more residents so the place is alive.
- *  - `neo`: {neo}'s own place — the inviter's work (MIKIE⭐︎DRILL's when nobody invited) and KIMORIN⭐︎'s come around;
- *    {neo}'s own work of this morning is in the place when it flew (`sent`).
+ *    すね毛) and the story's cast met so far (the day's oshi roster without the hosts themselves).
+ *  - `neo`: {neo}'s own place — the inviter's work (MIKIE⭐︎DRILL's when nobody invited: the script's stage direction)
+ *    and KIMORIN⭐︎'s come around, then the oshi of that day (M-R341: 9 on Saturn … 15 on Venus); {neo}'s own work of
+ *    this morning is in the place when it flew (`sent`).
+ * M-R342: nobody else — the sample people and the hosts' 「見本の住人」 of before are gone. MONBAN stays on the takoyaki
+ * siblings' record only, where the script has him (D04-S005: his kororin 「……今日も、異常なし…。」, 「MONBANは、私たちの
+ * ダチだワ。」); on the other hosts' places he was the earlier build's own addition and is gone (he joins the oshi on
+ * day 10, Uranus).
  */
 export type StoryPlace = 'takoyaki' | 'host' | 'neo';
 export type StoryPlanet = 'saturn' | 'jupiter' | 'mercury' | 'mars' | 'venus';
@@ -23,6 +29,8 @@ const KIMORIN_WORK: Record<StoryPlanet, { title?: string; text?: string }> = {
   venus: { title: 'すね毛、すね毛、すね毛楽しい！' },
 };
 const SATURN_WORDS: Record<string, string> = { MONBAN: '……今日も、異常なし…。', 'MIKIE⭐︎DRILL': 'ようこそ。' };
+/** the two hosts of Saturn's record share one place */
+const HOST_NAMES: Record<StoryPlanet, string[]> = { saturn: ['たこ焼きブラザー', 'たこ焼きシスター'], jupiter: ['大根カイザー'], mercury: ['フリージー'], mars: ['ヒポキン'], venus: ['ボスG', 'ロングG', 'ハットG'] };
 
 export interface StoryCastInput {
   neo: string;
@@ -41,24 +49,35 @@ const as = (w: HomeWork, id: string, o: Partial<HomeWork> & { name?: string; rel
 };
 
 export function storyHome(planet: StoryPlanet, place: StoryPlace, o: StoryCastInput, now = Date.now()): PlanetHomeView {
-  const sample = templateSample(planet as HomePlanet, now);
+  // the day this planet is visited on: its roster (M-R341), with MIKIE⭐︎DRILL in the sample for the inviter's stand-in
+  const day = rosterDayOf(planet as HomePlanet);
+  const sample = templateSample(planet as HomePlanet, now, { day, ordered: true });
+  // MONBAN's own figure and work (he is an oshi only from day 10: taken from the full roster's sample)
+  const monban = planet === 'saturn' ? by(templateSample('saturn', now), 'MONBAN') : undefined;
   const kimorin = by(sample, 'KIMORIN⭐︎')!;
   const mikie = by(sample, 'MIKIE⭐︎DRILL')!;
-  const monban = by(sample, 'MONBAN')!;
   const k = KIMORIN_WORK[planet];
+  /** one work each of the day's oshi, in the roster's order */
+  const oshi = (skip: string[] = []) =>
+    oshiOn(day)
+      .filter((p) => !skip.includes(p.name))
+      .flatMap((p, i) => {
+        const w = by(sample, p.name);
+        return w ? [as(w, `st-${planet}-o${i}`, { rel: 'oshi' })] : [];
+      });
   const words = (w: HomeWork, name: string) => (planet === 'saturn' && SATURN_WORDS[name] ? { text: SATURN_WORDS[name] } : {});
   if (place !== 'neo') {
-    // the resident's place: KIMORIN⭐︎ (pushed), MONBAN (their dachi), and the rest of the sample's residents
-    const others = sample.around.filter((w) => !['KIMORIN⭐︎', 'MIKIE⭐︎DRILL', 'MONBAN', 'たこ焼きブラザー', 'たこ焼きシスター'].includes(w.author.name)).filter((w, i, a) => a.findIndex((x) => x.author.name === w.author.name) === i);
+    // the resident's place: KIMORIN⭐︎ (pushed), and the story's cast met so far (never the hosts themselves)
     return {
       ...sample,
       owner: { id: `story-host-${planet}`, name: STORY_HOSTS[planet] },
       own: [],
       around: [
         as(kimorin, `st-${planet}-kimorin`, { ...k, rel: 'oshi' }),
-        as(monban, `st-${planet}-monban`, { ...words(monban, 'MONBAN'), rel: 'dachi' }),
+        // D04-S005: MONBAN's kororin, the siblings' ダチ (the script's own)
+        ...(monban ? [as(monban, `st-${planet}-monban`, { ...words(monban, 'MONBAN'), rel: 'dachi' })] : []),
         ...(planet === 'saturn' ? [as(kimorin, `st-${planet}-kimorin-2`, { ...k, rel: 'oshi' })] : []),
-        ...others.slice(0, 4).map((w, i) => as(w, `st-${planet}-r${i}`)),
+        ...oshi(HOST_NAMES[planet]),
       ],
       far: [],
     };
@@ -85,7 +104,7 @@ export function storyHome(planet: StoryPlanet, place: StoryPlace, o: StoryCastIn
     ...sample,
     owner: { id: 'story-neo', name: o.neo || 'あなた' },
     own,
-    around: [inviter, as(kimorin, `st-${planet}-kimorin`, { ...k, rel: 'dachi' })],
+    around: [inviter, as(kimorin, `st-${planet}-kimorin`, { ...k, rel: 'dachi' }), ...oshi()],
     far: [],
   };
 }

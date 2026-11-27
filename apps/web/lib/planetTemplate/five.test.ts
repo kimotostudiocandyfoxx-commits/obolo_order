@@ -55,7 +55,7 @@ describe('05 the five planets on the common template', () => {
     expect(waveBars()[1]).toEqual({ h: 22, delay: 0.08 });
     expect(SHELF_ASPECT).toMatchObject({ radio: 1.55, book: 0.72, game: 0.72 });
   });
-  it('the sample: the prototype’s five works per planet, never 「名前の〜」, ten of yours and a shelf for every friend', () => {
+  it('the sample: the prototype’s five works per planet, never 「名前の〜」, ten of yours and a shelf for every one of the cast (2 ダチ + 18 推し, M-R341)', () => {
     for (const p of FIVE_PLANETS) {
       const v = templateSample(p, Date.parse('2026-11-25T12:00:00Z'));
       expect(v.own).toHaveLength(10);
@@ -64,7 +64,7 @@ describe('05 the five planets on the common template', () => {
         expect(w.title).not.toContain(`${w.author.name}の`);
       }
       const people = peopleOf(v);
-      expect(people).toHaveLength(10);
+      expect(people).toHaveLength(20);
       for (const x of people) expect(x.works.length).toBeGreaterThanOrEqual(5);
     }
     const mars = templateSample('mars').around[0];

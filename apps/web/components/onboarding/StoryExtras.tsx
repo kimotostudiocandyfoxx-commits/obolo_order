@@ -469,10 +469,21 @@ export function stampsOn(day: number): StampId[] {
 /**
  * The tour ticket (M-R18): the ticket picture with four star-shaped stamp slots — Saturn, Jupiter,
  * Mercury, Mars (+ Venus, draft 21). `fresh` stamps one now; `flip` turns to the back: the star map, the
- * four planets joined by a gold line running on to Venus, and Uranus, Neptune, Pluto locked 『Obolo Orderのみ』, with
+ * four planets joined by a gold line running on to Venus, and Pluto, Neptune, Uranus with a lock, with
  * the Mars Theater's curtain by Mars (M-R188, M-R203).
+ * M-R341: the three outer planets are days 8–10 of the first journey — no 『Obolo Orderのみ』 over them any more; a lock
+ * comes off on the morning of its day (`unlock`: that planet's, the ones before it already open; 'all': every star gold
+ * and the line through all eight, the Eclipse day).
  */
-export function TicketCard({ stamps, fresh, flip, member = false, onDone }: { stamps: StampId[]; fresh?: StampId; flip?: boolean; /** Obolo Order already (joined early): the Mars Theater's curtain is open */ member?: boolean; onDone: () => void }) {
+export const OUTER_ORDER = ['pluto', 'neptune', 'uranus'] as const;
+/** which outer planets the star map shows open, and the one whose lock comes off now */
+export function ticketOpen(unlock: 'pluto' | 'neptune' | 'uranus' | 'all' | undefined): { open: string[]; fresh: string | null } {
+  if (!unlock) return { open: [], fresh: null };
+  if (unlock === 'all') return { open: [...OUTER_ORDER], fresh: null };
+  return { open: OUTER_ORDER.slice(0, OUTER_ORDER.indexOf(unlock) + 1), fresh: unlock };
+}
+export function TicketCard({ stamps, fresh, flip, member = false, unlock, onDone }: { stamps: StampId[]; fresh?: StampId; flip?: boolean; /** Obolo Order already (joined early): the Mars Theater's curtain is open */ member?: boolean; unlock?: 'pluto' | 'neptune' | 'uranus' | 'all'; onDone: () => void }) {
+  const outer = ticketOpen(unlock);
   const [pressed, setPressed] = useState(!fresh);
   const [back, setBack] = useState(false);
   useEffect(() => {
@@ -519,22 +530,40 @@ export function TicketCard({ stamps, fresh, flip, member = false, onDone }: { st
                   火星シアター
                 </text>
               </g>
-              {[
-                [170, 70, '天王星'],
-                [95, 95, '海王星'],
-                [245, 50, '冥王星'],
-              ].map(([x, y, t]) => (
-                <g key={String(t)} opacity=".75">
-                  <circle cx={Number(x)} cy={Number(y)} r="9" fill="none" stroke="#a5b4fc" strokeDasharray="3 3" />
-                  <LineIcon id="lock" x={Number(x) - 5} y={Number(y) - 5} width="10" height="10" className="text-indigo-200" strokeWidth={2} />
-                  <text x={Number(x)} y={Number(y) + 24} textAnchor="middle" fontSize="11" fill="#c7d2fe">
-                    {t}
-                  </text>
-                </g>
-              ))}
-              <text x="165" y="35" textAnchor="middle" fontSize="13" fill="#fde68a" letterSpacing="3">
-                Obolo Orderのみ
-              </text>
+              {/* M-R341: the gold line runs on through the outer planets that are open (Venus → Pluto → Neptune → Uranus) */}
+              {outer.open.length > 0 && (
+                <polyline
+                  points={['235,95', ...(['pluto', 'neptune', 'uranus'] as const).filter((k) => outer.open.includes(k)).map((k) => ({ pluto: '245,50', neptune: '95,95', uranus: '170,70' })[k])].join(' ')}
+                  fill="none"
+                  stroke="#fcd34d"
+                  strokeWidth="1.4"
+                  opacity=".85"
+                />
+              )}
+              {(
+                [
+                  [170, 70, '天王星', 'uranus'],
+                  [95, 95, '海王星', 'neptune'],
+                  [245, 50, '冥王星', 'pluto'],
+                ] as const
+              ).map(([x, y, t, k]) => {
+                const open = outer.open.includes(k);
+                return (
+                  <g key={t} opacity={open ? 1 : 0.75} data-testid={`ticket-${k}`} data-open={open ? '1' : '0'}>
+                    {open ? (
+                      <circle cx={x} cy={y} r="9" fill="#fcd34d" className={outer.fresh === k ? 'animate-pulse' : undefined} />
+                    ) : (
+                      <>
+                        <circle cx={x} cy={y} r="9" fill="none" stroke="#a5b4fc" strokeDasharray="3 3" />
+                        <LineIcon id="lock" x={x - 5} y={y - 5} width="10" height="10" className="text-indigo-200" strokeWidth={2} />
+                      </>
+                    )}
+                    <text x={x} y={y + 24} textAnchor="middle" fontSize="11" fill={open ? '#fde68a' : '#c7d2fe'}>
+                      {t}
+                    </text>
+                  </g>
+                );
+              })}
             </svg>
           </div>
         </div>

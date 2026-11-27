@@ -1,6 +1,6 @@
 import type { Step } from './script';
 import { PLANET_HOMES_ENV, planetHomeIsNew } from '../planetHomes';
-import { D5_NEW, withNewHomes } from './newHomeScenes';
+import { D5_NEW, OSHI_NOTES, withNewHomes } from './newHomeScenes';
 import { kimorinBack } from './kimorinBack';
 
 /**
@@ -225,7 +225,7 @@ export const DAY5_BEFORE: Step[] = [
  * story 2026-11-27 (M-R330): the day on the planet's NEW home — the script of now, word for word (story-sync checks
  * this one). Played only when the planet's switch is on (lib/planetHomes.ts, off by default).
  */
-export const DAY5_NEW_HOME: Step[] = withNewHomes(DAY5_BEFORE, D5_NEW);
+export const DAY5_NEW_HOME: Step[] = withNewHomes(DAY5_BEFORE, D5_NEW, OSHI_NOTES[5]);
 
 /** the day as played: its steps of before, unchanged, until mercury's switch is on */
 export const DAY5: Step[] = planetHomeIsNew('mercury', PLANET_HOMES_ENV) ? DAY5_NEW_HOME : DAY5_BEFORE;

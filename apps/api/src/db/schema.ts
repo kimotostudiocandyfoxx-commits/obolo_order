@@ -108,7 +108,7 @@ export const users = pgTable(
     invitedByMessage: text('invited_by_message'),
     /** 8-day journey (see @obolo/shared journey.ts): 1–8 = day to play, 9 = the Eclipse day (payment), 10 = ORDER member.
      *  Accounts created before the journey existed default to 10. */
-    journeyDay: integer('journey_day').notNull().default(9),
+    journeyDay: integer('journey_day').notNull().default(12),
     /** When the current day was finished; the next day unlocks 24 h later (or by skipping). */
     journeyCompletedAt: timestamp('journey_completed_at', { withTimezone: true }),
     /** When {name} became dachi with {inviter} on Saturn (D04-S005c, M-R212): the ダチ threads are shown from then (set even with no inviter). */

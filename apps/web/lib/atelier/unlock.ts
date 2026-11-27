@@ -5,8 +5,10 @@ import { batiKindOpensLine, JOURNEY_DONE, type BatiPersonality } from '@obolo/sh
  *   2 your look (プロフィールの姿) · {bati}'s dress-up / 変身 · lookups (調べもの) · showing pictures ·
  *   3 コロリン · 4 アート · 5 曲 · 6 映像 (MV) · 7 金星のラジオ (a recorded show).
  * After the journey (journeyDay ≥ JOURNEY_DONE) everything is open. A member who joined early is on the same day
- * schedule (only journeyDay counts). Client 2026-11-25: 本 (novel) and ゲーム open after the journey (JOURNEY_DONE),
- * with the members' later planets they belong to (Pluto, Neptune); story 2026-11-25: グッズ too (Uranus).
+ * schedule (only journeyDay counts).
+ * M-R341 (2026-11-27): the three outer planets are days 8–10 of the first journey, so their kinds open with them like
+ * the others — 8 本 (novel: Pluto) · 9 ゲーム (Neptune) · 10 グッズ (Uranus). (Before: all three after the journey,
+ * client / story 2026-11-25, when those planets were for members.)
  */
 export const UNLOCK_DAY = {
   look: 2,
@@ -18,10 +20,10 @@ export const UNLOCK_DAY = {
   song: 5,
   video: 6,
   radio: 7,
-  novel: JOURNEY_DONE,
-  game: JOURNEY_DONE,
-  // story 2026-11-25: グッズ (a kind + one of your arts, free) — with Uranus, after the journey
-  goods: JOURNEY_DONE,
+  novel: 8,
+  game: 9,
+  // グッズ (a kind + one of your arts, free) — with Uranus
+  goods: 10,
 } as const;
 
 export type AtelierKind = keyof typeof UNLOCK_DAY;

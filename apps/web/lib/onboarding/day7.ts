@@ -1,6 +1,6 @@
 import type { Step } from './script';
 import { PLANET_HOMES_ENV, planetHomeIsNew } from '../planetHomes';
-import { D7_BOOTH, D7_BOOTH_UNTIL, D7_BOOTHS, D7_BOOTHS_FROM, replaceStretch } from './newHomeScenes';
+import { D7_BOOTH, D7_BOOTH_UNTIL, D7_BOOTHS, D7_BOOTHS_FROM, OSHI_NOTES, replaceStretch, withOshi } from './newHomeScenes';
 import { kimorinBack } from './kimorinBack';
 
 /**
@@ -12,7 +12,7 @@ import { kimorinBack } from './kimorinBack';
  *    〔聞き直す〕〔録り直す〕, in Bluena at once) and 〔金星へ飛ばす〕 or 〔今は飛ばさない〕 (f_d07v_show = send / keep);
  *    the rocket leaves the Moon — the day's 88 minutes start here ('clock')
  *  - Venus only to listen: the king guess, ボスGたち, the radio cloud (D07V-S003, f_d07v_arrived), {neo}'s booth and the
- *    fifth stamp (D07V-S004, f_d07v_done). The only night of the journey slept on Venus: day 8 starts on a Venus morning.
+ *    fifth stamp (D07V-S004, f_d07v_done). The night is slept on Venus; day 8 (Pluto, M-R341) starts on the Moon like the others.
  * Nothing is made on Venus (M-R208; the easy DJ practice is gone).
  */
 export const DAY7_BEFORE: Step[] = [
@@ -162,8 +162,10 @@ export const DAY7_BEFORE: Step[] = [
   { t: 'ticket', stamp: 'venus' }, // 5つの欄が、全部うまる。切符が、金色に光る
   { t: 'caption', text: '5つの星を、まわった' },
   { t: 'sprite', image: ['bossg', 'kimorin-sun'] },
-  { t: 'say', who: 'ボスG', text: '明日は、地球だ。その先に、太陽がある。' },
-  { t: 'say', who: 'KIMORIN', text: '……明日は、決める日、ですね。' },
+  // M-R341: the journey goes on — Pluto is tomorrow (before: 「明日は、地球だ。その先に、太陽がある。」「……明日は、決める日、ですね。」).
+  // The order of the days is not the planet homes' switch: these two lines are the same with it on or off.
+  { t: 'say', who: 'ボスG', text: '明日は、冥王星だ。いちばん遠くて、暗い星だ。' },
+  { t: 'say', who: 'KIMORIN', text: '……まだ、星めぐりは続くのですね。' },
   { t: 'sprite', image: 'kimorin-sun' },
   { t: 'say', who: 'KIMORIN', text: '……{neo}の曲が、まだ耳に残っています。……すね毛の、次くらいに。' },
   { t: 'set', key: 'f_d07v_done', value: 'true' },
@@ -171,7 +173,7 @@ export const DAY7_BEFORE: Step[] = [
   { t: 'still', image: 's/venus-night', fade: 0.8 }, // 金星の雲の上。ラジオたちが星のように漂う。KIMORINとうんちピンポンくんが、雲にもたれて寝息
   { t: 'wait', s: 2 },
   { t: 'bgm', track: 'farewell' },
-  { t: 'caption', text: 'また明日' }, // 〔完了画面：8日目まで24時間のカウントダウン〕 (TomorrowScreen)
+  { t: 'caption', text: 'また明日' }, // 〔完了画面：8日目（冥王星）まで24時間のカウントダウン〕 (TomorrowScreen)
   { t: 'end' },
 ];
 
@@ -179,7 +181,7 @@ export const DAY7_BEFORE: Step[] = [
  * story 2026-11-27 (M-R330): the day on the planet's NEW home — the script of now, word for word (story-sync checks
  * this one). Played only when the planet's switch is on (lib/planetHomes.ts, off by default).
  */
-export const DAY7_NEW_HOME: Step[] = replaceStretch(replaceStretch(DAY7_BEFORE, 'D07V-S003', D7_BOOTHS, { from: D7_BOOTHS_FROM }), 'D07V-S004', D7_BOOTH, { until: D7_BOOTH_UNTIL });
+export const DAY7_NEW_HOME: Step[] = withOshi(replaceStretch(replaceStretch(DAY7_BEFORE, 'D07V-S003', D7_BOOTHS, { from: D7_BOOTHS_FROM }), 'D07V-S004', D7_BOOTH, { until: D7_BOOTH_UNTIL }), OSHI_NOTES[7]);
 
 /** the day as played: its steps of before, unchanged, until venus's switch is on */
 export const DAY7: Step[] = planetHomeIsNew('venus', PLANET_HOMES_ENV) ? DAY7_NEW_HOME : DAY7_BEFORE;

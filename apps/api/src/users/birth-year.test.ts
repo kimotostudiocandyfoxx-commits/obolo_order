@@ -99,7 +99,8 @@ describe('the birth year is always there (client 2026-11-27)', () => {
     await expect(day.s.completeJourneyDay('u1', { day: 1 })).rejects.toSatisfy(refused);
     const next = users(row({ journeyCompletedAt: new Date(Date.now() - 3 * 86400_000) }));
     await expect(next.s.advanceJourney('u1', false)).rejects.toSatisfy(refused);
-    const member = users(row({ journeyDay: 9, orderedAt: at, subscriptionStatus: 'active' }));
+    // a members' day: only an account of the eight-day journey has them (M-R341)
+    const member = users(row({ journeyDay: 12, orderedAt: at, subscriptionStatus: 'active', onboardingJson: { 'j.eight': '1' } }));
     await expect(member.s.completeLap2('u1', { chapter: 0 })).rejects.toSatisfy(refused);
     expect([day.sets, next.sets, member.sets]).toEqual([[], [], []]);
   });

@@ -1,6 +1,6 @@
 'use client';
 
-import { journeyMeta, PLANETS } from '@obolo/shared';
+import { journeyMeta, PLANETS, type PlanetId } from '@obolo/shared';
 import { useState } from 'react';
 import { PlanetSphere } from '@/components/PlanetSphere';
 import { getApi } from '@/lib/api';
@@ -20,6 +20,9 @@ export function JourneyDayScreen({ day }: { day: number }) {
   const [busy, setBusy] = useState(false);
   const meta = journeyMeta(day);
   if (!meta) return null;
+  // Pluto has no entry in the planet registry (its page exists only as a new home): Neptune's sphere stands in here.
+  // Never shown in practice — every journey day has its story (lib/onboarding/stories.ts).
+  const planet: PlanetId = meta.planet === 'pluto' ? 'neptune' : meta.planet;
 
   const finish = async () => {
     setBusy(true);
@@ -37,10 +40,10 @@ export function JourneyDayScreen({ day }: { day: number }) {
     >
       <span className="animate-[fadeUp_1s_ease-out] text-xs tracking-[0.6em] text-amber-200/70">{t(m.journey.day, { n: day })}</span>
       <div className="mt-6 animate-[fadeUp_1.4s_ease-out] drop-shadow-[0_0_30px_rgba(255,210,140,0.35)]">
-        <PlanetSphere id={meta.planet} size={120} />
+        <PlanetSphere id={planet} size={120} />
       </div>
       <p className="mt-6 text-2xl tracking-[0.25em] text-amber-50">{meta.title}</p>
-      <p className="mt-1 text-xs tracking-widest text-white/40">{PLANETS[meta.planet].emoji} {m.planets[meta.planet].name}</p>
+      <p className="mt-1 text-xs tracking-widest text-white/40">{PLANETS[planet].emoji} {meta.planet === 'pluto' ? '冥王星' : m.planets[planet].name}</p>
       {meta.guides.length > 0 && (
         <p className="mt-4 text-sm text-white/60">
           {m.journey.guides}：{meta.guides.join('・')}

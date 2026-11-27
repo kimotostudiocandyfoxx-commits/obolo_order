@@ -4,19 +4,20 @@ import type { PlanetId } from './planets';
  * The journey every invited person goes through before becoming an ORDER member. One day unlocks 24 h
  * after the previous one is finished (or immediately with "明日まで待てない").
  *
- * The first journey is seven days (story 2026-10-14, docs/story-rewrite/土星まで_UI引き継ぎ.md): KIMORIN
- * is no longer a guide but a fellow NEO who travels with you, and the Moon moved into day 2, so every
- * later day came one day earlier:
+ * The first journey is eleven days (story M-R341, 2026-11-27; handoff planets-08): after Venus the three outer planets
+ * are visited BEFORE becoming Obolo Order, and the Eclipse moved from day 8 to day 11:
  *   1 Earth (the invitation, MONBAN, OBOLON) · 2 Earth → the Moon (KIMORIN, the NEO look, name, Bati) ·
- *   3 Saturn · 4 Jupiter · 5 Mercury · 6 Mars · 7 Venus · 8 Earth → the Sun.
+ *   3 Saturn · 4 Jupiter · 5 Mercury · 6 Mars · 7 Venus · 8 Pluto (クロコパトラ) · 9 Neptune (オニモンク) ·
+ *   10 Uranus (MONBAN) · 11 Earth → the Sun.
+ * (Before: seven days from 2026-10-14, eight from draft 21 with the Sun on day 8 — migration 0064 moves the accounts.)
  * Draft 21 (M-R124): everyone makes everything on the first journey and lives in space from then on; at the
  * Sun the Eclipse is a choice — 〔エクリプスを受ける〕 (¥88/month: ORDER) or 〔今は、住人のままでいる〕 (free).
  *
- * Stored on the user as `journeyDay` (1–7 = day to play, 8 = the Sun day, 9 = done) plus
- * `journeyCompletedAt` (set when the current day is finished, cleared when the next starts). Day 8 can be
+ * Stored on the user as `journeyDay` (1–10 = day to play, 11 = the Sun day, 12 = done) plus
+ * `journeyCompletedAt` (set when the current day is finished, cleared when the next starts). Day 11 can be
  * finished paid or not; after it the visitor is an ORDER (`orderedAt` set) or a resident (not set).
  */
-export const JOURNEY_LAST_DAY = 7;
+export const JOURNEY_LAST_DAY = 10;
 /** Days that exist in the numbering but are not played (none since the seven-day journey). */
 export const SKIPPED_DAYS: readonly number[] = [];
 export function nextJourneyDay(day: number): number {
@@ -26,31 +27,35 @@ export function nextJourneyDay(day: number): number {
 }
 
 /**
- * Planets that open after joining (client decision 2026-10-07): one more each week after the
- * Eclipse — Neptune after 2 weeks, Pluto after 3 (Pluto is not built yet).
- * PLACEHOLDER (P-JOURNEY-1): which planet opens in which week.
+ * The three outer planets open on the first journey's day they are visited (M-R341: Pluto day 8, Neptune day 9, Uranus
+ * day 10) — for everyone, an Obolo Order or not. (Before: members only, Uranus with ORDER and Neptune / Pluto 2 / 3
+ * weeks after it.) Anyone past those days — every account whose journey is done — has all three open.
  */
-export const LATER_PLANETS: readonly { planet: 'venus' | 'uranus' | 'neptune' | 'pluto'; afterDays: number }[] = [
-  // Uranus (your atelier) is the second journey: it opens with ORDER (client 2026-10-15)
-  { planet: 'uranus', afterDays: 0 },
-  // (Venus is not on the first journey since 2026-10-14; ORDER members can visit it like the other planets)
-  { planet: 'neptune', afterDays: 14 },
-  { planet: 'pluto', afterDays: 21 },
-];
-/** When a later planet opens for this member (null = not a member yet); undefined = always open. */
-export function planetOpensAt(planet: string, orderedAt: string | null | undefined): Date | null | undefined {
-  const rule = LATER_PLANETS.find((p) => p.planet === planet);
-  if (!rule) return undefined;
-  if (!orderedAt) return null;
-  return new Date(new Date(orderedAt).getTime() + rule.afterDays * 24 * 3600_000);
+export const PLANET_OPEN_DAY: Readonly<Partial<Record<string, number>>> = { pluto: 8, neptune: 9, uranus: 10 };
+/** the journey day a planet opens on (undefined: open from the start) */
+export function planetOpenDay(planet: string): number | undefined {
+  return PLANET_OPEN_DAY[planet];
 }
-export const JOURNEY_PAYMENT = 8;
-export const JOURNEY_DONE = 9;
+/** a planet is open for someone on `journeyDay` (null / undefined day: not on a journey — open) */
+export function planetIsOpen(planet: string, journeyDay: number | null | undefined): boolean {
+  const day = PLANET_OPEN_DAY[planet];
+  return day === undefined || journeyDay == null || journeyDay >= day;
+}
+/** the Sun day: the Eclipse (the payment is inside its story) */
+export const JOURNEY_PAYMENT = 11;
+export const JOURNEY_DONE = 12;
+/**
+ * The journey of before (eight days: the Sun on day 8, done = 9). Accounts that had reached its day 8 when migration
+ * 0064 ran carry `story[JOURNEY_EIGHT_KEY] = '1'`: they never played days 8–10 of now (the outer planets) on the first
+ * journey, so the three days after joining (shared LAP2, as before) stay theirs.
+ */
+export const JOURNEY_EIGHT_KEY = 'j.eight';
 export const JOURNEY_WAIT_MS = 24 * 3600_000;
 
 export interface JourneyDayMeta {
   day: number;
-  planet: PlanetId;
+  /** 'pluto' has no page of its own in the registry (PlanetId): only its new home */
+  planet: PlanetId | 'pluto';
   /** Guides met that day (client's names). */
   guides: string[];
   /** Short title + what happens, in the client's words (Japanese source of truth). */
@@ -85,9 +90,13 @@ export const JOURNEY: readonly JourneyDayMeta[] = [
   { day: 5, planet: 'mercury', guides: ['KIMORIN', 'フリージー'], title: '水星へ', beats: ['水星に行く', 'フリージーに出会う', '水星（船の海と島）で遊ぶ'] },
   { day: 6, planet: 'mars', guides: ['KIMORIN', 'ヒポキン'], title: '火星へ', beats: ['火星に行く', '未来都市でヒポキンに出会う', '火星（映像の惑星）で遊ぶ'] },
   { day: 7, planet: 'venus', guides: ['KIMORIN', 'ボスG', 'ハットG', 'ロングG'], title: '金星へ', beats: ['金星に行く', 'ボスGたちに出会う', 'かんたんDJで自分の曲を回す', '〔🎤 見せる〕でダチに届ける'] },
+  // M-R341: the three outer planets, before becoming Obolo Order
+  { day: 8, planet: 'pluto', guides: ['KIMORIN', 'クロコパトラ'], title: '冥王星へ', beats: ['冥王星に行く', 'クロコパトラに出会う', '月の工房でお話を書く', '〔公開する〕で空に灯す'] },
+  { day: 9, planet: 'neptune', guides: ['KIMORIN', 'オニモンク'], title: '海王星へ', beats: ['海王星に行く', 'オニモンクに出会う', '『ナガレを越えて』で遊ぶ', '月の工房でゲームを作る'] },
+  { day: 10, planet: 'uranus', guides: ['KIMORIN', 'MONBAN'], title: '天王星へ', beats: ['天王星に行く', 'MONBANに出会う', '月の工房でグッズを作ってお店に並べる', 'obolo商店を見る（本物の注文はObolo Orderになってから）'] },
 ];
 
-/** Day 7 (the Eclipse day): not a planet visit — the way to ORDER. (Old wording: still to be rewritten in the new story.) */
+/** Day 11 (the Eclipse day; day 8 before M-R341): not a planet visit — the way to ORDER. (Old wording: still to be rewritten in the new story.) */
 export const ECLIPSE_DAY_BEATS = [
   '火星で目を覚ます。今日はもっと遠くの星へ……のはずが、バティの元気がない',
   'バティは太陽の力「マナ」で生きている。マナが切れかけているので地球の本部へ戻る',
@@ -104,7 +113,7 @@ export function journeyMeta(day: number): JourneyDayMeta | undefined {
 }
 
 /**
- * After day 7's countdown the visitor is an ORDER and the journey goes on in the solar system.
+ * After the Eclipse day the visitor is an ORDER and the journey goes on in the solar system.
  * Bati receiving mana / evolving into its ORDER form is not scripted yet.
  */
 export const AFTER_JOURNEY = ['ORDER として旅の続きへ（太陽系）', 'バティにマナが渡り、ORDERの姿に進化する（台本待ち）'] as const;

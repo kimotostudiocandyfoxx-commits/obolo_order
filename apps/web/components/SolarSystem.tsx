@@ -79,7 +79,7 @@ function PlanetLink({
   delay?: number;
 }) {
   const live = PLANETS[id].demo === 'live';
-  // Venus / Neptune open after joining (client decision 2026-10-07)
+  // M-R341: Uranus / Neptune open on their day of the first journey (10 / 9), an Obolo Order or not
   const lock = usePlanetLock(id);
   const resident = useResident();
   const [guide, setGuide] = useState(false);
