@@ -191,8 +191,8 @@ export function VoiceField({
 
   const sub = light ? 'text-slate-400' : 'text-white/55';
   return (
-    <div className="relative flex flex-col items-center">
-      {/* what was heard (tap ⌨ to touch it up by hand) */}
+    <div className={`relative flex flex-col items-center ${light ? '' : 'voice-magic'}`}>
+      {/* what was heard (tap ⌨ to touch it up by hand); client 2026-11-27: the dark (story) field's mystical look is `.voice-magic` in globals.css */}
       {(value || typing) && <div className="mb-3 flex w-full items-center gap-2">{typing ? field : <p className={`w-full rounded-xl px-3 py-2 text-center text-[16px] font-bold ${light ? 'bg-amber-50 text-slate-700' : 'bg-white/10 text-amber-50'}`}>{value}</p>}</div>}
       <button
         type="button"

@@ -22,3 +22,4 @@ export * from './kimorin';
 export * from './task';
 export * from './meter';
 export * from './prompts/planetFigures';
+export * from './prompts/lookSteps';

@@ -819,3 +819,90 @@ body {
 @keyframes twinkle { 0%, 100% { opacity: 0.25; } 50% { opacity: 0.85; } }
 @keyframes warp { from { transform: translate(0, 0) scaleY(0.2); opacity: 0; } 20% { opacity: 0.8; } to { transform: translate(var(--dx), var(--dy)) scaleY(1.4); opacity: 0; } }
 @keyframes warpOut { from { transform: translateY(-20px) scaleY(0.3); opacity: 0; } 25% { opacity: 0.9; } to { transform: translateY(-62vh) scaleY(1.6); opacity: 0; } }
+
+/*
+ * Client 2026-11-27 (day 2, refs 06–08): the mic answer, the newborn {bati}, its card and the bowl of water feel
+ * mystical — a slow halo, a few motes of light, words that float. Everything here is quiet and stops for
+ * prefers-reduced-motion.
+ */
+@keyframes mysticHalo { to { transform: rotate(360deg); } }
+@keyframes mysticFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes mysticWordsIn { from { opacity: 0; letter-spacing: 0.3em; filter: blur(4px); } to { opacity: 1; filter: none; } }
+@keyframes mysticDrift { from { background-position: 0 0, 0 0, 0 0; } to { background-position: 0 -520px, 0 -380px, 0 -260px; } }
+@keyframes mysticTwinkle { 0%, 100% { opacity: 0.35; } 50% { opacity: 0.8; } }
+@keyframes lookRise { 0% { opacity: 0; transform: scaleY(0.2); } 35% { opacity: 0.9; transform: scaleY(1); } 100% { opacity: 0; transform: scaleY(1.08); } }
+@keyframes lookCast { 0%, 100% { filter: brightness(1) drop-shadow(0 0 26px rgba(255, 220, 150, 0.45)); } 50% { filter: brightness(1.5) drop-shadow(0 0 44px rgba(190, 225, 255, 0.9)); } }
+@keyframes lookArrive { from { opacity: 0; transform: scale(0.94); filter: brightness(1.8) blur(3px); } to { opacity: 1; transform: none; } }
+
+/* a few motes of light drifting up (three sparse layers of dots) */
+.mystic-motes {
+  pointer-events: none;
+  background-image:
+    radial-gradient(1.5px 1.5px at 18% 82%, rgba(255, 232, 180, 0.8), transparent 60%),
+    radial-gradient(1.2px 1.2px at 71% 64%, rgba(200, 225, 255, 0.75), transparent 60%),
+    radial-gradient(2px 2px at 44% 30%, rgba(255, 220, 150, 0.55), transparent 60%);
+  background-size: 260px 520px, 190px 380px, 310px 260px;
+  animation: mysticDrift 46s linear infinite, mysticTwinkle 6s ease-in-out infinite;
+}
+.egg-mark { animation: mysticTwinkle 3.4s ease-in-out infinite; background: radial-gradient(circle, rgba(255, 255, 255, 0.16), transparent 70%); }
+.look-water { border: 1px solid rgba(190, 225, 255, 0.35); background: radial-gradient(ellipse at center, rgba(190, 225, 255, 0.42) 0%, rgba(80, 120, 170, 0.14) 60%, transparent 75%); animation: mysticTwinkle 4.5s ease-in-out infinite; }
+.look-rise { pointer-events: none; transform-origin: 50% 100%; background: linear-gradient(to top, rgba(190, 225, 255, 0.55), rgba(255, 236, 190, 0.25) 55%, transparent); filter: blur(10px); animation: lookRise 2.6s ease-in-out infinite; }
+.look-cast { animation: lookCast 1.6s ease-in-out infinite; }
+.look-arrive { animation: lookArrive 0.9s ease-out both; }
+
+/* the story's voice answer (components/onboarding/StoryExtras VoiceField, VoiceChoice): a thin halo turning slowly round
+   the mic, the words heard floating between two hairlines of gold instead of a grey box */
+.voice-magic > button.rounded-full { isolation: isolate; }
+.voice-magic > button.rounded-full::before {
+  content: '';
+  position: absolute;
+  inset: -13px;
+  z-index: -1;
+  border-radius: 9999px;
+  background: conic-gradient(from 0deg, transparent 0 8%, rgba(255, 226, 160, 0.75) 16%, transparent 30% 55%, rgba(170, 200, 255, 0.55) 64%, transparent 78%);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1.5px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1.5px));
+  animation: mysticHalo 14s linear infinite;
+}
+.voice-magic > button.rounded-full::after {
+  content: '';
+  position: absolute;
+  inset: -34px;
+  z-index: -2;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(255, 214, 140, 0.16), rgba(140, 170, 255, 0.07) 55%, transparent 72%);
+  animation: mysticTwinkle 5s ease-in-out infinite;
+}
+.voice-magic > div.mb-3 > p,
+.voice-magic > [data-testid='voice-choice-line'] {
+  border: 0;
+  border-radius: 0;
+  border-top: 1px solid rgba(255, 226, 160, 0.3);
+  border-bottom: 1px solid rgba(255, 226, 160, 0.3);
+  background: linear-gradient(90deg, transparent, rgba(255, 226, 160, 0.1) 30%, rgba(255, 226, 160, 0.1) 70%, transparent);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  color: #fff6de;
+  text-shadow: 0 0 14px rgba(255, 214, 140, 0.6), 0 1px 3px rgba(0, 0, 0, 0.9);
+  animation: mysticWordsIn 0.7s ease-out both, mysticFloat 6s ease-in-out 0.7s infinite;
+}
+.voice-magic > p {
+  font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+}
+
+/* {bati}'s card on day 2 (ref 08): the Moon temple behind, the card a pane of light, its words floating */
+.bati-card-mystic { animation: mysticFloat 7s ease-in-out infinite; }
+.bati-card-mystic dt, .bati-card-mystic .bati-card-title { text-shadow: 0 0 12px rgba(255, 214, 140, 0.7); }
+.bati-card-mystic dd, .bati-card-mystic p { text-shadow: 0 0 10px rgba(190, 215, 255, 0.45), 0 1px 3px rgba(0, 0, 0, 0.85); }
+
+@media (prefers-reduced-motion: reduce) {
+  .mystic-motes, .egg-mark, .look-water, .look-rise, .look-cast, .look-arrive, .bati-card-mystic,
+  .voice-magic > button.rounded-full::before, .voice-magic > button.rounded-full::after,
+  .voice-magic > div.mb-3 > p, .voice-magic > [data-testid='voice-choice-line'] { animation: none; }
+  .look-rise { opacity: 0.5; }
+}

@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type { BatiCard } from '@obolo/shared';
+import { eggMark, type BatiCard } from '@obolo/shared';
 import { SmallEgg } from './SmallEgg';
+import { EggMark } from '@/components/look/LookSteps';
 
 /**
  * バティのカード (M-R217): name, birth date, egg, the favourite food as said, personality + 口ぐせ, the introduction.
@@ -15,16 +16,18 @@ export const bornDate = (iso: string) => {
   return Number.isNaN(d.getTime()) ? '' : `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
 };
 
-export function BatiCardView({ card, egg, eggGrowth, onExport }: { card: BatiCard; /** the small egg beside the card (M-R218), no numbers */ egg?: boolean; eggGrowth?: number; onExport?: () => void }) {
+export function BatiCardView({ card, egg, eggGrowth, onExport, mystic = false }: { card: BatiCard; /** the small egg beside the card (M-R218), no numbers */ egg?: boolean; eggGrowth?: number; onExport?: () => void; /** client 2026-11-27 (ref 08): on the Moon temple — a pane of light, the words floating */ mystic?: boolean }) {
   return (
     <div className="relative flex items-end gap-2">
       <div
-        className={`relative w-64 overflow-hidden rounded-2xl border-2 bg-gradient-to-b from-[#1d2a52] to-[#0b1027] p-4 text-amber-50 ${
-          card.rare ? 'border-amber-300 shadow-[0_0_24px_4px_rgba(255,205,90,0.55)]' : 'border-amber-100/40'
+        className={`relative overflow-hidden p-4 text-amber-50 ${
+          mystic
+            ? `bati-card-mystic w-72 rounded-[1.75rem] border bg-[linear-gradient(180deg,rgba(18,24,56,0.38),rgba(6,8,24,0.62))] backdrop-blur-[3px] [font-family:"Shippori_Mincho","Hiragino_Mincho_ProN","Yu_Mincho","Noto_Serif_JP",serif] ${card.rare ? 'border-amber-300/80 shadow-[0_0_34px_6px_rgba(255,205,90,0.4)]' : 'border-amber-100/25 shadow-[0_0_40px_rgba(190,215,255,0.18)]'}`
+            : `w-64 rounded-2xl border-2 bg-gradient-to-b from-[#1d2a52] to-[#0b1027] ${card.rare ? 'border-amber-300 shadow-[0_0_24px_4px_rgba(255,205,90,0.55)]' : 'border-amber-100/40'}`
         }`}
       >
         {card.rare && <span className="pointer-events-none absolute inset-0 animate-pulse rounded-2xl ring-2 ring-amber-200/60" />}
-        <p className="text-[10px] tracking-[0.3em] text-amber-200/80">
+        <p className="bati-card-title text-[10px] tracking-[0.3em] text-amber-200/80">
           バティのカード{card.rare ? '　✦ めずらしい' : ''}
           {/* M-R230: the third, born from a wish */}
           {card.wish ? '　☾ ねがいの子' : ''}
@@ -32,12 +35,16 @@ export function BatiCardView({ card, egg, eggGrowth, onExport }: { card: BatiCar
         <div className="mt-2 flex items-center gap-3">
           {card.imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={card.imageUrl} alt="" className="h-20 w-20 rounded-xl bg-white/5 object-contain" />
+            <img src={card.imageUrl} alt="" className={`h-20 w-20 object-contain ${mystic ? 'drop-shadow-[0_0_14px_rgba(255,220,150,0.55)]' : 'rounded-xl bg-white/5'}`} />
           ) : (
             <span className="h-20 w-20 rounded-xl bg-white/5" />
           )}
           <div className="min-w-0">
-            <p className="truncate text-xl font-bold">{card.name ?? '……'}</p>
+            <p className="flex items-center gap-1 text-xl font-bold">
+              <span className="truncate">{card.name ?? '……'}</span>
+              {/* M-R334: ♀ (the moon egg) / ♂ (the sun egg) — on every {bati}'s card */}
+              <EggMark egg={card.egg} className="shrink-0" />
+            </p>
             <p className="text-xs text-amber-100/70">{bornDate(card.bornAt)}生まれ</p>
             <p className="text-xs text-amber-100/70">{eggName(card.egg)}</p>
           </div>
@@ -131,7 +138,7 @@ export async function cardPng(card: BatiCard): Promise<Blob | null> {
   ctx.font = `bold 88px ${font}`;
   ctx.fillText(card.name ?? '……', W / 2, 1100);
   ctx.font = `40px ${font}`;
-  ctx.fillText(`${bornDate(card.bornAt)}生まれ・${eggName(card.egg)}`, W / 2, 1175);
+  ctx.fillText(`${bornDate(card.bornAt)}生まれ・${eggName(card.egg)} ${eggMark(card.egg)}`, W / 2, 1175);
   ctx.textAlign = 'left';
   ctx.font = `44px ${font}`;
   let y = wrap(ctx, `好物：${card.seed}`, 140, 1300, W - 280, 60);
@@ -183,8 +190,14 @@ export function BatiCardStep({ card, onNext }: { card?: BatiCard; onNext: () => 
   }, []);
   if (!card) return null;
   return (
-    <div className="absolute inset-0 z-[46] flex animate-[fadeIn_0.4s_ease-out] flex-col items-center justify-center gap-5 bg-black/60 px-6">
+    <div className="absolute inset-0 z-[46] flex animate-[fadeIn_0.4s_ease-out] flex-col items-center justify-center gap-5 overflow-hidden bg-[#05060f] px-6">
+      {/* client 2026-11-27 (ref 08): the Moon temple behind the card, dimmed, a few motes of light */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/onboarding/s/moon-temple.jpg" alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover" />
+      <span aria-hidden className="absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_40%,rgba(5,6,15,0.25),rgba(5,6,15,0.82))]" />
+      <span aria-hidden className="mystic-motes absolute inset-0" />
       <BatiCardView
+        mystic
         card={card}
         onExport={async () => {
           setBusy(true);
@@ -192,7 +205,7 @@ export function BatiCardStep({ card, onNext }: { card?: BatiCard; onNext: () => 
           setBusy(false);
         }}
       />
-      <button onClick={onNext} disabled={busy} className="rounded-full border border-amber-200/80 px-10 py-2.5 tracking-widest text-amber-50 disabled:opacity-40">
+      <button onClick={onNext} disabled={busy} className="relative rounded-full border border-amber-200/70 bg-black/30 px-10 py-2.5 tracking-[0.3em] text-amber-50 backdrop-blur-sm [font-family:'Shippori_Mincho','Hiragino_Mincho_ProN','Yu_Mincho','Noto_Serif_JP',serif] disabled:opacity-40">
         次へ
       </button>
     </div>

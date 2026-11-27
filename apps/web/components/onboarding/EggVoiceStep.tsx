@@ -26,13 +26,14 @@ function wordsRecognizer(recording: boolean): (new () => Rec) | null {
 }
 
 /**
- * D03-S005 「たまごに声を聞かせる」 (M-R246 / M-R247): a big mic in the middle, recording ONLY while held (the HoldMic way);
- * a light ring around it fills with the length spoken (full at BATI_VOICE_TARGET_SECONDS). Let go too soon → OBOLON's
- * `short` line and the next press goes on where it stopped (the takes are appended). Full → the takes go to the server
+ * D03-S005 「{bati}に声を聞かせる」 (M-R246 / M-R247; M-R334, client 2026-11-27: after {bati} is born and named, and a TAP
+ * starts it and a TAP ends it — no holding): a big mic in the middle; a light ring around it fills with the length
+ * spoken (full at BATI_VOICE_TARGET_SECONDS, where it stops by itself). Stopped too soon → OBOLON's
+ * `short` line and the next tap goes on where it stopped (the takes are appended). Full → the takes go to the server
  * in the background (POST /voice/bati: {bati}'s voice, only with the start-of-app agreement) and the story goes on with
  * the words heard (shown as {name}'s bubble). The example sentence small under the mic. No explanation on the screen:
  * a small ⓘ beside the mic shows how the voice is used to those who tap it (M-R247).
- * `fake` (the demo, the review page, screenshots): no microphone and nothing sent — holding fills the ring by time.
+ * `fake` (the demo, the review page, screenshots): no microphone and nothing sent — the ring fills by time.
  * `listenOnly` (M-R250: under 13, or 13〜15 without the guardian's consent): the same scene, the words heard shown, but no
  * audio is recorded or sent and no voice model is made ({bati} gets a prepared voice).
  */
@@ -169,14 +170,12 @@ export function EggVoiceStep({
     rec.stop();
   }
 
-  // a finger that leaves the button (or the page losing focus) lets go too
+  // the page losing focus ends the take too
   useEffect(() => {
     if (!held) return;
     const up = () => release();
-    window.addEventListener('pointerup', up);
     window.addEventListener('blur', up);
     return () => {
-      window.removeEventListener('pointerup', up);
       window.removeEventListener('blur', up);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -190,6 +189,7 @@ export function EggVoiceStep({
     <div className="pb-safe absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black via-black/85 to-transparent px-6 pt-16 text-amber-50" style={{ fontFamily: SERIF }}>
       <div className="mx-auto flex max-w-sm flex-col items-center pb-6">
         <div className="relative">
+          <span aria-hidden className={`mystic-motes absolute -inset-10 rounded-full transition-opacity duration-700 ${held ? 'opacity-100' : 'opacity-40'}`} />
           <svg viewBox="0 0 140 140" className="h-[148px] w-[148px] -rotate-90" aria-hidden>
             <circle cx="70" cy="70" r={R} fill="none" stroke="rgba(255,226,160,0.16)" strokeWidth="5" />
             <circle
@@ -213,15 +213,11 @@ export function EggVoiceStep({
           </svg>
           <button
             type="button"
-            aria-label="押している間、たまごに声が届く"
+            aria-label={held ? 'タップで、話しおわる' : 'タップで、話しはじめる'}
+            aria-pressed={held}
+            data-testid="egg-voice-mic"
             disabled={done || !!trouble}
-            onPointerDown={(e) => {
-              e.preventDefault();
-              (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
-              press();
-            }}
-            onPointerUp={release}
-            onPointerCancel={release}
+            onClick={() => (holding.current ? release() : press())}
             onContextMenu={(e) => e.preventDefault()}
             className={`absolute left-1/2 top-1/2 grid h-[96px] w-[96px] -translate-x-1/2 -translate-y-1/2 touch-none select-none place-items-center rounded-full border transition disabled:opacity-50 ${held ? 'scale-105 border-amber-100 shadow-[0_0_40px_rgba(255,204,120,0.75)]' : 'border-amber-200/70 shadow-[0_0_22px_rgba(255,204,120,0.3)]'}`}
             style={{ background: held ? 'radial-gradient(circle at 50% 35%,rgba(255,214,140,0.4),rgba(40,26,8,0.92) 70%)' : 'radial-gradient(circle at 50% 30%,rgba(70,48,18,0.95),rgba(8,6,12,0.95) 72%)' }}
@@ -234,7 +230,8 @@ export function EggVoiceStep({
           </button>}
         </div>
         {info && <p className="mt-2 rounded-xl bg-black/70 px-3 py-2 text-[11px] leading-relaxed text-white/70">{BATI_VOICE_EXPLAIN}</p>}
-        <p className="mt-1 min-h-[18px] text-center text-[12px] leading-relaxed text-amber-100/80">{trouble ?? (done ? '' : held ? 'たまごに、声が届いている…' : '押している間、たまごに声が届く')}</p>
+        {/* M-R247 / M-R334: no explanation on the screen (the world stays whole) — only what is wrong with the mic, if anything */}
+        <p className="mt-1 min-h-[18px] text-center text-[12px] leading-relaxed text-amber-100/80">{trouble ?? ''}</p>
         <p className="mt-1 text-center text-[11px] leading-relaxed text-white/50">例「{example}」</p>
         {trouble && (
           <button type="button" onClick={() => onDone({ words: '', seconds: 0, skipped: true })} className="mt-3 text-[12px] text-white/55 underline">

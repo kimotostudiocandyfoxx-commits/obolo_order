@@ -707,6 +707,24 @@ export class HttpApi implements Api {
   chooseLook(mediaId: string) {
     return this.req<Awaited<ReturnType<Api['chooseLook']>>>('POST', '/me/look', { mediaId });
   }
+  lookStepsInfo() {
+    return this.req<Awaited<ReturnType<Api['lookStepsInfo']>>>('GET', '/me/look/steps');
+  }
+  lookStep(body: Parameters<Api['lookStep']>[0]) {
+    return this.req<Awaited<ReturnType<Api['lookStep']>>>('POST', '/me/look/steps', body);
+  }
+  lookPick4(body: Parameters<Api['lookPick4']>[0]) {
+    return this.req<Awaited<ReturnType<Api['lookPick4']>>>('POST', '/me/look/steps/pick4', body);
+  }
+  lookStepBase(mediaId: string) {
+    return this.req<Awaited<ReturnType<Api['lookStepBase']>>>('POST', '/me/look/steps/base', { mediaId });
+  }
+  lookStepFix(who: Parameters<Api['lookStepFix']>[0]) {
+    return this.req<Awaited<ReturnType<Api['lookStepFix']>>>('POST', '/me/look/steps/fix', { who });
+  }
+  lookStepOpen(who: Parameters<Api['lookStepOpen']>[0]) {
+    return this.req<Awaited<ReturnType<Api['lookStepOpen']>>>('POST', '/me/look/steps/open', { who });
+  }
   batiEgg(food: string, egg?: BatiEggKind) {
     return this.req<Awaited<ReturnType<Api['batiEgg']>>>('POST', '/me/bati/egg', { food, egg });
   }

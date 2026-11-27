@@ -389,7 +389,7 @@ function Character({ name, url, posed, lit, bust, hidden, talking, level, react,
               <img src={layer('tail')!} alt="" draggable={false} className={`absolute inset-0 ${img}`} style={{ transformOrigin: '50% 78%', animation: MOTION.tail.deg ? `tailSway ${MOTION.tail.period}ms ease-in-out infinite` : undefined, ['--tail' as string]: `${MOTION.tail.deg}deg` }} />
             )}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={layer('body') ?? url} alt="" draggable={false} className={`relative ${img} ${own ? 'rounded-[2rem] border-2 border-amber-200/50' : ''}`} />
+            <img src={layer('body') ?? url} alt="" draggable={false} className={`relative ${img} ${own && !name.startsWith('@bati') ? 'rounded-[2rem] border-2 border-amber-200/50' : ''}`} />
             {mouth && (
               // eslint-disable-next-line @next/next/no-img-element
               <img

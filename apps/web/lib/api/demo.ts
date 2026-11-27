@@ -209,6 +209,7 @@ import { getBlob, putBlob } from './idb';
 import { demoUnfurl } from './demoUnfurl';
 import { tokenStore } from './token';
 import { ApiError, type Api, type Paid } from './types';
+import { afterLookStep, canLookStep, EMPTY_LOOK_STEPS, foodNameByRules, lookStepView, type LookPick4Result, type LookStepResult, type LookStepsInfo, type LookStepState, type LookStepWho } from '@obolo/shared';
 import { incantNorm, premiumRequest, songVoiceKey, songVoiceQuote, type IncantView, type SongVoiceQuoteView, type SongVoiceUseView, type SongVoiceVersion } from '@obolo/shared';
 
 /** R17: the passphrase's digests and lengths (its normalized forms) — the demo's only knowledge of it */
@@ -2624,7 +2625,98 @@ export class DemoApi implements Api {
 
   // M-R215 / M-R217: the personality by the rules alone (no model), the card, the small egg
   async batiEgg(food: string, egg?: BatiEggKind) {
-    return this.patchMe((u) => demoBatiEgg(u, food, egg ?? 'sun'));
+    // M-R334: the food's name only is kept (the rules; the API asks its model); the birth picture's mana from the gem
+    const me = this.patchMe((u) => demoBatiEgg(u, foodNameByRules(food), egg ?? 'sun'));
+    try {
+      this.charge('batiBirth');
+    } catch {
+      /* a balance short of it never stops the story */
+    }
+    return me;
+  }
+
+  // --- client 2026-11-27 (story M-R334): the look changed step by step, like the API (LookStepsService), in this browser
+  private stepRound(who: LookStepWho): LookStepState {
+    try {
+      return { ...EMPTY_LOOK_STEPS, ...(JSON.parse(localStorage.getItem(`obolo.steps.${this.uid()}.${who}`) ?? '{}') as Partial<LookStepState>) };
+    } catch {
+      return { ...EMPTY_LOOK_STEPS };
+    }
+  }
+  private saveRound(who: LookStepWho, s: LookStepState) {
+    localStorage.setItem(`obolo.steps.${this.uid()}.${who}`, JSON.stringify(s));
+  }
+  private wornOf(who: LookStepWho): string | null {
+    const u = this.s.users[this.uid()];
+    return who === 'bati' ? (u.bati?.imageUrl ?? null) : (u.avatarUrl ?? null);
+  }
+  async lookStepsInfo(): Promise<LookStepsInfo> {
+    return {
+      bati: lookStepView(this.stepRound('bati'), this.wornOf('bati')),
+      self: lookStepView(this.stepRound('self'), this.wornOf('self')),
+      prices: { step: MAKE_COST.lookStep, pick4: MAKE_COST.lookPick4, fix: MAKE_COST.profileLook, birth: MAKE_COST.batiBirth },
+    };
+  }
+  async lookStep(body: Parameters<Api['lookStep']>[0]): Promise<LookStepResult> {
+    const s = this.stepRound(body.who);
+    if (body.who === 'self' && s.fixed) demoUnlocked(this.s.users[this.uid()]);
+    if (!canLookStep(s)) throw new ApiError(409, 'LOOK_STEPS_DONE', '、、、今日の魔法は、ここまでだ。');
+    const from = s.url ?? this.wornOf(body.who);
+    if (!from) throw new ApiError(409, body.who === 'bati' ? 'NO_BATI' : 'NO_LOOK', 'nothing to change yet');
+    this.charge('lookStep');
+    await new Promise((r) => setTimeout(r, 1600));
+    const url = await demoRefine(from, body.wish, s.used + 1, body.who === 'bati').catch(() => from);
+    const next = afterLookStep(s, url);
+    this.saveRound(body.who, next);
+    return { who: body.who, steps: lookStepView(next, this.wornOf(body.who)), mana: MAKE_COST.lookStep };
+  }
+  async lookPick4(body: Parameters<Api['lookPick4']>[0]): Promise<LookPick4Result> {
+    demoUnlocked(this.s.users[this.uid()]);
+    this.charge('lookPick4');
+    await new Promise((r) => setTimeout(r, 1800));
+    const urls = body.photo
+      ? await Promise.all([0, 1, 2, 3].map((v) => demoFromReference(`data:${body.photo!.mime};base64,${body.photo!.data}`, {}, v)))
+      : demoNeoLooks({ animal: body.wish ?? 'おまかせ', color: body.wish ?? 'おまかせ', mood: body.wish ?? 'おまかせ' }, 0);
+    const candidates = urls.map((url) => ({ id: uid(), url }));
+    this.lookCache = [...this.lookCache, ...candidates];
+    this.saveRound('self', { ...EMPTY_LOOK_STEPS });
+    return { candidates, mana: MAKE_COST.lookPick4 };
+  }
+  async lookStepBase(mediaId: string): Promise<LookStepResult> {
+    const c = this.lookCache.find((x) => x.id === mediaId);
+    if (!c) throw new ApiError(404, 'NOT_FOUND', 'not found');
+    const next: LookStepState = { used: 0, fixed: false, url: c.url };
+    this.saveRound('self', next);
+    return { who: 'self', steps: lookStepView(next, this.wornOf('self')), mana: 0 };
+  }
+  async lookStepFix(who: LookStepWho): Promise<LookStepResult & { me: Me }> {
+    const s = this.stepRound(who);
+    let mana = 0;
+    let me = this.s.users[this.uid()];
+    if (!s.fixed) {
+      if (who === 'bati') {
+        if (s.url && s.url !== this.wornOf('bati')) me = this.wearBati(s.url, true);
+      } else if (s.url && s.url !== me.avatarUrl) {
+        this.charge('profileLook');
+        mana = MAKE_COST.profileLook;
+        const url = s.url;
+        me = this.patchMe((u) => {
+          const h = [...(u.lookHistory ?? [])];
+          if (u.avatarUrl && !h.includes(u.avatarUrl)) h.push(u.avatarUrl);
+          if (!h.includes(url)) h.push(url);
+          return { avatarUrl: url, lookHistory: h.slice(-LOOK_HISTORY_MAX) };
+        });
+      }
+    }
+    const next: LookStepState = { used: s.used, fixed: true, url: null };
+    this.saveRound(who, next);
+    return { who, steps: lookStepView(next, this.wornOf(who)), mana, me };
+  }
+  async lookStepOpen(who: LookStepWho): Promise<LookStepResult> {
+    if (who === 'self') demoUnlocked(this.s.users[this.uid()]);
+    const next = { ...EMPTY_LOOK_STEPS };
+    this.saveRound(who, next);
+    return { who, steps: lookStepView(next, this.wornOf(who)), mana: 0 };
   }
 
   async batiHatch() {
