@@ -1,5 +1,7 @@
 'use client';
 
+import { NewPlanetScreen } from '@/components/planetTemplate/NewPlanetScreen';
+import { showsNewHome } from '@/lib/planetHomes';
 import { PlanetGate } from '@/components/PlanetLock';
 import { PlanetShell } from '@/components/PlanetShell';
 import { Atelier } from '@/components/uranus/Atelier';
@@ -11,6 +13,8 @@ import { Glyph } from '@/components/bluena/glyphs';
  * goods by application — opens on the third journey; until then its shutter is down.
  */
 export function UranusView() {
+  // M-R326: the new common home in place of this screen, only when the switch says so (lib/planetHomes.ts; off by default)
+  if (showsNewHome('uranus')) return <NewPlanetScreen planet="uranus" gate="天王星" />;
   return (
     <PlanetShell id="uranus">
       <PlanetGate planet="uranus" name="天王星">

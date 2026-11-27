@@ -1,5 +1,7 @@
 'use client';
 
+import { NewPlanetScreen } from '@/components/planetTemplate/NewPlanetScreen';
+import { showsNewHome } from '@/lib/planetHomes';
 import { Artwork } from '@/components/Artwork';
 import { PlanetGate } from '@/components/PlanetLock';
 import { PlanetShell } from '@/components/PlanetShell';
@@ -12,6 +14,8 @@ export function NeptuneView() {
   const { m, locale } = useI18n();
   const toast = useToast();
   const [hero, ...rest] = GAMES;
+  // M-R326: the new common home in place of this screen, only when the switch says so (lib/planetHomes.ts; off by default)
+  if (showsNewHome('neptune')) return <NewPlanetScreen planet="neptune" gate="海王星" />;
   return (
     <PlanetShell id="neptune">
       <PlanetGate planet="neptune" name="海王星">

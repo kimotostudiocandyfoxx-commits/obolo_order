@@ -303,7 +303,7 @@ export class PlanetFiguresService {
             : null;
           const other = flat && this.cutModel ? await cutByModel(flat, 'image/png', this.cutModel, FIGURE_SIDE, background, opt).catch(() => null) : undefined;
           // the stored picture is already framed: the kind's own range is of the painting, not of this
-          const i = await inspectCut(r.result, { background, kind: 'figure', other, judge });
+          const i = await inspectCut(r.result, { background, kind: 'figure', other, judge, soft: opt.bigHoles });
           for (const c of i.failed) failed.add(c);
           // one model call and one look are enough: the other keys only look for their own colour left inside
           if (backgrounds.length > 1 && !i.failed.length) continue;

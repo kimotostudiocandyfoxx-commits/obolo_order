@@ -162,6 +162,82 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 - **ゲームのケースの絵**：ゲームができたら（最初の版）{bati} が聞く：自分のアートから選ぶ／{bati} が描く（アートと同じ値段 `jacketArt`、アートのスペル・OK・引き落としそのまま。描いた絵はアートとしても残る）／「いらない」でネオンの顔のまま。あとで「ケースの絵を変えて」でもう一度。`games.cover_url`（`PUT /moon/games/:id/cover {rootId|null}`、自分のアートだけ）。海王星のケース・棚が見せる。せりふ（仮）：`GAME_COVER_LINES`。
 - **安全**：ダチ公開（dachi）の本・ゲーム・グッズは、流れ着いていない知らない人には開けない（`GET /moon/books|games|goods/:id` は 404）。Postgres を使うテスト `apps/api/src/craft/goods.test.ts`（`TEST_DATABASE_URL`、CI で設定）。
 
+## 月で作る → 星（M-R326 といっしょの依頼：8種類の点検）
+
+月（工房・ブルーナ）で作ったものは、〔星へ飛ばす〕でその種類の星へ行く（`KIND_HOME_PLANET`）。飛ばす入口は工房のカード・ブルーナの作品カードの2つで、どちらも同じ `fly()`（`apps/web/components/atelier/makers.ts`）を呼ぶ。新しい家（`GET /planet-home/:planet`）は、下の「星の入れもの」をそのまま読む。
+
+| 月で作るもの | 星 | 飛ばす時に呼ぶもの | 星の入れもの（表） | 飛んだ時刻（88時間のもと） | 開く時に要るもの |
+|---|---|---|---|---|---|
+| 声コロリン | 土星 | `POST /saturn/posts/:id/publish` | `saturn_posts`（`room` 1→0） | `created_at`（飛ばした時に今に直す） | 声 `voice_audio_url`・言葉 `text`・作った人のボール |
+| アート | 木星 | `POST /jupiter/posts` `{rootId}` | `jupiter_posts`（`jupiter_roots` から1行作る） | 投稿の `created_at` | 絵 `url`・題 `title`・蝶の羽の切り方 |
+| 曲 | 水星 | `POST /planets/mercury/posts` `{sourceId: 曲}` | `planet_posts`（`kind` song） | 投稿の `created_at` | 音 `url`・歌詞と時間（曲から）・曲名の読み上げ |
+| 動画・MV | 火星 | `POST /planets/mars/posts` `{sourceId: 裏スタジオ}` | `planet_posts`（`kind` video） | 投稿の `created_at` | 動画 `url`・ポスター `poster_url` |
+| ラジオ | 金星 | `POST /venus/shows/:id/publish` `{on}` | `radio_shows`（`status` public） | `published_at` | 音 `audio_url`・絵 `thumb_url` |
+| グッズ | 天王星 | `POST /moon/goods/:id/fly` `{on}` | `goods.flown_at` | `flown_at` | 種類 `kind`・のせた絵 `art_url` |
+| 本 | 冥王星 | `POST /moon/books/:id/fly` `{on}` | `books.flown_at` | `flown_at` | 表紙 `cover_url`・1章の書き出し（本文は `GET /moon/books/:id`） |
+| ゲーム | 海王星 | `POST /moon/games/:id/fly` `{on}` | `games.flown_at` | `flown_at` | ケースの絵 `cover_url`・遊び方（遊ぶ版は `GET /moon/games/:id`） |
+
+どの種類も：飛ばすとタグとチェックが付く（`planet_work_meta`）。自分の場所にはずっと、ダチ・推しのホームには88時間、大陸には「公開（public）でチェックに通った時」だけ出る。〔外す〕（`DELETE /planet-home/:planet/own/:id`）で星から消え、ブルーナと工房のカードの「星にいる」も消える。月で捨てる（`DELETE /storage/works/:kind/:id`）と星からも消える。種類ごとに1本ずつ、本物の Postgres での通しの試験がある（`apps/api/src/planets/moon-to-planet.pg.test.ts`。`TEST_DATABASE_URL` がない時は飛ばす）。
+
+点検で直したこと（2026-11-27）：
+- アートを月で捨てても、木星の投稿が残っていた → いっしょに消える。
+- 飛ばした曲を月で直す（自分の声で歌い直す・言葉を変える・調整）と、水星では前の音に新しい歌詞の時間が重なっていた → 飛んだ投稿が今の音についていく（`planets/song-follow.ts`）。
+- ラジオだけ、一度さげてから飛ばし直しても88時間が始まり直さなかった → ほかの種類と同じに、飛ばし直すと今から88時間。
+- ブルーナがアートと動画の「星にいる」を知らなかった（何度も飛ばせて、同じ絵が木星に何枚も出た）→ 分かるようにした。
+
+依頼主・物語の部屋に決めてほしいこと：
+- **飛ばし直しのちがい**：アート・曲・動画は飛ばすたびに「投稿」が1行できる（外さずにもう一度飛ばせば、自分の場所に同じ作品が2つ並ぶ。今は「星にいる」の間はボタンが押せないので、外したあとにだけ飛ばし直せる）。コロリン・ラジオ・グッズ・本・ゲームは1つの行の時刻を直すだけ。そろえるかどうか。
+- **88時間たって帰ってきた時の知らせ**（{bati}が★を伝える）は、コロリン・アート・曲・動画・ラジオだけ。グッズ・本・ゲームにはまだない（★の種類もない）。
+- **MV を作り直した時**（場面の描き直し・歌詞入り）は新しい動画になり、飛んだ投稿は前の動画のまま。曲の名前を月で変える方法は今はない（飛ばす時の題が星の題）。
+- **新しい家に入る作品の出どころ**：星の入れものは、月で作ったものだけではない。土星の前の画面の〔つぶやく〕（`POST /saturn/posts`）、木星の前の画面の投稿、水星・火星の前の画面の投稿、金星のブース（録音・生配信の録音）で作ったものも同じ表に入り、新しい家に出る。前の画面をやめるまでは両方が出どころ。
+
+## 切り抜き（M-R325・M-R326・M-R328）
+
+本番の切り抜きは1つ（`apps/api/src/media/cutting.ts`。中身は `cut.ts` と `keying.ts`）。通るもの：星の姿9つ（土星のボールも）、コロリンのデザインと蝶、立ち姿・ちび・話す時の表情と部品・後ろ姿、{bati}の絵。Web では切り抜かない（PNG を見せるだけ）。蝶の羽の切り方は、切り抜いた絵で測る（切り直したら測り直す）。
+
+切り方（M-R325）：背景の色はふちの中央値で測る／外側は「背景色との差12以下」で「りんかくがない（明るさの勾配60未満）」所だけをふちから塗り進める／ふちにつながらない背景色のかたまりは「絵の0.06%以上・平ら（差の平均7以下、明るさのばらつき3以下）・まわりの輪（3px）が背景色でない（差の平均45超）」時だけ消す／キー色の絵はキーで抜いたあと、ふちから「キー色との差60未満」の所をもう一度消す。こちらで足したもの：輪の2割以上が背景より100以上暗い（りんかく）時だけ穴とする（明るい体のつやを守る）／姿の3割より大きい「穴」は体なので消さない（海王星の泡は別）／床の影（下45%、背景より暗いだけで色がなく、なめらか）は消すが、その上に姿がある時は消さない。
+
+確かめ（M-R326、`inspectCut`）：a 面積（種類ごとの範囲 `CUT_AREA`：ボール20〜75%、蝶20〜72%、土星のちび10〜62%、船12〜55%、UFO 12〜60%、DJ 14〜60%、風船10〜55%、本14〜65%、泡16〜75%、ほか4〜90%。食べられた（外とつながった消えた所が、姿に8方向で囲まれている割合8%超／穴の合計35%超）・残った（ふちの25%超が残る）も a）／b 中の背景色のかたまり／c ふち2pxの15%超が背景色／d 背景を取るモデルの切り抜きとの IoU 0.9未満／e 見るモデル（Gemini Flash-Lite）が NG。モデルがない時（鍵なし・テスト）は d・e を飛ばす。
+
+やり直し（`cutLadder`）：色で切る → 背景を取るモデルの切り抜き → 服と重ならないキー色で描き直す（白い背景の姿もキー色で）→ もう一度描き直す。通った所で止まる。全部落ちたら見せない：星の姿は前の姿のまま（その姿にまだ無い時は、今までどおり型の代わりの絵）、`planet_figures` の `<姿>#cutfail` に「colour:shape|model:area|…」を残し、ログに出す。**立ち姿・表情・後ろ姿・{bati}** は代わりの絵がまだ無いので、全部落ちた時は色で切った絵を今までどおり使い、ログに出すだけ（決めてほしいこと）。コロリンのデザインは、落ちた候補を出さない。
+
+前の人の姿（切り抜く前の絵は残していなかった）：`POST /admin/figures-recut` は、切り抜いた PNG の上でできることだけをする — 中に残った背景（すきま）は消せる。**食べられた白は戻せない**（描き直しが要る）。同じ確かめをして、通ったものは入れかえ（`#cut` r2）、落ちたものは前の絵のまま印を付ける（`#cut` x2:…）。これからは切り抜く前の絵も残す（`<姿>#src`）ので、次に切り方を変えた時は描かずに切り直せる。
+
+火星（M-R328）：UFO の下から光を出さない。プロンプトの版を `mars#v` に残す（今は 2）。前の火星の姿は `POST /admin/figures-repaint` で描き直す（今着ている姿だけ。確かめとやり直しを通す。運営がかぶる）。光の出ている絵のうち、ファイルで持っているもの（物語の部屋が描き直して送る）：`apps/web/public/planets/sample/fig-mars-{user,kimorin,monban,mikie,brother,sister}.webp`、`apps/web/public/planet-home/sp-ufo.webp`、ラボの見本 `art/lab/runware-planet-avatar/mars-ufo__*.jpg`。
+
+## 新しい家への切り替え（準備だけ、M-R326）
+
+今の星の画面を、新しい家（共通の型。今は `/planets-preview/<星>` だけ）に替えるためのスイッチ。**切ったまま**（進め方は依頼主と確認中）。前の画面のコードは残す。
+
+| 変数（Vercel、ビルドの時に入る） | 意味 | 今 |
+|---|---|---|
+| `NEXT_PUBLIC_PLANET_HOMES` | `new` で全部の星が新しい家。ほかの値・空は前の画面 | 空 |
+| `NEXT_PUBLIC_PLANET_HOMES_NEW` | ここに書いた星だけ新しい家（例 `saturn,jupiter`）。上が空でも効く | 空 |
+| `NEXT_PUBLIC_PLANET_HOMES_OLD` | ここに書いた星は前の画面のまま（上が `new` でも）。両方に書いた星は前の画面 | 空 |
+
+効く道：`/saturn` `/jupiter` `/mercury` `/mars` `/venus` `/uranus` `/neptune`、それと `/pluto`（冥王星には前の画面がないので、スイッチが入った時だけある。切っている間は今までどおり「見つかりません」）。太陽系の入口（`/` の `SolarSystem`）は道を変えない（冥王星は入口に無い：新しい家の星の切り替えから行く）。わくは前のまま：上の帯、ログインの壁、旅の鍵（金星・天王星・海王星の `PlanetGate`）。金星の `?dj=1`（DJの練習）と `?booth=1`（月の工房の〔ラジオ〕が開く放送ブース）は、スイッチが入っても前の画面を開く。
+
+**はじめの旅は道を通らない**：旅の日は、前の星の画面の部品を物語の中に直接はめている（`StoryPlayer.tsx`）。スイッチを入れても旅は変わらないが、旅が前の画面にたよっている所は物語で決めることがある：
+- 3日目（土星）：`SaturnLesson`（`KororinVessels`：〔器〕のコロリン、〔つぶやく〕で声を入れる、〔広場〕）。それと物語の中の「土星のホーム」（`StoryHome`：前の `planetHome/PlanetHome` で {neo} のレコードとたこ焼きのレコードを見せる）。
+- 4日目（木星）：`JupiterLesson`（`MyAtelier`・`NeoButterfly`：myアトリエ、ステッカー）。
+- 5日目（水星）：`MercuryLesson`（`MyIsland`：自分の島、レコード）。
+- 6日目（火星）：`MarsLesson`（`MyStudio`、UFO、Bluena の光）。
+- 7日目（金星）：`VenusLesson`。
+- 旅のあとの案内（`AfterScreens`）と2周目（`lap2`）の言葉にも、前の画面の場所の名前（広場・器・島・スタジオ）が出る。
+新しい家には〔つぶやく〕〔器〕〔広場〕が無い（作るのは月）。旅のせりふと場面をどうするかは物語の部屋で決める。ここでは何も変えていない。
+
+**今あるデータの準備**：`GET /admin/planets-readiness`（数えるだけ）と、GitHub の Actions「Planets backfill」（`.github/workflows/planets-backfill.yml`。Cloud Run の一度きりのジョブ、管理トークンは Google Cloud の中）。`action` で選ぶ。順番（`all` はこの順）：
+
+1. `works` — 前の作品のタグとチェック（大陸に要る）。全部 0 になるまで。
+2. `figures` — まだ無い星の姿を描く（描く：運営がかぶる）。裏で描くので、少し待ってもう一度。
+3. `recut` — 前の姿を描かずに切り直して確かめる。`members` が 0 になるまで。
+4. `mars-repaint` — 光の出る火星の姿を描き直す（描く：運営がかぶる）。
+5. `wings` — 蝶の羽の切り方を測る（切り直し・描き直しのあと）。
+6. `title-voice` — 声のある人の水星の曲名を読む（運営がかぶる）。
+7. `readiness` — もう一度数える。`ready: true` になるまで緑にならない。
+
+`planets-readiness` の数：`worksWithoutTags`（種類ごと）、`figures.membersMissing`／`membersWithNone`（姿が足りない人／1つも無い人）、`membersToRecut`（切り直す前の姿がある人）、`figuresToRepaint`（切り直しても確かめに落ちた前の姿：描き直しが要る）、`cutFailures`（やり直しに全部落ちて見せていない絵）、`oldPrompt`／`oldPromptOtherLooks`（光の出る火星の姿：今の姿／ほかの姿）、`wingsNotMeasured`、`songsWithoutTitleVoice`。`figuresToRepaint`・`cutFailures`・`oldPromptOtherLooks` は `ready` に入れていない（運営が見て決める）。
+
 ## API
 | | |
 |---|---|
@@ -176,6 +252,9 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 | `PUT /planet-works/:kind/:id/save {on}` ・ `GET /planet-works/saved` | ☆ ブルーナ |
 | `POST /planet-works/:kind/:id/report` ・ `…/hide` | 通報（＋作品の非表示＋その人を一方向に非表示）・見えなくする（前から） |
 | `POST /admin/planet-works-backfill?limit=` | 前の作品のタグ・チェック |
+| `GET /admin/planets-readiness` | 切り替えの前に：まだ準備のできていないデータの数（M-R326） |
+| `POST /admin/figures-recut?limit=` | 前の星の姿を描かずに切り直して確かめる（M-R325／M-R326） |
+| `POST /admin/figures-repaint?limit=` | 光の出る火星の姿を描き直す（M-R328、運営がかぶる） |
 | `GET /planet-works/planet_post/:id/song` | 02 水星：曲を開く（音・ジャケット・曲名・歌詞と時間） |
 | `GET /planet-home/:planet` | 前から。作品に `tags`、自分の作品に `visibility`・`heldReason` が付いた |
 | `POST /moon/books/:id/fly` ・ `POST /moon/games/:id/fly` `{on}` | 05：本を冥王星へ・ゲームを海王星へ飛ばす（`on:false` で月へ） |

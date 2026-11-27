@@ -98,19 +98,19 @@ export class ChibiBackfillController {
 
   /**
    * M-R325 / M-R326 backfill (admin token only): the figures cut before the checked cut are cut again WITHOUT painting
-   * and checked — `limit` members at a time (default 20, at most 200), oldest first. With the painting kept (figures
+   * and checked — `limit` members at a time (default 10, at most 100), oldest first. With the painting kept (figures
    * made from M-R325 on) the whole new cut runs on it; of older figures only the cut PNG is left: their inner gaps go,
    * whites the old cut ate cannot be restored (counted in `eaten` / `failed`; those keep the picture of before, marked
    * for a new painting). No painter is called; the background-removal model and the vision check are (absorbed:
    * 'figures'), when configured. Run again until `members` is 0.
-   *   curl -X POST -H "x-admin-token: …" "https://<api>/admin/figures-recut?limit=20"
+   *   curl -X POST -H "x-admin-token: …" "https://<api>/admin/figures-recut?limit=10"
    */
   @Post('figures-recut')
   @HttpCode(200)
   async recut(@Headers('x-admin-token') token: string | undefined, @Ip() ip: string, @Req() req: Request, @Query('limit') limit?: string) {
     await rateLimit(this.kv, `admin:${ip}`, 120, 600);
     assertAdmin(this.cfg, token);
-    const n = Math.max(1, Math.min(200, Number(limit) || 20));
+    const n = Math.max(1, Math.min(100, Number(limit) || 10));
     const rows = await this.db.read
       .select({ id: users.id })
       .from(users)

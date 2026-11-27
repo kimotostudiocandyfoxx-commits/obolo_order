@@ -1,5 +1,7 @@
 'use client';
 
+import { NewPlanetScreen } from '@/components/planetTemplate/NewPlanetScreen';
+import { showsNewHome } from '@/lib/planetHomes';
 import { DemoBanner } from '@/components/DemoBanner';
 import { MarsWorld } from '@/components/mars/MarsWorld';
 import { PlanetShell } from '@/components/PlanetShell';
@@ -10,6 +12,8 @@ import { RequireAuth } from '@/components/RequireAuth';
  * (client design 2026-10-05, docs/mars.md; spec §2.7's long-form video lives on in the studio).
  */
 export function MarsView() {
+  // M-R326: the new common home in place of this screen, only when the switch says so (lib/planetHomes.ts; off by default)
+  if (showsNewHome('mars')) return <NewPlanetScreen planet="mars" auth />;
   return (
     <PlanetShell id="mars" bare>
       <DemoBanner />

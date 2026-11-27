@@ -264,6 +264,7 @@ jobs:
             SATURN_CHIBI_MODEL=${{ vars.SATURN_CHIBI_MODEL || 'runware:400@4' }}
             SATURN_BALL_MODEL=${{ vars.SATURN_BALL_MODEL || 'alibaba:qwen-image@2.1-turbo' }}
             PLANET_CHIBI_MODEL=${{ vars.PLANET_CHIBI_MODEL || 'alibaba:qwen-image@2.1-turbo' }}
+            CUTOUT_MODEL=${{ vars.CUTOUT_MODEL || 'runware:109@1' }}
             LOOK_CANDIDATES=${{ vars.LOOK_CANDIDATES || '4' }}
             PAID_LOOK_CANDIDATES=${{ vars.PAID_LOOK_CANDIDATES || '2' }}
             KORORIN_CANDIDATES=${{ vars.KORORIN_CANDIDATES || '4' }}

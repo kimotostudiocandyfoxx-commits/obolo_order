@@ -26,6 +26,11 @@ import {
   RUNWARE_REF_PRICES,
   pictureUsd,
   profileLookParts,
+  profileLookPictures,
+  LOOK_CUT_PICTURES,
+  CUTOUT_CHECK_MODEL,
+  CUTOUT_VISION_MODEL,
+  CUTOUT_VISION_USD,
   estimateJpy,
   DEFAULT_COST_RATES,
 } from './manaPrice';
@@ -146,25 +151,34 @@ describe('the quoted mana', () => {
     expect(pictureUsd('civitai:123@456')).toBeLessThan(0.01);
     expect(pictureUsd('someone:new@1')).toBeGreaterThanOrEqual(0.05);
   });
-  it('client 2026-11-25: the profile look covers everything painted for a look ≈ 25.7 mana', () => {
+  it('client 2026-11-25: the profile look covers everything painted for a look, and (M-R326) the checks of every cut-out ≈ 28.1 mana', () => {
     const e = MAKE_COST_ESTIMATE.profileLook;
     // 13 × FLUX.2 klein 4B with a reference (2 candidates, the standee, the chibi, 3 expressions, 4 blink / mouth parts,
     // the back view, the Saturn chibi) + 8 × Qwen-Image 2.1 Turbo (costs.json: $0.01413) + the words check
     expect(pictureUsd('alibaba:qwen-image@2.1-turbo', true)).toBe(0.01413);
-    expect(profileLookParts().reduce((a, p) => a + p.count, 0)).toBe(21);
-    expect(e.usd).toBeCloseTo(13 * pictureUsd('runware:400@4', true) + 8 * 0.01413 + 0.0005, 6);
-    // 18 pictures (2 candidates, 7 of the look's own set with the round icon, 9 figures) and 4 small patches, kept 12 months
-    expect(e.storedBytes).toBe(18 * 1.5 * 1024 ** 2 + 4 * 0.125 * 1024 ** 2);
+    expect(profileLookPictures()).toBe(21);
+    // M-R326: every cut-out picture is checked, always — the background-removal model's cut (shapes compared) and one look by
+    // the cheap vision model: 19 cut pictures (the standee, the chibi, 3 expressions, 4 parts, the back view, 9 figures)
+    expect(LOOK_CUT_PICTURES).toBe(19);
+    const checks = profileLookParts().filter((p) => p.model === CUTOUT_CHECK_MODEL || p.model === CUTOUT_VISION_MODEL);
+    expect(checks.map((p) => p.count)).toEqual([19, 19]);
+    const checksUsd = 19 * (0.0006 + CUTOUT_VISION_USD);
+    expect(CUTOUT_VISION_USD).toBeCloseTo(0.000078, 6);
+    expect(e.usd).toBeCloseTo(13 * pictureUsd('runware:400@4', true) + 8 * 0.01413 + 0.0005 + checksUsd, 6);
+    // 18 pictures (2 candidates, 7 of the look's own set with the round icon, 9 figures), 4 small patches and — M-R325 — the
+    // nine figures' paintings (kept so a later cut-out needs no painting), kept 12 months
+    expect(e.storedBytes).toBe(18 * 1.5 * 1024 ** 2 + 4 * 0.125 * 1024 ** 2 + 9 * 0.25 * 1024 ** 2);
     const yen = estimateJpy(e, DEFAULT_COST_RATES);
-    expect(yen).toBeGreaterThan(22.5);
-    expect(yen).toBeLessThan(23.5);
+    expect(yen).toBeGreaterThan(24.5);
+    expect(yen).toBeLessThan(25.5);
     expect(MAKE_COST.profileLook).toBe(manaFor10(yen));
-    expect(MAKE_COST.profileLook).toBe(25.7);
+    expect(MAKE_COST.profileLook).toBe(28.1);
     // {bati}'s dress-up keeps its own price
     expect(MAKE_COST.look).toBeLessThan(MAKE_COST.profileLook);
     // the figures follow their models (SATURN_CHIBI_MODEL / SATURN_BALL_MODEL / PLANET_CHIBI_MODEL)
     const cheap = makeCostEstimates({ ...DEFAULT_MAKE_SETUP, saturnBallModel: 'runware:400@4', planetChibiModel: 'runware:400@4' });
-    expect(cheap.profileLook.usd).toBeLessThan(e.usd / 3);
+    // (the cut-out's checks cost the same whatever paints: M-R326)
+    expect(cheap.profileLook.usd - checksUsd).toBeLessThan((e.usd - checksUsd) / 3);
   });
   it('R17: a song on Runware is about 2–3 mana', () => {
     expect(MAKE_COST.song).toBeLessThanOrEqual(3);

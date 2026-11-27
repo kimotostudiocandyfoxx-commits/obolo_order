@@ -421,7 +421,7 @@ export function makeCostEstimates(s: MakeSetup = DEFAULT_MAKE_SETUP): Record<Mak
         .map((p) => `${p.label} ${p.model} ×${p.count}`)
         .join('＋')
         .concat('（どれも姿を参照）＋言葉の確認＋保存12か月'),
-      storedBytes: (n(s.paidLookCandidates) + LOOK_SET_STORED.pictures + PLANET_FIGURE_COUNT) * PICTURE_STORED_BYTES + LOOK_SET_STORED.patches * LOOK_PART_STORED_BYTES,
+      storedBytes: (n(s.paidLookCandidates) + LOOK_SET_STORED.pictures + PLANET_FIGURE_COUNT) * PICTURE_STORED_BYTES + LOOK_SET_STORED.patches * LOOK_PART_STORED_BYTES + PLANET_FIGURE_COUNT * FIGURE_SOURCE_STORED_BYTES,
     },
     kororinDesign: { usd: pics(s.kororinModel, s.kororinCandidates, true) + WORDS_USD, cpuSeconds: 10, note: `${s.kororinModel} ×${n(s.kororinCandidates)} 枚（見本の絵つき）＋切り抜き CPU＋保存12か月`, storedBytes: n(s.kororinCandidates) * PICTURE_STORED_BYTES },
     jacketArt: { usd: pics(s.artModel, 1, false) + WORDS_USD, note: `${s.artModel} ×1 枚＋言葉の確認＋保存12か月`, storedBytes: PICTURE_STORED_BYTES },
@@ -464,6 +464,19 @@ export const LOOK_SET_STORED = { pictures: 7, patches: 4 } as const;
 /** one blink / mouth patch (a small cut-out PNG around the eyes or the mouth) */
 export const LOOK_PART_STORED_BYTES = 0.125 * MIB;
 
+/**
+ * M-R326: the cut-out's always-on checks, per cut picture — Runware's background removal (CUTOUT_MODEL; RemBG 1.4) and
+ * one look by the cheap vision model (Gemini Flash-Lite: one 768×384 sheet ≈ 520 tokens, the question ≈ 180, the answer ≈ 20).
+ */
+export const CUTOUT_CHECK_MODEL = 'runware:109@1';
+export const CUTOUT_VISION_MODEL = 'gemini-flash-lite-latest';
+export const CUTOUT_VISION_TOKENS = { in: 700, out: 20 } as const;
+export const CUTOUT_VISION_USD = (CUTOUT_VISION_TOKENS.in * GEMINI_PRICES[CUTOUT_VISION_MODEL].inUsd + CUTOUT_VISION_TOKENS.out * GEMINI_PRICES[CUTOUT_VISION_MODEL].outUsd) / 1e6;
+/** the cut-out pictures of one profile look: the standee, the small chibi, three expressions, four blink / mouth parts, the back view and the nine figures */
+export const LOOK_CUT_PICTURES = LOOK_TALK_PICTURES.standee + LOOK_TALK_PICTURES.chibi + LOOK_TALK_PICTURES.faces + LOOK_TALK_PICTURES.parts + LOOK_BACK_PICTURES + 9;
+/** M-R325: the painting each figure was cut from is kept beside it (a JPEG, about a quarter of a megabyte), so a later cut-out needs no painting */
+export const FIGURE_SOURCE_STORED_BYTES = 0.25 * MIB;
+
 /** one line of the profile look's price: what is painted, on which model, how many, at what each (USD) */
 export interface ProfileLookPart {
   label: string;
@@ -485,8 +498,18 @@ export function profileLookParts(s: MakeSetup = DEFAULT_MAKE_SETUP): ProfileLook
     { label: '土星のちびキャラ', model: s.saturnChibiModel, count: 1, usd: pictureUsd(s.saturnChibiModel, true) },
     { label: '土星のボール', model: s.saturnBallModel, count: 1, usd: pictureUsd(s.saturnBallModel, true) },
     { label: '7つの星のちびキャラ', model: s.planetChibiModel, count: PLANET_FIGURE_COUNT - 2, usd: pictureUsd(s.planetChibiModel, true) },
+    // M-R326: every cut-out picture is checked — always: the background-removal model cuts it too (the shapes are
+    // compared) and the cheap vision model looks at it on dark and on light. The retries (the model's cut used, a
+    // repaint on the key colour, one more) are not counted, like the figures' second try: they are in the daily p90.
+    { label: '切り抜きの確かめ（背景を取るモデルと形を比べる）', model: CUTOUT_CHECK_MODEL, count: LOOK_CUT_PICTURES, usd: RUNWARE_PRICES[CUTOUT_CHECK_MODEL] },
+    { label: '切り抜きの確かめ（暗い・明るい背景で見る）', model: CUTOUT_VISION_MODEL, count: LOOK_CUT_PICTURES, usd: CUTOUT_VISION_USD },
   ];
 }
+/** the pictures of a profile look, without the checks' lines (what is painted) */
+export const profileLookPictures = (s: MakeSetup = DEFAULT_MAKE_SETUP): number =>
+  profileLookParts(s)
+    .filter((p) => p.model !== CUTOUT_CHECK_MODEL && p.model !== CUTOUT_VISION_MODEL)
+    .reduce((a, p) => a + p.count, 0);
 
 /** client 2026-11-25: the figures of one look — the Saturn chibi, the Saturn ball and the seven other planets' chibis */
 export const PLANET_FIGURE_COUNT = 9;

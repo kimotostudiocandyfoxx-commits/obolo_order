@@ -1,5 +1,7 @@
 'use client';
 
+import { NewPlanetScreen } from '@/components/planetTemplate/NewPlanetScreen';
+import { showsNewHome } from '@/lib/planetHomes';
 import { DemoBanner } from '@/components/DemoBanner';
 import { MercuryWorld } from '@/components/mercury/MercuryWorld';
 import { PlanetShell } from '@/components/PlanetShell';
@@ -12,6 +14,8 @@ import { getApi } from '@/lib/api';
  * and 3-tier Stars, now entered by island).
  */
 export function MercuryView() {
+  // M-R326: the new common home in place of this screen, only when the switch says so (lib/planetHomes.ts; off by default)
+  if (showsNewHome('mercury')) return <NewPlanetScreen planet="mercury" auth />;
   return (
     <PlanetShell id="mercury" bare>
       <DemoBanner />

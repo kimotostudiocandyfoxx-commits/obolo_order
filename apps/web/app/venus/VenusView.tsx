@@ -1,5 +1,7 @@
 'use client';
 
+import { NewPlanetScreen } from '@/components/planetTemplate/NewPlanetScreen';
+import { showsNewHome } from '@/lib/planetHomes';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { DemoBanner } from '@/components/DemoBanner';
@@ -28,6 +30,9 @@ function Venus() {
   // ?booth=1: straight into the broadcast booth (from the Moon atelier's 〔ラジオ〕)
   const booth = params.get('booth') === '1';
   const router = useRouter();
+  // M-R326: the new common home in place of this screen, only when the switch says so (lib/planetHomes.ts; off by default)
+  // (?dj=1 the practice console and ?booth=1 the broadcast booth — the Moon atelier's 〔ラジオ〕 — stay this screen's)
+  if (showsNewHome('venus', params, ['dj', 'booth'])) return <NewPlanetScreen planet="venus" auth gate="金星" />;
   return (
     <PlanetShell id="venus" bare>
       <DemoBanner />

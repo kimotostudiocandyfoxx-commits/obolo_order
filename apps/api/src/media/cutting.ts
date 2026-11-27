@@ -119,10 +119,16 @@ export function fringeShare(w: CutWork, background: CutBackground): number {
     }
     cur = next;
   }
+  // only the figure itself: small things floating beside it (glowing letters, sparkles) are soft and pale all over
+  const keptMask = new Uint8Array(N);
+  for (let i = 0; i < N; i++) keptMask[i] = px[i * 4 + 3] > 10 ? 1 : 0;
+  const parts = regions(keptMask, W, H);
+  let main = 0;
+  for (let k = 1; k < parts.sizes.length; k++) if (parts.sizes[k] > (parts.sizes[main] ?? 0) || !main) main = k;
   let rim = 0;
   let bad = 0;
   for (let i = 0; i < N; i++) {
-    if (d[i] === 0 || d[i] === 255 || px[i * 4 + 3] < 128) continue;
+    if (d[i] === 0 || d[i] === 255 || px[i * 4 + 3] < 128 || parts.lab[i] !== main) continue;
     rim++;
     if (dist[i] <= near) bad++;
   }
@@ -198,7 +204,7 @@ export interface Inspection {
  * M-R326: the five checks of one cut. `kind`: the picture's kind (CUT_AREA), `other`: the model's cut of the same
  * painting for the shape check (not for the model's own cut), `judge`: the vision check.
  */
-export async function inspectCut(c: CutResult, a: { background: CutBackground; kind: string; other?: CutResult | null; judge?: CutJudge | null }): Promise<Inspection> {
+export async function inspectCut(c: CutResult, a: { background: CutBackground; kind: string; other?: CutResult | null; judge?: CutJudge | null; soft?: boolean }): Promise<Inspection> {
   const failed: CutCheck[] = [];
   const skipped: CutCheck[] = [];
   const [min, max] = CUT_AREA[a.kind] ?? CUT_AREA.figure;
@@ -208,8 +214,9 @@ export async function inspectCut(c: CutResult, a: { background: CutBackground; k
   // b: no flat background-coloured blob inside
   if (r.problems.includes('holes')) failed.push('blob');
   // c: no background-coloured rim
+  // (a see-through bubble's own rim is pale by nature: not judged — `soft`)
   const fringe = fringeShare(c.work, a.background);
-  if (fringe > FRINGE_MAX) failed.push('fringe');
+  if (!a.soft && fringe > FRINGE_MAX) failed.push('fringe');
   // d: the same shape as the model's cut
   let iou: number | null = null;
   if (c.how === 'model') {
@@ -288,7 +295,7 @@ export async function cutLadder(a: {
       note(step, [], 'nothing could be cut');
       return { pass: null, model };
     }
-    const i = await inspectCut(cut, { background: p.background, kind: a.kind, other: a.model ? model : undefined, judge: a.judge });
+    const i = await inspectCut(cut, { background: p.background, kind: a.kind, other: a.model ? model : undefined, judge: a.judge, soft: a.opt?.bigHoles });
     if (!i.failed.length) return { pass: cut, model };
     note(step, i.failed, i.reason);
     return { pass: null, model };
@@ -299,7 +306,7 @@ export async function cutLadder(a: {
   if (one.pass) return done('colour', one.pass, a.first);
   // 1st retry: the model's cut of the same painting
   if (one.model) {
-    const i = await inspectCut(one.model, { background: a.first.background, kind: a.kind, judge: a.judge });
+    const i = await inspectCut(one.model, { background: a.first.background, kind: a.kind, judge: a.judge, soft: a.opt?.bigHoles });
     if (!i.failed.length) return done('model', one.model, a.first);
     note('model', i.failed, i.reason);
   } else if (a.model) note('model', [], 'the model could not cut it');

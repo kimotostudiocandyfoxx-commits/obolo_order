@@ -1,0 +1,109 @@
+name: Planets backfill
+
+# Before the live planet screens become the new homes (M-R326; docs/planets.md "新しい家への切り替え"): what of the
+# existing data is not ready, and the backfills that make it ready — from the Actions tab. A one-off Cloud Run job with
+# the API's own service account, so the admin token stays in Google Cloud (as Media to R2).
+#  - readiness:    GET  /admin/planets-readiness (read only: counts; the run is red until everything is ready)
+#  - works:        POST /admin/planet-works-backfill   tags and the check of works made before them (text model: small cost)
+#  - figures:      POST /admin/figures-backfill        planet figures still to paint (PAINTS: absorbed 'figures')
+#  - recut:        POST /admin/figures-recut           figures of before cut again, without painting (M-R325 / M-R326)
+#  - mars-repaint: POST /admin/figures-repaint         Mars figures with the light beam painted again (M-R328; PAINTS)
+#  - wings:        POST /admin/wings-backfill          the butterfly's wing cut measured (CPU only)
+#  - title-voice:  POST /admin/title-voice-backfill    song titles read in the maker's voice (voice model: absorbed)
+#  - all:          the six above in the order docs/planets.md gives, then readiness
+# Each backfill is called again and again (`limit` at a time) until it has nothing left or `minutes` are over.
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'readiness / works / figures / recut / mars-repaint / wings / title-voice / all'
+        default: 'readiness'
+        type: choice
+        options: [readiness, works, figures, recut, mars-repaint, wings, title-voice, all]
+      limit:
+        description: 'how many at a time (empty: each backfill''s own default)'
+        default: ''
+      minutes:
+        description: 'how long to keep going (minutes, ≤ 55)'
+        default: '20'
+
+env:
+  REGION: asia-northeast1
+  WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER || format('projects/{0}/locations/global/workloadIdentityPools/github/providers/github', vars.GCP_PROJECT_NUMBER) }}
+  DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA || format('obolo-deployer@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+  RUNTIME_SA: ${{ vars.GCP_RUNTIME_SA || format('obolo-api-runtime@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+
+jobs:
+  backfill:
+    if: ${{ vars.GCP_PROJECT_ID != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Run
+        env:
+          ACTION: ${{ inputs.action }}
+          LIMIT: ${{ inputs.limit }}
+          MINUTES: ${{ inputs.minutes }}
+        run: |
+          API="https://obolo-api-${{ vars.GCP_PROJECT_NUMBER }}.${REGION}.run.app"
+          MIN=$(python3 -c 'import os; m=os.environ.get("MINUTES","20").strip() or "20"; print(max(1, min(55, int(float(m)))))')
+          LIM=$(python3 -c 'import os; v=os.environ.get("LIMIT","").strip(); print(max(1, min(1000, int(float(v)))) if v else "")')
+          IMAGE=$(gcloud run services describe obolo-api --region "$REGION" --format='value(spec.template.spec.containers[0].image)')
+          cat > script.mjs <<'JS'
+          const h = { 'x-admin-token': process.env.ADMIN_TOKEN };
+          const api = process.env.API;
+          const lim = process.env.LIM ? '?limit=' + process.env.LIM : '';
+          const call = async (method, path) => {
+            const r = await fetch(api + path, { method, headers: h });
+            return { status: r.status, j: await r.json().catch(() => null) };
+          };
+          // each backfill: its path, and how many it still found this time (0: nothing left)
+          const steps = {
+            works: { path: '/admin/planet-works-backfill', left: (j) => Object.values(j).reduce((a, b) => a + Number(b || 0), 0) },
+            figures: { path: '/admin/figures-backfill', left: (j) => j.queued, once: true },
+            recut: { path: '/admin/figures-recut', left: (j) => j.members },
+            'mars-repaint': { path: '/admin/figures-repaint', left: (j) => j.repainted + j.failed },
+            wings: { path: '/admin/wings-backfill', left: (j) => j.members },
+            'title-voice': { path: '/admin/title-voice-backfill', left: (j) => j.queued, once: true },
+          };
+          // docs/planets.md: tags first (the continents need them), then the figures (paint what is missing, re-cut the
+          // old ones, repaint Mars), the wings last of the figures (measured on the final pictures), then the title voices
+          const order = ['works', 'figures', 'recut', 'mars-repaint', 'wings', 'title-voice'];
+          const act = process.env.ACTION;
+          const until = Date.now() + Number(process.env.MIN) * 60_000;
+          for (const name of act === 'all' ? order : order.filter((x) => x === act)) {
+            const s = steps[name];
+            for (let round = 1; ; round++) {
+              const { status, j } = await call('POST', s.path + lim);
+              if (status !== 200 || !j) { console.log('FAILED ' + name + ' ' + status + ' ' + JSON.stringify(j)); break; }
+              console.log('LINE ' + name + ' #' + round + ' ' + JSON.stringify(j));
+              // a backfill that only queues background jobs is called once a run (the jobs paint afterwards: run it again later)
+              if (s.once || !s.left(j) || Date.now() > until) break;
+              await new Promise((r) => setTimeout(r, 2_000));
+            }
+          }
+          const r = await call('GET', '/admin/planets-readiness');
+          console.log('READINESS ' + r.status + ' ' + JSON.stringify(r.j));
+          console.log(r.j && r.j.ready ? 'PLANETS_READY' : 'PLANETS_NOT_READY');
+          JS
+          SCRIPT=$(base64 -w0 script.mjs)
+          gcloud run jobs deploy obolo-planets-backfill --region "$REGION" --image "$IMAGE" --service-account "$RUNTIME_SA" \
+            --set-secrets ADMIN_TOKEN=obolo-admin-token:latest \
+            --set-env-vars "^##^API=$API##ACTION=$ACTION##MIN=$MIN##LIM=$LIM##SCRIPT_B64=$SCRIPT" \
+            --command node --args "^##^--input-type=module##-e##await import('data:text/javascript;base64,' + process.env.SCRIPT_B64)" \
+            --memory 512Mi --task-timeout $(( MIN * 60 + 600 )) --max-retries 0 --quiet
+          gcloud run jobs execute obolo-planets-backfill --region "$REGION" --wait || true
+          EXEC=$(gcloud run jobs executions list --job obolo-planets-backfill --region "$REGION" --limit 1 --format='value(metadata.name)')
+          sleep 20
+          gcloud logging read "resource.type=cloud_run_job AND resource.labels.job_name=obolo-planets-backfill AND labels.\"run.googleapis.com/execution_name\"=\"$EXEC\"" \
+            --order=asc --limit=500 --format='value(textPayload)' | tee log.txt
+          grep -E '^(LINE|READINESS|FAILED) ' log.txt | tail -30 | sed 's/^/    /' >> "$GITHUB_STEP_SUMMARY" || true
+          if [ "$ACTION" = "readiness" ] && ! grep -q PLANETS_READY log.txt; then echo "::error::星の切り替えの準備はまだ終わっていません（上の READINESS の数）"; exit 1; fi
