@@ -6,6 +6,8 @@ import { micAdvice, RECORD_NOTICE_POLITE, recordNoticeOnce } from '@/lib/mic/cor
 import { currentEngine, currentEnv } from '@/lib/mic/env';
 import { hear, type HearPhase, type Hearing } from '@/lib/mic/hear';
 import { LineIcon } from '@/components/LineIcon';
+import { useVoiceEdit, VoiceText } from '@/components/mic/VoiceText';
+import { insertAt } from '@/lib/mic/edit';
 
 /**
  * A choice answered by voice (D01-S006, story M-R169): a big mic button 〔話してみよう〕 with the answers as a small
@@ -14,7 +16,15 @@ import { LineIcon } from '@/components/LineIcon';
  * (client 2026-11-22) and is only matched to the nearest answer to choose the way on (the browser's own speech recognition; nothing is sent or kept). A miss stays on the mic with a
  * word of why (it used to drop to the buttons, which looked like the old choice coming back); only a mic that cannot
  * be used goes to the buttons, saying so.
+ *
+ * Client 2026-11-27: the heard words can be fixed here too (components/mic/VoiceText.tsx). They show for a moment and
+ * the story goes on by itself, as before; a tap on them stops that — a caret stands in the sentence, 〔けす〕 takes a
+ * character, the mic puts new words at the caret, and 〔これで答える〕 goes on with the sentence as it now is.
  */
+/** the heard words stay this long before the story goes on (a tap on them holds it) */
+export const VOICE_ANSWER_HOLD_MS = 1600;
+/** PROVISIONAL wording: goes on with the fixed sentence */
+export const VOICE_ANSWER_GO = 'これで答える';
 export const VOICE_OK_KEY = 'obolo.voiceOk';
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 
@@ -42,17 +52,40 @@ export function matchAnswer(heard: string, options: string[]): number {
 export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k: number, words?: string) => void }) {
   const [mode, setMode] = useState<'mic' | 'listen' | 'keys'>('mic');
   const [heard, setHeard] = useState('');
+  const heardRef = useRef('');
+  heardRef.current = heard;
   const [note, setNote] = useState('');
   const [recordNote, setRecordNote] = useState(false);
   const [phase, setPhase] = useState<HearPhase | null>(null);
   const [level, setLevel] = useState<number | null>(null);
   const take = useRef<Hearing | null>(null);
   const done = useRef(false);
+  // client 2026-11-27: the heard words being fixed (a tap on them): the story waits for 〔これで答える〕
+  const [fixing, setFixing] = useState(false);
+  const fixingRef = useRef(false);
+  const edit = useVoiceEdit(heard, setHeard);
+  const going = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const answer = (words: string) => {
+    if (done.current || !words.trim()) return;
+    done.current = true;
+    if (going.current) clearTimeout(going.current);
+    onPick(matchAnswer(words, options), words.trim().slice(0, 120));
+  };
+  const hold = () => {
+    if (done.current) return;
+    if (going.current) clearTimeout(going.current);
+    going.current = null;
+    fixingRef.current = true;
+    setFixing(true);
+  };
   // no way to hear on this browser: the mic stays, with the reason in one line; ⌨ in the corner is the way on
   // (story chat 2026-10-29: never switch to the buttons by itself)
   useEffect(() => {
     if (!currentEngine()) setNote(micAdvice('unsupported', currentEnv()).text);
-    return () => take.current?.abort();
+    return () => {
+      take.current?.abort();
+      if (going.current) clearTimeout(going.current);
+    };
   }, []);
 
   // ends the take now (the tap, a quiet after words, the 9 s cap); set by listen()
@@ -60,7 +93,11 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
   // client 2026-11-27: the hearing is lib/mic/hear.ts — the browser's recogniser where it works, else the recorder and
   // the server's words (iPhone Chrome, in-app browsers: the mic used to be dead here)
   const listen = () => {
-    if (take.current) return;
+    if (take.current || done.current) return;
+    // fixing: the new words go in at the caret (in place of a selected stretch), into the sentence as it is
+    const base = fixingRef.current ? heardRef.current : '';
+    const at = fixingRef.current ? edit.get() : null;
+    const whole = (words: string) => (fixingRef.current ? insertAt(base, at, words) : { text: words, sel: null });
     let said = '';
     let ended = false;
     const timers: ReturnType<typeof setTimeout>[] = [];
@@ -71,7 +108,7 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
       quiet = setTimeout(stop, ms);
       timers.push(quiet);
     };
-    setHeard('');
+    if (!fixingRef.current) setHeard('');
     setNote('');
     setLevel(null);
     setPhase('opening');
@@ -84,13 +121,15 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
       onLevel: setLevel,
       onInterim: (t) => {
         if (!t) return;
-        setHeard(said + t);
+        setHeard(whole(said + t).text);
         // iOS ends a one-shot recognition almost at once: listen on and stop ourselves after a short quiet
         soon(1400);
       },
       onFinal: (t) => {
         said += t;
-        setHeard(said);
+        const w = whole(said);
+        setHeard(w.text);
+        if (w.sel) edit.setSel(w.sel);
         soon(400);
       },
       onEnd: (r) => {
@@ -99,14 +138,19 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
         timers.forEach(clearTimeout);
         setPhase(null);
         setLevel(null);
+        setMode('mic');
+        if (fixingRef.current) {
+          // fixing: the sentence stays for 〔これで答える〕 (nothing heard this time: one line of why)
+          if (!said.trim()) setNote(micAdvice(r.fault ?? 'empty', currentEnv()).text);
+          return;
+        }
         if (said.trim() && !done.current) {
-          done.current = true;
-          const k = matchAnswer(said, options);
-          setTimeout(() => onPick(k, said.trim().slice(0, 120)), 500);
+          // shown as said for a moment, then the story goes on — unless the words are tapped to be fixed
+          const words = said;
+          going.current = setTimeout(() => answer(heardRef.current || words), VOICE_ANSWER_HOLD_MS);
           return;
         }
         setNote(micAdvice(r.fault ?? 'empty', currentEnv()).text);
-        setMode('mic');
       },
     });
     if (ended) return;
@@ -120,11 +164,19 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
 
   if (mode === 'keys') return <ReplyChips options={options} onPick={onPick} />;
   const on = mode === 'listen';
+  // the heard words, to be tapped and fixed (while listening for a first answer the line says what the mic does)
+  const words = !!heard && (!on || fixing);
+  const lineClass = 'mb-4 min-h-[2rem] rounded-2xl border border-amber-200/15 bg-black/55 px-4 py-1.5 text-center text-[12px] tracking-[0.08em] text-amber-50/85 backdrop-blur';
   return (
     <div className="voice-magic pb-safe absolute inset-x-0 bottom-0 z-20 flex flex-col items-center px-5 pb-8">
-      <p data-testid="voice-choice-line" className="mb-4 min-h-[2rem] rounded-2xl border border-amber-200/15 bg-black/55 px-4 py-1.5 text-center text-[12px] tracking-[0.08em] text-amber-50/85 backdrop-blur" style={{ fontFamily: SERIF }}>
-        {on && recordNote && !heard && phase !== 'thinking' ? RECORD_NOTICE_POLITE : on ? heard || (phase === 'thinking' ? '文字にしています……' : phase === 'hearing' ? '聞こえています……' : '聞いています……') : note || `例：${options.join('・')}`}
-      </p>
+      {words ? (
+        <VoiceText testId="voice-choice-line" value={heard} edit={edit} locked={on} hint={false} onTouch={hold} className={`${lineClass} ${fixing ? '!mb-2' : ''}`} toolClass="mb-3" />
+      ) : (
+        <p data-testid="voice-choice-line" className={lineClass} style={{ fontFamily: SERIF }}>
+          {on && recordNote && !heard && phase !== 'thinking' ? RECORD_NOTICE_POLITE : on ? heard || (phase === 'thinking' ? '文字にしています……' : phase === 'hearing' ? '聞こえています……' : '聞いています……') : note || `例：${options.join('・')}`}
+        </p>
+      )}
+      {fixing && !on && note && <div className="mb-2 text-center text-[11px] text-amber-100/80" style={{ fontFamily: SERIF }}>{note}</div>}
       <button onClick={on ? () => stopNow.current() : listen} className="relative flex h-24 w-24 items-center justify-center rounded-full active:scale-95" aria-label="話してみよう">
         {/* rings of light going out while it listens; a slow breath while it waits */}
         {on ? (
@@ -144,6 +196,11 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
       <p className="mt-3 text-[12px] tracking-[0.4em] text-amber-100/90" style={{ fontFamily: SERIF }}>
         {on ? '話してください' : '話してみよう'}
       </p>
+      {fixing && !on && (
+        <button onClick={() => answer(heard)} disabled={!heard.trim()} data-testid="voice-choice-go" className="mt-3 rounded-full border border-amber-200/80 bg-gradient-to-b from-amber-200/25 to-amber-500/10 px-7 py-2.5 text-[14px] tracking-[0.2em] text-amber-50 shadow-[0_0_24px_rgba(255,210,130,0.25)] disabled:opacity-40" style={{ fontFamily: SERIF }}>
+          {VOICE_ANSWER_GO}
+        </button>
+      )}
       <button onClick={() => setMode('keys')} className="absolute bottom-[calc(12px+env(safe-area-inset-bottom))] right-4 rounded-lg bg-white/10 px-2 py-1 text-[16px] text-white/60" aria-label="文字で答える">
         <LineIcon id="keyboard" className="h-5 w-5" />
       </button>

@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { DELIVERY_KINDS } from './schemas';
 import { TALK_FACES, type TalkBeat, type TalkFace, type TalkLook } from './talk';
 import type { ClipFile } from './clip';
+import { VOICE_SOUNDS, type VoiceSound } from './voiceSound';
 
 /**
  * ダチの声のメッセージ (client decision M-R212). After {name} becomes dachi with {inviter} on Saturn (day 3,
@@ -212,6 +213,11 @@ export interface DachiMessageView {
   /** the words of a character's line (shown while its voice is not made), or of a text message */
   text: string | null;
   work: DachiWorkCard | null;
+  /**
+   * client 2026-11-27 (voiceSound.ts): this voice has a quiet sound mixed in (`audioUrl`); `plainUrl` is the voice
+   * alone, for 〔おとをけす〕
+   */
+  sound?: { mood: VoiceSound; plainUrl: string } | null;
   /** a 📎 file (a picture, a film, a sound, a document); opened through GET /media/files/:id */
   file?: ClipFile | null;
   /** M-R234: the sender's expression, decided when it was sent */
@@ -228,7 +234,16 @@ export interface DachiMessageView {
 /** M-R234: the sender's expression with the message */
 const SendFace = z.enum(TALK_FACES).optional();
 export const SendDachiMessageBody = z.union([
-  z.object({ mediaId: z.string().uuid(), seconds: z.number().positive().max(DACHI_VOICE_MAX_SECONDS + 1), face: SendFace }),
+  z.object({
+    mediaId: z.string().uuid(),
+    seconds: z.number().positive().max(DACHI_VOICE_MAX_SECONDS + 1),
+    face: SendFace,
+    // client 2026-11-27 (the trial, voiceSound.ts): the voice's words as its caption (the member may have touched them
+    // up), and the sound mixed in quietly (`soft`: the weakest うれしい); left out = the voice as it is
+    caption: z.string().trim().max(DACHI_TEXT_MAX).optional(),
+    sound: z.enum(VOICE_SOUNDS).optional(),
+    soft: z.boolean().optional(),
+  }),
   z.object({ work: DachiWorkCard, face: SendFace }),
   // client 2026-11-24: words typed in the ダチ talk (the small keyboard beside the mic)
   z.object({ text: z.string().trim().min(1).max(DACHI_TEXT_MAX), face: SendFace }),
@@ -239,3 +254,19 @@ export type SendDachiMessageBody = z.infer<typeof SendDachiMessageBody>;
 
 /** a thread id: a user id (uuid) or a character */
 export const isCharacterThread = (id: string): id is DachiCharacter => (DACHI_CHARACTERS as readonly string[]).includes(id);
+
+/** client 2026-11-27: a recording made ready to send (POST /dachi/voice): cleaned, a little faster, heard as words */
+export interface DachiVoiceDraft {
+  /** the cleaned voice (the member's own media, kind 'voice') */
+  mediaId: string;
+  url: string;
+  /** its length now (the recording ÷ VOICE_MIX_TEMPO) */
+  seconds: number;
+  /** the words heard ('' when none could be heard) */
+  text: string;
+  /** the sound picked from the words */
+  sound: VoiceSound;
+  soft: boolean;
+}
+export const VoicePreviewBody = z.object({ mediaId: z.string().uuid(), sound: z.enum(VOICE_SOUNDS), soft: z.boolean().optional() });
+export type VoicePreviewBody = z.infer<typeof VoicePreviewBody>;

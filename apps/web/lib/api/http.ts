@@ -131,6 +131,30 @@ export class HttpApi implements Api {
   buddyForget() {
     return this.req<void>('DELETE', '/buddy/memory');
   }
+  dachiVoiceDraft(blob: Blob) {
+    return this.req<Awaited<ReturnType<Api['dachiVoiceDraft']>>>('POST', '/dachi/voice', undefined, blob);
+  }
+  /** an MP3 comes back (not JSON) */
+  async dachiVoicePreview(body: Parameters<Api['dachiVoicePreview']>[0]) {
+    const headers: Record<string, string> = { 'content-type': 'application/json' };
+    const token = tokenStore.get();
+    if (token) headers.authorization = `Bearer ${token}`;
+    let res: Response;
+    try {
+      res = await fetch(`${this.base}/dachi/voice/preview`, { method: 'POST', headers, body: JSON.stringify(body) });
+    } catch {
+      throw new ApiError(0, 'NETWORK', 'Network error');
+    }
+    if (!res.ok) {
+      const json = (await res.json().catch(() => null)) as { error?: { code: string; message: string } } | null;
+      if (res.status === 401) tokenStore.clear();
+      throw new ApiError(res.status, json?.error?.code ?? 'ERROR', json?.error?.message ?? res.statusText);
+    }
+    return res.blob();
+  }
+  async discardDachiVoice(mediaId: string) {
+    await this.req<unknown>('DELETE', `/dachi/voice/${encodeURIComponent(mediaId)}`);
+  }
   uploadVoice(blob: Blob) {
     return this.req<{ id: string; url: string }>('POST', '/media/voice', undefined, blob);
   }

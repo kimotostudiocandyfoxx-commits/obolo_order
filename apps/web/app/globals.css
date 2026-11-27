@@ -895,6 +895,9 @@ body {
   letter-spacing: 0.22em;
 }
 
+/* client 2026-11-27: the caret in heard words (components/mic/VoiceText.tsx) */
+@keyframes voice-caret { 50% { opacity: 0; } }
+
 /* {bati}'s card on day 2 (ref 08): the Moon temple behind, the card a pane of light, its words floating */
 .bati-card-mystic { animation: mysticFloat 7s ease-in-out infinite; }
 .bati-card-mystic dt, .bati-card-mystic .bati-card-title { text-shadow: 0 0 12px rgba(255, 214, 140, 0.7); }

@@ -4,7 +4,7 @@ import type { IncantBody, IncantView } from '@obolo/shared';
 import type { ArtTitleBody, ArtTitleView } from '@obolo/shared';
 import type { LyricsBody, LyricsView, SongLyrics, SongTweakBody, SongTweakResult, SongVoiceBody, SongVoiceQuoteView, SongVoiceUseView, SongVoiceVersion } from '@obolo/shared';
 import type { BookView, CompassSpell, GameBrokenBody, GameBuildBody, GameView, GoodsMakeBody, GoodsView, MoonCompassBody, NovelChapterBody, SaveSpellBody, SaveSpellResult, SavedSpell } from '@obolo/shared';
-import type { ClipFile, ClipStartBody, ClipUploadStart, ChangeResult, HomeOshi, HomePlanet, PlanetHomeView, AddVersionBody, CreateMoonWorkBody, DemoJobBody, MakeConfirm, MakeKind, SpellBody, SpellKind, SpellTag, SpellView, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiHistoryPage, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView, MvEditBody, MvPicturesBody, MvRedrawBody } from '@obolo/shared';
+import type { ClipFile, ClipStartBody, ClipUploadStart, ChangeResult, HomeOshi, HomePlanet, PlanetHomeView, AddVersionBody, CreateMoonWorkBody, DemoJobBody, MakeConfirm, MakeKind, SpellBody, SpellKind, SpellTag, SpellView, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiHistoryPage, DachiMessageView, DachiThreadView, DachiVoiceDraft, VoicePreviewBody, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView, MvEditBody, MvPicturesBody, MvRedrawBody } from '@obolo/shared';
 import type {
   MembersDay,
   BuddyChatResponse,
@@ -337,6 +337,15 @@ export interface Api {
   /** a voice message (mediaId from uploadVoice, ≤ 60 s) or a Bluena work card; only between dachi */
   sendDachiMessage(thread: string, body: SendDachiMessageBody): Promise<DachiMessageView>;
   readDachiThread(thread: string): Promise<void>;
+  /**
+   * client 2026-11-27 (the trial): a recording made ready to send — cleaned, 1.2× faster, heard as words, a sound picked
+   * from them (POST /dachi/voice). `seconds`: the recording's length (the demo has no server to measure it).
+   */
+  dachiVoiceDraft(blob: Blob, seconds: number): Promise<DachiVoiceDraft>;
+  /** 〔▶ きいてみる〕: the mix with the chosen sound (an MP3; nothing is kept) */
+  dachiVoicePreview(body: VoicePreviewBody): Promise<Blob>;
+  /** 〔けす〕 / a new take: the draft's file goes */
+  discardDachiVoice(mediaId: string): Promise<void>;
   /** Jupiter: 🦋 蝶を描いてもらう (2 painted candidates, 3 tries a day) */
   butterflyCandidates(body: PuniPicBody): Promise<PuniPicResult>;
   chooseButterfly(mediaId: string | null): Promise<Me>;

@@ -54,6 +54,9 @@ export function featureOfPath(path: string): UsageFeature {
     [/^\/compose\//, 'songEdit'],
     [/^\/mars\//, 'videoEdit'],
     [/^\/links\/unfurl/, 'unfurl'],
+    // client 2026-11-27: a ダチ voice message made ready (clean-up, words, mood, mix) is a small cost of the member's
+    // — not absorbed with the rest of the ダチ talk
+    [/^\/dachi\/voice(\/|$)/, 'voiceMix'],
     // R18: the ダチ talk (moderation, KIMORIN⭐︎'s answers): never charged — an unrecovered marketing cost
     [/^\/dachi\//, 'dachi'],
     [/^\/me\/(look|puni|butterfly|sticker|bati)/, 'look'],

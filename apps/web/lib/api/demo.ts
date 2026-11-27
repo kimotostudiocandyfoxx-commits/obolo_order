@@ -2219,7 +2219,7 @@ export class DemoApi implements Api {
     await sleep(300);
     const m: DachiMessageView =
       'mediaId' in body
-        ? { id: uid(), fromMe: true, character: null, kind: 'voice', audioUrl: `idb:${body.mediaId}`, seconds: Math.round(body.seconds * 10) / 10, text: null, work: null, face: body.face ?? null, createdAt: now() }
+        ? { id: uid(), fromMe: true, character: null, kind: 'voice', audioUrl: `idb:${body.mediaId}`, seconds: Math.round(body.seconds * 10) / 10, text: body.caption || null, work: null, face: body.face ?? null, createdAt: now(), ...(body.sound && body.sound !== 'none' ? { sound: { mood: body.sound, plainUrl: `idb:${body.mediaId}` } } : {}) }
         : 'text' in body
           ? { id: uid(), fromMe: true, character: null, kind: 'text', audioUrl: null, seconds: null, text: body.text, work: null, face: body.face ?? null, createdAt: now() }
           : 'fileId' in body
@@ -2235,6 +2235,22 @@ export class DemoApi implements Api {
     }
     this.save();
     return reply ? { ...m, reply } : m;
+  }
+  // demo: no server to clean, hear or mix — the take itself, a stand-in line, the weakest sound; the chips and the
+  // caption can be walked through, 〔▶ きいてみる〕 plays the take as it is
+  async dachiVoiceDraft(blob: Blob, seconds: number) {
+    await sleep(900);
+    const { id, url } = await this.uploadVoice(blob);
+    return { mediaId: id, url, seconds: Math.round(seconds * 10) / 10, text: '（デモ）こんにちは', sound: 'ureshii' as const, soft: true };
+  }
+  async dachiVoicePreview(body: Parameters<Api['dachiVoicePreview']>[0]) {
+    await sleep(300);
+    const b = await getBlob(body.mediaId);
+    if (!b) throw new ApiError(404, 'MEDIA_NOT_FOUND', 'not found');
+    return b;
+  }
+  async discardDachiVoice() {
+    /* demo: the take stays on the device */
   }
   async readDachiThread(thread: string) {
     for (const m of this.s.dachiMsgs ?? []) if (m.thread === thread) m.read = true;

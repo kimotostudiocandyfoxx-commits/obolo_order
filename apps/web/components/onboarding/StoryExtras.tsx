@@ -11,6 +11,7 @@ import { TicketArt } from '@/components/story/Ticket';
 import { micTrouble, useDictation } from '@/lib/useDictation';
 import { RECORD_NOTICE_POLITE } from '@/lib/mic/core';
 import { useRecordNotice } from '@/lib/mic/useRecordNotice';
+import { useVoiceEdit, VoiceText } from '@/components/mic/VoiceText';
 import { nameCharsOk } from '@obolo/shared';
 import { LineIcon } from '@/components/LineIcon';
 
@@ -146,7 +147,9 @@ export function VoiceField({
   textFirst?: boolean;
 }) {
   const ref = useRef<HTMLInputElement & HTMLTextAreaElement>(null);
-  const mic = useDictation({ field: ref, value, onChange, maxLength, path: 'story' });
+  // client 2026-11-27: the heard words are fixed in place (a tap: the caret; the mic puts the new words there)
+  const edit = useVoiceEdit(value, onChange);
+  const mic = useDictation({ field: ref, value, onChange, maxLength, path: 'story', caret: edit });
   const recordNote = useRecordNotice(mic.listening, mic.engine);
   // while they speak, their own figure comes up big (M-R149, components/NeoSpeaking.tsx)
   useEffect(() => {
@@ -193,7 +196,11 @@ export function VoiceField({
   return (
     <div className={`relative flex flex-col items-center ${light ? '' : 'voice-magic'}`}>
       {/* what was heard (tap ⌨ to touch it up by hand); client 2026-11-27: the dark (story) field's mystical look is `.voice-magic` in globals.css */}
-      {(value || typing) && <div className="mb-3 flex w-full items-center gap-2">{typing ? field : <p className={`w-full rounded-xl px-3 py-2 text-center text-[16px] font-bold ${light ? 'bg-amber-50 text-slate-700' : 'bg-white/10 text-amber-50'}`}>{value}</p>}</div>}
+      {(value || typing) && (
+        <div className={`mb-3 flex w-full gap-2 ${typing ? 'items-center' : 'flex-col'}`}>
+          {typing ? field : <VoiceText value={value} edit={edit} interim={mic.interim} locked={mic.listening} tone={light ? 'light' : 'dark'} className={`w-full rounded-xl px-3 py-2 text-center text-[16px] font-bold ${light ? 'bg-amber-50 text-slate-700' : 'bg-white/10 text-amber-50'}`} />}
+        </div>
+      )}
       <button
         type="button"
         onClick={mic.toggle}

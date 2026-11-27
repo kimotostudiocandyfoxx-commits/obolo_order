@@ -6,7 +6,8 @@ import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { CHARACTER_AVATAR } from '@/lib/dachi/useDachiThreads';
 import { loadBluenaWorks, workCard, WORK_WORD, type BluenaWork } from '@/lib/dachi/works';
-import { HoldMic, Wave } from './HoldMic';
+import { Wave } from './HoldMic';
+import { TapVoice, type VoiceToSend } from './TapVoice';
 import { playClip, readyClip, type Clip } from '@/lib/voice/webVoice';
 import { DACHI_PAGE, DACHI_TEXT_MAX, linkDomain, TALK_FIXED_FACE_KEY, wordsAndLinks } from '@obolo/shared';
 import { DeviceButton } from '@/components/atelier/DeviceButton';
@@ -178,12 +179,11 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
     });
   };
 
-  const sendVoice = async (blob: Blob, seconds: number) => {
-    const api = getApi();
+  /** client 2026-11-27: the voice made ready (components/dachi/TapVoice.tsx): its caption and its sound go with it */
+  const sendVoice = async (v: VoiceToSend) => {
     if (id === 'kimorin') setWaiting(true);
     try {
-      const up = await api.uploadVoice(blob);
-      sent(await api.sendDachiMessage(id, { mediaId: up.id, seconds: Math.max(0.1, Math.round(seconds * 10) / 10) }));
+      sent(await getApi().sendDachiMessage(id, { ...v, seconds: Math.max(0.1, Math.round(v.seconds * 10) / 10) }));
     } catch (e) {
       setWaiting(false);
       throw e;
@@ -265,7 +265,7 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
       // M-R238: from the words (a character's line), else the sender's own face with it, else the rules
       face: m.faces ? undefined : (m.face ?? undefined),
       faces: m.faces,
-      voice: m.kind === 'voice' ? { url: m.audioUrl, seconds: m.seconds } : undefined,
+      voice: m.kind === 'voice' ? { url: m.audioUrl, seconds: m.seconds, plainUrl: m.sound?.plainUrl } : undefined,
       mark: { kind: 'dachi_message' as const, id: m.id },
       ...(relics.length ? { relics, relicLabel: g.length > 1 ? `${label}ほか${g.length - 1}つ` : label, relicFan: g.every((i) => parts[i].m.file?.kind === 'photo') } : {}),
     };
@@ -307,17 +307,10 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
             {typing ? (
               <TalkComposer key={bar} micPath="dachi" startTyping placeholder={`${name}に送る`} maxLength={DACHI_TEXT_MAX} onVoice={() => setTyping(false)} onState={(st) => setKeyboard(st.keyboard)} onSend={(t) => { void sendText(t); setBar((n) => n + 1); }} />
             ) : (
-            <HoldMic
-              big
-              onSend={sendVoice}
-              disabled={!!err && msgs?.length === 0}
-              right={
-                <button onClick={() => setTyping(true)} aria-label="文字で送る" className="grid h-[42px] w-[42px] place-items-center rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] text-[15px] text-[#f4f1ff] backdrop-blur-[10px]">
-                  ⌨
-                </button>
-              }
-              left={
-                // R10: the Bluena device in this slot (its works can be sent here); the old picker where there is none
+            // client 2026-11-27: a tap starts the recording, a tap ends it; the take is made ready on the server (the
+            // trial). A member whose voice may not be recorded (under 13 …): the mic hears words only — nothing is kept
+            (() => {
+              const left = (
                 onDevice ? (
                   <DeviceButton onClick={onDevice} />
                 ) : (
@@ -325,8 +318,22 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
                     ✦
                   </button>
                 )
-              }
-            />
+              );
+              return me?.mediaOk ? (
+                <TapVoice
+                  onSend={sendVoice}
+                  disabled={!!err && msgs?.length === 0}
+                  left={left}
+                  right={
+                    <button onClick={() => setTyping(true)} aria-label="文字で送る" className="grid h-[42px] w-[42px] place-items-center rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] text-[15px] text-[#f4f1ff] backdrop-blur-[10px]">
+                      ⌨
+                    </button>
+                  }
+                />
+              ) : (
+                <TalkComposer key={`w${bar}`} micPath="dachi" placeholder={`${name}に送る`} maxLength={DACHI_TEXT_MAX} side={left} onState={(st) => setKeyboard(st.keyboard)} onSend={(t) => { void sendText(t); setBar((n) => n + 1); }} />
+              );
+            })()
             )}
           </div>
         }

@@ -646,8 +646,11 @@ export const MAKE_COST: Readonly<ManaPrices> = Object.freeze(manaPrices());
  * 'titleVoice' (client 2026-11-25, Mercury): a song title read in its maker's voice outside a paid song's making — a song
  * made without mana, a post that flies under another title, the admin backfill — is absorbed too (a paid song's is in its
  * price: TITLE_VOICE_CHARS).
+ * 'voiceMix' (client 2026-11-27, voiceSound.ts): a ダチ voice message made ready — the clean-up and the mix on our CPU,
+ * its words, its mood (about ¥0.03 a message). Unlike the rest of the ダチ talk it is NOT absorbed: it is added to the
+ * member's small costs like any free feature, and capped a day (VOICE_MIX_DAILY_CAP).
  */
-export const USAGE_FEATURES = ['chat', 'search', 'draw', 'voice', 'spell', 'lyrics', 'compass', 'songEdit', 'videoEdit', 'novel', 'unfurl', 'listen', 'memory', 'look', 'story', 'dachi', 'figures', 'titleVoice', 'cutRetry', 'other'] as const;
+export const USAGE_FEATURES = ['chat', 'search', 'draw', 'voice', 'spell', 'lyrics', 'compass', 'songEdit', 'videoEdit', 'novel', 'unfurl', 'listen', 'memory', 'look', 'story', 'dachi', 'figures', 'titleVoice', 'cutRetry', 'voiceMix', 'other'] as const;
 export type UsageFeature = (typeof USAGE_FEATURES)[number];
 /**
  * the free costs the operator absorbs (recorded, never taken from the member). 'cutRetry' (client 2026-11-27): what a

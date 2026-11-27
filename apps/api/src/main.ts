@@ -29,6 +29,8 @@ async function bootstrap() {
   app.use('/media/voice', express.raw({ type: 'audio/*', limit: VOICE_MAX_BYTES }));
   // the mic where the browser cannot hear by itself (iPhone Chrome …): one take, turned into words, not kept
   app.use('/voice/dictate', express.raw({ type: 'audio/*', limit: VOICE_MAX_BYTES }));
+  // client 2026-11-27: a ダチ voice message's recording, made ready on the server (clean-up, words, sound)
+  app.use('/dachi/voice', (req: express.Request, res: express.Response, next: express.NextFunction) => (req.path === '/' ? express.raw({ type: 'audio/*', limit: VOICE_MAX_BYTES })(req, res, next) : next()));
   // the NEO look can start from a reference image (sent once, never stored)
   app.use('/me/look', express.json({ limit: '3mb' }));
   app.use('/me/puni/pic/candidates', express.json({ limit: '8mb' }));

@@ -35,6 +35,7 @@ import { DachiController } from './dachi/dachi.controller';
 import { DachiService } from './dachi/dachi.service';
 import { DachiLinkService } from './dachi/dachi-link.service';
 import { DachiVoiceService } from './dachi/dachi-voice.service';
+import { DachiVoiceDraftService } from './dachi/voice-draft.service';
 import { FindsController } from './finds/finds.controller';
 import { FindsService } from './finds/finds.service';
 import { MoonWorksController } from './moon/moon-works.controller';
@@ -219,6 +220,7 @@ import { StorageWorksService } from './storage/storage-works.service';
     DachiService,
     DachiLinkService,
     DachiVoiceService,
+    DachiVoiceDraftService,
     FindsService,
     MoonWorksService,
     SpellService,

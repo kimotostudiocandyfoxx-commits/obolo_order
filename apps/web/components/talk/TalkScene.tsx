@@ -14,6 +14,7 @@ import type { Planet } from '@/lib/story/ambient';
 import { unlockAudio } from '@/lib/onboarding/audio';
 import { playClip, stopClip, type Clip } from '@/lib/voice/webVoice';
 import { BARGE_FADE_MS, onBargeIn } from '@/lib/voice/barge';
+import { setSoundOff, SOUND_PREF_WORDS, useSoundOff, voiceUrlFor } from '@/lib/voice/soundPref';
 import { OTS_BACK } from './SelfBack';
 import { RelicCluster, RelicHost } from '@/components/relic/Relic';
 
@@ -84,7 +85,7 @@ export type TalkItem = {
   /** R14: the length of the voice reading this line (ms): its words come out at the voice's pace, ending with it */
   voiceMs?: number;
   /** a voice message: a play button in the bubble (the speaker's mouth moves while it plays) */
-  voice?: { url: string | null; seconds: number | null };
+  voice?: { url: string | null; seconds: number | null; /** client 2026-11-27: the voice alone, when `url` has a quiet sound mixed in (〔おとをけす〕) */ plainUrl?: string | null };
   chips?: { label: string; onPick: () => void; disabled?: boolean }[];
   /** under the words: the pages looked up, a map, a note */
   extra?: ReactNode;
@@ -462,7 +463,9 @@ export function TalkScene({
       onPlayingChange?.(true);
       if (!mutedRef.current && it.voice.url)
         void (async () => {
-          const url = audioSrc ? await audioSrc(it.voice!.url!) : it.voice!.url!;
+          // client 2026-11-27: with the sound turned off on this device, the voice alone (lib/voice/soundPref.ts)
+          const file = voiceUrlFor(it.voice!)!;
+          const url = audioSrc ? await audioSrc(file) : file;
           const clip = url ? await playClip(url) : null;
           if (!clip) return;
           setSpeech((cur) => (cur?.id === it.id ? { ...cur, start: Date.now(), dur: clip.duration * 1000 + 150, level: clip.level, clip } : cur));
@@ -1613,6 +1616,38 @@ export function toneFor(who?: TalkPerson): TalkTone {
 export const inkOf = (color?: string) => (Object.values(TONES).find((t) => t.line === color?.toLowerCase()) ?? TONES.pearl).ink;
 
 /** the top bubble when a third comes: it floats up and fades */
+/**
+ * Client 2026-11-27 (the ダチ voice message trial): a small ♪ by a voice that has a quiet sound mixed in. A tap opens
+ * 〔おとをけす〕 — the voice is then played alone, here and for every voice message on this device, until 〔おとをつける〕.
+ */
+function SoundNote({ ink, onChange }: { ink: string; onChange: () => void }) {
+  const off = useSoundOff();
+  const [open, setOpen] = useState(false);
+  return (
+    <span className="ml-2 inline-flex items-center gap-1.5 align-middle">
+      <button type="button" onClick={() => setOpen((o) => !o)} aria-label={SOUND_PREF_WORDS.label} aria-expanded={open} data-testid="voice-sound-note" className="relative grid h-7 w-7 place-items-center rounded-full text-[13px]" style={{ background: `${ink}1a`, opacity: off ? 0.5 : 0.9 }}>
+        ♪{off && <i aria-hidden className="absolute left-1/2 top-1/2 h-[1.5px] w-5 -translate-x-1/2 -translate-y-1/2 rotate-[-38deg] rounded-full" style={{ background: ink }} />}
+      </button>
+      {open && (
+        <button
+          type="button"
+          data-testid="voice-sound-toggle"
+          onClick={() => {
+            setSoundOff(!off);
+            setOpen(false);
+            // heard again at once, the way it was just chosen
+            onChange();
+          }}
+          className="rounded-full px-2.5 py-1 text-[11.5px] font-bold"
+          style={{ border: `1px solid ${ink}55`, background: `${ink}12` }}
+        >
+          {off ? SOUND_PREF_WORDS.on : SOUND_PREF_WORDS.off}
+        </button>
+      )}
+    </span>
+  );
+}
+
 function Ghost({ item, who }: { item: TalkItem; who?: TalkPerson }) {
   const story = useContext(SkinCtx) === 'story';
   const t = story ? (who?.self ? STORY_ME : STORY_THEM) : toneFor(who);
@@ -1749,6 +1784,7 @@ function Bubble({
               {item.voice.seconds != null && <span className="text-xs opacity-70">{Math.max(1, Math.round(item.voice.seconds))}秒</span>}
             </button>
           )}
+          {item.voice?.plainUrl && !clamp && <SoundNote ink={ink} onChange={onReplay} />}
           {item.text && (
             <p className={`whitespace-pre-line ${clamp ? 'line-clamp-2' : ''} ${item.voice ? 'mt-1 text-[12.5px] opacity-75' : ''}`}>
               <Marked text={item.text} upto={shown} />

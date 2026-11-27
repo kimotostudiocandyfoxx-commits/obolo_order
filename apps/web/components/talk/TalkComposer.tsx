@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { MicGlyph, SendGlyph } from '@/components/dachi/HoldMic';
 import { MicNotice } from '@/components/mic/MicCheck';
+import { useVoiceEdit, VoiceText } from '@/components/mic/VoiceText';
+import { EDIT_WORDS } from '@/lib/mic/edit';
 import { micAdvice, RECORD_NOTICE, type MicPath } from '@/lib/mic/core';
 import { useRecordNotice } from '@/lib/mic/useRecordNotice';
 import { currentEnv } from '@/lib/mic/env';
@@ -61,7 +63,10 @@ export function TalkComposer({
   const [typing, setTyping] = useState(startTyping);
   const [focus, setFocus] = useState(false);
   const field = useRef<HTMLInputElement>(null);
-  const mic = useDictation({ field, value: text, onChange: setText, maxLength, path: micPath });
+  // client 2026-11-27: the heard words are fixed in place — a tap puts a caret, 〔けす〕 takes a character, the mic puts
+  // the new words at the caret (components/mic/VoiceText.tsx). Not while typing: the field has its own cursor.
+  const edit = useVoiceEdit(text, setText);
+  const mic = useDictation({ field, value: text, onChange: setText, maxLength, path: micPath, caret: typing ? undefined : edit });
   // this browser has no mic way at all: said in a line (the keyboard is one tap away, never opened by itself)
   const [noMic, setNoMic] = useState(false);
   useEffect(() => {
@@ -128,20 +133,23 @@ export function TalkComposer({
     <div className="pb-safe relative flex flex-col items-center px-4 pb-[18px] pt-1">
       {/* what was heard, with 〔送る〕 */}
       {(text.trim() || mic.interim) && (
-        <div className="mb-2 flex w-full max-w-sm items-center gap-2 rounded-2xl border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] backdrop-blur-[10px] px-3 py-2">
-          <p className="min-w-0 flex-1 text-[14px] font-bold leading-snug text-[#f4f1ff]">
-            {text}
-            <span className="text-[#b9bde6]">{mic.interim}</span>
-          </p>
-          {text.trim() && !mic.listening && (
-            <>
-              <button onClick={() => setText('')} aria-label="けす" className="text-[12px] text-amber-50/55">
-                けす
-              </button>
-              <button onClick={() => void go()} disabled={disabled} className="rounded-full bg-[#dfe6ff] px-3 py-1.5 text-[13px] font-bold text-[#070b24] disabled:opacity-40">
+        <div className="mb-2 w-full max-w-sm rounded-2xl border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] backdrop-blur-[10px] px-3 py-2" data-testid="composer-heard">
+          <div className="flex items-center gap-2">
+            <div className="min-w-0 flex-1">
+              <VoiceText value={text} edit={edit} interim={mic.interim} locked={mic.listening} className="text-[14px] font-bold leading-snug text-[#f4f1ff]" toolClass="mt-2" />
+            </div>
+            {text.trim() && !mic.listening && (
+              <button onClick={() => void go()} disabled={disabled} className="shrink-0 self-start rounded-full bg-[#dfe6ff] px-3 py-1.5 text-[13px] font-bold text-[#070b24] disabled:opacity-40">
                 送る
               </button>
-            </>
+            )}
+          </div>
+          {text.trim() && !mic.listening && (
+            <div className="mt-1 text-right">
+              <button onClick={() => setText('')} className="text-[12px] text-amber-50/55">
+                {EDIT_WORDS.clear}
+              </button>
+            </div>
           )}
         </div>
       )}

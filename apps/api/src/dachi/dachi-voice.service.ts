@@ -28,6 +28,8 @@ import {
   isTalkFace,
   ruleBeats,
   type TalkFace,
+  isVoiceSound,
+  type VoiceSound,
 } from '@obolo/shared';
 import { and, desc, eq, inArray, isNotNull, isNull, lt, or, sql, type SQL } from 'drizzle-orm';
 import { apiError } from '../common/errors';
@@ -37,6 +39,7 @@ import { MediaService } from '../media/media.service';
 import { PushService } from '../push/push.service';
 import { LLM } from '../infra/tokens';
 import { DachiService } from './dachi.service';
+import { DachiVoiceDraftService } from './voice-draft.service';
 import { talkLookOf } from '../look/talk';
 
 type Row = typeof dachiMessages.$inferSelect;
@@ -53,6 +56,11 @@ type NewRow = typeof dachiMessages.$inferInsert;
 const fileOf = (j: unknown): ClipFile | null => (j && typeof j === 'object' && (j as { file?: unknown }).file && typeof (j as { file: { id?: unknown } }).file.id === 'string' ? (j as { file: ClipFile }).file : null);
 const fileWords = (f: ClipFile | null) => (f ? `${CLIP_WORD[f.kind]}「${f.name}」` : 'ファイル');
 const textOf = (j: unknown): string | null => (j && typeof j === 'object' && typeof (j as { text?: unknown }).text === 'string' ? (j as { text: string }).text : null);
+/** client 2026-11-27: the sound mixed into a voice (work_json { sound }): the mood, and the voice alone for 〔おとをけす〕 */
+const soundOf = (j: unknown): { mood: VoiceSound; plainUrl: string } | null => {
+  const s = j && typeof j === 'object' ? (j as { sound?: { mood?: unknown; plainUrl?: unknown } }).sound : null;
+  return s && isVoiceSound(s.mood) && typeof s.plainUrl === 'string' ? { mood: s.mood, plainUrl: s.plainUrl } : null;
+};
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** dachi = both follow each other (2 rows), no block either way, the other is still here and not suspended */
@@ -83,6 +91,8 @@ export class DachiVoiceService {
     @Optional() @Inject(LLM) private readonly llm?: LlmProvider,
     /** R9: the Fish key for KIMORIN⭐︎'s voice */
     @Optional() @Inject(CONFIG) private readonly cfg?: Pick<AppConfig, 'FISH_API_KEY' | 'FISH_MODEL'>,
+    /** client 2026-11-27: the sound mixed into a voice message (the trial) */
+    @Optional() private readonly mixer?: DachiVoiceDraftService,
   ) {}
 
   // ── small lookups (stubbed in tests) ──
@@ -302,7 +312,17 @@ export class DachiVoiceService {
       const m = await this.media.getOwned(userId, body.mediaId, 'voice');
       if (!m) throw apiError(HttpStatus.NOT_FOUND, 'MEDIA_NOT_FOUND', 'Recording not found');
       // M-R234: the sender's expression rides in work_json (a voice row has no card; no new column)
-      row = { ...base, kind: 'voice', audioUrl: m.url, audioMediaId: m.id, seconds: Math.round(body.seconds * 10) / 10, ...(body.face ? { workJson: { face: body.face } } : {}) };
+      // client 2026-11-27 (the trial): the voice's words as its caption — checked like typed words; the sound mixed in
+      // quietly as a second file (the clean voice stays for 〔おとをけす〕). No mix (it failed, no mixer): the voice alone.
+      const caption = body.caption?.trim() || null;
+      if (caption && (await moderateText(caption, this.llm)).flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'CONTENT_FLAGGED', 'This cannot be sent');
+      const mixed = body.sound && body.sound !== 'none' && this.mixer ? await this.mixer.mixFor(userId, m.id, { sound: body.sound, soft: body.soft }, opts.origin ?? '') : null;
+      const json = {
+        ...(body.face ? { face: body.face } : {}),
+        ...(caption ? { text: caption } : {}),
+        ...(mixed ? { sound: { mood: body.sound, ...(body.soft ? { soft: true } : {}), plainUrl: m.url, plainMediaId: m.id } } : {}),
+      };
+      row = { ...base, kind: 'voice', audioUrl: mixed?.url ?? m.url, audioMediaId: mixed?.id ?? m.id, seconds: Math.round((mixed?.seconds ?? body.seconds) * 10) / 10, ...(Object.keys(json).length ? { workJson: json } : {}) };
     } else if ('fileId' in body) {
       // Bluena's 📎: one of your own files; its id in audio_media_id (who may open it: GET /media/files/:id)
       const f = await this.media.getOwnedFile(userId, body.fileId);
@@ -373,7 +393,9 @@ export class DachiVoiceService {
     let words = '';
     if ('text' in body) words = body.text;
     else if ('mediaId' in body) {
-      words = sent.audioUrl ? await this.transcribeVoice(userId, sent.audioUrl).catch(() => '') : '';
+      // the caption is the voice's words already (client 2026-11-27); else the voice itself is heard (the clean one)
+      const heard = soundOf(sent.workJson)?.plainUrl ?? sent.audioUrl;
+      words = body.caption?.trim() || (heard ? await this.transcribeVoice(userId, heard).catch(() => '') : '');
       if (words && (await moderateText(words, this.llm)).flagged) return null;
     } else if ('fileId' in body) words = `（${fileWords(fileOf(sent.workJson))}を送りました）`;
     else words = `（作品「${body.work.title || '作品'}」を送りました）`;
@@ -409,6 +431,7 @@ export class DachiVoiceService {
       text: line?.text ?? textOf(r.workJson),
       work: r.kind === 'work' ? cardOf(r.workJson) : null,
       ...(r.kind === 'file' ? { file: fileOf(r.workJson) } : {}),
+      ...(r.kind === 'voice' && soundOf(r.workJson) ? { sound: soundOf(r.workJson) } : {}),
       face: faceOf(r.workJson),
       // M-R238: a line with words gets its sentences' faces by the rules (no call: the characters' lines are fixed)
       ...(line?.text ? { faces: ruleBeats(line.text) } : textOf(r.workJson) ? { faces: ruleBeats(textOf(r.workJson)!) } : {}),

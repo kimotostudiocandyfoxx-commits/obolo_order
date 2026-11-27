@@ -289,6 +289,8 @@ const Env = z.object({
   BATI_DAILY_CAP_MEMBER: z.coerce.number().min(1).default(300),
   /** R18: a non-member's ダチ messages a day (ダチ is free even at 0 mana; a soft cap against abuse) */
   DACHI_DAILY_CAP_FREE: z.coerce.number().min(1).default(200),
+  /** client 2026-11-27 (the trial): ダチ voice messages one member may have made ready a day (about ¥0.03 each) */
+  VOICE_MIX_DAILY_CAP: z.coerce.number().min(1).default(100),
   /** M-R208: web searches {bati} may make for one member a day (each ~1–5 yen), and for everyone together (cost ceiling) */
   BUDDY_SEARCH_DAILY: z.coerce.number().default(30),
   BUDDY_SEARCH_GLOBAL_DAILY: z.coerce.number().default(5000),

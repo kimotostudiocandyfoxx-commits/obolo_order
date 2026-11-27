@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, HttpCode, Inject, NotFoundException, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Header, Headers, HttpCode, Inject, NotFoundException, Param, Post, Query, Req, StreamableFile, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
-import { DACHI_SEND_PER_DAY, DACHI_SEND_PER_HOUR, KIMORIN_REPLIES_PER_DAY, DELIVERY_KINDS, DeliverBody, isCharacterThread, SendDachiMessageBody } from '@obolo/shared';
+import { DACHI_SEND_PER_DAY, DACHI_SEND_PER_HOUR, KIMORIN_REPLIES_PER_DAY, DELIVERY_KINDS, DeliverBody, isCharacterThread, SendDachiMessageBody, VoicePreviewBody } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
@@ -9,6 +9,7 @@ import { KV } from '../infra/tokens';
 import { DachiLinkService } from './dachi-link.service';
 import { DachiService } from './dachi.service';
 import { DachiVoiceService } from './dachi-voice.service';
+import { DachiVoiceDraftService } from './voice-draft.service';
 import { AccessService } from '../wallet/access.service';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -27,6 +28,7 @@ export class DachiController {
     private readonly voice: DachiVoiceService,
     @Inject(KV) private readonly kv: KvStore,
     private readonly access: AccessService,
+    private readonly drafts: DachiVoiceDraftService,
   ) {}
 
   @Get()
@@ -78,6 +80,34 @@ export class DachiController {
     // R18: KIMORIN⭐︎'s read-aloud falls back to text for a non-member at 0 mana (the words stay free)
     const voiced = !(reply && (await this.access.outOfMana(userId)));
     return this.voice.send(userId, thread, b, { reply, voiced, origin: `${req.protocol}://${req.get('host')}` });
+  }
+
+  // ── client 2026-11-27: a voice message made ready (the trial: clean-up, 1.2×, its words, a quiet sound) ──
+
+  /** the recording as the raw body (audio/*, main.ts) → the clean voice kept, its words, the sound picked from them */
+  @Post('voice')
+  @HttpCode(200)
+  async voiceDraft(@UserId() userId: string, @Headers('content-type') type: string | undefined, @Req() req: Request) {
+    await rateLimit(this.kv, `dachi-voice-draft:${userId}`, 40, 3600);
+    return this.drafts.draft(userId, type, req.body, `${req.protocol}://${req.get('host')}`);
+  }
+
+  /** 〔▶ きいてみる〕: the mix with the chosen sound, as MP3 bytes (nothing kept) */
+  @Post('voice/preview')
+  @HttpCode(200)
+  @Header('content-type', 'audio/mpeg')
+  @Header('cache-control', 'no-store')
+  async voicePreview(@UserId() userId: string, @Body() body: unknown) {
+    await rateLimit(this.kv, `dachi-voice-preview:${userId}`, 120, 3600);
+    return new StreamableFile(await this.drafts.preview(userId, parseBody(VoicePreviewBody, body)));
+  }
+
+  /** 〔けす〕 / a new take: the draft's file goes */
+  @Delete('voice/:mediaId')
+  @HttpCode(200)
+  discardVoice(@UserId() userId: string, @Param('mediaId') mediaId: string) {
+    if (!UUID_RE.test(mediaId)) throw new NotFoundException();
+    return this.drafts.discard(userId, mediaId);
   }
 
   @Post('threads/:id/read')
