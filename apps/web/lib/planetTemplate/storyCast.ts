@@ -8,8 +8,8 @@ import { templateSample } from './sample';
  *  - `host` (Saturn: `takoyaki`): the resident's own place — たこ焼き兄妹's record, 大根カイザー's tree, フリージー's island,
  *    ヒポキン's studio, ボスG's booth. Around it: KIMORIN⭐︎ (whom the resident pushes: 『プリプリ・ボカン』 / 「うんち。」 /
  *    すね毛) and the story's cast met so far (the day's oshi roster without the hosts themselves).
- *  - `neo`: {neo}'s own place — the inviter's work (MIKIE⭐︎DRILL's when nobody invited: the script's stage direction)
- *    and KIMORIN⭐︎'s come around, then the oshi of that day (M-R341: 9 on Saturn … 15 on Venus); {neo}'s own work of
+ *  - `neo`: {neo}'s own place — the inviter's work (nobody in that spot when nobody invited: M-R343, no MIKIE⭐︎DRILL
+ *    stand-in before Order) and KIMORIN⭐︎'s come around, then the oshi of that day (M-R341: 9 on Saturn … 15 on Venus); {neo}'s own work of
  *    this morning is in the place when it flew (`sent`).
  * M-R342: nobody else — the sample people and the hosts' 「見本の住人」 of before are gone. MONBAN stays on the takoyaki
  * siblings' record only, where the script has him (D04-S005: his kororin 「……今日も、異常なし…。」, 「MONBANは、私たちの
@@ -17,24 +17,28 @@ import { templateSample } from './sample';
  * day 10, Uranus).
  */
 export type StoryPlace = 'takoyaki' | 'host' | 'neo';
-export type StoryPlanet = 'saturn' | 'jupiter' | 'mercury' | 'mars' | 'venus';
+// M-R343: days 8–10 too (Pluto: クロコパトラ's library, Neptune: オニモンク's arcade, Uranus: MONBAN's shop)
+export type StoryPlanet = 'saturn' | 'jupiter' | 'mercury' | 'mars' | 'venus' | 'pluto' | 'neptune' | 'uranus';
 
-export const STORY_HOSTS: Record<StoryPlanet, string> = { saturn: 'たこ焼き兄妹', jupiter: '大根カイザー', mercury: 'フリージー', mars: 'ヒポキン', venus: 'ボスG' };
-/** KIMORIN⭐︎'s work on each planet, as the script tells it */
+export const STORY_HOSTS: Record<StoryPlanet, string> = { saturn: 'たこ焼き兄妹', jupiter: '大根カイザー', mercury: 'フリージー', mars: 'ヒポキン', venus: 'ボスG', pluto: 'クロコパトラ', neptune: 'オニモンク', uranus: 'MONBAN' };
+/** KIMORIN⭐︎'s work on each planet, as the script tells it (Pluto: his three-line 『天才の一生』, M-PLUTO-S002; none told on Neptune / Uranus) */
 const KIMORIN_WORK: Record<StoryPlanet, { title?: string; text?: string }> = {
   saturn: { text: 'うんち。' },
   jupiter: { title: 'プリプリ・ボカン' },
   mercury: { title: 'プリプリ・ボカン' },
   mars: { title: 'プリプリ・ボカン' },
   venus: { title: 'すね毛、すね毛、すね毛楽しい！' },
+  pluto: { title: '天才の一生', text: 'KIMORIN⭐︎は、生まれた。\n天才だった。\n今も、天才である。' },
+  neptune: {},
+  uranus: {},
 };
 const SATURN_WORDS: Record<string, string> = { MONBAN: '……今日も、異常なし…。', 'MIKIE⭐︎DRILL': 'ようこそ。' };
 /** the two hosts of Saturn's record share one place */
-const HOST_NAMES: Record<StoryPlanet, string[]> = { saturn: ['たこ焼きブラザー', 'たこ焼きシスター'], jupiter: ['大根カイザー'], mercury: ['フリージー'], mars: ['ヒポキン'], venus: ['ボスG', 'ロングG', 'ハットG'] };
+const HOST_NAMES: Record<StoryPlanet, string[]> = { saturn: ['たこ焼きブラザー', 'たこ焼きシスター'], jupiter: ['大根カイザー'], mercury: ['フリージー'], mars: ['ヒポキン'], venus: ['ボスG', 'ロングG', 'ハットG'], pluto: ['クロコパトラ'], neptune: ['オニモンク'], uranus: ['MONBAN'] };
 
 export interface StoryCastInput {
   neo: string;
-  /** the inviter's name ('' / '…': nobody invited → MIKIE⭐︎DRILL) */
+  /** the inviter's name ('' / '…' / the old stand-in's name: nobody invited → nobody in that spot, M-R343) */
   inviter?: string;
   /** {neo}'s work of this morning flew */
   sent?: boolean;
@@ -49,7 +53,7 @@ const as = (w: HomeWork, id: string, o: Partial<HomeWork> & { name?: string; rel
 };
 
 export function storyHome(planet: StoryPlanet, place: StoryPlace, o: StoryCastInput, now = Date.now()): PlanetHomeView {
-  // the day this planet is visited on: its roster (M-R341), with MIKIE⭐︎DRILL in the sample for the inviter's stand-in
+  // the day this planet is visited on: its roster (M-R341); MIKIE⭐︎DRILL is in the sample only to lend the inviter a work
   const day = rosterDayOf(planet as HomePlanet);
   const sample = templateSample(planet as HomePlanet, now, { day, ordered: true });
   // MONBAN's own figure and work (he is an oshi only from day 10: taken from the full roster's sample)
@@ -83,9 +87,9 @@ export function storyHome(planet: StoryPlanet, place: StoryPlace, o: StoryCastIn
     };
   }
   const real = !!o.inviter && o.inviter !== '…' && o.inviter !== 'MIKIE⭐︎DRILL';
-  const inviter = real ? as(mikie, `st-${planet}-inviter`, { name: o.inviter!, rel: 'dachi', ...words(mikie, 'MIKIE⭐︎DRILL') }) : as(mikie, `st-${planet}-inviter`, { rel: 'dachi', ...words(mikie, 'MIKIE⭐︎DRILL') });
-  // a real inviter has no figure of the sample's: the planet's plain figure with their name (never MIKIE's face)
-  if (real) inviter.author = { ...inviter.author, figure: null, ball: null, pic: null };
+  // the inviter: the planet's plain figure with their name (never MIKIE's face); nobody invited → nobody (M-R343)
+  const inviter = real ? as(mikie, `st-${planet}-inviter`, { name: o.inviter!, rel: 'dachi', ...words(mikie, 'MIKIE⭐︎DRILL') }) : null;
+  if (inviter) inviter.author = { ...inviter.author, figure: null, ball: null, pic: null };
   const mine = sample.own[0];
   const own: HomeWork[] =
     o.sent && mine
@@ -104,7 +108,7 @@ export function storyHome(planet: StoryPlanet, place: StoryPlace, o: StoryCastIn
     ...sample,
     owner: { id: 'story-neo', name: o.neo || 'あなた' },
     own,
-    around: [inviter, as(kimorin, `st-${planet}-kimorin`, { ...k, rel: 'dachi' }), ...oshi()],
+    around: [...(inviter ? [inviter] : []), as(kimorin, `st-${planet}-kimorin`, { ...k, rel: 'dachi' }), ...oshi()],
     far: [],
   };
 }

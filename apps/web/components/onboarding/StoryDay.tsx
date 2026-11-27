@@ -168,7 +168,8 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
       steps={story.steps}
       vars={{
         name: me.displayName,
-        inviter: me.invitedByName ?? 'MIKIE⭐︎DRILL',
+        // M-R343: nobody invited (an operator invitation) → no stand-in: the inviter's parts of the story are skipped (f_inviter)
+        inviter: me.invitedByName ?? '',
         // from day 3 the display name is the NEO name (set on the Moon)
         neo: day >= 3 ? me.displayName : undefined,
         kimorinStar: day >= 3,
@@ -185,7 +186,7 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
         lookStandee: me.lookStandee ?? undefined,
         talkLook: me.talk ?? null,
         batiTalk: me.bati?.talk ?? null,
-        story: { ...me.story, ...joinFlags(me.story) },
+        story: { ...me.story, ...joinFlags(me.story), ...(me.invitedByName ? {} : { f_inviter: 'none' }) },
         made: madeFrom(me.story),
       }}
       lessonApi={realLessonApi}

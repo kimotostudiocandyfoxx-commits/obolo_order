@@ -1,5 +1,6 @@
 import { PLANET_HOMES_ENV, planetHomeIsNew } from '../planetHomes';
 import { kimorinBack } from './kimorinBack';
+import { oshiNote } from './newHomeScenes';
 import type { Speaker, Step } from './script';
 
 /**
@@ -16,18 +17,52 @@ import type { Speaker, Step } from './script';
  * These days were the three days AFTER joining until M-R341 (lib/onboarding/after.ts, with other residents and
  * another order); those stay as they were for the accounts of the eight-day journey only (shared lap2Applies).
  *
- * One version for both states of the planets' switch: the script of these days is not written for the new planet
- * homes yet (no resident's place / {neo}'s place / door like days 3–7, M-R330) — the planet is told over its stills and
- * the atelier screens. Only the 〔画面：〇〇が、{neo}の推しになった〕 note depends on the switch: it promises visitors
- * on {neo}'s place on every planet, which only the new homes show, so it is left out while that planet's switch is off.
+ * Two versions, like days 3–7 (M-R343): DAYn_BEFORE tells the planet over its stills (played while the planet's switch
+ * is off); DAYn_NEW_HOME opens the planet's NEW home in the same form as days 3–7 — the resident's place (`host`), then
+ * {neo}'s own place (`neo`, until the door is opened) — with the script's words as they are (the script has no lines
+ * written for these two moments yet, so the 'home' steps stand where its words point at the places). The lines are the
+ * same in both; only the screen notes that describe the screens of before are left out of the new-home days.
+ * The 〔推しになった〕 notes and the stamps are in both (M-R343).
  */
+
+/** day 8's screen note of the stills-version: it names 〔本の空〕〔my図書館〕 and the balloon ride, which the new home does not have */
+const PLUTO_OLD_NOTE = '冥王星｜下に〔本の空〕〔my図書館〕。行きたい場所をタップすると、気球でそこまで渡ります。図書館の形は、あとで{bati}と話して変えられます';
+const NEPTUNE_BYE = 'よう遊んだのう。明日は、天王星じゃ。最後の星じゃな。';
 
 /** Pluto's resident (her standing picture: onboarding/crocopatra.webp) */
 const CROCO: Speaker = 'クロコパトラ';
 
-/** 〔画面：〇〇が、{neo}の推しになった｜…〕 — only where the planet has its new home (the roster lives there) */
-function oshi(planet: 'pluto' | 'neptune' | 'uranus', text: string): Step[] {
-  return planetHomeIsNew(planet, PLANET_HOMES_ENV) ? [{ t: 'se', sound: 'sparkle' }, { t: 'notice', text }] : [];
+/** 〔画面：〇〇が、{neo}の推しになった｜…〕 — whichever home the planet has (M-R343) */
+function oshi(who: string): Step[] {
+  return [{ t: 'se', sound: 'sparkle' }, { t: 'notice', text: oshiNote(who) }];
+}
+
+/** 〔{neo}の金色の切符に、〇〇のスタンプが、ぽん、と押される〕 — on arrival (M-R343: the ticket has eight slots) */
+function stamp(planet: 'pluto' | 'neptune' | 'uranus'): Step[] {
+  return [{ t: 'se', sound: 'stamp' }, { t: 'ticket', stamp: planet }];
+}
+
+/** steps put right after the first 'say' whose text is `text` */
+function afterSay(steps: readonly Step[], text: string, extra: Step[]): Step[] {
+  let done = false;
+  return steps.flatMap((s): Step[] => {
+    if (!done && s.t === 'say' && s.text === text) {
+      done = true;
+      return [s, ...extra];
+    }
+    return [s];
+  });
+}
+/** steps put right before the first 'say' whose text is `text` */
+function beforeSay(steps: readonly Step[], text: string, extra: Step[]): Step[] {
+  let done = false;
+  return steps.flatMap((s): Step[] => {
+    if (!done && s.t === 'say' && s.text === text) {
+      done = true;
+      return [...extra, s];
+    }
+    return [s];
+  });
 }
 
 /**
@@ -58,7 +93,7 @@ function goodnight(): Step[] {
 // ---------------------------------------------------------------------------------------------------------------
 // 8日目 — 冥王星（物語の星）
 // ---------------------------------------------------------------------------------------------------------------
-export const DAY8: Step[] = [
+export const DAY8_BEFORE: Step[] = [
   // M-PLUTO-S001 物語の星
   { t: 'scene', id: 'M-PLUTO-S001' },
   { t: 'bgm', track: 'morning' },
@@ -75,6 +110,7 @@ export const DAY8: Step[] = [
   { t: 'caption', text: '冥王星が開いた' },
   // 太陽からいちばん遠い、小さな冥王星→白い氷の平原、六角形の結晶に眠る本→暗い空の小さな灯り→三輪のバイカ（s/pluto-plain, M-R251 review）
   ...rocket('冥王星に着いた', 's/pluto-plain'),
+  ...stamp('pluto'),
   { t: 'bgm', track: 'night' },
   // 氷の平原に、気球が一つ降りてくる。かごから、ワインレッドのドレスのワニの貴婦人が、扇子をひらいて降りてくる。頭に小さなティアラ
   { t: 'sprite', image: 'crocopatra' },
@@ -83,8 +119,8 @@ export const DAY8: Step[] = [
   { t: 'say', who: CROCO, text: '空の灯りは、ぜんぶ、どなたかの物語ですのよ。' }, // 扇子で空を指して
   // 平原のはしに、{neo}の名前の札がかかった、小さな氷の書庫。中の棚は、まだ空いている
   { t: 'say', who: CROCO, text: 'こちらが、{neo}の図書館。公開なさった本が、ここに並びますわ。お書きになるのは、月の工房ですわ。' },
-  ...oshi('pluto', 'クロコパトラが、{neo}の推しになった｜推しは、どの星でも、{neo}の島に遊びに来ます'),
-  { t: 'notice', text: '冥王星｜下に〔本の空〕〔my図書館〕。行きたい場所をタップすると、気球でそこまで渡ります。図書館の形は、あとで{bati}と話して変えられます' },
+  ...oshi('クロコパトラ'),
+  { t: 'notice', text: PLUTO_OLD_NOTE },
 
   // M-PLUTO-S002 お話を書いて、空に灯す
   { t: 'scene', id: 'M-PLUTO-S002' },
@@ -197,7 +233,7 @@ export const DAY8: Step[] = [
 // ---------------------------------------------------------------------------------------------------------------
 // 9日目 — 海王星（ゲームの星）
 // ---------------------------------------------------------------------------------------------------------------
-export const DAY9: Step[] = [
+export const DAY9_BEFORE: Step[] = [
   // M-NEPTUNE-S001 深海の都／『ナガレを越えて』
   { t: 'scene', id: 'M-NEPTUNE-S001' },
   { t: 'bgm', track: 'morning' },
@@ -214,13 +250,14 @@ export const DAY9: Step[] = [
   { t: 'caption', text: '海王星が開いた' },
   // 深い青の海王星、白い嵐の渦→潜水艇が沈んでいく→海の底のネオン→沈んだ都（s/neptune-town stands in: no deep-sea picture yet）
   ...rocket('海王星に着いた', 's/neptune-town'),
+  ...stamp('neptune'),
   { t: 'bgm', track: 'night' },
   // 都のまん中に、巻き貝の形の建物。入口のまわりだけ、ネオンが灯っている。看板『ナガレを越えて』
   // 巻き貝の館の入口に、背の高い鬼のお坊さん。青いうろこの肌に、青く光る目。笠にまるいゴーグル。肩に、画面のついた古いラジカセ
   { t: 'sprite', image: 'onimonk' },
   { t: 'say', who: 'オニモンク', text: 'ようこそ、ようこそ。わしは、オニモンク。この都の、遊びの番人じゃ。' },
   { t: 'say', who: 'オニモンク', text: '海王星は、ゲームの星。月の工房で作った遊びが、ここで館になって、灯りがともるのじゃ。' },
-  ...oshi('neptune', 'オニモンクが、{neo}の推しになった｜推しは、どの星でも、{neo}の島に遊びに来ます'),
+  ...oshi('オニモンク'),
   // 潜水艇の中の札
   { t: 'sprite', image: null },
   { t: 'notice', text: '『ようこそ。ここは、ゲームの星。深海の都の、結社のゲームセンター。建物の一つ一つが、遊びの館。何度でも、潜りに来ていい。』' },
@@ -324,14 +361,17 @@ export const DAY9: Step[] = [
   { t: 'label', id: 'n-end' },
   { t: 'set', key: 'f_m_neptune_done', value: 'true' },
   { t: 'sprite', image: null },
-  // (the script gives day 9 no closing words: the day ends on KIMORIN's game — a question for the story session)
+  // M-R343: the day's closing words
+  { t: 'sprite', image: 'onimonk' },
+  { t: 'say', who: 'オニモンク', text: NEPTUNE_BYE },
+  { t: 'notice', text: '天王星は、明日ひらきます。海王星で、ゲームを作って公開する、館を見て回ることは、このあとも自由にできます' },
   ...goodnight(),
 ];
 
 // ---------------------------------------------------------------------------------------------------------------
 // 10日目 — 天王星（グッズの星）
 // ---------------------------------------------------------------------------------------------------------------
-export const DAY10: Step[] = [
+export const DAY10_BEFORE: Step[] = [
   // M-URANUS-S001 天王星の町／{neo}のお店に並べる
   { t: 'scene', id: 'M-URANUS-S001' },
   { t: 'bgm', track: 'morning' },
@@ -348,6 +388,7 @@ export const DAY10: Step[] = [
   { t: 'caption', text: '天王星が開いた' },
   // 青緑にかすむ天王星→雲の上の野原、点々と並ぶ小さな店→縄の橋を渡る気球→まん中の浮島に看板『obolo商店』
   ...rocket('天王星に着いた', 's/uranus-field'),
+  ...stamp('uranus'),
   { t: 'bgm', track: 'monban' },
   // 雲の上の野原に、黒い煙が湧く。黒いフードの長いローブ。額に金色の目がひとつ。MONBANが現れる
   { t: 'se', sound: 'smoke' },
@@ -355,7 +396,7 @@ export const DAY10: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '……門番さん？　門は、いいのですか？' },
   { t: 'say', who: 'MONBAN', text: '天王星は…俺の…受け持ちだ…。' },
   { t: 'say', who: 'MONBAN', text: '天王星は…グッズの星だ…。月の工房で作ったグッズが…この町で…品物になって並ぶ…。' },
-  ...oshi('uranus', 'MONBANが、{neo}の推しになった｜推しは、どの星でも、{neo}の島に遊びに来ます'),
+  ...oshi('MONBAN'),
   { t: 'bgm', track: 'city' },
   // 町のはしに、{neo}の名前の札がかかった、小さな空き店。窓の向こうの棚は、まだ空いている
   { t: 'still', image: 's/uranus-shop', fade: 0.8 },
@@ -441,12 +482,21 @@ export const DAY10: Step[] = [
   },
   { t: 'label', id: 'u-look' },
   { t: 'set', key: 'f_m_uranus_shop', value: 'look' },
+  // M-R343: someone who became Obolo Order early (f_join_early) has 〔購入〕 without the lock and MONBAN's other line
+  { t: 'branch', key: 'f_join_early', cases: { true: 'u-look-order' }, otherwise: 'u-look-lock' },
+  { t: 'label', id: 'u-look-lock' },
   // {neo}が、たこ焼き柄のトートバッグに触る。札が開く。いちばん下に〔購入〕。いまは鍵の印がついている — pressed while locked:
   // 〔画面：本物のグッズの注文は、Obolo Orderになってからできます。見て回るのと、お店に並べるのは、いまもできます〕 (the screen's own words)
   { t: 'l2', what: 'm-shop-locked' },
   { t: 'sprite', image: 'monban' },
   { t: 'say', who: 'MONBAN', text: '注文すれば…本物が…家に届く…。だが…それには、お金がかかる…。' },
   { t: 'say', who: 'MONBAN', text: 'マナじゃない…本物の、お金だ…。だから…注文できるのは…Obolo Orderになってからだ…。' },
+  { t: 'goto', id: 'u-shop-join' },
+  { t: 'label', id: 'u-look-order' },
+  // （先にObolo Orderになった人：上の二行のかわりに）〔購入〕の鍵の印は、ついていない
+  { t: 'l2', what: 'm-shop' },
+  { t: 'sprite', image: 'monban' },
+  { t: 'say', who: 'MONBAN', text: 'お前は…もうOrderだ…。注文も…できる…。' },
   { t: 'goto', id: 'u-shop-join' },
   { t: 'label', id: 'u-skip' },
   { t: 'set', key: 'f_m_uranus_shop', value: 'skip' },
@@ -468,6 +518,37 @@ export const DAY10: Step[] = [
   { t: 'set', key: 'f_m_uranus_done', value: 'true' },
   ...goodnight(),
 ];
+
+// ---------------------------------------------------------------------------------------------------------------
+// M-R343: days 8–10 on the planets' NEW homes — the resident's place, then {neo}'s own place (door), as days 3–7
+// ---------------------------------------------------------------------------------------------------------------
+/** 冥王星：クロコパトラの書庫 →「こちらが、{neo}の図書館。」→ {neo}の図書館（扉） */
+export const DAY8_NEW_HOME: Step[] = afterSay(
+  afterSay(
+    DAY8_BEFORE.filter((s) => !(s.t === 'notice' && s.text === PLUTO_OLD_NOTE)),
+    '空の灯りは、ぜんぶ、どなたかの物語ですのよ。',
+    [{ t: 'home', planet: 'pluto', place: 'host' }, { t: 'sprite', image: 'crocopatra' }],
+  ),
+  'こちらが、{neo}の図書館。公開なさった本が、ここに並びますわ。お書きになるのは、月の工房ですわ。',
+  [{ t: 'home', planet: 'pluto', place: 'neo', until: 'door' }, { t: 'sprite', image: 'crocopatra' }],
+);
+/** 海王星：オニモンクの館 → … 作って公開したあと → {neo}の館（扉。公開していれば、そこにある）→「よう遊んだのう。」 */
+export const DAY9_NEW_HOME: Step[] = beforeSay(
+  afterSay(DAY9_BEFORE, '海王星は、ゲームの星。月の工房で作った遊びが、ここで館になって、灯りがともるのじゃ。', [{ t: 'home', planet: 'neptune', place: 'host' }, { t: 'sprite', image: 'onimonk' }]),
+  NEPTUNE_BYE,
+  [{ t: 'sprite', image: null }, { t: 'home', planet: 'neptune', place: 'neo', until: 'door', sent: { key: 'f_m_neptune_publish', value: 'send' } }, { t: 'sprite', image: 'onimonk' }],
+);
+/** 天王星：MONBANの店 →「お前の店だ…。」→ {neo}の店（扉） */
+export const DAY10_NEW_HOME: Step[] = afterSay(
+  afterSay(DAY10_BEFORE, '天王星は…グッズの星だ…。月の工房で作ったグッズが…この町で…品物になって並ぶ…。', [{ t: 'home', planet: 'uranus', place: 'host' }, { t: 'sprite', image: ['monban', 'kimorin-sun'] }]),
+  'お前の店だ…。形を選んで…絵をのせて…ハンドルを回すだけだ…。作るのは…月の工房だ…。',
+  [{ t: 'home', planet: 'uranus', place: 'neo', until: 'door' }],
+);
+
+/** the days as played: the stills-version until the planet's switch is on */
+export const DAY8: Step[] = planetHomeIsNew('pluto', PLANET_HOMES_ENV) ? DAY8_NEW_HOME : DAY8_BEFORE;
+export const DAY9: Step[] = planetHomeIsNew('neptune', PLANET_HOMES_ENV) ? DAY9_NEW_HOME : DAY9_BEFORE;
+export const DAY10: Step[] = planetHomeIsNew('uranus', PLANET_HOMES_ENV) ? DAY10_NEW_HOME : DAY10_BEFORE;
 
 // ---------------------------------------------------------------------------------------------------------------
 // M-END-S001 どこへでも — the end of day 11, after the Eclipse (lib/onboarding/day11.ts plays it; no 'end' of its own)

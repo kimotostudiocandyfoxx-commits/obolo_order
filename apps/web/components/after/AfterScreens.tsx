@@ -781,8 +781,9 @@ export function AfterStep({ what, vars: v, answers, lessonApi, onDone }: { what:
     case 'm-shop':
       return <ShopTag onDone={onDone} />;
     case 'm-shop-locked':
-      // M-R341 (day 10, before the Eclipse): 〔購入〕 wears a lock until Obolo Order; someone who joined early has it open
-      return <ShopTag locked={answers.f_join_early !== 'true' && v.story?.f_join_early !== 'true'} onDone={onDone} />;
+      // M-R341 (day 10, before the Eclipse): 〔購入〕 wears a lock until Obolo Order (someone who joined early gets
+      // 'm-shop' from the day's own branch: M-R343)
+      return <ShopTag locked onDone={onDone} />;
     case 'm-story-seed':
       return <Seed v={v} kind="story" how={answers.f_m_pluto_story ?? 'talk'} onDone={onDone} />;
     case 'm-story-cards':

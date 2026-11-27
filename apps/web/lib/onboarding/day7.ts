@@ -1,6 +1,6 @@
 import type { Step } from './script';
 import { PLANET_HOMES_ENV, planetHomeIsNew } from '../planetHomes';
-import { D7_BOOTH, D7_BOOTH_UNTIL, D7_BOOTHS, D7_BOOTHS_FROM, OSHI_NOTES, replaceStretch, withOshi } from './newHomeScenes';
+import { D7_BOOTH, D7_BOOTH_UNTIL, D7_BOOTHS, D7_BOOTHS_FROM, journeyNotes, replaceStretch } from './newHomeScenes';
 import { kimorinBack } from './kimorinBack';
 
 /**
@@ -15,7 +15,8 @@ import { kimorinBack } from './kimorinBack';
  *    fifth stamp (D07V-S004, f_d07v_done). The night is slept on Venus; day 8 (Pluto, M-R341) starts on the Moon like the others.
  * Nothing is made on Venus (M-R208; the easy DJ practice is gone).
  */
-export const DAY7_BEFORE: Step[] = [
+/** the day as written before M-R341 / M-R336 (journeyNotes adds what they bring) */
+const DAY7_OLD: Step[] = [
   // D07V-S001 月の朝／番組が作れる
   { t: 'scene', id: 'D07V-S001' },
   { t: 'bgm', track: 'moon' },
@@ -177,11 +178,14 @@ export const DAY7_BEFORE: Step[] = [
   { t: 'end' },
 ];
 
+/** the day on the planet's screen of before: played until the planet's switch is on */
+export const DAY7_BEFORE: Step[] = journeyNotes(7, DAY7_OLD);
+
 /**
  * story 2026-11-27 (M-R330): the day on the planet's NEW home — the script of now, word for word (story-sync checks
  * this one). Played only when the planet's switch is on (lib/planetHomes.ts, off by default).
  */
-export const DAY7_NEW_HOME: Step[] = withOshi(replaceStretch(replaceStretch(DAY7_BEFORE, 'D07V-S003', D7_BOOTHS, { from: D7_BOOTHS_FROM }), 'D07V-S004', D7_BOOTH, { until: D7_BOOTH_UNTIL }), OSHI_NOTES[7]);
+export const DAY7_NEW_HOME: Step[] = journeyNotes(7, replaceStretch(replaceStretch(DAY7_OLD, 'D07V-S003', D7_BOOTHS, { from: D7_BOOTHS_FROM }), 'D07V-S004', D7_BOOTH, { until: D7_BOOTH_UNTIL }));
 
 /** the day as played: its steps of before, unchanged, until venus's switch is on */
 export const DAY7: Step[] = planetHomeIsNew('venus', PLANET_HOMES_ENV) ? DAY7_NEW_HOME : DAY7_BEFORE;

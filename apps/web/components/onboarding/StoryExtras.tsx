@@ -459,9 +459,13 @@ export const STAMPS = [
   { id: 'mars', label: '火星', icon: '🎬' },
   // draft 21 (M-R124): Venus joins the first journey — its slot floats up at the end of Mars
   { id: 'venus', label: '金星', icon: '🎤' },
+  // M-R343: eight slots — the outer planets of days 8–10 are stamped on arrival
+  { id: 'pluto', label: '冥王星', icon: '📖' },
+  { id: 'neptune', label: '海王星', icon: '🎮' },
+  { id: 'uranus', label: '天王星', icon: '🎁' },
 ] as const;
 export type StampId = (typeof STAMPS)[number]['id'];
-/** The stamps you have by the journey day you are on (a planet's stamp is pressed at the end of its day). */
+/** The stamps you have by the journey day you are on (a planet's stamp is yours from the day after it: Saturn 4 … Uranus 11). */
 export function stampsOn(day: number): StampId[] {
   return STAMPS.filter((_, k) => day >= 4 + k).map((s) => s.id);
 }

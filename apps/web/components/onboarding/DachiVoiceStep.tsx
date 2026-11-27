@@ -9,8 +9,9 @@ import { getApi } from '@/lib/api';
 /**
  * D04-S005c (M-R212): the first voice message, inside the story. {inviter} becomes a dachi (idempotent: the caption
  * 「{inviter}がダチになった」 is just before), then their thread opens full screen — the first one that is not KIMORIN⭐︎'s:
- * {inviter}'s, or MIKIE⭐︎DRILL's when there is no inviter. While there is no thread (or it cannot be read) `fallback`
- * (MIKIE⭐︎DRILL 「ようこそ。……」) is shown instead. Sending a voice message → 'reply'; 〔あとで〕 → 'later'.
+ * {inviter}'s. M-R343: no MIKIE⭐︎DRILL stand-in before Order — her thread is never the one opened here, and the story
+ * does not reach this step when nobody invited (f_inviter). While there is no thread (or it cannot be read) `fallback`
+ * ({inviter}'s 「ようこそ。……あなたのつぶやき、聞こえたよ。」 as a text message) is shown instead. Sending a voice message → 'reply'; 〔あとで〕 → 'later'.
  * Works in the demo too (lib/api/demo.ts keeps the threads in this browser). `test` (the review page with no account):
  * no thread can be read, so the fallback gets the mic and the take is sent nowhere.
  */
@@ -23,7 +24,7 @@ export function DachiVoiceStep({ fallback, onDone, test = false }: { fallback: {
       const api = getApi();
       await api.befriendInviter().catch(() => null);
       const list = await api.dachiThreads().catch(() => [] as DachiThreadView[]);
-      if (live) setThread(list.find((t) => t.kind !== 'kimorin') ?? null);
+      if (live) setThread(list.find((t) => t.kind !== 'kimorin' && t.kind !== 'mikie') ?? null);
     })();
     return () => {
       live = false;

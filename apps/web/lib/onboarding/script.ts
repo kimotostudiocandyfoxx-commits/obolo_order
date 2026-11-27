@@ -37,6 +37,8 @@ export type Speaker =
   | 'かにぶぅ'
   /** the inviter's stand-in on Saturn when nobody invited you: her welcome voice message (D04-S005c, M-R212) */
   | 'MIKIE⭐︎DRILL'
+  /** the one who invited {name}: their words as a text message when they recorded no voice (D04-S005c, M-R343) */
+  | '{inviter}'
   /** a voice not seen yet (（声）「おい。」) */
   | '？？？';
 
@@ -199,7 +201,7 @@ export type Step =
    * `unlock` (M-R341, with `flip`): on the star map the lock of that outer planet comes off (Pluto day 8, Neptune day 9,
    * Uranus day 10 — the ones before it are open already); 'all' = every star open and gold (the Eclipse day)
    */
-  | { t: 'ticket'; stamp?: 'saturn' | 'jupiter' | 'mercury' | 'mars' | 'venus'; flip?: boolean; dest?: string; unlock?: 'pluto' | 'neptune' | 'uranus' | 'all' }
+  | { t: 'ticket'; stamp?: 'saturn' | 'jupiter' | 'mercury' | 'mars' | 'venus' | 'pluto' | 'neptune' | 'uranus'; flip?: boolean; dest?: string; unlock?: 'pluto' | 'neptune' | 'uranus' | 'all' }
   /** The day's 88 minutes (M-R22): on from the first rocket departure, off in the temples of Earth and the Moon. */
   | { t: 'clock'; on: boolean }
   /** Bluena projects (open) or closes the square screen: MONBAN at the HQ gate. */
@@ -261,7 +263,7 @@ export type Step =
   /**
    * D04-S005c (M-R212): the first voice message — the inviter's ダチ thread full screen (components/dachi/DachiThread),
    * 〔あとで〕 at the top. Sending → f_d04_voice_reply = 'reply', 〔あとで〕 → 'later'. `fallback`: shown when there is
-   * no thread to open (MIKIE⭐︎DRILL 「ようこそ。……」, shared MIKIE_WELCOME).
+   * no thread to open ({inviter}'s 「ようこそ。……」 as a text message, M-R343; the step is not reached when nobody invited).
    */
   | { t: 'dachivoice'; fallback: ScriptLine }
   /**
@@ -277,7 +279,8 @@ export type Step =
        * (components/planetTemplate, lib/planetTemplate/storyCast) — Saturn's two places, and on Jupiter / Mercury / Mars /
        * Venus the resident's place (`host`) and {neo}'s (`neo`). Switch off: only Saturn's steps exist (the home of before).
        */
-      planet: 'saturn' | 'jupiter' | 'mercury' | 'mars' | 'venus';
+      // M-R343: days 8–10 too — Pluto / Neptune / Uranus, the resident's place and {neo}'s (new homes only)
+      planet: 'saturn' | 'jupiter' | 'mercury' | 'mars' | 'venus' | 'pluto' | 'neptune' | 'uranus';
       place: 'takoyaki' | 'host' | 'neo';
       /** what lets the story go on: 〔次へ〕 (the default), or opening {neo}'s own place (`door`: then 〔次へ〕 appears) */
       until?: 'next' | 'door';
@@ -408,6 +411,7 @@ export function sayText(who: Speaker, text: string, v: StoryVars): string {
 export function speakerName(who: Speaker, v: StoryVars): string {
   if (who === 'バティ') return v.bati || 'バティ';
   if (who === 'KIMORIN' && v.kimorinStar) return 'KIMORIN⭐︎';
+  if (who === '{inviter}') return v.inviter || '…';
   return who;
 }
 

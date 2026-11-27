@@ -39,8 +39,7 @@ describe('story days 3–7 and the planet switch (M-R330)', () => {
     expect(notes3(DAY3_NEW_HOME)).not.toContain(D3_PLAY_ALL_NOTE);
     expect(notes3(DAY3_NEW_HOME).some((t) => t.includes('全部流す') || t.includes('針のマイク'))).toBe(false);
     expect(notes3(DAY3_NEW_HOME)).toContain(D3_GROOVE_NOTE);
-    // M-R336 / M-R341: + the Sushimon's boarding scene and the siblings' 〔推しになった〕 note (se + notice)
-    expect(DAY3_NEW_HOME).toHaveLength(DAY3_BEFORE.length + D3_SUSHIMON.length + 2);
+    expect(DAY3_NEW_HOME).toHaveLength(DAY3_BEFORE.length);
     expect(homes(DAY4_NEW_HOME)).toEqual(['jupiter:host:next', 'jupiter:neo:door']);
     expect(homes(DAY5_NEW_HOME)).toEqual(['mercury:host:next', 'mercury:neo:door']);
     expect(homes(DAY6_NEW_HOME)).toEqual(['mars:host:next', 'mars:neo:door']);
@@ -74,11 +73,11 @@ describe('story days 3–7 and the planet switch (M-R330)', () => {
     }
   });
 
-  it('the cast (M-R341 / M-R342): the resident’s place has KIMORIN⭐︎ (pushed) and the story’s cast met so far; {neo}’s has the inviter (or MIKIE⭐︎DRILL), KIMORIN⭐︎ and that day’s oshi — nobody else', () => {
-    const DAY = { saturn: 3, jupiter: 4, mercury: 5, mars: 6, venus: 7 } as const;
-    const COUNT = { saturn: 9, jupiter: 10, mercury: 11, mars: 12, venus: 15 } as const;
-    const HOSTS = { saturn: ['たこ焼きブラザー', 'たこ焼きシスター'], jupiter: ['大根カイザー'], mercury: ['フリージー'], mars: ['ヒポキン'], venus: ['ボスG', 'ロングG', 'ハットG'] } as const;
-    for (const planet of ['saturn', 'jupiter', 'mercury', 'mars', 'venus'] as const) {
+  it('the cast (M-R341 / M-R342): the resident’s place has KIMORIN⭐︎ (pushed) and the story’s cast met so far; {neo}’s has the inviter (when someone invited), KIMORIN⭐︎ and that day’s oshi — nobody else', () => {
+    const DAY = { saturn: 3, jupiter: 4, mercury: 5, mars: 6, venus: 7, pluto: 8, neptune: 9, uranus: 10 } as const;
+    const COUNT = { saturn: 9, jupiter: 10, mercury: 11, mars: 12, venus: 15, pluto: 16, neptune: 17, uranus: 18 } as const;
+    const HOSTS = { saturn: ['たこ焼きブラザー', 'たこ焼きシスター'], jupiter: ['大根カイザー'], mercury: ['フリージー'], mars: ['ヒポキン'], venus: ['ボスG', 'ロングG', 'ハットG'], pluto: ['クロコパトラ'], neptune: ['オニモンク'], uranus: ['MONBAN'] } as const;
+    for (const planet of ['saturn', 'jupiter', 'mercury', 'mars', 'venus', 'pluto', 'neptune', 'uranus'] as const) {
       const host = storyHome(planet, planet === 'saturn' ? 'takoyaki' : 'host', { neo: 'ミナト' });
       expect(host.own).toEqual([]);
       const there = host.around.map((w) => w.author.name);
@@ -91,11 +90,14 @@ describe('story days 3–7 and the planet switch (M-R330)', () => {
       const alone = storyHome(planet, 'neo', { neo: 'ミナト', inviter: '…', sent: false });
       expect(alone.owner.name).toBe('ミナト');
       const came = alone.around.map((w) => w.author.name);
-      expect(came.slice(0, 2)).toEqual(['MIKIE⭐︎DRILL', 'KIMORIN⭐︎']);
+      // M-R343: nobody invited → nobody in the inviter's spot (no MIKIE⭐︎DRILL stand-in before Order)
+      expect(came[0]).toBe('KIMORIN⭐︎');
+      expect(came).not.toContain('MIKIE⭐︎DRILL');
+      expect(storyHome(planet, 'neo', { neo: 'ミナト', inviter: 'MIKIE⭐︎DRILL' }).around.map((w) => w.author.name)).toEqual(came);
       // the oshi of the day this planet is visited on (the handoff's table), each once, each on this planet's figure
-      expect(came.slice(2)).toEqual(oshiOn(DAY[planet]).map((p) => p.name));
-      expect(came.slice(2)).toHaveLength(COUNT[planet]);
-      for (const w of alone.around.slice(2)) {
+      expect(came.slice(1)).toEqual(oshiOn(DAY[planet]).map((p) => p.name));
+      expect(came.slice(1)).toHaveLength(COUNT[planet]);
+      for (const w of alone.around.slice(1)) {
         expect(w.rel).toBe('oshi');
         expect(w.author.figure ?? w.author.ball).toMatch(/^\/planets\/sample\/(fig|chibi)-/);
       }
@@ -110,29 +112,49 @@ describe('story days 3–7 and the planet switch (M-R330)', () => {
     expect(storyHome('saturn', 'takoyaki', { neo: '' }).around[0].text).toBe('うんち。');
   });
 
-  it('M-R341: each resident becomes {neo}’s oshi where they first appear — the script’s note, on the new-home days only', () => {
+  it('M-R341 / M-R343: each resident becomes {neo}’s oshi at the end of the scene they first appear in — on both versions of the day', () => {
     const notes = (d: Step[]) => d.flatMap((s) => (s.t === 'notice' ? [s.text] : []));
     const days: [3 | 4 | 5 | 6 | 7, Step[], Step[]][] = [[3, DAY3_BEFORE, DAY3_NEW_HOME], [4, DAY4_BEFORE, DAY4_NEW_HOME], [5, DAY5_BEFORE, DAY5_NEW_HOME], [6, DAY6_BEFORE, DAY6_NEW_HOME], [7, DAY7_BEFORE, DAY7_NEW_HOME]];
     for (const [day, before, now] of days) {
       const note = oshiNote(OSHI_NOTES[day].who);
       expect(note).toContain('が、{neo}の推しになった｜推しは、どの星でも、{neo}の島に遊びに来ます');
       expect(note).not.toContain('M-R341');
-      expect(notes(now).filter((t) => t === note)).toHaveLength(1);
-      expect(notes(before).some((t) => t.includes('推しになった'))).toBe(false);
-      // right after the line the script puts it under
-      const at = now.findIndex((s) => s.t === 'notice' && s.text === note);
-      expect(now.slice(0, at).reverse().find((s) => s.t === 'say')).toMatchObject({ text: OSHI_NOTES[day].after });
+      for (const d of [before, now]) {
+        expect(notes(d).filter((t) => t === note)).toHaveLength(1);
+        // the last thing of its scene: the next step starts another scene
+        const at = d.findIndex((s) => s.t === 'notice' && s.text === note);
+        expect(d[at + 1].t).toBe('scene');
+        expect(d.slice(0, at).reverse().find((s) => s.t === 'scene')).toMatchObject({ id: OSHI_NOTES[day].scene });
+      }
     }
   });
 
-  it('M-R336: the seven Sushimon board the rocket on day 3 (new home only), after 〔ロケットに乗る〕 and before the rocket leaves', () => {
+  it('M-R336 / M-R343: the seven Sushimon board the rocket on day 3 — on both versions, after 〔ロケットに乗る〕 and before the rocket leaves', () => {
     const who = D3_SUSHIMON.flatMap((s) => (s.t === 'say' ? [s.who] : []));
     expect(who).toEqual(['？？？', 'KIMORIN', 'サーぽん', 'しゃりお', 'ガリみ♡', 'えびすけ', 'ウニまる', 'いかチョロ', 'かにぶぅ', 'KIMORIN', 'バティ']);
-    const board = DAY3_NEW_HOME.findIndex((s) => s.t === 'action' && s.label === 'ロケットに乗る');
-    expect(DAY3_NEW_HOME.slice(board + 1, board + 1 + D3_SUSHIMON.length)).toEqual(D3_SUSHIMON);
-    expect(DAY3_NEW_HOME[board + 1 + D3_SUSHIMON.length]).toEqual(DAY3_BEFORE[DAY3_BEFORE.findIndex((s) => s.t === 'action' && s.label === 'ロケットに乗る') + 1]);
+    for (const d of [DAY3_BEFORE, DAY3_NEW_HOME]) {
+      const board = d.findIndex((s) => s.t === 'action' && s.label === 'ロケットに乗る');
+      expect(d.slice(board + 1, board + 1 + D3_SUSHIMON.length)).toEqual(D3_SUSHIMON);
+      expect(d[board + 1 + D3_SUSHIMON.length]).toEqual({ t: 'sprite', image: null });
+    }
     expect(D3_SUSHIMON[D3_SUSHIMON.length - 1]).toEqual({ t: 'notice', text: oshiNote('スシモンの7体') });
-    expect(DAY3_BEFORE.some((s) => s.t === 'say' && s.who === 'サーぽん')).toBe(false);
+  });
+
+  it('M-R343: nobody invited → no stand-in: the inviter’s parts of day 3 are skipped, and nobody is in that spot on {neo}’s place', () => {
+    for (const d of [DAY3_BEFORE, DAY3_NEW_HOME]) {
+      const skips = d.flatMap((s) => (s.t === 'branch' && s.key === 'f_inviter' ? [s.cases.none] : []));
+      expect(skips).toEqual(['inv-a-end', 'inv-b-end', 'reply-end']);
+      for (const l of skips) expect(labels(d)).toContain(l);
+      // what is skipped: the inviter's kororin and its two lines, the name card, the thread with the first message
+      const cut = (from: string, to: string) => d.slice(d.findIndex((s) => s.t === 'label' && s.id === from), d.findIndex((s) => s.t === 'label' && s.id === to));
+      expect(says(cut('inv-a', 'inv-a-end'))).toEqual(['今のは、招待者の、{inviter}のだZE。', '{neo}を、ここに招いてくれた人だワ。']);
+      expect(cut('inv-b', 'inv-b-end').some((s) => s.t === 'caption' && s.text === '{inviter}がダチになった')).toBe(true);
+      expect(cut('inv-c', 'reply-end').some((s) => s.t === 'dachivoice')).toBe(true);
+      // no voice recorded: the inviter's own words as a text message (never MIKIE⭐︎DRILL's)
+      const dv = d.find((s) => s.t === 'dachivoice');
+      expect(dv?.t === 'dachivoice' && dv.fallback).toEqual({ t: 'say', who: '{inviter}', text: 'ようこそ。……あなたのつぶやき、聞こえたよ。' });
+    }
+    expect(says([...DAY3_BEFORE, ...DAY3_NEW_HOME]).some((t) => t.includes('聞こえたわよ'))).toBe(false);
   });
 
   it('M-R341: the order of the days is not the switch — Venus ends with 「明日は、冥王星だ。」 on both versions', () => {

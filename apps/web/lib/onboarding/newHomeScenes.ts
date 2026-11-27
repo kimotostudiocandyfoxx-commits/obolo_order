@@ -7,18 +7,19 @@ import type { Step } from './script';
  * steps of before, unchanged). The script's lines word for word (story-sync checks THESE: the script of now is written
  * for the new homes); the 〔画面：…〕 lines are the notices.
  *
- * M-R341 / M-R336 (handoff planets-08): on these days each planet's resident becomes {neo}'s oshi (OSHI_NOTES) and the
- * seven Sushimon board the rocket on day 3 (D3_SUSHIMON); the homes show the roster of that day (storyCast rosterOn).
+ * M-R341 / M-R336 (handoff planets-08): each planet's resident becomes {neo}'s oshi (OSHI_NOTES) and the seven Sushimon
+ * board the rocket on day 3 (D3_SUSHIMON) — on both versions of a day (journeyNotes, M-R343); the new homes show the
+ * roster of that day (storyCast).
  *
  * What changes against the days of before: the planet is no longer told over a still with a 〔…をタップする〕 button —
  * the 'home' step opens the planet's new home (components/planetTemplate) with the people the script names
  * (lib/planetTemplate/storyCast.ts): first the resident's own place (`host`: touch what came to them, 〔次へ〕), then
- * {neo}'s own place (`neo`: the inviter's — or MIKIE⭐︎DRILL's — and KIMORIN⭐︎'s works come around; two fingers pinch
+ * {neo}'s own place (`neo`: the inviter's — when someone invited — and KIMORIN⭐︎'s works come around; two fingers pinch
  * up to the sky; tapping {neo}'s own place opens it — `until: 'door'` — and the story goes on from inside).
  */
 
 /** a scene's steps of before replaced by its steps for the new homes (a scene = from its 'scene' step to the next one) */
-export function withNewHomes(steps: readonly Step[], scenes: Record<string, Step[]>, oshi?: { after: string; who: string }): Step[] {
+export function withNewHomes(steps: readonly Step[], scenes: Record<string, Step[]>): Step[] {
   const out: Step[] = [];
   let skip = false;
   for (const s of steps) {
@@ -29,7 +30,7 @@ export function withNewHomes(steps: readonly Step[], scenes: Record<string, Step
     }
     if (!skip) out.push(s);
   }
-  return oshi ? withOshi(out, oshi) : out;
+  return out;
 }
 
 // ───────────────────────────── day 3: Saturn (D04-S005) ─────────────────────────────
@@ -44,42 +45,54 @@ export const D3_GROOVE_NOTE = 'コロリンは、指でつまんで投げられ�
  */
 export const D3_PLAY_ALL_NOTE = '転がっているコロリンは、前に開いてから降ってきた新しいコロリンです。つつく・はじく・投げると喋って、溝にしまわれます。〔▶ 全部流す〕で、溝のコロリンを、針のマイクの前でまとめて聞けます';
 export function day3NewHomes(steps: readonly Step[]): Step[] {
-  const out = steps.flatMap((s): Step[] => {
+  return steps.flatMap((s): Step[] => {
     if (s.t === 'say' && s.text === D3_GROOVE_BEFORE) return [{ ...s, text: D3_GROOVE_NOW }, { t: 'notice', text: D3_GROOVE_NOTE }];
     if (s.t === 'notice' && s.text === D3_PLAY_ALL_NOTE) return [];
-    // M-R336: the seven Sushimon run up as {neo} boards the rocket (D04-S002b, after 〔ロケットに乗る〕)
-    if (s.t === 'action' && s.label === D3_BOARD) return [s, ...D3_SUSHIMON];
     return [s];
   });
-  return withOshi(out, OSHI_NOTES[3]);
 }
 
 // ───────────────────────────── M-R341: the oshi roster ─────────────────────────────
 /**
- * 〔画面：〇〇が、{neo}の推しになった｜推しは、どの星でも、{neo}の島に遊びに来ます〕 — where a planet's resident first
- * appears, after the line the script puts it under (`after`). Only on the new-home days: the visitors it promises are
- * the new homes' (lib/planetTemplate/storyCast.ts rosterOn). The script's own text; its decision tag 「（M-R341）」, which
- * the script carries inside five of these notes, is not shown.
+ * 〔画面：〇〇が、{neo}の推しになった｜推しは、どの星でも、{neo}の島に遊びに来ます〕 — the last line of the scene where a
+ * planet's resident first appears (the script's place for it). M-R343: shown whether the planet's new home is switched
+ * on or not, so it is part of the day itself (journeyNotes) — the days of before and the new-home days both carry it.
+ * The script's own text; its decision tag 「（M-R341）」, which the script carries inside five of these notes, is not shown.
  */
 export const OSHI_LINE = '推しは、どの星でも、{neo}の島に遊びに来ます';
-export const OSHI_NOTES: Record<3 | 4 | 5 | 6 | 7, { after: string; who: string }> = {
-  3: { after: '再生するZE!!!', who: 'たこ焼きブラザーとたこ焼きシスター' },
-  4: { after: '我が、木星の森を、見せてやるダ。', who: '大根カイザー' },
-  5: { after: 'ようこそ。俺は、フリージーだ。海を、見せてやる。', who: 'フリージー' },
-  6: { after: 'UFOは、88時間、飛んだら、そいつのスタジオへ帰る。', who: 'ヒポキン' },
-  7: { after: '88時間、漂ったら、電波は、そいつのブースへ帰る。', who: 'ボスG・ロングG・ハットG' },
+export const OSHI_NOTES: Record<3 | 4 | 5 | 6 | 7, { scene: string; who: string }> = {
+  3: { scene: 'D04-S003', who: 'たこ焼きブラザーとたこ焼きシスター' },
+  4: { scene: 'D05-S002', who: '大根カイザー' },
+  5: { scene: 'D06-S003', who: 'フリージー' },
+  6: { scene: 'D07-S002', who: 'ヒポキン' },
+  7: { scene: 'D07V-S003', who: 'ボスG・ロングG・ハットG' },
 };
 export const oshiNote = (who: string): string => `${who}が、{neo}の推しになった｜${OSHI_LINE}`;
-/** the note put after the first 'say' whose text is `after` */
-export function withOshi(steps: readonly Step[], o: { after: string; who: string }): Step[] {
+/** the note as the last thing of scene `o.scene` (just before the next scene starts) */
+export function withOshi(steps: readonly Step[], o: { scene: string; who: string }): Step[] {
+  const out: Step[] = [];
+  let inScene = false;
   let done = false;
-  return steps.flatMap((s): Step[] => {
-    if (!done && s.t === 'say' && s.text === o.after) {
-      done = true;
-      return [s, { t: 'se', sound: 'sparkle' }, { t: 'notice', text: oshiNote(o.who) }];
+  const note = (): Step[] => [{ t: 'se', sound: 'sparkle' }, { t: 'notice', text: oshiNote(o.who) }];
+  for (const s of steps) {
+    if (s.t === 'scene') {
+      if (inScene && !done) {
+        out.push(...note());
+        done = true;
+      }
+      inScene = s.id === o.scene && !done;
     }
-    return [s];
-  });
+    out.push(s);
+  }
+  return out;
+}
+/**
+ * What M-R341 / M-R336 add to a day whichever home the planet has (M-R343): on day 3 the seven Sushimon board the
+ * rocket (after 〔ロケットに乗る〕), and on days 3–7 the planet's resident becomes {neo}'s oshi.
+ */
+export function journeyNotes(day: 3 | 4 | 5 | 6 | 7, steps: readonly Step[]): Step[] {
+  const base = day === 3 ? steps.flatMap((s): Step[] => (s.t === 'action' && s.label === D3_BOARD ? [s, ...D3_SUSHIMON] : [s])) : steps;
+  return withOshi(base, OSHI_NOTES[day]);
 }
 
 // ───────────────────────────── day 3: the Sushimon board the rocket (M-R336, D04-S002b) ─────────────────────────────
@@ -151,7 +164,7 @@ export const D4_NEW: Record<string, Step[]> = {
     { t: 'still', image: 's/jupiter-daikon' }, // 大根カイザーの木のとなりに、まだ若い一本の木。名札『{neo}』
     { t: 'sprite', image: ['kaiser1', 'kimorin-sun'] },
     { t: 'say', who: '大根カイザー', text: 'こっちが、{neo}の木ダ。' },
-    // ひらり。羅針盤の封印の蝶（招待者、いなければMIKIE⭐︎DRILL）。続いて、丸いサングラスの蝶
+    // ひらり。羅針盤の封印の蝶（招待者。いなければ、出さない：M-R343）。続いて、丸いサングラスの蝶
     { t: 'say', who: 'KIMORIN', text: '……ダチですから。当然、来ますね。' },
     { t: 'notice', text: '{neo}の木のまわりには、ダチと推しのアートが、蝶になって88時間あつまります' },
     { t: 'say', who: '大根カイザー', text: '森の上から見わたすと、まだ知らない誰かのアートが集まる広場が、いっぱいあるダ。気に入ったら、推すといいダ。次から、{neo}の木にも飛んでくるダ。' },
@@ -207,7 +220,7 @@ export const D5_NEW: Record<string, Step[]> = {
     { t: 'say', who: 'フリージー', text: '次は、{neo}の島だ。' },
     { t: 'se', sound: 'whoosh' }, // 汽笛。海の底から五線の輪。白い砂とヤシの木の、小さな島がせり上がる。浜の立て札に『{neo}』
     { t: 'say', who: 'KIMORIN', text: '……島とは、生えるものだったのですね。' },
-    // ぽう、と汽笛。羅針盤の封印の船（招待者、いなければMIKIE⭐︎DRILL）。続いて、帆に『プリプリ・ボカン』の船
+    // ぽう、と汽笛。羅針盤の封印の船（招待者。いなければ、出さない：M-R343）。続いて、帆に『プリプリ・ボカン』の船
     { t: 'say', who: 'KIMORIN', text: '……ダチですから。当然、来ますね。' },
     { t: 'notice', text: '{neo}の島のまわりには、ダチと推しの曲が、音船になって88時間やってきます' },
     { t: 'say', who: 'フリージー', text: '空から見ろ。まだ知らない誰かの曲が流れ着く島が、いくらでもある。気に入ったら推せ。次から、{neo}の島にも来る。' },
@@ -258,7 +271,7 @@ export const D6_NEW: Record<string, Step[]> = {
     { t: 'still', image: 's/arr-mars-city' }, // ヒポキンのスタジオのとなりに、まだ新しい四角いスタジオ。屋根の名札に『{neo}』
     { t: 'sprite', image: ['hipokin', 'kimorin-sun'] },
     { t: 'say', who: 'ヒポキン', text: 'ここが、{neo}のスタジオだ。' },
-    // ひゅうん。羅針盤の封印のUFO（招待者、いなければMIKIE⭐︎DRILL）。続いて、金色の滑り台のマークのUFO
+    // ひゅうん。羅針盤の封印のUFO（招待者。いなければ、出さない：M-R343）。続いて、金色の滑り台のマークのUFO
     { t: 'say', who: 'KIMORIN', text: '……ダチですから。当然、来ますね。' },
     { t: 'notice', text: '{neo}のスタジオの空には、ダチと推しが、映像を連れて、UFOで88時間やってきます' },
     { t: 'say', who: 'ヒポキン', text: '上から見りゃ、まだ知らないやつの映像が集まる地区が、いくつもある。気に入ったら推せ。次から、{neo}の空にも来る。' },
@@ -316,7 +329,7 @@ export const D7_BOOTH: Step[] = [
   { t: 'still', image: 's/venus-night' }, // ボスGのブースのとなりに、まるいガラスの小さなブース。屋根の名札に『{neo}』
   { t: 'sprite', image: ['bossg', 'kimorin-sun'] },
   { t: 'say', who: 'ボスG', text: 'ここが、{neo}のブースだ。' },
-  // ふわり。羅針盤の封印の電波の輪（招待者、いなければMIKIE⭐︎DRILLの番組）。続いて、すね毛の声の輪
+  // ふわり。羅針盤の封印の電波の輪（招待者。いなければ、出さない：M-R343）。続いて、すね毛の声の輪
   { t: 'say', who: 'KIMORIN', text: '……ダチですから。当然、来ますね。' },
   { t: 'notice', text: '{neo}のブースのまわりには、ダチと推しの番組が、電波の輪になって88時間漂ってきます' },
   { t: 'say', who: 'ボスG', text: '雲の上には、まだ知らないやつの番組が集まる放送局が、いくつもある。気に入ったら推せ。次から、{neo}のブースにも来る。' },

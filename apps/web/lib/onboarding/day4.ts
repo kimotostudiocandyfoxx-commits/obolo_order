@@ -1,7 +1,7 @@
 import { kimorinBack } from './kimorinBack';
 import type { Step } from './script';
 import { PLANET_HOMES_ENV, planetHomeIsNew } from '../planetHomes';
-import { D4_NEW, OSHI_NOTES, withNewHomes } from './newHomeScenes';
+import { D4_NEW, journeyNotes, withNewHomes } from './newHomeScenes';
 
 /**
  * DAY 4 【月 → 木星】 — the simple version (M-R208/M-R210/M-R211; wip/P03/c01.md D05-S001〜S007, c02.md D05-S002〜S009;
@@ -13,7 +13,8 @@ import { D4_NEW, OSHI_NOTES, withNewHomes } from './newHomeScenes';
  *  - Jupiter only to look: KIMORIN⭐︎'s たこ焼き guess, 大根カイザー, the butterfly forest (D05-S005), {neo}'s atelier
  *    (D05-S008b), the Jupiter stamp, back to the Moon to sleep. Nothing is made on Jupiter (M-R208).
  */
-export const DAY4_BEFORE: Step[] = [
+/** the day as written before M-R341 / M-R336 (journeyNotes adds what they bring) */
+const DAY4_OLD: Step[] = [
   // D05-S001 月の朝／アートが作れる
   { t: 'scene', id: 'D05-S001' },
   { t: 'bgm', track: 'moon' },
@@ -232,11 +233,14 @@ export const DAY4_BEFORE: Step[] = [
   { t: 'end' },
 ];
 
+/** the day on the planet's screen of before: played until the planet's switch is on */
+export const DAY4_BEFORE: Step[] = journeyNotes(4, DAY4_OLD);
+
 /**
  * story 2026-11-27 (M-R330): the day on the planet's NEW home — the script of now, word for word (story-sync checks
  * this one). Played only when the planet's switch is on (lib/planetHomes.ts, off by default).
  */
-export const DAY4_NEW_HOME: Step[] = withNewHomes(DAY4_BEFORE, D4_NEW, OSHI_NOTES[4]);
+export const DAY4_NEW_HOME: Step[] = journeyNotes(4, withNewHomes(DAY4_OLD, D4_NEW));
 
 /** the day as played: its steps of before, unchanged, until jupiter's switch is on */
 export const DAY4: Step[] = planetHomeIsNew('jupiter', PLANET_HOMES_ENV) ? DAY4_NEW_HOME : DAY4_BEFORE;

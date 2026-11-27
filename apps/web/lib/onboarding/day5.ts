@@ -1,6 +1,6 @@
 import type { Step } from './script';
 import { PLANET_HOMES_ENV, planetHomeIsNew } from '../planetHomes';
-import { D5_NEW, OSHI_NOTES, withNewHomes } from './newHomeScenes';
+import { D5_NEW, journeyNotes, withNewHomes } from './newHomeScenes';
 import { kimorinBack } from './kimorinBack';
 
 /**
@@ -13,7 +13,8 @@ import { kimorinBack } from './kimorinBack';
  *  - Mercury only to look: the food guess, フリージー, the sea of music ships (D06-S005), {neo}'s island (D06-S007b), the
  *    Mercury stamp, back to the Moon to sleep. Nothing is made on Mercury (M-R208).
  */
-export const DAY5_BEFORE: Step[] = [
+/** the day as written before M-R341 / M-R336 (journeyNotes adds what they bring) */
+const DAY5_OLD: Step[] = [
   // D06-S001 月の朝／曲が作れる
   { t: 'scene', id: 'D06-S001' },
   { t: 'bgm', track: 'moon' },
@@ -221,11 +222,14 @@ export const DAY5_BEFORE: Step[] = [
   { t: 'end' },
 ];
 
+/** the day on the planet's screen of before: played until the planet's switch is on */
+export const DAY5_BEFORE: Step[] = journeyNotes(5, DAY5_OLD);
+
 /**
  * story 2026-11-27 (M-R330): the day on the planet's NEW home — the script of now, word for word (story-sync checks
  * this one). Played only when the planet's switch is on (lib/planetHomes.ts, off by default).
  */
-export const DAY5_NEW_HOME: Step[] = withNewHomes(DAY5_BEFORE, D5_NEW, OSHI_NOTES[5]);
+export const DAY5_NEW_HOME: Step[] = journeyNotes(5, withNewHomes(DAY5_OLD, D5_NEW));
 
 /** the day as played: its steps of before, unchanged, until mercury's switch is on */
 export const DAY5: Step[] = planetHomeIsNew('mercury', PLANET_HOMES_ENV) ? DAY5_NEW_HOME : DAY5_BEFORE;

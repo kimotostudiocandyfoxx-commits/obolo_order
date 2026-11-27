@@ -149,12 +149,11 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 - **推しの顔ぶれ**：`lib/planetTemplate/roster.ts`（`oshiOn(日)`：その日までに行った星の住人＋スシモン7体。`dachiOf`：KIMORIN⭐︎、オーダー後は MIKIE⭐︎DRILL も）。出る順は試作の ROSTER と同じ考え方（会ったばかりの住人3人 → スシモン → 前の住人）。
 - **絵**：物語の部屋の絵（design/mv-art/out）から、試作の build.py と同じ切り方で `public/planets/sample/` に：`fig-<星>-<key>.webp`（土星 kor4・木星 chibi4・水星 ship4・ほか p5-<星>）と `chibi-<key>.webp`。key＝sapon gari ebi uni ika shari kani kaiser freezy hipokin bossg longg hatg croco onimonk。`python3 scripts/planet-home/roster-figures.py <絵のフォルダ>`。物語の立ち絵（スシモン7体・オニモンク）は `scripts/planet-home/story-sprites-r341.py` → `public/onboarding/sushi-<key>.webp`・`onimonk.webp`。
 - **見本のホーム**（`/planets-preview/<星>?sample=1`、API なしのデモ）：ダチ2人＋推し18人（旅のあと・オーダーの姿）。`&day=3`〜`10` で、その日の顔ぶれ（KIMORIN⭐︎＋その日の推し）。
-- **物語の中のホーム**（3〜7日目、スイッチが入っている時）：住人の場所＝KIMORIN⭐︎（推されている）＋その日までの物語の人（その星の住人本人は除く）。{neo}の場所＝招待した人（いなければ MIKIE⭐︎DRILL：台本のト書きどおり）＋KIMORIN⭐︎＋その日の推し（土星 9・木星 10・水星 11・火星 12・金星 15）。
+- **物語の中のホーム**（3〜10日目、スイッチが入っている時。8〜10日目は M-R343）：住人の場所＝KIMORIN⭐︎（推されている）＋その日までの物語の人（その星の住人本人は除く）。{neo}の場所＝招待した人（いなければ、だれも出さない：M-R343）＋KIMORIN⭐︎＋その日の推し（土星 9・木星 10・水星 11・火星 12・金星 15・冥王星 16・海王星 17・天王星 18）。
 - **まだ**：
   - 本当の星の道（`/saturn` など、スイッチを入れた時）に推しを出すこと。今は本当のフィード（ダチ・推している人の作品）だけ。物語の人が来るには、その人たちの作品（下）が要る。
   - 3章 スシモン7体の作品（8惑星ぶん：土星のひとこと・木星のアート・水星の曲・火星のMV・金星のラジオ・天王星のグッズ・冥王星の絵本・海王星のゲーム）と、住人の作品。今は見本の作品を持って来る。音・動画・絵は物語の部屋の design/home/sapon・design/home/sushi/<key>・design/mv-art/out/sapon・out/su/<key>（合わせて約20MB）。
   - 冥王星の絵本の開き方（6ページ・読み上げ・速さ3つ・最後に飛ぶ）、海王星の7つのゲーム、4章の場面ごとの効果音。
-  - 8〜10日目を新しい家の形（住人の場所 → {neo}の場所 → 扉）で出すこと（台本がまだその形でない）。
   - 大根カイザーの物語の立ち絵は前のまま（参照画像 kaiser-ref2 に合わせた立ち絵・表情はまだ）。
 
 ## 音（全惑星まとめて・物語の部屋 2026-11-25、M-R319「効果音は全惑星まとめて」）

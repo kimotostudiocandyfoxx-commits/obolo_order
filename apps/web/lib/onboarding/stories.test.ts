@@ -257,7 +257,7 @@ describe('day 3: Bluena and Saturn (story 2026-10-14)', () => {
     expect(steps.filter((s) => s.t === 'set' && s.key === 'f_d04_fly').map((s) => s.t === 'set' && s.value)).toEqual(['fly', 'skip']);
     // D04-S005c: the first voice message in the inviter's dachi thread (M-R212), then the way on by its answer
     const dv = t.indexOf('dachivoice');
-    expect(steps[dv]).toEqual({ t: 'dachivoice', fallback: { t: 'say', who: 'MIKIE⭐︎DRILL', text: 'ようこそ。……あなたのつぶやき、聞こえたわよ。' } });
+    expect(steps[dv]).toEqual({ t: 'dachivoice', fallback: { t: 'say', who: '{inviter}', text: 'ようこそ。……あなたのつぶやき、聞こえたよ。' } });
     expect(steps[dv + 1]).toMatchObject({ t: 'branch', key: 'f_d04_voice_reply', cases: { reply: 'reply' }, otherwise: 'reply-later' });
     expect(t.indexOf('ticket')).toBeGreaterThan(t.indexOf('clock'));
     // M-R274: no MONBAN transmission at the end of day 3 (no early/later choice, no SYS-S002 from here)

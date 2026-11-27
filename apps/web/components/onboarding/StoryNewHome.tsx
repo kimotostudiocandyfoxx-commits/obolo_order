@@ -13,7 +13,7 @@ import { sampleSky, songOf } from '@/lib/planetTemplate/sky';
 import { storyHome, type StoryCastInput, type StoryPlace, type StoryPlanet } from '@/lib/planetTemplate/storyCast';
 import { viewsOf } from '@/lib/story/views';
 
-const KIND: Record<StoryPlanet, AtelierWork['kind']> = { saturn: 'voice', jupiter: 'art', mercury: 'song', mars: 'video', venus: 'radio' };
+const KIND: Record<StoryPlanet, AtelierWork['kind']> = { saturn: 'voice', jupiter: 'art', mercury: 'song', mars: 'video', venus: 'radio', pluto: 'novel', neptune: 'game', uranus: 'goods' };
 
 /** {neo}'s own work of this morning (made in the day's atelier step) for their place: its words, title and picture */
 export function storyOwnWork(planet: StoryPlanet, works: readonly AtelierWork[], kororinWords?: string): StoryCastInput['own'] {
@@ -30,7 +30,7 @@ const sampleGame = async (w: HomeWork): Promise<GameView> => {
 };
 
 /**
- * Story days 3–7 on the NEW planet homes (story session M-R330; shown only when the planet's switch is on): the
+ * Story days 3–10 on the NEW planet homes (story session M-R330, days 8–10: M-R343; shown only when the planet's switch is on): the
  * planet's common home full screen with the people the script names (lib/planetTemplate/storyCast) — nothing is loaded
  * from the feed and nothing is written; the sky is the sample's (two fingers pinch up to it, a place is landed on, ♡).
  *  - `until: 'next'`: touch what came around (tap opens, drag throws, ▶ at the top right); 〔次へ〕 goes on.

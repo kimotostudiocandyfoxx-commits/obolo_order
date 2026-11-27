@@ -3,10 +3,10 @@ import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { planetLockOf } from '@/components/PlanetLock';
 import { SHOP_LOCKED_NOTE } from '@/components/after/AfterScreens';
-import { ticketOpen } from '@/components/onboarding/StoryExtras';
+import { STAMPS, stampsOn, ticketOpen } from '@/components/onboarding/StoryExtras';
 import { AFTER_DAYS } from './after';
 import { DAY11 } from './day11';
-import { DAY10, DAY8, DAY9, M_END } from './outer';
+import { DAY10, DAY10_BEFORE, DAY10_NEW_HOME, DAY8, DAY8_BEFORE, DAY8_NEW_HOME, DAY9, DAY9_BEFORE, DAY9_NEW_HOME, M_END } from './outer';
 import { SCENE_DAY } from './sceneDays';
 import { labelIndex, type Step } from './script';
 import { STORIES, STORIES_NEW_HOMES } from './stories';
@@ -23,8 +23,11 @@ describe('M-R341: days 8–10 are the outer planets, before becoming Obolo Order
     expect(scenes(STORIES[11].steps).slice(0, 1)).toEqual(['D08-S001']);
     expect(scenes(STORIES[11].steps).slice(-2)).toEqual(['D08-S011', 'M-END-S001']);
     expect(STORIES[11].steps).toBe(DAY11);
-    // one version of these days for both states of the planets' switch
-    for (const d of [8, 9, 10, 11]) expect(STORIES_NEW_HOMES[d].steps).toBe(STORIES[d].steps);
+    // switch off (this build): the stills-versions; the Eclipse day has one version
+    expect([STORIES[8].steps, STORIES[9].steps, STORIES[10].steps]).toEqual([DAY8_BEFORE, DAY9_BEFORE, DAY10_BEFORE]);
+    expect([DAY8, DAY9, DAY10]).toEqual([DAY8_BEFORE, DAY9_BEFORE, DAY10_BEFORE]);
+    expect([STORIES_NEW_HOMES[8].steps, STORIES_NEW_HOMES[9].steps, STORIES_NEW_HOMES[10].steps]).toEqual([DAY8_NEW_HOME, DAY9_NEW_HOME, DAY10_NEW_HOME]);
+    expect(STORIES_NEW_HOMES[11].steps).toBe(STORIES[11].steps);
     expect([SCENE_DAY('M-PLUTO-S002'), SCENE_DAY('M-NEPTUNE-S001'), SCENE_DAY('M-URANUS-S002'), SCENE_DAY('M-END-S001'), SCENE_DAY('D08-S003'), SCENE_DAY('D07V-S004')]).toEqual([8, 9, 10, 11, 11, 7]);
   });
 
@@ -93,15 +96,70 @@ describe('M-R341: days 8–10 are the outer planets, before becoming Obolo Order
     expect(DAY10.some((s) => s.t === 'l2' && s.what === 'm-goods')).toBe(true);
     expect(DAY10.some((s) => s.t === 'l2' && s.what === 'm-publish-goods')).toBe(true);
     expect(DAY10.some((s) => s.t === 'l2' && s.what === 'm-shop-locked')).toBe(true);
-    expect(DAY10.some((s) => s.t === 'l2' && s.what === 'm-shop')).toBe(false);
+    // M-R343: someone who became Obolo Order early has 〔購入〕 without the lock and MONBAN's other line
+    const early = DAY10.find((s) => s.t === 'branch' && s.key === 'f_join_early');
+    expect(early).toMatchObject({ cases: { true: 'u-look-order' }, otherwise: 'u-look-lock' });
+    const order = DAY10.slice(labelIndex(DAY10, 'u-look-order'), labelIndex(DAY10, 'u-skip'));
+    expect(order.some((s) => s.t === 'l2' && s.what === 'm-shop')).toBe(true);
+    expect(says(order)).toEqual(['MONBAN「お前は…もうOrderだ…。注文も…できる…。」']);
+    const lock = DAY10.slice(labelIndex(DAY10, 'u-look-lock'), labelIndex(DAY10, 'u-look-order'));
+    expect(lock.some((s) => s.t === 'l2' && s.what === 'm-shop-locked')).toBe(true);
+    expect(lock.some((s) => s.t === 'l2' && s.what === 'm-shop')).toBe(false);
     expect(says(DAY10)).toContain('MONBAN「マナじゃない…本物の、お金だ…。だから…注文できるのは…Obolo Orderになってからだ…。」');
     expect(SHOP_LOCKED_NOTE).toBe('本物のグッズの注文は、Obolo Orderになってからできます。見て回るのと、お店に並べるのは、いまもできます');
     // the days after joining of before keep the open 〔購入〕 (their members are Obolo Order)
     expect(AFTER_DAYS[0].some((s) => s.t === 'l2' && s.what === 'm-shop')).toBe(true);
   });
 
-  it('the 〔推しになった〕 notes of days 8–10 wait for the planet’s new home (switch off in this build: none)', () => {
-    for (const d of [DAY8, DAY9, DAY10]) expect(notes(d).some((t) => t.includes('推しになった'))).toBe(false);
+  it('M-R343: the 〔推しになった〕 note and the arrival stamp are on both versions of days 8–10', () => {
+    const who = ['クロコパトラ', 'オニモンク', 'MONBAN'];
+    const planet = ['pluto', 'neptune', 'uranus'] as const;
+    [[DAY8_BEFORE, DAY8_NEW_HOME], [DAY9_BEFORE, DAY9_NEW_HOME], [DAY10_BEFORE, DAY10_NEW_HOME]].forEach((pair, k) => {
+      for (const d of pair) {
+        expect(notes(d).filter((t) => t === `${who[k]}が、{neo}の推しになった｜推しは、どの星でも、{neo}の島に遊びに来ます`)).toHaveLength(1);
+        const st = d.findIndex((s) => s.t === 'ticket' && s.stamp === planet[k]);
+        // pressed on arrival: after 〔〇〇に着いた〕, before the resident speaks
+        expect(st).toBeGreaterThan(d.findIndex((s) => s.t === 'arrive'));
+        expect(st).toBeLessThan(d.findIndex((s) => s.t === 'say' && s.who === (k === 2 ? 'MONBAN' : who[k])));
+      }
+    });
+    expect(stampsOn(7)).toEqual(['saturn', 'jupiter', 'mercury', 'mars']);
+    expect(stampsOn(8)).toEqual(['saturn', 'jupiter', 'mercury', 'mars', 'venus']);
+    expect(stampsOn(10)).toEqual(['saturn', 'jupiter', 'mercury', 'mars', 'venus', 'pluto', 'neptune']);
+    expect(stampsOn(11)).toHaveLength(8);
+    expect(STAMPS.map((s) => s.id)).toEqual(['saturn', 'jupiter', 'mercury', 'mars', 'venus', 'pluto', 'neptune', 'uranus']);
+  });
+
+  it('M-R343: days 8–10 on the new homes — the resident’s place, then {neo}’s own place (door); the same lines as the stills-version', () => {
+    const homes = (d: Step[]) => d.flatMap((s) => (s.t === 'home' ? [`${s.planet}:${s.place}:${s.until ?? 'next'}`] : []));
+    expect(homes(DAY8_NEW_HOME)).toEqual(['pluto:host:next', 'pluto:neo:door']);
+    expect(homes(DAY9_NEW_HOME)).toEqual(['neptune:host:next', 'neptune:neo:door']);
+    expect(homes(DAY10_NEW_HOME)).toEqual(['uranus:host:next', 'uranus:neo:door']);
+    for (const [before, now] of [[DAY8_BEFORE, DAY8_NEW_HOME], [DAY9_BEFORE, DAY9_NEW_HOME], [DAY10_BEFORE, DAY10_NEW_HOME]]) {
+      expect(homes(before)).toEqual([]);
+      expect(says(now)).toEqual(says(before));
+      expect(scenes(now)).toEqual(scenes(before));
+      const ls = now.flatMap((s) => (s.t === 'label' ? [s.id] : []));
+      expect(new Set(ls).size).toBe(ls.length);
+      expect(now[now.length - 1]).toEqual({ t: 'end' });
+    }
+    // the resident's place comes with the line that points at it, {neo}'s with the line that names it
+    const at = (d: Step[], k: number) => d.slice(0, d.findIndex((s) => s.t === 'home' && s.place === (k ? 'neo' : 'host'))).reverse().find((s) => s.t === 'say');
+    expect(at(DAY8_NEW_HOME, 0)).toMatchObject({ text: '空の灯りは、ぜんぶ、どなたかの物語ですのよ。' });
+    expect(at(DAY8_NEW_HOME, 1)).toMatchObject({ text: 'こちらが、{neo}の図書館。公開なさった本が、ここに並びますわ。お書きになるのは、月の工房ですわ。' });
+    expect(at(DAY10_NEW_HOME, 1)).toMatchObject({ who: 'MONBAN', text: 'お前の店だ…。形を選んで…絵をのせて…ハンドルを回すだけだ…。作るのは…月の工房だ…。' });
+    // Neptune has no line that names {neo}'s arcade before it is made: its place opens after the making, before the goodbye
+    const n = DAY9_NEW_HOME.findIndex((s) => s.t === 'home' && s.place === 'neo');
+    expect(DAY9_NEW_HOME[n]).toMatchObject({ sent: { key: 'f_m_neptune_publish', value: 'send' } });
+    expect(DAY9_NEW_HOME.slice(n).find((s) => s.t === 'say')).toMatchObject({ who: 'オニモンク', text: 'よう遊んだのう。明日は、天王星じゃ。最後の星じゃな。' });
+    // the note about the screens of before (〔本の空〕〔my図書館〕, the balloon) is the stills-version's only
+    expect(notes(DAY8_BEFORE).some((t) => t.includes('〔本の空〕〔my図書館〕'))).toBe(true);
+    expect(notes(DAY8_NEW_HOME).some((t) => t.includes('〔本の空〕〔my図書館〕'))).toBe(false);
+  });
+
+  it('M-R343: day 9 ends with オニモンク’s goodbye and the note that Uranus opens tomorrow', () => {
+    expect(says(DAY9).slice(-1)).toEqual(['オニモンク「よう遊んだのう。明日は、天王星じゃ。最後の星じゃな。」']);
+    expect(notes(DAY9).slice(-1)).toEqual(['天王星は、明日ひらきます。海王星で、ゲームを作って公開する、館を見て回ることは、このあとも自由にできます']);
   });
 });
 

@@ -1,6 +1,6 @@
 import type { Step } from './script';
 import { PLANET_HOMES_ENV, planetHomeIsNew } from '../planetHomes';
-import { day3NewHomes } from './newHomeScenes';
+import { day3NewHomes, journeyNotes } from './newHomeScenes';
 
 /**
  * DAY 3 【月 → 土星】 — the simple version (M-R208〜M-R212; wip/P02/c02.md D04-S002〜S002b, c03.md D04-S003〜S007; the scene
@@ -16,7 +16,8 @@ import { day3NewHomes } from './newHomeScenes';
  *  - the night: the Saturn stamp, back to the Moon to sleep, MONBAN's one-time offer to become Obolo Order early (SYS-S002)
  * Nothing is made on Saturn (M-R208).
  */
-export const DAY3_BEFORE: Step[] = [
+/** the day as written before M-R341 / M-R336 (journeyNotes adds what they bring) */
+const DAY3_OLD: Step[] = [
   // D04-S002 おはようございます／Bluena（M-R207：{bati}は2日目に生まれている。Bluenaと月の工房はここで）
   { t: 'scene', id: 'D04-S002' },
   { t: 'bgm', track: 'moon' }, // 月の神殿の朝
@@ -259,10 +260,14 @@ export const DAY3_BEFORE: Step[] = [
   { t: 'say', who: 'たこ焼きシスター', text: 'それから、{neo}のレコード、何色にする？' },
   { t: 'recordcolour' }, // レコードの色を選ぶ（黒・ピンク・ラベンダー・ミント・ゴールド・空色）。選ぶと、{neo}のレコードが、その色にふわっと変わる
   { t: 'say', who: 'たこ焼きシスター', text: '似合ってるワ。コロリンもレコードも、変えたくなったら、月で{bati}に言えば、いつでも変えてくれるワ。' },
+  // M-R343: nobody invited {name} (an operator invitation) → the inviter's kororin, name card and message are not shown
+  { t: 'branch', key: 'f_inviter', cases: { none: 'inv-a-end' }, otherwise: 'inv-a' },
+  { t: 'label', id: 'inv-a' },
   { t: 'fx', fx: 'ring-drop' }, // ひゅう。羅針盤の形の金の封印がついたコロリンが一つ、{neo}のレコードの上に、ぽとん
   { t: 'say', who: 'たこ焼きブラザー', text: '今のは、招待者の、{inviter}のだZE。' },
   { t: 'say', who: 'たこ焼きシスター', text: '{neo}を、ここに招いてくれた人だワ。' },
   { t: 'fx', fx: null },
+  { t: 'label', id: 'inv-a-end' },
   { t: 'say', who: 'たこ焼きブラザー', text: '土星では、作ったものを届け合う仲間を、ダチって呼ぶZE。' },
   { t: 'say', who: 'たこ焼きブラザー', text: 'ダチは、本当に知ってる奴とだけ、なるもんだZE。' },
   { t: 'sprite', image: 'kimorin-sun' },
@@ -273,11 +278,14 @@ export const DAY3_BEFORE: Step[] = [
   // ひゅう、ぽとん。{neo}のレコードに、白い狐の顔のコロリンが、もう一つ降ってくる
   { t: 'say', who: 'KIMORIN', text: '……さっそく、私のが、行きましたね。' }, // KIMORIN⭐︎の扇の尾が、ぱたぱた揺れている
   // 右上の〔ダチ〕がひらく。名札が二つ。『ダチ　KIMORIN⭐︎』と、羅針盤の封印の{inviter}の名札。招待状のひとことが金色の字で
+  { t: 'branch', key: 'f_inviter', cases: { none: 'inv-b-end' }, otherwise: 'inv-b' },
+  { t: 'label', id: 'inv-b' },
   { t: 'caption', text: '「{inviter_message}」', when: 'inviterMessage' },
   { t: 'se', sound: 'chime' },
   { t: 'caption', text: '{inviter}がダチになった' },
   { t: 'set', key: 'f_dachi_inviter', value: 'true' },
   { t: 'set', key: 'f_d04_dachi_inviter', value: 'true' },
+  { t: 'label', id: 'inv-b-end' },
   { t: 'sprite', image: ['takoyaki-brother', 'kimorin-sun', 'takoyaki-sister'] },
   { t: 'say', who: 'たこ焼きシスター', text: 'ダチや、{neo}が推した人がコロリンを飛ばすと、{neo}のレコードに降ってくるの。降ってきたコロリンは、88時間ここで歌って、その人のレコードに帰っていくワ。' },
   { t: 'say', who: 'KIMORIN', text: '推し、ですか。……私は、ずっと、自分推しです。' },
@@ -302,15 +310,18 @@ export const DAY3_BEFORE: Step[] = [
   { t: 'say', who: 'たこ焼きシスター', text: '全部、聞いたワね。新しいコロリンが降ってきたら、また転がってるワ。' },
   { t: 'notice', text: '転がっているコロリンは、前に開いてから降ってきた新しいコロリンです。つつく・はじく・投げると喋って、溝にしまわれます。〔▶ 全部流す〕で、溝のコロリンを、針のマイクの前でまとめて聞けます' },
   // ピロン。チャットの画面の左のバナーが光る。{bati}の下に『{inviter}』と『KIMORIN⭐︎』の会話。『{inviter}』に声のメッセージ
+  { t: 'branch', key: 'f_inviter', cases: { none: 'reply-end' }, otherwise: 'inv-c' },
+  { t: 'label', id: 'inv-c' },
   { t: 'se', sound: 'blip' },
   { t: 'notice', text: '左のバナーを開いて、『{inviter}』を押す。声のメッセージを再生する' },
   { t: 'sprite', image: '@bati' },
   { t: 'say', who: 'バティ', text: '{neo}、声で、返してみよう！' },
   { t: 'notice', text: 'ダチとの会話も、{bati}とのチャットと同じ画面です。マイクのボタンを押している間だけ録音され、離すと送る前に聞き直せます。Bluenaの作品も、カードで送れます' },
-  // the inviter's thread full screen: their recorded voice message (or MIKIE⭐︎DRILL's welcome), 〔声で返す〕 by the mic, 〔あとで〕
+  // the inviter's thread full screen: their recorded voice message — or, when they recorded none, their words as a text
+  // message (M-R343: no MIKIE⭐︎DRILL stand-in before Order) — 〔声で返す〕 by the mic, 〔あとで〕
   {
     t: 'dachivoice',
-    fallback: { t: 'say', who: 'MIKIE⭐︎DRILL', text: 'ようこそ。……あなたのつぶやき、聞こえたわよ。' },
+    fallback: { t: 'say', who: '{inviter}', text: 'ようこそ。……あなたのつぶやき、聞こえたよ。' },
   },
   { t: 'branch', key: 'f_d04_voice_reply', cases: { reply: 'reply' }, otherwise: 'reply-later' },
   { t: 'label', id: 'reply' },
@@ -347,11 +358,14 @@ export const DAY3_BEFORE: Step[] = [
   { t: 'end' },
 ];
 
+/** the day on the planet's screen of before: played until the planet's switch is on */
+export const DAY3_BEFORE: Step[] = journeyNotes(3, DAY3_OLD);
+
 /**
  * story 2026-11-27 (M-R330): the day on the planet's NEW home — the script of now, word for word (story-sync checks
  * this one). Played only when the planet's switch is on (lib/planetHomes.ts, off by default).
  */
-export const DAY3_NEW_HOME: Step[] = day3NewHomes(DAY3_BEFORE);
+export const DAY3_NEW_HOME: Step[] = journeyNotes(3, day3NewHomes(DAY3_OLD));
 
 /** the day as played: its steps of before, unchanged, until saturn's switch is on */
 export const DAY3: Step[] = planetHomeIsNew('saturn', PLANET_HOMES_ENV) ? DAY3_NEW_HOME : DAY3_BEFORE;

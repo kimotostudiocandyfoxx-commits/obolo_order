@@ -6,8 +6,8 @@ import type { HomeWork, PlanetHomeView } from '@obolo/shared';
  *  - takoyaki: the takoyaki siblings' own flashy record — MONBAN's kororin (their dachi) and KIMORIN's two (whom the
  *    sister pushes). M-R342: the three sample kororins of before (ゴリラ 5454, サーモン, むらさき) are gone — only the
  *    story's cast is on a home
- *  - neo: {neo}'s new record — {neo}'s own kororin (when flown this morning, f_d04_fly = fly), the inviter's (or
- *    MIKIE⭐︎DRILL's) and KIMORIN's arriving
+ *  - neo: {neo}'s new record — {neo}'s own kororin (when flown this morning, f_d04_fly = fly), the inviter's (nobody
+ *    in that spot when nobody invited: M-R343, no MIKIE⭐︎DRILL stand-in before Order) and KIMORIN's arriving
  */
 /** the story cast's mini figures (M-R262, design/mv-art/out/chibi-*): the user stands in for {neo} in the story */
 const CHIBI = (who: 'user' | 'kimorin' | 'monban' | 'mikie' | 'brother' | 'sister') => `/planet-home/chibi-${who}.webp`;
@@ -44,7 +44,7 @@ export function takoyakiRecord(now = Date.now()): PlanetHomeView {
 
 export function neoRecord(o: { neo: string; inviter: string; fly: boolean; words?: string; now?: number }): PlanetHomeView {
   const now = o.now ?? Date.now();
-  const inviter = o.inviter && o.inviter !== '…' ? o.inviter : 'MIKIE⭐︎DRILL';
+  const inviter = o.inviter && o.inviter !== '…' && o.inviter !== 'MIKIE⭐︎DRILL' ? o.inviter : null;
   return {
     planet: 'saturn',
     live: true,
@@ -52,7 +52,7 @@ export function neoRecord(o: { neo: string; inviter: string; fly: boolean; words
     young: false,
     lastVisitAt: ago(600, now),
     own: o.fly ? [w('neo-own', o.neo, 'own', o.words || '……', 120, now, null, CHIBI('user'))] : [],
-    around: [w('neo-inviter', inviter, 'dachi', '♪ようこそ。♪', 3, now, '/puni-test/purple.png', inviter === 'MIKIE⭐︎DRILL' ? CHIBI('mikie') : null), w('neo-kimorin', 'KIMORIN⭐︎', 'dachi', '♪うんち。♪', 1, now, '/puni-test/green.png', CHIBI('kimorin'))],
+    around: [...(inviter ? [w('neo-inviter', inviter, 'dachi', '♪ようこそ。♪', 3, now, '/puni-test/purple.png', null)] : []), w('neo-kimorin', 'KIMORIN⭐︎', 'dachi', '♪うんち。♪', 1, now, '/puni-test/green.png', CHIBI('kimorin'))],
     far: [],
   };
 }

@@ -59,7 +59,7 @@ export const DAY11: Step[] = [
   { t: 'loop', motion: 13 }, // 天球儀の大広間。光の柱の中に、黒い球のOBOLON
   { t: 'caption', text: '地球の神殿に戻った' },
   { t: 'say', who: 'OBOLON', text: '、、、おかえり。' },
-  { t: 'say', who: 'OBOLON', text: '5つの星は、、、どうだった？' },
+  { t: 'say', who: 'OBOLON', text: '八つの星は、、、どうだった？' },
   { t: 'choice', key: 'f_d08_how', options: [{ label: '楽しかった', goto: 'how-fun' }, { label: '疲れた', goto: 'how-tired' }, { label: 'まだ、わからない', goto: 'how-unsure' }] },
   { t: 'label', id: 'how-fun' },
   { t: 'say', who: 'OBOLON', text: '、、、そうか。' }, // 黒い球が、少しだけ、にっこりする
@@ -144,7 +144,7 @@ export const DAY11: Step[] = [
   { t: 'sprite', image: null },
   { t: 'bgm', track: 'farewell' },
   { t: 'notice', text: '住人のまま、いつでも星に戻れます。作ったもの・届けたもの・my場所・金星の番組・声のコロリンは、ずっとそのままです' },
-  { t: 'notice', text: 'Obolo Order（会員）には、いつでもなれます。地球の神殿でMONBANに話しかけると、エクリプスを受けられます。なると、{bati}にまたマナが湧きます' }, // the script's note still ends 「…湧き、天王星・冥王星・海王星が、一つずつ開きます」: no longer true since M-R341 (they are days 8–10), so that clause is not shown — the story session is asked for the new words
+  { t: 'notice', text: 'Obolo Order（会員）には、いつでもなれます。地球の神殿でMONBANに話しかけると、エクリプスを受けられます。なると、{bati}にまたマナが湧き、本物のグッズの注文などもできるようになります' },
   { t: 'caption', text: '最初の旅、おわり' },
   { t: 'action', label: '宇宙の地図へ' },
   { t: 'end' },
@@ -208,7 +208,7 @@ export const DAY11: Step[] = [
   { t: 'say', who: 'OBOLON', text: '{neo}。1日目、宇宙に行きたいか、\n聞いたな。' },
   { t: 'say', who: 'OBOLON', text: 'お前は、『{choice1}』と、\n言った。' },
   { t: 'say', who: 'OBOLON', text: '、、、今は、もう、\n答えは、いらないな。' },
-  { t: 'say', who: 'OBOLON', text: '、、、お前は、もう、五つの星を、渡ってきた。' },
+  { t: 'say', who: 'OBOLON', text: '、、、お前は、もう、八つの星を、渡ってきた。' },
 
   // D08-S009 「わかりやすく、言う。」（映画の場面）
   { t: 'scene', id: 'D08-S009' },

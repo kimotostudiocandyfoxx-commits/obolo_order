@@ -5,7 +5,7 @@ import { DAY4, DAY4_NEW_HOME } from './day4';
 import { DAY5, DAY5_NEW_HOME } from './day5';
 import { DAY6, DAY6_NEW_HOME } from './day6';
 import { DAY7, DAY7_NEW_HOME } from './day7';
-import { DAY8, DAY9, DAY10 } from './outer';
+import { DAY8, DAY8_NEW_HOME, DAY9, DAY9_NEW_HOME, DAY10, DAY10_NEW_HOME } from './outer';
 import { DAY11 } from './day11';
 import type { Step } from './script';
 
@@ -64,6 +64,10 @@ export const STORIES_NEW_HOMES: Record<number, DayStory> = {
   5: { ...STORIES[5], steps: DAY5_NEW_HOME },
   6: { ...STORIES[6], steps: DAY6_NEW_HOME },
   7: { ...STORIES[7], steps: DAY7_NEW_HOME },
+  // M-R343: days 8–10 in the same form
+  8: { ...STORIES[8], steps: DAY8_NEW_HOME },
+  9: { ...STORIES[9], steps: DAY9_NEW_HOME },
+  10: { ...STORIES[10], steps: DAY10_NEW_HOME },
 };
 
 /** Days shown only on the preview pages (none now: Venus is day 7 of the first journey since draft 21). */
