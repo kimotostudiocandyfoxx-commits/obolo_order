@@ -209,7 +209,7 @@ for nm in ['map','sea','edm','hiphop','ballad','rock','chill','citypop','anison'
 
 # Sapon (M-R333): the first oshi's works on every planet (pictures in out/sapon/, sounds and the MV loop in design/home/sapon/)
 for f in sorted(_g.glob(f'{O}/sapon/*.jpg')):
-    k='sap-'+os.path.basename(f)[:-4]; im=Image.open(f).convert('RGB'); im.thumbnail((720,720)); A[k]=uri(im,80)
+    k='sap-'+os.path.basename(f)[:-4]; im=Image.open(f).convert('RGB'); im.thumbnail((600,600)); A[k]=uri(im,76)
 f=f'{O}/sushi/salmon-ref2.jpg'
 if os.path.exists(f): o=unwhite(Image.open(f)); bb=o.getbbox(); o=o.crop(bb) if bb else o; o.thumbnail((600,600),Image.LANCZOS); A['sap-game']=uri(o,88)
 for f in sorted(_g.glob(H+'/sapon/*')):
