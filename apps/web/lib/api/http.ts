@@ -152,6 +152,9 @@ export class HttpApi implements Api {
     }
     return res.blob();
   }
+  dachiCuteVoice() {
+    return this.req<Awaited<ReturnType<Api['dachiCuteVoice']>>>('GET', '/dachi/voice/cute');
+  }
   async discardDachiVoice(mediaId: string) {
     await this.req<unknown>('DELETE', `/dachi/voice/${encodeURIComponent(mediaId)}`);
   }
@@ -443,8 +446,8 @@ export class HttpApi implements Api {
   getInvite(code: string) {
     return this.req<Awaited<ReturnType<Api['getInvite']>>>('GET', `/invites/${encodeURIComponent(code)}`);
   }
-  acceptInvite(code: string, displayName: string) {
-    return this.req<Awaited<ReturnType<Api['acceptInvite']>>>('POST', `/invites/${encodeURIComponent(code)}/accept`, { displayName });
+  acceptInvite(code: string, displayName: string, birthYear?: number | null) {
+    return this.req<Awaited<ReturnType<Api['acceptInvite']>>>('POST', `/invites/${encodeURIComponent(code)}/accept`, { displayName, ...(birthYear ? { birthYear } : {}) });
   }
   completeLap2(chapter: number, answers?: Record<string, string>) {
     return this.req<Awaited<ReturnType<Api['completeLap2']>>>('POST', '/me/lap2/complete', { chapter, answers });

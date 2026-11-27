@@ -1,18 +1,19 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { type LlmProvider, moderateText } from '@obolo/ai';
 import { LLM } from '../infra/tokens';
-import { batiDefaultVoice, VOICE_MAX_BYTES, VOICE_MIME_TYPES, VOICE_SCRIPTS, VOICE_STYLES, type Me, type RegisterVoiceBody, type SpeakBody, type VoiceSlot } from '@obolo/shared';
+import { batiDefaultVoice, defaultVoiceSilent, VOICE_MAX_BYTES, VOICE_MIME_TYPES, VOICE_SCRIPTS, VOICE_STYLES, type Me, type RegisterVoiceBody, type SpeakBody, type VoiceSlot } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { AppConfig, CONFIG } from '../config';
 import { Database } from '../db/db';
-import { users } from '../db/schema';
+import { users, wallets } from '../db/schema';
 import { MediaService } from '../media/media.service';
 import { toMe } from '../users/users.service';
 import { toMp3 } from './audio';
 import { canUseMedia } from './media-consent';
 import { activeBati } from '../look/batis';
 import { createVoiceModel, deleteVoiceModel, textToSpeech, type TtsOptions } from './fish.client';
+import { defaultCuteVoiceId } from './voice-models';
 
 /** one dictated take is at most this long (the web's recorder stops at 45 s) */
 export const DICTATE_MAX_SECONDS = 50;
@@ -168,10 +169,19 @@ export class VoiceService {
     const [u] = await this.db.write.select().from(users).where(eq(users.id, userId));
     // M-R248 / M-R250: the member's own {bati} voice only when it may be used; else the prepared voice for the egg ×
     // personality (none chosen yet: FISH_DEFAULT_VOICE_ID)
+    // client 2026-11-27: a member who is not recorded hears the default voice only while there is mana (no voice at 0:
+    // the caller's fallback, the device's reading voice, costs nothing)
+    if (u && defaultVoiceSilent({ recorded: canUseMedia(u), balance: await this.balance(userId) })) return null;
     const r = u ? activeBati(u) : null;
-    const ref = (u && canUseMedia(u) ? u.voiceBatiId : null) ?? batiDefaultVoice(r?.egg, r?.personality).fish ?? this.cfg.FISH_DEFAULT_VOICE_ID;
+    const ref = (u && canUseMedia(u) ? u.voiceBatiId : null) ?? batiDefaultVoice(r?.egg, r?.personality).fish ?? defaultCuteVoiceId(this.cfg);
     if (!ref) return null;
     return this.readWith(ref, userId, { ...body, slot: 'bati' }, origin, this.key());
+  }
+
+  /** the member's mana now (stubbed in tests) */
+  protected async balance(userId: string): Promise<number> {
+    const [w] = await this.db.write.select({ b: wallets.manaBalance }).from(wallets).where(eq(wallets.userId, userId));
+    return w?.b ?? 0;
   }
 
   private async readWith(ref: string, userId: string, body: SpeakBody, origin: string, key: string): Promise<{ url: string; mediaId: string }> {

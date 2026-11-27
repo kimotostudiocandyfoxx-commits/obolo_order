@@ -301,6 +301,22 @@ export function fishCostUsd(text: string): number {
 /** the song title read in the maker's voice (p90: TITLE_VOICE_CHARS Japanese characters on Fish) */
 export const titleVoiceUsd = () => fishCostUsd('あ'.repeat(TITLE_VOICE_CHARS));
 
+/**
+ * Client 2026-11-27 (cuteVoice.ts): a ダチ message of a member who is not recorded, read by the default cute voice.
+ * Each message is priced on its own words (cuteVoiceMana); these are the parts, and the list's one number stands for
+ * the p90 message of CUTE_VOICE_QUOTE_CHARS Japanese characters.
+ */
+/** the mood picked from the words (the cheapest text model: the labelling prompt + the words in, one word out) */
+export const CUTE_VOICE_MOOD_USD = textUsd('gemini-2.5-flash-lite', { in: 320, out: 4 });
+/** our CPU: the mix (ffmpeg, 0.3〜0.7 s) and storing the two files */
+export const CUTE_VOICE_CPU_SECONDS = 1;
+/**
+ * the files kept per spoken UTF-8 byte: Fish's MP3 (128 kbit/s) and its mix (96 kbit/s) ≈ 28 KB a second, about seven
+ * Japanese characters (21 bytes) a second
+ */
+export const CUTE_VOICE_STORED_BYTES_PER_BYTE = 1_350;
+export const CUTE_VOICE_QUOTE_CHARS = 40;
+
 // ───────────────────────────── the makings and their quoted mana ─────────────────────────────
 
 /**
@@ -315,8 +331,10 @@ export const titleVoiceUsd = () => fishCostUsd('あ'.repeat(TITLE_VOICE_CHARS));
  * Client 2026-11-27 (story M-R334; shared lookSteps.ts): lookStep = one evolve / transform step ({mana_step}: one edit of
  * the current picture on LOOK_STEP_MODEL), lookPick4 = the four first pictures of one's own look ({mana_pick4}),
  * batiBirth = the one picture a {bati} is born with (BATI_BIRTH_MODEL). profileLook is the script's {mana_fix}.
+ * Client 2026-11-27 (cuteVoice.ts): cuteVoice = a ダチ message read by the default cute voice for a member who is not
+ * recorded — charged per message on its own words (cuteVoiceMana); the list's number is the p90 message.
  */
-export const MAKE_KINDS = ['look', 'kororinDesign', 'jacketArt', 'song', 'songPremium', 'songVoice', 'mv', 'story', 'game', 'gameTweak', 'mvPictures', 'mvRedraw', 'gameTrial', 'gamePro', 'gameTweakPro', 'profileLook', 'lookStep', 'lookPick4', 'batiBirth'] as const;
+export const MAKE_KINDS = ['look', 'kororinDesign', 'jacketArt', 'song', 'songPremium', 'songVoice', 'mv', 'story', 'game', 'gameTweak', 'mvPictures', 'mvRedraw', 'gameTrial', 'gamePro', 'gameTweakPro', 'profileLook', 'lookStep', 'lookPick4', 'batiBirth', 'cuteVoice'] as const;
 export type MakeKind = (typeof MAKE_KINDS)[number];
 export const isMakeKind = (k: string): k is MakeKind => (MAKE_KINDS as readonly string[]).includes(k);
 /** the game makings (each keeps its version on the game; each is refunded the same way) */
@@ -457,6 +475,12 @@ export function makeCostEstimates(s: MakeSetup = DEFAULT_MAKE_SETUP): Record<Mak
     },
     // the one picture a {bati} is born with (the food itself as a character). Client 2026-11-27: 3.6 mana as approved —
     // its cut-out check (CUT_CHECK_USD) is not in it (with it: 3.7)
+    cuteVoice: {
+      usd: fishCostUsd('あ'.repeat(CUTE_VOICE_QUOTE_CHARS)) + CUTE_VOICE_MOOD_USD,
+      cpuSeconds: CUTE_VOICE_CPU_SECONDS,
+      note: `ダチの声のメッセージ（録音しない人：既定のかわいい声 Fish が読む）${CUTE_VOICE_QUOTE_CHARS}文字のばあい。1通ごとに文字数で決まる（cuteVoiceMana）＋おとを選ぶ文章モデル＋まぜる CPU＋保存12か月`,
+      storedBytes: CUTE_VOICE_QUOTE_CHARS * 3 * CUTE_VOICE_STORED_BYTES_PER_BYTE,
+    },
     batiBirth: { usd: pictureUsd(BATI_BIRTH_MODEL, false), note: `バティの誕生の絵 ${BATI_BIRTH_MODEL} ×1 枚＋保存12か月`, storedBytes: PICTURE_STORED_BYTES },
     mvRedraw: { usd: 4 * RUNWARE_PRICES['runware:400@4'] + 0.002, cpuSeconds: 180, note: 'FLUX.2 klein 4B ×最大4 場面＋描画 CPU＋保存12か月（新しい MP4・場面）', storedBytes: VIDEO_STORED_BYTES + 4 * 0.125 * MIB },
   };

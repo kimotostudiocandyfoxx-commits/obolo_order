@@ -24,8 +24,7 @@ export const OPERATOR = {
 export const CONSENT_YEAR = {
   ask: '生まれた年を教えてください',
   pick: '年を選ぶ',
-  /** the choice for no answer (the draft: 「答えない・分からない時は、13歳未満と同じ扱いにする」) */
-  none: '答えない・分からない',
+  // client 2026-11-27: there is no 〔答えない・分からない〕 any more — the year is always chosen (shared birthYear.ts)
 } as const;
 
 /** 1-2: the agreement, split by age */

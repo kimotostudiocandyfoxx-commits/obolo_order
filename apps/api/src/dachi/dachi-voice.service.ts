@@ -40,6 +40,7 @@ import { PushService } from '../push/push.service';
 import { LLM } from '../infra/tokens';
 import { DachiService } from './dachi.service';
 import { DachiVoiceDraftService } from './voice-draft.service';
+import { CuteVoiceService } from './cute-voice.service';
 import { talkLookOf } from '../look/talk';
 
 type Row = typeof dachiMessages.$inferSelect;
@@ -93,6 +94,8 @@ export class DachiVoiceService {
     @Optional() @Inject(CONFIG) private readonly cfg?: Pick<AppConfig, 'FISH_API_KEY' | 'FISH_MODEL'>,
     /** client 2026-11-27: the sound mixed into a voice message (the trial) */
     @Optional() private readonly mixer?: DachiVoiceDraftService,
+    /** client 2026-11-27: the default cute voice that reads the words of a member who is not recorded */
+    @Optional() private readonly cute?: CuteVoiceService,
   ) {}
 
   // ── small lookups (stubbed in tests) ──
@@ -308,6 +311,7 @@ export class DachiVoiceService {
     const character = isCharacterThread(thread) ? (thread as DachiCharacter) : null;
     const base: NewRow = { senderId: userId, recipientId: character ? null : thread, character };
     let row: NewRow;
+    let cute: DachiMessageView['cute'];
     if ('mediaId' in body) {
       const m = await this.media.getOwned(userId, body.mediaId, 'voice');
       if (!m) throw apiError(HttpStatus.NOT_FOUND, 'MEDIA_NOT_FOUND', 'Recording not found');
@@ -333,6 +337,18 @@ export class DachiVoiceService {
       // kept in work_json { text, face } (the kind column is free text: no migration)
       if ((await moderateText(body.text, this.llm)).flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'CONTENT_FLAGGED', 'This cannot be sent');
       row = { ...base, kind: 'text', workJson: { text: body.text, ...(body.face ? { face: body.face } : {}) } };
+      // client 2026-11-27 (shared/cuteVoice.ts): a member who is not recorded asked for a voice — the checked words are
+      // read by the default cute voice (mana) and sent as a voice message with the words as its caption; with no mana,
+      // or when it cannot be made, the words go as they are (`cute.miss`: a calm line, never an error)
+      if (body.spoken && this.cute) {
+        const v = await this.cute.speak(userId, body.text, opts.origin ?? '').catch((e: unknown) => (this.log.warn(`cute voice: ${String(e)}`), { miss: 'failed' as const }));
+        if (v && 'miss' in v) cute = v;
+        else if (v) {
+          cute = { mana: v.mana };
+          const sound = v.mixed ? { sound: { mood: v.mixed.mood, ...(v.mixed.soft ? { soft: true } : {}), plainUrl: v.voice.url, plainMediaId: v.voice.id } } : {};
+          row = { ...base, kind: 'voice', audioUrl: v.mixed?.url ?? v.voice.url, audioMediaId: v.mixed?.id ?? v.voice.id, seconds: Math.round(v.seconds * 10) / 10, workJson: { text: body.text, tts: 'cute', ...(body.face ? { face: body.face } : {}), ...sound } };
+        }
+      }
     } else {
       row = { ...base, kind: 'work', workJson: body.face ? { ...body.work, face: body.face } : body.work };
     }
@@ -341,7 +357,7 @@ export class DachiVoiceService {
       const name = (await this.journey(userId))?.displayName || 'ダチ';
       const file = fileOf(row.workJson);
       const n =
-        'text' in body
+        'text' in body && row.kind === 'text'
           ? { title: `💬 ${name}から、メッセージ`, body: body.text.length > 40 ? `${body.text.slice(0, 40)}…` : body.text }
           : file
             ? { title: `📎 ${name}から、${CLIP_WORD[file.kind]}`, body: 'ひらいて見てみよう' }
@@ -350,7 +366,7 @@ export class DachiVoiceService {
         .notify(thread, { ...n, url: `/moon/atelier?tab=dachi&dachi=${userId}`, tag: `dachi-${userId}` })
         .catch((e: unknown) => this.log.warn(`push failed: ${String(e)}`));
     }
-    const view = this.toView(userId, m);
+    const view: DachiMessageView = { ...this.toView(userId, m), ...(cute ? { cute } : {}) };
     // R9: KIMORIN⭐︎ answers (within the day's limit, decided by the caller); the message stands even when it cannot
     if (character === 'kimorin' && opts.reply) {
       const reply = await this.kimorinAnswer(userId, body, m, opts.origin ?? '', opts.voiced ?? true).catch((e: unknown) => (this.log.warn(`kimorin reply: ${String(e)}`), null));

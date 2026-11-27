@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { BatiEggKind, BatiPersonality } from './batiPersona';
+import { BirthYear } from './birthYear';
 
 /**
  * {bati}'s voice from the member's own voice (M-R246 / M-R247, D03-S005 「たまごに声を聞かせる」): on day 2, before
@@ -145,7 +146,8 @@ export const ConsentBody = z.object({
   version: z.string().min(1).max(40),
   guardian: z.boolean().optional(),
   media: z.boolean().optional(),
-  birthYear: z.number().int().min(1900).max(2100).nullable().optional(),
+  // client 2026-11-27: an account with no year cannot agree without one (BIRTH_YEAR_REQUIRED, UsersService.consent)
+  birthYear: BirthYear.nullable().optional(),
 });
 export type ConsentBody = z.infer<typeof ConsentBody>;
 

@@ -1,5 +1,5 @@
 import { CallHandler, ExecutionContext, HttpStatus, Inject, Injectable, NestInterceptor } from '@nestjs/common';
-import { CHARGE_ERROR_WORDS, dachiCapped, outOfMana, QUOTA_TIMEZONE, stoppedAtZero, type SpendState } from '@obolo/shared';
+import { CHARGE_ERROR_WORDS, dachiCapped, defaultVoiceSilent, outOfMana, QUOTA_TIMEZONE, stoppedAtZero, type SpendState } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import type { Observable } from 'rxjs';
 import { apiError } from '../common/errors';
@@ -9,6 +9,7 @@ import { users, wallets } from '../db/schema';
 import type { KvStore } from '../infra/kv';
 import { KV } from '../infra/tokens';
 import { activeMember } from '../users/tester';
+import { canUseMedia } from '../voice/media-consent';
 
 /** the day (Japan) the daily counts are kept under */
 export const accessDay = (now = new Date()) => new Intl.DateTimeFormat('en-CA', { timeZone: QUOTA_TIMEZONE }).format(now);
@@ -36,6 +37,18 @@ export class AccessService {
   /** a non-member past the first journey with no mana */
   async outOfMana(userId: string): Promise<boolean> {
     return outOfMana(await this.state(userId));
+  }
+
+  /**
+   * {bati}'s read-aloud is not made: a non-member past the first journey at 0 mana (R18), or — client 2026-11-27 — a
+   * member who is not recorded (the default cute voice speaks for them) with no mana left. The words always stay.
+   */
+  async noVoice(userId: string): Promise<boolean> {
+    const [u] = await this.db.write.select().from(users).where(eq(users.id, userId));
+    const [w] = await this.db.write.select({ b: wallets.manaBalance }).from(wallets).where(eq(wallets.userId, userId));
+    const balance = w?.b ?? 0;
+    if (outOfMana({ member: activeMember(u), journeyDay: u?.journeyDay ?? 1, journeyCompletedAt: u?.journeyCompletedAt ?? null, balance })) return true;
+    return !!u && defaultVoiceSilent({ recorded: canUseMedia(u), balance });
   }
 
   /**

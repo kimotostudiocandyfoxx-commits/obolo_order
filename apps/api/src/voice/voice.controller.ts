@@ -96,8 +96,9 @@ export class VoiceController {
   @HttpCode(200)
   async batiSays(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
     await rateLimit(this.kv, `voice-bati-says:${userId}`, 30, 60);
-    // R18: no voice (text only) for a non-member past the first journey at 0 mana
-    if (await this.access.outOfMana(userId)) return { url: null };
+    // R18: no voice (text only) for a non-member past the first journey at 0 mana; client 2026-11-27: nor for a member
+    // who is not recorded (the default cute voice speaks for them) with no mana left
+    if (await this.access.noVoice(userId)) return { url: null };
     return (await this.lines.batiSays(userId, parseBody(BatiSaysBody, body).text, `${req.protocol}://${req.get('host')}`)) ?? { url: null };
   }
 }

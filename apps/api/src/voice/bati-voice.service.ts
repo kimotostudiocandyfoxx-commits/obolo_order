@@ -12,7 +12,7 @@ import { MediaService } from '../media/media.service';
 import { toMe } from '../users/users.service';
 import { toMp3 } from './audio';
 import { canUseMedia } from './media-consent';
-import { VOICE_MODELS, type VoiceModels } from './voice-models';
+import { defaultCuteVoiceId, VOICE_MODELS, type VoiceModels } from './voice-models';
 
 export { canUseMedia, hasMediaConsent } from './media-consent';
 
@@ -137,10 +137,10 @@ export class BatiVoiceService implements OnModuleInit {
    * made (make()), it is used from the next line on — no switch to flip. null: no Fish voice (the caller's fallback).
    */
   voiceRef(u: User | null): string | null {
-    if (!u) return this.cfg.FISH_DEFAULT_VOICE_ID ?? null;
+    if (!u) return defaultCuteVoiceId(this.cfg);
     if (u.voiceBatiId && canUseMedia(u)) return u.voiceBatiId;
     const r = activeBati(u);
-    return batiDefaultVoice(r?.egg, r?.personality).fish ?? this.cfg.FISH_DEFAULT_VOICE_ID ?? null;
+    return batiDefaultVoice(r?.egg, r?.personality).fish ?? defaultCuteVoiceId(this.cfg);
   }
 
   /**

@@ -28,3 +28,11 @@ export function fishVoiceModels(cfg: Pick<AppConfig, 'FISH_API_KEY' | 'FISH_MODE
     speak: (id, text, speed) => textToSpeech(key(), cfg.FISH_MODEL, { text, referenceId: id, ...(speed && speed !== 1 ? { prosody: { speed, volume: 0 } } : {}) }),
   };
 }
+
+/**
+ * THE default cute voice (client 2026-11-27): one constant, the config's FISH_DEFAULT_VOICE_ID — the shared {bati} voice
+ * model made from design/voices/default-bati-source.* pitched up two semitones (scripts/make-default-bati-voice.ts).
+ * It is {bati}'s voice for a member with no voice of their own, and the voice that reads the ダチ messages of a member
+ * who is not recorded (dachi/cute-voice.service.ts). Another voice = that one variable; null = no such voice here.
+ */
+export const defaultCuteVoiceId = (cfg: Partial<Pick<AppConfig, 'FISH_DEFAULT_VOICE_ID'>>): string | null => cfg.FISH_DEFAULT_VOICE_ID || null;

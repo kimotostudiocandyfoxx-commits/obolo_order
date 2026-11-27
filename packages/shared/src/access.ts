@@ -47,6 +47,16 @@ export function outOfMana(s: SpendState): boolean {
   return !s.member && !onFirstJourney(s) && Math.floor(s.balance) <= 0;
 }
 
+/**
+ * Client 2026-11-27 (cuteVoice.ts): a member who is NOT recorded (under 13; 13〜15 without the guardian's consent; the
+ * branch without photo and voice) has no voice of their own for {bati} to imitate — {bati} speaks in the default cute
+ * voice, which costs mana like every read-aloud. With no mana left there is no voice (the words stay): for everyone
+ * who is not recorded, a member and the first journey too. A recorded member is as before (outOfMana).
+ */
+export function defaultVoiceSilent(o: { recorded: boolean; balance: number }): boolean {
+  return !o.recorded && Math.floor(o.balance) <= 0;
+}
+
 export type BatiGate = { allow: true } | { allow: false; rest: BatiRest };
 
 /**

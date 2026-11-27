@@ -1,6 +1,6 @@
 'use client';
 
-import { CONSENT_TEXT, CONSENT_YEAR, MEDIA_CONSENT_VERSION, mediaAge, type Me } from '@obolo/shared';
+import { CONSENT_TEXT, CONSENT_YEAR, MEDIA_CONSENT_VERSION, mediaAge, validBirthYear, type Me } from '@obolo/shared';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { LegalSheet, type LegalKind } from '@/components/LegalText';
@@ -14,16 +14,14 @@ const GKEY = 'obolo.consent.guardian';
 /** M-R252: the branch without the photo and voice ('0'), and the year as answered on the start screen ('' = no answer) */
 const MKEY = 'obolo.consent.media';
 const YKEY = 'obolo.consent.year';
-/** the select's value for 〔答えない・分からない〕 */
-const NONE = 'none';
 
 /** what the start screen decided */
 export interface ConsentChoice {
   /** 13〜15: 〔保護者の人が同意しました〕 */
   guardian: boolean;
-  /** false: the photo and voice are not used (under 13 / no year, or 13〜15 without the guardian) */
+  /** false: the photo and voice are not used (under 13, or 13〜15 without the guardian) */
   media: boolean;
-  /** the year chosen (null = 〔答えない・分からない〕) */
+  /** the year chosen (client 2026-11-27: always one — the buttons only come once a year is chosen) */
   birthYear: number | null;
 }
 
@@ -38,7 +36,7 @@ export function localConsent(): string | null {
 function localChoice(): ConsentChoice {
   try {
     const y = Number(localStorage.getItem(YKEY));
-    return { guardian: localStorage.getItem(GKEY) === MEDIA_CONSENT_VERSION, media: localStorage.getItem(MKEY) !== '0', birthYear: y || null };
+    return { guardian: localStorage.getItem(GKEY) === MEDIA_CONSENT_VERSION, media: localStorage.getItem(MKEY) !== '0', birthYear: y || localBirthYear() };
   } catch {
     return { guardian: false, media: false, birthYear: null };
   }
@@ -64,13 +62,29 @@ function storedYear(): string {
   }
 }
 
+/** the year chosen on this device (the start screen, or the seal), null = none yet */
+export function localBirthYear(): number | null {
+  try {
+    const y = Number(localStorage.getItem(YKEY)) || Number(localStorage.getItem(BIRTH_YEAR_KEY));
+    return validBirthYear(y) ? y : null;
+  } catch {
+    return null;
+  }
+}
+
 /** the agreement on the account is the current one */
 export const agreedNow = (me: Pick<Me, 'consent'> | null | undefined) => me?.consent?.version === MEDIA_CONSENT_VERSION;
+/**
+ * client 2026-11-27: the account may go on — it agreed to the current words AND has its birth year. An account from
+ * before with no year (it chose 〔答えない・分からない〕, or was made before the year was asked) is asked again.
+ */
+export const readyNow = (me: Pick<Me, 'consent' | 'birthYear'> | null | undefined) => agreedNow(me) && !!me?.birthYear;
 
 /**
  * M-R247 / M-R252: the one agreement at the start of the app, before day 1 (the story itself explains nothing). The
  * words are the draft's (docs/legal/同意の画面と規約の下書き.md; shared legal.ts), word for word:
- *  1-1 「生まれた年を教えてください」〔年を選ぶ〕 — no answer / not known = as under 13 (skipped when the account has one);
+ *  1-1 「生まれた年を教えてください」〔年を選ぶ〕 (skipped when the account has one). Client 2026-11-27: there is no
+ *      〔答えない・分からない〕 — nothing below shows until a year is chosen, so nobody goes on without one;
  *  1-2 by age (mediaAge): 16+ 〔利用規約〕〔プライバシーについて〕 (the full text over this screen), 〔同意してはじめる〕;
  *      13〜15 the guardian line, 〔保護者の人が同意しました〕 (as 16+) or 〔保護者の同意なしではじめる〕 (no
  *      photo, no voice); under 13 the one line and 〔はじめる〕 (no photo, no voice).
@@ -88,8 +102,8 @@ export function ConsentPanel({ onAgree, busy = false, knownYear = null }: { onAg
   }, [knownYear]);
   const [sheet, setSheet] = useState<LegalKind | null>(null);
   const thisYear = new Date().getFullYear();
-  const birthYear = year && year !== NONE ? Number(year) : null;
-  const age = year ? mediaAge(birthYear) : null;
+  const birthYear = validBirthYear(Number(year)) ? Number(year) : null;
+  const age = birthYear ? mediaAge(birthYear) : null;
   const agree = (c: Omit<ConsentChoice, 'birthYear'>) => onAgree({ ...c, birthYear });
   const btn = 'w-full rounded-full border py-3.5 text-[16px] tracking-widest disabled:opacity-40';
   const main = `${btn} border-amber-200/80 bg-gradient-to-b from-amber-200/25 to-amber-500/10 text-amber-50 shadow-[0_0_24px_rgba(255,210,130,0.25)]`;
@@ -136,7 +150,6 @@ export function ConsentPanel({ onAgree, busy = false, knownYear = null }: { onAg
                   {y}年
                 </option>
               ))}
-              <option value={NONE}>{CONSENT_YEAR.none}</option>
             </select>
           </label>
         )}
@@ -192,12 +205,15 @@ export async function sendLocalConsent() {
 /** pages that never ask (the invitation asks itself; the team's review pages play without an account of their own; the texts themselves) */
 const QUIET = /^\/(invite|kakunin-|tameshi-|admin|terms|privacy|tokushoho)/;
 
-/** members who have not agreed to the current words yet (an account from before M-R247 / M-R252): the agreement over the app, once */
+/**
+ * members who have not agreed to the current words yet (an account from before M-R247 / M-R252), or who have no birth
+ * year (client 2026-11-27: nobody goes on without one): the start screen over the app, once
+ */
 export function ConsentGate() {
   const { me, setMe } = useAuth();
   const path = usePathname() ?? '';
   const [busy, setBusy] = useState(false);
-  if (!me || agreedNow(me) || QUIET.test(path)) return null;
+  if (!me || readyNow(me) || QUIET.test(path)) return null;
   return (
     <ConsentPanel
       busy={busy}
