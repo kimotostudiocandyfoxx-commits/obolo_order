@@ -17,34 +17,39 @@ describe('たまごに声を聞かせる (D03-S005, M-R246 / M-R247)', () => {
     expect(afterTake(3.2 + 6.9)).toBe('full');
   });
 
-  it('day 2: KIMORIN speaks to the egg first, then the held mic, before {bati} hatches; the short line verbatim', () => {
+  it('day 2 (M-R334): the voice comes after {bati} is born and named — OBOLON’s two lines, the mic, then {bati} has learnt it; the short line verbatim', () => {
     const at = DAY2.findIndex((s) => s.t === 'eggvoice');
-    const kimorin = DAY2.findIndex((s) => s.t === 'say' && s.text === 'なんて話しかければいいか、わかりません。……これが、本音です。');
     const hatch = DAY2.findIndex((s) => s.t === 'hatch');
-    expect(kimorin).toBeGreaterThan(0);
-    expect(at).toBeGreaterThan(kimorin);
-    expect(hatch).toBeGreaterThan(at);
+    const named = DAY2.findIndex((s) => s.t === 'batiname');
+    expect(hatch).toBeGreaterThan(0);
+    expect(named).toBeGreaterThan(hatch);
+    expect(at).toBeGreaterThan(named);
+    expect(DAY2[at - 2]).toEqual({ t: 'say', who: 'OBOLON', text: '{bati}は、、、お前の声を、真似して、喋る。' });
+    expect(DAY2[at - 1]).toEqual({ t: 'say', who: 'OBOLON', text: 'だから、、、お前の声を、聞かせてやれ。' });
+    expect(DAY2.slice(at).find((s) => s.t === 'say')).toEqual({ t: 'say', who: 'バティ', text: '{name}の声、おぼえたよ！' });
+    // KIMORIN's 「何と話しかければ」 passage is gone
+    expect(DAY2.some((s) => s.t === 'say' && s.text.includes('なんて話しかければいいか'))).toBe(false);
     const step = DAY2[at] as Extract<(typeof DAY2)[number], { t: 'eggvoice' }>;
     expect(step.short).toEqual({ t: 'say', who: 'OBOLON', text: '、、、もう少し、聞かせてやれ。' });
-    expect(step.example).toMatch(/^私も正直、/);
+    expect(step.example).toBe('よろしくね。いっしょに、いろんな星に行こう。');
     // M-R247: no explanation in the scene (only the ⓘ) — the consent words are not a line or a notice of the story
     expect(JSON.stringify(DAY2)).not.toContain('相方の声のためだけに使い');
     expect(BATI_VOICE_EXPLAIN).toBe('あなたの声は、相方の声のもとになります（少し高くして使います）。相方の声のためだけに使い、ほかには使いません。あとで設定から消せます');
   });
 
-  it('M-R250: under 13 the photo passage is skipped — OBOLON asks for an animal instead (the branch f_media no)', () => {
+  it('M-R250 / M-R334: under 13 the photo passage is skipped — OBOLON asks for the wished look instead (the branch f_media no)', () => {
     const b = DAY2.find((s) => s.t === 'branch' && s.key === 'f_media') as Extract<(typeof DAY2)[number], { t: 'branch' }>;
-    expect(b.cases.no).toBe('look-animal');
+    expect(b.cases.no).toBe('look-wish');
     const at = (id: string) => DAY2.findIndex((s) => s.t === 'label' && s.id === id);
     const photo = DAY2[at('look-photo') + 1];
-    expect(photo).toEqual({ t: 'say', who: 'OBOLON', text: 'まず、お前の姿を、器の水に映せ。' });
+    expect(photo).toEqual({ t: 'say', who: 'OBOLON', text: 'まず、、、お前の姿を、器の水に映せ。' });
     expect(DAY2[at('look-photo') + 2]).toEqual({ t: 'goto', id: 'look-make' });
-    expect(DAY2[at('look-animal') + 1]).toEqual({ t: 'say', who: 'OBOLON', text: '、、、器の水に、好きな動物を、思い浮かべろ。' });
-    expect(DAY2.slice(at('look-make')).find((s) => s.t === 'look')).toBeTruthy();
+    expect(DAY2[at('look-wish') + 1]).toEqual({ t: 'say', who: 'OBOLON', text: '、、、器の水に、なりたい姿を、思い浮かべろ。' });
+    expect(DAY2.slice(at('look-make')).find((s) => s.t === 'pick4')).toBeTruthy();
   });
 
   it('day 1 asks for no photo and no voice registration (dictated answers only)', () => {
-    const asks = DAY1.filter((s) => ['look', 'eggvoice', 'dachivoice', 'atelier', 'egg'].includes(s.t));
+    const asks = DAY1.filter((s) => ['look', 'pick4', 'evolve', 'eggvoice', 'dachivoice', 'atelier', 'egg'].includes(s.t));
     expect(asks).toEqual([]);
     expect(JSON.stringify(DAY1)).not.toMatch(/写真|録音|声の登録/);
   });

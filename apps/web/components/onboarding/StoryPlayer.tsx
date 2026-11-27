@@ -14,6 +14,7 @@ import { eggSvg } from '@/lib/look';
 import { EggStep, HatchStep } from './BatiSteps';
 import { EclipsePay, type OrderApi } from './EclipsePay';
 import { LookMaker, type LookApi } from './LookMaker';
+import { LookPick4Panel, LookStepsPanel } from '@/components/look/LookSteps';
 import { PlanetHome } from '@/components/planetHome/PlanetHome';
 import { getApi } from '@/lib/api';
 import { neoRecord, takoyakiRecord, TAKOYAKI_BACKDROP } from '@/lib/planetHome/storyHomes';
@@ -108,8 +109,10 @@ interface Props {
   onNeo?: (id: string) => Promise<void>;
   /** Day 3 'look' step: generate and choose the OBOLO NEO look. */
   lookApi?: LookApi;
-  /** Day 3 'egg' step. */
-  onEgg?: (food: string, egg: BatiEggKind) => Promise<void>;
+  /** Day 3 'egg' step. Resolves with the food's name as it is kept (M-R334: the name only, not the sentence as said). */
+  onEgg?: (food: string, egg: BatiEggKind) => Promise<string | void>;
+  /** 'evolve' step decided ({bati}'s look / one's own): the account changed — the caller reads it again */
+  onLookFixed?: (who: 'bati' | 'self') => void;
   /** Day 4 'hatch' step: resolves with the Bati picture. */
   onHatch?: () => Promise<string>;
   /** Day 4 'batiname' step. */
@@ -243,7 +246,7 @@ const STILL_LOOK: Record<string, string> = {
   's/d2-moon-kimorin-half': 'kimorin-iu',
 };
 
-export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, orderApi, ordered, onNeoName, lessonApi, seals, stamps, onClock, timeUp, onTimeUp, onPause, onEnd, onScene, textOnly = false, autoStart = false, showGate = false, replayFilms = false, atelierTest = false, batiLookApi }: Props) {
+export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onLookFixed, onHatch, onBatiName, orderApi, ordered, onNeoName, lessonApi, seals, stamps, onClock, timeUp, onTimeUp, onPause, onEnd, onScene, textOnly = false, autoStart = false, showGate = false, replayFilms = false, atelierTest = false, batiLookApi }: Props) {
   const seenFilm = (id: string) => !replayFilms && filmWatched(id);
   const videoA = useRef<HTMLVideoElement>(null);
   const videoB = useRef<HTMLVideoElement>(null);
@@ -872,7 +875,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   };
   const kimorinLook = lookBefore(i);
   // where today's look is made (answers after it show the visitor's look)
-  const lookStepAt = steps.findIndex((x) => x.t === 'look');
+  const lookStepAt = steps.findIndex((x) => x.t === 'look' || x.t === 'pick4');
   // the inventor (day 2 until the Moon), then the round sunglasses over his eyes (story M-R112)
   // until he changes on the Moon the icon is the white lab coat, never the red robe (client 2026-11-22)
   const kimorinAvatar: Avatar | undefined =
@@ -1808,6 +1811,53 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           }}
         />
       )}
+      {/* D03-S004 (M-R334): the four first pictures of one's own look — photo (or the wished look by voice) → four → one */}
+      {started && step?.t === 'pick4' && (
+        <LookPick4Panel
+          key={i}
+          noPhoto={v.mediaOk === false}
+          spell={step.spell ? { name: speakerName(step.spell.who, v), text: sayText(step.spell.who, step.spell.text, v), face: step.spell.who === 'バティ' ? v.batiImage : undefined } : undefined}
+          onSaid={(t) => addLine({ id: `pw${i}`, kind: 'me', text: t })}
+          onChooseForm={async (id) => {
+            await lookApi?.chooseForm(id);
+          }}
+          onDone={(url, flags) => {
+            remember('look', url ?? '');
+            if (flags?.photo) remember('f_d03_photo', flags.photo);
+            if (flags?.card != null) remember('f_d03_card', String(flags.card));
+            run(iRef.current + 1);
+          }}
+        />
+      )}
+      {/* D03-S005b / D03-S004 (M-R334): the look changed step by step — {bati}'s 進化, one's own 変身 */}
+      {started && step?.t === 'evolve' && (
+        <LookStepsPanel
+          key={i}
+          who={step.who}
+          counter={step.counter}
+          ok={fill(step.ok, v)}
+          more={fill(step.more, v)}
+          example={step.example}
+          spell={step.spell ? { name: speakerName(step.spell.who, v), text: sayText(step.spell.who, step.spell.text, v), face: step.spell.who === 'バティ' ? v.batiImage : undefined } : undefined}
+          limit={{ name: speakerName(step.limit.who, v), text: sayText(step.limit.who, step.limit.text, v), face: spriteUrl('obolon') }}
+          image={step.who === 'bati' ? v.batiImage : v.look}
+          egg={step.who === 'bati' ? eggOf(stateRef.current.answers, v.story) : undefined}
+          noImage={v.mediaOk === false}
+          onSaid={(t) => addLine({ id: `es${i}-${Date.now()}`, kind: 'me', text: t })}
+          onLimit={() => addLine({ id: `el${i}`, kind: 'them', who: step.limit.who, text: step.limit.text })}
+          onStep={(url, used) => {
+            remember(step.who === 'bati' ? 'batiImage' : 'look', url);
+            remember(step.who === 'bati' ? 'f_bati_evolve' : 'f_d03_change', String(used));
+          }}
+          onDone={({ url, used }) => {
+            if (url) remember(step.who === 'bati' ? 'batiImage' : 'look', url);
+            remember(step.who === 'bati' ? 'f_bati_evolve' : 'f_d03_change', String(used));
+            addLine({ id: `c${i}`, kind: 'me', text: fill(step.ok, v) });
+            onLookFixed?.(step.who);
+            run(iRef.current + 1);
+          }}
+        />
+      )}
       {/* M-R217: the newborn {bati}'s card in the chat */}
       {started && step?.t === 'baticard' && <BatiCardStep card={v.batiCard} onNext={() => run(iRef.current + 1)} />}
       {/* SYS-S003: the grown egg's seed, the new {bati} born; its greeting and its role */}
@@ -1862,8 +1912,10 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           submit={step.submit}
           onEgg={async (food) => {
             // the egg chosen on the altar picks the Bati's body types (client decision 2026-10-25)
-            await onEgg?.(food, eggOf(stateRef.current.answers, v.story));
-            remember('food', food);
+            const kept = await onEgg?.(food, eggOf(stateRef.current.answers, v.story));
+            // M-R334: the bubble is the sentence as said; the favourite food kept (f_food, {food}) is the food's name only
+            addLine({ id: `fd${iRef.current}`, kind: 'me', text: food });
+            remember('food', kept || food);
             run(iRef.current + 1);
           }}
         />

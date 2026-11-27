@@ -56,3 +56,4 @@ export * from './planetFigures';
 export * from './artTitle';
 export * from './planetWorks';
 export * from './goods';
+export * from './lookSteps';

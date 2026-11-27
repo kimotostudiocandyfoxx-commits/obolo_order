@@ -1,4 +1,4 @@
-import { JOURNEY_PAYMENT } from '@obolo/shared';
+import { formatMana, JOURNEY_PAYMENT, MAKE_COST } from '@obolo/shared';
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { hasMotion, PLANNED_MOTIONS } from './media';
@@ -78,22 +78,54 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
     expect(steps[first]).toMatchObject({ text: '待ちなさい。' });
     expect(steps.some((s) => s.t === 'say' && s.text.includes('天才発明家'))).toBe(true);
   });
-  it('the gate (M-R207): the line of light to the gate, KIMORIN behind you, MONBAN out of the smoke, the ticket, through the gate', () => {
+  it('the gate (M-R334): MONBAN out of the smoke, the ticket shown, the gate opens, 「地球の神殿に行け…」 — and only then 「待ちなさい。」', () => {
     const at = (f: (s: Step) => boolean) => steps.findIndex(f);
+    const say = (text: string) => at((s) => s.t === 'say' && s.text === text);
     const line = at((s) => s.t === 'still' && s.image === 's/d2-gate-near');
-    const wait = at((s) => s.t === 'say' && s.text === '待ちなさい。');
-    const smoke = at((s) => s.t === 'still' && s.image === 's/d2-gate-two-inside');
+    const monban = at((s) => s.t === 'video' && s.motion === 'd1-monban');
+    const ask = say('来たか…切符は持ってきたか？');
+    const show = at((s) => s.t === 'action' && s.label === '切符を見せる');
     const give = at((s) => s.t === 'video' && s.motion === 'd2-ticket-give');
+    const open = at((s) => s.t === 'bgvideo' && s.motion === 11);
+    const go = say('地球の神殿に行け…地下にロケット場がある');
+    const wait = say('待ちなさい。');
+    const who = say('誰だお前…。');
+    const invite = say('……なんだ、招待か。');
     const through = at((s) => s.t === 'video' && s.motion === '12-a');
     const into = at((s) => s.t === 'still' && s.image === 's/d2-hall-dark-kimorin');
-    expect([line, wait, smoke, give, through, into].every((x, k, a) => x > -1 && (k === 0 || x > a[k - 1]))).toBe(true);
+    expect([line, monban, ask, show, give, open, go, wait, who, invite, through, into].every((x, k, a) => x > -1 && (k === 0 || x > a[k - 1]))).toBe(true);
+    // his entrance is held only briefly: one still after the look back, then he talks (the walk-up and the long reveal are cut)
+    expect(steps.some((s) => s.t === 'video' && (s.motion === 'd2-kimorin-walkup' || s.motion === 'd2-reveal'))).toBe(false);
+    const between = steps.slice(wait + 1, say('なんですか、この怪しい建物は。'));
+    expect(between.filter((s) => s.t === 'video').map((s) => s.t === 'video' && s.motion)).toEqual(['d2-look-back']);
+    expect(between.filter((s) => s.t === 'wait').every((s) => s.t === 'wait' && s.s <= 1)).toBe(true);
     // no crane any more (M-R207)
     expect(steps.some((s) => s.t === 'video' && s.motion === '5-f')).toBe(false);
   });
-  it('the egg: the visitor picks one, KIMORIN⭐︎ gets the other', () => {
-    // M-R215: the moon egg (girl-leaning) or the sun egg (boy-leaning), f_egg = moon / sun
+  it('the launch pit (M-R334): 「キモリンのもある」, 「…月へ！」, and MONBAN no longer says 「月だ」', () => {
+    const says = steps.filter((s): s is Extract<Step, { t: 'say' }> => s.t === 'say');
+    expect(says.some((s) => s.who === 'MONBAN' && s.text === 'キモリンのもある')).toBe(true);
+    expect(says.some((s) => s.text === 'お前のもある')).toBe(false);
+    expect(says.some((s) => s.who === 'KIMORIN' && s.text === 'それでは私たちも行きましょう。。。月へ！')).toBe(true);
+    expect(says.some((s) => s.text === '月だ')).toBe(false);
+  });
+  it('the magic talk is the short one (M-R334)', () => {
+    const k = steps.findIndex((s) => s.t === 'say' && s.text === 'え？魔法？　……魔法、使えるのですか？');
+    expect(steps.slice(k + 1, k + 5).map((s) => (s.t === 'say' ? `${s.who}:${s.text}` : s.t))).toEqual([
+      'OBOLON:この月の神殿なら、、、魔法を、唱えられる。',
+      'OBOLON:それでは、、、魔法の相方を、誕生させよう。',
+      'KIMORIN:相方？',
+      'OBOLON:うん。魔法を唱えられる、と言ったが。',
+    ]);
+    expect(JSON.stringify(steps)).not.toContain('最初は、いっぱい望みすぎないほうがいい');
+  });
+  it('the egg: the visitor picks one, KIMORIN⭐︎ gets the other; ♀ / ♂ is not told before the birth (M-R334)', () => {
     const c = steps.find((s) => s.t === 'choice' && s.key === 'egg');
-    expect(c?.t === 'choice' && c.options.map((o) => o.label)).toEqual(['月のたまご（女の子寄り）', '太陽のたまご（男の子寄り）']);
+    expect(c?.t === 'choice' && c.options.map((o) => o.label)).toEqual(['月のたまご', '太陽のたまご']);
+    const k = steps.findIndex((s) => s.t === 'choice' && s.key === 'egg');
+    expect(steps[k - 1]).toEqual({ t: 'notice', text: 'どちらのたまごからも、旅の相方が生まれます。生まれたあとの姿は、魔法で自由に変えられます' });
+    // nothing of the day says girl-leaning / boy-leaning, and no line or note carries the mark (it is drawn by the screen)
+    expect(JSON.stringify(steps)).not.toMatch(/女の子寄り|男の子寄り|♀|♂/);
     expect(steps.filter((s) => s.t === 'set' && s.key === 'f_egg').map((s) => s.t === 'set' && s.value)).toEqual(['moon', 'sun']);
     const b = steps.filter((s): s is Extract<Step, { t: 'branch' }> => s.t === 'branch' && s.key === 'f_egg');
     // the gem, KIMORIN⭐︎'s egg (its pinpon and うんちピンポンくん), then the visitor's own egg hatching (M-R207: on day 2 again)
@@ -103,24 +135,69 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
     expect(steps.findIndex((s) => s.t === 'fx' && s.fx === 'shell-egg')).toBeGreaterThan(t.indexOf('hatch'));
     expect(t.indexOf('baticard')).toBeGreaterThan(t.indexOf('batiname'));
   });
-  it('the gem at the launch pit, then {bati} is born, {bati}\'s magic makes the look, KIMORIN\'s dragon, the NEO name and the first chat (M-R209)', () => {
+  it('the order of the Moon (M-R334): 愛 → the food → うんち → うんちピンポンくん → {name}’s food → {bati} → its name → the voice → the bowl → 進化 → the own look → the dragon → the names → the chat', () => {
     const t = kinds(steps);
     expect(t).not.toContain('riddles');
     const scenes = steps.filter((s): s is Extract<Step, { t: 'scene' }> => s.t === 'scene').map((s) => s.id);
-    expect(scenes.slice(scenes.indexOf('D03-S003'))).toEqual(['D03-S003', 'D03-S005', 'D03-S004', 'D03-S004b', 'D03-S004c', 'D03-S008', 'D03-S009']);
-    expect(steps.findIndex((s) => s.t === 'caption' && s.text === 'マナジェムを手に入れた')).toBeLessThan(t.indexOf('egg'));
-    expect(t.indexOf('egg')).toBeLessThan(t.indexOf('hatch'));
-    expect(t.indexOf('hatch')).toBeLessThan(t.indexOf('batiname'));
-    expect(t.indexOf('batiname')).toBeLessThan(t.indexOf('look'));
-    expect(t.indexOf('look')).toBeLessThan(steps.findIndex((s) => s.t === 'video' && s.motion === 'd2-dragon'));
-    expect(steps.findIndex((s) => s.t === 'video' && s.motion === 'd2-dragon')).toBeLessThan(t.indexOf('neoname'));
-    expect(t.indexOf('neoname')).toBeLessThan(t.indexOf('batitalk'));
-    // {bati} casts the look's magic (「いくよ、{name}！」); OBOLON asks for the animal
-    const look = steps.find((s): s is Extract<Step, { t: 'look' }> => s.t === 'look');
-    expect(look?.ask).toEqual({ t: 'say', who: 'OBOLON', text: '何の動物に、アレンジする？' });
-    expect(look?.spell).toEqual({ t: 'say', who: 'バティ', text: 'いくよ、{name}！' });
+    expect(scenes.slice(scenes.indexOf('D03-S003'))).toEqual(['D03-S003', 'D03-S005', 'D03-S005b', 'D03-S004', 'D03-S004b', 'D03-S004c', 'D03-S008', 'D03-S009']);
+    const at = (f: (s: Step) => boolean) => steps.findIndex(f);
+    const say = (text: string) => at((s) => s.t === 'say' && s.text === text);
+    const evolve = (who: 'bati' | 'self') => at((s) => s.t === 'evolve' && s.who === who);
+    const order = [
+      at((s) => s.t === 'caption' && s.text === 'マナジェムを手に入れた'),
+      say('愛、と言っても、、、そんなに、構えなくていい。'),
+      say('お前たちの、好きなもの、、、そうだ。好きな食べ物を、教えてほしい。'),
+      say('……うんち。'),
+      say('うんちピンポンくん、、、いや、うんぽん'),
+      say('次は、、、{name}だ。好きな食べ物は？'),
+      t.indexOf('egg'),
+      t.indexOf('hatch'),
+      t.indexOf('batiname'),
+      t.indexOf('baticard'),
+      say('{bati}は、、、お前の声を、真似して、喋る。'),
+      say('だから、、、お前の声を、聞かせてやれ。'),
+      t.indexOf('eggvoice'),
+      say('{name}の声、おぼえたよ！'),
+      say('魔法を唱える時は、、、この器の前に、来るんだ。'),
+      say('まず、、、{bati}の姿と、お前の姿を、魔法で、変えるんだ。'),
+      say('決まりは、ひとつだけ。、、、今の姿から、どう変えるか、を伝えろ。'),
+      evolve('bati'),
+      say('これが、ぼくの姿だね！'),
+      say('、、、次は、お前の番だ。'),
+      t.indexOf('pick4'),
+      say('ここからは、、、{bati}の時と、同じだ。今の姿から、どう変えるか、を伝えろ。'),
+      evolve('self'),
+      at((s) => s.t === 'video' && s.motion === 'd2-dragon'),
+      t.indexOf('neoname'),
+      t.indexOf('batilook'),
+      t.indexOf('batitalk'),
+    ];
+    expect(order.every((x, k, a) => x > -1 && (k === 0 || x > a[k - 1])), JSON.stringify(order)).toBe(true);
+    // the food question follows 「愛、と言っても…」 at once; KIMORIN's 「何と話しかければ」 passage is gone
+    expect(say('お前たちの、好きなもの、、、そうだ。好きな食べ物を、教えてほしい。')).toBe(say('愛、と言っても、、、そんなに、構えなくていい。') + 1);
+    expect(JSON.stringify(steps)).not.toMatch(/なんて話しかければいいか|たまごに、、、声を、聞かせてやれ|相方は、お前たちの声から、生まれる/);
+    // the animal question and the redraw of the old look screen are gone
+    expect(t).not.toContain('look');
+    expect(JSON.stringify(steps)).not.toMatch(/何の動物に、アレンジする|好きな動物を、思い浮かべろ/);
     // Bluena is given on the morning of day 3 (M-R207/M-R212)
     expect(steps.some((s) => s.t === 'say' && s.text.includes('作るのは、月。しまうのは、Bluena。'))).toBe(false);
+  });
+  it('the two rounds (M-R334): the choices, OBOLON’s last line, {bati}’s spell; the four pictures before the own round', () => {
+    const rounds = steps.filter((s): s is Extract<Step, { t: 'evolve' }> => s.t === 'evolve');
+    expect(rounds.map((r) => [r.who, r.counter, r.ok, r.more])).toEqual([
+      ['bati', '進化', '{bati}の姿はこれだ', '進化させる'],
+      ['self', '変身', 'この姿にする', '変身させる'],
+    ]);
+    for (const r of rounds) expect(r.limit).toEqual({ t: 'say', who: 'OBOLON', text: '、、、今日の魔法は、ここまでだ。' });
+    expect(rounds[0].spell).toEqual({ t: 'say', who: 'バティ', text: 'いくよ！' });
+    const four = steps.find((s): s is Extract<Step, { t: 'pick4' }> => s.t === 'pick4');
+    expect(four?.spell).toEqual({ t: 'say', who: 'バティ', text: 'いくよ、{name}！' });
+    // what the confirmed look took is told right after it (the profile look's price), not at the end of the day
+    const k = steps.findIndex((s) => s.t === 'evolve' && s.who === 'self');
+    expect(steps[k + 1]).toMatchObject({ t: 'notice' });
+    const told = steps[k + 1];
+    expect(told.t === 'notice' && told.text).toContain(`マナジェム −${formatMana(MAKE_COST.profileLook)}（表情・後ろ姿・星ごとの姿を作る分）`);
+    expect(steps.slice(steps.findIndex((s) => s.t === 'scene' && s.id === 'D03-S009')).some((s) => s.t === 'notice')).toBe(false);
   });
   it("M-R223: {bati}'s look in the chat (four cards, until decided), then OBOLON's lookups, then the free questions", () => {
     const t = kinds(steps);

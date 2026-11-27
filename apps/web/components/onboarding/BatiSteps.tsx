@@ -5,6 +5,7 @@ import { demoBati, eggSvg } from '@/lib/look';
 import type { BatiEggKind } from '@obolo/shared';
 import { eggFile } from '@/lib/onboarding/egg';
 import { VoiceField } from './StoryExtras';
+import { EggMark } from '@/components/look/LookSteps';
 
 /** Day 2 on the Moon: the favourite food the Bati is born from (examples from the story, 2026-10-14). */
 
@@ -95,7 +96,13 @@ export function HatchStep({ food, egg, onHatch, onDone }: { food: string; egg?: 
         )
       ) : (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={url!} alt="" className="relative h-[42svh] w-auto animate-[spriteIn_0.6s_ease-out] rounded-[2.5rem] shadow-[0_0_60px_rgba(255,220,150,0.6)]" />
+        // M-R334 (client 2026-11-27): no square frame round the newborn — the light follows its own outline; beside it,
+        // small, the ♀ (moon egg) / ♂ (sun egg) mark (on the screen only, never drawn into the picture)
+        <span className="relative">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={url!} alt="" className="relative h-[42svh] w-auto animate-[spriteIn_0.6s_ease-out] object-contain" style={{ filter: 'drop-shadow(0 0 34px rgba(255,220,150,0.6))' }} />
+          {egg && <EggMark egg={egg} className="absolute -right-3 top-2" />}
+        </span>
       )}
       {/* no sudden light (QA 14 R52): a soft rise to less than half white */}
       {stage === 'flash' && <span className="pointer-events-none absolute inset-0 animate-[softFlash_0.9s_ease-out_both] bg-white" />}

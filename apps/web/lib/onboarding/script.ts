@@ -203,6 +203,21 @@ export type Step =
    * `spell` ({bati}'s 「いくよ、{name}！」 as the magic goes into the water) → the four looks → choose one (LookMaker).
    */
   | { t: 'look'; ask?: ScriptLine; spell?: ScriptLine }
+  /**
+   * D03-S004 (M-R334): the four first pictures of one's own look — 〔写真フォルダから器の水に映す〕〔カメラで撮って器の水に映す〕
+   * (no photo may be used: the wished look by voice) → `spell` ({bati}'s 「いくよ、{name}！」) → four cards in four
+   * Japanese-anime touches, 2 / 3 / 5 / 7 heads, 「マナジェム −{mana_pick4}」 → one is tapped and becomes the base
+   * (components/look/LookSteps LookPick4). Saves look, f_d03_photo, f_d03_card.
+   */
+  | { t: 'pick4'; spell?: ScriptLine }
+  /**
+   * D03-S005b / D03-S004 (M-R334; shared lookSteps.ts): a look changed step by step — say how to change it from the look
+   * it has now (the mic, 〔画像を送る〕, 〔文字で答える〕 small in the corner); each step takes {mana_step} from the gem and
+   * 「`counter` あと◯回」 counts down from 8; after every step the choices `ok` (decide) / `more` (again); after the 8th
+   * only `ok` is left and `limit` (OBOLON 「、、、今日の魔法は、ここまでだ。」) is said. `spell`: {bati}'s line as it casts.
+   * Saves f_bati_evolve / f_d03_change (the steps used) and the picture (components/look/LookSteps).
+   */
+  | { t: 'evolve'; who: 'bati' | 'self'; counter: string; ok: string; more: string; limit: ScriptLine; spell?: ScriptLine; example: string }
   /** The favourite food → the Bati (Day 2: the food is given to the egg on the altar). */
   | { t: 'egg'; submit?: string }
   /** The egg hatches (the Bati image is generated meanwhile). */
@@ -257,8 +272,9 @@ export type Step =
   /** M-R266: choose your kororin (the 8: colour + face) */
   | { t: 'kororin' }
   /**
-   * D03-S005 (M-R246 / M-R247) 「たまごに声を聞かせる」: a big mic in the middle, held to talk to the egg; a light ring around
-   * it fills with the length spoken (full at about 10 s). Released too soon → `short` (OBOLON 「、、、もう少し、聞かせてやれ。」)
+   * D03-S005 (M-R246 / M-R247; M-R334: after {bati} is born and named — 「{bati}に声を聞かせる」, a tap starts and a tap
+   * ends): a big mic in the middle; a light ring around
+   * it fills with the length spoken (full at about 10 s). Stopped too soon → `short` (OBOLON 「、、、もう少し、聞かせてやれ。」)
    * and the takes go on (appended). The words heard come out as {name}'s bubble; full → the egg glows and the story goes
    * on. `example`: the small example sentence under the mic. No explanation on the screen (M-R247): a small ⓘ by the mic
    * shows how the voice is used to those who tap it. The recording becomes {bati}'s voice on the server (POST /voice/bati)
@@ -349,6 +365,8 @@ export function fill(text: string, v: StoryVars): string {
     .replaceAll('{name}', v.name || '…')
     .replaceAll('{inviter_message}', v.inviterMessage || '')
     .replaceAll('{inviter}', v.inviter || '…')
+    // the visitor before the NEO name is chosen (the profile notice of D03-S004): the NEO name, else the name told on day 1
+    .replaceAll('{me}', v.neo || v.name || '…')
     .replaceAll('{neo}', v.neo || '…')
     .replaceAll('{bati}', v.bati || 'バティ')
     .replaceAll('{food}', v.batiFood || '…')

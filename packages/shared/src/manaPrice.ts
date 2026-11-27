@@ -12,6 +12,8 @@
  * free features (added up per member and taken a whole mana at a time).
  */
 
+import { BATI_BIRTH_MODEL, LOOK_PICK4_HEADS, LOOK_STEP_MODEL } from './lookSteps';
+
 /** Stripe's fee and the operator's margin. All rates are fractions (0.036 = 3.6%). */
 export interface PriceRule {
   /** Stripe's fee on the yen that bought the mana (STRIPE_FEE_RATE; Japan domestic cards 3.6%) */
@@ -310,8 +312,11 @@ export const titleVoiceUsd = () => fishCostUsd('あ'.repeat(TITLE_VOICE_CHARS));
  * Client 2026-11-25: profileLook = the member's own profile look, everything painted for it (its candidates, the talk's
  * pictures, the back view and the figures on every home planet: profileLookParts) — taken when the first look is
  * confirmed at the end of day 2 (LookService.confirmFirstLook) and for every change after it; 'look' is {bati}'s dress-up.
+ * Client 2026-11-27 (story M-R334; shared lookSteps.ts): lookStep = one evolve / transform step ({mana_step}: one edit of
+ * the current picture on LOOK_STEP_MODEL), lookPick4 = the four first pictures of one's own look ({mana_pick4}),
+ * batiBirth = the one picture a {bati} is born with (BATI_BIRTH_MODEL). profileLook is the script's {mana_fix}.
  */
-export const MAKE_KINDS = ['look', 'kororinDesign', 'jacketArt', 'song', 'songPremium', 'songVoice', 'mv', 'story', 'game', 'gameTweak', 'mvPictures', 'mvRedraw', 'gameTrial', 'gamePro', 'gameTweakPro', 'profileLook'] as const;
+export const MAKE_KINDS = ['look', 'kororinDesign', 'jacketArt', 'song', 'songPremium', 'songVoice', 'mv', 'story', 'game', 'gameTweak', 'mvPictures', 'mvRedraw', 'gameTrial', 'gamePro', 'gameTweakPro', 'profileLook', 'lookStep', 'lookPick4', 'batiBirth'] as const;
 export type MakeKind = (typeof MAKE_KINDS)[number];
 export const isMakeKind = (k: string): k is MakeKind => (MAKE_KINDS as readonly string[]).includes(k);
 /** the game makings (each keeps its version on the game; each is refunded the same way) */
@@ -440,6 +445,14 @@ export function makeCostEstimates(s: MakeSetup = DEFAULT_MAKE_SETUP): Record<Mak
     gameTweak: { usd: textUsd(s.gameCheapModel, GAME_TOKENS.cheapTweak) + WORDS_USD, note: `ゲームの直し ${short(s.gameCheapModel)}（今のコード＋直し）`, storedBytes: 128 * 1024 },
     gameTweakPro: { usd: textUsd(s.gameFullModel, GAME_TOKENS.fullTweak) + WORDS_USD, note: `ゲームの直し・強い魔法 ${short(s.gameFullModel)}（ふつうの直しが2回とも通らなかった時）`, storedBytes: 256 * 1024 },
     mvPictures: { usd: 0.002, cpuSeconds: 180, note: '動き選び Gemini＋描画 CPU p90 180秒＋保存12か月（MP4 約11MB）', storedBytes: VIDEO_STORED_BYTES },
+    // client 2026-11-27: one evolve / transform step — one edit of the current picture on FLUX.2 klein 4B (measured ≈ ¥0.34
+    // with its storage, art/lab/runware-evolve-chain) → 0.4 mana, the client's fixed number. The wish's word check is
+    // not in it (with it the step would round up to 0.5): it is counted with the member's small costs ('look')
+    lookStep: { usd: pictureUsd(LOOK_STEP_MODEL, true), note: `進化・変身の1回 ${LOOK_STEP_MODEL} ×1 枚（今の姿を参照）＋保存12か月`, storedBytes: PICTURE_STORED_BYTES },
+    // the four first pictures of one's own look (four touches, 2 / 3 / 5 / 7 heads), each from the photo
+    lookPick4: { usd: LOOK_PICK4_HEADS.length * pictureUsd(s.lookModel, true) + WORDS_USD, note: `自分の姿の4枚 ${s.lookModel} ×${LOOK_PICK4_HEADS.length} 枚（写真を参照）＋言葉の確認＋保存12か月`, storedBytes: LOOK_PICK4_HEADS.length * PICTURE_STORED_BYTES },
+    // the one picture a {bati} is born with (the food itself as a character)
+    batiBirth: { usd: pictureUsd(BATI_BIRTH_MODEL, false), note: `バティの誕生の絵 ${BATI_BIRTH_MODEL} ×1 枚＋保存12か月`, storedBytes: PICTURE_STORED_BYTES },
     mvRedraw: { usd: 4 * RUNWARE_PRICES['runware:400@4'] + 0.002, cpuSeconds: 180, note: 'FLUX.2 klein 4B ×最大4 場面＋描画 CPU＋保存12か月（新しい MP4・場面）', storedBytes: VIDEO_STORED_BYTES + 4 * 0.125 * MIB },
   };
 }
@@ -567,6 +580,9 @@ export type UsageLine = (typeof USAGE_LINES)[number];
 export function usageLineOf(refType: string | null | undefined): UsageLine {
   switch (refType) {
     case 'look':
+    case 'lookStep':
+    case 'lookPick4':
+    case 'batiBirth':
     case 'profileLook':
     case 'kororinDesign':
     case 'jacketArt':

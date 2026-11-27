@@ -1,6 +1,6 @@
 import { HttpStatus, Inject, Injectable, Logger, Optional } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { decideBatiPersona, decideBatiWish, moderateLookWish, rewriteBatiLines, withAgeBand, withTouch, batiPrompt, keyedBackground, batiRestylePrompt, batiSeedRule, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromPhotoPrompt, neoFromReferencePrompt, neoAnimalPrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, kororinPicPrompt, refineLookPrompt } from '@obolo/ai';
+import { decideBatiPersona, decideBatiWish, moderateLookWish, rewriteBatiLines, withAgeBand, withTouch, batiPrompt, batiCharacterPrompt, foodNameOf, keyedBackground, batiRestylePrompt, batiSeedRule, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromPhotoPrompt, neoFromReferencePrompt, neoAnimalPrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, kororinPicPrompt, refineLookPrompt } from '@obolo/ai';
 import { readdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import sharp from 'sharp';
@@ -16,7 +16,7 @@ import { alreadyStarted } from '../wallet/confirmed';
 import { buddyProfiles, users } from '../db/schema';
 import type { KvStore } from '../infra/kv';
 import type { JobQueue } from '../infra/queue';
-import { BATI_IMAGES, BUDDY_LLM, CUTOUT_MODEL, IMAGES, KORORIN_IMAGES, KV, LLM, LOOK_IMAGES, QUEUE } from '../infra/tokens';
+import { BATI_BIRTH_IMAGES, BATI_IMAGES, BUDDY_LLM, CUTOUT_MODEL, IMAGES, KORORIN_IMAGES, KV, LLM, LOOK_IMAGES, QUEUE } from '../infra/tokens';
 import { CONFIG, type AppConfig } from '../config';
 import { activeBati, batiList, columnsOf, keepLook, lookHistory, type BatiRecord } from './batis';
 import { MediaService } from '../media/media.service';
@@ -63,6 +63,9 @@ let butterflySheet: Promise<GeneratedImage> | null = null;
 let kororinSheet: Promise<GeneratedImage> | null = null;
 /** The client's パタパタ butterflies (cut from the Jupiter mock), the style to follow. */
 /** The Bati's prepared body types (client decision 2026-10-25): eight per egg, on flat grey (assets/bati/<egg>-<n>.jpg); put on the key colour before an edit. */
+/** client 2026-11-27: the style sheet of a newborn {bati} (design/refs/2026-11-27-story/09: food characters, no watermark) */
+let batiSheet: Promise<{ data: Buffer; mime: string }> | undefined;
+const batiStyle = () => (batiSheet ??= readFile(resolve(__dirname, '../../assets/bati-style-food.jpg')).then((data) => ({ data, mime: 'image/jpeg' })));
 const BATI_DIR = resolve(__dirname, '../../assets/bati');
 const BATI_GREY: [number, number, number] = [128, 128, 128];
 /*
@@ -151,6 +154,8 @@ export class LookService {
     @Optional() private readonly figures?: PlanetFiguresService,
     /** M-R326: the background-removal model of the cut-out's checks and first retry (CUTOUT_MODEL; none: those are skipped) */
     @Optional() @Inject(CUTOUT_MODEL) private readonly cutModel?: BackgroundRemover | null,
+    /** client 2026-11-27: the one picture a {bati} is born with (BATI_BIRTH_MODEL, Seedream 5.0 Flash); {bati}'s painter without it */
+    @Optional() @Inject(BATI_BIRTH_IMAGES) private readonly birthPainter?: ImageProvider,
   ) {
     this.queue.register('bati.lines', ({ userId, batiId }) => this.writeLines(userId, batiId));
     this.queue.register('bati.paint', ({ userId, origin }) => this.paintBati(userId, origin).then(() => undefined));
@@ -159,6 +164,10 @@ export class LookService {
     this.queue.register('talk.look', ({ userId, origin, who }) => this.talkLook(userId, who, origin));
   }
 
+  /** client 2026-11-27: the painter of a {bati}'s birth picture (BATI_BIRTH_MODEL) */
+  private get birth(): ImageProvider {
+    return this.birthPainter ?? this.bati;
+  }
   /** R17: {bati}'s painter (BATI_MODEL) */
   private get bati(): ImageProvider {
     return this.batiPainter ?? this.looks;
@@ -431,7 +440,7 @@ export class LookService {
    * look worn until now is noted with its expressions, so putting it back needs no painting; a look without them has
    * them drawn again in the background.
    */
-  private async wearBati(userId: string, cur: typeof users.$inferSelect, url: string, origin: string, isNew: boolean): Promise<Me> {
+  async wearBati(userId: string, cur: typeof users.$inferSelect, url: string, origin: string, isNew: boolean): Promise<Me> {
     const r = activeBati(cur);
     const j = { ...((cur.onboardingJson ?? {}) as Record<string, string>) };
     let nowFaces: Record<string, string> | undefined;
@@ -529,7 +538,7 @@ export class LookService {
    * M-R223: the member's own look worn — a new one (added to the looks, onboardingJson 'look.history') or one worn
    * before (Bluena's first shelf). Each look keeps its round icon, so putting one back paints nothing.
    */
-  private async wearLook(userId: string, url: string, origin: string | undefined, isNew: boolean): Promise<Me> {
+  async wearLook(userId: string, url: string, origin: string | undefined, isNew: boolean): Promise<Me> {
     const before = await this.user(userId);
     const j0 = (before.onboardingJson ?? {}) as Record<string, string>;
     let hist = lookHistory(j0);
@@ -737,6 +746,9 @@ export class LookService {
    */
   async egg(userId: string, body: BatiEggBody, origin?: string): Promise<Me> {
     await this.clean(body.food);
+    // M-R334: the bubble keeps the sentence as said; what is kept as the favourite food (f_food, the card's 好物, the
+    // picture's seed) is the food's name only (「ゼロ時零分カレーだよ。」 → カレー)
+    const food = await foodNameOf(this.llm, body.food);
     const egg: BatiEggKind = body.egg === 'sun' ? 'sun' : body.egg ? 'moon' : 'sun';
     const cur = await this.user(userId);
     // the first {bati} (again): the list starts over unless more were born since (then only the one in the chat is made again)
@@ -744,15 +756,15 @@ export class LookService {
     const keep = list.length > 1 ? list.filter((r) => r.id !== cur.batiId) : [];
     // M-R227: never the same style as the member's other {bati}
     // M-R230: a first {bati} (none other yet) comes from the bright group only
-    const persona = await decideBatiPersona(this.buddyLlm ?? this.llm, body.food, egg, 'food', { exclude: keep.map((r) => r.personality), first: keep.length === 0 });
+    const persona = await decideBatiPersona(this.buddyLlm ?? this.llm, food, egg, 'food', { exclude: keep.map((r) => r.personality), first: keep.length === 0 });
     if (!persona) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'SEED_REASK', '、、、食べられるものを、言ってみろ。');
-    const rec = this.record(body.food, 'food', egg, persona);
+    const rec = this.record(food, 'food', egg, persona);
     const [u] = await this.db.write
       .update(users)
       .set({
         batisJson: [...keep, rec],
         batiId: rec.id,
-        batiFood: body.food,
+        batiFood: food,
         batiImageUrl: null,
         batiName: null,
         // M-R218: the broken shell becomes a small egg; M-R231: it hatches on the app's day 9 (users.bati_egg_at keeps when
@@ -761,6 +773,13 @@ export class LookService {
       })
       .where(eq(users.id, userId))
       .returning();
+    // client 2026-11-27: the birth picture's mana from the gem (one per {bati} born; a balance short of it never stops
+    // the story: the rest waits with the tenths)
+    try {
+      await this.ledger.chargeWhole(this.db, userId, 'batiBirth', `make:batiBirth:${rec.id}`, rec.id);
+    } catch (e) {
+      this.log.warn(`bati birth charge failed: ${String(e)}`);
+    }
     // which egg: its body types (kept beside the account until the hatching)
     await this.kv.set(`bati:egg:${userId}`, egg, TRY_TTL);
     if (persona.rare) await this.queue.enqueue('bati.lines', { userId, batiId: rec.id }, { dedupeKey: `bati-lines-${rec.id}` }).catch(() => undefined);
@@ -826,7 +845,7 @@ export class LookService {
    * the re-key of before) — the first that passes the checks. When none does the colour cut is still handed back, as
    * before the checks (these pictures have no stand-in yet; logged for the operators). Null: nothing to cut.
    */
-  private async cut(img: GeneratedImage, out: number, key: KeyName): Promise<Buffer | null> {
+  async cut(img: GeneratedImage, out: number, key: KeyName): Promise<Buffer | null> {
     const r = await cutLadder({
       first: { ...img, background: key },
       out,
@@ -971,10 +990,7 @@ export class LookService {
     let url: string | null = null;
     for (let k = 0; k < 2 && !url; k++) {
       try {
-        const img = await this.bati.generate(batiPrompt(u.batiFood, !!body, paintKind(activeBati(u)?.seedKind), body ? KEY_WORDS[body.key] : undefined), k, body ? [body] : []);
-        // painted on the body's flat key colour: cut out, so the Bati stands on the stage like the others
-        const png = body ? await this.cut(img, 768, body.key) : null;
-        url = (png ? await this.media.storeImage(userId, 'bati', 'image/png', png, origin) : await this.media.storeImage(userId, 'bati', img.mime, img.data, origin)).url;
+        url = await this.paintBorn(userId, u, origin, k);
       } catch (e) {
         this.log.warn(`bati generation failed (${k + 1}): ${String(e)}`);
       }
@@ -1003,6 +1019,19 @@ export class LookService {
     return nu;
   }
 
+  /**
+   * client 2026-11-27 (story M-R334): the picture a {bati} is born with — the seed itself as a character, 2D anime
+   * (batiCharacterPrompt; BATI_BIRTH_MODEL with the style sheet as reference), on a flat key colour and cut out so it
+   * stands on the stage without a frame. Blue: the colour food has least of.
+   */
+  private async paintBorn(userId: string, u: typeof users.$inferSelect, origin: string, variant: number): Promise<string> {
+    const key: KeyName = 'blue';
+    const style = await batiStyle().catch(() => null);
+    const img = await this.birth.generate(batiCharacterPrompt(u.batiFood ?? '', paintKind(activeBati(u)?.seedKind), KEY_WORDS[key], !!style), variant, style ? [style] : []);
+    const png = await this.cut(img, 768, key);
+    return (png ? await this.media.storeImage(userId, 'bati', 'image/png', png, origin) : await this.media.storeImage(userId, 'bati', img.mime, img.data, origin)).url;
+  }
+
   /** the stand-in body replaced by the real picture (a few tries, a minute apart); the faces are made again from it */
   private async repaintBati(userId: string, origin: string) {
     for (let k = 0; k < 3; k++) {
@@ -1011,9 +1040,7 @@ export class LookService {
       if (!u.batiFood || !(u.onboardingJson as Record<string, string> | null)?.['bati.stand']) return;
       const body = await this.batiBody(activeBati(u)?.egg ?? (await this.kv.get(`bati:egg:${userId}`)) ?? 'sun');
       try {
-        const img = await this.bati.generate(batiPrompt(u.batiFood, !!body, paintKind(activeBati(u)?.seedKind), body ? KEY_WORDS[body.key] : undefined), 7 + k, body ? [body] : []);
-        const png = body ? await this.cut(img, 768, body.key) : null;
-        const url = (png ? await this.media.storeImage(userId, 'bati', 'image/png', png, origin) : await this.media.storeImage(userId, 'bati', img.mime, img.data, origin)).url;
+        const url = await this.paintBorn(userId, u, origin, 7 + k);
         const cur = await this.user(userId);
         if (cur.batiFood !== u.batiFood) return;
         const j = { ...((cur.onboardingJson ?? {}) as Record<string, string>) };
@@ -1232,10 +1259,10 @@ export class LookService {
    * figures are painted, as that making. From now on a resident's look stays as it is (LOOK_LOCKED) until they join.
    * Returns the member and the mana the look took (0: nothing taken — no own look, already confirmed, not day 2's end).
    */
-  async confirmFirstLook(userId: string, origin: string): Promise<{ me: Me; mana: number }> {
+  async confirmFirstLook(userId: string, origin: string, /** M-R334: decided at the bowl of water (〔この姿にする〕), before the day is finished */ atFix = false): Promise<{ me: Me; mana: number }> {
     const u = await this.user(userId);
     const j = (u.onboardingJson ?? {}) as Record<string, string>;
-    if (j[LOOK_CONFIRMED_KEY] || u.journeyDay !== 2 || !u.journeyCompletedAt) return { me: toMe(u), mana: 0 };
+    if (j[LOOK_CONFIRMED_KEY] || (atFix ? u.journeyDay > 2 : u.journeyDay !== 2 || !u.journeyCompletedAt)) return { me: toMe(u), mana: 0 };
     const look = u.avatarUrl;
     let mana = 0;
     if (look) {
