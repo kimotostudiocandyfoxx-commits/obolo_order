@@ -87,6 +87,8 @@ const Env = z.object({
   /** client 2026-11-25 (art/lab/runware-planet-avatar): the member's planet figures — the Saturn chibi on FLUX.2 klein 4B, the Saturn ball and the seven planets' chibis on Qwen-Image 2.1 Turbo */
   SATURN_CHIBI_MODEL: z.string().default('runware:400@4'),
   SATURN_BALL_MODEL: z.string().default('alibaba:qwen-image@2.1-turbo'),
+  /** M-R325: the background-removal model the cut-out falls back on when the colour cut failed its check twice (a Runware AIR id; empty: none) */
+  CUTOUT_MODEL: z.string().default('runware:109@1'),
   PLANET_CHIBI_MODEL: z.string().default('alibaba:qwen-image@2.1-turbo'),
   /** the look rounds of the first journey (free): four to pick from (M-R173, four touches) */
   LOOK_CANDIDATES: z.coerce.number().int().min(1).max(4).default(4),

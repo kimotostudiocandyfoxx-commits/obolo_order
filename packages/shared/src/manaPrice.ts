@@ -148,6 +148,7 @@ export const RUNWARE_PRICES: Record<string, number> = {
   'google:nano-banana@2-lite': 0.0336,
   'bytedance:seedream@5.0-pro': 0.045, // ≈ ¥2–7 a picture at 1024 (p90 ≈ ¥7)
   'runware:ace-step@v1.5-xl-sft': 0.009, // ACE-Step 1.5 XL SFT, ≈ 60 s of song at 50 steps, scales with the length (Music lab: $0.009)
+  'runware:109@1': 0.0006, // RemBG 1.4 background removal (M-R325: the cut-out's last resort; Runware's "from" price, not measured yet — the real cost is metered from each response)
   'minimax:music@2.6': 0.15, // MiniMax Music 2.6, one clip (Music lab: $0.15)
 };
 

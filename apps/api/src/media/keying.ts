@@ -1,4 +1,5 @@
 import sharp from 'sharp';
+import { checkCut, frame, keyFringe, rawOf, type CutReport } from './cut';
 
 /**
  * Chroma keying for the live looks and {bati} (cut-out review 2026-11-23) — the server twin of scripts/lib/keying.py
@@ -255,6 +256,8 @@ export interface KeyInfo {
   gapsKept: number;
   /** how far the character's colours are from the background (OKLab, nearest 0.1 %) */
   clearance: number;
+  /** M-R325: pixels near the key and connected to the outside that went after the key (the fringe, a shadow) */
+  fringe: number;
 }
 
 /**
@@ -263,6 +266,7 @@ export interface KeyInfo {
  */
 export function keyMatte(px: Uint8Array, W: number, H: number, key?: Rgb): KeyInfo {
   const N = W * H;
+  const before = px.slice();
   // the border's colour and noise
   const border: number[] = [];
   const B = Math.max(2, Math.min(6, Math.floor(Math.min(W, H) / 20)));
@@ -489,45 +493,23 @@ export function keyMatte(px: Uint8Array, W: number, H: number, key?: Rgb): KeyIn
       if (a > 0.97) a = 1;
       px[i * 4 + 3] = Math.round(a * 255);
     }
-  return { key: K, tBg, islandsRemoved, holesFilled, gapsKept, clearance: clearanceOf(subjectLab(px, W, H), K) };
+  // M-R325: after the key, what is still near it and touches the outside goes too (a saturated key only: near a grey
+  // key is the character's own grey)
+  const fringe = ch ? keyFringe(px, before, W, H, K) : 0;
+  return { key: K, tBg, islandsRemoved, holesFilled, gapsKept, clearance: clearanceOf(subjectLab(px, W, H), K), fringe };
 }
 
 /**
  * Cut a character off its flat key background → a square transparent PNG of `out` px around it (3 % margin), like
  * cutoutWhite. Throws when nothing is left.
  */
-export async function cutoutKey(input: Buffer, out = 768, key?: Rgb): Promise<{ png: Buffer; info: KeyInfo }> {
-  const { data, info: meta } = await sharp(input).removeAlpha().ensureAlpha().resize(900, 900, { fit: 'inside', withoutEnlargement: true }).raw().toBuffer({ resolveWithObject: true });
-  const W = meta.width;
-  const H = meta.height;
-  const px = new Uint8Array(data.buffer, data.byteOffset, data.length);
+export async function cutoutKey(input: Buffer, out = 768, key?: Rgb): Promise<{ png: Buffer; info: KeyInfo; report: CutReport }> {
+  const { px, W, H } = await rawOf(input);
+  const before = px.slice();
   const info = keyMatte(px, W, H, key);
-  let minX = W;
-  let minY = H;
-  let maxX = 0;
-  let maxY = 0;
-  for (let y = 0; y < H; y++)
-    for (let x = 0; x < W; x++)
-      if (px[(y * W + x) * 4 + 3] > 10) {
-        minX = Math.min(minX, x);
-        maxX = Math.max(maxX, x);
-        minY = Math.min(minY, y);
-        maxY = Math.max(maxY, y);
-      }
-  if (maxX <= minX || maxY <= minY) throw new Error('nothing left after removing the background');
-  const side = Math.round(Math.max(maxX - minX, maxY - minY) * 1.06);
-  const left = Math.round((minX + maxX) / 2 - side / 2);
-  const top = Math.round((minY + maxY) / 2 - side / 2);
-  const ext = await sharp(Buffer.from(px.buffer, px.byteOffset, px.length), { raw: { width: W, height: H, channels: 4 } })
-    .extend({ top: Math.max(0, -top), bottom: Math.max(0, top + side - H), left: Math.max(0, -left), right: Math.max(0, left + side - W), background: { r: 0, g: 0, b: 0, alpha: 0 } })
-    .png()
-    .toBuffer();
-  const png = await sharp(ext)
-    .extract({ left: Math.max(0, left), top: Math.max(0, top), width: side, height: side })
-    .resize(out, out)
-    .png({ compressionLevel: 9 })
-    .toBuffer();
-  return { png, info };
+  // M-R325: the automatic check (too much gone, too little, a gap of the key left inside)
+  const report = checkCut(before, px, W, H, { bg: info.key, kind: 'key' });
+  return { png: await frame(px, W, H, out), info, report };
 }
 
 /**
@@ -540,18 +522,18 @@ export async function cutoutChecked(
   out: number,
   key: KeyName,
   rekey?: (to: KeyName, prompt: string) => Promise<Buffer>,
-): Promise<{ png: Buffer; key: KeyName; clearance: number } | null> {
+): Promise<{ png: Buffer; key: KeyName; clearance: number; report: CutReport } | null> {
   const first = await cutoutKey(data, out, KEYS[key]).catch(() => null);
-  if (first && first.info.clearance >= MIN_CLEARANCE) return { png: first.png, key, clearance: first.info.clearance };
-  if (!rekey) return first ? { png: first.png, key, clearance: first.info.clearance } : null;
+  if (first && first.info.clearance >= MIN_CLEARANCE) return { png: first.png, key, clearance: first.info.clearance, report: first.report };
+  if (!rekey) return first ? { png: first.png, key, clearance: first.info.clearance, report: first.report } : null;
   // the key its colours are farthest from, measured on the first cut (or the whole picture)
   const ranked = (await rankKeys(first?.png ?? data).catch(() => [])).filter((r) => r.key !== key);
   const to = ranked[0]?.key ?? (key === 'magenta' ? 'green' : 'magenta');
   const again = await rekey(to, rekeyPrompt(to))
     .then((b) => cutoutKey(b, out, KEYS[to]))
     .catch(() => null);
-  if (again && (!first || again.info.clearance > first.info.clearance)) return { png: again.png, key: to, clearance: again.info.clearance };
-  return first ? { png: first.png, key, clearance: first.info.clearance } : null;
+  if (again && (!first || again.info.clearance > first.info.clearance)) return { png: again.png, key: to, clearance: again.info.clearance, report: again.report };
+  return first ? { png: first.png, key, clearance: first.info.clearance, report: first.report } : null;
 }
 
 /**

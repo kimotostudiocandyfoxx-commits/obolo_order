@@ -23,3 +23,5 @@ export const GAME_TRIAL_LLM = Symbol('GAME_TRIAL_LLM');
 export const LYRICS_LLM = Symbol('LYRICS_LLM');
 /** R14: the model that builds a spell first (SPELL_MODEL: Gemini Flash now, Claude by config) */
 export const SPELL_LLM = Symbol('SPELL_LLM');
+/** M-R325: the cut-out's last resort (a background-removal model; null when not configured) */
+export const CUTOUT_MODEL = Symbol('CUTOUT_MODEL');

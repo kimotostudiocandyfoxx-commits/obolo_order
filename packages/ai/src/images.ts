@@ -180,6 +180,50 @@ export class RunwareImageProvider implements ImageProvider {
   }
 }
 
+/**
+ * M-R325: a picture's background removed by a model — the cut-out's last resort when the colour cut failed its check
+ * twice (apps/api/src/media/cutting.ts). Returns a PNG with its alpha, the picture's own size.
+ */
+export interface BackgroundRemover {
+  readonly name: string;
+  remove(img: GeneratedImage): Promise<GeneratedImage>;
+}
+/** Runware's background removal task (RemBG 1.4 by default; includeCost always) */
+export const RUNWARE_CUTOUT_MODEL = 'runware:109@1';
+export function runwareCutoutTask(model: string, taskUUID: string, img: GeneratedImage): Record<string, unknown> {
+  return { taskType: 'removeBackground', taskUUID, model, inputImage: `data:${img.mime};base64,${img.data.toString('base64')}`, outputType: 'URL', outputFormat: 'PNG', includeCost: true };
+}
+export class RunwareBackgroundRemover implements BackgroundRemover {
+  readonly name: string;
+  constructor(
+    private readonly apiKey: string,
+    readonly model: string = RUNWARE_CUTOUT_MODEL,
+    private readonly timeoutMs = 60_000,
+  ) {
+    this.name = `runware:${model}`;
+  }
+  async remove(img: GeneratedImage): Promise<GeneratedImage> {
+    const res = await fetch('https://api.runware.ai/v1', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${this.apiKey}` },
+      body: JSON.stringify([runwareCutoutTask(this.model, crypto.randomUUID(), img)]),
+      signal: AbortSignal.timeout(this.timeoutMs),
+    });
+    const j = (await res.json().catch(() => ({}))) as { data?: { imageURL?: string; cost?: number }[]; errors?: unknown[] };
+    const url = j.data?.[0]?.imageURL;
+    if (!res.ok || j.errors?.length || !url) throw new Error(`${this.name} ${res.status} ${JSON.stringify(j.errors ?? j).slice(0, 200)}`);
+    meterRunware(this.model, [j.data![0]]);
+    const out = await fetch(url, { signal: AbortSignal.timeout(60_000) });
+    if (!out.ok) throw new Error(`${this.name} image ${out.status}`);
+    return { data: Buffer.from(await out.arrayBuffer()), mime: 'image/png' };
+  }
+}
+/** the cut-out's model from its config: a Runware AIR id on the Runware key; none without the key or with an empty model */
+export function createBackgroundRemover(model: string | undefined, keys: { runwareKey?: string }): BackgroundRemover | null {
+  const m = (model ?? '').trim();
+  return m && keys.runwareKey ? new RunwareBackgroundRemover(keys.runwareKey, m) : null;
+}
+
 /** Seedream 5.0 Pro on Runware (the R16 painter of the looks and the Bati) */
 export class SeedreamImageProvider extends RunwareImageProvider {
   constructor(apiKey: string, side = 1024, maxAtOnce = 12, timeoutMs = 115_000) {
