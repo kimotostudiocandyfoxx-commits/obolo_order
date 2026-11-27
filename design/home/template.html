@@ -1577,7 +1577,7 @@ function lyricsStop(){if(LYR){LYR.stop();LYR=null}}
 function stopSong(){lyricsStop();if(SONG){const s=SONG;SONG=null;try{if(s.g&&AC){s.g.gain.setTargetAtTime(0,AC.currentTime,.08);setTimeout(()=>{try{s.stop()}catch(e){}},400)}else s.stop()}catch(e){}}}
 function playSong(k){const c=getAC(),buf=VBUF[k];stopSong();if(c&&buf&&buf!=='loading'){const s=c.createBufferSource(),g=c.createGain();g.gain.value=.9;s.buffer=buf;s.loop=true;s.connect(g);g.connect(c.destination);s.start();s.g=g;s.__t0=c.currentTime;SONG=s;return buf.duration}
   if(A[k]){const au=VEL.length?VEL[VEL.length-1]:new Audio();try{au.pause();au.src=A[k];au.loop=true;au.currentTime=0;au.play().catch(()=>{});SONG={stop:()=>au.pause(),__el:au}}catch(e){}return au.duration&&isFinite(au.duration)?au.duration:60}return 60}
-const OSHIX=()=>[...oshi].filter(n=>!PEOPLE.some(p=>p.n===n)&&!ROSTER('uranus').some(o=>o.n===n)).map(n=>({n,k:'oshi'}));
+const OSHIX=()=>[...oshi].filter(n=>!PEOPLE.some(p=>p.n===n)&&!RESG.flat().includes(n)&&!SUSHI_ALL.includes(n)).map(n=>({n,k:'oshi'}));
 function setupMer(){setTimeout(()=>{if(cur!=='mercury')return;predecode(['exp-mercury-sea',...CONT.mercury.flatMap(c=>['isl-mercury-'+c.k,'exp-mercury-'+c.k]),'isl-mercury-me'])},1200);
   const base=[...ROSTER(cur)];
   SH=[];SHQ=base.slice(MMAX);base.slice(0,MMAX).forEach((o,i)=>SH.push(makeSh(o,i,i)));
