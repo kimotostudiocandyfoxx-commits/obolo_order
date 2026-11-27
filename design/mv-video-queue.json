@@ -381,6 +381,15 @@
    "always": false,
    "cameraFixed": true,
    "prompt": "The muscular cartoon angel holding two bouquets slowly flies backward away from the camera, shrinking back into the torn hole in the middle of the heavenly sky until he disappears inside it; then the jagged torn paper edges curl inward and close up seamlessly, the flying paper scraps and gold stars float back and vanish, until the heavenly sky with soft clouds and golden rays is completely whole and calm again. Keep the vintage cartoon drawing style of the angel and the painterly heavenly sky exactly as in the frame; the angel's face and body stay the same. No text."
+  },
+  {
+   "id": "sapon-dad",
+   "image": "design/mv-art/out/sapon/dad.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "always": false,
+   "cameraFixed": true,
+   "prompt": "The big salmon swims gently forward in place through the deep blue sea, its tail and fins sway smoothly, scales shimmer, sun rays from the surface ripple softly, small bubbles rise. Calm, seamless, the same painterly style, no cuts, no text."
   }
  ],
  "redo": []
