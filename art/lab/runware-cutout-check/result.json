@@ -1,0 +1,50 @@
+{
+  "model": "runware:109@1",
+  "sample": "art/lab/runware-planet-avatar/mercury-ship__A-fox__flux2-klein-4b.jpg",
+  "sample_size": [
+    1024,
+    1024
+  ],
+  "request": {
+    "taskType": "removeBackground",
+    "taskUUID": "3958e938-eedc-4bf6-a0cd-ba6da9b06be4",
+    "model": "runware:109@1",
+    "inputImage": "data:image/jpeg;base64,<237664 bytes>",
+    "outputType": "URL",
+    "outputFormat": "PNG",
+    "includeCost": true
+  },
+  "seconds": 8.1,
+  "response": {
+    "data": [
+      {
+        "taskType": "imageBackgroundRemoval",
+        "imageUUID": "9c8f1d2f-96c1-4702-acef-353d35c7bd4a",
+        "inputImageUUID": "930f8917-be84-4935-afb9-b8f485b053fd",
+        "taskUUID": "3958e938-eedc-4bf6-a0cd-ba6da9b06be4",
+        "cost": 0.0006,
+        "imageURL": "https://im.runware.ai/image/os/a06dlim3/ws/5/ii/9c8f1d2f-96c1-4702-acef-353d35c7bd4a.png"
+      }
+    ]
+  },
+  "cost_usd": 0.0006,
+  "cost_jpy": 0.096,
+  "format": "PNG",
+  "mode": "RGBA",
+  "size": [
+    1024,
+    1024
+  ],
+  "same_size_as_sample": true,
+  "has_alpha": true,
+  "removed_share": 0.6551,
+  "kept_share": 0.3408,
+  "checks": {
+    "png": true,
+    "alpha": true,
+    "background_removed": true,
+    "figure_kept": true,
+    "cost_reported": true
+  },
+  "ok": true
+}
