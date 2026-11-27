@@ -16135,6 +16135,1656 @@
    ],
    "always": false,
    "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges. Sapon is the character in the first reference picture (Sapon, a cute mascot whose whole body is one neat rectangular block cut from a salmon fillet (bright orange flesh with white diagonal fat stripes, solid salmon all the way to the bottom), a happy face on the front, two small stubby orange arms and exactly two short legs); keep its shape exactly. No text, no letters. Page 6: Sunset on the beach. Sapon, the cute shrimp mascot and the big gentle salmon in the shallow water all smile together, warm orange sky, little hearts floating. A happy ending."
+  },
+  {
+   "id": "chibi-gari",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/gari-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "A super-deformed chibi version of the character in the reference picture (a fluffy round mop-like mascot made entirely of curly thin slices of pickled sushi ginger (pale peach-pink and soft yellow), a round cream-yellow face peeking out of the fluff), keeping its shape, colours and details exactly recognisable, drawn as a glossy cute 3D vinyl mini figure with soft studio lighting and a sparkly highlight, cute pastel kawaii style. Jumping out joyfully with both arms up, a big happy smile. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text."
+  },
+  {
+   "id": "kor4-gari",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/gari-ref.jpg",
+    "design/mv-art/out/kor4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "A round ball-shaped mascot (a perfect glossy sphere with no arms and no legs) in exactly the same style as the SECOND reference picture: soft cute anime mascot, glossy highlight top-left, and the same simple face — two tiny shiny black dot eyes, a small ω-shaped cat mouth and soft round pink blush. Its colour and surface pattern are designed from the character in the FIRST reference picture (pale peach-pink and soft yellow curly ginger slices). It must still read as a round ball first. Front view, centered, filling about 80% of the frame. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "chibi4-gari",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/gari-ref.jpg",
+    "design/mv-art/out/chibi4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a fluffy round mop-like mascot made entirely of curly thin slices of pickled sushi ginger (pale peach-pink and soft yellow), a round cream-yellow face peeking out of the fluff), dressed up as a butterfly: curly butterfly antennae on top and butterfly wings growing from its back whose colours and patterns are designed from it (pale peach-pink and soft yellow curly ginger slices). Flying gently and hugging a small framed painting in both arms. Front view, centered, the whole character and both wings inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+  },
+  {
+   "id": "ship4-gari",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/gari-ref.jpg",
+    "design/mv-art/out/ship4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a small cute sailboat seen from the side with a sail shaped like a music note. The hull and sail colours and patterns are designed from the character (pale peach-pink and soft yellow curly ginger slices). Riding in the boat is a cute super-deformed chibi of the character in the FIRST reference picture (a fluffy round mop-like mascot made entirely of curly thin slices of pickled sushi ginger (pale peach-pink and soft yellow), a round cream-yellow face peeking out of the fluff), happily carrying a big boombox speaker. No water, no sea. Centered, the whole boat and character inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-mars-gari",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/gari-ref.jpg",
+    "design/mv-art/out/p5-mars-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a fluffy round mop-like mascot made entirely of curly thin slices of pickled sushi ginger (pale peach-pink and soft yellow), a round cream-yellow face peeking out of the fluff, its shape and colours recognisable), riding in a small round flying saucer UFO (in its colours, a glass dome) like the UFO in the 2nd reference picture. There is no light beam, no glow and no light cone under the saucer; its bottom has a clean outline. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-venus-gari",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/gari-ref.jpg",
+    "design/mv-art/out/p5-venus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a fluffy round mop-like mascot made entirely of curly thin slices of pickled sushi ginger (pale peach-pink and soft yellow), a round cream-yellow face peeking out of the fluff, its shape and colours recognisable), working as a radio DJ: sitting at a tiny cute radio DJ booth desk (with a little mixer and an ON AIR lamp) in its colours, wearing headphones and talking happily into a microphone on a desk arm, the whole little booth floating on a small fluffy cloud. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-uranus-gari",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/gari-ref.jpg",
+    "design/mv-art/out/p5-uranus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a fluffy round mop-like mascot made entirely of curly thin slices of pickled sushi ginger (pale peach-pink and soft yellow), a round cream-yellow face peeking out of the fluff, its shape and colours recognisable), hanging from a bunch of balloons with a gift box in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-pluto-gari",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/gari-ref.jpg",
+    "design/mv-art/out/p5-pluto-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a fluffy round mop-like mascot made entirely of curly thin slices of pickled sushi ginger (pale peach-pink and soft yellow), a round cream-yellow face peeking out of the fluff, its shape and colours recognisable), riding on a big open flying book whose cover is in its colours, little glowing letters floating. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-neptune-gari",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/gari-ref.jpg",
+    "design/mv-art/out/p5-neptune-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a fluffy round mop-like mascot made entirely of curly thin slices of pickled sushi ginger (pale peach-pink and soft yellow), a round cream-yellow face peeking out of the fluff, its shape and colours recognisable), floating inside a big transparent bubble holding a game controller in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "su/gari/dad",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [],
+   "always": false,
+   "prompt": "A beautiful painting of a field of young ginger plants at sunset: tall green leaves and pale pink young ginger stems at the base, warm pink and gold sky, soft painterly brush strokes, dreamy and gentle, like a fine art poster. No text."
+  },
+  {
+   "id": "su/gari/jacket",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/gari-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Square music album cover for a song called ガリガリ・ラブ (genre: kawaii): a cute super-deformed chibi of the character in the reference picture (a fluffy round mop-like mascot made entirely of curly thin slices of pickled sushi ginger (pale peach-pink and soft yellow), a round cream-yellow face peeking out of the fluff) performing happily, colourful energetic background that fits the music, sparkles. Bold, bright, glossy, kawaii. No text, no letters."
+  },
+  {
+   "id": "su/gari/radio",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/gari-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Square radio show artwork: a cute super-deformed chibi of the character in the reference picture (a fluffy round mop-like mascot made entirely of curly thin slices of pickled sushi ginger (pale peach-pink and soft yellow), a round cream-yellow face peeking out of the fluff) talking into a big microphone with headphones on, surrounded by little floating icons about its food and the sea, a question mark and a light bulb. Warm sunset pastel colours, kawaii, clean. No text, no letters."
+  },
+  {
+   "id": "su/gari/goods",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/gari-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Product photo of a cute clear acrylic keychain with a printed illustration of the character in the reference picture, hanging from a little gold ring, on a pastel pink background with soft daylight. Kawaii merchandise photo. No text."
+  },
+  {
+   "id": "su/gari/book-1",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/gari-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a fluffy round mop-like mascot made entirely of curly thin slices of pickled sushi ginger (pale peach-pink and soft yellow), a round cream-yellow face peeking out of the fluff); keep its shape exactly. No text, no letters. Page 1: Gari-mi stands happily in a sunny meadow with flowers, fluffy pink, smiling."
+  },
+  {
+   "id": "su/gari/book-2",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/gari-ref.jpg",
+    "design/mv-art/out/sushi/salmon-ref.jpg",
+    "design/mv-art/out/sushi/ebi-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a fluffy round mop-like mascot made entirely of curly thin slices of pickled sushi ginger (pale peach-pink and soft yellow), a round cream-yellow face peeking out of the fluff); keep its shape exactly. No text, no letters. Page 2: Gari-mi looks at an old photo frame showing a pale yellow ginger root, curious face."
+  },
+  {
+   "id": "su/gari/book-3",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/gari-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a fluffy round mop-like mascot made entirely of curly thin slices of pickled sushi ginger (pale peach-pink and soft yellow), a round cream-yellow face peeking out of the fluff); keep its shape exactly. No text, no letters. Page 3: A cosy ginger field: a small pale yellow ginger root baby sprout among green leaves, warm morning light."
+  },
+  {
+   "id": "su/gari/book-4",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/gari-ref.jpg",
+    "design/mv-art/out/sushi/salmon-ref.jpg",
+    "design/mv-art/out/sushi/ebi-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a fluffy round mop-like mascot made entirely of curly thin slices of pickled sushi ginger (pale peach-pink and soft yellow), a round cream-yellow face peeking out of the fluff); keep its shape exactly. No text, no letters. Page 4: Gari-mi bathing in a big round bowl of clear vinegar bath with bubbles, cheeks blushing, turning pink."
+  },
+  {
+   "id": "su/gari/book-5",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/gari-ref.jpg",
+    "design/mv-art/out/sushi/salmon-ref.jpg",
+    "design/mv-art/out/sushi/ebi-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a fluffy round mop-like mascot made entirely of curly thin slices of pickled sushi ginger (pale peach-pink and soft yellow), a round cream-yellow face peeking out of the fluff); keep its shape exactly. No text, no letters. Page 5: Gari-mi surrounded by cute sushi friends (a salmon block mascot, a round shrimp mascot) clapping, little hearts."
+  },
+  {
+   "id": "su/gari/book-6",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/gari-ref.jpg",
+    "design/mv-art/out/sushi/salmon-ref.jpg",
+    "design/mv-art/out/sushi/ebi-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a fluffy round mop-like mascot made entirely of curly thin slices of pickled sushi ginger (pale peach-pink and soft yellow), a round cream-yellow face peeking out of the fluff); keep its shape exactly. No text, no letters. Page 6: Sunset on a sushi plate stage: Gari-mi and sushi friends smiling together, pink sky, hearts. A happy ending."
+  },
+  {
+   "id": "chibi-ebi",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ebi-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "A super-deformed chibi version of the character in the reference picture (a chubby round shrimp mascot (warm orange, segmented body, a fan tail at the back) with two long thin antennae, small round hands, a big round face on the front), keeping its shape, colours and details exactly recognisable, drawn as a glossy cute 3D vinyl mini figure with soft studio lighting and a sparkly highlight, cute pastel kawaii style. Jumping out joyfully with both arms up, a big happy smile. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text."
+  },
+  {
+   "id": "kor4-ebi",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ebi-ref.jpg",
+    "design/mv-art/out/kor4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "A round ball-shaped mascot (a perfect glossy sphere with no arms and no legs) in exactly the same style as the SECOND reference picture: soft cute anime mascot, glossy highlight top-left, and the same simple face — two tiny shiny black dot eyes, a small ω-shaped cat mouth and soft round pink blush. Its colour and surface pattern are designed from the character in the FIRST reference picture (warm orange shrimp shell with segments). It must still read as a round ball first. Front view, centered, filling about 80% of the frame. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "chibi4-ebi",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ebi-ref.jpg",
+    "design/mv-art/out/chibi4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a chubby round shrimp mascot (warm orange, segmented body, a fan tail at the back) with two long thin antennae, small round hands, a big round face on the front), dressed up as a butterfly: curly butterfly antennae on top and butterfly wings growing from its back whose colours and patterns are designed from it (warm orange shrimp shell with segments). Flying gently and hugging a small framed painting in both arms. Front view, centered, the whole character and both wings inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+  },
+  {
+   "id": "ship4-ebi",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ebi-ref.jpg",
+    "design/mv-art/out/ship4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a small cute sailboat seen from the side with a sail shaped like a music note. The hull and sail colours and patterns are designed from the character (warm orange shrimp shell with segments). Riding in the boat is a cute super-deformed chibi of the character in the FIRST reference picture (a chubby round shrimp mascot (warm orange, segmented body, a fan tail at the back) with two long thin antennae, small round hands, a big round face on the front), happily carrying a big boombox speaker. No water, no sea. Centered, the whole boat and character inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-mars-ebi",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ebi-ref.jpg",
+    "design/mv-art/out/p5-mars-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a chubby round shrimp mascot (warm orange, segmented body, a fan tail at the back) with two long thin antennae, small round hands, a big round face on the front, its shape and colours recognisable), riding in a small round flying saucer UFO (in its colours, a glass dome) like the UFO in the 2nd reference picture. There is no light beam, no glow and no light cone under the saucer; its bottom has a clean outline. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-venus-ebi",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ebi-ref.jpg",
+    "design/mv-art/out/p5-venus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a chubby round shrimp mascot (warm orange, segmented body, a fan tail at the back) with two long thin antennae, small round hands, a big round face on the front, its shape and colours recognisable), working as a radio DJ: sitting at a tiny cute radio DJ booth desk (with a little mixer and an ON AIR lamp) in its colours, wearing headphones and talking happily into a microphone on a desk arm, the whole little booth floating on a small fluffy cloud. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-uranus-ebi",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ebi-ref.jpg",
+    "design/mv-art/out/p5-uranus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a chubby round shrimp mascot (warm orange, segmented body, a fan tail at the back) with two long thin antennae, small round hands, a big round face on the front, its shape and colours recognisable), hanging from a bunch of balloons with a gift box in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-pluto-ebi",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ebi-ref.jpg",
+    "design/mv-art/out/p5-pluto-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a chubby round shrimp mascot (warm orange, segmented body, a fan tail at the back) with two long thin antennae, small round hands, a big round face on the front, its shape and colours recognisable), riding on a big open flying book whose cover is in its colours, little glowing letters floating. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-neptune-ebi",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ebi-ref.jpg",
+    "design/mv-art/out/p5-neptune-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a chubby round shrimp mascot (warm orange, segmented body, a fan tail at the back) with two long thin antennae, small round hands, a big round face on the front, its shape and colours recognisable), floating inside a big transparent bubble holding a game controller in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "su/ebi/dad",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [],
+   "always": false,
+   "prompt": "A beautiful painting of one big majestic old spiny lobster resting on a rock in the deep blue sea, long antennae, red-orange shell, dignified and wise, soft light rays, small fish around, painterly brush strokes, like a fine art poster. No text."
+  },
+  {
+   "id": "su/ebi/jacket",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ebi-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Square music album cover for a song called エビエビ・ピコピコ (genre: chip): a cute super-deformed chibi of the character in the reference picture (a chubby round shrimp mascot (warm orange, segmented body, a fan tail at the back) with two long thin antennae, small round hands, a big round face on the front) performing happily, colourful energetic background that fits the music, sparkles. Bold, bright, glossy, kawaii. No text, no letters."
+  },
+  {
+   "id": "su/ebi/radio",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ebi-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Square radio show artwork: a cute super-deformed chibi of the character in the reference picture (a chubby round shrimp mascot (warm orange, segmented body, a fan tail at the back) with two long thin antennae, small round hands, a big round face on the front) talking into a big microphone with headphones on, surrounded by little floating icons about its food and the sea, a question mark and a light bulb. Warm sunset pastel colours, kawaii, clean. No text, no letters."
+  },
+  {
+   "id": "su/ebi/goods",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ebi-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Product photo of a soft cute plush toy of the character in the reference picture sitting on a light wooden shelf, fuzzy fabric texture, warm daylight, cosy. Kawaii merchandise photo. No text."
+  },
+  {
+   "id": "su/ebi/book-1",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ebi-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a chubby round shrimp mascot (warm orange, segmented body, a fan tail at the back) with two long thin antennae, small round hands, a big round face on the front); keep its shape exactly. No text, no letters. Page 1: Ebisuke on a sandy sea floor looking at its own bent back, a bit worried, other straight fish swimming by."
+  },
+  {
+   "id": "su/ebi/book-2",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ebi-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a chubby round shrimp mascot (warm orange, segmented body, a fan tail at the back) with two long thin antennae, small round hands, a big round face on the front); keep its shape exactly. No text, no letters. Page 2: Ebisuke sitting alone on a rock, thinking, a small question mark above its head."
+  },
+  {
+   "id": "su/ebi/book-3",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ebi-ref.jpg",
+    "design/mv-art/out/su/ebi/dad.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a chubby round shrimp mascot (warm orange, segmented body, a fan tail at the back) with two long thin antennae, small round hands, a big round face on the front); keep its shape exactly. No text, no letters. Page 3: Ebisuke swimming to a big kind old spiny lobster (like the second reference picture) on a rock in the blue sea."
+  },
+  {
+   "id": "su/ebi/book-4",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ebi-ref.jpg",
+    "design/mv-art/out/su/ebi/dad.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a chubby round shrimp mascot (warm orange, segmented body, a fan tail at the back) with two long thin antennae, small round hands, a big round face on the front); keep its shape exactly. No text, no letters. Page 4: The kind old spiny lobster smiling and explaining to Ebisuke, gentle light rays."
+  },
+  {
+   "id": "su/ebi/book-5",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ebi-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a chubby round shrimp mascot (warm orange, segmented body, a fan tail at the back) with two long thin antennae, small round hands, a big round face on the front); keep its shape exactly. No text, no letters. Page 5: Ebisuke sitting proudly on top of a Japanese New Year osechi lacquer box with colourful food, cherry blossoms."
+  },
+  {
+   "id": "su/ebi/book-6",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ebi-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a chubby round shrimp mascot (warm orange, segmented body, a fan tail at the back) with two long thin antennae, small round hands, a big round face on the front); keep its shape exactly. No text, no letters. Page 6: Ebisuke puffing out its chest proudly, sparkles, friends clapping. A happy ending."
+  },
+  {
+   "id": "chibi-uni",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/uni-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "A super-deformed chibi version of the character in the reference picture (a round ball mascot with a dark brown body covered all over in soft golden-yellow sea-urchin roe petals like spikes, a dark brown round face area, two short stubby arms), keeping its shape, colours and details exactly recognisable, drawn as a glossy cute 3D vinyl mini figure with soft studio lighting and a sparkly highlight, cute pastel kawaii style. Jumping out joyfully with both arms up, a big happy smile. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text."
+  },
+  {
+   "id": "kor4-uni",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/uni-ref.jpg",
+    "design/mv-art/out/kor4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "A round ball-shaped mascot (a perfect glossy sphere with no arms and no legs) in exactly the same style as the SECOND reference picture: soft cute anime mascot, glossy highlight top-left, and the same simple face — two tiny shiny black dot eyes, a small ω-shaped cat mouth and soft round pink blush. Its colour and surface pattern are designed from the character in the FIRST reference picture (dark brown body with soft golden-yellow spikes). It must still read as a round ball first. Front view, centered, filling about 80% of the frame. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "chibi4-uni",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/uni-ref.jpg",
+    "design/mv-art/out/chibi4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a round ball mascot with a dark brown body covered all over in soft golden-yellow sea-urchin roe petals like spikes, a dark brown round face area, two short stubby arms), dressed up as a butterfly: curly butterfly antennae on top and butterfly wings growing from its back whose colours and patterns are designed from it (dark brown body with soft golden-yellow spikes). Flying gently and hugging a small framed painting in both arms. Front view, centered, the whole character and both wings inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+  },
+  {
+   "id": "ship4-uni",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/uni-ref.jpg",
+    "design/mv-art/out/ship4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a small cute sailboat seen from the side with a sail shaped like a music note. The hull and sail colours and patterns are designed from the character (dark brown body with soft golden-yellow spikes). Riding in the boat is a cute super-deformed chibi of the character in the FIRST reference picture (a round ball mascot with a dark brown body covered all over in soft golden-yellow sea-urchin roe petals like spikes, a dark brown round face area, two short stubby arms), happily carrying a big boombox speaker. No water, no sea. Centered, the whole boat and character inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-mars-uni",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/uni-ref.jpg",
+    "design/mv-art/out/p5-mars-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a round ball mascot with a dark brown body covered all over in soft golden-yellow sea-urchin roe petals like spikes, a dark brown round face area, two short stubby arms, its shape and colours recognisable), riding in a small round flying saucer UFO (in its colours, a glass dome) like the UFO in the 2nd reference picture. There is no light beam, no glow and no light cone under the saucer; its bottom has a clean outline. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-venus-uni",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/uni-ref.jpg",
+    "design/mv-art/out/p5-venus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a round ball mascot with a dark brown body covered all over in soft golden-yellow sea-urchin roe petals like spikes, a dark brown round face area, two short stubby arms, its shape and colours recognisable), working as a radio DJ: sitting at a tiny cute radio DJ booth desk (with a little mixer and an ON AIR lamp) in its colours, wearing headphones and talking happily into a microphone on a desk arm, the whole little booth floating on a small fluffy cloud. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-uranus-uni",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/uni-ref.jpg",
+    "design/mv-art/out/p5-uranus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a round ball mascot with a dark brown body covered all over in soft golden-yellow sea-urchin roe petals like spikes, a dark brown round face area, two short stubby arms, its shape and colours recognisable), hanging from a bunch of balloons with a gift box in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-pluto-uni",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/uni-ref.jpg",
+    "design/mv-art/out/p5-pluto-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a round ball mascot with a dark brown body covered all over in soft golden-yellow sea-urchin roe petals like spikes, a dark brown round face area, two short stubby arms, its shape and colours recognisable), riding on a big open flying book whose cover is in its colours, little glowing letters floating. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-neptune-uni",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/uni-ref.jpg",
+    "design/mv-art/out/p5-neptune-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a round ball mascot with a dark brown body covered all over in soft golden-yellow sea-urchin roe petals like spikes, a dark brown round face area, two short stubby arms, its shape and colours recognisable), floating inside a big transparent bubble holding a game controller in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "su/uni/dad",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [],
+   "always": false,
+   "prompt": "A beautiful painting of a quiet rocky sea floor at night under moonlight: dark purple sea urchins on rocks among swaying kelp, soft blue moonbeams through the water, calm and peaceful, painterly brush strokes, like a fine art poster. No text."
+  },
+  {
+   "id": "su/uni/jacket",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/uni-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Square music album cover for a song called ウニのゆめ (genre: lofi): a cute super-deformed chibi of the character in the reference picture (a round ball mascot with a dark brown body covered all over in soft golden-yellow sea-urchin roe petals like spikes, a dark brown round face area, two short stubby arms) performing happily, colourful energetic background that fits the music, sparkles. Bold, bright, glossy, kawaii. No text, no letters."
+  },
+  {
+   "id": "su/uni/radio",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/uni-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Square radio show artwork: a cute super-deformed chibi of the character in the reference picture (a round ball mascot with a dark brown body covered all over in soft golden-yellow sea-urchin roe petals like spikes, a dark brown round face area, two short stubby arms) talking into a big microphone with headphones on, surrounded by little floating icons about its food and the sea, a question mark and a light bulb. Warm sunset pastel colours, kawaii, clean. No text, no letters."
+  },
+  {
+   "id": "su/uni/goods",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/uni-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Product photo of a round fluffy cushion shaped like the character in the reference picture, on a cosy sofa with a knitted blanket, soft daylight. Kawaii merchandise photo. No text."
+  },
+  {
+   "id": "su/uni/book-1",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/uni-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a round ball mascot with a dark brown body covered all over in soft golden-yellow sea-urchin roe petals like spikes, a dark brown round face area, two short stubby arms); keep its shape exactly. No text, no letters. Page 1: Unimaru hiding shyly behind a rock on the sea floor, peeking out, blushing."
+  },
+  {
+   "id": "su/uni/book-2",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/uni-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a round ball mascot with a dark brown body covered all over in soft golden-yellow sea-urchin roe petals like spikes, a dark brown round face area, two short stubby arms); keep its shape exactly. No text, no letters. Page 2: Unimaru alone under kelp while other little fish keep their distance, a little sad."
+  },
+  {
+   "id": "su/uni/book-3",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/uni-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a round ball mascot with a dark brown body covered all over in soft golden-yellow sea-urchin roe petals like spikes, a dark brown round face area, two short stubby arms); keep its shape exactly. No text, no letters. Page 3: Night sea floor: Unimaru looking up, a faint glowing five-pointed star pattern on its back, moonlight."
+  },
+  {
+   "id": "su/uni/book-4",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/uni-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a round ball mascot with a dark brown body covered all over in soft golden-yellow sea-urchin roe petals like spikes, a dark brown round face area, two short stubby arms); keep its shape exactly. No text, no letters. Page 4: Close view of Unimaru's back glowing with a sparkling five-line star pattern, magical sparkles."
+  },
+  {
+   "id": "su/uni/book-5",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/uni-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a round ball mascot with a dark brown body covered all over in soft golden-yellow sea-urchin roe petals like spikes, a dark brown round face area, two short stubby arms); keep its shape exactly. No text, no letters. Page 5: Little fish and sushi friends gathering around Unimaru admiring the glowing star, warm light."
+  },
+  {
+   "id": "su/uni/book-6",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/uni-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a round ball mascot with a dark brown body covered all over in soft golden-yellow sea-urchin roe petals like spikes, a dark brown round face area, two short stubby arms); keep its shape exactly. No text, no letters. Page 6: Unimaru smiling softly among friends under the moonlit sea. A happy ending."
+  },
+  {
+   "id": "chibi-ika",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ika-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "A super-deformed chibi version of the character in the reference picture (a pearly white-pink squid mascot: a triangular pointed mantle head with two side fins, the face on the mantle, many soft wavy tentacles below), keeping its shape, colours and details exactly recognisable, drawn as a glossy cute 3D vinyl mini figure with soft studio lighting and a sparkly highlight, cute pastel kawaii style. Jumping out joyfully with both arms up, a big happy smile. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text."
+  },
+  {
+   "id": "kor4-ika",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ika-ref.jpg",
+    "design/mv-art/out/kor4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "A round ball-shaped mascot (a perfect glossy sphere with no arms and no legs) in exactly the same style as the SECOND reference picture: soft cute anime mascot, glossy highlight top-left, and the same simple face — two tiny shiny black dot eyes, a small ω-shaped cat mouth and soft round pink blush. Its colour and surface pattern are designed from the character in the FIRST reference picture (pearly white-pink squid). It must still read as a round ball first. Front view, centered, filling about 80% of the frame. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "chibi4-ika",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ika-ref.jpg",
+    "design/mv-art/out/chibi4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a pearly white-pink squid mascot: a triangular pointed mantle head with two side fins, the face on the mantle, many soft wavy tentacles below), dressed up as a butterfly: curly butterfly antennae on top and butterfly wings growing from its back whose colours and patterns are designed from it (pearly white-pink squid). Flying gently and hugging a small framed painting in both arms. Front view, centered, the whole character and both wings inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+  },
+  {
+   "id": "ship4-ika",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ika-ref.jpg",
+    "design/mv-art/out/ship4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a small cute sailboat seen from the side with a sail shaped like a music note. The hull and sail colours and patterns are designed from the character (pearly white-pink squid). Riding in the boat is a cute super-deformed chibi of the character in the FIRST reference picture (a pearly white-pink squid mascot: a triangular pointed mantle head with two side fins, the face on the mantle, many soft wavy tentacles below), happily carrying a big boombox speaker. No water, no sea. Centered, the whole boat and character inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-mars-ika",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ika-ref.jpg",
+    "design/mv-art/out/p5-mars-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a pearly white-pink squid mascot: a triangular pointed mantle head with two side fins, the face on the mantle, many soft wavy tentacles below, its shape and colours recognisable), riding in a small round flying saucer UFO (in its colours, a glass dome) like the UFO in the 2nd reference picture. There is no light beam, no glow and no light cone under the saucer; its bottom has a clean outline. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-venus-ika",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ika-ref.jpg",
+    "design/mv-art/out/p5-venus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a pearly white-pink squid mascot: a triangular pointed mantle head with two side fins, the face on the mantle, many soft wavy tentacles below, its shape and colours recognisable), working as a radio DJ: sitting at a tiny cute radio DJ booth desk (with a little mixer and an ON AIR lamp) in its colours, wearing headphones and talking happily into a microphone on a desk arm, the whole little booth floating on a small fluffy cloud. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-uranus-ika",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ika-ref.jpg",
+    "design/mv-art/out/p5-uranus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a pearly white-pink squid mascot: a triangular pointed mantle head with two side fins, the face on the mantle, many soft wavy tentacles below, its shape and colours recognisable), hanging from a bunch of balloons with a gift box in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-pluto-ika",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ika-ref.jpg",
+    "design/mv-art/out/p5-pluto-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a pearly white-pink squid mascot: a triangular pointed mantle head with two side fins, the face on the mantle, many soft wavy tentacles below, its shape and colours recognisable), riding on a big open flying book whose cover is in its colours, little glowing letters floating. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-neptune-ika",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ika-ref.jpg",
+    "design/mv-art/out/p5-neptune-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a pearly white-pink squid mascot: a triangular pointed mantle head with two side fins, the face on the mantle, many soft wavy tentacles below, its shape and colours recognisable), floating inside a big transparent bubble holding a game controller in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "su/ika/dad",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [],
+   "always": false,
+   "prompt": "A beautiful painting of a night bay where countless firefly squids glow bright blue in the dark water and along the shore waves, starry sky, magical and calm, painterly brush strokes, like a fine art poster. No text."
+  },
+  {
+   "id": "su/ika/jacket",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ika-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Square music album cover for a song called イカ・スミ・ファンク (genre: funk): a cute super-deformed chibi of the character in the reference picture (a pearly white-pink squid mascot: a triangular pointed mantle head with two side fins, the face on the mantle, many soft wavy tentacles below) performing happily, colourful energetic background that fits the music, sparkles. Bold, bright, glossy, kawaii. No text, no letters."
+  },
+  {
+   "id": "su/ika/radio",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ika-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Square radio show artwork: a cute super-deformed chibi of the character in the reference picture (a pearly white-pink squid mascot: a triangular pointed mantle head with two side fins, the face on the mantle, many soft wavy tentacles below) talking into a big microphone with headphones on, surrounded by little floating icons about its food and the sea, a question mark and a light bulb. Warm sunset pastel colours, kawaii, clean. No text, no letters."
+  },
+  {
+   "id": "su/ika/goods",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ika-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Product photo of a white T-shirt with a big cute print of the character in the reference picture, folded neatly on a pastel blue table, soft daylight. Merchandise photo. No text."
+  },
+  {
+   "id": "su/ika/book-1",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ika-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a pearly white-pink squid mascot: a triangular pointed mantle head with two side fins, the face on the mantle, many soft wavy tentacles below); keep its shape exactly. No text, no letters. Page 1: Ikachoro squirting a small cute puff of black ink in the blue sea, playful wink."
+  },
+  {
+   "id": "su/ika/book-2",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ika-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a pearly white-pink squid mascot: a triangular pointed mantle head with two side fins, the face on the mantle, many soft wavy tentacles below); keep its shape exactly. No text, no letters. Page 2: Little fish swimming away from a cloud of ink, Ikachoro looking a bit lonely."
+  },
+  {
+   "id": "su/ika/book-3",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ika-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a pearly white-pink squid mascot: a triangular pointed mantle head with two side fins, the face on the mantle, many soft wavy tentacles below); keep its shape exactly. No text, no letters. Page 3: Ikachoro thinking with a light bulb above its head, holding a paintbrush with a tentacle."
+  },
+  {
+   "id": "su/ika/book-4",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ika-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a pearly white-pink squid mascot: a triangular pointed mantle head with two side fins, the face on the mantle, many soft wavy tentacles below); keep its shape exactly. No text, no letters. Page 4: Ikachoro painting with black ink on a big white shell canvas: waves, stars and friends drawn in ink."
+  },
+  {
+   "id": "su/ika/book-5",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ika-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a pearly white-pink squid mascot: a triangular pointed mantle head with two side fins, the face on the mantle, many soft wavy tentacles below); keep its shape exactly. No text, no letters. Page 5: Fish and sushi friends gathering around the ink painting, amazed and happy."
+  },
+  {
+   "id": "su/ika/book-6",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/ika-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a pearly white-pink squid mascot: a triangular pointed mantle head with two side fins, the face on the mantle, many soft wavy tentacles below); keep its shape exactly. No text, no letters. Page 6: Ikachoro proudly next to its ink artwork, winking, sparkles. A happy ending."
+  },
+  {
+   "id": "chibi-shari",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/shari-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "A super-deformed chibi version of the character in the reference picture (a tall rounded block of white sushi rice mascot (each grain visible, warm cream colour) with a black nori seaweed belt tied around the middle with a little bow at the back, small rice-grain arms), keeping its shape, colours and details exactly recognisable, drawn as a glossy cute 3D vinyl mini figure with soft studio lighting and a sparkly highlight, cute pastel kawaii style. Jumping out joyfully with both arms up, a big happy smile. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text."
+  },
+  {
+   "id": "kor4-shari",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/shari-ref.jpg",
+    "design/mv-art/out/kor4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "A round ball-shaped mascot (a perfect glossy sphere with no arms and no legs) in exactly the same style as the SECOND reference picture: soft cute anime mascot, glossy highlight top-left, and the same simple face — two tiny shiny black dot eyes, a small ω-shaped cat mouth and soft round pink blush. Its colour and surface pattern are designed from the character in the FIRST reference picture (white rice grains with a black nori belt). It must still read as a round ball first. Front view, centered, filling about 80% of the frame. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "chibi4-shari",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/shari-ref.jpg",
+    "design/mv-art/out/chibi4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a tall rounded block of white sushi rice mascot (each grain visible, warm cream colour) with a black nori seaweed belt tied around the middle with a little bow at the back, small rice-grain arms), dressed up as a butterfly: curly butterfly antennae on top and butterfly wings growing from its back whose colours and patterns are designed from it (white rice grains with a black nori belt). Flying gently and hugging a small framed painting in both arms. Front view, centered, the whole character and both wings inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+  },
+  {
+   "id": "ship4-shari",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/shari-ref.jpg",
+    "design/mv-art/out/ship4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a small cute sailboat seen from the side with a sail shaped like a music note. The hull and sail colours and patterns are designed from the character (white rice grains with a black nori belt). Riding in the boat is a cute super-deformed chibi of the character in the FIRST reference picture (a tall rounded block of white sushi rice mascot (each grain visible, warm cream colour) with a black nori seaweed belt tied around the middle with a little bow at the back, small rice-grain arms), happily carrying a big boombox speaker. No water, no sea. Centered, the whole boat and character inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-mars-shari",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/shari-ref.jpg",
+    "design/mv-art/out/p5-mars-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a tall rounded block of white sushi rice mascot (each grain visible, warm cream colour) with a black nori seaweed belt tied around the middle with a little bow at the back, small rice-grain arms, its shape and colours recognisable), riding in a small round flying saucer UFO (in its colours, a glass dome) like the UFO in the 2nd reference picture. There is no light beam, no glow and no light cone under the saucer; its bottom has a clean outline. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-venus-shari",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/shari-ref.jpg",
+    "design/mv-art/out/p5-venus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a tall rounded block of white sushi rice mascot (each grain visible, warm cream colour) with a black nori seaweed belt tied around the middle with a little bow at the back, small rice-grain arms, its shape and colours recognisable), working as a radio DJ: sitting at a tiny cute radio DJ booth desk (with a little mixer and an ON AIR lamp) in its colours, wearing headphones and talking happily into a microphone on a desk arm, the whole little booth floating on a small fluffy cloud. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-uranus-shari",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/shari-ref.jpg",
+    "design/mv-art/out/p5-uranus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a tall rounded block of white sushi rice mascot (each grain visible, warm cream colour) with a black nori seaweed belt tied around the middle with a little bow at the back, small rice-grain arms, its shape and colours recognisable), hanging from a bunch of balloons with a gift box in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-pluto-shari",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/shari-ref.jpg",
+    "design/mv-art/out/p5-pluto-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a tall rounded block of white sushi rice mascot (each grain visible, warm cream colour) with a black nori seaweed belt tied around the middle with a little bow at the back, small rice-grain arms, its shape and colours recognisable), riding on a big open flying book whose cover is in its colours, little glowing letters floating. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-neptune-shari",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/shari-ref.jpg",
+    "design/mv-art/out/p5-neptune-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a tall rounded block of white sushi rice mascot (each grain visible, warm cream colour) with a black nori seaweed belt tied around the middle with a little bow at the back, small rice-grain arms, its shape and colours recognisable), floating inside a big transparent bubble holding a game controller in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "su/shari/dad",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [],
+   "always": false,
+   "prompt": "A beautiful painting of golden rice terraces on hills at sunset, ripe rice swaying, a small farmhouse, warm golden light, peaceful, painterly brush strokes, like a fine art poster. No text."
+  },
+  {
+   "id": "su/shari/jacket",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/shari-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Square music album cover for a song called シャリシャリ・ビート (genre: boombap): a cute super-deformed chibi of the character in the reference picture (a tall rounded block of white sushi rice mascot (each grain visible, warm cream colour) with a black nori seaweed belt tied around the middle with a little bow at the back, small rice-grain arms) performing happily, colourful energetic background that fits the music, sparkles. Bold, bright, glossy, kawaii. No text, no letters."
+  },
+  {
+   "id": "su/shari/radio",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/shari-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Square radio show artwork: a cute super-deformed chibi of the character in the reference picture (a tall rounded block of white sushi rice mascot (each grain visible, warm cream colour) with a black nori seaweed belt tied around the middle with a little bow at the back, small rice-grain arms) talking into a big microphone with headphones on, surrounded by little floating icons about its food and the sea, a question mark and a light bulb. Warm sunset pastel colours, kawaii, clean. No text, no letters."
+  },
+  {
+   "id": "su/shari/goods",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/shari-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Product photo of a cute lunch box shaped and printed like the character in the reference picture, with chopsticks beside it, on a light wooden table, soft daylight. Kawaii merchandise photo. No text."
+  },
+  {
+   "id": "su/shari/book-1",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/shari-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a tall rounded block of white sushi rice mascot (each grain visible, warm cream colour) with a black nori seaweed belt tied around the middle with a little bow at the back, small rice-grain arms); keep its shape exactly. No text, no letters. Page 1: Shario standing quietly on a wooden sushi counter, gentle smile."
+  },
+  {
+   "id": "su/shari/book-2",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/shari-ref.jpg",
+    "design/mv-art/out/sushi/salmon-ref.jpg",
+    "design/mv-art/out/sushi/ebi-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a tall rounded block of white sushi rice mascot (each grain visible, warm cream colour) with a black nori seaweed belt tied around the middle with a little bow at the back, small rice-grain arms); keep its shape exactly. No text, no letters. Page 2: Colourful sushi topping friends (salmon, shrimp, squid, sea urchin mascots) shining, Shario watching admiringly from the side."
+  },
+  {
+   "id": "su/shari/book-3",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/shari-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a tall rounded block of white sushi rice mascot (each grain visible, warm cream colour) with a black nori seaweed belt tied around the middle with a little bow at the back, small rice-grain arms); keep its shape exactly. No text, no letters. Page 3: Shario sitting alone, looking down thoughtfully, a small sigh."
+  },
+  {
+   "id": "su/shari/book-4",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/shari-ref.jpg",
+    "design/mv-art/out/sushi/salmon-ref.jpg",
+    "design/mv-art/out/sushi/ebi-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a tall rounded block of white sushi rice mascot (each grain visible, warm cream colour) with a black nori seaweed belt tied around the middle with a little bow at the back, small rice-grain arms); keep its shape exactly. No text, no letters. Page 4: The sushi friends turning to Shario and cheering, reaching out to it."
+  },
+  {
+   "id": "su/shari/book-5",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/shari-ref.jpg",
+    "design/mv-art/out/sushi/salmon-ref.jpg",
+    "design/mv-art/out/sushi/ebi-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a tall rounded block of white sushi rice mascot (each grain visible, warm cream colour) with a black nori seaweed belt tied around the middle with a little bow at the back, small rice-grain arms); keep its shape exactly. No text, no letters. Page 5: Shario hugging all the sushi topping friends at once, warm glow."
+  },
+  {
+   "id": "su/shari/book-6",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/shari-ref.jpg",
+    "design/mv-art/out/sushi/salmon-ref.jpg",
+    "design/mv-art/out/sushi/ebi-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a tall rounded block of white sushi rice mascot (each grain visible, warm cream colour) with a black nori seaweed belt tied around the middle with a little bow at the back, small rice-grain arms); keep its shape exactly. No text, no letters. Page 6: All friends together forming a happy sushi platter, smiling. A happy ending."
+  },
+  {
+   "id": "chibi-kani",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/kani-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "A super-deformed chibi version of the character in the reference picture (a round orange crab mascot with small spikes on the top of the shell, a cream-white belly, two big claws and six thin legs, the face on the front of the shell), keeping its shape, colours and details exactly recognisable, drawn as a glossy cute 3D vinyl mini figure with soft studio lighting and a sparkly highlight, cute pastel kawaii style. Jumping out joyfully with both arms up, a big happy smile. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text."
+  },
+  {
+   "id": "kor4-kani",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/kani-ref.jpg",
+    "design/mv-art/out/kor4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "A round ball-shaped mascot (a perfect glossy sphere with no arms and no legs) in exactly the same style as the SECOND reference picture: soft cute anime mascot, glossy highlight top-left, and the same simple face — two tiny shiny black dot eyes, a small ω-shaped cat mouth and soft round pink blush. Its colour and surface pattern are designed from the character in the FIRST reference picture (bright orange crab shell with a cream belly). It must still read as a round ball first. Front view, centered, filling about 80% of the frame. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "chibi4-kani",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    640,
+    640
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/kani-ref.jpg",
+    "design/mv-art/out/chibi4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a round orange crab mascot with small spikes on the top of the shell, a cream-white belly, two big claws and six thin legs, the face on the front of the shell), dressed up as a butterfly: curly butterfly antennae on top and butterfly wings growing from its back whose colours and patterns are designed from it (bright orange crab shell with a cream belly). Flying gently and hugging a small framed painting in both arms. Front view, centered, the whole character and both wings inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+  },
+  {
+   "id": "ship4-kani",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/kani-ref.jpg",
+    "design/mv-art/out/ship4-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a small cute sailboat seen from the side with a sail shaped like a music note. The hull and sail colours and patterns are designed from the character (bright orange crab shell with a cream belly). Riding in the boat is a cute super-deformed chibi of the character in the FIRST reference picture (a round orange crab mascot with small spikes on the top of the shell, a cream-white belly, two big claws and six thin legs, the face on the front of the shell), happily carrying a big boombox speaker. No water, no sea. Centered, the whole boat and character inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-mars-kani",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/kani-ref.jpg",
+    "design/mv-art/out/p5-mars-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a round orange crab mascot with small spikes on the top of the shell, a cream-white belly, two big claws and six thin legs, the face on the front of the shell, its shape and colours recognisable), riding in a small round flying saucer UFO (in its colours, a glass dome) like the UFO in the 2nd reference picture. There is no light beam, no glow and no light cone under the saucer; its bottom has a clean outline. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-venus-kani",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/kani-ref.jpg",
+    "design/mv-art/out/p5-venus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a round orange crab mascot with small spikes on the top of the shell, a cream-white belly, two big claws and six thin legs, the face on the front of the shell, its shape and colours recognisable), working as a radio DJ: sitting at a tiny cute radio DJ booth desk (with a little mixer and an ON AIR lamp) in its colours, wearing headphones and talking happily into a microphone on a desk arm, the whole little booth floating on a small fluffy cloud. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-uranus-kani",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/kani-ref.jpg",
+    "design/mv-art/out/p5-uranus-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a round orange crab mascot with small spikes on the top of the shell, a cream-white belly, two big claws and six thin legs, the face on the front of the shell, its shape and colours recognisable), hanging from a bunch of balloons with a gift box in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-pluto-kani",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/kani-ref.jpg",
+    "design/mv-art/out/p5-pluto-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a round orange crab mascot with small spikes on the top of the shell, a cream-white belly, two big claws and six thin legs, the face on the front of the shell, its shape and colours recognisable), riding on a big open flying book whose cover is in its colours, little glowing letters floating. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "p5-neptune-kani",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    512,
+    512
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/kani-ref.jpg",
+    "design/mv-art/out/p5-neptune-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "In exactly the same art style as the 2nd reference picture (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed chibi of the character in the FIRST reference picture (a round orange crab mascot with small spikes on the top of the shell, a cream-white belly, two big claws and six thin legs, the face on the front of the shell, its shape and colours recognisable), floating inside a big transparent bubble holding a game controller in its colours. Centered, everything inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+  },
+  {
+   "id": "su/kani/dad",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [],
+   "always": false,
+   "prompt": "A beautiful painting of a big strong snow crab on a snowy winter beach by a dark blue sea, snowflakes falling, warm light on its orange shell, dignified, painterly brush strokes, like a fine art poster. No text."
+  },
+  {
+   "id": "su/kani/jacket",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/kani-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Square music album cover for a song called カニカニ・ロック (genre: rock): a cute super-deformed chibi of the character in the reference picture (a round orange crab mascot with small spikes on the top of the shell, a cream-white belly, two big claws and six thin legs, the face on the front of the shell) performing happily, colourful energetic background that fits the music, sparkles. Bold, bright, glossy, kawaii. No text, no letters."
+  },
+  {
+   "id": "su/kani/radio",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/kani-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Square radio show artwork: a cute super-deformed chibi of the character in the reference picture (a round orange crab mascot with small spikes on the top of the shell, a cream-white belly, two big claws and six thin legs, the face on the front of the shell) talking into a big microphone with headphones on, surrounded by little floating icons about its food and the sea, a question mark and a light bulb. Warm sunset pastel colours, kawaii, clean. No text, no letters."
+  },
+  {
+   "id": "su/kani/goods",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/kani-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Product photo of a cute orange knit beanie hat with the face of the character in the reference picture and two little claw pom-poms on top, on a soft cream background, soft daylight. Kawaii merchandise photo. No text."
+  },
+  {
+   "id": "su/kani/book-1",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/kani-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a round orange crab mascot with small spikes on the top of the shell, a cream-white belly, two big claws and six thin legs, the face on the front of the shell); keep its shape exactly. No text, no letters. Page 1: Kanibu walking sideways on a sandy beach, leaving little side tracks, smiling."
+  },
+  {
+   "id": "su/kani/book-2",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/kani-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a round orange crab mascot with small spikes on the top of the shell, a cream-white belly, two big claws and six thin legs, the face on the front of the shell); keep its shape exactly. No text, no letters. Page 2: Sea friends walking forward in a line while Kanibu walks sideways next to them."
+  },
+  {
+   "id": "su/kani/book-3",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/kani-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a round orange crab mascot with small spikes on the top of the shell, a cream-white belly, two big claws and six thin legs, the face on the front of the shell); keep its shape exactly. No text, no letters. Page 3: A big rock blocking the beach path, friends stopped and puzzled."
+  },
+  {
+   "id": "su/kani/book-4",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/kani-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a round orange crab mascot with small spikes on the top of the shell, a cream-white belly, two big claws and six thin legs, the face on the front of the shell); keep its shape exactly. No text, no letters. Page 4: Kanibu squeezing sideways through a narrow gap beside the big rock, determined."
+  },
+  {
+   "id": "su/kani/book-5",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/kani-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a round orange crab mascot with small spikes on the top of the shell, a cream-white belly, two big claws and six thin legs, the face on the front of the shell); keep its shape exactly. No text, no letters. Page 5: Kanibu leading the friends sideways through the gap, waving a claw."
+  },
+  {
+   "id": "su/kani/book-6",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "design/mv-art/out/sushi/kani-ref.jpg"
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, lots of white space at the edges, square composition. The main character is the character in the first reference picture (a round orange crab mascot with small spikes on the top of the shell, a cream-white belly, two big claws and six thin legs, the face on the front of the shell); keep its shape exactly. No text, no letters. Page 6: Everyone on the other side of the rock celebrating with Kanibu, sunset. A happy ending."
   }
  ],
  "redo": []
