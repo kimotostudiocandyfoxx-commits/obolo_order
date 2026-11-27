@@ -1,7 +1,7 @@
 {
  "brother": {
   "name": "たこ焼きブラザー",
-  "voice": "f92df673645b4436ac0a8c3a0caff8db",
+  "voice": "2aa5d0dd03414c468bd87a8d701089b0",
   "ref": "design/mv-art/out/chibi-brother.jpg",
   "end": "だZE",
   "genre": "boombap",
@@ -39,7 +39,8 @@
   ],
   "game": "クルクルたこやき",
   "gameKind": "spin",
-  "gameLine": "クルクルたこやき！　タップで、回すZE！"
+  "gameLine": "クルクルたこやき！　タップで、回すZE！",
+  "voiceName": "熱血筋肉ボイス"
  },
  "sister": {
   "name": "たこ焼きシスター",
@@ -81,11 +82,12 @@
   ],
   "game": "ゆらゆらシスター",
   "gameKind": "puff",
-  "gameLine": "ゆらゆらシスター。タップすると、ゆげが舞うのだワ。"
+  "gameLine": "ゆらゆらシスター。タップすると、ゆげが舞うのだワ。",
+  "voiceName": "落ち着いた女性"
  },
  "kaiser": {
   "name": "大根カイザー",
-  "voice": "c1779589576d42148e9e864e65d5b84a",
+  "voice": "41d849e0e3524caebf87580e504e47a3",
   "ref": "design/mv-art/out/res/kaiser-ref2.jpg",
   "end": "ダ",
   "genre": "rock",
@@ -123,11 +125,12 @@
   ],
   "game": "ぶるんぶるんカイザー",
   "gameKind": "jump",
-  "gameLine": "ぶるんぶるんカイザーダ！　タップで、跳ねるのダ！"
+  "gameLine": "ぶるんぶるんカイザーダ！　タップで、跳ねるのダ！",
+  "voiceName": "大魔王"
  },
  "freezy": {
   "name": "フリージー",
-  "voice": "dd25aabce1894d94b5c3d1230efaeb68",
+  "voice": "05ed53d8812c49749231fdbbb97eb8e6",
   "ref": "apps/web/public/onboarding/freezy.webp",
   "end": "だ",
   "genre": "lofi",
@@ -165,11 +168,12 @@
   ],
   "game": "カチコチフリージー",
   "gameKind": "scatter",
-  "gameLine": "カチコチフリージーだ。タップすると、氷がはじける。"
+  "gameLine": "カチコチフリージーだ。タップすると、氷がはじける。",
+  "voiceName": "おじいちゃん"
  },
  "hipokin": {
   "name": "ヒポキン",
-  "voice": "56dd91fba4d44070acb4c2dbf37090ed",
+  "voice": "65b8d83cbbb24ccc883570211475ea2c",
   "ref": "apps/web/public/onboarding/hipokin.webp",
   "end": "のだ",
   "genre": "funk",
@@ -207,11 +211,12 @@
   ],
   "game": "ドスンとヒポキン",
   "gameKind": "jump",
-  "gameLine": "ドスンとヒポキンなのだ。タップで、跳ぶのだ。"
+  "gameLine": "ドスンとヒポキンなのだ。タップで、跳ぶのだ。",
+  "voiceName": "執事の紳士"
  },
  "bossg": {
   "name": "ボスG",
-  "voice": "3c263006ce7d4fddb6fa9294ff770463",
+  "voice": "1e4ccf2686b142a980d5160272781b01",
   "ref": "apps/web/public/onboarding/bossg.webp",
   "end": "だ",
   "genre": "boombap",
@@ -249,7 +254,8 @@
   ],
   "game": "ドンドンボスG",
   "gameKind": "snap",
-  "gameLine": "ドンドンボスGだ。タップしたところへ、行くぞ。"
+  "gameLine": "ドンドンボスGだ。タップしたところへ、行くぞ。",
+  "voiceName": "威厳ある低音男性"
  },
  "longg": {
   "name": "ロングG",
@@ -291,11 +297,12 @@
   ],
   "game": "エコーロングG",
   "gameKind": "puff",
-  "gameLine": "エコーロングGだぜ。タップすると、音が広がるぜ。"
+  "gameLine": "エコーロングGだぜ。タップすると、音が広がるぜ。",
+  "voiceName": "元気な男性"
  },
  "hatg": {
   "name": "ハットG",
-  "voice": "c5b4f9fa40de475a9c47c9ab22cfefc5",
+  "voice": "281b0ecb9a084feb9a370b6a3fd926a2",
   "ref": "apps/web/public/onboarding/hatg.webp",
   "end": "。",
   "genre": "kawaii",
@@ -333,11 +340,12 @@
   ],
   "game": "ピカピカハットG",
   "gameKind": "scatter",
-  "gameLine": "ピカピカハットG。タップで、光る。推してる。"
+  "gameLine": "ピカピカハットG。タップで、光る。推してる。",
+  "voiceName": "ボス"
  },
  "croco": {
   "name": "クロコパトラ",
-  "voice": "4e5cd0480914436ab3f8f286202fc0f3",
+  "voice": "302375f37b904dd9bfc5c829de1acf0c",
   "ref": "docs/story-rewrite/design/crocopatra.jpg",
   "end": "ですわ",
   "genre": "lofi",
@@ -375,7 +383,8 @@
   ],
   "game": "パクパククロコ",
   "gameKind": "snap",
-  "gameLine": "パクパククロコですわ。タップしたところへ、まいりますわ。"
+  "gameLine": "パクパククロコですわ。タップしたところへ、まいりますわ。",
+  "voiceName": "冷徹な女王"
  },
  "onimonk": {
   "name": "オニモンク",
@@ -417,11 +426,12 @@
   ],
   "game": "ゲームオニモンク",
   "gameKind": "spin",
-  "gameLine": "ゲームオニモンクじゃ。タップで、回るのじゃ。"
+  "gameLine": "ゲームオニモンクじゃ。タップで、回るのじゃ。",
+  "voiceName": "豪快な老兵"
  },
  "monban": {
   "name": "MONBAN",
-  "voice": "9600581739c44a9c8bd1401faae802ae",
+  "voice": "a2374e5755374e19b680160b1c91cae6",
   "ref": "design/mv-art/out/chibi-monban.jpg",
   "end": "…",
   "genre": "boombap",
@@ -459,11 +469,12 @@
   ],
   "game": "まもれMONBAN",
   "gameKind": "snap",
-  "gameLine": "まもれ…MONBAN…。タップしたところへ…行く…。"
+  "gameLine": "まもれ…MONBAN…。タップしたところへ…行く…。",
+  "voiceName": "低音"
  },
  "kimorin": {
   "name": "KIMORIN⭐︎",
-  "voice": "58a927973cf94da0ab861b2e4c6dc411",
+  "voice": "23d9324f0b434ab299fc36455b5d5f90",
   "ref": "design/home/chibi-ref/kimorin.jpg",
   "end": "です",
   "genre": "funk",
@@ -501,6 +512,7 @@
   ],
   "game": "ピンポンKIMORIN",
   "gameKind": "jump",
-  "gameLine": "ピンポンKIMORINです。タップで、跳びます。大正解です。"
+  "gameLine": "ピンポンKIMORINです。タップで、跳びます。大正解です。",
+  "voiceName": "少年2"
  }
 }
