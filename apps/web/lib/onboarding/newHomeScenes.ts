@@ -34,8 +34,18 @@ export function withNewHomes(steps: readonly Step[], scenes: Record<string, Step
 export const D3_GROOVE_BEFORE = '聞き終わったコロリンは、溝にしまわれるZE。再生ボタンを押せば、溝のコロリンが、針のマイクの前で、全部まとめて歌うZE!!';
 export const D3_GROOVE_NOW = '聞き終わったコロリンは、溝にしまわれるZE。再生ボタンを押せば、レコードに降りられて、コロリンが溝を流れてきて、順番に喋ってくれるZE!!';
 export const D3_GROOVE_NOTE = 'コロリンは、指でつまんで投げられます。右上の再生ボタンで、レコードに降りて、コロリンの声をまとめて聞けます';
+/**
+ * D04-S005c's screen note of the home of before: it names 〔▶ 全部流す〕 and the needle's mic. The new Saturn home has
+ * neither (its ▶ at the top right drops onto the record and the kororins ride the groove — told by D3_GROOVE_NOTE), so
+ * the new-home day leaves this one note out (story session M-R340: shown only where the two controls exist).
+ */
+export const D3_PLAY_ALL_NOTE = '転がっているコロリンは、前に開いてから降ってきた新しいコロリンです。つつく・はじく・投げると喋って、溝にしまわれます。〔▶ 全部流す〕で、溝のコロリンを、針のマイクの前でまとめて聞けます';
 export function day3NewHomes(steps: readonly Step[]): Step[] {
-  return steps.flatMap((s): Step[] => (s.t === 'say' && s.text === D3_GROOVE_BEFORE ? [{ ...s, text: D3_GROOVE_NOW }, { t: 'notice', text: D3_GROOVE_NOTE }] : [s]));
+  return steps.flatMap((s): Step[] => {
+    if (s.t === 'say' && s.text === D3_GROOVE_BEFORE) return [{ ...s, text: D3_GROOVE_NOW }, { t: 'notice', text: D3_GROOVE_NOTE }];
+    if (s.t === 'notice' && s.text === D3_PLAY_ALL_NOTE) return [];
+    return [s];
+  });
 }
 
 // ───────────────────────────── day 4: Jupiter ─────────────────────────────

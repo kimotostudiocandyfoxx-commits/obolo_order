@@ -36,7 +36,7 @@ export const STORIES: Record<number, DayStory> = {
   2: {
     steps: DAY2,
     auth: true,
-    waitNote: '明日、星へ遊びに行くまでの24時間は、{bati}と好きなだけ話せます。見た目は、チャットの上の顔を押すと、いつでも変えられます',
+    waitNote: '明日、星へ遊びに行くまでの24時間は、{bati}と好きなだけ話せます',
   },
   3: { steps: DAY3, auth: true },
   4: { steps: DAY4, auth: true },

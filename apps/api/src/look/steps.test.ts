@@ -308,4 +308,37 @@ describe('{name} の変身 (D03-S004)', () => {
     expect(f.mana).toBe(MAKE_COST.profileLook);
     expect(m.confirmed).toEqual([]);
   });
+  it('M-R340: a try that failed is not paid for — after 「もういちど」 only the try that worked is charged; a member’s 〔この姿にする〕 that could not be worn gives its mana back', async () => {
+    // a step whose picture was never cut cleanly, then the same step again once it works
+    const t = make({ badCut: true });
+    await expect(t.s.step('u', { who: 'bati', wish: '翼' }, 'https://x')).rejects.toMatchObject({ response: { error: { code: 'LOOK_CUT_FAILED' } } });
+    await expect(t.s.step('u', { who: 'bati', wish: '翼' }, 'https://x')).rejects.toMatchObject({ response: { error: { code: 'LOOK_CUT_FAILED' } } });
+    expect(t.balance()).toBe(88);
+    expect(stepsOf(t.user as never, 'bati').used).toBe(0);
+    (t.s as unknown as { look: { cutOrNothing: unknown } }).look.cutOrNothing = async (img: { data: Buffer }) => ({ png: img.data, record: '' });
+    const ok = await t.s.step('u', { who: 'bati', wish: '翼' }, 'https://x');
+    expect(ok.steps.used).toBe(1);
+    expect(t.balance()).toBe(Math.round((88 - MAKE_COST.lookStep) * 10) / 10);
+    expect(t.charged).toEqual(['lookStep', 'lookStep', 'lookStep']);
+    expect(t.refunded).toEqual(['lookStep', 'lookStep']);
+
+    // an Obolo Order member decides a new look, wearing it fails: the profile look's mana goes back, the round stays open
+    const m = make({ confirmed: true, journeyDay: 9, member: true });
+    await m.s.open('u', 'self');
+    await m.s.step('u', { who: 'self', wish: 'マントを着せて' }, 'https://x');
+    const look = (m.s as unknown as { look: { wearLook: unknown } }).look;
+    const wear = look.wearLook;
+    look.wearLook = async () => {
+      throw new Error('storage down');
+    };
+    const before = m.balance();
+    await expect(m.s.fix('u', 'self', 'https://x')).rejects.toThrow('storage down');
+    expect(m.balance()).toBe(before);
+    expect(m.refunded).toEqual(['profileLook']);
+    expect(stepsOf(m.user as never, 'self').fixed).toBe(false);
+    look.wearLook = wear;
+    const f = await m.s.fix('u', 'self', 'https://x');
+    expect(f.mana).toBe(MAKE_COST.profileLook);
+    expect(m.balance()).toBe(Math.round((before - MAKE_COST.profileLook) * 10) / 10);
+  });
 });

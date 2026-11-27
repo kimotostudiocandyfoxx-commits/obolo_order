@@ -271,11 +271,20 @@ export class LookStepsService {
       if (!url) throw apiError(HttpStatus.CONFLICT, 'NO_LOOK', 'No look yet');
       const first = !lookConfirmedOf(u);
       // a member's later change: the profile look's mana before it is worn (402 NO_MANA stops it; nothing changed yet)
+      let fee: { refund: () => Promise<unknown> } | null = null;
       if (!first && !unlimited && url !== u.avatarUrl) {
         mana = (await livePrices()).profileLook;
-        await this.ledger.charge(this.db, userId, 'profileLook');
+        fee = await this.ledger.charge(this.db, userId, 'profileLook');
       }
-      if (url !== u.avatarUrl) await this.look.wearLook(userId, url, origin, true);
+      if (url !== u.avatarUrl) {
+        try {
+          await this.look.wearLook(userId, url, origin, true);
+        } catch (e) {
+          // M-R340: a try that failed is never paid for — the look was not worn, its mana goes back (the screen asks again)
+          await fee?.refund();
+          throw e;
+        }
+      }
       // the first look: confirmed here, at the bowl of water (its mana: one charge per member, never twice)
       if (first) {
         const r = await this.look.confirmFirstLook(userId, origin, true);

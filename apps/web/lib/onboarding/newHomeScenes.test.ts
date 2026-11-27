@@ -6,7 +6,7 @@ import { DAY4, DAY4_BEFORE, DAY4_NEW_HOME } from './day4';
 import { DAY5, DAY5_BEFORE, DAY5_NEW_HOME } from './day5';
 import { DAY6, DAY6_BEFORE, DAY6_NEW_HOME } from './day6';
 import { DAY7, DAY7_BEFORE, DAY7_NEW_HOME } from './day7';
-import { D3_GROOVE_BEFORE, D3_GROOVE_NOW } from './newHomeScenes';
+import { D3_GROOVE_BEFORE, D3_GROOVE_NOTE, D3_GROOVE_NOW, D3_PLAY_ALL_NOTE } from './newHomeScenes';
 import type { Step } from './script';
 import { STORIES, STORIES_NEW_HOMES } from './stories';
 
@@ -32,7 +32,13 @@ describe('story days 3–7 and the planet switch (M-R330)', () => {
   it('switch on: Saturn tells the play button as dropping onto the record; the other days open the resident’s place, then {neo}’s (door)', () => {
     expect(says(DAY3_NEW_HOME)).toContain(D3_GROOVE_NOW);
     expect(says(DAY3_NEW_HOME)).not.toContain(D3_GROOVE_BEFORE);
-    expect(DAY3_NEW_HOME).toHaveLength(DAY3_BEFORE.length + 1);
+    // M-R340: the note about 〔▶ 全部流す〕 and the needle's mic is only for the home that has them (the one of before)
+    const notes3 = (d: Step[]) => d.flatMap((s) => (s.t === 'notice' ? [s.text] : []));
+    expect(notes3(DAY3_BEFORE)).toContain(D3_PLAY_ALL_NOTE);
+    expect(notes3(DAY3_NEW_HOME)).not.toContain(D3_PLAY_ALL_NOTE);
+    expect(notes3(DAY3_NEW_HOME).some((t) => t.includes('全部流す') || t.includes('針のマイク'))).toBe(false);
+    expect(notes3(DAY3_NEW_HOME)).toContain(D3_GROOVE_NOTE);
+    expect(DAY3_NEW_HOME).toHaveLength(DAY3_BEFORE.length);
     expect(homes(DAY4_NEW_HOME)).toEqual(['jupiter:host:next', 'jupiter:neo:door']);
     expect(homes(DAY5_NEW_HOME)).toEqual(['mercury:host:next', 'mercury:neo:door']);
     expect(homes(DAY6_NEW_HOME)).toEqual(['mars:host:next', 'mars:neo:door']);

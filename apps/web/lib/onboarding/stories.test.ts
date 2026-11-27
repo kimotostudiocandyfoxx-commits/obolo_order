@@ -217,7 +217,7 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
     expect(research).toBeLessThan(t.indexOf('batitalk'));
     const wait = steps.findIndex((s) => s.t === 'say' && s.text === '今日は、、、月で、好きに過ごせ。{bati}と、いくらでも、話していい。');
     expect(wait).toBeGreaterThan(t.indexOf('batitalk'));
-    expect(STORIES[2].waitNote).toContain('{bati}と好きなだけ話せます');
+    expect(STORIES[2].waitNote).toBe('明日、星へ遊びに行くまでの24時間は、{bati}と好きなだけ話せます'); // M-R340: no look change before Order
   });
   it('KIMORIN wears the sunglasses look after the dragon', () => {
     const dragon = steps.findIndex((s) => s.t === 'video' && s.motion === 'd2-dragon');
