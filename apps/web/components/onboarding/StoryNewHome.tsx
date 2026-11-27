@@ -97,7 +97,7 @@ export function StoryNewHome({
     <div className="absolute inset-0 z-[40] overflow-hidden bg-[#04050d]" data-testid={`story-new-home-${planet}-${place}`} data-planet-home="new">
       <PlanetTemplateHome key={`${planet}-${place}`} planet={p} view={view} me={me} hooks={hooks} onEvent={onEvent} />
       {ready ? (
-        <button onClick={go} data-testid="story-home-next" className="pb-safe absolute bottom-4 left-1/2 z-[200] -translate-x-1/2 rounded-full bg-white/90 px-6 py-2 text-sm font-black text-[#2a1630] shadow">
+        <button onClick={go} data-testid="story-home-next" className="pt-safe absolute right-3 top-[104px] z-[200] rounded-full bg-white/90 px-5 py-2 text-sm font-black text-[#2a1630] shadow">
           次へ
         </button>
       ) : (

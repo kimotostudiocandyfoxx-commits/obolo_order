@@ -160,7 +160,7 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 - **海王星の PRESS START**：全画面で遊べる（`GameFull`、プレビューで確認：390×800 の枠）。✕で閉じると星のホームにもどる（開いていたケースのまま）。
 - **金星の話題**：番組の題名を、土星のコロリンと同じ安いテキストモデルに聞く（`showTopicTags`、`@obolo/ai`、温度0・小さな JSON。原価はその要求の小さな原価）。答えが無い時（オフライン・失敗）は言葉のルールのまま。番組の説明・話した言葉はまだ保存していないので、題名だけ（`talk` に渡せば一緒に読む）。
 - **ゲームのケースの絵**：ゲームができたら（最初の版）{bati} が聞く：自分のアートから選ぶ／{bati} が描く（アートと同じ値段 `jacketArt`、アートのスペル・OK・引き落としそのまま。描いた絵はアートとしても残る）／「いらない」でネオンの顔のまま。あとで「ケースの絵を変えて」でもう一度。`games.cover_url`（`PUT /moon/games/:id/cover {rootId|null}`、自分のアートだけ）。海王星のケース・棚が見せる。せりふ（仮）：`GAME_COVER_LINES`。
-- **安全**：ダチ公開（dachi）の本・ゲーム・グッズは、流れ着いていない知らない人には開けない（`GET /moon/books|games|goods/:id` は 404）。Postgres を使うテスト `apps/api/src/craft/goods.test.ts`（`TEST_DATABASE_URL`、CI で設定）。
+- **安全**：ダチ公開（dachi）の本・ゲーム・グッズは、流れ着いていない知らない人には開けない（`GET /moon/books|games|goods/:id` は 404）。Postgres を使うテスト `apps/api/src/craft/goods.test.ts`（`TEST_DATABASE_URL`、CI で設定：`.github/workflows/ci.yml` の `pnpm test` に Postgres 16 のサービスの URL を渡している。`moon-to-planet.pg.test.ts`・`readiness.pg.test.ts` も同じ変数で走る。テストは自分で migration を当てないので、CI は `pnpm test` の前に migration を当てる）。
 
 ## 月で作る → 星（M-R326 といっしょの依頼：8種類の点検）
 
@@ -185,11 +185,13 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 - ラジオだけ、一度さげてから飛ばし直しても88時間が始まり直さなかった → ほかの種類と同じに、飛ばし直すと今から88時間。
 - ブルーナがアートと動画の「星にいる」を知らなかった（何度も飛ばせて、同じ絵が木星に何枚も出た）→ 分かるようにした。
 
-依頼主・物語の部屋に決めてほしいこと：
-- **飛ばし直しのちがい**：アート・曲・動画は飛ばすたびに「投稿」が1行できる（外さずにもう一度飛ばせば、自分の場所に同じ作品が2つ並ぶ。今は「星にいる」の間はボタンが押せないので、外したあとにだけ飛ばし直せる）。コロリン・ラジオ・グッズ・本・ゲームは1つの行の時刻を直すだけ。そろえるかどうか。
-- **88時間たって帰ってきた時の知らせ**（{bati}が★を伝える）は、コロリン・アート・曲・動画・ラジオだけ。グッズ・本・ゲームにはまだない（★の種類もない）。
-- **MV を作り直した時**（場面の描き直し・歌詞入り）は新しい動画になり、飛んだ投稿は前の動画のまま。曲の名前を月で変える方法は今はない（飛ばす時の題が星の題）。
-- **新しい家に入る作品の出どころ**：星の入れものは、月で作ったものだけではない。土星の前の画面の〔つぶやく〕（`POST /saturn/posts`）、木星の前の画面の投稿、水星・火星の前の画面の投稿、金星のブース（録音・生配信の録音）で作ったものも同じ表に入り、新しい家に出る。前の画面をやめるまでは両方が出どころ。
+決まったこと（物語の部屋 2026-11-27・M-R331。スイッチに関係なく、いつも）：
+- **1つの作品＝1つの投稿**：アート・曲・動画も、飛ばし直すと同じ投稿が新しくなる（今の絵・音・動画・題になり、88時間が今から始まる。〔外す〕のあとに飛ばし直しても同じ投稿）。2つ目の投稿はできない（`planets/one-post.ts`、`JupiterService.create`・`PlanetPostsService.create`）。★・返信・公開範囲・タグはその投稿に残る。
+  - この決まりの前に2回飛んでいた作品（同じ作品に生きた投稿が2つ）：前の画面ではそのまま読める。新しい家・大陸・曲を開く所は、いちばん新しい1つだけを出す（`newestOfArt`・`newestOfSource`）。〔外す〕は全部いっしょに外す。**migration・backfill は無い**（消さない・書きかえない）。
+- **88時間たって帰ってきた時の知らせ**（{bati}の「〜から帰ってきたよ」）：グッズ（天王星）・本（冥王星）・ゲーム（海王星）も入る（`MoonWorksService.homecomings`）。★の数え方：前の画面の★（star_events）と、新しい家の☆＝ブルーナにしまった人（bluena_saves）を合わせて、1人1回。グッズ・本・ゲームは☆だけ。飛ばし直して、もう一度帰ってきたら、もう一度知らせる（知らせた時刻と、帰ってきた時刻を比べる）。しまう場所の言葉（仮）：お店・図書館・ゲーム小屋（`HOME_PLACE`）。
+- **MV を作り直した時**（場面の描き直し・切り方の変更・歌詞入り）：飛んでいる火星の投稿が、今の動画・ポスター・長さになる。投稿は新しい裏スタジオの動画のものになる（ブルーナの「星にいる」が新しい動画に付き、それを飛ばしても同じ投稿）。題・88時間・★はそのまま（`planets/mv-follow.ts`）。
+- **曲の題を、作ったあとに言葉で変える**：「タイトルは〇〇にして」「〇〇ってタイトルにして」「曲名は〇〇にして」（`songTitleTalk`、@obolo/shared）。いちばん新しく作ったカードが曲ならその曲、言葉に「曲名・曲の名前」があればいちばん新しい曲。`PATCH /compose/songs/:id/title`：題のチェック（アートの題と同じ。だめなら `MODERATION`）→ 曲の題・飛んでいる水星の投稿の題 → 曲名の読み上げを作り直す（`song.title` の仕事）。{bati}のせりふはアートの題と同じもの（`ART_TITLE_LINES` の changed・flagged・failed）。「ほかのタイトルにして」（{bati}の別の案）は曲にはまだ無い。
+- **新しい家に入る作品の出どころ**：スイッチを入れた星は、前の画面の投稿の入口を閉じる（下の「新しい家への切り替え」）。作るのは月だけ。
 
 ## 切り抜き（M-R325・M-R326・M-R328）
 
@@ -209,7 +211,7 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 
 ## 新しい家への切り替え（準備だけ、M-R326）
 
-今の星の画面を、新しい家（共通の型。今は `/planets-preview/<星>` だけ）に替えるためのスイッチ。**切ったまま**（進め方は依頼主と確認中）。前の画面のコードは残す。
+今の星の画面を、新しい家（共通の型。今は `/planets-preview/<星>` だけ）に替えるためのスイッチ。**切ったまま**（進め方は依頼主と確認中）。前の画面のコードは残す。スイッチは **Web と API の2か所**（同じ決まり `planetHomeIsNew`、@obolo/shared）。必ず両方を同じに入れる。
 
 | 変数（Vercel、ビルドの時に入る） | 意味 | 今 |
 |---|---|---|
@@ -217,16 +219,40 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 | `NEXT_PUBLIC_PLANET_HOMES_NEW` | ここに書いた星だけ新しい家（例 `saturn,jupiter`）。上が空でも効く | 空 |
 | `NEXT_PUBLIC_PLANET_HOMES_OLD` | ここに書いた星は前の画面のまま（上が `new` でも）。両方に書いた星は前の画面 | 空 |
 
-効く道：`/saturn` `/jupiter` `/mercury` `/mars` `/venus` `/uranus` `/neptune`、それと `/pluto`（冥王星には前の画面がないので、スイッチが入った時だけある。切っている間は今までどおり「見つかりません」）。太陽系の入口（`/` の `SolarSystem`）は道を変えない（冥王星は入口に無い：新しい家の星の切り替えから行く）。わくは前のまま：上の帯、ログインの壁、旅の鍵（金星・天王星・海王星の `PlanetGate`）。金星の `?dj=1`（DJの練習）と `?booth=1`（月の工房の〔ラジオ〕が開く放送ブース）は、スイッチが入っても前の画面を開く。
+| API（Cloud Run の変数、入れると新しいリビジョン。ビルドは要らない） | 意味 | 今 |
+|---|---|---|
+| `PLANET_HOMES` | `new` で全部の星。Web の `NEXT_PUBLIC_PLANET_HOMES` と同じ | 空 |
+| `PLANET_HOMES_NEW` | ここに書いた星だけ。Web の `…_NEW` と同じ | 空 |
+| `PLANET_HOMES_OLD` | ここに書いた星は前のまま。Web の `…_OLD` と同じ | 空 |
 
-**はじめの旅は道を通らない**：旅の日は、前の星の画面の部品を物語の中に直接はめている（`StoryPlayer.tsx`）。スイッチを入れても旅は変わらないが、旅が前の画面にたよっている所は物語で決めることがある：
-- 3日目（土星）：`SaturnLesson`（`KororinVessels`：〔器〕のコロリン、〔つぶやく〕で声を入れる、〔広場〕）。それと物語の中の「土星のホーム」（`StoryHome`：前の `planetHome/PlanetHome` で {neo} のレコードとたこ焼きのレコードを見せる）。
-- 4日目（木星）：`JupiterLesson`（`MyAtelier`・`NeoButterfly`：myアトリエ、ステッカー）。
-- 5日目（水星）：`MercuryLesson`（`MyIsland`：自分の島、レコード）。
-- 6日目（火星）：`MarsLesson`（`MyStudio`、UFO、Bluena の光）。
-- 7日目（金星）：`VenusLesson`。
-- 旅のあとの案内（`AfterScreens`）と2周目（`lap2`）の言葉にも、前の画面の場所の名前（広場・器・島・スタジオ）が出る。
-新しい家には〔つぶやく〕〔器〕〔広場〕が無い（作るのは月）。旅のせりふと場面をどうするかは物語の部屋で決める。ここでは何も変えていない。
+効く道：`/saturn` `/jupiter` `/mercury` `/mars` `/venus` `/uranus` `/neptune`、それと `/pluto`（冥王星には前の画面がないので、スイッチが入った時だけある。切っている間は今までどおり「見つかりません」）。太陽系の入口（`/` の `SolarSystem`）は道を変えない（冥王星は入口に無い：新しい家の星の切り替えから行く）。わくは前のまま：上の帯、ログインの壁、旅の鍵（金星・天王星・海王星の `PlanetGate`）。
+
+**スイッチを入れた星は、前の投稿の入口を閉じる**（物語の部屋 2026-11-27。切っている間は何も変わらない）：
+- Web：その星の道は新しい家だけを出す。土星の〔つぶやく〕〔器〕〔広場〕、木星・水星・火星の星の上の投稿、金星のブース（`?dj=1`・`?booth=1` も新しい家になる）は、画面に出ない。
+- API：前の入口は **403 `MADE_ON_MOON`** で断る（`planets/moon-only.ts`。変数は呼ばれるたびに読む）。
+  - 土星：`POST /saturn/posts`（部屋にしまうだけ＝`room: true` は通す。月の工房のコロリン）、`POST /saturn/plazas`
+  - 木星：`POST /jupiter/posts`・`POST /jupiter/posts/:id/replies`
+  - 水星・火星：`POST /planets/:planet/posts`・`…/posts/:id/replies`
+  - 金星：`POST /venus/shows`・`POST /venus/lives`
+  - 月の〔星へ飛ばす〕と月の録音は `via: 'moon'` を付けて同じ道を通る（`makers.ts fly`・`keepShow`、ブルーナの〔投影〕）。`POST /saturn/posts/:id/publish`・`POST /venus/shows/:id/publish`・`/moon/*/fly` は月の道なので閉じない。
+- 前のデータを見るのは、そのまま（読む道は閉じない。★・フォロー・〔外す〕・消すも前のまま）。
+- 前のアプリを開いたままの人（切りかえの前に読みこんだ画面）は、投稿しようとすると断られる（前の画面の「できなかった」の言葉が出る）。
+
+**何も無い人の新しい家**（B7）：本当の星の道では、作品が1つも無く、だれも来ていない人には、**自分の場所だけ**を出す（見本の顔ぶれは出さない。`liveHomeShows`・`emptyHome`）。見比べ用の `/planets-preview/<星>` と、物語の中は、今までどおり見本・台本の顔ぶれ。
+
+**はじめの旅（3〜7日目）**：スイッチを入れた星の日は、物語の中の星の画面が新しい家になる（物語 M-R330。`lib/onboarding/newHomeScenes.ts`・`components/onboarding/StoryNewHome.tsx`・`lib/planetTemplate/storyCast.ts`）。切っている間は、前の日のまま（`DAYn_BEFORE`、1字も変えていない）。
+- 台本（物語のブランチ `f733ae6a`＝M-R334 まで。M-R330 を含む）を取り込んだ。`story-sync` は**新しい家の日**（`STORIES_NEW_HOMES`）と台本を照らし合わせる：0件。
+- 物語のブランチの M-R336（`c0bb5ea7`：3日目にスシモンがロケットに乗る・2日目の「8回まで」）は**まだ取り込んでいない**（新しい話者7人の絵と声が要る）。
+- 並ぶ人：その星の住人の場所（土星 たこ焼き兄妹・木星 大根カイザー・水星 フリージー・火星 ヒポキン・金星 ボスG）には KIMORIN⭐︎（推し。『プリプリ・ボカン』／「うんち。」／すね毛）・MONBAN（ダチ）と、見本の住人。{neo}の場所には、招待した人（いなければ MIKIE⭐︎DRILL）と KIMORIN⭐︎、その朝に飛ばしていれば{neo}の作品。
+- 進むきっかけ：住人の場所＝〔次へ〕（前の土星と同じ。さわる・▶・空は自由）。{neo}の場所＝台本の「扉をタップする」：自分の場所を開くと〔次へ〕が出る。土星の{neo}のレコードは〔次へ〕（前は「全部聞くと進む」もあった）。
+- 場面の対応とスクリーンショット：`docs/handoff/shots/story-<日>-<星>[-neo][-door|-play].jpg`（390×844。`npx tsx apps/web/scripts/story-home-steps.ts` が場面の番号を出す → `/kakunin-…/play?day=N&i=<番号>`）。
+- まだ：新しい台詞の声（`public/story/voices/lines`、声の仕事はまだ回していない）。旅のあとの案内（`AfterScreens`）・2周目（`lap2`：`AtelierVisit`・`IslandWorks` が前の部品）・練習（`SaturnLesson` など。3〜7日目はもう呼ばない）は前のまま。
+
+**スイッチを入れる時の順番**：
+1. データの準備（下の「今あるデータの準備」）：`works` → `figures` → `recut` → `mars-repaint` → `wings` → `title-voice` → `readiness` が `ready: true`。
+2. API の変数（`PLANET_HOMES` か `PLANET_HOMES_NEW`）を入れる → 前の入口が閉じる。
+3. すぐ続けて Web の変数（`NEXT_PUBLIC_PLANET_HOMES…`、同じ星）を入れてビルド → 新しい家が出る。（2 と 3 の間は、前の画面から投稿できないだけ。逆の順だと、開いたままの前の画面から投稿が入る）
+4. もどす時：Web → API の順に空にする。
 
 **今あるデータの準備**：`GET /admin/planets-readiness`（数えるだけ）と、GitHub の Actions「Planets backfill」（`.github/workflows/planets-backfill.yml`。Cloud Run の一度きりのジョブ、管理トークンは Google Cloud の中）。`action` で選ぶ。順番（`all` はこの順）：
 
@@ -263,6 +289,7 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 | `POST /moon/goods` `{kind, rootId, title?}` ・ `GET /moon/goods` ・ `GET /moon/goods/:id` ・ `POST /moon/goods/:id/fly` `{on}` | グッズ：自分のアートで作る（無料）・一覧・開く・天王星へ飛ばす |
 | `PUT /moon/games/:id/cover` `{rootId \| null}` | ゲームのケースの絵（自分のアート、null でネオンの顔） |
 | `GET /moon/games/:id` ・ `GET /moon/books/:id` | 05：飛んだゲーム・本は、その星のホームに届く人も開ける |
+| `PATCH /compose/songs/:id/title` `{title}` | 曲の題を言葉で変える（水星の投稿の題・曲名の読み上げも）。2026-11-27 |
 | `GET /planet-home/:planet/person/:id` | 04 土星：その人の過去の作品（プロフィールの2D舞台）。自分＝自分の作品、ダチ・見られる推し＝88時間なしで、ほかの人＝何も返さない（`person: null`）。新しい順・24まで |
 
 ## まだのこと
