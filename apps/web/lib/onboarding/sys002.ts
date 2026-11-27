@@ -67,14 +67,14 @@ export const SYS002: Step[] = [
 
   { t: 'label', id: 'sys-price' },
   { t: 'notice', text: '月額88円（毎月88マナの代金）。値上げはしません。いつでもやめられます。やめ方は、支払いの画面に書いてあります' },
-  { t: 'notice', text: 'Obolo Orderにならなくても、8日目まで旅は同じように続きます。旅の途中でマナジェムのマナを使い切ると、新しく作れなくなることがあります' },
-  { t: 'say', who: 'MONBAN', text: '……決めるのは、お前だ…。8日目まで待っても、いい…。' },
+  { t: 'notice', text: 'Obolo Orderにならなくても、11日目まで旅は同じように続きます。旅の途中でマナジェムのマナを使い切ると、新しく作れなくなることがあります' },
+  { t: 'say', who: 'MONBAN', text: '……決めるのは、お前だ…。11日目まで待っても、いい…。' },
   {
     t: 'choice',
     key: 'f_join_choice',
     options: [
       { label: 'いま、Obolo Orderになる', goto: 'sys-now' },
-      { label: '8日目に決める', goto: 'sys-later' },
+      { label: '11日目に決める', goto: 'sys-later' },
     ],
   },
   { t: 'label', id: 'sys-now' },
@@ -82,13 +82,13 @@ export const SYS002: Step[] = [
   { t: 'set', key: 'f_join_early_now', value: 'early' },
   { t: 'caption', text: 'Obolo Orderになった' },
   { t: 'caption', text: '通信：火星シアターの扉が、開いた' },
-  { t: 'say', who: 'MONBAN', text: '……儀式は、8日目に、太陽でやる…。それまで、旅を楽しめ…。' },
+  { t: 'say', who: 'MONBAN', text: '……儀式は、11日目に、太陽でやる…。それまで、旅を楽しめ…。' },
   { t: 'goto', id: 'sys-out' },
   { t: 'label', id: 'sys-back' },
   { t: 'say', who: 'MONBAN', text: '……いつでもいい…。設定からも、なれる…。' },
   { t: 'goto', id: 'sys-out' },
   { t: 'label', id: 'sys-later' },
-  { t: 'say', who: 'MONBAN', text: '……そうか…。8日目に、待っている…。' },
+  { t: 'say', who: 'MONBAN', text: '……そうか…。11日目に、待っている…。' },
   { t: 'label', id: 'sys-out' },
   { t: 'bgm', track: null, fade: 3 },
   { t: 'motes', count: 40 }, // 景色が光の粒になってほどけ、元いた所へ戻る

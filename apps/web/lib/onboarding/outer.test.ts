@@ -6,7 +6,8 @@ import { SHOP_LOCKED_NOTE } from '@/components/after/AfterScreens';
 import { STAMPS, stampsOn, ticketOpen } from '@/components/onboarding/StoryExtras';
 import { AFTER_DAYS } from './after';
 import { DAY11 } from './day11';
-import { DAY10, DAY10_BEFORE, DAY10_NEW_HOME, DAY8, DAY8_BEFORE, DAY8_NEW_HOME, DAY9, DAY9_BEFORE, DAY9_NEW_HOME, M_END } from './outer';
+import { DAY10, DAY10_BEFORE, DAY10_NEW_HOME, DAY8, DAY8_BEFORE, DAY8_NEW_HOME, DAY9, DAY9_BEFORE, DAY9_NEW_HOME, HOME_NOTES, M_END } from './outer';
+import { TICKET } from '@/components/story/Ticket';
 import { SCENE_DAY } from './sceneDays';
 import { labelIndex, type Step } from './script';
 import { STORIES, STORIES_NEW_HOMES } from './stories';
@@ -155,6 +156,39 @@ describe('M-R341: days 8–10 are the outer planets, before becoming Obolo Order
     // the note about the screens of before (〔本の空〕〔my図書館〕, the balloon) is the stills-version's only
     expect(notes(DAY8_BEFORE).some((t) => t.includes('〔本の空〕〔my図書館〕'))).toBe(true);
     expect(notes(DAY8_NEW_HOME).some((t) => t.includes('〔本の空〕〔my図書館〕'))).toBe(false);
+  });
+
+  it('days 8–10 on the new homes carry the notes days 4–7 have: who comes around, the pinch and ♡, the door — right before {neo}’s place', () => {
+    for (const [planet, now, before] of [['pluto', DAY8_NEW_HOME, DAY8_BEFORE], ['neptune', DAY9_NEW_HOME, DAY9_BEFORE], ['uranus', DAY10_NEW_HOME, DAY10_BEFORE]] as const) {
+      const at = now.findIndex((s) => s.t === 'home' && s.place === 'neo');
+      expect(now.slice(at - 3, at)).toEqual(HOME_NOTES[planet].map((text) => ({ t: 'notice', text })));
+      const [around, sky, door] = HOME_NOTES[planet];
+      expect(around).toContain('ダチと推しの');
+      expect(around).toContain('88時間');
+      expect(sky).toMatch(/^2本の指でつまむと、空から.+♡を押すと、/);
+      expect(door).toMatch(/^\{neo\}の.+の扉をタップする$/);
+      // the stills-version has no home to pinch or door to tap
+      for (const t of HOME_NOTES[planet]) expect(notes(before)).not.toContain(t);
+    }
+  });
+
+  it('D08-S011: the completion screen after the Eclipse day says the first journey is over; the other days have none', () => {
+    expect(STORIES[11].doneText).toBe('最初の旅、おわり。ここから先は、どの星へも自由に');
+    for (const d of [1, 2, 3, 7, 8, 9, 10]) expect(STORIES[d].doneText).toBeUndefined();
+  });
+
+  it('the ticket: the eight-slot picture, one table for its file, shape, slots and words', () => {
+    expect(TICKET.art).toBe('/onboarding/s/ticket-8stars.jpg');
+    expect(existsSync(`public${TICKET.art}`)).toBe(true);
+    // the slots in the visiting order, left to right, evenly spaced along the bottom
+    expect(TICKET.slots.map((s) => s.id)).toEqual(STAMPS.map((s) => s.id));
+    const xs = TICKET.slots.map((s) => s.x);
+    for (let k = 1; k < xs.length; k++) {
+      expect(xs[k] - xs[k - 1]).toBeGreaterThan(9.5);
+      expect(xs[k] - xs[k - 1]).toBeLessThan(11.5);
+    }
+    expect(TICKET.row.y).toBeGreaterThan(70);
+    expect(TICKET.aspect).toBeGreaterThan(1.5);
   });
 
   it('M-R343: day 9 ends with オニモンク’s goodbye and the note that Uranus opens tomorrow', () => {

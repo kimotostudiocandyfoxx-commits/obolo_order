@@ -522,6 +522,30 @@ export const DAY10_BEFORE: Step[] = [
 // ---------------------------------------------------------------------------------------------------------------
 // M-R343: days 8–10 on the planets' NEW homes — the resident's place, then {neo}'s own place (door), as days 3–7
 // ---------------------------------------------------------------------------------------------------------------
+/**
+ * The screen notes before {neo}'s own place, as days 4–7 have them (M-R330's three: who comes around for 88 hours, the
+ * two-finger pinch up to the sky with ♡, the door). The script has none for days 8–10 yet: written here after the
+ * pattern of days 4–7 (story session 2026-11-27: 「同じ知らせを足す」) — to be replaced by the script's own when it has them.
+ */
+export const HOME_NOTES: Record<'pluto' | 'neptune' | 'uranus', [around: string, sky: string, door: string]> = {
+  pluto: [
+    '{neo}の図書館のまわりには、ダチと推しのお話が、飛ぶ本になって88時間やってきます',
+    '2本の指でつまむと、空から氷の平原を見わたせます。書庫に降りると、知らない人のお話を読めます。♡を押すと、その人の本が、{neo}の図書館にも飛んでくるようになります',
+    '{neo}の図書館の扉をタップする',
+  ],
+  neptune: [
+    '{neo}の館のまわりには、ダチと推しのゲームが、泡になって88時間漂ってきます',
+    '2本の指でつまむと、空から深海の都を見わたせます。館に降りると、知らない人のゲームで遊べます。♡を押すと、その人の泡が、{neo}の館にも漂ってくるようになります',
+    '{neo}の館の扉をタップする',
+  ],
+  uranus: [
+    '{neo}のお店のまわりには、ダチと推しのグッズが、風船になって88時間やってきます',
+    '2本の指でつまむと、空から雲の上の町を見わたせます。お店に降りると、知らない人のグッズを見られます。♡を押すと、その人の風船が、{neo}のお店にも飛んでくるようになります',
+    '{neo}のお店の扉をタップする',
+  ],
+};
+const homeNotes = (planet: 'pluto' | 'neptune' | 'uranus'): Step[] => HOME_NOTES[planet].map((text): Step => ({ t: 'notice', text }));
+
 /** 冥王星：クロコパトラの書庫 →「こちらが、{neo}の図書館。」→ {neo}の図書館（扉） */
 export const DAY8_NEW_HOME: Step[] = afterSay(
   afterSay(
@@ -530,19 +554,19 @@ export const DAY8_NEW_HOME: Step[] = afterSay(
     [{ t: 'home', planet: 'pluto', place: 'host' }, { t: 'sprite', image: 'crocopatra' }],
   ),
   'こちらが、{neo}の図書館。公開なさった本が、ここに並びますわ。お書きになるのは、月の工房ですわ。',
-  [{ t: 'home', planet: 'pluto', place: 'neo', until: 'door' }, { t: 'sprite', image: 'crocopatra' }],
+  [...homeNotes('pluto'), { t: 'home', planet: 'pluto', place: 'neo', until: 'door' }, { t: 'sprite', image: 'crocopatra' }],
 );
 /** 海王星：オニモンクの館 → … 作って公開したあと → {neo}の館（扉。公開していれば、そこにある）→「よう遊んだのう。」 */
 export const DAY9_NEW_HOME: Step[] = beforeSay(
   afterSay(DAY9_BEFORE, '海王星は、ゲームの星。月の工房で作った遊びが、ここで館になって、灯りがともるのじゃ。', [{ t: 'home', planet: 'neptune', place: 'host' }, { t: 'sprite', image: 'onimonk' }]),
   NEPTUNE_BYE,
-  [{ t: 'sprite', image: null }, { t: 'home', planet: 'neptune', place: 'neo', until: 'door', sent: { key: 'f_m_neptune_publish', value: 'send' } }, { t: 'sprite', image: 'onimonk' }],
+  [{ t: 'sprite', image: null }, ...homeNotes('neptune'), { t: 'home', planet: 'neptune', place: 'neo', until: 'door', sent: { key: 'f_m_neptune_publish', value: 'send' } }, { t: 'sprite', image: 'onimonk' }],
 );
 /** 天王星：MONBANの店 →「お前の店だ…。」→ {neo}の店（扉） */
 export const DAY10_NEW_HOME: Step[] = afterSay(
   afterSay(DAY10_BEFORE, '天王星は…グッズの星だ…。月の工房で作ったグッズが…この町で…品物になって並ぶ…。', [{ t: 'home', planet: 'uranus', place: 'host' }, { t: 'sprite', image: ['monban', 'kimorin-sun'] }]),
   'お前の店だ…。形を選んで…絵をのせて…ハンドルを回すだけだ…。作るのは…月の工房だ…。',
-  [{ t: 'home', planet: 'uranus', place: 'neo', until: 'door' }],
+  [...homeNotes('uranus'), { t: 'home', planet: 'uranus', place: 'neo', until: 'door' }],
 );
 
 /** the days as played: the stills-version until the planet's switch is on */

@@ -24,7 +24,10 @@ export function TomorrowScreen({
   canSkip = false,
   bati,
   note,
+  doneText,
 }: {
+  /** the day's 〔完了画面〕 words, over the countdown (D08-S011, after the Eclipse day) */
+  doneText?: string;
   /** a line under the countdown (D03-S009: the 24 hours are for talking with {bati}) */
   note?: string;
   /** the hatched Bati: a calm way into Bati's room (the Moon) to talk while the day waits (P-BATI-ROOM) */
@@ -140,6 +143,11 @@ export function TomorrowScreen({
       ) : (
         <>
           <div className={`relative flex flex-col items-center transition-all duration-700 ${phase === 'wait' ? '' : 'scale-[0.97]'}`}>
+            {doneText && (
+              <p data-testid="day-done-text" className="mb-5 max-w-xs animate-[fadeUp_1.2s_ease-out] text-[15px] leading-relaxed tracking-[0.2em] text-amber-100">
+                {doneText}
+              </p>
+            )}
             <p className="animate-[fadeUp_1.6s_ease-out] text-[19px] tracking-[0.35em] text-amber-50/90">{t(m.gate.seeYouName, { name })}</p>
             <div className="relative mt-8 flex h-[280px] w-[280px] items-center justify-center">
               {/* the eclipse ring: a thin gold circle filling as the day goes by; it spins up on a skip */}

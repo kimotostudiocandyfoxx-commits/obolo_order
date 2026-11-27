@@ -24,6 +24,8 @@ export interface DayStory {
   auth: boolean;
   /** The caption when the skip has rolled the clock to zero (instead of 「扉が開いた」). */
   skippedText?: string;
+  /** 〔完了画面〕 words of the day's end, over the countdown (D08-S011: 「最初の旅、おわり。ここから先は、どの星へも自由に」) */
+  doneText?: string;
   /** a line under the countdown when {bati} is there ({bati} = its name): D03-S009's note on the 24 hours with {bati} */
   waitNote?: string;
 }
@@ -49,7 +51,7 @@ export const STORIES: Record<number, DayStory> = {
   9: { steps: DAY9, auth: true },
   10: { steps: DAY10, auth: true },
   // the Sun: the Eclipse is a choice inside the story (pay → ORDER, or stay a resident); no countdown after it
-  11: { steps: DAY11, auth: true },
+  11: { steps: DAY11, auth: true, doneText: '最初の旅、おわり。ここから先は、どの星へも自由に' },
 };
 
 /**
