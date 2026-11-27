@@ -25,6 +25,7 @@ import {
 import { and, eq, isNull } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
+import { followSong } from '../planets/song-follow';
 import { songs } from '../db/schema';
 import { LLM } from '../infra/tokens';
 import { MediaService } from '../media/media.service';
@@ -245,6 +246,7 @@ export class SongTweakService {
       .update(songs)
       .set({ mixUrl: v.mixUrl, seconds: v.seconds, phrasesJson: v.phrases as unknown as Record<string, unknown>[], designJson: v.design as unknown as Record<string, unknown>, updatedAt: new Date() })
       .where(and(eq(songs.id, id), eq(songs.userId, userId)));
+    await followSong(this.db, { id, userId, mixUrl: v.mixUrl, seconds: v.seconds });
   }
   protected async render(userId: string, o: { instrumentalUrl: string; vocalsUrl: string; segments: Segment[]; plan: TweakPlan; seconds: number; total: number }): Promise<{ data: Buffer; seconds: number }> {
     const [inst, voc] = await Promise.all([this.media.audioByUrl(userId, o.instrumentalUrl), this.media.audioByUrl(userId, o.vocalsUrl)]);

@@ -100,12 +100,13 @@ export class FindsService {
     if (want('jupiter') && !q)
       jobs.push(
         this.db.read
-          .select()
+          // M-R326 audit: on Jupiter already (a post flown from it): the card says so and it is not flown twice
+          .select({ r: jupiterRoots, posted: sql<boolean>`EXISTS (SELECT 1 FROM jupiter_posts jp WHERE jp.root_id = "jupiter_roots"."id" AND jp.deleted_at IS NULL)` })
           .from(jupiterRoots)
           .where(and(eq(jupiterRoots.userId, userId), eq(jupiterRoots.kind, 'photo'), isNull(jupiterRoots.deletedAt)))
           .orderBy(desc(jupiterRoots.createdAt))
           .limit(LIMIT)
-          .then((rows) => rows.map((r) => this.w('jupiter_root', r.id, 'jupiter', r.title ?? '', r.createdAt, { image: r.url }))),
+          .then((rows) => rows.map(({ r, posted }) => this.w('jupiter_root', r.id, 'jupiter', r.title ?? '', r.createdAt, { image: r.url, flown: !!posted }))),
       );
     if (want('mercury'))
       jobs.push(
@@ -121,12 +122,12 @@ export class FindsService {
     if (want('mars'))
       jobs.push(
         this.db.read
-          .select()
+          .select({ r: marsBackstage, posted: sql<boolean>`EXISTS (SELECT 1 FROM planet_posts pp WHERE pp.source_id = "mars_backstage"."id" AND pp.planet = 'mars' AND pp.deleted_at IS NULL)` })
           .from(marsBackstage)
           .where(and(eq(marsBackstage.userId, userId), isNull(marsBackstage.deletedAt), ilike(marsBackstage.title)))
           .orderBy(desc(marsBackstage.createdAt))
           .limit(LIMIT)
-          .then((rows) => rows.map((r) => this.w('mars_backstage', r.id, 'mars', r.title, r.createdAt, { video: r.url, image: r.posterUrl }))),
+          .then((rows) => rows.map(({ r, posted }) => this.w('mars_backstage', r.id, 'mars', r.title, r.createdAt, { video: r.url, image: r.posterUrl, flown: !!posted }))),
       );
     if (want('venus'))
       jobs.push(

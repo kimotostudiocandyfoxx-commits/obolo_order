@@ -97,6 +97,13 @@ export class StorageWorksService {
       UPDATE planet_posts p SET deleted_at = now(), updated_at = now()
       WHERE p.source_id::text = ${id} AND p.user_id = ${userId} AND p.deleted_at IS NULL RETURNING row_to_json(p)::text AS j`);
     extra.push(...posts.rows.map((x) => x.j));
+    // M-R326 audit: an art's posts on Jupiter go with it (a picture thrown away on the Moon stayed on the planet)
+    if (kind === 'jupiter_root') {
+      const jp = await this.db.write.execute<{ j: string }>(sql`
+        UPDATE jupiter_posts p SET deleted_at = now(), updated_at = now()
+        WHERE p.root_id = ${id}::uuid AND p.user_id = ${userId} AND p.deleted_at IS NULL RETURNING row_to_json(p)::text AS j`);
+      extra.push(...jp.rows.map((x) => x.j));
+    }
     if (kind === 'mars_backstage') {
       const mv = await this.db.write.execute<{ j: string }>(sql`
         UPDATE mv_projects m SET deleted_at = now(), updated_at = now()

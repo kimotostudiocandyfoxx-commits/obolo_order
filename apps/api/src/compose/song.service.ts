@@ -6,6 +6,7 @@ import { and, desc, eq, isNotNull, isNull, sql } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { AppConfig, CONFIG } from '../config';
 import { Database } from '../db/db';
+import { followSong } from '../planets/song-follow';
 import { songs, users } from '../db/schema';
 import { LLM } from '../infra/tokens';
 import { MediaService } from '../media/media.service';
@@ -456,6 +457,7 @@ export class SongService {
       })
       .where(eq(songs.id, row.id))
       .returning();
+    await followSong(this.db, nr);
     this.log.log(`song ${row.id} split on our GPU: ${made.lines.length}/${lines.length} lines timed, voice ${made.voiced ? 'member' : 'studio'} (${made.voiceNote})`);
     return this.view(nr);
   }
@@ -511,6 +513,7 @@ export class SongService {
       .set({ designJson: design as unknown as Record<string, unknown>, ...(untouched ? { mixUrl: shown.mixUrl, seconds: shown.seconds, phrasesJson: shown.phrases as unknown as Record<string, unknown>[] } : {}), updatedAt: new Date() })
       .where(eq(songs.id, row.id))
       .returning();
+    await followSong(this.db, nr);
     this.log.log(`song ${row.id} ${userId}: sung in the member's voice (${made.voiceNote})${st.split ? ', split first' : ''}`);
     return this.view(nr);
   }
@@ -699,6 +702,7 @@ export class SongService {
       })
       .where(eq(songs.id, row.id))
       .returning();
+    await followSong(this.db, nr);
     // the previous mix and the vocal lines / instrumental no longer used are deleted (storage) —
     // unless that version was saved: it is on the member's island and still plays from there
     if (!row.savedAt) {
@@ -867,6 +871,7 @@ export class SongService {
       })
       .where(eq(songs.id, row.id))
       .returning();
+    await followSong(this.db, nr);
     if (!row.savedAt) {
       const keep = new Set([mixUrl, vocalsUrl, instrumentalUrl]);
       for (const u of [row.mixUrl, oldVocals, row.instrumentalUrl]) if (u && !keep.has(u)) void this.media.removeByUrl(userId, u).catch(() => undefined);

@@ -269,10 +269,14 @@ export class RadioService {
     return this.showView(rows.map((x) => x.s), viewer);
   }
 
+  /**
+   * 〔星へ飛ばす〕 / back to private. M-R326 audit: a show flown AGAIN (it was private) starts its 88 hours again, like every
+   * other kind (M-R208); one already public keeps its time.
+   */
   async publishShow(userId: string, id: string, on: boolean): Promise<RadioShowView> {
     const [r] = await this.db.write
       .update(radioShows)
-      .set(on ? { status: 'public', publishedAt: sql`coalesce(${radioShows.publishedAt}, now())`, updatedAt: new Date() } : { status: 'private', updatedAt: new Date() })
+      .set(on ? { status: 'public', publishedAt: sql`CASE WHEN ${radioShows.status} = 'public' THEN coalesce(${radioShows.publishedAt}, now()) ELSE now() END`, updatedAt: new Date() } : { status: 'private', updatedAt: new Date() })
       .where(and(eq(radioShows.id, id), eq(radioShows.userId, userId), isNull(radioShows.deletedAt), isNull(radioShows.removedAt)))
       .returning();
     if (!r) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Not found');
