@@ -800,7 +800,7 @@ function WorkOpen({
     <div className={`${x.estage} ${closing ? x.closing : ''}`} onClick={() => performance.now() - t0 > 300 && onClose()} data-testid="land-work" data-planet={planet}>
       {kit.opener({ w: w as HomeWork & LandWork, shore, closing, onEnd })}
       <div className={x.auth} style={{ top: `${sp.whoTop * 100}%` }} data-testid="work-maker">
-        {!shore && <img src={kit.figureOf(w)} alt="" draggable={false} />}
+        <img src={kit.figureOf(w)} alt="" draggable={false} />
         <b>{mine ? `${me.name}（じぶん）` : w.author.name}</b>
       </div>
       <div className={x.acts} onClick={(e) => e.stopPropagation()}>
