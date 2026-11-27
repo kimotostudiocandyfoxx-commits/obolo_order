@@ -14,8 +14,11 @@ export const MOTION = {
   lip: { open: 0.06, holdMs: 70 },
   /** KIMORIN's eye slits: a soft glow that breathes (never while the sunglasses are on) */
   eyes: { period: 2600, min: 0.35, max: 0.95 },
-  /** the tail feathers, a layer of their own: a slow sway (degrees) */
-  tail: { deg: 2.2, period: 2400 },
+  /**
+   * the tail feathers, a layer of their own. Client 2026-11-27: they do NOT sway — the sway moved badly cut edges with
+   * them and opened a gap to the body, so the tail is simply shown (0 = off)
+   */
+  tail: { deg: 0, period: 2400 },
   /** reactions picked from the line */
   react: {
     /** surprise: a jump and a quick shiver */
