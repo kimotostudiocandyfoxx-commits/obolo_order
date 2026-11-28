@@ -3,7 +3,10 @@
   "sfxModel": "bytedance:seed-audio@1.0",
   "musicModel": "minimax:music@2.6",
   "parallel": 3,
-  "redo": [],
+  "redo": [
+    "steps-hall",
+    "gem-hum"
+  ],
   "probe": [],
   "items": [
     {
@@ -513,7 +516,7 @@
     {
       "id": "steps-hall",
       "kind": "se",
-      "prompt": "The light, soft footsteps of a small creature walking unhurriedly on polished stone in a vast echoing hall, about eight steps, with a long natural reverb, quiet and clean. High quality, realistic and rich, clean recording, no music, no voices."
+      "prompt": "Light, soft footsteps of a small creature walking steadily on polished stone in a vast open-air stone plaza at dusk: about ten evenly spaced steps over five seconds, each a gentle soft tap with a short natural echo off stone, absolutely no background hiss, no hum, no wind noise, silent between steps. High quality, realistic and rich, clean recording, no music, no voices."
     },
     {
       "id": "hall-reveal",

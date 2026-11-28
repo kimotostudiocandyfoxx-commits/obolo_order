@@ -5,19 +5,20 @@ background plate with characters composited as cut-outs) moved by the stage — 
 between plate and character layers, light effects — plus a fitting sound. Lines and their order are the story
 session's (D02-S002 / D02-S004 / D02-S009, story branch 008471a6); nothing spoken is changed here.
 
-Story changes built in: no underground pit — OBOLON opens the wall behind the pillar of light, a corridor leads deeper
-into the society, and the rocket towers in the **結社大広間**, a hall open to the evening sky (default; a roofed
-version is a plate swap). In the hall **KIMORIN and the visitor stand in front, looking up at the rocket; OBOLON and
-MONBAN stand beyond, before the rocket** — so OBOLON / MONBAN are filmed over KIMORIN's shoulder (OTS), and KIMORIN's
-lines are the reverse shot (he faces the camera because OBOLON and MONBAN are where the camera is; behind him the hall's
-entrance, never the rocket).
+Story changes built in (client 2026-11-28, with the corrections of the same day): no underground pit and no corridor —
+OBOLON opens the far wall behind the pillar of light and through it we look **straight out of the temple onto the
+rocket plaza (ロケット場)**: an OPEN-AIR plaza under the evening sky (not an indoor hall, so the word 「結社大広間」 is not
+used), where the rocket stands. We walk straight out and arrive. On the plaza **KIMORIN and the visitor stand in front,
+looking up at the rocket; OBOLON and MONBAN stand beyond, before the rocket** — so OBOLON / MONBAN are filmed over
+KIMORIN's shoulder (OTS), and KIMORIN's lines are the reverse shot (he faces the camera because OBOLON and MONBAN are
+where the camera is; behind him the Earth temple's open doors, never the rocket).
 
-The great hall and the rocket follow the rocket-song pictures the client approved (story branch
+The plaza and the rocket follow the rocket-song pictures the client approved (story branch
 design/mv-art/refs-mv/ok-*.jpg, out/mvr/p-rocket3f-front.jpg; copies in refs/): black obelisks with gold ornament,
 golden lanterns, a black mirror floor with gold star lines, steps up to a round platform, a ~20-storey black rocket with a
 magenta centre line and teal side lines, an eye emblem, gold filigree, **three** fins level with the nozzles, and a huge
 golden ring of light behind it. The song film (the story session's) starts right after 〔ロケットに乗る〕 — its intro
-walks KIMORIN toward this same rocket, so the last cut here hands over in the same hall.
+walks KIMORIN toward this same rocket, so the last cut here hands over on the same plaza.
 
 Legend: **plate** = background without characters; **layer** = a cut-out composited on it (parallax depth 0 = the
 plate, 1 = foreground); **KB** = Ken Burns move on the whole picture; **close** = the cinema close-up the stage already
@@ -55,17 +56,17 @@ Durations are the feel; the lines are tapped through as always.
 | B11 | — | same plate | the point of light comes back down out of the sky straight at the camera, flash (replaces d2-kimorin-back) | flash → cut | `zoom-back` |
 | B12 | 「どういう仕組みかわからんけど……24時間、スキップできた！」 | **s/d2-hall-run** | hit shake on the cut | cut | `thud` |
 | B13 | OBOLON「、、、では、、、宇宙へ、行こう。」 | s/d2-hall-run | — | — | — |
-| B14 | 〔光の柱の奥の壁が、左右に開く〕 | **s/d2-hall** → **gh-wall-open** (OBOLON laid over at the same place) | push 1.0→1.08 toward the wall, the doors' dissolve 1.4 s with light spilling over the floor, dust motes | dissolve (replaces d2-floor-open) | `magic`, `stone-door` |
+| B14 | 〔光の柱の奥の壁が開き、まっすぐ外のロケット場が見える〕 | **s/d2-hall** → **gh-wall-open** (OBOLON laid over at the same place) | push 1.0→1.08 toward the wall; the doors' dissolve 1.4 s, evening light spilling in across the floor, dust motes; the rocket and its ring visible far ahead through the opening | dissolve (replaces d2-floor-open) | `magic`, `stone-door` |
 
-## C. The great hall (D02-S009)
+## C. The rocket plaza (D02-S009)
 
 | # | Line(s) | Picture | Movement / effects | Transition | Sound |
 |---|---|---|---|---|---|
-| C1 | — | **gh-corridor** + layer **kb-walk** small in the middle | slow push down the corridor 1.0→1.25 (6 s), KIMORIN walks ahead (scale 0.55→0.42), dust motes in the light shafts | from the open wall: push into the light | `steps-hall`; BGM launch starts here |
-| C2 | 〔テロップ：結社大広間に着いた〕 | **gh-hall-wide** + layer **kb-back** (KIMORIN from behind, lower left-centre, looking up) + OBOLON and MONBAN small at the foot of the steps | open on the floor (1.35, focus low) and tilt/pull up to the whole rocket and the ring (5 s); KIMORIN moves less than the plate (parallax); a slow light sweep along the rocket's lines; the ring breathes and flares; dust motes | white-gold bloom out of the corridor | `hall-reveal` |
+| C1 | — | gh-wall-open held | walking straight out: push through the doors toward the rocket 1.08→1.5 (2.4 s) into a warm bloom (no corridor) | bloom | `steps-hall`; BGM launch starts here |
+| C2 | 〔テロップ：（場所の名前は物語の担当が直す。いまの台本は「結社大広間に着いた」）〕 | **gh-hall-wide** + layer **kb-back** (KIMORIN from behind, lower left-centre, looking up) + OBOLON and MONBAN small at the foot of the steps | open on the floor (1.35, focus low) and tilt/pull up to the whole rocket and the ring (5 s); KIMORIN moves less than the plate (parallax); a slow light sweep along the rocket's lines; the ring breathes and flares; dust motes | from the bloom | `hall-reveal` |
 | C3 | OBOLON「これがロケットだ。月に行く。乗れ。」 | **gh-hall-low**: the rocket from the foot of the steps | tilt up the hull 1.25 (focus low) → 1.0 (focus top), 5 s; light sweep on the lines; his voice over the rocket | cut | — |
 | C4 | MONBAN「では、いってこい。」 | **gh-ots-base** + **kb-ots** (KIMORIN's shoulder and head, big, soft, lower left) + OBOLON (left) and MONBAN (right) before the steps | OTS; slow push toward MONBAN; foreground drifts against the plate | cut | — |
-| C5 | KIMORIN「え？あなた達は乗らないのですか？」 | **gh-reverse** (the hall looking back toward the entrance) + KIMORIN close | reverse shot | cut | — |
+| C5 | KIMORIN「え？あなた達は乗らないのですか？」 | **gh-reverse** (the plaza looking back toward the Earth temple's open doors) + KIMORIN close | reverse shot | cut | — |
 | C6 | MONBAN「俺は…門を、守る必要がある…。」 | OTS, reframed on MONBAN | 0.8 s reframe | cut | — |
 | C7 | KIMORIN「え？知らない人といきなり2人っきりで宇宙？おかしいやろ。」 | reverse + close (shout punch) | — | cut | — |
 | C8 | OBOLON「俺は先に月に行って待ってる。大丈夫だ」 | OTS, reframed on OBOLON | reframe | cut | — |
@@ -89,7 +90,7 @@ Durations are the feel; the lines are tapped through as always.
   `streak-up` / `zoom-back` the point of light; `vanish` a layer dissolving into particles.
 
 ## Pictures (design/rocket-art-queue.json → design/cast/rocket/, published as onboarding/s/gh-*.jpg and gh-*.webp cut-outs)
-- Plates: gh-wall-open (edit of s/d2-hall), gh-corridor, gh-hall-wide, gh-hall-low, gh-ots-base, gh-reverse.
+- Plates: gh-wall-open (edit of s/d2-hall, the doors open onto the plaza), gh-hall-wide, gh-hall-low, gh-ots-base, gh-reverse.
 - Inserts (painted with the character): gh-gem-monban, gh-gem-kimorin.
 - KIMORIN cut-outs (green → scripts/rocket/cut.py): kb-back (three-quarter back, looking up), kb-ots (shoulder and
   head from behind), kb-walk (walking away).
@@ -110,6 +111,6 @@ Durations are the feel; the lines are tapped through as always.
 | bgvideo d2-kimorin-leave | KIMORIN leaves through the gate | his tail becomes a black spiky disc from behind (off-model), the walk slides |
 | video d2-kimorin-back | the light point returns, he runs back | generated; the box device and goggles morph, the gem/ticket glows as a lamp |
 | video d2-floor-open | the floor opens onto a spiral staircase | story change: no descending any more |
-| video d2-descend / s/d2-launch-pit / s/d2-monban-pit / obolon-pit | the underground pit | story change: the great hall instead; old banners and candles do not match the approved rocket design |
+| video d2-descend / s/d2-launch-pit / s/d2-monban-pit / obolon-pit | the underground pit | story change: the open-air rocket plaza instead; old banners and candles do not match the approved rocket design |
 | video d2-gem | a gem on a HUMAN hand | wrong: MONBAN wears black gloves; a bare pink human hand |
 | (the hall exchange) | MONBAN still with OBOLON laid over, close-ups facing us | KIMORIN stood beside OBOLON talking to the camera (client: wrong) |

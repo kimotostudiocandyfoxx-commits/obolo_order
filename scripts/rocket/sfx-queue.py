@@ -11,7 +11,7 @@ NEW = [
     ('whip', 'A very short, crisp cinematic whip-pan swish, like a camera turning around fast: one tight airy swoosh with a soft tail, under half a second.'),
     ('glint', 'A tiny bright metallic glint of light on polished brass: a single delicate high shimmer, very short and clean, anime sparkle-glint sound design.'),
     ('stone-door', 'Two colossal ancient stone temple doors slowly sliding apart: a deep heavy grinding rumble of stone on stone with a low resonant boom, faint dust trickling, and a soft rush of air as they open, in a huge echoing hall.'),
-    ('steps-hall', 'The light, soft footsteps of a small creature walking unhurriedly on polished stone in a vast echoing hall, about eight steps, with a long natural reverb, quiet and clean.'),
+    ('steps-hall', 'Light, soft footsteps of a small creature walking steadily on polished stone in a vast open-air stone plaza at dusk: about ten evenly spaced steps over five seconds, each a gentle soft tap with a short natural echo off stone, absolutely no background hiss, no hum, no wind noise, silent between steps.'),
     ('hall-reveal', 'A vast space opening up: a slow, deep, airy swell of wind and low resonance with a faint high golden shimmer, like walking out into an immense open-air hall at dusk; cinematic reveal sound design, calm and majestic, fading softly.'),
     ('beam', 'A pillar of golden light descending from high above and touching the floor: a bright rising shimmer that falls in pitch, ending in a soft deep resonant impact and a warm humming glow that fades.'),
     ('star-sky', 'A ceiling dissolving into a starry night sky: a slow, gentle wash of soft glassy twinkles and a deep airy hum widening out, magical and calm, fading slowly.'),
