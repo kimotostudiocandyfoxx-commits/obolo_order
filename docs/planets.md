@@ -154,10 +154,10 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 
 ## 09 キャラの投稿・絵本・ゲーム・場面ごとの音・本当の星の道（引き継ぎ 08 の 3・4・6・7章、09 の確認表。M-R337・M-R344）
 物語のブランチ（claude/hopeful-pascal-udqkh2、この中身は b1fafb64。確認表は 2e279cfa）から入れた。スクリーンショットは `docs/handoff/shots/<星>-cast-day10.jpg`（10日目の顔ぶれ）・`<星>-cast-<作品>.jpg`・`pluto-cast-book*.jpg`・`neptune-cast-game.jpg`・`pluto-profile-back.jpg`（390×844）。
-- **投稿（見本ではなく本物）**：スシモン7体・住人11体・KIMORIN⭐︎ の19人が、8惑星に1つずつ（19×8＝152作品）。言葉は `apps/web/lib/planetTemplate/castWorks.json`（sushi.json・res.json・試作の SAPON／SAPLY から1字も変えずに写す）、音と絵は `apps/web/public/planets/cast/<key>/`（音は試作の mp3 をそのまま＝M-R344 の声、絵は webp 768px。合わせて約22MB）。取り込みは `python3 scripts/planet-home/cast-works.py <物語のブランチを取り出したフォルダ>`（声を作り直したら、同じコマンドで入れかえる）。決まりは `lib/planetTemplate/castWorks.ts`（`castWorks.test.ts`）。
+- **投稿（見本ではなく本物）**：スシモン7体・住人11体・KIMORIN⭐︎・MIKIE⭐︎DRILL の20人が、8惑星に1つずつ（20×8＝160作品。MIKIE はオーダー後だけ）。言葉は `apps/web/lib/planetTemplate/castWorks.json`（sushi.json・res.json・試作の SAPON／SAPLY から1字も変えずに写す）、音と絵は `apps/web/public/planets/cast/<key>/`（音は試作の mp3 をそのまま＝M-R344 の声、絵は webp 768px。合わせて約25MB）。取り込みは `python3 scripts/planet-home/cast-works.py <物語のブランチを取り出したフォルダ>`（声を作り直したら、同じコマンドで入れかえる）。決まりは `lib/planetTemplate/castWorks.ts`（`castWorks.test.ts`）。
   - キャラは会員ではない：作品はどの表にも入れない（DB・API・backfill なし）。ホームには `cast-<key>-<星>` という id の作品として出る（`demo`：〔推す〕〔外す〕〔通報〕なし、API に何も聞かない）。
-  - **MIKIE⭐︎DRILL は作品がまだ無い**（物語の部屋が作っていない）ので、オーダーのあとも、作品ができるまでホームに来ない。
-  - **KIMORIN⭐︎ の音は KIMORIN の声**（本番の KIMORIN_VOICE。物語のブランチ f943f6f2 で作り直された mp3 を `cast-works.py` で入れかえた。res.json の `mikie` は音のフォルダがまだ無いので飛ばす）。
+  - **MIKIE⭐︎DRILL の投稿**（物語のブランチ f66e3a1e：音 `design/home/res/mikie/`、絵 `design/mv-art/out/re/mikie/`、言葉 res.json の `mikie`）も `cast-works.py` で入れた（20人×8＝160作品。絵にすかしが無いことを確かめた）。**オーダーになってから**（`orderedAt` がある＝一度でも入った。サーバーの MIKIE のダチのスレッドと同じ決まり：`isOrderedMember`・`castDayOfMember`）だけ、KIMORIN⭐︎ と並ぶダチとして8惑星すべてに来る。オーダー前は、ホームにも、物語の中の住人の場所・{neo}の場所にも出ない（M-R342・M-R343）。見本のホームは、ログインしている会員ならその会員の本当の状態、だれもいなければ今までどおり（日の指定なし＝オーダーの姿で2人、`&day=` あり＝KIMORIN⭐︎ だけ）。スクリーンショット：`docs/handoff/shots/mikie-after-order.jpg`。
+  - **KIMORIN⭐︎ の音は KIMORIN の声**（本番の KIMORIN_VOICE。物語のブランチ f943f6f2 で作り直された mp3 を `cast-works.py` で入れかえた。res.json の `mikie` は f66e3a1e で音のフォルダが来たので入った）。
   - 開き方：土星＝ひとこと＋本人の声。木星＝アート＋題（タップと同時に題を本人の声で）。水星＝曲・ジャケット・曲名の読み上げ・歌詞（時間つき）。火星＝スシモンは短い動画がつなぎ目なくくり返し＋曲（物語の3秒の動画は、くり返す所で光・太陽・カニのはさみが跳んでいた（ふつうの1コマの約3倍）→ 取りこむ時に最後の8コマを最初の8コマへ重ねてつなぎ、2.67秒・24コマ/秒に。キーフレームだけくっきりするのも継ぎ目に見えたので画質をそろえて作る：`scripts/planet-home/mvloop.py`。ブラウザで、くり返す前後のコマの差がふだんの1コマの差と同じことを確かめた）、住人と KIMORIN はアートがゆっくり動く＋曲（閉じるまで。▶では曲の終わりまで）。金星＝豆知識ラジオ（スシモンはラジオの絵、ほかはアート）。天王星＝グッズの絵そのもの＋本人の声（マグはカップの音も）。冥王星＝絵本。海王星＝タップのゲーム＋本人の声でゲーム名。
   - 声はタップの中で鳴らし始める（`lib/planetTemplate/castAudio.ts`：1つの audio を使い回す。少し遅らせるとスマホで鳴らないため）。
 - **冥王星の絵本**（`components/planetTemplate/cast/PictureBook.tsx`、決まりは `castBook.ts`）：正方形のページ（スシモン6・ほか3）、言葉は下の帯。題→1ページずつ本人の声で読み、読み終わると 1.1 秒で次へめくれる。〔‹〕〔›〕とページの左右の端でもめくれる（右端で次へ）。右下に〔ゆっくり〕〔ふつう〕〔はやい〕（0.8・1・1.3倍、声の高さは変えない、端末に覚える `obolo.book.speed`）。最後まで読んだら（最後で〔›〕でも）本が閉じて飛んでいき、ホームに戻る。▶の中では押せないが、**最後のページまで読んで**から閉じて飛んでいき、次の作品へ（本だけは5.2秒で切らない。`castReadsToEnd`）。
@@ -346,7 +346,7 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 | `GET /planet-home/:planet/person/:id` | 04 土星：その人の過去の作品（プロフィールの2D舞台）。自分＝自分の作品、ダチ・見られる推し＝88時間なしで、ほかの人＝何も返さない（`person: null`）。新しい順・24まで |
 
 ## まだのこと
-- 09：MIKIE⭐︎DRILL の投稿（無い）、8日目の本と9日目のゲームを本物の作品にすること、2日目のロケットの映像（音待ち）。
+- 09：8日目の本と9日目のゲームを本物の作品にすること、2日目のロケットの映像（音待ち）。
 - 公開範囲の初期値（依頼主の答え待ち。今は dachi）。
 - 大陸の絵：水星（0058）・木星（0059）・土星（0060）の90枚、5惑星（0063）の160枚は全部入った。
 - 05 のつづき：グッズ・ケースの絵の {bati} のせりふは仮（物語の部屋で確認）。金星の番組の説明・話した言葉は保存していない（話題は題名だけから）。おためしのデモでは、{bati} が描いたケースの絵は `idb:` のままなので海王星では出ない（本番は https）。

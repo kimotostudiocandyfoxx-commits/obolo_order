@@ -33,7 +33,8 @@ const KIMORIN_WORK: Record<StoryPlanet, { title?: string; text?: string }> = {
   neptune: {},
   uranus: {},
 };
-const SATURN_WORDS: Record<string, string> = { MONBAN: '……今日も、異常なし…。', 'MIKIE⭐︎DRILL': 'ようこそ。' };
+// MONBAN's line in the script (D04-S005). MIKIE⭐︎DRILL is never in the story's places: they are all before Order (M-R343)
+const SATURN_WORDS: Record<string, string> = { MONBAN: '……今日も、異常なし…。' };
 /** the two hosts of Saturn's record share one place */
 const HOST_NAMES: Record<StoryPlanet, string[]> = { saturn: ['たこ焼きブラザー', 'たこ焼きシスター'], jupiter: ['大根カイザー'], mercury: ['フリージー'], mars: ['ヒポキン'], venus: ['ボスG', 'ロングG', 'ハットG'], pluto: ['クロコパトラ'], neptune: ['オニモンク'], uranus: ['MONBAN'] };
 

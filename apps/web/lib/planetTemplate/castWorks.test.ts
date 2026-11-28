@@ -8,6 +8,7 @@ import {
   castAsset,
   castByKey,
   castByName,
+  castDayOfMember,
   castGamePicture,
   castMv,
   castOfWork,
@@ -18,6 +19,7 @@ import {
   castTapVoice,
   castWork,
   isCastPerson,
+  isOrderedMember,
   rosterDayOfMember,
   withCast,
 } from './castWorks';
@@ -26,17 +28,18 @@ import { peopleOf } from './people';
 import { oshiOn, ROSTER_DAYS, SUSHIMON } from './roster';
 import { emptyHome } from './sample';
 import { songOf } from './sky';
+import { STORY_HOSTS, storyHome, type StoryPlanet } from './storyCast';
 
 const file = (url: string) => `public${url}`;
 
 describe('M-R344: the cast’s works on all eight planets are the story team’s own (no sample works)', () => {
-  it('the seven Sushimon, the eleven residents and KIMORIN⭐︎ — nineteen with works; MIKIE⭐︎DRILL has none yet', () => {
-    expect(CAST_WORKS).toHaveLength(19);
+  it('the seven Sushimon, the eleven residents, KIMORIN⭐︎ and MIKIE⭐︎DRILL — twenty with works', () => {
+    expect(CAST_WORKS).toHaveLength(20);
     expect(CAST_WORKS.filter((c) => c.group === 'sushimon').map((c) => c.name)).toEqual(SUSHIMON.map((p) => p.name));
     expect(CAST_WORKS.filter((c) => c.group === 'resident').map((c) => c.name).sort()).toEqual(ROSTER_DAYS.flatMap((d) => d.residents.map((p) => p.name)).sort());
-    expect(CAST_WORKS.filter((c) => c.group === 'dachi').map((c) => c.name)).toEqual(['KIMORIN⭐︎']);
-    expect(CAST_WITHOUT_WORKS).toEqual(['MIKIE⭐︎DRILL']);
-    expect(castByName('MIKIE⭐︎DRILL')).toBeUndefined();
+    expect(CAST_WORKS.filter((c) => c.group === 'dachi').map((c) => c.name)).toEqual(['KIMORIN⭐︎', 'MIKIE⭐︎DRILL']);
+    expect(CAST_WITHOUT_WORKS).toEqual([]);
+    expect(castByName('MIKIE⭐︎DRILL')?.key).toBe('mikie');
     // the keys are the roster's picture keys (their figures on every planet are public/planets/sample/fig-<planet>-<key>)
     for (const p of [...SUSHIMON, ...ROSTER_DAYS.flatMap((d) => d.residents)]) expect(castByKey(p.pic)?.name, p.name).toBe(p.name);
   });
@@ -56,6 +59,13 @@ describe('M-R344: the cast’s works on all eight planets are the story team’s
     expect(castByKey('monban')!.art).toBe('夜明けの…門だ…。');
     expect(castByKey('kimorin')!.pages).toEqual(['KIMORINは、なんでも せいこうする はつめいかです。', 'きょうの はつめいは、ぜんぶ ばくはつ しました。', '「これは、ばくはつする はつめい です。せいこうです。」 おしまい。']);
     expect(castByKey('kaiser')!.lyrics[0]).toEqual([1.5, 'ダ！']);
+    // MIKIE⭐︎DRILL (res.json `mikie`, story f66e3a1e)
+    const mikie = castByKey('mikie')!;
+    expect(mikie.saturn).toBe('人生はね、ドリルみたいに、まわしてナンボよ！');
+    expect(mikie.song).toBe('ドリル・マダム');
+    expect(mikie.book).toBe('MIKIEと ちいさな はつめいか');
+    expect(mikie.pages).toHaveLength(3);
+    expect(mikie.game).toBe('まわせ！MIKIE');
   });
 
   it('a Sushimon’s picture book has six pages, the others’ three; the seven Sushimon have seven different games', () => {
@@ -173,7 +183,7 @@ describe('M-R341: who comes, by the member’s journey day', () => {
     expect(rosterDayOfMember({ journeyDay: 12, journeyCompletedAt: null })).toBe(10);
   });
 
-  it('before day 3 nobody; then KIMORIN⭐︎ (the only ダチ with works) and the day’s oshi: 9, 10, 11, 12, 15, 16, 17, 18', () => {
+  it('before day 3 nobody; then KIMORIN⭐︎ (the only ダチ before Order) and the day’s oshi: 9, 10, 11, 12, 15, 16, 17, 18', () => {
     expect(castOn({ day: 2, ordered: false })).toEqual([]);
     const counts = [3, 4, 5, 6, 7, 8, 9, 10].map((day) => castOn({ day, ordered: false }).filter((x) => x.rel === 'oshi').length);
     expect(counts).toEqual([9, 10, 11, 12, 15, 16, 17, 18]);
@@ -183,8 +193,8 @@ describe('M-R341: who comes, by the member’s journey day', () => {
       expect(on.filter((x) => x.rel === 'dachi')).toHaveLength(1);
       expect(on.slice(1).map((x) => x.person.name)).toEqual(oshiOn(day).map((p) => p.name));
     }
-    // an Obolo Order: MIKIE⭐︎DRILL is a ダチ, but she comes only once she has works — today the same nineteen
-    expect(castOn({ day: 10, ordered: true }).map((x) => x.person.name)).toEqual(castOn({ day: 10, ordered: false }).map((x) => x.person.name));
+    // an Obolo Order: MIKIE⭐︎DRILL is a ダチ too, right after KIMORIN⭐︎
+    expect(castOn({ day: 10, ordered: true }).map((x) => x.person.name)).toEqual(['KIMORIN⭐︎', 'MIKIE⭐︎DRILL', ...oshiOn(10).map((p) => p.name)]);
   });
 
   it('the cast come to a member’s real home after their real ダチ・推し; an empty home gets the cast; the far scenery is untouched', () => {
@@ -207,6 +217,52 @@ describe('M-R341: who comes, by the member’s journey day', () => {
     // before the first planet day: nobody (the view is returned as it is)
     const none = emptyHome('saturn', 'me', 'ミナト', now);
     expect(withCast(none, { day: 2, ordered: false }, now)).toBe(none);
-    expect(castAround('pluto', { day: 10, ordered: true }, now)).toHaveLength(19);
+    expect(castAround('pluto', { day: 10, ordered: true }, now)).toHaveLength(20);
+    expect(castAround('pluto', { day: 10, ordered: false }, now)).toHaveLength(19);
+  });
+});
+
+describe('M-R342 / M-R343: MIKIE⭐︎DRILL is a ダチ only after the member becomes Obolo Order', () => {
+  const now = Date.parse('2026-11-28T12:00:00Z');
+  const member = (o: Partial<{ journeyDay: number; journeyCompletedAt: string | null; orderedAt: string | null }> = {}) => ({ journeyDay: 12, journeyCompletedAt: null, orderedAt: null, ...o });
+  const homeOf = (planet: (typeof HOME_PLANETS)[number], me: ReturnType<typeof member>) => withCast(emptyHome(planet, 'me', 'ミナト', now), castDayOfMember(me), now);
+
+  it('the member’s real state decides: `orderedAt` set (joined once) — as the server’s MIKIE ダチ thread rule', () => {
+    expect(isOrderedMember(null)).toBe(false);
+    expect(isOrderedMember(member())).toBe(false);
+    expect(isOrderedMember(member({ orderedAt: '2026-11-20T00:00:00Z' }))).toBe(true);
+    expect(castDayOfMember(member({ orderedAt: '2026-11-20T00:00:00Z' }))).toEqual({ day: 10, ordered: true });
+    expect(castDayOfMember(member({ journeyDay: 5, journeyCompletedAt: null }))).toEqual({ day: 4, ordered: false });
+  });
+
+  it('before Order: absent on all eight planets, even after the journey (a resident)', () => {
+    for (const planet of HOME_PLANETS) {
+      for (const me of [member(), member({ journeyDay: 10, journeyCompletedAt: '2026-11-28T00:00:00Z' }), member({ journeyDay: 4, journeyCompletedAt: null })]) {
+        const v = homeOf(planet, me);
+        expect(v.around.map((w) => w.author.name), planet).not.toContain('MIKIE⭐︎DRILL');
+        expect(v.around.filter((w) => w.rel === 'dachi').map((w) => w.author.name)).toEqual(['KIMORIN⭐︎']);
+      }
+    }
+  });
+
+  it('after Order: present as a ダチ alongside KIMORIN⭐︎ on all eight planets, with her own work of each planet', () => {
+    for (const planet of HOME_PLANETS) {
+      const v = homeOf(planet, member({ orderedAt: '2026-11-20T00:00:00Z' }));
+      expect(v.around.filter((w) => w.rel === 'dachi').map((w) => w.author.name), planet).toEqual(['KIMORIN⭐︎', 'MIKIE⭐︎DRILL']);
+      const w = v.around.find((x) => x.author.name === 'MIKIE⭐︎DRILL')!;
+      expect(w).toMatchObject({ id: `cast-mikie-${planet}`, rel: 'dachi', demo: true });
+      expect(castOfWork(w)?.cast.key).toBe('mikie');
+      for (const url of [w.url, w.thumbUrl, w.author.figure, castPicture(castByKey('mikie')!, planet)]) if (url) expect(existsSync(file(url)), url).toBe(true);
+      expect(peopleOf(v).map((p) => p.name)).toContain('MIKIE⭐︎DRILL');
+    }
+  });
+
+  it('the story’s places (days 3–10, all before Order): never MIKIE⭐︎DRILL — not the residents’ places, not {neo}’s', () => {
+    for (const planet of Object.keys(STORY_HOSTS) as StoryPlanet[]) {
+      for (const place of ['host', 'neo'] as const) {
+        const v = storyHome(planet, place, { neo: 'ミナト', inviter: 'MIKIE⭐︎DRILL', sent: true }, now);
+        expect([...v.around, ...v.own].map((w) => w.author.name), `${planet} ${place}`).not.toContain('MIKIE⭐︎DRILL');
+      }
+    }
   });
 });

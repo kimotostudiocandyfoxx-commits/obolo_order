@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { PlanetTemplateHome, type TemplateMe } from '@/components/planetTemplate/PlanetTemplateHome';
 import { planetHooks } from '@/components/planetTemplate/planetHooks';
 import { getApi } from '@/lib/api';
-import { isCastPerson, rosterDayOfMember, withCast } from '@/lib/planetTemplate/castWorks';
+import { castDayOfMember, isCastPerson, isOrderedMember, withCast } from '@/lib/planetTemplate/castWorks';
 import { ownFigure } from '@/lib/planetTemplate/people';
 import { emptyHome, liveHomeShows, SAMPLE_OWN_FIGURE, templateSample } from '@/lib/planetTemplate/sample';
 import { samplePast } from '@/lib/planetTemplate/saturn';
@@ -59,8 +59,10 @@ export function LivePlanetHome({
 
   useEffect(() => {
     let live = true;
+    // M-R342 / M-R343: MIKIE⭐︎DRILL is a ダチ only for an Obolo Order — a signed-in member's sample follows their real
+    // state (`orderedAt`); with nobody signed in, the sample's own default (the journey done as an Order; a day: before it)
     const sample = (me: Me | null) => ({
-      view: templateSample(planet, Date.now(), sampleDay ? { day: sampleDay } : {}),
+      view: templateSample(planet, Date.now(), { ...(sampleDay ? { day: sampleDay } : {}), ...(me ? { ordered: isOrderedMember(me) } : {}) }),
       me: { name: me?.displayName || 'ミナト★', figure: ownFigure(me?.planetFigures, planet) ?? SAMPLE_OWN_FIGURE(planet), back: backOf(me), dance: me?.chibiPic ?? SAMPLE_DANCE, chibi: chibiOf(me, true) },
       sample: true,
     });
@@ -75,8 +77,9 @@ export function LivePlanetHome({
       // a live route with nothing to show yet (or the feed could not be read): the member's own place, nobody around
       // M-R341 / M-R344: the cast come to the member's real home too — KIMORIN⭐︎ (ダチ) and the oshi of the journey day
       // they have reached (after the journey: all eighteen), each with their one real work of this planet, after the
-      // member's real ダチ・推し. Nobody signed in: nobody comes.
-      const cast = (v: PlanetHomeView) => (me ? withCast(v, { day: rosterDayOfMember(me), ordered: !!me.orderedAt }) : v);
+      // member's real ダチ・推し; MIKIE⭐︎DRILL as a ダチ only once they are an Obolo Order (M-R342 / M-R343). Nobody
+      // signed in: nobody comes.
+      const cast = (v: PlanetHomeView) => (me ? withCast(v, castDayOfMember(me)) : v);
       if (real === 'empty' || !view) {
         const empty = emptyHome(planet, me?.id ?? 'me', me?.displayName ?? '');
         return { view: cast(view?.live ? view : empty), me: { name: me?.displayName || empty.owner.name, figure: ownFigure(me?.planetFigures, planet), back: backOf(me), dance: me?.chibiPic ?? null, chibi: chibiOf(me, false) }, sample: false };

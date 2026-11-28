@@ -106,10 +106,11 @@ describe('the people: one figure each, from figureFor (author.figure / Saturn’
     const v = templateSample('jupiter', Date.parse('2026-11-25T00:00:00Z'));
     v.around.push({ ...v.around[0], id: 'x2', flownAt: '2026-11-25T00:00:00Z' });
     const ps = peopleOf(v);
-    // M-R341 / M-R342 / M-R344: the story's cast only — KIMORIN⭐︎ (ダチ) and the 18 oshi (MIKIE⭐︎DRILL has no works yet)
-    expect(ps).toHaveLength(19);
-    expect(ps[0]).toMatchObject({ name: 'KIMORIN⭐︎', figure: '/planets/sample/fig-jupiter-kimorin.webp' });
-    expect(ps[0].works.map((w) => w.id)).toEqual(['x2', 'cast-kimorin-jupiter']);
+    // M-R341 / M-R342 / M-R344: the story's cast only — the sample is an Obolo Order: MIKIE⭐︎DRILL and KIMORIN⭐︎ (ダチ), the 18 oshi
+    expect(ps).toHaveLength(20);
+    expect(ps[0]).toMatchObject({ name: 'MIKIE⭐︎DRILL', figure: '/planets/sample/fig-jupiter-mikie.webp' });
+    expect(ps[0].works.map((w) => w.id)).toEqual(['x2', 'cast-mikie-jupiter']);
+    expect(ps[1]).toMatchObject({ name: 'KIMORIN⭐︎', figure: '/planets/sample/fig-jupiter-kimorin.webp' });
   });
   it('Saturn rides the ball; others their figure', () => {
     expect(figureOfAuthor({ id: 'a', name: 'a', figure: 'chibi', ball: 'ball' }, 'saturn')).toBe('ball');

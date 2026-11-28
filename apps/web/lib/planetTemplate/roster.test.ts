@@ -39,11 +39,14 @@ describe('M-R341: the oshi grow by the residents of each planet visited (handoff
 });
 
 describe('M-R342: only the story’s cast is on a home', () => {
-  it('the sample home: KIMORIN⭐︎ and the eighteen oshi — the sample people of before are gone, and MIKIE⭐︎DRILL waits until she has works (M-R344)', () => {
+  it('the sample home: the ダチ and the eighteen oshi — the sample people of before are gone; MIKIE⭐︎DRILL only for an Obolo Order', () => {
     for (const planet of HOME_PLANETS) {
       const names = peopleOf(templateSample(planet)).map((p) => p.name);
-      expect(names).toHaveLength(19);
-      expect(names).not.toContain('MIKIE⭐︎DRILL');
+      expect(names).toHaveLength(20);
+      expect(names).toContain('MIKIE⭐︎DRILL');
+      const before = peopleOf(templateSample(planet, Date.now(), { ordered: false })).map((p) => p.name);
+      expect(before).toHaveLength(19);
+      expect(before).not.toContain('MIKIE⭐︎DRILL');
       for (const n of names) expect(HOME_CAST.has(n), n).toBe(true);
       for (const gone of ['ユウキ', 'nana', 'れい', 'ショウ', 'ミオ', 'みお', 'はるか', 'ぽんず', 'kei']) expect(names).not.toContain(gone);
     }

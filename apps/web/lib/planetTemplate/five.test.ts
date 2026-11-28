@@ -56,7 +56,7 @@ describe('05 the five planets on the common template', () => {
     expect(waveBars()[1]).toEqual({ h: 22, delay: 0.08 });
     expect(SHELF_ASPECT).toMatchObject({ radio: 1.55, book: 0.72, game: 0.72 });
   });
-  it('the sample: ten of yours (the prototype’s five works per planet, never 「名前の〜」); around you the cast with their own one work each (M-R344), MIKIE⭐︎DRILL not there until she has works', () => {
+  it('the sample: ten of yours (the prototype’s five works per planet, never 「名前の〜」); around you the cast with their own one work each (M-R344); without a day the sample is an Obolo Order: MIKIE⭐︎DRILL is there', () => {
     for (const p of FIVE_PLANETS) {
       const v = templateSample(p, Date.parse('2026-11-25T12:00:00Z'));
       expect(v.own).toHaveLength(10);
@@ -65,8 +65,8 @@ describe('05 the five planets on the common template', () => {
         expect(w.title).not.toContain(`${w.author.name}の`);
       }
       const people = peopleOf(v);
-      expect(people).toHaveLength(19);
-      expect(people.map((x) => x.name)).not.toContain('MIKIE⭐︎DRILL');
+      expect(people).toHaveLength(20);
+      expect(people.map((x) => x.name)).toContain('MIKIE⭐︎DRILL');
       for (const x of people) {
         expect(x.works).toHaveLength(1);
         expect(castOfWork(x.works[0])?.cast.name).toBe(x.name);
@@ -74,11 +74,13 @@ describe('05 the five planets on the common template', () => {
       }
     }
     // Mars: the cast's song under their film; Pluto: the book opens on its own first page
-    const mars = templateSample('mars').around[0];
+    // (before Order: KIMORIN⭐︎ comes first; an Order's sample has MIKIE⭐︎DRILL first)
+    expect(templateSample('mars').around[0].author.name).toBe('MIKIE⭐︎DRILL');
+    const mars = templateSample('mars', Date.now(), { ordered: false }).around[0];
     expect(mars.author.name).toBe('KIMORIN⭐︎');
     expect(mars.url).toBe('/planets/cast/kimorin/song.mp3');
     expect(mars.title).toBe('ピンポン・ジーニアス');
-    expect(templateSample('pluto').around[0].text).toBe('KIMORINは、なんでも せいこうする はつめいかです。');
+    expect(templateSample('pluto', Date.now(), { ordered: false }).around[0].text).toBe('KIMORINは、なんでも せいこうする はつめいかです。');
   });
   it('story 2026-11-25 Uranus: each goods item on its own kind (its words, else its main tag, else a tote); the sample shows all six', () => {
     expect(goodsKindOfWork({ text: 'マグカップ' })).toBe('マグカップ');
