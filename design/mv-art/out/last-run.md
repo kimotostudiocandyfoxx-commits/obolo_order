@@ -1,6 +1,6 @@
-# UI art — 2026-11-28T07:48:33.091Z
+# UI art — 2026-11-28T07:53:18.310Z
 
-Seedream 5.0 Pro / 2枚 / 約29円
+Seedream 5.0 Pro / 2枚 / 約31円
 
-- ✅ mvr/plate-base-low
-- ✅ mvr/plate-base-wide
+- ✅ mvr/plate-gate-a
+- ✅ mvr/plate-gate-b
