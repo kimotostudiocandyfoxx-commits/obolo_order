@@ -13,10 +13,8 @@ import type { Step } from './script';
  */
 export const DAY1: Step[] = [
   { t: 'scene', id: 'D01-S000' },
-  // D01-S000 招待信号 (M-R90/M-R93, client 2026-10-26): the luxury film — night scenes around the world, a golden
-  // streak, the Earth's golden threads, the fragments, the seal; the envelope streams to the viewer as light.
-  // Skippable; once seen it does not play again.
-  { t: 'film', id: 'signal', parts: 10 },
+  // D01-S000 招待信号: the opening film (M-R90/M-R93) was taken out by the client (2026-11-28); the seal gate (sound /
+  // voice / birth year) still opens day 1, then straight to the invitation.
   // BGM (client, 2026-10-04): opening → MONBAN's theme from MONBAN → OBOLON's theme from OBOLON.
   { t: 'bgm', track: 'opening' },
   { t: 'motes', count: 36 }, // 金色の光の粒（演出）

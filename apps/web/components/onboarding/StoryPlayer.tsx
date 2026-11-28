@@ -95,6 +95,9 @@ import {
  *    motions or at loop seams, and no stale frame. Both are unlocked by the first tap (iOS).
  *  - Progress is saved after every step so a reload resumes where the visitor was.
  */
+/** day 1 opens with the seal gate (sound / voice / birth year) — once with the opening film, which the client took out (2026-11-28) */
+const opensWithSeal = (steps: Step[]) => steps[0]?.t === 'scene' && steps[0].id === 'D01-S000';
+
 export interface StoryProgress {
   i: number;
   name: string;
@@ -2118,8 +2121,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         />
       )}
 
-      {!started && i === 0 && steps[0]?.t === 'film' && steps[0].id === 'signal' && !gateSeen && <SealGate knownYear={vars.birthYear} onOpen={() => start(true)} />}
-      {!started && !(i === 0 && steps[0]?.t === 'film' && steps[0].id === 'signal' && !gateSeen) && (
+      {!started && i === 0 && opensWithSeal(steps) && !gateSeen && <SealGate knownYear={vars.birthYear} onOpen={() => start(true)} />}
+      {!started && !(i === 0 && opensWithSeal(steps) && !gateSeen) && (
         <button className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-6 bg-black" onClick={() => start()}>
           <span className="relative flex h-24 w-24 items-center justify-center">
             <span className="absolute inset-0 animate-ping rounded-full bg-amber-200/20" />
