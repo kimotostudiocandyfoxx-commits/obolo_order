@@ -20483,6 +20483,36 @@
     "docs/story-rewrite/design/refs/places/headquarters-gate.webp"
    ],
    "prompt": "An OUTDOOR launch plaza under the open sky, keeping the same mood, materials and colours as the golden hall of the first reference picture: black stone and gold filigree, rows of tall black-and-gold columns and obelisks around the plaza, golden lanterns, a polished reflective black-and-gold tiled floor with glowing gold lines, and a giant glowing golden ring disc with star points standing upright behind the rocket like a monumental gate. Above: a vast dusk sky, deep violet and navy with gold-lit clouds and the first stars, the spires of a black-and-gold city in the far distance. In the centre a grand wide staircase rises from the plaza to a high round black-and-gold launch platform; ON TOP of the stairs, on the platform, stands the rocket of the second reference picture, EXACTLY its design (black hull with gold filigree, pink and cyan neon lines, orange emblem, swept-back fins whose bottoms are level with the three bronze nozzles), perfectly upright, its nozzles and fins resting firmly on the platform (never floating). The rocket is GIGANTIC, as tall as a 20-storey building, towering over the stairs and the tiny lanterns. No people. Cinematic, dramatic. Vertical 9:16, edge to edge. No text, no letters, no watermark. CAMERA: extreme wide establishing shot from far back across the plaza: the whole plaza with its columns and lanterns, the grand staircase, the rocket on its platform and the golden ring, the dusk sky and distant city spires."
+  },
+  {
+   "id": "mvr/p-out2-a",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "design/mv-art/out/mvr/p-out-wide.jpg",
+    "design/mv-art/out/mvr/p-rocket3f-front.jpg"
+   ],
+   "prompt": "Edit the first reference picture: keep EXACTLY the same scene, camera, composition, dusk sky with gold-lit clouds, reflective black-and-gold floor with gold lines, the lanterns, the tall black-and-gold obelisks in the foreground on both sides, the round platform with the staircase, the giant glowing golden ring, the colours, light and rendering. Change: (1) make the rocket noticeably BIGGER - about 1.4 times taller and wider, its nose rising high into the sky, still exactly the same rocket design (as in the second reference) standing upright on the platform at the top of the stairs, nozzles and fins resting on the platform; the golden ring scaled up with it so it still frames the rocket's upper hull. (2) REMOVE all the distant city buildings, spires and towers behind the rocket - behind the rocket there is only the open dusk sky with clouds down to a low clear horizon. No people. No text, no watermark. Vertical 9:16. Keep the smaller obelisks in the middle distance on both sides of the platform."
+  },
+  {
+   "id": "mvr/p-out2-b",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "design/mv-art/out/mvr/p-out-wide.jpg",
+    "design/mv-art/out/mvr/p-rocket3f-front.jpg"
+   ],
+   "prompt": "Edit the first reference picture: keep EXACTLY the same scene, camera, composition, dusk sky with gold-lit clouds, reflective black-and-gold floor with gold lines, the lanterns, the tall black-and-gold obelisks in the foreground on both sides, the round platform with the staircase, the giant glowing golden ring, the colours, light and rendering. Change: (1) make the rocket noticeably BIGGER - about 1.4 times taller and wider, its nose rising high into the sky, still exactly the same rocket design (as in the second reference) standing upright on the platform at the top of the stairs, nozzles and fins resting on the platform; the golden ring scaled up with it so it still frames the rocket's upper hull. (2) REMOVE all the distant city buildings, spires and towers behind the rocket - behind the rocket there is only the open dusk sky with clouds down to a low clear horizon. No people. No text, no watermark. Vertical 9:16. Also remove the smaller obelisks in the middle distance behind the lanterns, keeping only the big foreground obelisks on both sides, so the rocket stands alone against the sky."
   }
  ],
  "redo": []
