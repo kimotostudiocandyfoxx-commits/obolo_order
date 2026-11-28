@@ -31,10 +31,11 @@ const api = async (body) => {
   return j;
 };
 
-// a 960px square jpeg of the painting (the clip takes its shape from the frame)
-const frame = (p) => {
+// a jpeg of the painting (the clip takes its shape from the frame): 960px square by default,
+// or the item's own frame size (frameSize: [w, h], e.g. [720, 1280] for a vertical 9:16 clip)
+const frame = (p, size = [960, 960]) => {
   const tmp = `/tmp/frame-${randomUUID()}.jpg`;
-  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', p, '-vf', 'scale=960:960:flags=lanczos', '-q:v', '2', tmp]);
+  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', p, '-vf', `scale=${size[0]}:${size[1]}:flags=lanczos`, '-q:v', '2', tmp]);
   const b = readFileSync(tmp);
   unlinkSync(tmp);
   return `data:image/jpeg;base64,${b.toString('base64')}`;
@@ -42,8 +43,8 @@ const frame = (p) => {
 
 async function make(x) {
   const taskUUID = randomUUID();
-  const frames = [{ image: frame(x.image), frame: 'first' }];
-  if (x.last) frames.push({ image: frame(x.last), frame: 'last' });
+  const frames = [{ image: frame(x.image, x.frameSize), frame: 'first' }];
+  if (x.last) frames.push({ image: frame(x.last, x.frameSize), frame: 'last' });
   await api([
     {
       taskType: 'videoInference',
