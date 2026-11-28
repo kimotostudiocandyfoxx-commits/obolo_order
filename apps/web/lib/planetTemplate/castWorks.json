@@ -101,6 +101,7 @@
   "gameKind": "wobble",
   "hasJacket": true,
   "hasRadioPic": true,
+  "hasGamePic": true,
   "hasMv": true
  },
  {
@@ -233,6 +234,7 @@
   "gameKind": "puff",
   "hasJacket": true,
   "hasRadioPic": true,
+  "hasGamePic": true,
   "hasMv": true
  },
  {
@@ -365,6 +367,7 @@
   "gameKind": "jump",
   "hasJacket": true,
   "hasRadioPic": true,
+  "hasGamePic": true,
   "hasMv": true
  },
  {
@@ -449,6 +452,7 @@
   "gameKind": "spin",
   "hasJacket": true,
   "hasRadioPic": true,
+  "hasGamePic": true,
   "hasMv": true
  },
  {
@@ -549,6 +553,7 @@
   "gameKind": "ink",
   "hasJacket": true,
   "hasRadioPic": true,
+  "hasGamePic": true,
   "hasMv": true
  },
  {
@@ -633,6 +638,7 @@
   "gameKind": "scatter",
   "hasJacket": true,
   "hasRadioPic": true,
+  "hasGamePic": true,
   "hasMv": true
  },
  {
@@ -781,6 +787,7 @@
   "gameKind": "snap",
   "hasJacket": true,
   "hasRadioPic": true,
+  "hasGamePic": true,
   "hasMv": true
  },
  {
@@ -842,6 +849,7 @@
   "gameKind": "spin",
   "hasJacket": false,
   "hasRadioPic": false,
+  "hasGamePic": false,
   "hasMv": false
  },
  {
@@ -899,6 +907,7 @@
   "gameKind": "puff",
   "hasJacket": false,
   "hasRadioPic": false,
+  "hasGamePic": false,
   "hasMv": false
  },
  {
@@ -980,6 +989,7 @@
   "gameKind": "jump",
   "hasJacket": false,
   "hasRadioPic": false,
+  "hasGamePic": false,
   "hasMv": false
  },
  {
@@ -1037,6 +1047,7 @@
   "gameKind": "scatter",
   "hasJacket": false,
   "hasRadioPic": false,
+  "hasGamePic": false,
   "hasMv": false
  },
  {
@@ -1106,6 +1117,7 @@
   "gameKind": "jump",
   "hasJacket": false,
   "hasRadioPic": false,
+  "hasGamePic": false,
   "hasMv": false
  },
  {
@@ -1167,6 +1179,7 @@
   "gameKind": "snap",
   "hasJacket": false,
   "hasRadioPic": false,
+  "hasGamePic": false,
   "hasMv": false
  },
  {
@@ -1228,6 +1241,7 @@
   "gameKind": "puff",
   "hasJacket": false,
   "hasRadioPic": false,
+  "hasGamePic": false,
   "hasMv": false
  },
  {
@@ -1309,6 +1323,7 @@
   "gameKind": "scatter",
   "hasJacket": false,
   "hasRadioPic": false,
+  "hasGamePic": false,
   "hasMv": false
  },
  {
@@ -1366,6 +1381,7 @@
   "gameKind": "snap",
   "hasJacket": false,
   "hasRadioPic": false,
+  "hasGamePic": false,
   "hasMv": false
  },
  {
@@ -1447,6 +1463,7 @@
   "gameKind": "spin",
   "hasJacket": false,
   "hasRadioPic": false,
+  "hasGamePic": false,
   "hasMv": false
  },
  {
@@ -1504,6 +1521,7 @@
   "gameKind": "snap",
   "hasJacket": false,
   "hasRadioPic": false,
+  "hasGamePic": false,
   "hasMv": false
  },
  {
@@ -1581,6 +1599,7 @@
   "gameKind": "jump",
   "hasJacket": false,
   "hasRadioPic": false,
+  "hasGamePic": false,
   "hasMv": false
  }
 ]

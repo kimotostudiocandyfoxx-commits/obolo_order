@@ -42,6 +42,8 @@ export interface CastWorks {
   hasJacket: boolean;
   hasRadioPic: boolean;
   hasMv: boolean;
+  /** Neptune: a flat anime picture of their own to tap (the Sushimon, cut from their reference picture); else their chibi */
+  hasGamePic?: boolean;
 }
 
 export const CAST_WORKS: readonly CastWorks[] = data as CastWorks[];
@@ -87,8 +89,11 @@ export function castPicture(c: CastWorks, planet: HomePlanet): string | null {
       return castAsset(c.key, 'art.webp');
   }
 }
-/** Neptune: who is tapped in the game (the cast member's chibi, handoff 08 §6) */
-export const castGamePicture = (c: CastWorks) => `/planets/sample/chibi-${c.key}.webp`;
+/**
+ * Neptune: who is tapped in the game. The seven Sushimon: their flat anime picture cut from the reference picture
+ * (story 2026-11-28: never the 3D jumping chibi). The residents and KIMORIN⭐︎: their chibi (handoff 08 §6).
+ */
+export const castGamePicture = (c: CastWorks) => (c.hasGamePic ? castAsset(c.key, 'game.webp') : `/planets/sample/chibi-${c.key}.webp`);
 
 /** the voice that starts with the tap (handoff 08 §3: 「声は、タップの瞬間に鳴らす」): Jupiter the title, Uranus the goods' line, Pluto the book's title, Neptune the game's name */
 export function castTapVoice(c: CastWorks, planet: HomePlanet): string | null {
@@ -193,3 +198,9 @@ export function withCast(view: PlanetHomeView, o: CastDay, now = Date.now()): Pl
 export const CAST_WITH_WORKS: ReadonlySet<string> = new Set(CAST_WORKS.map((c) => c.name));
 /** in the roster but without works yet */
 export const CAST_WITHOUT_WORKS: readonly string[] = [KIMORIN, MIKIE].map((p) => p.name).filter((n) => !BY_NAME.has(n));
+
+/**
+ * ▶ (story 2026-11-28): a cast member's picture book is read to its last page — then it closes, flies away, and the next
+ * work comes. No 5.2 s cut for a book; every other work keeps the planet's own time.
+ */
+export const castReadsToEnd = (w: Pick<HomeWork, 'id'> | null | undefined): boolean => castOfWork(w)?.planet === 'pluto';

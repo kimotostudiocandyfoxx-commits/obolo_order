@@ -13,6 +13,7 @@ import {
   castOfWork,
   castOn,
   castPicture,
+  castReadsToEnd,
   castSong,
   castTapVoice,
   castWork,
@@ -121,6 +122,21 @@ describe('a cast member’s work on each planet, as a home shows it', () => {
     expect(castMv(k)).toBeNull();
     expect(castMv(castByKey('sapon')!)).toBe('/planets/cast/sapon/mv.mp4');
     expect(castGamePicture(k)).toBe('/planets/sample/chibi-kaiser.webp');
+  });
+
+  it('Neptune (story 2026-11-28): the seven Sushimon are tapped as their flat anime picture, everyone else as their chibi', () => {
+    for (const c of CAST_WORKS) {
+      const sushi = c.key === 'sapon' || ['gari', 'ebi', 'uni', 'ika', 'shari', 'kani'].includes(c.key);
+      expect(castGamePicture(c), c.key).toBe(sushi ? `/planets/cast/${c.key}/game.webp` : `/planets/sample/chibi-${c.key}.webp`);
+    }
+  });
+
+  it('▶ (story 2026-11-28): only a cast member’s picture book is read to its end; their other works keep the planet’s time', () => {
+    expect(castReadsToEnd({ id: 'cast-gari-pluto' })).toBe(true);
+    expect(castReadsToEnd({ id: 'cast-kimorin-pluto' })).toBe(true);
+    for (const p of ['saturn', 'jupiter', 'venus', 'uranus', 'neptune'] as const) expect(castReadsToEnd({ id: `cast-gari-${p}` })).toBe(false);
+    expect(castReadsToEnd({ id: 'pluto-s1' })).toBe(false);
+    expect(castReadsToEnd(null)).toBe(false);
   });
 
   it('the voice that starts with the tap: Jupiter the title, Uranus the goods, Pluto the book’s title, Neptune the game’s name', () => {
