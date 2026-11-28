@@ -686,6 +686,18 @@ body {
   .divine-mote { display: none; }
 }
 /*
+ * The Earth temple's mystical lights (client 2026-11-28; components/story/Stage.tsx TempleLights): far points twinkle as
+ * they drift up, near out-of-focus discs float across and breathe. Transform and opacity only; gone with
+ * prefers-reduced-motion.
+ */
+@keyframes templeFar { 0% { opacity: 0; transform: translate(0, 0) scale(0.7); } 20% { opacity: var(--o, 0.7); } 45% { opacity: calc(var(--o, 0.7) * 0.45); } 65% { opacity: var(--o, 0.7); } 100% { opacity: 0; transform: translate(var(--dx, 0), var(--dy, -40px)) scale(1); } }
+@keyframes templeNear { 0% { opacity: 0; transform: translate(0, 0) scale(0.9); } 25% { opacity: var(--o, 0.18); } 75% { opacity: var(--o, 0.18); } 100% { opacity: 0; transform: translate(var(--dx, 40px), var(--dy, -20px)) scale(1.08); } }
+.temple-far { opacity: 0; animation: templeFar 20s ease-in-out infinite; will-change: transform, opacity; }
+.temple-near { opacity: 0; animation: templeNear 30s ease-in-out infinite; will-change: transform, opacity; }
+@media (prefers-reduced-motion: reduce) {
+  .temple-far, .temple-near { display: none; }
+}
+/*
  * MONBAN's golden halo (components/story/Halo.tsx, numbers in lib/story/motion.ts MOTION.poise.still.halo): a faint
  * disc behind his head whose opacity breathes very slowly. Opacity only — it never turns, and he never bobs. With
  * prefers-reduced-motion it is simply there.

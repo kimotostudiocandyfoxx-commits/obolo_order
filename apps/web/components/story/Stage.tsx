@@ -639,6 +639,57 @@ export function Motes({ count = 40 }: { count?: number }) {
   );
 }
 
+/**
+ * The Earth temple's mystical lights (client 2026-11-28): `far` — a few small soft points deep in the hall, drifting up
+ * very slowly and twinkling (under the picture's camera, over the motion); `near` — a handful of large out-of-focus
+ * discs close to the lens that float slowly across, faint, over everyone. Plain elements with radial gradients (no
+ * blur filter), transform and opacity only, about 20 nodes: cheap on phones. Hidden with prefers-reduced-motion
+ * (globals.css .temple-*).
+ */
+export function TempleLights({ layer }: { layer: 'far' | 'near' }) {
+  const far = layer === 'far';
+  // placed after mounting (random places would differ between the server's HTML and the browser)
+  const [lights, setLights] = useState<{ x: number; y: number; size: number; dur: number; delay: number; dx: number; dy: number; o: number; warm: boolean }[]>([]);
+  useEffect(() => {
+    const n = far ? 14 : 6;
+    setLights(
+      Array.from({ length: n }, (_, k) => {
+        // spread evenly across the width (a slot each), random within it
+        const x = ((k + 0.15 + Math.random() * 0.7) / n) * 100;
+        return far
+          ? { x, y: 12 + Math.random() * 70, size: 3 + Math.random() * 5, dur: 14 + Math.random() * 12, delay: -Math.random() * 26, dx: (Math.random() - 0.5) * 18, dy: -(30 + Math.random() * 60), o: 0.45 + Math.random() * 0.4, warm: Math.random() < 0.5 }
+          : { x, y: 8 + Math.random() * 80, size: 60 + Math.random() * 90, dur: 22 + Math.random() * 16, delay: -Math.random() * 38, dx: (Math.random() < 0.5 ? -1 : 1) * (30 + Math.random() * 50), dy: -(10 + Math.random() * 40), o: 0.1 + Math.random() * 0.14, warm: Math.random() < 0.6 };
+      }),
+    );
+  }, [far]);
+  return (
+    <div className={`pointer-events-none absolute inset-0 overflow-hidden ${far ? 'z-[3]' : 'z-[5]'}`} aria-hidden data-temple-lights={layer}>
+      {lights.map((l, k) => (
+        <span
+          key={k}
+          className={`${far ? 'temple-far' : 'temple-near'} absolute block rounded-full`}
+          style={{
+            left: `${l.x}%`,
+            top: `${l.y}%`,
+            width: l.size,
+            height: l.size,
+            marginLeft: -l.size / 2,
+            marginTop: -l.size / 2,
+            background: far
+              ? `radial-gradient(circle, rgba(255,255,255,0.95) 0%, ${l.warm ? 'rgba(255,222,160,0.55)' : 'rgba(205,220,255,0.55)'} 35%, transparent 70%)`
+              : `radial-gradient(circle, ${l.warm ? 'rgba(255,226,170,0.9)' : 'rgba(215,226,255,0.9)'} 0%, ${l.warm ? 'rgba(255,214,150,0.45)' : 'rgba(200,214,255,0.45)'} 45%, transparent 72%)`,
+            animationDuration: `${l.dur}s`,
+            animationDelay: `${l.delay}s`,
+            ['--dx' as string]: `${l.dx}px`,
+            ['--dy' as string]: `${l.dy}px`,
+            ['--o' as string]: `${l.o}`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 /** 〔カメラ：寄る／引く／揺れ〕 on whatever is inside (the background layers). */
 export function Camera({ move, focus = '50% 40%', children }: { move: 'in' | 'out' | 'shake' | null; focus?: string; children: ReactNode }) {
   return (

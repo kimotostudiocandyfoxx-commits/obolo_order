@@ -41,7 +41,7 @@ import { MarsLesson } from '@/components/mars/MarsLesson';
 import { MercuryLesson } from '@/components/mercury/MercuryLesson';
 import type { LessonApi } from '@/lib/onboarding/lessonApi';
 import { madeFrom } from '@/lib/onboarding/made';
-import { Camera, Cast, CutIn, Motes, OFFSTAGE, Smoke, Spark, speakerSprite, StillMouth } from '@/components/story/Stage';
+import { Camera, Cast, CutIn, Motes, OFFSTAGE, Smoke, Spark, speakerSprite, StillMouth, TempleLights } from '@/components/story/Stage';
 import { exprFor, reactFor } from '@/lib/story/expression';
 import { DialogueWindow, IconButton, MixerPanel, Telop } from '@/components/story/parts';
 import { filmWatched, markFilmWatched } from '@/lib/story/films';
@@ -163,6 +163,8 @@ type ChatRaw = { id: string; kind: 'them'; who: Speaker; text: string } | { id: 
 /** the day's fly-or-keep choices (days 3–7): made on the atelier's cards (〔星へ飛ばす〕 / 〔今は飛ばさない〕) */
 /** seconds a background motion dissolves into the next (bgvideo, its `then` chain): client 2026-11-28 */
 const BG_DISSOLVE = 0.8;
+/** the scenes in the Earth temple (day 1 OBOLON and MONBAN in the hall, day 2 the hall): its mystical lights (2026-11-28) */
+const TEMPLE_SCENES = new Set(['D01-S006', 'D01-S012', 'D02-S004']);
 const FLY_CHOICES = new Set(['f_d04_fly', 'f_d05_sent_jacket', 'f_d06_sent_song', 'f_d07_sent_mv', 'f_d07v_show']);
 
 const AVATARS: Partial<Record<Speaker, Avatar>> = {
@@ -1291,6 +1293,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const sceneNow = sceneIdAt(steps, i);
   const stage = stageOf(sceneNow);
   const cinema = stage === 'cinema';
+  // the Earth temple's lights: not over black, a film or the white
+  const templeLights = !!sceneNow && TEMPLE_SCENES.has(sceneNow) && !blackout && !white && steps[i]?.t !== 'film';
   // day 1 (client 2026-11-27): as before the cinema — the motion plays on, the first chat bubbles over it, the camera
   // moves on the picture; nobody is cut out and brought forward
   const film = stage === 'film';
@@ -1383,6 +1387,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         />
       )}
       <style>{'@keyframes stillIn{from{opacity:0}to{opacity:1}}'}</style>
+      {templeLights && <TempleLights layer="far" />}
       </Camera>
       {!sprite && autoStandee && !talkOn && (
         <Cast names={[autoStandee]} src={(n) => spriteSrc(n) ?? null} speaking={autoStandee} talking={talking} expressions={sayExpressions({}, [autoStandee])} mirror={sayMirror([autoStandee])} level={voiceLevel} react={sayReact} slot={spriteSlot} cinema={cinema} shot={cineShot} />
@@ -1407,6 +1412,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       )}
       {smoke > 0 && <Smoke key={smoke} />}
       {motes > 0 && <Motes count={motes} />}
+      {templeLights && <TempleLights layer="near" />}
       {cutin && spriteSrc(cutin) && <CutIn key={cutin} url={spriteSrc(cutin)!} onDone={() => setCutin(null)} />}
       {spark && <Spark key={spark} url={stillUrl(spark)} />}
       <FxLayer fx={fx} />
