@@ -20752,6 +20752,36 @@
     "design/mv-art/out/mvr/k-reverse.jpg"
    ],
    "prompt": "AERIAL DRONE SHOT at dusk of the secret society's headquarters complex (the Earth temple). Keep the layout and shapes of the reference pictures: (a) the HEADQUARTERS from the first reference: a black-and-gold city of tall spires, the giant front gate with the ringed celestial globe on top, a black-and-gold avenue with a compass emblem leading to the gate, and behind the gate the huge glass-domed temple; (b) directly BEHIND the headquarters (on the far side of the dome, away from the front gate) lies the outdoor LAUNCH PLAZA from the second reference: a long reflective black-and-gold tiled plaza with gold lines, lined on both sides by tall black-and-gold obelisks and golden lanterns, leading to a grand staircase and a round black-and-gold launch platform at the far end, on which stands the gigantic black rocket with gold filigree and pink and cyan neon lines (as tall as a 20-storey building, taller than the spires), with the giant glowing golden ring standing behind it; beyond the rocket there are NO buildings - only open land and the horizon (as in the second reference). The plaza's axis lines up with the gate, the dome and the rocket in one straight line. Violet and navy dusk sky with gold-lit clouds, the first stars, glittering gold lights in the city. No people, no characters. Cinematic, same rendering and colours as the references. Vertical 9:16, edge to edge. No text, no letters, no watermark. CAMERA: very high bird's-eye view looking almost straight down at a steep angle: the geometric layout is clear - the gate, the round dome, the rectangular obelisk-lined plaza and the round launch platform with the rocket seen from above (its three fins like a star) and the golden ring, all on one axis, surrounded by the dark spired city."
+  },
+  {
+   "id": "mvr/air-earth-c2",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "design/mv-art/out/mvr/air-earth-c.jpg",
+    "docs/story-rewrite/design/refs/places/headquarters-gate.webp"
+   ],
+   "prompt": "Edit the first reference picture: keep EXACTLY the same aerial camera, composition, dusk sky, the front gate with the ringed celestial globe and the avenue with the compass emblem in the foreground, the spired black-and-gold city, the obelisk-lined launch plaza, the platform with the staircase, the gigantic rocket and the golden ring, the colours, light and rendering. Change ONE thing: the glass-domed cathedral in the middle (between the gate and the launch plaza) becomes a COLOSSAL dome, about THREE TIMES its current diameter - a vast glass-and-gold dome as wide as most of the picture, the main temple building of the complex, rising right behind the gate; the gate stays in front of it, and the launch plaza, its staircase, platform, the rocket and the golden ring are still clearly visible behind and above the dome. No people. Vertical 9:16. No text, no watermark."
+  },
+  {
+   "id": "mvr/air-earth-c3",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "design/mv-art/out/mvr/air-earth-c.jpg",
+    "docs/story-rewrite/design/refs/places/headquarters-gate.webp"
+   ],
+   "prompt": "Edit the first reference picture: keep EXACTLY the same aerial camera, composition, dusk sky, the front gate with the ringed celestial globe and the avenue with the compass emblem in the foreground, the spired black-and-gold city, the obelisk-lined launch plaza, the platform with the staircase, the gigantic rocket and the golden ring, the colours, light and rendering. Change ONE thing: the glass-domed cathedral in the middle (between the gate and the launch plaza) becomes a COLOSSAL dome, about THREE TIMES its current diameter - a vast glass-and-gold dome as wide as most of the picture, the main temple building of the complex, rising right behind the gate; the gate stays in front of it, and the launch plaza, its staircase, platform, the rocket and the golden ring are still clearly visible behind and above the dome. No people. Vertical 9:16. No text, no watermark. The camera is slightly higher so that the colossal dome, the plaza behind it and the whole rocket all fit in the frame."
   }
  ],
  "redo": []
