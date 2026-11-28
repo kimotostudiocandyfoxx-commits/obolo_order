@@ -42,6 +42,8 @@ import { MercuryLesson } from '@/components/mercury/MercuryLesson';
 import type { LessonApi } from '@/lib/onboarding/lessonApi';
 import { madeFrom } from '@/lib/onboarding/made';
 import { Camera, Cast, CutIn, Motes, OFFSTAGE, Smoke, Spark, speakerSprite, StillMouth, TempleLights } from '@/components/story/Stage';
+import { ShotView } from '@/components/story/Shot';
+import { SHOTS, type Shot } from '@/lib/onboarding/shots';
 import { exprFor, reactFor } from '@/lib/story/expression';
 import { DialogueWindow, IconButton, MixerPanel, Telop } from '@/components/story/parts';
 import { filmWatched, markFilmWatched } from '@/lib/story/films';
@@ -346,6 +348,10 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   };
   // a cross-fade between two stills: the one before stays underneath (the same <img>) while the new one fades in
   const [under, setUnder] = useState<{ image: string; fade: number } | null>(null);
+  /** the shot each picture is moved with (lib/onboarding/shots.ts; client 2026-11-28): set by its still step, so a cut
+   * that waits for its picture to decode keeps its shot, and a still step on the same picture reframes at once */
+  const [stillShots, setStillShots] = useState<Record<string, string>>({});
+  const shotSpec = (img: string | null | undefined): Shot | null => (img && stillShots[img] ? SHOTS[stillShots[img]] ?? null : null);
   const underTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const clearStillOnShow = useRef(false);
   const [placeholder, setPlaceholder] = useState<MotionId | null>(null);
@@ -559,6 +565,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         } else if (s.t === 'still') {
           setWhite(false);
           setTicketArt(null);
+          const shotId = s.shot ?? '';
+          setStillShots((m) => (m[s.image] === shotId ? m : { ...m, [s.image]: shotId }));
+          if (s.clear) clearLog();
           showStill(s.image, s.fade);
           // a still is a full background: lift the start light / black screen (back from a lesson: once it is in place)
           setReady(true);
@@ -568,7 +577,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           setSprite(s.image);
           n++;
         } else if (s.t === 'se') {
-          playSfx(s.sound, mutedRef.current, mixRef.current.se);
+          const snd = s.sound;
+          if (s.after) setTimeout(() => playSfx(snd, mutedRef.current, mixRef.current.se), s.after * 1000);
+          else playSfx(snd, mutedRef.current, mixRef.current.se);
           n++;
         } else if (s.t === 'cam') {
           // a move without a focus keeps the one before (QA 11 R34: the picture jumped back to 50% 40%)
@@ -951,6 +962,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     // unless the still is itself their painted close-up (its mouth moves) or the screen is black (a voice in the dark)
     if (stageOf(sceneIdAt(steps, i)) === 'cinema') {
       if (blackout || (still && STILL_MOUTH[still] === talkId(st.who))) return null;
+      // the shot films them already (the over-the-shoulder shot, KIMORIN from behind, a voice over the rocket)
+      if (shotSpec(still)?.cast?.includes(talkId(st.who))) return null;
       // already in the film behind (MONBAN at the gate): the film is his close-up
       if (inFilm) return null;
       // KIMORIN before he has been seen today (day 2's 「待ちなさい。」 comes from behind, before the look back): a voice
@@ -1043,6 +1056,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       const s = steps[k];
       const img = s.t === 'still' || s.t === 'arrive' ? s.image : null;
       if (img) void loadStill(img);
+      if (s.t === 'still' && s.shot) for (const l of SHOTS[s.shot]?.layers ?? []) new Image().src = spriteUrl(l.src);
       // the hatching egg's picture is decoded before the bright motion ends (QA 14 R52: black for a frame, then the egg)
       if (s.t === 'hatch') for (const e of ['sun', 'earth']) void loadStill(`s/d2-egg-${e}-cracked`);
     }
@@ -1102,6 +1116,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     if (lastBack?.t === 'still') {
       // from black, once the picture is decoded (QA 12 R40: it came up in two or three frames); the motion behind is hidden
       const img = lastBack.image;
+      if (lastBack.shot) setStillShots({ [img]: lastBack.shot });
       dual.current?.pauseAll();
       // a picture that comes late does not cover a scene the story already moved on to (QA 13 R44), and a very slow
       // one does not hold the story: after 4 s the lines start over black (R49)
@@ -1328,7 +1343,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   // (their plain picture added for the line: the others step back)
   let castNames = sprite ? (Array.isArray(sprite) ? sprite : [sprite]).map((n) => (talkOn && n && (speakerOfSprite(n) || n === '@me') ? '' : n)) : [];
   let castSpeaking = speakerSprite(step?.t === 'say' ? step.who : prompt?.who, spriteNames);
-  if (cinema && talkSays && castSpeaking === OFFSTAGE && !blackout && !screen && !inFilm && !(talkId(talkSays.who) === 'KIMORIN' && !lookBefore(i - 1))) {
+  if (cinema && talkSays && castSpeaking === OFFSTAGE && !blackout && !screen && !inFilm && !shotSpec(still)?.cast?.includes(talkId(talkSays.who)) && !(talkId(talkSays.who) === 'KIMORIN' && !lookBefore(i - 1))) {
     const pic = cinemaSprite(talkSays.who);
     if (pic && spriteSrc(pic)) {
       castNames = [...castNames, pic];
@@ -1373,11 +1388,28 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       <div className={`pointer-events-none absolute inset-0 z-[7] bg-white transition-opacity duration-[2600ms] ease-in-out ${white ? 'opacity-100' : 'opacity-0'}`} aria-hidden />
       {/* the still before (during a cross-fade) and the still now, keyed by picture: the one before is the same <img>
           left in place, and a still's animation is set once, when it comes in (QA 10 R27) */}
-      {[...(under && under.image !== still ? [under.image] : []), ...(still ? [still] : [])].map((img) => (
+      {[...(under && under.image !== still ? [under.image] : []), ...(still ? [still] : [])].map((img) => {
+        const spec = ownStage ? shotSpec(img) : null;
+        // a still-based cut: the camera moves on the picture (its mouth layer moves with it)
+        if (spec)
+          return (
+            <div key={img} className="pointer-events-none absolute inset-0 z-[2]" style={img === still ? { animation: spec.enter ? undefined : stillAnim } : undefined} aria-hidden>
+              <ShotView
+                src={stillUrl(img)}
+                spec={spec}
+                under={img !== still}
+                mouth={
+                  img === still && STILL_MOUTH[img] && !sprite ? (
+                    <StillMouth url={stillMouthUrl(img)} talking={talking && sayStep?.who === STILL_MOUTH[img]} level={voiceLevel} className="pointer-events-none absolute inset-0 h-full w-full" />
+                  ) : undefined
+                }
+              />
+            </div>
+          );
         // eslint-disable-next-line @next/next/no-img-element
-        <img key={img} src={stillUrl(cleanStill(img))} alt="" className="story-fit pointer-events-none absolute inset-0 z-[2] h-full w-full" style={img === still ? { animation: stillAnim } : undefined} aria-hidden />
-      ))}
-      {still && STILL_MOUTH[still] && !sprite && (
+        return <img key={img} src={stillUrl(cleanStill(img))} alt="" className="story-fit pointer-events-none absolute inset-0 z-[2] h-full w-full" style={img === still ? { animation: stillAnim } : undefined} aria-hidden />;
+      })}
+      {still && STILL_MOUTH[still] && !sprite && !(ownStage && shotSpec(still)) && (
         <StillMouth
           url={stillMouthUrl(still)}
           talking={talking && sayStep?.who === STILL_MOUTH[still]}

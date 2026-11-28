@@ -1,0 +1,193 @@
+/**
+ * Still-based cuts (client 2026-11-28, design/refs/2026-11-28-rocket/storyboard.md): day 2 from 「待ちなさい。」 to the
+ * rocket is told with painted stills and background plates instead of generated video. A `still` step may name a shot
+ * here; the stage (components/story/Shot.tsx) then moves the picture like a film camera:
+ *   cam     Ken Burns from → to over `dur` seconds (scale; x / y = the point of the picture at the centre of the screen,
+ *           % of the picture). The next still step on the SAME picture with another shot reframes smoothly from where
+ *           the camera is (`reframe` seconds) — the over-the-shoulder shot moving to whoever speaks.
+ *   layers  cut-outs (onboarding/<src>.webp) standing on the plate: x = their centre, y = their feet, h = their height,
+ *           all % of the picture; `drift` moves a layer a little more than the plate (parallax, % of its own size);
+ *           `reflect` mirrors it faintly on a polished floor; `anim` a move of its own.
+ *   fx      light effects in picture coordinates (they move with the camera); `at` / `dur` in seconds from the cut.
+ *   enter   how the cut comes in when it is not a plain cross-fade.
+ *   cast    who is in the picture: the cinema brings no close-up of them while they speak (OBOLON and MONBAN in the
+ *           over-the-shoulder shot are filmed there, KIMORIN from behind speaks from behind).
+ * Everything moves with transform / opacity only; with prefers-reduced-motion the camera rests on `to`, layers stand
+ * at their last place and the particles are not drawn.
+ */
+export interface ShotCam {
+  s: number;
+  x: number;
+  y: number;
+}
+
+export type ShotLayerAnim =
+  /** walks away from us into the picture: smaller and higher, a small bob each step */
+  | 'walk-away'
+  /** fades in */
+  | 'in'
+  /** dissolves into rising light (OBOLON leaving for the Moon) */
+  | 'vanish';
+
+export interface ShotLayer {
+  src: string;
+  x: number;
+  y: number;
+  h: number;
+  /** parallax: how far it moves beyond the plate over the shot, [dx, dy] in % of its own size */
+  drift?: [number, number];
+  flip?: boolean;
+  /** soft focus (px), e.g. the foreground shoulder of an over-the-shoulder shot */
+  blur?: number;
+  /** a faint mirror image on the polished floor under the feet */
+  reflect?: boolean;
+  /** darken / tint to sit in the plate's light (CSS filter after the blur) */
+  tone?: string;
+  /** the halo layer behind MONBAN's head, as on the stage */
+  halo?: boolean;
+  anim?: ShotLayerAnim;
+  /** seconds the anim takes (walk-away 3.2, vanish 2.2) */
+  animDur?: number;
+  /** OBOLON's slow float */
+  float?: boolean;
+}
+
+export type ShotFx =
+  /** a pillar of light drops from the top to (x, y) */
+  | { k: 'beam'; x: number; y: number; w: number; at?: number }
+  /** a star glint at (x, y) */
+  | { k: 'glint'; x: number; y: number; at?: number; size?: number }
+  /** a soft band of light running up a region (the rocket's lines): x, y = top left, w, h in % of the picture */
+  | { k: 'sweep'; x: number; y: number; w: number; h: number; period?: number }
+  /** a ring of light breathing and flaring at (x, y), r = radius % of the picture's width */
+  | { k: 'ring'; x: number; y: number; r: number }
+  /** a warm glow breathing at (x, y) (the mana gem) */
+  | { k: 'glow'; x: number; y: number; r: number; color?: string }
+  /** dust motes drifting in the light */
+  | { k: 'dust'; n?: number }
+  /** stars twinkling in the upper part */
+  | { k: 'stars'; n?: number; top?: number; bottom?: number }
+  /** warm light spilling over the floor from (x, y) */
+  | { k: 'spill'; x: number; y: number; at?: number }
+  /** a point of light flying from (x, y) to (x2, y2) */
+  | { k: 'streak'; x: number; y: number; x2: number; y2: number; at?: number; dur?: number; grow?: boolean };
+
+export interface Shot {
+  from: ShotCam;
+  to: ShotCam;
+  /** seconds from `from` to `to` */
+  dur: number;
+  /** seconds to reframe from the shot before on the same picture (default 0.9) */
+  reframe?: number;
+  layers?: ShotLayer[];
+  fx?: ShotFx[];
+  /** whip: a fast sideways slide with motion blur; bloom: out of a white-gold glow; flash: a white flash; settle: a quick
+   * push that settles (someone turning to us) */
+  enter?: 'whip' | 'bloom' | 'flash' | 'settle';
+  /** ends in a white-gold glow (pushing through a door into light) at this second */
+  bloomOut?: number;
+  /** who is in the picture (speaker names) */
+  cast?: string[];
+}
+
+const C = (s: number, x = 50, y = 50): ShotCam => ({ s, x, y });
+
+/** OBOLON (the client's own picture) and MONBAN standing small before the rocket's steps */
+const OBOLON_FAR: ShotLayer = { src: 'obolon', x: 43, y: 69, h: 5.5, float: true };
+const MONBAN_FAR: ShotLayer = { src: 'monban', x: 58, y: 75.5, h: 11, reflect: true, tone: 'brightness(0.85)', halo: true };
+/** KIMORIN from behind on the plaza, warmed to the dusk light */
+const KIMORIN_BACK: ShotLayer = { src: 'kb-back', x: 27, y: 106, h: 40, drift: [-4, -2], tone: 'brightness(0.86) sepia(0.12)' };
+/** the over-the-shoulder shot: KIMORIN's shoulder soft in front, OBOLON and MONBAN before the rocket's steps */
+const OTS = (obolon?: ShotLayer['anim']): ShotLayer[] => [
+  { src: 'obolon', x: 47, y: 49, h: 8.5, float: !obolon, anim: obolon, animDur: 2.2 },
+  { src: 'monban', x: 68, y: 72, h: 30, reflect: true, tone: 'brightness(0.88)', halo: true },
+  { src: 'kb-ots', x: 11, y: 106, h: 58, blur: 2.5, drift: [-3, 0], tone: 'brightness(0.72) sepia(0.12)' },
+];
+
+export const SHOTS: Record<string, Shot> = {
+  // A — the gate
+  'reveal-whip': { from: C(1.0), to: C(1.06, 50, 46), dur: 5, enter: 'whip', fx: [{ k: 'glint', x: 47, y: 37, at: 0.55, size: 7 }], cast: ['KIMORIN'] },
+  'gate-two': { from: C(1.05, 50, 50), to: C(1.0), dur: 6, cast: ['KIMORIN', 'MONBAN'] },
+  'invite-hand': { from: C(1.0), to: C(1.12, 50, 52), dur: 4, cast: ['KIMORIN', 'MONBAN'] },
+  'kimorin-turn': { from: C(1.1, 50, 42), to: C(1.0), dur: 0.6, enter: 'settle', cast: ['KIMORIN'] },
+  'gate-through': { from: C(1.0, 50, 55), to: C(1.38, 50, 52), dur: 2.4, bloomOut: 1.6 },
+
+  // B — the Earth temple
+  'temple-dark': { from: C(1.0, 50, 55), to: C(1.05, 50, 55), dur: 4, fx: [{ k: 'beam', x: 50, y: 84, w: 8, at: 0.9 }] },
+  'temple-sky': { from: C(1.24, 50, 72), to: C(1.0, 50, 45), dur: 6.5, fx: [{ k: 'stars', n: 40, top: 0, bottom: 45 }] },
+  'leave-gate': {
+    from: C(1.0, 50, 55),
+    to: C(1.04, 50, 50),
+    dur: 6,
+    layers: [{ src: 'kb-walk', x: 50, y: 98, h: 46, anim: 'walk-away', animDur: 3.2 }],
+    fx: [{ k: 'streak', x: 50, y: 73, x2: 55, y2: 2, at: 3.0, dur: 1.1 }],
+    cast: ['KIMORIN'],
+  },
+  'back-gate': { from: C(1.04, 50, 50), to: C(1.04, 50, 50), dur: 1, fx: [{ k: 'streak', x: 47, y: 6, x2: 50, y2: 55, at: 0.2, dur: 0.7, grow: true }] },
+  'wall-push': { from: C(1.0, 50, 50), to: C(1.08, 50, 46), dur: 2.2 },
+  'wall-open': {
+    from: C(1.08, 50, 46),
+    to: C(1.12, 50, 46),
+    dur: 3,
+    layers: [{ src: 'obolon', x: 50, y: 66, h: 9, float: true }],
+    fx: [{ k: 'spill', x: 50, y: 52, at: 0.2 }, { k: 'dust', n: 26 }],
+    cast: ['OBOLON'],
+  },
+  'wall-through': { from: C(1.12, 50, 46), to: C(1.55, 50, 44), dur: 2.4, bloomOut: 1.7, layers: [{ src: 'obolon', x: 50, y: 66, h: 9, float: true }] },
+
+  // C — the rocket plaza
+  'plaza-wide': {
+    from: C(1.35, 50, 80),
+    to: C(1.0, 50, 50),
+    dur: 5.5,
+    enter: 'bloom',
+    layers: [OBOLON_FAR, MONBAN_FAR, KIMORIN_BACK],
+    fx: [{ k: 'ring', x: 50, y: 41.5, r: 33 }, { k: 'sweep', x: 44, y: 6, w: 12, h: 52 }, { k: 'dust', n: 30 }],
+    cast: ['KIMORIN', 'OBOLON', 'MONBAN'],
+  },
+  'plaza-low': {
+    from: C(1.25, 50, 78),
+    to: C(1.0, 50, 50),
+    dur: 5,
+    fx: [{ k: 'ring', x: 50, y: 40, r: 40 }, { k: 'sweep', x: 38, y: 0, w: 24, h: 80 }],
+    cast: ['OBOLON'],
+  },
+  'ots-monban': {
+    from: C(1.06, 60, 52),
+    to: C(1.14, 64, 52),
+    dur: 7,
+    reframe: 0.9,
+    layers: OTS(),
+    fx: [{ k: 'dust', n: 18 }],
+    cast: ['OBOLON', 'MONBAN'],
+  },
+  'ots-obolon': {
+    from: C(1.08, 48, 46),
+    to: C(1.18, 47, 45),
+    dur: 7,
+    reframe: 0.9,
+    layers: OTS(),
+    fx: [{ k: 'dust', n: 18 }],
+    cast: ['OBOLON', 'MONBAN'],
+  },
+  'ots-vanish': {
+    from: C(1.18, 47, 45),
+    to: C(1.12, 52, 48),
+    dur: 3,
+    reframe: 0.6,
+    layers: OTS('vanish'),
+    fx: [{ k: 'dust', n: 30 }],
+    cast: ['OBOLON', 'MONBAN'],
+  },
+  reverse: { from: C(1.04, 50, 50), to: C(1.0, 50, 50), dur: 6 },
+  'gem-monban': { from: C(1.0, 50, 60), to: C(1.1, 50, 62), dur: 6, fx: [{ k: 'glow', x: 50, y: 62, r: 16 }, { k: 'dust', n: 20 }], cast: ['MONBAN'] },
+  'gem-kimorin': { from: C(1.08, 50, 55), to: C(1.0, 50, 52), dur: 1.2, enter: 'settle', fx: [{ k: 'glow', x: 50, y: 66, r: 14 }], cast: ['KIMORIN'] },
+  'plaza-after': {
+    from: C(1.0, 50, 50),
+    to: C(1.08, 50, 52),
+    dur: 7,
+    layers: [MONBAN_FAR, KIMORIN_BACK],
+    fx: [{ k: 'ring', x: 50, y: 41.5, r: 33 }, { k: 'sweep', x: 44, y: 6, w: 12, h: 52 }, { k: 'dust', n: 30 }],
+    cast: ['KIMORIN', 'MONBAN'],
+  },
+};
