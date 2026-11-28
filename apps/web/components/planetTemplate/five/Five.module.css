@@ -93,6 +93,13 @@
     0 2px 0 rgba(0, 0, 0, 0.35),
     0 0 18px rgba(0, 0, 0, 0.5);
 }
+/* a long title: two lines in 90% of the screen (lib/planetTemplate/five.ts titleFit shrinks the letters past that) */
+.ttl.two {
+  white-space: normal;
+  width: 90vw;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
 .ttl span {
   display: inline-block;
   opacity: 0;

@@ -153,3 +153,24 @@ export function caseFace(id: string, title: string): { a: string; b: string; gly
 
 /** the sample's work picture (popG5's ai: the prototype's jart-1 … 5) for the i-th person */
 export const sampleArtIndex = (i: number, name: string) => ((i * 2 + [...name].length) % 5) + 1;
+
+// --- a long title (story 2026-11-28) -----------------------------------------------------------------------------
+
+/** the title's letter size on a screen `w` px wide (the CSS: clamp(22px, 7vw, 30px)) and the room it has (90% of the screen) */
+export const titleBase = (w: number) => Math.max(22, Math.min(30, w * 0.07));
+export const TITLE_ROOM = 0.9;
+export const TITLE_MIN_PX = 13;
+/**
+ * A title too long for one line wraps to two; one too long for two lines gets smaller letters until two lines hold it
+ * (never cut, never off the screen). `size` null: the CSS's own size. A letter is counted a full square wide (kanji are
+ * drawn a little bigger, kana smaller: the square is the safe side).
+ */
+export function titleFit(title: string, screenW: number): { lines: 1 | 2; size: number | null } {
+  const n = [...title].length;
+  const base = titleBase(screenW);
+  const room = screenW * TITLE_ROOM;
+  if (n * base <= room) return { lines: 1, size: null };
+  const perLine = Math.ceil(n / 2);
+  if (perLine * base <= room) return { lines: 2, size: null };
+  return { lines: 2, size: Math.max(TITLE_MIN_PX, Math.floor((room / perLine) * 10) / 10) };
+}

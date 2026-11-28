@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { templateConfig } from './config';
 import type { FloorState } from './motion';
 import {
+  BUBBLE,
+  bubbleX,
   depthScale,
   firstVoiceMs,
   floorMotion,
@@ -236,5 +238,20 @@ describe('04 §3 the profile: the 2D stage (M-R304)', () => {
     // piled: some rest on the ground, little overlap
     expect(bs.filter((b) => Math.abs(b.y + b.r - F) < 1).length).toBeGreaterThan(3);
     for (let i = 0; i < bs.length; i++) for (let j = i + 1; j < bs.length; j++) expect(Math.hypot(bs[i].x - bs[j].x, bs[i].y - bs[j].y)).toBeGreaterThan(bs[i].r + bs[j].r - 12);
+  });
+});
+
+describe('the pop’s bubble (story 2026-11-28: the prototype’s .bub)', () => {
+  it('above the one speaking, its middle within 24%–76% of the screen, a wide one pushed in to stay whole', () => {
+    expect(BUBBLE.maxW).toBe(0.62);
+    expect(bubbleX(195, 120, 390)).toBe(195);
+    expect(bubbleX(250, 100, 390)).toBe(250);
+    // a short bubble near an edge: the prototype's 24% / 76%
+    expect(bubbleX(10, 80, 390)).toBeCloseTo(390 * 0.24);
+    expect(bubbleX(380, 80, 390)).toBeCloseTo(390 * 0.76);
+    // the widest (62%): pushed in just enough to stay on the screen
+    const w = 390 * 0.62;
+    expect(bubbleX(10, w, 390) - w / 2).toBeGreaterThanOrEqual(0);
+    expect(bubbleX(380, w, 390) + w / 2).toBeLessThanOrEqual(390);
   });
 });

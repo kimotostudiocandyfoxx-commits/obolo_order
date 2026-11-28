@@ -2,6 +2,18 @@ import type { HomeWork } from '@obolo/shared';
 import { clamp, HOME_MAX } from './layout';
 import { makeBody, type Body, type FigureMotion, type FloorState } from './motion';
 
+/** the pop's bubble (the prototype's .bub): at most 62% of the screen wide, its middle kept within 24%–76% of the screen */
+export const BUBBLE = { maxW: 0.62, from: 0.24, to: 0.76, edge: 6 } as const;
+/**
+ * Where the middle of the pop's bubble goes (px): above the one speaking (`x`), kept within 24%–76% of the screen `W`
+ * like the prototype — and a bubble too wide to stay whole there is pushed in just enough (never off the screen).
+ */
+export function bubbleX(x: number, w: number, W: number): number {
+  const mid = Math.max(W * BUBBLE.from, Math.min(W * BUBBLE.to, x));
+  const half = Math.min(w, W) / 2 + BUBBLE.edge;
+  return Math.max(Math.min(half, W / 2), Math.min(Math.max(W - half, W / 2), mid));
+}
+
 /**
  * 04 土星 (handoff docs/handoff/planets-04-saturn.md; prototype design/home/template.html `startSim3D`, `play`,
  * `pileStart`): the exception to the common template's floating rows. The kororins stand on the record floor — the

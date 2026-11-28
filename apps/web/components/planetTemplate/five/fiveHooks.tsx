@@ -16,6 +16,7 @@ import {
   OPEN_MS,
   RADIO_VOICE_MS,
   SHELF_ASPECT,
+  titleFit,
   waveBars,
   WHO_CORNER,
   WHO_NAME,
@@ -45,9 +46,23 @@ function useNextFrame() {
 export function FiveTitle({ kind, title, tags, className = '' }: { kind: FiveKind; title: string; tags?: WorkTags | null; className?: string }) {
   const st = fiveTitleStyle(kind, title, tags);
   useTitleFont(st.family, title);
+  // a long title wraps to two lines, and shrinks when two are not enough (never off the screen); the book's own page title is the page's
+  const [w, setW] = useState(390);
+  useEffect(() => {
+    const fit = () => setW(window.innerWidth || 390);
+    fit();
+    window.addEventListener('resize', fit);
+    return () => window.removeEventListener('resize', fit);
+  }, []);
   if (!title) return null;
+  const fit = className ? { lines: 1 as const, size: null } : titleFit(title, w);
   return (
-    <div className={`${f.ttl} ${f[`m_${st.motion}`] ?? ''} ${className}`} style={{ fontFamily: `'${st.font}', var(--font-sans)` }} data-testid="five-title">
+    <div
+      className={`${f.ttl} ${f[`m_${st.motion}`] ?? ''} ${fit.lines === 2 ? f.two : ''} ${className}`}
+      style={{ fontFamily: `'${st.font}', var(--font-sans)`, ...(fit.size ? { fontSize: fit.size } : {}) }}
+      data-testid="five-title"
+      data-lines={fit.lines}
+    >
       {[...title].map((ch, i) => (
         <span key={i} className={f[letterKind(ch)]} style={{ animationDelay: `${(0.25 + i * 0.05).toFixed(2)}s` }}>
           {ch === ' ' ? ' ' : ch}

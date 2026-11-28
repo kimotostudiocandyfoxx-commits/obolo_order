@@ -3,6 +3,7 @@
 import type { HomeWork } from '@obolo/shared';
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import {
+  bubbleX,
   grooveAt,
   grooveEndMs,
   grooveRides,
@@ -87,6 +88,16 @@ function KororinPop({ o }: { o: OpenWork }) {
   }, [o.work]);
   const at = o.from ?? { x: 195, y: 520, size: 1 };
   const words = wordsOf(o.work);
+  // the words above the one speaking (the prototype: its middle kept within 24%–76% of the screen); a wide bubble is
+  // then pushed in just enough to stay whole on the screen
+  const bub = useRef<HTMLDivElement>(null);
+  const [bubX, setBubX] = useState<number | null>(null);
+  useLayoutEffect(() => {
+    const el = bub.current;
+    const W = el?.parentElement?.clientWidth;
+    if (!el || !W) return;
+    setBubX(bubbleX(at.x, el.offsetWidth, W));
+  }, [phase, at.x, words]);
   return (
     <div className={m.popLayer} data-testid="work-view" data-phase={phase}>
       {o.figure && (
@@ -103,7 +114,7 @@ function KororinPop({ o }: { o: OpenWork }) {
         <img src={chibiOf(o.person)} alt="" draggable={false} />
       </div>
       {phase === 'talk' && (
-        <div className={m.bub} style={{ left: `clamp(24%, ${at.x}px, 76%)`, top: at.y - 118 }} data-testid="pop-words">
+        <div ref={bub} className={m.bub} style={{ left: bubX ?? `clamp(24%, ${at.x}px, 76%)`, top: at.y - 118 }} data-testid="pop-words">
           {words ? `「${words}」` : '♪'}
           <button
             type="button"
@@ -360,7 +371,7 @@ function Pile({ person, deps }: { person: ProfilePerson; deps: SaturnDeps }) {
               else els.current.delete(b.j);
             }}
             className={`${m.pb} ${b.isNew ? m.isNew : ''}`}
-            style={{ width: b.r * 2, height: b.r * 2, opacity: popped?.j === b.j ? 0 : 1, transform: `translate3d(${b.x - b.r}px,${b.y - b.r}px,0)` }}
+            style={{ width: b.r * 2, height: b.r * 2, opacity: popped?.j === b.j ? 0 : 1, pointerEvents: popped?.j === b.j ? 'none' : undefined, transform: `translate3d(${b.x - b.r}px,${b.y - b.r}px,0)` }}
             role="button"
             tabIndex={0}
             aria-label={wordsOf(workOf(b.j)) || 'コロリン'}

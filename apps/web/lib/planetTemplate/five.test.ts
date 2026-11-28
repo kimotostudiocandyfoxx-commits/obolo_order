@@ -92,3 +92,22 @@ describe('05 the five planets on the common template', () => {
     expect(cases.some((w) => !w.thumbUrl)).toBe(true);
   });
 });
+
+describe('a long title wraps to two lines, then shrinks (story 2026-11-28)', () => {
+  it('one line when it fits; two lines at the same size; smaller letters only past two lines — never under 13 px', async () => {
+    const { titleFit, titleBase } = await import('./five');
+    expect(titleBase(390)).toBeCloseTo(27.3);
+    expect(titleFit('ネオンの夜', 390)).toEqual({ lines: 1, size: null });
+    // 17 letters: two lines of nine at 27.3 px fit in 351 px
+    expect(titleFit('サーぽんのサーモンまめちしきラジオ', 390)).toEqual({ lines: 2, size: null });
+    const long = titleFit('あ'.repeat(40), 390);
+    expect(long.lines).toBe(2);
+    expect(long.size).toBeCloseTo(17.5);
+    expect(20 * long.size!).toBeLessThanOrEqual(351);
+    expect(titleFit('あ'.repeat(200), 390).size).toBe(13);
+    // every cast title on every planet fits a 320 px phone in two lines at 13 px or more
+    const { CAST_WORKS } = await import('./castWorks');
+    for (const c of CAST_WORKS) for (const t of [c.song, c.radio, c.goods, c.game]) expect(Math.ceil([...t].length / 2) * (titleFit(t, 320).size ?? titleBase(320)), t).toBeLessThanOrEqual(320 * 0.9 + 0.01);
+  });
+});
+
