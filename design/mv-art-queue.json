@@ -20275,6 +20275,34 @@
     "docs/story-rewrite/design/refs/places/earth-temple-hall.jpg"
    ],
    "prompt": "Edit the first reference picture: keep EXACTLY the same dramatic low-angle composition, camera, lighting, colours, the golden hall (tall black-and-gold columns, the giant glowing golden ring disc behind the rocket, the dome, the stairs, the lanterns, the polished reflective floor) and the same rocket design (black hull with gold filigree, pink and cyan neon lines, orange emblem, sharp swept-back fins, three bronze engine nozzles). Change two things: (1) remove the small fox character completely - no characters, no people at all, fill that floor area with the matching reflective tiles; (2) the rocket must NOT float: it stands firmly ON THE GROUND - its long fin tips and the three engine nozzles rest on the floor (or on a low round black-and-gold launch pad on the floor), with contact shadows and its reflection in the tiles. The rocket is gigantic, as tall as a 20-storey building, towering over the tiny lanterns. Vertical 9:16, edge to edge. No text, no letters, no watermark. The rocket stands on a low round black-and-gold launch pad set into the floor in front of the stairs; the camera looks up steeply from near the floor so the rocket feels enormous and powerful."
+  },
+  {
+   "id": "mvr/p-rocket3-front",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/rocket.jpg"
+   ],
+   "prompt": "Edit the reference picture of the rocket: keep EXACTLY the same design, materials and colours - the long slender black hull with gold filigree, the pink neon line and cyan neon lines, the orange glowing emblem and pink ring near the nose, the blue glowing slits, the three bronze engine nozzles, the same rendering style. Change the fins: the rocket has exactly THREE large sharp swept-back fins, spaced evenly around the hull at 120 degrees (like a classic tripod rocket), each fin long enough that its pointed tip reaches lower than the engine nozzles, so the rocket stands steadily on the tips of its three fins. The rocket stands perfectly upright, nose straight up, not tilted. Plain white background, the whole rocket in frame. Vertical 9:16. No text, no letters, no watermark. Front view at eye level: one fin points straight toward the camera in the middle, the other two fins stick out to the left and right behind it; all three fin tips touch the same ground line."
+  },
+  {
+   "id": "mvr/p-rocket3-quarter",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/rocket.jpg"
+   ],
+   "prompt": "Edit the reference picture of the rocket: keep EXACTLY the same design, materials and colours - the long slender black hull with gold filigree, the pink neon line and cyan neon lines, the orange glowing emblem and pink ring near the nose, the blue glowing slits, the three bronze engine nozzles, the same rendering style. Change the fins: the rocket has exactly THREE large sharp swept-back fins, spaced evenly around the hull at 120 degrees (like a classic tripod rocket), each fin long enough that its pointed tip reaches lower than the engine nozzles, so the rocket stands steadily on the tips of its three fins. The rocket stands perfectly upright, nose straight up, not tilted. Plain white background, the whole rocket in frame. Vertical 9:16. No text, no letters, no watermark. Three-quarter view from slightly below: all three fins clearly visible, one front-left, one front-right and one at the back; all three fin tips touch the same ground line."
   }
  ],
  "redo": []
