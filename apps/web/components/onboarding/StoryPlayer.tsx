@@ -161,6 +161,8 @@ const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Ser
 type ChatRaw = { id: string; kind: 'them'; who: Speaker; text: string } | { id: string; kind: 'me'; text: string; action?: boolean } | { id: string; kind: 'sys'; text: string };
 /** each speaker's face in the thread */
 /** the day's fly-or-keep choices (days 3–7): made on the atelier's cards (〔星へ飛ばす〕 / 〔今は飛ばさない〕) */
+/** seconds a background motion dissolves into the next (bgvideo, its `then` chain): client 2026-11-28 */
+const BG_DISSOLVE = 0.8;
 const FLY_CHOICES = new Set(['f_d04_fly', 'f_d05_sent_jacket', 'f_d06_sent_song', 'f_d07_sent_mv', 'f_d07v_show']);
 
 const AVATARS: Partial<Record<Speaker, Avatar>> = {
@@ -501,7 +503,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   );
 
   /** Show a motion. freeze = jump to its last frame without playing (used when resuming). */
-  const playMedia = useCallback((motion: MotionId, loop: boolean, freeze = false) => {
+  const playMedia = useCallback((motion: MotionId, loop: boolean, freeze = false, xfade = 0) => {
     const d = dual.current;
     if (!d) return;
     if (placeholderTimer.current) clearTimeout(placeholderTimer.current);
@@ -518,7 +520,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       return;
     }
     setPlaceholder(null);
-    d.show(motionUrl(motion), loop, freeze);
+    d.show(motionUrl(motion), loop, freeze, xfade);
   }, []);
 
   /** Advance from step `from`, running non-interactive steps until something needs the visitor. */
@@ -670,7 +672,10 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           clearStillOnShow.current = true;
           bgQueue.current = [...(s.then ?? [])];
           setTicketArt(null);
-          playMedia(s.motion, false);
+          // a motion on screen behind (a loop, a motion, a background motion): the new one dissolves in over it
+          // (client 2026-11-28: OBOLON's universe stopped at each join)
+          const behind = [...steps.slice(0, n)].reverse().find((x) => ['still', 'black', 'film', 'video', 'loop', 'bgvideo', 'whiteout', 'ticket'].includes(x.t));
+          playMedia(s.motion, false, false, behind && ['video', 'loop', 'bgvideo'].includes(behind.t) ? BG_DISSOLVE : 0);
           n++;
         } else if (s.t === 'vanish') {
           const sec = s.s ?? 2;
@@ -778,10 +783,21 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       run(iRef.current + 1);
     }
     else {
-      // a background motion finished while the visitor reads: play the next one in its chain
+      // a background motion finished while the visitor reads: play the next one in its chain (normally it has already
+      // started under this one's last frames: onNearEnd)
       const next = bgQueue.current.shift();
-      if (next !== undefined) playMedia(next, false);
+      if (next !== undefined) playMedia(next, false, false, BG_DISSOLVE);
     }
+  };
+  /** the background motion on screen is about to end: the next one of its chain starts now and dissolves in */
+  const onNearEndRef = useRef(() => {});
+  onNearEndRef.current = () => {
+    const s = steps[iRef.current];
+    if (!s || s.t === 'video' || s.t === 'film') return;
+    const next = bgQueue.current.shift();
+    if (next === undefined) return;
+    playMedia(next, false, false, BG_DISSOLVE);
+    if (bgQueue.current[0] !== undefined && hasMotion(bgQueue.current[0])) dual.current?.preload(motionUrl(bgQueue.current[0]));
   };
 
   useEffect(() => {
@@ -789,6 +805,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     const d = new DualVideo([videoA.current, videoB.current], {
       onEnded: () => onEndedRef.current(),
       onBlocked: () => setBlocked(true),
+      onNearEnd: () => onNearEndRef.current(),
       onShown: (url) => {
         setBlocked(false);
         setReady(true);
@@ -975,6 +992,12 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   // the next motion loads behind the one on screen
   useEffect(() => {
     if (!started) return;
+    // the next motion of the background chain playing now comes first (it starts under this one's last frames)
+    const q = bgQueue.current[0];
+    if (q !== undefined && hasMotion(q)) {
+      dual.current?.preload(motionUrl(q));
+      return;
+    }
     for (let k = i + 1; k < Math.min(steps.length, i + 12); k++) {
       const s = steps[k];
       if (s.t === 'film') {

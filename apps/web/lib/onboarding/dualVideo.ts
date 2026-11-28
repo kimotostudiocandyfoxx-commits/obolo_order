@@ -17,7 +17,15 @@ export interface DualVideoCallbacks {
   onBlocked: () => void;
   /** A new motion is now visible. */
   onShown: (url: string) => void;
+  /**
+   * A play-once motion is about to end (NEAR_END seconds left): the next background motion of a chain starts now, under
+   * its last frames, and dissolves in (client 2026-11-28: OBOLON's universe froze at each join).
+   */
+  onNearEnd?: () => void;
 }
+
+/** how long before a play-once motion's end onNearEnd is told (s) — a little more than the dissolve */
+export const NEAR_END = 0.9;
 
 export class DualVideo {
   private front = 0;
@@ -31,6 +39,10 @@ export class DualVideo {
   /** the watch over a play-once motion (story chat 2026-10-29: a load that stalls must never stop the story) */
   private watch: ReturnType<typeof setTimeout> | undefined;
   private endedFor = -1;
+  /** the dissolve of the motion being shown (s; 0 = a cut) */
+  private xfade = 0;
+  private fadeTimer: ReturnType<typeof setTimeout> | undefined;
+  private nearFor = -1;
 
   constructor(
     private readonly els: [HTMLVideoElement, HTMLVideoElement],
@@ -40,6 +52,14 @@ export class DualVideo {
       el.loop = false;
       el.playsInline = true;
       el.addEventListener('ended', () => this.handleEnded(el));
+      el.addEventListener('timeupdate', () => {
+        if (el !== this.frontEl || this.loop || this.pending || this.nearFor === this.token || !this.cb.onNearEnd) return;
+        if (el.dataset.src !== this.url || !isFinite(el.duration) || el.duration <= 0) return;
+        if (el.duration - el.currentTime <= NEAR_END) {
+          this.nearFor = this.token;
+          this.cb.onNearEnd();
+        }
+      });
       el.addEventListener('error', () => {
         if (el === this.pending || el === this.frontEl) this.cb.onBlocked();
       });
@@ -69,10 +89,14 @@ export class DualVideo {
     for (const el of this.els) el.muted = m || (this.loop && el === this.frontEl);
   }
 
-  /** Show a motion. freeze = show its last frame without playing (resuming mid-story). */
-  show(url: string, loop: boolean, freeze = false) {
+  /**
+   * Show a motion. freeze = show its last frame without playing (resuming mid-story). xfade = seconds the new motion
+   * dissolves in over the one on screen, which plays on under it (consecutive background motions, 2026-11-28).
+   */
+  show(url: string, loop: boolean, freeze = false, xfade = 0) {
     const t = ++this.token;
     this.loop = loop;
+    this.xfade = freeze ? 0 : xfade;
     this.url = url;
     const el = this.backEl;
     this.pending = el;
@@ -109,7 +133,8 @@ export class DualVideo {
   }
 
   private loadNext() {
-    if (!this.next || this.loop || this.pending || this.next === this.url) return;
+    // not while the motion before dissolves out in the hidden element: after (the fade's timer)
+    if (!this.next || this.loop || this.pending || this.next === this.url || this.fadeTimer !== undefined) return;
     this.setSrc(this.backEl, this.next);
   }
 
@@ -125,6 +150,7 @@ export class DualVideo {
   pauseAll() {
     this.token++;
     clearTimeout(this.watch);
+    this.endFade();
     for (const el of this.els) el.pause();
   }
 
@@ -175,8 +201,27 @@ export class DualVideo {
     const old = this.els[1 - idx];
     if (idx !== this.front) {
       this.front = idx;
-      this.applyLayers();
-      old.pause();
+      this.endFade(false);
+      if (this.xfade > 0 && old.dataset.src) {
+        // the dissolve: the new motion fades in on top while the one before plays out its last frames beneath
+        el.style.transition = 'none';
+        el.style.opacity = '0';
+        this.applyLayers();
+        void el.offsetWidth;
+        el.style.transition = `opacity ${this.xfade}s linear`;
+        el.style.opacity = '1';
+        this.fadeTimer = setTimeout(() => {
+          this.fadeTimer = undefined;
+          el.style.transition = '';
+          if (el === this.frontEl) old.pause();
+          this.loadNext();
+          if (this.loop && this.url && el === this.frontEl) this.primeLoop(old);
+        }, this.xfade * 1000 + 50);
+      } else {
+        el.style.opacity = '1';
+        this.applyLayers();
+        old.pause();
+      }
     }
     this.pending = null;
     if (this.url) this.cb.onShown(this.url);
@@ -188,16 +233,19 @@ export class DualVideo {
       this.watch = setTimeout(() => t === this.token && this.finish(), (left + 6) * 1000);
     }
     this.loadNext();
-    // Pre-load the same motion at 0:00 in the hidden element for a seamless loop restart.
-    if (this.loop && this.url) {
-      this.setSrc(old, this.url);
-      // a loop never sounds: the hidden element may still carry the sound of the motion it played before
-      old.muted = this.muted || this.loop;
-      try {
-        old.currentTime = 0;
-      } catch {
-        /* ignore */
-      }
+    // Pre-load the same motion at 0:00 in the hidden element for a seamless loop restart (after a dissolve: at its end).
+    if (this.loop && this.url && this.fadeTimer === undefined) this.primeLoop(old);
+  }
+
+  private primeLoop(old: HTMLVideoElement) {
+    if (!this.url) return;
+    this.setSrc(old, this.url);
+    // a loop never sounds: the hidden element may still carry the sound of the motion it played before
+    old.muted = this.muted || this.loop;
+    try {
+      old.currentTime = 0;
+    } catch {
+      /* ignore */
     }
   }
 
@@ -208,6 +256,7 @@ export class DualVideo {
     // ended before his film had loaded, client 2026-10-29)
     if (this.pending && this.pending !== el && el.dataset.src !== this.url) return;
     if (this.loop && this.url) {
+      this.xfade = 0; // a loop restarts with a cut on the same frame
       const next = this.backEl;
       this.pending = next;
       this.setSrc(next, this.url);
@@ -216,6 +265,18 @@ export class DualVideo {
       return;
     }
     this.finish();
+  }
+
+  /** a dissolve in progress ends at once (the next motion is coming, or everything stops) */
+  private endFade(pauseBack = true) {
+    if (this.fadeTimer === undefined) return;
+    clearTimeout(this.fadeTimer);
+    this.fadeTimer = undefined;
+    for (const el of this.els) {
+      el.style.transition = '';
+      el.style.opacity = '1';
+      if (pauseBack && el !== this.frontEl && el !== this.pending) el.pause();
+    }
   }
 
   /** a play-once motion is over (its end, or the watch): told once */
