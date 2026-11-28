@@ -102,3 +102,12 @@ Cloud Run は1回のリクエストが 32MiB までなので、**8MB ずつに�
 - MP4 は今までどおり、はじめから再生できる形（`+faststart`）で 1 本のファイル。R2 の公開ドメインは Range を受けるので、途中から再生・シークができる。
 - HLS（画質を自動で切り替える配信）は今はしない。720p・1.5Mbps の短い動画なのでいらない。長い動画や遅い回線が問題になったら、Cloudflare Stream か、HLS に切ったファイルを R2 に置くことを考える。
 
+
+## 物語の非公開メディア（GCS → R2・2026-11-28）
+
+リポジトリは公開なので、クライアントの歌など公開前の素材は git に入れず、クライアントの非公開 Google Cloud Storage から R2 に写して `https://media.obolo.life/<key>` で配る。
+
+- 写し方：Actions の **Story media to R2**（`.github/workflows/story-media-r2.yml`、手で動かす）。入力は `gcs_prefix`（例 `gs://obolo-order-models-asia-southeast1/story/rocket-song/`）・`r2_prefix`（例 `story/rocket-song/`）・`cache_control`（既定 `public, max-age=31536000, immutable`）。下にあるファイルを同じ相対パスで写し、content-type を拡張子から付け、最後に公開 URL を HEAD で確かめる（200・content-type・content-length。違えば赤）。
+- 権限：Google Cloud はデプロイ用サービスアカウント（そのバケットに roles/storage.objectAdmin。オブジェクトの一覧と取得だけを使い、バケット自体は読まない）。R2 は deploy-api.yml と同じ `R2_*` の secrets / variables。
+- キャッシュは1年・immutable：中身を変えたら別の名前で置く（同じ名前に上書きすると古いものが残る）。
+- 2日目のロケットの映像の歌（KIMORIN が歌う・73.3 秒）：`story/rocket-song/kimorin-song.mp3`（歌＋伴奏。映像はこれを使う）・`kimorin-vocals.mp3`・`instrumental.mp3`。web では `ROCKET_SONG_URL`（`apps/web/lib/onboarding/media.ts`）。映像がまだ作られているので、まだどの場面にもつないでいない。

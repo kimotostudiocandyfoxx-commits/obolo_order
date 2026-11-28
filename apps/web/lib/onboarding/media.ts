@@ -179,3 +179,11 @@ export const BGM_LOOPS: Record<string, readonly [number, number]> = {
   'd2-temple': [66.1089, 154.78],
   'd2-crimson': [82.9066, 168.44],
 };
+
+/**
+ * The song of the day-2 rocket film (KIMORIN singing over the accompaniment, 73.3 s; client 2026-11-28). Kept out of
+ * the public repository: copied from the client's Google Cloud Storage to Cloudflare R2 by the workflow
+ * "Story media to R2" (.github/workflows/story-media-r2.yml; docs/media.md). Not used by a scene yet — the film is
+ * still being made. The vocals alone and the instrumental sit next to it (kimorin-vocals.mp3, instrumental.mp3).
+ */
+export const ROCKET_SONG_URL = 'https://media.obolo.life/story/rocket-song/kimorin-song.mp3';
