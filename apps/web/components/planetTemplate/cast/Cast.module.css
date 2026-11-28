@@ -17,6 +17,11 @@
   transform: translate(-40%, -140%) rotate(-24deg) scale(0.25) !important;
   opacity: 0 !important;
 }
+/* flying away (fading out): its pages and buttons take no touch (fa0a2db0: a faded overlay must not steal a tap) */
+.bookWrap.away,
+.bookWrap.away * {
+  pointer-events: none !important;
+}
 .bk {
   position: relative;
   width: 100%;
