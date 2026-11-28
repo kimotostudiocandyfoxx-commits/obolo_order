@@ -46,7 +46,7 @@ export interface CastViewerProps {
 
 /**
  * How the cast's works open on Mars, Uranus, Pluto and Neptune (handoff planets-08 §3 / §6, the prototype's sapViewer):
- *  - Mars: the Sushimon's three-second film loops without a seam (no sound of its own) under their song; the others'
+ *  - Mars: the Sushimon's short film (2.67 s, made seamless at its loop point: scripts/planet-home/mvloop.py) loops (no sound of its own) under their song; the others'
  *    Jupiter art moves slowly under their song. The song plays until the work is closed (▶: once, to its end).
  *  - Uranus: the goods item's own picture; its maker says its name and a line as it opens; a mug clinks.
  *  - Pluto: the picture book. - Neptune: the tap game, its maker saying its name.
@@ -91,7 +91,8 @@ export function CastViewer({ planet, cast, className, screenClass, style, playin
   if (planet === 'pluto')
     return (
       <div className={`${className} ${c.bookWrap} ${playing ? '' : c.live} ${away ? c.away : ''}`} style={style} data-testid="five-viewer" data-kind="book" data-cast={cast.key}>
-        <PictureBook cast={cast} touch={!playing} onFinish={onFinish} away={setAway} />
+        {/* ▶: read to the last page, then the fly-away, then the play view's next work */}
+        <PictureBook cast={cast} touch={!playing} onFinish={playing ? () => done.current?.() : onFinish} away={setAway} />
       </div>
     );
   return (

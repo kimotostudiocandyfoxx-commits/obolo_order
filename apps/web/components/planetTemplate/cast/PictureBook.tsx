@@ -25,7 +25,7 @@ function Face({ cast, i }: { cast: CastWorks; i: number }) {
  * then each page in their own voice; a page read turns to the next by itself, 〔‹〕〔›〕 and the page's edges turn it by
  * hand (the right edge forward), the three speed buttons change how fast it is read (not how high; remembered), and
  * after the last page — read to the end, or 〔›〕 pressed on it — the book closes and flies away (`onFinish`).
- * `touch` false (▶): nothing is pressed; it reads from the start until the play view moves on.
+ * `touch` false (▶): nothing is pressed; it reads itself to the last page, closes and flies away (`onFinish`: the next work).
  */
 export function PictureBook({ cast, touch = true, onFinish, away }: { cast: CastWorks; touch?: boolean; onFinish?: () => void; away: (on: boolean) => void }) {
   const n = cast.pages.length;
