@@ -221,6 +221,31 @@ export const SHOTS: Record<string, Shot> = {
   // temple with the ○ while OBOLON watches — his back (the client's picture, its face hidden), soft in front
   'pp-hand': { from: C(1.0, 50, 50), to: C(1.08, 46, 47), dur: 1.4, enter: 'settle', fx: [{ k: 'glow', x: 38, y: 44, r: 12, color: 'rgba(255,210,130,.75)' }] },
   'pp-head': { from: C(1.14, 52, 46), to: C(1.02, 52, 46), dur: 1.4, enter: 'settle', fx: [{ k: 'glow', x: 52, y: 46, r: 18, color: 'rgba(255,220,150,.7)' }] },
+  // 「気になりますか？　これが。」: the button held out, a slow push onto it
+  'pp-show': { from: C(1.0, 50, 50), to: C(1.1, 42, 46), dur: 5, fx: [{ k: 'glow', x: 38, y: 44, r: 10, color: 'rgba(255,210,130,.55)' }] },
+  // the Moon temple's talk at the water bowl (the Bati chat's terrace, s/moon-bowl): OBOLON floating over the bowl, KIMORIN's
+  // back big and soft in front (right), a slow push on OBOLON
+  'bowl-obolon': {
+    from: C(1.1, 42, 50),
+    to: C(1.2, 42, 49),
+    dur: 7,
+    layers: [
+      { src: 'obolon', x: 43, y: 56, h: 10, float: true },
+      {
+        src: 'kb-ots',
+        x: 86,
+        y: 116,
+        h: 66,
+        flip: true,
+        blur: 4.5,
+        drift: [3, 0],
+        tone: 'brightness(0.6) contrast(1.05) saturate(0.9)',
+        key: 'linear-gradient(120deg, rgba(150,180,255,.7) 0%, rgba(120,150,230,.3) 45%, rgba(8,12,40,.6) 100%)',
+        rim: 'rgba(190,215,255,.6)',
+      },
+    ],
+    cast: ['OBOLON'],
+  },
   'pp-moon': {
     from: C(1.0, 50, 50),
     to: C(1.08, 50, 44),

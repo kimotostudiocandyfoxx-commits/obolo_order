@@ -23,6 +23,8 @@ declare -A F=(
 )
 # the pillar of light: the shimmer of the first take, then the impact of the second (the gap between them cut out)
 BEAM="[0:a]atrim=0:2.8,asetpts=N/SR/TB,afade=t=out:st=2.4:d=0.4[a];[0:a]atrim=8.35:13,asetpts=N/SR/TB,afade=t=in:d=0.03[b];[a][b]acrossfade=d=0.15[o]"
+# the eggs rising out of the water bowl (playtest 2026-11-28): the stir of the first part, then the rising shimmer of the second
+WATER="[0:a]atrim=0.3:2.9,asetpts=N/SR/TB,afade=t=in:d=0.15,afade=t=out:st=2.2:d=0.4[a];[0:a]atrim=5.6:9.6,asetpts=N/SR/TB,afade=t=in:d=0.3,afade=t=out:st=2.6:d=1.4[b];[a][b]acrossfade=d=0.4,highpass=f=50[o]"
 ids=("$@")
 [ ${#ids[@]} -gt 0 ] || ids=(whip glint stone-door hall-reveal beam star-sky streak-up zoom-back gem-hum dissolve into-light)
 for i in "${ids[@]}"; do
@@ -33,6 +35,7 @@ for i in "${ids[@]}"; do
   if [ ! -f "$src" ] || [ "$(md5sum < "$out" | cut -c1-32)" != "$last" ]; then cp "$out" "$src"; fi
   tmp=$(mktemp --suffix=.wav)
   if [ "$i" = beam ]; then ffmpeg -v error -y -i "$src" -filter_complex "$BEAM" -map "[o]" -ac 1 "$tmp"
+  elif [ "$i" = water-rise ]; then ffmpeg -v error -y -i "$src" -filter_complex "$WATER" -map "[o]" -ac 1 "$tmp"
   else ffmpeg -v error -y -i "$src" -af "${F[$i]}" -ac 1 "$tmp"; fi
   peak=$(ffmpeg -hide_banner -i "$tmp" -af volumedetect -f null - 2>&1 | grep max_volume | awk '{print $5}')
   gain=$(echo "-1.5 - ($peak)" | bc -l)

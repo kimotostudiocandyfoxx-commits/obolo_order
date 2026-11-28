@@ -56,7 +56,9 @@ export type SoundFx =
   // day 2 told with pictures (client 2026-11-28, Seed Audio): the whip pan, a glint, the temple's doors,
   // the rocket plaza's reveal, the pillar of light, the starry ceiling, KIMORIN's flight and return, the mana gem, OBOLON
   // leaving, the push into the light
-  | 'whip' | 'glint' | 'stone-door' | 'hall-reveal' | 'beam' | 'star-sky' | 'streak-up' | 'zoom-back' | 'gem-hum' | 'dissolve' | 'into-light';
+  | 'whip' | 'glint' | 'stone-door' | 'hall-reveal' | 'beam' | 'star-sky' | 'streak-up' | 'zoom-back' | 'gem-hum' | 'dissolve' | 'into-light'
+  // the eggs rising out of the Moon temple's water bowl (playtest 2026-11-28)
+  | 'water-rise';
 
 /** Picture effects drawn over the background ('fx' steps). */
 export type PictureFx =

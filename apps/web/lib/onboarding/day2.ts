@@ -90,8 +90,28 @@ export const DAY2: Step[] = [
   // A4 shot / reverse shot (playtest 2026-11-28, story M-R347): MONBAN over KIMORIN's shoulder, then KIMORIN
   { t: 'still', image: 's/d2-gate-near', shot: 'gate-ots-monban', fade: 0.35 },
   { t: 'say', who: 'MONBAN', text: '誰だお前…。' },
+  // M-R348 (the client's shortened day 2): KIMORIN walks right up to MONBAN — 「…キリンです。」 — and presses Pinpon 2.5:
+  // ピンポン♪, the two cut-ins (the paw on the button, the ○ on the box on his head; playtest 2026-11-28), シーン……
   { t: 'still', image: 's/rv-kimorin', shot: 'gate-rv-kimorin', fade: 0.1 },
-  { t: 'say', who: 'KIMORIN', text: '私ですか？私は、なんでもすぐに発明してしまう、天才発明家、KIMORINです。' },
+  { t: 'say', who: 'KIMORIN', text: '見てわかりませんか？　どっからどう見ても、、、キリンです。' },
+  { t: 'bgm', track: null, fade: 0.3 },
+  { t: 'se', sound: 'pinpon' }, // ポチッ。ピンポンピンポン♪　頭の上の本体の画面に、◎が光る
+  { t: 'sprite', image: null },
+  { t: 'still', image: 's/pp-hand', shot: 'pp-hand', fade: 0.08 },
+  { t: 'wait', s: 1.2, keepChat: true },
+  { t: 'still', image: 's/pp-head', shot: 'pp-head', fade: 0.08 },
+  { t: 'wait', s: 1.6, keepChat: true },
+  { t: 'still', image: 's/rv-kimorin', shot: 'gate-rv-kimorin', fade: 0.12 }, // シーン……
+  { t: 'wait', s: 3.6, keepChat: true },
+  { t: 'bgm', track: 'd2-kimorin' },
+  // he shows the button, proudly, to us and MONBAN — the device itself on screen for 「これが。」
+  { t: 'still', image: 's/pp-hand', shot: 'pp-show', fade: 0.2 },
+  { t: 'say', who: 'KIMORIN', text: '気になりますか？　これが。' },
+  { t: 'still', image: 's/rv-kimorin', shot: 'gate-rv-kimorin', fade: 0.12 },
+  { t: 'say', who: 'KIMORIN', text: 'これは私が発明した、持ち運び式完全肯定型デバイス『ピンポン2.5』です。' },
+  { t: 'say', who: 'KIMORIN', text: 'どんな適当なことを言っても、ボタン一つで、必ず大正解してしまうのです！' },
+  { t: 'say', who: 'KIMORIN', text: 'これは、私の発明品の一つ。' },
+  { t: 'say', who: 'KIMORIN', text: 'そう、このように、なんでもすぐに発明してしまう、天才発明家、KIMORINです。' },
   { t: 'still', image: 's/d2-gate-near', shot: 'gate-ots-monban', fade: 0.1 },
   { t: 'say', who: 'MONBAN', text: 'この先はObolo Orderしか入れない…帰れ…。' },
   { t: 'still', image: 's/rv-kimorin', shot: 'gate-rv-kimorin', fade: 0.1 },
@@ -293,98 +313,20 @@ export const DAY2: Step[] = [
   { t: 'bgm', track: 'moon' },
   { t: 'video', motion: 'd2-moon-enter' }, // 神殿の中へ。床の器の水、光の柱の中のOBOLON
   { t: 'still', image: 's/d2-moon-in' },
+  // M-R348: the Moon temple cut to its few lines (the 「何回目」 question, the trick question, the SNS talk and the
+  // condition are gone; Pinpon 2.5 was shown at the gate). The talk is at the water bowl — the Bati chat's terrace —
+  // as shot / reverse shot: OBOLON over KIMORIN's shoulder, KIMORIN facing us (his facing picture by the bowl comes with
+  // the next art round; until then his still in the temple)
+  { t: 'still', image: 's/moon-bowl', shot: 'bowl-obolon', fade: 0.5 },
   { t: 'say', who: 'OBOLON', text: '、、、来たか。' },
-  { t: 'say', who: 'OBOLON', text: 'ちなみに、、、秘密結社は、初めてか？' },
-  // answered by voice: the bubble is the words as said (M-R207); any answer goes on to 「、、、そうか。」
-  { t: 'choice', key: 'times', voice: true, options: [{ label: '1回目' }, { label: '2回目' }, { label: '3回目以上' }] },
-  { t: 'say', who: 'OBOLON', text: '、、、そうか。' },
-  { t: 'still', image: 's/d2-moon-kimorin' }, // 黒い球が、くるりとKIMORINのほうへ向く
-  { t: 'say', who: 'OBOLON', text: 'KIMORINは？' },
-  // 「12回目です。」 after a tap, as the next line (client 2026-10-29): the one voice cut at its pause
-  { t: 'say', who: 'KIMORIN', text: '私は、、、、、、' },
-  { t: 'say', who: 'KIMORIN', text: '12回目です。' },
-  { t: 'se', sound: 'pinpon' }, // ポチッ。ピンポンピンポン♪　クイズ番組の正解音 → シーン……　KIMORINが、無言で、こちらをじっと見つめてくる
-  { t: 'bgm', track: null, fade: 0.3 },
-  // the music only 5 s after the pinpon has rung out (7 s), a little quieter (client 2026-10-29)
-  { t: 'bgm', track: 'comedy', after: 12 }, // ピンポン2.5の発表
-  // ポチッ (client playtest 2026-11-28: stills instead of the film, both presses): three cut-ins on the ring — the paw
-  // pressing the button, the ○ on the box on his head, KIMORIN in the Moon temple with the ○ while OBOLON watches (his
-  // back, soft, in front)
-  { t: 'still', image: 's/pp-hand', shot: 'pp-hand', fade: 0.08 },
-  { t: 'wait', s: 1.2, keepChat: true },
-  { t: 'still', image: 's/pp-head', shot: 'pp-head', fade: 0.08 },
-  { t: 'wait', s: 1.4, keepChat: true },
-  { t: 'still', image: 's/pp-moon-kimorin', shot: 'pp-moon', fade: 0.12 },
-  { t: 'wait', s: 2.6, keepChat: true },
-  { t: 'say', who: 'KIMORIN', text: '気になりますか？　これが。' },
-  { t: 'still', image: 's/d2-moon-kimorin' }, // KIMORINの大写し。台詞ごとに、表情が変わる
-  { t: 'sprite', image: 'kimorin-iu' },
-  { t: 'say', who: 'KIMORIN', text: 'これは私が発明した、持ち運び式完全肯定型デバイス『ピンポン2.5』です。' },
-  { t: 'say', who: 'KIMORIN', text: '人生を生きていたら、なんと答えればいいかわからない。そんな場面に、よく遭遇します。' },
-  { t: 'say', who: 'KIMORIN', text: 'しかし、この持ち運び式完全肯定型デバイス『ピンポン2.5』さえあれば、もう安心。' },
-  { t: 'say', who: 'KIMORIN', text: 'どんな適当なことを言っても、間違ったことを言ったとしても、ボタン一つで、必ず大正解してしまうのです！' },
-  { t: 'bgm', track: null, fade: 1.5 }, // 曲が、すっと止まる。シーン……
-  { t: 'say', who: 'KIMORIN', text: 'さらに、気づきましたか？' },
-  { t: 'bgm', track: 'suspect' }, // 怪しい、ゆっくりした曲（client 2026-10-29）: from 「引っかけ問題」 to 「試されていた」
-  { t: 'say', who: 'KIMORIN', text: 'この『秘密結社は何回目？』という質問。実は、引っかけ問題なのです。' },
-  { t: 'sprite', image: null }, // OBOLON's eyes narrowing are on the still
-  // OBOLONの白い三日月の目が、少しずつ、細くなっていく — in two steps, half then narrow (QA 10 R30), the line staying (R29)
-  { t: 'cam', move: 'in', focus: '50% 41%' },
-  { t: 'still', image: 's/d2-moon-kimorin-half', fade: 0.9 },
-  { t: 'wait', s: 0.9, keepChat: true },
-  { t: 'still', image: 's/d2-moon-kimorin-squint', fade: 0.9 },
-  { t: 'wait', s: 0.9, keepChat: true },
-  { t: 'cam', move: 'out' },
-  { t: 'sprite', image: 'kimorin-iu' }, // ふたたび、KIMORINの大写し
-  { t: 'say', who: 'KIMORIN', text: 'もし本当に秘密結社に入ったことがあるとして、2回目です！と答えてしまった場合。' },
-  { t: 'say', who: 'KIMORIN', text: 'それは、過去に秘密結社に入っていたという秘密を、自ら暴露していることになります。' },
-  { t: 'say', who: 'KIMORIN', text: 'そんな口の軽いやつは、Obolo Orderになる資格はない。ここで脱落。' },
-  { t: 'say', who: 'KIMORIN', text: 'そう、私たちは、試されていたのです！' },
-  { t: 'bgm', track: null, fade: 0.4 },
-  { t: 'se', sound: 'pinpon' }, // ポチッ。ピンポンピンポン♪
-  // ピンポンが鳴り終わるまで — the same three cut-ins as the first press (playtest 2026-11-28), then back to him
-  { t: 'sprite', image: null },
-  { t: 'still', image: 's/pp-hand', shot: 'pp-hand', fade: 0.08 },
-  { t: 'wait', s: 1.2, keepChat: true },
-  { t: 'still', image: 's/pp-head', shot: 'pp-head', fade: 0.08 },
-  { t: 'wait', s: 1.4, keepChat: true },
-  { t: 'still', image: 's/pp-moon-kimorin', shot: 'pp-moon', fade: 0.12 },
-  { t: 'wait', s: 4.3, keepChat: true },
-  { t: 'still', image: 's/d2-moon-kimorin', fade: 0.3 },
-  { t: 'sprite', image: 'kimorin-iu' },
-  { t: 'say', who: 'KIMORIN', text: 'ふ、、、また大正解してしまった。ですよね？OBOLONさん' },
-  { t: 'sprite', image: null },
-  { t: 'say', who: 'OBOLON', text: '、、、Obolo Orderは、完全招待制だ。' },
-  { t: 'say', who: 'OBOLON', text: '招待された時点でObolo Orderになる資格を持っている、脱落など、存在しない。' },
-  { t: 'say', who: 'KIMORIN', text: 'え？、、そうなの？' },
-  { t: 'spark', image: 's/d2-kimorin-pin-b', sound: 'pin' }, // 差し込み絵：ピンとくるKIMORIN（月の神殿）
-  { t: 'say', who: 'KIMORIN', text: '、、、、は！、、ゴホンゴホン！' },
-  { t: 'bgm', track: 'comedy' },
-  { t: 'say', who: 'KIMORIN', text: 'なるほどなるほど、、そうですか。確かにそうですよね？' },
-  { t: 'say', who: 'KIMORIN', text: 'あなた達詐欺グループソボロオーダーさん達は脱落なんかさせずに1人でも多くの人からお金を回収したほうが儲かりますもんねー？' },
-  { t: 'say', who: 'OBOLON', text: '....' },
-  { t: 'sprite', image: 'kimorin-iu' },
-  { t: 'say', who: 'KIMORIN', text: 'それでは一つお聞きしてもいいですか？\nここのことをSNSに書いてもいいですか？' },
-  { t: 'sprite', image: null },
-  { t: 'say', who: 'OBOLON', text: 'だめだ' },
-  { t: 'say', who: 'KIMORIN', text: 'はい出ました、詐欺グループ確定オツ。' },
-  { t: 'say', who: 'KIMORIN', text: 'SNSに書くな。は詐欺手口の王道テク鉄板の流れ。' },
-  { t: 'say', who: 'KIMORIN', text: 'そりゃ色々バレたら、まずいですもんねー？' },
-  { t: 'bgm', track: 'moon' },
-  { t: 'say', who: 'OBOLON', text: 'そのままでは、だめだ。ただ条件を守れば、ここのことを、自由に話していい。' },
-  { t: 'say', who: 'KIMORIN', text: 'え？条件？' },
-  { t: 'say', who: 'OBOLON', text: '姿と名前を、変えることだ。' },
-  { t: 'say', who: 'OBOLON', text: '秘密結社用の、姿と名前に、なってもらう。その姿と名前で話すのなら、問題は、ない。' }, // 黒い球が、KIMORINのほうへ向く
-  { t: 'say', who: 'KIMORIN', text: 'ほう。新しい姿とは、、、仮装でもするのですか？' },
-  { t: 'say', who: 'OBOLON', text: 'どんな姿になりたいか、伝えてくれたら、、、魔法で、その姿にする。' },
-  { t: 'say', who: 'KIMORIN', text: 'え？魔法？　……魔法、使えるのですか？' },
-  // M-R334: the magic talk, shortened
+  { t: 'still', image: 's/d2-moon-kimorin', fade: 0.12 },
+  { t: 'say', who: 'KIMORIN', text: '月の神殿ですか。まぁ、私の研究所の方が、広いですけど。' },
+  { t: 'still', image: 's/moon-bowl', shot: 'bowl-obolon', fade: 0.12 },
   { t: 'say', who: 'OBOLON', text: 'この月の神殿なら、、、魔法を、唱えられる。' },
+  { t: 'still', image: 's/d2-moon-kimorin', fade: 0.12 },
+  { t: 'say', who: 'KIMORIN', text: 'え？　魔法？' },
+  { t: 'still', image: 's/moon-bowl', shot: 'bowl-obolon', fade: 0.12 },
   { t: 'say', who: 'OBOLON', text: 'それでは、、、魔法の相方を、誕生させよう。' },
-  { t: 'say', who: 'KIMORIN', text: '相方？' },
-  { t: 'say', who: 'OBOLON', text: 'うん。魔法を唱えられる、と言ったが。' },
-  { t: 'say', who: 'OBOLON', text: '厳密には、一人では、魔法は使えない。相方と、力を合わせて、魔法を唱えるんだ。' },
-  { t: 'say', who: 'OBOLON', text: 'お前たちの新しい姿も、、、相方が、魔法で、作る。' },
   // M-R209: {bati} is born first — the egg, the mana gem, KIMORIN's food (うんちピンポンくん), then {name}'s food and {bati}
   { t: 'scene', id: 'D03-S005' }, // 相方の誕生
   { t: 'sprite', image: null },
@@ -419,12 +361,8 @@ export const DAY2: Step[] = [
   { t: 'still', image: 's/d2-egg-earth-gem' },
   { t: 'label', id: 'egg-gem' },
   { t: 'say', who: 'OBOLON', text: 'この卵にマナと、愛が、加われば、、、お前だけの旅の相方、バティが、生まれる。' },
-  { t: 'say', who: 'KIMORIN', text: 'ア、、、アイ//？' }, // 声が裏返る。狐の耳の先まで赤くなる
-  { t: 'say', who: 'OBOLON', text: '愛、と言っても、、、そんなに、構えなくていい。' },
-  // M-R334: the favourite food at once (the voice comes after {bati} is born and named; KIMORIN's 「何と話しかければ」 is gone)
-  { t: 'say', who: 'OBOLON', text: 'お前たちの、好きなもの、、、そうだ。好きな食べ物を、教えてほしい。' },
   { t: 'sprite', image: ['obolon', 'kimorin-iu'] }, // 黒い球が、KIMORINのほうへ向く
-  { t: 'say', who: 'OBOLON', text: 'まずは、、、KIMORINだ。好きな食べ物は？' },
+  { t: 'say', who: 'OBOLON', text: '好きな食べ物を、教えてほしい。、、、まずは、KIMORINだ。' }, // M-R348
   { t: 'say', who: 'KIMORIN', text: '私の好きな食べ物は、、、、、' },
   { t: 'say', who: 'KIMORIN', text: '……うんち。' },
   // KIMORINの手が、押しボタンを探して空をつかむ。何もない → 曲が止まり、KIMORIN⭐︎のたまごの中から、はっきりと：ピンポンピンポン♪
@@ -463,8 +401,6 @@ export const DAY2: Step[] = [
   { t: 'sprite', image: ['kimorin-iu', 'unchi-pinpon'] },
   { t: 'say', who: 'OBOLON', text: 'これが、、、お前の、相方だ。' },
   { t: 'say', who: 'KIMORIN', text: 'こ、、、これが、、私の、、相方？' }, // サングラスが鼻先までずり落ち、目の切れ目から青い光がぽろぽろ
-  { t: 'say', who: 'OBOLON', text: 'うん、そうだ。' },
-  { t: 'say', who: 'KIMORIN', text: 'どんな時も、私のことを肯定してくれてましたね、、、' },
   { t: 'say', who: 'KIMORIN', text: 'やっと、会えましたね。' },
   { t: 'say', who: 'OBOLON', text: '名前を、つけろ' },
   { t: 'say', who: 'KIMORIN', text: 'うんちピンポンくん！' }, // M-R347: the name as it is (「…いや、うんぽん」 and the cry after it cut)
@@ -559,7 +495,11 @@ export const DAY2: Step[] = [
   // the base → up to 8 transformations ({mana_step} each) → 〔この姿にする〕 confirms it ({mana_fix}: the expressions,
   // the back view, the figures on every planet). No animal question and no redraw any more.
   { t: 'scene', id: 'D03-S004' }, // {name}のネオ
-  { t: 'still', image: 's/d2-moon-in' },
+  { t: 'still', image: 's/moon-bowl', fade: 0.4 },
+  { t: 'sprite', image: 'obolon' },
+  // M-R348: why the new look and name (the condition, said here now that the long talk is cut)
+  { t: 'say', who: 'OBOLON', text: '秘密結社のことは、、、そのままの姿では、外で話せない。' },
+  { t: 'say', who: 'OBOLON', text: 'だから、、、秘密結社用の、姿と名前に、なってもらう。' },
   { t: 'sprite', image: ['obolon', '@bati'] }, // {bati}が、ころころと、こちらの足もとへ戻ってくる
   { t: 'say', who: 'OBOLON', text: '、、、次は、お前の番だ。' }, // KIMORINが、両腕を大きく広げて、息を吸いこむ。黒い球は、こちらを向いたまま
   // M-R250: under 13 (or 13〜15 without the guardian's consent) no photo — the wished look is said by voice

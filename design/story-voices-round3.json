@@ -1,0 +1,41 @@
+{
+ "note": "声のない 1・2日目の台詞（scripts/voice-coverage.ts --days 1,2 --only design/story-voices-round3.json）。Actions の「Story voices」を only=design/story-voices-round3.json で回すと、これだけを作る。",
+ "lines": [
+  {
+   "who": "KIMORIN",
+   "text": "見てわかりませんか？　どっからどう見ても、、、キリンです。"
+  },
+  {
+   "who": "KIMORIN",
+   "text": "どんな適当なことを言っても、ボタン一つで、必ず大正解してしまうのです！"
+  },
+  {
+   "who": "KIMORIN",
+   "text": "これは、私の発明品の一つ。"
+  },
+  {
+   "who": "KIMORIN",
+   "text": "そう、このように、なんでもすぐに発明してしまう、天才発明家、KIMORINです。"
+  },
+  {
+   "who": "KIMORIN",
+   "text": "月の神殿ですか。まぁ、私の研究所の方が、広いですけど。"
+  },
+  {
+   "who": "KIMORIN",
+   "text": "え？　魔法？"
+  },
+  {
+   "who": "OBOLON",
+   "text": "好きな食べ物を、教えてほしい。、、、まずは、KIMORINだ。"
+  },
+  {
+   "who": "OBOLON",
+   "text": "秘密結社のことは、、、そのままの姿では、外で話せない。"
+  },
+  {
+   "who": "OBOLON",
+   "text": "だから、、、秘密結社用の、姿と名前に、なってもらう。"
+  }
+ ]
+}

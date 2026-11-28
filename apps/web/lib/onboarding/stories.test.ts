@@ -146,15 +146,21 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
     expect(says.some((s) => s.who === 'KIMORIN' && s.text === 'それでは私たちも行きましょう。。。月へ！')).toBe(true);
     expect(says.some((s) => s.text === '月だ')).toBe(false);
   });
-  it('the magic talk is the short one (M-R334)', () => {
-    const k = steps.findIndex((s) => s.t === 'say' && s.text === 'え？魔法？　……魔法、使えるのですか？');
-    expect(steps.slice(k + 1, k + 5).map((s) => (s.t === 'say' ? `${s.who}:${s.text}` : s.t))).toEqual([
+  it('the Moon temple is the short one (M-R348): 「来たか」, his lab boast, magic, the partner', () => {
+    const k = steps.findIndex((s) => s.t === 'say' && s.text === '、、、来たか。');
+    const says = steps.slice(k).filter((s): s is Extract<Step, { t: 'say' }> => s.t === 'say').slice(0, 5).map((s) => `${s.who}:${s.text}`);
+    expect(says).toEqual([
+      'OBOLON:、、、来たか。',
+      'KIMORIN:月の神殿ですか。まぁ、私の研究所の方が、広いですけど。',
       'OBOLON:この月の神殿なら、、、魔法を、唱えられる。',
+      'KIMORIN:え？　魔法？',
       'OBOLON:それでは、、、魔法の相方を、誕生させよう。',
-      'KIMORIN:相方？',
-      'OBOLON:うん。魔法を唱えられる、と言ったが。',
     ]);
-    expect(JSON.stringify(steps)).not.toContain('最初は、いっぱい望みすぎないほうがいい');
+    // the trick question, the SNS talk and the second press are gone; Pinpon 2.5 is shown at the gate
+    expect(JSON.stringify(steps)).not.toMatch(/引っかけ問題|SNSに書いても|12回目です|最初は、いっぱい望みすぎないほうがいい/);
+    const gate = steps.findIndex((s) => s.t === 'say' && s.text === '見てわかりませんか？　どっからどう見ても、、、キリンです。');
+    expect(steps[gate + 2]).toEqual({ t: 'se', sound: 'pinpon' });
+    expect(steps.slice(gate, gate + 8).filter((s) => s.t === 'still').map((s) => (s as { image: string }).image)).toEqual(['s/pp-hand', 's/pp-head']);
   });
   it('the egg: the visitor picks one, KIMORIN⭐︎ gets the other; ♀ / ♂ is not told before the birth (M-R334)', () => {
     const c = steps.find((s) => s.t === 'choice' && s.key === 'egg');
@@ -182,8 +188,7 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
     const evolve = (who: 'bati' | 'self') => at((s) => s.t === 'evolve' && s.who === who);
     const order = [
       at((s) => s.t === 'caption' && s.text === 'マナジェムを手に入れた'),
-      say('愛、と言っても、、、そんなに、構えなくていい。'),
-      say('お前たちの、好きなもの、、、そうだ。好きな食べ物を、教えてほしい。'),
+      say('好きな食べ物を、教えてほしい。、、、まずは、KIMORINだ。'),
       say('……うんち。'),
       say('うんちピンポンくん！'),
       say('次は、、、{name}だ。好きな食べ物は？'),
@@ -210,8 +215,8 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
       t.indexOf('batitalk'),
     ];
     expect(order.every((x, k, a) => x > -1 && (k === 0 || x > a[k - 1])), JSON.stringify(order)).toBe(true);
-    // the food question follows 「愛、と言っても…」 at once; KIMORIN's 「何と話しかければ」 passage is gone
-    expect(say('お前たちの、好きなもの、、、そうだ。好きな食べ物を、教えてほしい。')).toBe(say('愛、と言っても、、、そんなに、構えなくていい。') + 1);
+    // M-R348: the food question right after the mana gem (no 「ア、、、アイ//？」 / 「愛、と言っても…」); 「何と話しかければ」 is gone
+    expect(steps.slice(say('この卵にマナと、愛が、加われば、、、お前だけの旅の相方、バティが、生まれる。') + 1, say('好きな食べ物を、教えてほしい。、、、まずは、KIMORINだ。')).filter((s) => s.t === 'say')).toEqual([]);
     expect(JSON.stringify(steps)).not.toMatch(/なんて話しかければいいか|たまごに、、、声を、聞かせてやれ|相方は、お前たちの声から、生まれる/);
     // the animal question and the redraw of the old look screen are gone
     expect(t).not.toContain('look');

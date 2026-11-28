@@ -57,6 +57,8 @@ export const SE_FILES: ReadonlySet<string> = new Set<string>([
   'bell', 'blip', 'boing', 'chime', 'crackers', 'ding', 'egg-crack', 'footsteps', 'gate-close', 'gong', 'heartbeat', 'knock', 'magic', 'paper', 'pop', 'portal', 'rocket', 'smoke', 'sparkle', 'stamp', 'thud', 'whoosh', 'arrive', 'riddle', 'pinpon', 'pinpon-muffled', 'pin', 'veil',
   // day 2 told with pictures (client 2026-11-28; design/story-audio-queue.json, trimmed by scripts/rocket/master-se.sh)
   'whip', 'glint', 'stone-door', 'hall-reveal', 'beam', 'star-sky', 'streak-up', 'zoom-back', 'gem-hum', 'dissolve', 'into-light',
+  // the eggs rising out of the water bowl (playtest 2026-11-28)
+  'water-rise',
 ]);
 export const seUrl = (id: string) => `${MEDIA_BASE}/se-${id}.mp3`;
 
