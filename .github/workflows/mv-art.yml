@@ -98,17 +98,21 @@ jobs:
             if [ -s /tmp/mv-$SET-$i.jpg ] && [ -n "$WANT" ] && [ "$(md5sum < /tmp/mv-$SET-$i.jpg | cut -c1-32)" != "$WANT" ]; then echo "reference $SET-$i does not match its sum: dropped"; rm -f /tmp/mv-$SET-$i.jpg; fi
             [ -s /tmp/mv-$SET-$i.jpg ] && echo "reference $SET-$i ready" || true
           done
+      - uses: actions/setup-python@v5
+        if: ${{ inputs.set == 'kimorinvc' }}
+        with:
+          python-version: '3.11'
       - name: Voice conversion (set=kimorinvc) - a sung vocal into a story voice, everything stays encrypted
         if: ${{ inputs.set == 'kimorinvc' }}
         run: |
           [ -s /tmp/mv-vc-song.mp3 ] && [ -s /tmp/mv-vc-ref.wav ] || { echo "no encrypted song/reference"; exit 1; }
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
-          python3 -m pip install --quiet "torch==2.4.0" "torchaudio==2.4.0" --index-url https://download.pytorch.org/whl/cpu
-          python3 -m pip install --quiet "demucs==4.0.1" "scipy==1.13.1" "librosa==0.10.2" "huggingface-hub>=0.28.1" "munch==4.0.0" "einops==0.8.0" "descript-audio-codec==1.0.0" "transformers==4.46.3" "soundfile==0.12.1" "numpy==1.26.4" pyyaml matplotlib tqdm
-          python3 -m demucs --two-stems=vocals -n htdemucs -o /tmp/sep /tmp/mv-vc-song.mp3
+          python -m pip install --quiet "torch==2.4.0" "torchaudio==2.4.0" --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --quiet "demucs==4.0.1" "scipy==1.13.1" "librosa==0.10.2" "huggingface-hub>=0.28.1" "munch==4.0.0" "einops==0.8.0" "descript-audio-codec==1.0.0" "transformers==4.46.3" "soundfile==0.12.1" "numpy==1.26.4" pyyaml matplotlib tqdm
+          python -m demucs --two-stems=vocals -n htdemucs -o /tmp/sep /tmp/mv-vc-song.mp3
           V=/tmp/sep/htdemucs/mv-vc-song/vocals.wav; I=/tmp/sep/htdemucs/mv-vc-song/no_vocals.wav
           git clone -q https://github.com/Plachtaa/seed-vc.git /tmp/seedvc && cd /tmp/seedvc && git checkout -q 51383efd921027683c89e5348211d93ff12ac2a8
-          python3 inference.py --source "$V" --target /tmp/mv-vc-ref.wav --output /tmp/vcout --diffusion-steps 30 --length-adjust 1.0 --inference-cfg-rate 0.7 --f0-condition True --auto-f0-adjust False --semi-tone-shift 0 --fp16 False
+          python inference.py --source "$V" --target /tmp/mv-vc-ref.wav --output /tmp/vcout --diffusion-steps 30 --length-adjust 1.0 --inference-cfg-rate 0.7 --f0-condition True --auto-f0-adjust False --semi-tone-shift 0 --fp16 False
           C="$(ls /tmp/vcout/*.wav | head -1)"
           mkdir -p /tmp/vcpack && cd /tmp/vcpack
           ffmpeg -y -loglevel error -i "$C" -b:a 192k kimorin-vocals.mp3
