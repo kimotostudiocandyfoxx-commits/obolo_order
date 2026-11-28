@@ -1,11 +1,6 @@
-# UI art — 2026-11-28T05:14:23.892Z
+# UI art — 2026-11-28T05:21:18.313Z
 
-Seedream 5.0 Pro / 7枚 / 約107円
+Seedream 5.0 Pro / 2枚 / 約30円
 
-- ✅ mvr/r02-plaza-walk
 - ✅ mvr/r03-stop
-- ✅ mvr/r05-suspicious
-- ✅ mvr/r09-monban
-- ✅ mvr/r12-run
 - ✅ mvr/r13-board
-- ✅ mvr/r24-landed
