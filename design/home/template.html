@@ -886,11 +886,11 @@ function s6Walls(){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,w=S6G.
 const DAYPL=['saturn','jupiter','mercury','mars','venus','pluto','neptune','uranus'];
 const RESG=[['たこ焼きブラザー','たこ焼きシスター'],['大根カイザー'],['フリージー'],['ヒポキン'],['ボスG','ロングG','ハットG'],['クロコパトラ'],['オニモンク'],['MONBAN']];
 const NAMEK={'サーぽん':'sapon','ガリみ♡':'gari','えびすけ':'ebi','ウニまる':'uni','いかチョロ':'ika','しゃりお':'shari','かにぶぅ':'kani','大根カイザー':'kaiser','フリージー':'freezy','ヒポキン':'hipokin','ボスG':'bossg','ロングG':'longg','ハットG':'hatg','クロコパトラ':'croco','オニモンク':'onimonk'};
-const WORKPAGE={'サーぽん':'星のホーム（10日間）','ガリみ♡':'スシモンのホーム1','えびすけ':'スシモンのホーム1','ウニまる':'スシモンのホーム2','いかチョロ':'スシモンのホーム2','しゃりお':'スシモンのホーム3','かにぶぅ':'スシモンのホーム3','たこ焼きブラザー':'住人のホーム1','たこ焼きシスター':'住人のホーム1','大根カイザー':'住人のホーム1','フリージー':'住人のホーム1','ヒポキン':'住人のホーム2','ボスG':'住人のホーム2','ロングG':'住人のホーム2','ハットG':'住人のホーム2','クロコパトラ':'住人のホーム3','オニモンク':'住人のホーム3','MONBAN':'住人のホーム3','KIMORIN⭐︎':'住人のホーム3'};
+const WORKPAGE={'サーぽん':'星のホーム（10日間）','ガリみ♡':'スシモンのホーム1','えびすけ':'スシモンのホーム1','ウニまる':'スシモンのホーム2','いかチョロ':'スシモンのホーム2','しゃりお':'スシモンのホーム3','かにぶぅ':'スシモンのホーム3','たこ焼きブラザー':'住人のホーム1','たこ焼きシスター':'住人のホーム1','大根カイザー':'住人のホーム1','フリージー':'住人のホーム1','ヒポキン':'住人のホーム2','ボスG':'住人のホーム2','ロングG':'住人のホーム2','ハットG':'住人のホーム2','クロコパトラ':'住人のホーム3','オニモンク':'住人のホーム3','MONBAN':'住人のホーム3','KIMORIN⭐︎':'住人のホーム3','MIKIE⭐︎DRILL':'住人のホーム4（オーダー後）'};
 function NOWORK(n){if(SUSHI[n]||!WORKPAGE[n])return false;toast('🪐 '+n+'の投稿は「'+WORKPAGE[n]+'」で見られるよ');return true}
 const SUSHI_ALL=['サーぽん','ガリみ♡','えびすけ','ウニまる','いかチョロ','しゃりお','かにぶぅ'];
 function ROSTER(pl){const d=Math.max(0,DAYPL.indexOf(pl)),res=RESG.slice(0,d+1).flat().reverse(),on=SUSHI_ON,rest=SUSHI_ALL.filter(n=>!on.includes(n));
-  const L=[...on.map(n=>({n,k:'oshi'})),...res.slice(0,res.length>3?3:res.length).map(n=>({n,k:'oshi'})),{n:'KIMORIN⭐︎',k:'dachi'},...rest.map(n=>({n,k:'oshi'})),...res.slice(3).map(n=>({n,k:'oshi'})),...OSHIX()];
+  const L=[...(SUSHI['MIKIE⭐︎DRILL']?[{n:'MIKIE⭐︎DRILL',k:'dachi'}]:[]),...on.map(n=>({n,k:'oshi'})),...res.slice(0,res.length>3?3:res.length).map(n=>({n,k:'oshi'})),{n:'KIMORIN⭐︎',k:'dachi'},...rest.map(n=>({n,k:'oshi'})),...res.slice(3).map(n=>({n,k:'oshi'})),...OSHIX()];
   return [...L.filter(o=>SUSHI[o.n]),...L.filter(o=>!SUSHI[o.n])]}
 const CHB=n=>n===ME?'user':NAMEK[n]?NAMEK[n]:n==='KIMORIN⭐︎'?'kimorin':n==='MONBAN'?'monban':n==='たこ焼きブラザー'?'brother':n==='たこ焼きシスター'?'sister':n==='MIKIE⭐︎DRILL'?'mikie':'user';
 const BALL=k=>A['ball-'+(k==='mine'?'mine':k==='oshi'?'oshi':'dachi')]||A['puni-gray'];
