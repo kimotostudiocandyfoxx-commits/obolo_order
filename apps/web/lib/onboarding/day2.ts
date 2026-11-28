@@ -38,8 +38,13 @@ export const DAY2: Step[] = [
   // gate opens, and only as the visitor goes through KIMORIN calls from behind; his entrance is one short still (the
   // walk-up and the long reveal film are cut), he talks at once
   { t: 'scene', id: 'D02-S002' }, // お待ちなさい
-  { t: 'se', sound: 'sparkle' }, // 手の中の切符が、金色に光る。光が一本の細い線になって、本部の門の前まで続いていく
-  { t: 'bgm', track: 'city' }, // 金と黒の都へ（2026-10-25）
+  // the flight to HQ is back (client 2026-11-28: 「本部へ向かう時の紙飛行機の映像が消えている」): the ticket folds into the
+  // crane and flies, as it did until M-R207 (the day-1 crane's films, M-R169), then the gate with its line of light
+  { t: 'se', sound: 'paper' }, // 切符が折り鶴に折れる
+  { t: 'video', motion: '5-f' }, // 鶴が空を飛んでいく
+  { t: 'se', sound: 'whoosh' },
+  { t: 'video', motion: 'd1-arrive' }, // 金の雲を抜けて都へ降り、本部の門の前へ
+  { t: 'bgm', track: 'city' }, // 金と黒の都へ（2026-10-25）。鶴が着いてから（QA 5 U1）
   { t: 'still', image: 's/d2-gate-near' }, // 光の線をたどって、本部の門の前へ（床の光の筋が門まで続く絵）
   { t: 'cam', move: 'in', focus: '50% 60%' },
   { t: 'wait', s: 1.6 },

@@ -102,8 +102,12 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
     const between = steps.slice(wait + 1, say('なんですか、この怪しい建物は。'));
     expect(between.filter((s) => s.t === 'video').map((s) => s.t === 'video' && s.motion)).toEqual(['d2-look-back']);
     expect(between.filter((s) => s.t === 'wait').every((s) => s.t === 'wait' && s.s <= 1)).toBe(true);
-    // no crane any more (M-R207)
-    expect(steps.some((s) => s.t === 'video' && s.motion === '5-f')).toBe(false);
+    // the crane's flight to HQ is back before the gate (client 2026-11-28), after the ticket's 〔本部へ向かう〕
+    const fly = at((s) => s.t === 'video' && s.motion === '5-f');
+    const arrive = at((s) => s.t === 'video' && s.motion === 'd1-arrive');
+    expect(fly).toBeGreaterThan(at((s) => s.t === 'action' && s.label === '本部へ向かう'));
+    expect(arrive).toBe(fly + 2);
+    expect(arrive).toBeLessThan(line);
   });
   it('the launch pit (M-R334): 「キモリンのもある」, 「…月へ！」, and MONBAN no longer says 「月だ」', () => {
     const says = steps.filter((s): s is Extract<Step, { t: 'say' }> => s.t === 'say');
