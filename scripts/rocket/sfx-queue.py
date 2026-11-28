@@ -11,7 +11,6 @@ NEW = [
     ('whip', 'A very short, crisp cinematic whip-pan swish, like a camera turning around fast: one tight airy swoosh with a soft tail, under half a second.'),
     ('glint', 'A tiny bright metallic glint of light on polished brass: a single delicate high shimmer, very short and clean, anime sparkle-glint sound design.'),
     ('stone-door', 'Two colossal ancient stone temple doors slowly sliding apart: a deep heavy grinding rumble of stone on stone with a low resonant boom, faint dust trickling, and a soft rush of air as they open, in a huge echoing hall.'),
-    ('steps-hall', 'Close-miked footsteps of a small, light child-sized creature walking briskly across polished marble in a quiet open-air plaza at dusk: about ten soft, quick, evenly spaced steps over four seconds, light heel-and-toe taps with a short natural echo, very clean and low noise.'),
     ('hall-reveal', 'A vast space opening up: a slow, deep, airy swell of wind and low resonance with a faint high golden shimmer, like walking out into an immense open-air hall at dusk; cinematic reveal sound design, calm and majestic, fading softly.'),
     ('beam', 'A pillar of golden light descending from high above and touching the floor: a bright rising shimmer that falls in pitch, ending in a soft deep resonant impact and a warm humming glow that fades.'),
     ('star-sky', 'A ceiling dissolving into a starry night sky: a slow, gentle wash of soft glassy twinkles and a deep airy hum widening out, magical and calm, fading slowly.'),
@@ -21,6 +20,7 @@ NEW = [
     ('dissolve', 'A being of light slowly dissolving into countless tiny golden particles that drift upward: an airy, glittering shimmer rising softly and thinning into silence, mysterious and calm.'),
     ('into-light', 'Stepping through a great gate into blinding warm light: a smooth rising swell of soft air and a bright golden shimmer that blooms and then settles, cinematic transition sound design.'),
 ]
+# (steps-hall was tried three times — thin clicks over hiss, then silence: dropped; no footsteps rather than cheap ones)
 q = json.load(open(P))
 ids = {x['id'] for x in q['items']}
 for i, pr in NEW:

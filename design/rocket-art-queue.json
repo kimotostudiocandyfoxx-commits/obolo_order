@@ -3,14 +3,10 @@
  "dir": "../../../design/cast/rocket",
  "png": true,
  "always": "",
- "redo": [
-  "gh-wall-open",
-  "gh-hall-low",
-  "gh-gem-kimorin"
- ],
+ "redo": [],
  "items": [
   {
-   "id": "gh-wall-open",
+   "id": "gh-wall-open-b",
    "w": 1152,
    "h": 2048,
    "size": [
@@ -39,7 +35,7 @@
    "prompt": "THE ROCKET PLAZA of the society (ロケット場), straight beyond the Earth temple: a vast OPEN-AIR ceremonial plaza under the evening sky (it is outdoors: no roof, no ceiling, no walls closing it in; the sky is wide above). Its ground is polished black stone like a dark mirror, inlaid with thin gold lines in large geometric star patterns, reflecting every light. Along both sides stand rows of tall black obelisks carved with fine gold ornament, and between them ornate golden lanterns on black stone posts glow warmly. At the far end, a broad flight of black-and-gold steps rises to a ROUND PLATFORM, and on it stands THE ROCKET, towering like a 20-storey building: a slender black rocket with an elegant pointed nose, its hull engraved with gold filigree and an eye emblem, glowing neon lines running along it (one bright magenta-pink line down the centre with a pink ring-and-dot near the nose, thin teal-cyan lines beside it, small blue panels), EXACTLY THREE swept fins whose lower tips are level with the bronze engine nozzles (copy the rocket of the rocket reference picture exactly), a small arched glowing door at its base reached by the steps. Behind the rocket floats an enormous ring of golden light, engraved with faint runes, with four small star-like glints on it. CAMERA: a grand establishing shot from the temple end of the plaza, low camera at the height of a small child, looking straight down the central axis toward the rocket, perfectly symmetrical. The rocket and its ring stand in the upper middle, the nose reaching about 8% below the top edge; the round platform and steps sit at about 62% of the picture's height; the long polished floor fills the lower third, empty, its gold lines leading the eye to the steps. The rows of obelisks and lanterns frame both sides, the wide open sky above. This is an EMPTY background plate: no people, no characters, no creatures, no figures, no animals anywhere in the picture. Vertical 9:16 frame for a premium Japanese anime feature film, in exactly the look of the reference pictures: cinematic photoreal-painterly 3DCG dark fantasy, deep blacks, polished black stone with fine real-gold inlay, warm golden lantern light against a deep evening sky (indigo above, a thin band of amber and rose at the horizon, gold-lit clouds), crisp detail, physically plausible light, gentle atmospheric haze for depth, film-grade composition. No text, no letters, no numbers, no writing, no logos, no watermark anywhere."
   },
   {
-   "id": "gh-hall-low",
+   "id": "gh-hall-low-b",
    "w": 1152,
    "h": 2048,
    "size": [
@@ -98,7 +94,7 @@
    "prompt": "Close-up, from the viewer's point of view: MONBAN's gloved hand (copy MONBAN, the hooded gatekeeper, from the second reference picture: black gloves with fine gold trim at the knuckles and cuffs, a heavy black sleeve with gold embroidery along its hem) is held out toward the viewer, palm up, and on the palm lies a small MANA GEM (copy it from the first reference picture): an egg-shaped clear crystal pebble, inside it swirling threads of golden light with flecks of blue, glowing softly and lighting the glove from below. The hand and gem in the lower middle, sharp; behind, out of focus, the open-air rocket plaza at dusk: golden lanterns as round bokeh, the black rocket's teal and pink lines as soft streaks, a part of the golden ring. Only the hand and sleeve of MONBAN are seen, no face. Vertical 9:16 frame for a premium Japanese anime feature film, in exactly the look of the reference pictures: cinematic photoreal-painterly 3DCG dark fantasy, deep blacks, polished black stone with fine real-gold inlay, warm golden lantern light against a deep evening sky (indigo above, a thin band of amber and rose at the horizon, gold-lit clouds), crisp detail, physically plausible light, gentle atmospheric haze for depth, film-grade composition. No text, no letters, no numbers, no writing, no logos, no watermark anywhere."
   },
   {
-   "id": "gh-gem-kimorin",
+   "id": "gh-gem-kimorin-b",
    "w": 1152,
    "h": 2048,
    "size": [
