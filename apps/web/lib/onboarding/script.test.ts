@@ -67,10 +67,10 @@ describe('day 2 music (the client, 2026-11-28)', () => {
   const say = (text: string) => (s: (typeof DAY2)[number]) => s.t === 'say' && s.text === text;
   it("KIMORIN's theme from his appearance until just before the Earth temple", () => {
     expect(at(say('待ちなさい。'))).toBe('monban');
-    expect(at((s) => s.t === 'video' && s.motion === 'd2-look-back')).toBe('d2-kimorin');
+    expect(at((s) => s.t === 'still' && s.shot === 'reveal-whip')).toBe('d2-kimorin');
     expect(at(say('誰だお前…。'))).toBe('d2-kimorin');
     expect(at(say('気をつけなさい。'))).toBe('d2-kimorin');
-    expect(at((s) => s.t === 'video' && s.motion === '12-a')).toBe(null);
+    expect(at((s) => s.t === 'still' && s.shot === 'gate-through')).toBe(null);
   });
   it('the temple music from the dark hall until KIMORIN catches on, then Crimson Pulse until he goes home', () => {
     expect(at((s) => s.t === 'still' && s.image === 's/d2-hall-dark-kimorin')).toBe('d2-temple');
@@ -79,8 +79,8 @@ describe('day 2 music (the client, 2026-11-28)', () => {
     expect(at((s) => s.t === 'spark' && s.image === 's/d2-kimorin-pin-a')).toBe('d2-crimson');
     expect(at(say('…………。'))).toBe('d2-crimson');
     expect(at(say('宇宙行きの切符、私の家に、送っといてください。'))).toBe('d2-crimson');
-    expect(at((s) => s.t === 'bgvideo' && s.motion === 'd2-kimorin-leave')).toBe(null);
-    expect(at((s) => s.t === 'video' && s.motion === 'd2-descend')).toBe('launch');
+    expect(at((s) => s.t === 'still' && s.shot === 'leave-gate')).toBe(null);
+    expect(at((s) => s.t === 'still' && s.shot === 'plaza-wide')).toBe('launch');
   });
   it('every day-2 track has a file; the new ones have a level and loop points inside the file', () => {
     const fs = require('node:fs') as typeof import('node:fs');

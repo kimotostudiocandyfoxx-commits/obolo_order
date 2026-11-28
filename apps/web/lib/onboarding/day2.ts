@@ -6,7 +6,11 @@ import type { Step } from './script';
  * c05.md D02-S004〜S009, P02/c01.md D03-S003〜S005, c02.md D03-S008〜S009):
  *  - the ticket glows and a line of light leads to the HQ gate (no crane); KIMORIN's 「待ちなさい。」 comes at once, before
  *    MONBAN checks the ticket; his warning and his mother's invitation at the gate
- *  - the Earth temple, the rocket pit and the Moon temple are back to the longer conversations (KIMORIN's 24-hour skip,
+ *  - 「待ちなさい。」 to 〔ロケットに乗る〕 (client 2026-11-28, design/refs/2026-11-28-rocket/storyboard.md): no generated video —
+ *    painted stills and plates moved by the stage (still steps with a `shot`, lib/onboarding/shots.ts); no pit and no
+ *    corridor: the temple's far wall opens straight onto the open-air rocket plaza; on the plaza OBOLON and MONBAN are
+ *    filmed over KIMORIN's shoulder and his lines are the reverse shot
+ *  - the Earth temple, the rocket plaza and the Moon temple are back to the longer conversations (KIMORIN's 24-hour skip,
  *    「魔法、使えるのですか？」, the 「引っかけ問題」)
  *  - on the Moon (M-R334, client 2026-11-27): the eggs (moon = ♀, sun = ♂, shown only as a small mark once {bati} is
  *    born), the favourite food right after 「愛、と言っても…」, うんちピンポンくん, {bati} born from the food's name (the
@@ -59,32 +63,34 @@ export const DAY2: Step[] = [
   { t: 'video', motion: 'd2-ticket-give' }, // MONBANが切符を受け取り、金色のロケットの絵を確かめて、こちらに返す
   // the line comes while the gate opens and MONBAN steps aside (client 2026-10-29), as on day 1
   { t: 'bgvideo', motion: 11 }, // 門が開き、MONBANが、横へ動く（M-R180）
-  { t: 'say', who: 'MONBAN', text: '地球の神殿に行け…地下にロケット場がある' },
-  // 門をくぐろうとした、その時
+  { t: 'say', who: 'MONBAN', text: '地球の神殿に行け…結社の奥の大広間に、ロケットがある' },
+  // ── 「待ちなさい。」 to 〔ロケットに乗る〕 told with pictures (client 2026-11-28, design/refs/2026-11-28-rocket/storyboard.md):
+  // no generated video any more — painted stills and plates moved by the stage (lib/onboarding/shots.ts), effects, sounds.
+  // A1 門をくぐろうとした、その時 — his voice from behind, over the open gate
   { t: 'say', who: 'KIMORIN', text: '待ちなさい。' }, // 後ろから
   // the client's KIMORIN theme (2026-11-28) from his appearance until just before the Earth temple: it crossfades from
   // MONBAN's theme as we look back, and replaces the pause, MONBAN's theme and the comedy theme that played here
   { t: 'bgm', track: 'd2-kimorin' },
-  { t: 'se', sound: 'whoosh' },
-  { t: 'video', motion: 'd2-look-back' }, // ふり返る：来た道のほうを見た景色
-  // 止め絵：来た道の逆光の中の人影（立っているだけの間は短く、すぐ話しはじめる） — the still with a mouth layer
-  { t: 'still', image: 's/d2-reveal-end' },
-  { t: 'wait', s: 0.6 },
+  // A2 ふり返る: a whip pan to the avenue behind us — a small figure against the light, the goggles glint
+  { t: 'se', sound: 'whip' },
+  { t: 'still', image: 's/d2-reveal-end', shot: 'reveal-whip', clear: true },
+  { t: 'se', sound: 'glint', after: 0.5 },
+  { t: 'wait', s: 0.9 },
   { t: 'say', who: 'KIMORIN', text: 'なんですか、この怪しい建物は。' }, // こちらの横まで歩いてきて、本部の建物を、下から上まで、じろじろと見上げる
-  // the clip d2-monban-smoke showed KIMORIN already in the order's robe (client 2026-10-28: on day 2 he wears the white
-  // coat and goggles until he changes on the Moon) — a still until the new cut is made (art/review)
-  { t: 'still', image: 's/d2-gate-two-inside' }, // MONBANが左、白衣のKIMORINが右
+  // A4 MONBAN left, KIMORIN in his white coat right
+  { t: 'still', image: 's/d2-gate-two-inside', shot: 'gate-two', fade: 0.35 },
   { t: 'say', who: 'MONBAN', text: '誰だお前…。' },
   { t: 'say', who: 'KIMORIN', text: '私ですか？私は、なんでもすぐに発明してしまう、天才発明家、KIMORINです。' },
   { t: 'say', who: 'MONBAN', text: 'この先はObolo Orderしか入れない…帰れ…。' },
   { t: 'say', who: 'KIMORIN', text: 'おやおや、帰れは失礼なのでは？　なぜなら、私は！招待客なんですよー？' },
   { t: 'sprite', image: null },
-  { t: 'still', image: 's/d2-invite-hand' }, // KIMORINが白衣のポケットから招待状を出して、MONBANに渡す
+  // A5 KIMORINが白衣のポケットから招待状を出して、MONBANに渡す
+  { t: 'still', image: 's/d2-invite-hand', shot: 'invite-hand', fade: 0.3 },
   { t: 'se', sound: 'pop' },
   { t: 'say', who: 'MONBAN', text: '……なんだ、招待か。' },
-  { t: 'video', motion: 'd2-kimorin-face' }, // KIMORINが門をくぐろうとして、止まる。こちらに向き直る
-  // the film's last frame with a mouth layer, so he talks with a moving mouth (client 2026-10-29)
-  { t: 'still', image: 's/d2-gate-kimorin-face' },
+  // A6 KIMORINが門をくぐろうとして、止まる。こちらに向き直る (he speaks to the visitor: facing us is right here)
+  { t: 'se', sound: 'whip' },
+  { t: 'still', image: 's/d2-gate-kimorin-face', shot: 'kimorin-turn', fade: 0.12 },
   { t: 'say', who: 'KIMORIN', text: 'おや、そこのあなた、もしかして、あなたも招待客？' },
   { t: 'say', who: 'KIMORIN', text: '気をつけなさい。' },
   { t: 'say', who: 'KIMORIN', text: '私は、この世の全ての仕組みを理解しているので、分かります。' },
@@ -100,19 +106,21 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '母が悪徳商法に引っかかっているなら、この天才発明家KIMORINが、こいつらの正体を暴いてみせましょう。' },
   { t: 'action', label: '地球の神殿に向かう' },
   { t: 'bgm', track: null, fade: 2 },
-  { t: 'video', motion: '12-a' }, // 門をくぐり、神殿の奥へ
+  // A9 門をくぐり、神殿の奥へ: through the arch into a warm bloom (replaces the motion 12-a)
+  { t: 'se', sound: 'steps-hall' },
+  { t: 'still', image: 's/d2-gate-inside', shot: 'gate-through', clear: true, fade: 0.4 },
+  { t: 'se', sound: 'into-light', after: 1.2 },
+  { t: 'wait', s: 2.4 },
 
   { t: 'scene', id: 'D02-S004' }, // お金は、かからない（M-R207：削る前の形に戻した）
   // the client's day-2 temple music (2026-11-28) from the dark hall until KIMORIN catches on (the 〔ピンとくる〕 after
   // 「はい！ぜひ！」): it replaces OBOLON's theme and its pause under 「……めちゃくちゃすごい！」
   { t: 'bgm', track: 'd2-temple' },
-  // d2-walk-in walked toward the gate and then swapped to the temple (client 2026-10-28) — a still of KIMORIN in the
-  // dark hall until the new cut (walking into the temple) is made
-  { t: 'still', image: 's/d2-hall-dark-kimorin' }, // 天球儀の大広間（暗い）
-  { t: 'wait', s: 1.2 }, // the dark hall is seen before the light comes down (QA 12 R41)
-  { t: 'se', sound: 'portal' },
-  { t: 'video', motion: 'd2-obolon-appear' }, // 光の柱の中に、黒い球のOBOLON
-  { t: 'still', image: 's/d2-hall-kimorin' }, // 天球儀の大広間。光の柱の中にOBOLON、右手前に白衣のKIMORIN（QA 5 N7）
+  // B1–B2 天球儀の大広間（暗い）. The pillar of light drops to the floor circle and OBOLON is in it (replaces d2-obolon-appear)
+  { t: 'still', image: 's/d2-hall-dark-kimorin', shot: 'temple-dark', clear: true, fade: 1.0 },
+  { t: 'se', sound: 'beam', after: 0.8 },
+  { t: 'wait', s: 2.2 }, // the dark hall is seen before the light comes down (QA 12 R41)
+  { t: 'still', image: 's/d2-hall-kimorin', fade: 0.6 }, // 天球儀の大広間。光の柱の中にOBOLON、右手前に白衣のKIMORIN（QA 5 N7）
   // M-R169 (QA 6 §4-6・QA 8 R20): OBOLON looks at you once, and his eyes narrow
   // (QA 10 R28: the still first, then in to him and the eyes narrow; they stay narrowed into his first line)
   { t: 'wait', s: 0.8 },
@@ -121,9 +129,10 @@ export const DAY2: Step[] = [
   { t: 'wait', s: 1.2 },
   { t: 'cam', move: 'out' },
   { t: 'say', who: 'OBOLON', text: '俺の名前はOBOLON、双子座だ。' }, // 黒い球が、KIMORINのほうへ向く
+  // B4 KIMORINがのけぞる (replaces d2-kimorin-startle): the camera jolts, his shock close-up
   { t: 'se', sound: 'boing' },
   { t: 'sprite', image: null },
-  { t: 'bgvideo', motion: 'd2-kimorin-startle' }, // KIMORINがのけぞり、ゴーグルを額に押し上げる（目が光る。M-R100）
+  { t: 'cam', move: 'shake' },
   { t: 'say', who: 'KIMORIN', text: 'うわ！なんやこの喋る黒い玉は！　宙に浮いとる！　どういう仕組み！？' },
   { t: 'still', image: 's/d2-hall-kimorin-up' }, // ゴーグルを額に上げたKIMORIN
   { t: 'say', who: 'OBOLON', text: 'ここは、宇宙秘密結社だ。' },
@@ -132,13 +141,16 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'え？宇宙、、、行ってみたい' },
   { t: 'say', who: 'OBOLON', text: '実はな、お前は、、、もう宇宙にいる。' },
   { t: 'sprite', image: null },
-  { t: 'bgvideo', motion: 'd2-sky' }, // 神殿の天井が夜空になる。金の輪をまとった地球が浮かぶ。KIMORINの横顔ごしに
+  // B6 神殿の天井が夜空になる。金の輪をまとった地球が浮かぶ: a slow dissolve while the camera tilts up to the Earth (replaces d2-sky)
+  { t: 'se', sound: 'star-sky' },
+  { t: 'still', image: 's/d2-hall-sky', shot: 'temple-sky', clear: true, fade: 2.5 },
   { t: 'wait', s: 6.5 }, // 地球が浮かんでから、しばらく、見とれる間（client 2026-10-22／10-29）
   { t: 'say', who: 'KIMORIN', text: '……めちゃくちゃすごい！' }, // ゴーグルを額に押し上げる。目の切れ目が、青く光る
-  { t: 'bgvideo', motion: 'd2-monban-walkin' }, // MONBANが、入り口から歩いてくる
+  // B8 MONBANが、入り口から歩いてくる (replaces d2-monban-walkin): his steps, and he is there
+  { t: 'se', sound: 'steps-hall' },
+  { t: 'still', image: 's/d2-hall-sky-monban', fade: 1.2 }, // 星空の大広間。MONBANが左、OBOLONが真ん中、KIMORINが右（QA 5 N8）
   { t: 'say', who: 'MONBAN', text: 'お前はObolo Orderに招待された...だから知る権利がある。' },
   { t: 'say', who: 'MONBAN', text: 'どうだ、宇宙へ行ってみるか？' },
-  { t: 'still', image: 's/d2-hall-sky-monban' }, // 星空の大広間。MONBANが左、OBOLONが真ん中、KIMORINが右（QA 5 N8）
   // ピンとくる → 咳払い: the 'it clicked' cut-in before the cough (client 2026-10-29)
   { t: 'say', who: 'KIMORIN', text: 'はい！ぜひ！' },
   // KIMORIN catches on (勘付く): the client's Crimson Pulse (2026-11-28) from here until he goes home — it replaces the
@@ -158,50 +170,89 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '、、、そうですか！それではめちゃくちゃ宇宙に行かせていただきます！' },
   { t: 'say', who: 'KIMORIN', text: '宇宙行きの切符、私の家に、送っといてください。' },
   { t: 'sprite', image: null },
-  // he goes home: the music fades as he leaves, his humming alone (quiet as before until the rocket pit's music)
+  // he goes home: the music fades as he leaves, his humming alone (quiet as before until the rocket plaza's music)
   { t: 'bgm', track: null, fade: 2.5 },
-  { t: 'bgvideo', motion: 'd2-kimorin-leave' }, // 咳払いして、白衣の裾をひるがえし、門の外へ。扇の尾をぱたぱた、光の点になって空へ
+  // B10 白衣の裾をひるがえし、門の外へ。扇の尾をぱたぱた、光の点になって空へ (replaces d2-kimorin-leave): seen from behind,
+  // he walks out through the arch, then a point of light shoots up into the sky
+  { t: 'still', image: 's/d2-gate-inside', shot: 'leave-gate', clear: true, fade: 0.4 },
+  { t: 'se', sound: 'streak-up', after: 3.0 },
   { t: 'say', who: 'KIMORIN', text: 'ふんふ、ふーん♪　宇宙、宇宙♪　うっちゅう、うっちゅう〜♪' }, // 鼻歌
-  { t: 'se', sound: 'whoosh' },
-  { t: 'video', motion: 'd2-kimorin-back' }, // すぐに、光の点が戻ってきて門の前で急停止 → 切符を握りしめ、ダッシュで神殿に戻る
-  { t: 'still', image: 's/d2-hall-run' }, // 肩で息をしている
+  // B11 すぐに、光の点が戻ってきて門の前で急停止 → ダッシュで神殿に戻る (replaces d2-kimorin-back)
+  { t: 'still', image: 's/d2-gate-inside', shot: 'back-gate' },
+  { t: 'se', sound: 'zoom-back' },
+  { t: 'wait', s: 1.0 },
+  { t: 'still', image: 's/d2-hall-run', fade: 0.08 }, // 肩で息をしている
+  { t: 'cam', move: 'shake' },
+  { t: 'se', sound: 'thud' },
   { t: 'say', who: 'KIMORIN', text: 'どういう仕組みかわからんけど……24時間、スキップできた！' }, // M-R207 で戻した
   { t: 'say', who: 'OBOLON', text: '、、、では、、、宇宙へ、行こう。' },
+  // B14 光の柱の奥の壁が、左右に開く — straight beyond it, out in the open air, the rocket plaza (replaces d2-floor-open;
+  // client 2026-11-28: no stairs down, no corridor)
   { t: 'se', sound: 'magic' },
-  { t: 'video', motion: 'd2-floor-open' }, // 光の柱の足もとの床が、丸く開く。下へ続く、長いらせん階段
+  { t: 'still', image: 's/d2-hall', shot: 'wall-push', clear: true, fade: 0.5 },
+  { t: 'se', sound: 'stone-door', after: 0.6 },
+  { t: 'wait', s: 1.4 },
+  { t: 'still', image: 's/gh-wall-open', shot: 'wall-open', fade: 1.4 },
+  { t: 'wait', s: 2.6 },
 
-  { t: 'scene', id: 'D02-S009' }, // ロケット発射場／マナジェム（M-R207：削る前の形に戻した）
+  { t: 'scene', id: 'D02-S009' }, // ロケット場／マナジェム（client 2026-11-28: the rocket stands on an open-air plaza straight beyond the temple）
   { t: 'bgm', track: 'launch' },
-  { t: 'video', motion: 'd2-descend' }, // らせん階段を下りきると、地下の巨大な縦穴。塔のように大きなロケット
-  { t: 'still', image: 's/d2-launch-pit' },
+  // C1 まっすぐ外へ: through the open doors toward the rocket, into the evening light
+  { t: 'se', sound: 'steps-hall' },
+  { t: 'still', image: 's/gh-wall-open', shot: 'wall-through' },
+  { t: 'wait', s: 2.4 },
+  // C2 the plaza: KIMORIN (and we) in front, looking up at the rocket; OBOLON and MONBAN beyond, before it
+  { t: 'se', sound: 'hall-reveal' },
+  { t: 'still', image: 's/gh-hall-wide', shot: 'plaza-wide', clear: true, fade: 0.05 },
+  { t: 'wait', s: 3.2 },
   { t: 'caption', text: 'ロケット発射場に着いた' },
-  { t: 'still', image: 's/d2-monban-pit' }, // ロケットの前のMONBAN（話し手はチャットのアイコンで）
-  { t: 'sprite', image: ['', '', 'obolon-pit'] }, // 光の柱の中のOBOLONも、発射場にいる（QA 5 N9）、MONBANの光の輪から離して（QA 7 R3）
+  // C3 the rocket from the foot of its steps; OBOLON's voice over it
+  { t: 'still', image: 's/gh-hall-low', shot: 'plaza-low', fade: 0.3 },
   { t: 'say', who: 'OBOLON', text: 'これがロケットだ。月に行く。乗れ。' },
+  // C4– over KIMORIN's shoulder to OBOLON and MONBAN; KIMORIN's lines are the reverse (the plaza behind him, his close-up)
+  { t: 'still', image: 's/gh-ots-base', shot: 'ots-monban', fade: 0.25 },
   { t: 'say', who: 'MONBAN', text: 'では、いってこい。' },
+  { t: 'still', image: 's/gh-reverse', shot: 'reverse', fade: 0.2 },
   { t: 'say', who: 'KIMORIN', text: 'え？あなた達は乗らないのですか？' },
+  { t: 'still', image: 's/gh-ots-base', shot: 'ots-monban', fade: 0.2 },
   { t: 'say', who: 'MONBAN', text: '俺は…門を、守る必要がある…。' },
+  { t: 'still', image: 's/gh-reverse', shot: 'reverse', fade: 0.2 },
   { t: 'say', who: 'KIMORIN', text: 'え？知らない人といきなり2人っきりで宇宙？おかしいやろ。' },
+  { t: 'still', image: 's/gh-ots-base', shot: 'ots-obolon', fade: 0.2 },
   { t: 'say', who: 'OBOLON', text: '俺は先に月に行って待ってる。大丈夫だ' },
+  { t: 'still', image: 's/gh-reverse', shot: 'reverse', fade: 0.2 },
   { t: 'say', who: 'KIMORIN', text: 'そうですか、わかりました。' },
-  { t: 'sprite', image: null },
-  { t: 'still', image: 's/d2-monban-pit' },
+  { t: 'still', image: 's/gh-ots-base', shot: 'ots-monban', fade: 0.2 },
   { t: 'say', who: 'MONBAN', text: 'そうだ、{inviter}からこれを預かっている。受け取れ' },
+  // C11 手のひらに、小さな石。中の光が、ゆっくり揺れている — MONBAN's gloved hand holds it out to us
   { t: 'se', sound: 'sparkle' },
-  { t: 'video', motion: 'd2-gem' }, // 手のひらに、小さな石。中の光が、ゆっくり揺れている
+  { t: 'still', image: 's/gh-gem-monban', shot: 'gem-monban', clear: true, fade: 0.3 },
+  { t: 'se', sound: 'gem-hum', after: 0.4 },
   { t: 'say', who: 'MONBAN', text: 'マナジェムだ…。' },
   { t: 'caption', text: 'マナジェムを手に入れた' },
-  { t: 'still', image: 's/d2-monban-pit' },
+  { t: 'still', image: 's/gh-ots-base', shot: 'ots-monban', fade: 0.25 },
   { t: 'say', who: 'MONBAN', text: 'キモリンのもある' }, // MONBANが、KIMORINの手のひらにも、小さな石をのせる（M-R334）
+  // C13 KIMORIN staring at the stone in his paws, lit from below
+  { t: 'still', image: 's/gh-gem-kimorin', shot: 'gem-kimorin', clear: true, fade: 0.15 },
+  { t: 'se', sound: 'gem-hum' },
   { t: 'say', who: 'KIMORIN', text: 'なんやこれ！　光っとる！　どういう仕組み！？' },
+  { t: 'still', image: 's/gh-ots-base', shot: 'ots-monban', fade: 0.2 },
   { t: 'say', who: 'MONBAN', text: '使い方は…そのうち、わかる…。' },
+  { t: 'still', image: 's/gh-reverse', shot: 'reverse', fade: 0.2 },
   { t: 'say', who: 'KIMORIN', text: 'いや今教えてくださいよ。' },
-  { t: 'sprite', image: ['', '', 'obolon-pit'] },
+  { t: 'still', image: 's/gh-ots-base', shot: 'ots-obolon', fade: 0.2 },
   { t: 'say', who: 'OBOLON', text: 'それでは、先に月に行ってる' },
-  { t: 'se', sound: 'sparkle' }, // OBOLONが消える
-  { t: 'vanish', s: 2.2 }, // 神秘的に、光の粒になって薄れていく（client 2026-10-29）
+  // C17 OBOLONが消える: 神秘的に、光の粒になって薄れていく（client 2026-10-29）
+  { t: 'still', image: 's/gh-ots-base', shot: 'ots-vanish' },
+  { t: 'se', sound: 'dissolve' },
+  { t: 'wait', s: 2.4 },
+  // C18 he says it from behind, looking up at the rocket
+  { t: 'still', image: 's/gh-hall-wide', shot: 'plaza-after', fade: 0.4 },
   { t: 'say', who: 'KIMORIN', text: 'すごい、、全然どういう仕組みかわからん、、、。' },
+  { t: 'still', image: 's/gh-reverse', shot: 'reverse', fade: 0.25 },
   { t: 'say', who: 'KIMORIN', text: 'それでは私たちも行きましょう。。。月へ！' }, // M-R334 (MONBAN's 「月だ」 is gone)
+  // C20 the plaza held under the button: the song film (the story session's) starts from this same rocket
+  { t: 'still', image: 's/gh-hall-wide', shot: 'plaza-after', fade: 0.5 },
   { t: 'action', label: 'ロケットに乗る' },
   { t: 'sprite', image: null },
   // SLOT (M-R345, D02-S009 — not brought in yet): from here to 〔月に着いた〕 becomes ONE film of about 73 s that KIMORIN

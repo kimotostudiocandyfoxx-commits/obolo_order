@@ -52,7 +52,11 @@ export type SoundFx =
   // the client's own Pinpon 2.5 press (M-R128): it rings on behind the lines and fades on the next tap; muffled from inside the egg
   | 'pinpon' | 'pinpon-muffled'
   // the 'it clicked' sting under a 〔ピンとくる〕 cut-in (synthesised, 2026-10-29)
-  | 'pin';
+  | 'pin'
+  // day 2 told with pictures (client 2026-11-28, Seed Audio): the whip pan, a glint, the temple's doors, footsteps on stone,
+  // the rocket plaza's reveal, the pillar of light, the starry ceiling, KIMORIN's flight and return, the mana gem, OBOLON
+  // leaving, the push into the light
+  | 'whip' | 'glint' | 'stone-door' | 'steps-hall' | 'hall-reveal' | 'beam' | 'star-sky' | 'streak-up' | 'zoom-back' | 'gem-hum' | 'dissolve' | 'into-light';
 
 /** Picture effects drawn over the background ('fx' steps). */
 export type PictureFx =
@@ -94,7 +98,9 @@ export type Step =
   | { t: 'sprite'; image: string | string[] | null }
   /** Still background image (public/onboarding/<image>.jpg) for scenes without a motion yet. */
   /** fade: seconds to cross-fade from the still before (it stays underneath meanwhile), e.g. OBOLON's eyes narrowing (QA 9 R23) */
-  | { t: 'still'; image: string; fade?: number }
+  /** shot: a still-based cut (lib/onboarding/shots.ts SHOTS) — the camera moving on the picture, cut-outs on it, light effects */
+  /** clear: the lines on screen go (a new place: they would hang over the cut, as a video's start clears them) */
+  | { t: 'still'; image: string; fade?: number; shot?: string; clear?: boolean }
   /**
    * Saturn: the story's kororin lesson on top of the real world (ころりんぱ) — listen, drop your own voice
    * to your own room (or skip), the sister's sunset kororin. Saves answers.f_d04_kororin (try/skip).
@@ -207,7 +213,8 @@ export type Step =
   /** Bluena projects (open) or closes the square screen: MONBAN at the HQ gate. */
   | { t: 'screen'; open: boolean }
   /** A sound effect (synthesised). Continues immediately. */
-  | { t: 'se'; sound: SoundFx }
+  /** after: seconds later (the story goes on meanwhile), to land on a moment of a shot */
+  | { t: 'se'; sound: SoundFx; after?: number }
   /** A picture effect over the background (null = clear). Continues immediately. */
   | { t: 'fx'; fx: PictureFx | null }
   /** Ends the day here (「やめておく」, Day 2). The next visit starts again at the label `resume`. */

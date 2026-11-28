@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { hasMotion, PLANNED_MOTIONS } from './media';
 import { DAY_TITLE, labelIndex, type Step } from './script';
+import { SHOTS } from './shots';
 import { AFTER_DAYS } from './after';
 import { SYS002_ALONE } from './sys002';
 import { DEFAULT_SKIP_LABEL, PREVIEW_ONLY, STORIES, STORIES_NEW_HOMES } from './stories';
@@ -90,17 +91,19 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
     const show = at((s) => s.t === 'action' && s.label === '切符を見せる');
     const give = at((s) => s.t === 'video' && s.motion === 'd2-ticket-give');
     const open = at((s) => s.t === 'bgvideo' && s.motion === 11);
-    const go = say('地球の神殿に行け…地下にロケット場がある');
+    const go = say('地球の神殿に行け…結社の奥の大広間に、ロケットがある');
     const wait = say('待ちなさい。');
     const who = say('誰だお前…。');
     const invite = say('……なんだ、招待か。');
-    const through = at((s) => s.t === 'video' && s.motion === '12-a');
+    const through = at((s) => s.t === 'still' && s.shot === 'gate-through');
     const into = at((s) => s.t === 'still' && s.image === 's/d2-hall-dark-kimorin');
     expect([line, monban, ask, show, give, open, go, wait, who, invite, through, into].every((x, k, a) => x > -1 && (k === 0 || x > a[k - 1]))).toBe(true);
     // his entrance is held only briefly: one still after the look back, then he talks (the walk-up and the long reveal are cut)
     expect(steps.some((s) => s.t === 'video' && (s.motion === 'd2-kimorin-walkup' || s.motion === 'd2-reveal'))).toBe(false);
     const between = steps.slice(wait + 1, say('なんですか、この怪しい建物は。'));
-    expect(between.filter((s) => s.t === 'video').map((s) => s.t === 'video' && s.motion)).toEqual(['d2-look-back']);
+    // the look back is a whip pan onto the still (client 2026-11-28: no generated video from here to the rocket)
+    expect(between.filter((s) => s.t === 'video' || s.t === 'bgvideo')).toEqual([]);
+    expect(between.some((s) => s.t === 'still' && s.shot === 'reveal-whip')).toBe(true);
     expect(between.filter((s) => s.t === 'wait').every((s) => s.t === 'wait' && s.s <= 1)).toBe(true);
     // the crane's flight to HQ is back before the gate (client 2026-11-28), after the ticket's 〔本部へ向かう〕
     const fly = at((s) => s.t === 'video' && s.motion === '5-f');
@@ -108,6 +111,28 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
     expect(fly).toBeGreaterThan(at((s) => s.t === 'action' && s.label === '本部へ向かう'));
     expect(arrive).toBe(fly + 2);
     expect(arrive).toBeLessThan(line);
+  });
+  it('「待ちなさい。」 to 〔ロケットに乗る〕 with pictures (client 2026-11-28): no video, every shot exists, no stairs down, OBOLON / MONBAN over KIMORIN\'s shoulder', () => {
+    const from = steps.findIndex((s) => s.t === 'say' && s.text === '待ちなさい。');
+    const to = steps.findIndex((s) => s.t === 'action' && s.label === 'ロケットに乗る');
+    const span = steps.slice(from, to + 1);
+    expect(span.filter((s) => s.t === 'video' || s.t === 'bgvideo' || s.t === 'loop')).toEqual([]);
+    for (const s of span) if (s.t === 'still' && s.shot) expect(SHOTS[s.shot], s.shot).toBeDefined();
+    for (const s of Object.values(SHOTS)) for (const l of s.layers ?? []) expect(existsSync(`public/onboarding/${l.src}.webp`), l.src).toBe(true);
+    expect(JSON.stringify(span)).not.toMatch(/d2-floor-open|d2-descend|launch-pit|monban-pit|obolon-pit/);
+    // on the plaza: OBOLON's and MONBAN's lines over KIMORIN's shoulder, KIMORIN's on the reverse
+    const shotOf = (k: number) => {
+      for (let j = k; j >= 0; j--) if (steps[j].t === 'still') return (steps[j] as Extract<Step, { t: 'still' }>).shot;
+    };
+    const plaza = steps.findIndex((s) => s.t === 'still' && s.shot === 'plaza-wide');
+    for (let k = plaza; k < to; k++) {
+      const s = steps[k];
+      if (s.t !== 'say') continue;
+      const shot = shotOf(k) ?? '';
+      if (s.who === 'MONBAN') expect(shot, s.text).toMatch(/^(ots-|gem-monban)/);
+      if (s.who === 'OBOLON') expect(shot, s.text).toMatch(/^(ots-|plaza-low)/);
+      if (s.who === 'KIMORIN') expect(shot, s.text).toMatch(/^(reverse|gem-kimorin|plaza-after)$/);
+    }
   });
   it('the launch pit (M-R334): 「キモリンのもある」, 「…月へ！」, and MONBAN no longer says 「月だ」', () => {
     const says = steps.filter((s): s is Extract<Step, { t: 'say' }> => s.t === 'say');

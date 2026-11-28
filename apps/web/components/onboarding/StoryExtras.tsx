@@ -33,7 +33,7 @@ export function unlockSfx() {
   }
 }
 /** the made sounds a story sound falls back to when its file is not there */
-const NEAREST: Record<string, Preset> = { 'gate-close': 'thud', smoke: 'whoosh', rocket: 'whoosh', crackers: 'pop', 'egg-crack': 'pop', paper: 'whoosh', stamp: 'thud', footsteps: 'knock', portal: 'magic' };
+const NEAREST: Record<string, Preset> = { 'gate-close': 'thud', smoke: 'whoosh', rocket: 'whoosh', crackers: 'pop', 'egg-crack': 'pop', paper: 'whoosh', stamp: 'thud', footsteps: 'knock', portal: 'magic', whip: 'whoosh', glint: 'sparkle', 'stone-door': 'thud', 'steps-hall': 'knock', 'hall-reveal': 'magic', beam: 'magic', 'star-sky': 'sparkle', 'streak-up': 'whoosh', 'zoom-back': 'whoosh', 'gem-hum': 'chime', dissolve: 'sparkle', 'into-light': 'magic' };
 const seBuffers = new Map<string, Promise<AudioBuffer | null>>();
 /** the sounds already decoded: played in the same moment as the tap, without waiting a turn */
 const seReady = new Map<string, AudioBuffer>();
