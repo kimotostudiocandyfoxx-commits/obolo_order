@@ -20303,6 +20303,36 @@
     "docs/story-rewrite/design/refs/places/rocket.jpg"
    ],
    "prompt": "Edit the reference picture of the rocket: keep EXACTLY the same design, materials and colours - the long slender black hull with gold filigree, the pink neon line and cyan neon lines, the orange glowing emblem and pink ring near the nose, the blue glowing slits, the three bronze engine nozzles, the same rendering style. Change the fins: the rocket has exactly THREE large sharp swept-back fins, spaced evenly around the hull at 120 degrees (like a classic tripod rocket), each fin long enough that its pointed tip reaches lower than the engine nozzles, so the rocket stands steadily on the tips of its three fins. The rocket stands perfectly upright, nose straight up, not tilted. Plain white background, the whole rocket in frame. Vertical 9:16. No text, no letters, no watermark. Three-quarter view from slightly below: all three fins clearly visible, one front-left, one front-right and one at the back; all three fin tips touch the same ground line."
+  },
+  {
+   "id": "mvr/p-rocket3w-front",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "design/mv-art/out/mvr/p-rocket3-front.jpg",
+    "docs/story-rewrite/design/refs/places/rocket.jpg"
+   ],
+   "prompt": "Edit the first reference picture of the rocket: keep EXACTLY the same hull design, materials, colours and rendering (black hull with gold filigree, pink and cyan neon lines, orange emblem and pink ring near the nose, blue slits, bronze engine nozzles), and keep exactly THREE fins. Change only the fins: the three fins spread much WIDER outward from the hull, angled out like a wide tripod, and they END at exactly the SAME HEIGHT as the bottom of the engine nozzles - the fin tips do NOT extend below the nozzles. The bottoms of the three fins and the engine nozzles all line up on one flat level, so the rocket would sit flat on a launch pad on its nozzles and fin ends together, stable and natural. The rocket stands perfectly upright, nose straight up. Plain white background, the whole rocket in frame. Vertical 9:16. No text, no letters, no watermark. Front view at eye level: one fin toward the camera in the middle, the other two spread wide to the left and right."
+  },
+  {
+   "id": "mvr/p-rocket3w-quarter",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "design/mv-art/out/mvr/p-rocket3-front.jpg",
+    "docs/story-rewrite/design/refs/places/rocket.jpg"
+   ],
+   "prompt": "Edit the first reference picture of the rocket: keep EXACTLY the same hull design, materials, colours and rendering (black hull with gold filigree, pink and cyan neon lines, orange emblem and pink ring near the nose, blue slits, bronze engine nozzles), and keep exactly THREE fins. Change only the fins: the three fins spread much WIDER outward from the hull, angled out like a wide tripod, and they END at exactly the SAME HEIGHT as the bottom of the engine nozzles - the fin tips do NOT extend below the nozzles. The bottoms of the three fins and the engine nozzles all line up on one flat level, so the rocket would sit flat on a launch pad on its nozzles and fin ends together, stable and natural. The rocket stands perfectly upright, nose straight up. Plain white background, the whole rocket in frame. Vertical 9:16. No text, no letters, no watermark. Three-quarter view at eye level: all three wide fins clearly visible around the hull, their ends level with the nozzles."
   }
  ],
  "redo": []
