@@ -20333,6 +20333,48 @@
     "docs/story-rewrite/design/refs/places/rocket.jpg"
    ],
    "prompt": "Edit the first reference picture of the rocket: keep EXACTLY the same hull design, materials, colours and rendering (black hull with gold filigree, pink and cyan neon lines, orange emblem and pink ring near the nose, blue slits, bronze engine nozzles), and keep exactly THREE fins. Change only the fins: the three fins spread much WIDER outward from the hull, angled out like a wide tripod, and they END at exactly the SAME HEIGHT as the bottom of the engine nozzles - the fin tips do NOT extend below the nozzles. The bottoms of the three fins and the engine nozzles all line up on one flat level, so the rocket would sit flat on a launch pad on its nozzles and fin ends together, stable and natural. The rocket stands perfectly upright, nose straight up. Plain white background, the whole rocket in frame. Vertical 9:16. No text, no letters, no watermark. Three-quarter view at eye level: all three wide fins clearly visible around the hull, their ends level with the nozzles."
+  },
+  {
+   "id": "mvr/p-rocket3f-front",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/rocket.jpg"
+   ],
+   "prompt": "Redraw the rocket of the reference picture standing perfectly upright on a flat white floor, keeping EXACTLY its hull design, materials, colours and rendering (black hull with gold filigree, pink and cyan neon lines, orange emblem and pink ring near the nose, blue slits, three bronze engine nozzles). FINS: exactly THREE fins, evenly spaced around the hull, spread wide outward. IMPORTANT: the lowest point of every fin is EXACTLY level with the bottom rims of the engine nozzles. The fins do NOT hang down below the nozzles and do NOT end in long downward spikes: each fin's bottom edge is cut flat and horizontal at the nozzle level, like the flat feet of a lunar lander. The three fin bottoms and the three nozzles all stand together on the same flat floor line, with a soft shadow, the rocket sitting stable and natural. Plain white background, the whole rocket in frame. Vertical 9:16. No text, no letters, no watermark. Front view at eye level, slightly from above so the floor line under the nozzles and fin bottoms is clearly visible."
+  },
+  {
+   "id": "mvr/p-rocket3f-quarter",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/rocket.jpg"
+   ],
+   "prompt": "Redraw the rocket of the reference picture standing perfectly upright on a flat white floor, keeping EXACTLY its hull design, materials, colours and rendering (black hull with gold filigree, pink and cyan neon lines, orange emblem and pink ring near the nose, blue slits, three bronze engine nozzles). FINS: exactly THREE fins, evenly spaced around the hull, spread wide outward. IMPORTANT: the lowest point of every fin is EXACTLY level with the bottom rims of the engine nozzles. The fins do NOT hang down below the nozzles and do NOT end in long downward spikes: each fin's bottom edge is cut flat and horizontal at the nozzle level, like the flat feet of a lunar lander. The three fin bottoms and the three nozzles all stand together on the same flat floor line, with a soft shadow, the rocket sitting stable and natural. Plain white background, the whole rocket in frame. Vertical 9:16. No text, no letters, no watermark. Three-quarter view at eye level, all three fins visible, the floor line under the nozzles and fin bottoms clearly visible."
+  },
+  {
+   "id": "mvr/p-rocket3f-wide",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/rocket.jpg"
+   ],
+   "prompt": "Redraw the rocket of the reference picture standing perfectly upright on a flat white floor, keeping EXACTLY its hull design, materials, colours and rendering (black hull with gold filigree, pink and cyan neon lines, orange emblem and pink ring near the nose, blue slits, three bronze engine nozzles). FINS: exactly THREE fins, evenly spaced around the hull, spread wide outward. IMPORTANT: the lowest point of every fin is EXACTLY level with the bottom rims of the engine nozzles. The fins do NOT hang down below the nozzles and do NOT end in long downward spikes: each fin's bottom edge is cut flat and horizontal at the nozzle level, like the flat feet of a lunar lander. The three fin bottoms and the three nozzles all stand together on the same flat floor line, with a soft shadow, the rocket sitting stable and natural. Plain white background, the whole rocket in frame. Vertical 9:16. No text, no letters, no watermark. Front view; the fins are broad, swept back and flare out far to the sides near the base, ending flat at the nozzle level."
   }
  ],
  "redo": []
