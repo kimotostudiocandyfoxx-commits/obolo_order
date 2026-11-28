@@ -44,9 +44,6 @@ const ja = {
     notInvited: 'このアドレスには招待が届いていません。OBOLO ORDER は完全招待制です。',
     wrongCode: '合言葉が違います',
     demoHint: 'デモモード：どのアドレスでも KIMORIN からの招待として入れます',
-    authTitle: '扉の合言葉',
-    authLead: '招待状が届いたメールアドレスを入れてください',
-    authMismatch: '登録されているアドレスと一致しません',
   },
   journey: {
     day: 'DAY {n}',

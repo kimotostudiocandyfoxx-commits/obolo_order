@@ -5,7 +5,7 @@ import { kimorinBack } from './kimorinBack';
 
 /**
  * DAY 7 【月 → 金星】 — the simple version (M-R208/M-R210/M-R211; wip/P04/c01v.md D07V-S001〜S004; M-R190: Venus is the
- * radio planet). Starts after the email check 〔扉の合言葉〕 (DayAuth).
+ * radio planet).
  *  - the Moon morning: OBOLON 「お前は、ついに、ラジオを、作れるようになる。」; Bluena gains the broadcast shelf;
  *    KIMORIN⭐︎'s sample show in his chat (『プリプリ・ボカン』, すね毛が三倍)
  *  - {neo}'s show in {bati}'s chat (the 'atelier' step: pick a song, talk into the mic, the song after it; the card with

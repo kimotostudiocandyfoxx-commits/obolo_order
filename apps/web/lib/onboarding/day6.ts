@@ -5,7 +5,7 @@ import { kimorinBack } from './kimorinBack';
 
 /**
  * DAY 6 【月 → 火星】 — the simple version (M-R208/M-R210/M-R211; wip/P04/c01.md D07-S001〜S007; S003 and S006 are cut;
- * the scene ids say D07 but it is day 6). Starts after the email check 〔扉の合言葉〕 (DayAuth).
+ * the scene ids say D07 but it is day 6).
  *  - the Moon morning: OBOLON 「お前は、ついに、映像を、作れるようになる。」; Bluena gains the play-triangle shelf
  *  - the Moon atelier: KIMORIN⭐︎'s 「全部です」 and his slide MV in his chat, then {neo}'s MV in {bati}'s chat (the 'atelier'
  *    step: yesterday's song → the scene by voice → three scenes → the first one → camera wishes → the card, in Bluena at

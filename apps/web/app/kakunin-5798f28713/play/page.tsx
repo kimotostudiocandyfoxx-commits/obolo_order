@@ -136,7 +136,7 @@ function PreviewPlay() {
     );
   }
 
-  const story = sys ? { steps: SYS002_ALONE, skipLabel: DEFAULT_SKIP_LABEL, auth: false } : eggN ? { steps: SYS003, skipLabel: DEFAULT_SKIP_LABEL, auth: false } : afterN ? { steps: AFTER_DAYS[afterN - 1], skipLabel: DEFAULT_SKIP_LABEL, auth: false } : (STORIES[day] ?? PREVIEW_ONLY[day]);
+  const story = sys ? { steps: SYS002_ALONE, skipLabel: DEFAULT_SKIP_LABEL } : eggN ? { steps: SYS003, skipLabel: DEFAULT_SKIP_LABEL } : afterN ? { steps: AFTER_DAYS[afterN - 1], skipLabel: DEFAULT_SKIP_LABEL } : (STORIES[day] ?? PREVIEW_ONLY[day]);
   if (!story) return <Ended text="その日のストーリーはまだありません" />;
   // thru=N: played straight through, each day handing over to the next up to day N (the client's check from the start to Saturn)
   const thru = Number(q.get('thru') ?? 0);
