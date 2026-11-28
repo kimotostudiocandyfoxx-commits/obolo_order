@@ -9,6 +9,7 @@ import { type Book, loadDrawer, putInDrawer } from '@/components/uranus/drawer';
 import { getApi } from '@/lib/api';
 import { realLessonApi, type LessonApi } from '@/lib/onboarding/lessonApi';
 import type { StoryVars } from '@/lib/onboarding/script';
+import { publishStoryGoods, storyGoodsNote, type StoryGoodsResult } from '@/lib/onboarding/storyGoods';
 import { Glyph } from '@/components/bluena/glyphs';
 import { LineIcon } from '@/components/LineIcon';
 
@@ -33,7 +34,7 @@ type Done = (a: Record<string, string>) => void;
 type Art = { text: string; url: string | null };
 
 const BLUENA_KEY = 'obolo.bluena.after';
-type Kept = { goods?: { shape: string; art: Art }; game?: { title: string; cards: string[] } };
+type Kept = { goods?: { shape: string; art: Art; /** the real goods item it became (day 10, lib/onboarding/storyGoods.ts) */ sentId?: string }; game?: { title: string; cards: string[] } };
 function loadKept(): Kept {
   try {
     return JSON.parse(localStorage.getItem(BLUENA_KEY) ?? '{}') as Kept;
@@ -168,8 +169,22 @@ function Mock({ shape, art, size = 150 }: { shape: string; art: Art; size?: numb
   }
 }
 
-function GoodsMaker({ v, onDone }: { v: StoryVars; onDone: Done }) {
-  const arts = myArts(v);
+function GoodsMaker({ v, lessonApi, onDone }: { v: StoryVars; lessonApi?: LessonApi; onDone: Done }) {
+  // 「Bluenaの中の自分のアート」: the member's real arts (the ones made in the Moon atelier since day 4) when there are
+  // any — goods printed on one of them become a real item in the shop (lib/onboarding/storyGoods.ts); else the story's own
+  const [mine, setMine] = useState<Art[]>([]);
+  useEffect(() => {
+    if (lessonApi !== realLessonApi) return;
+    let off = false;
+    void getApi()
+      .jupiterRoots()
+      .then((rs) => !off && setMine(rs.filter((r) => r.kind === 'photo').slice(0, 6).map((r) => ({ text: r.title || v.neo || v.name || '★', url: r.url }))))
+      .catch(() => undefined);
+    return () => {
+      off = true;
+    };
+  }, [lessonApi, v.neo, v.name]);
+  const arts = mine.length ? mine : myArts(v);
   const [shape, setShape] = useState<string | null>(null);
   const [art, setArt] = useState<Art | null>(null);
   const [made, setMade] = useState(false);
@@ -238,10 +253,26 @@ function GoodsMaker({ v, onDone }: { v: StoryVars; onDone: Done }) {
   );
 }
 
-function PublishGoods({ v, onDone }: { v: StoryVars; onDone: Done }) {
-  const g = loadKept().goods ?? { shape: 'sticker', art: myArts(v)[0] };
+function PublishGoods({ v, lessonApi, onDone }: { v: StoryVars; lessonApi?: LessonApi; onDone: Done }) {
+  const [g] = useState(() => loadKept().goods ?? { shape: 'sticker', art: myArts(v)[0] });
+  // day 10: the goods become a real item in the member's shop on Uranus (the Moon's own free maker, then 〔星へ飛ばす〕);
+  // the previews and the in-browser demo keep it on the device, as before
+  const live = lessonApi === realLessonApi;
+  const [sent, setSent] = useState<StoryGoodsResult | 'preview' | null>(live ? null : 'preview');
+  useEffect(() => {
+    if (!live) return;
+    let off = false;
+    void publishStoryGoods(getApi(), g.shape, g.art.url, g.sentId).then((r) => {
+      if (off) return;
+      if (r.at === 'shop') keep({ goods: { ...g, sentId: r.id } });
+      setSent(r);
+    });
+    return () => {
+      off = true;
+    };
+  }, [live, g]);
   return (
-    <Moment note="（お店の棚は、いまはこの端末の中だけに並びます。ダチには、まだ見えません）" onDone={() => onDone({})}>
+    <Moment note={storyGoodsNote(sent).replace('{neo}', v.neo || v.name || '')} onDone={() => onDone({})}>
       <span className="absolute bottom-[-10%] right-[6%] h-[80%] w-1 origin-bottom rotate-[-24deg] animate-[atelier-beam_0.9s_ease-out_forwards] rounded-full bg-gradient-to-t from-sky-200/0 via-sky-100/80 to-sky-50/0 blur-[2px]" />
       <div className="relative rounded-2xl border-4 border-amber-900/80 bg-amber-100/15 p-5 shadow-[0_0_40px_rgba(255,220,140,0.55)] animate-[fadeIn_1.2s_0.8s_both]">
         <Mock shape={g.shape} art={g.art} size={130} />
@@ -775,9 +806,9 @@ function PublishGame({ v, onDone }: { v: StoryVars; onDone: Done }) {
 export function AfterStep({ what, vars: v, answers, lessonApi, onDone }: { what: AfterWhat; vars: StoryVars; answers: Record<string, string>; lessonApi?: LessonApi; onDone: Done }) {
   switch (what) {
     case 'm-goods':
-      return <GoodsMaker v={v} onDone={onDone} />;
+      return <GoodsMaker v={v} lessonApi={lessonApi} onDone={onDone} />;
     case 'm-publish-goods':
-      return <PublishGoods v={v} onDone={onDone} />;
+      return <PublishGoods v={v} lessonApi={lessonApi} onDone={onDone} />;
     case 'm-shop':
       return <ShopTag onDone={onDone} />;
     case 'm-shop-locked':
