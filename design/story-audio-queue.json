@@ -3,10 +3,7 @@
   "sfxModel": "bytedance:seed-audio@1.0",
   "musicModel": "minimax:music@2.6",
   "parallel": 3,
-  "redo": [
-    "steps-hall",
-    "gem-hum"
-  ],
+  "redo": [],
   "probe": [],
   "items": [
     {
