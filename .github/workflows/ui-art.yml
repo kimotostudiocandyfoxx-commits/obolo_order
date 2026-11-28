@@ -71,10 +71,13 @@ jobs:
           node scripts/review-art/budget.mjs || true
       - name: Save the pictures to the branch
         if: always()
+        env:
+          ONE_QUEUE: ${{ github.event.inputs.queue }}
         run: |
           git config user.name "ui-art"
           git config user.email "ui-art@users.noreply.github.com"
           [ -d design/cast ] && git add -f design/cast design/cast-art-queue.json
+          [ -n "${ONE_QUEUE:-}" ] && [ -f "$ONE_QUEUE" ] && git add -f "$ONE_QUEUE"
           git add -f apps/web/public/dj/art apps/web/public/onboarding/s apps/web/public/atelier/raw apps/web/public/ui/parts/raw design/ui-parts-queue.json design/ui-art-queue.json design/story-art-queue.json design/atelier-art-queue.json art/review design/review-art-queue.json design/messenger-art-queue.json design/plaza-art-queue.json design/ui1-art-queue.json
           git diff --cached --quiet && exit 0
           git commit -m "UI art: new pictures [skip ci]"
