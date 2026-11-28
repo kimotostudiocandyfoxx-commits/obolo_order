@@ -1,15 +1,7 @@
-# UI art — 2026-11-28T08:54:09.608Z
+# UI art — 2026-11-28T09:44:05.839Z
 
-Seedream 5.0 Pro / 11枚 / 約109円
+Seedream 5.0 Pro / 3枚 / 約24円
 
-- ✅ gh-corridor
-- ✅ gh-gem-kimorin
-- ✅ gh-gem-monban
-- ✅ gh-hall-low
-- ✅ gh-hall-wide
-- ✅ gh-ots-base
-- ✅ gh-reverse
-- ✅ gh-wall-open
-- ✅ kb-back
-- ✅ kb-ots
-- ✅ kb-walk
+- ✅ gh-gem-kimorin-b
+- ✅ gh-hall-low-b
+- ✅ gh-wall-open-b
