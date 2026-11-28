@@ -756,6 +756,32 @@
     1280
    ],
    "prompt": "Moon dust settles slowly; the character looks up at the temple. Smooth, slow, cinematic motion in exactly the same 3DCG style. The camera stays fixed. Every character, face, body, costume and the composition stay exactly as in the first frame. No text."
+  },
+  {
+   "id": "mvr-r03-stop",
+   "image": "design/mv-art/out/mvr/r03-stop.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "always": false,
+   "model": "bytedance:2@2",
+   "frameSize": [
+    720,
+    1280
+   ],
+   "prompt": "The feet step forward once and stop abruptly; the robe hem sways and settles. Smooth, slow, cinematic motion in exactly the same 3DCG style. The camera stays fixed. Every character, face, body, costume and the composition stay exactly as in the first frame. No text."
+  },
+  {
+   "id": "mvr-r13-board",
+   "image": "design/mv-art/out/mvr/r13-board.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "always": false,
+   "model": "bytedance:2@2",
+   "frameSize": [
+    720,
+    1280
+   ],
+   "prompt": "The character hops up into the glowing hatch. Smooth, slow, cinematic motion in exactly the same 3DCG style. The camera stays fixed. Every character, face, body, costume and the composition stay exactly as in the first frame. No text."
   }
  ],
  "redo": []
