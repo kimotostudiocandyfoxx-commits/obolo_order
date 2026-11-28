@@ -1362,6 +1362,7 @@ const BSPD=[['ゆっくり',.8],['ふつう',1],['はやい',1.3]];
 const SUSHI=Object.assign({'サーぽん':Object.assign({},SAPON,{k:'sapon',p:'sap-',name:'サーぽん',goodsImg:'mug',goodsVoice:'mugv',kind:'wobble',ly:SAPLY})},/*SUSHI*/{});
 Object.assign(SUSHI,/*RESW*/{});
 const SUSHI_ON=/*SUSHION*/['サーぽん'];
+if(!SUSHI_ON.includes('サーぽん'))delete SUSHI['サーぽん'];
 function sapBook(into,X){const v=document.createElement('div');v.className='vw sapbk live';v.style.top='13%';let p=0,auto=null,sp=1,busy=false,done=false;
   try{const x=+localStorage.getItem('sapBookSpeed');if(BSPD.some(b=>b[1]===x))sp=x}catch(e){}
   const face=i=>`<div class="sq" style="background-image:url(${A[X.p+'book-'+(i+1)]||''})"><span class="pno">${i+1} / ${X.pages.length}</span>${i===0?`<h4>${X.book}</h4>`:''}<p class="cap">${X.pages[i]}</p></div>`;
