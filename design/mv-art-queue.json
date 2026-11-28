@@ -20704,6 +20704,54 @@
     "docs/story-rewrite/design/refs/cast/monban.jpg"
    ],
    "prompt": "Edit the first reference picture: keep EXACTLY the same scene, camera, composition, KIMORIN (white lab coat, goggles, box on the head, feather fan behind him) in the foreground facing the camera, the back of the headquarters, the obelisks, lanterns, reflective floor, dusk sky, colours, light and rendering. ADD two figures standing BEHIND KIMORIN, a few metres further back on the plaza, between KIMORIN and the headquarters, silently watching, slightly eerie and mysterious: (1) OBOLON exactly as in the OBOLON reference picture: a floating pitch-black sphere with a thin glowing white corona ring around its edge like a solar eclipse and two white crescent closed eyes smiling, no mouth, floating in the air at about the height of a man's head inside a faint pillar of golden light; (2) MONBAN exactly as in the MONBAN reference picture: a tall adult figure in a long black hooded robe with gold lines and magic-circle patterns, a black masked face deep in the hood with ONE glowing golden eye on the forehead, a golden magic-circle halo disc behind the head, black gloves and boots with gold trim. KIMORIN does not notice them yet. Exactly these three characters, no others. Vertical 9:16. No text, no watermark. OBOLON and MONBAN stand side by side directly behind KIMORIN, centred, framed by the headquarters' gate; MONBAN towers behind KIMORIN's right shoulder, OBOLON floats behind his left shoulder at MONBAN's head height."
+  },
+  {
+   "id": "mvr/air-earth-a",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/headquarters-gate.webp",
+    "design/mv-art/out/mvr/p-out2-b.jpg",
+    "design/mv-art/out/mvr/k-reverse.jpg"
+   ],
+   "prompt": "AERIAL DRONE SHOT at dusk of the secret society's headquarters complex (the Earth temple). Keep the layout and shapes of the reference pictures: (a) the HEADQUARTERS from the first reference: a black-and-gold city of tall spires, the giant front gate with the ringed celestial globe on top, a black-and-gold avenue with a compass emblem leading to the gate, and behind the gate the huge glass-domed temple; (b) directly BEHIND the headquarters (on the far side of the dome, away from the front gate) lies the outdoor LAUNCH PLAZA from the second reference: a long reflective black-and-gold tiled plaza with gold lines, lined on both sides by tall black-and-gold obelisks and golden lanterns, leading to a grand staircase and a round black-and-gold launch platform at the far end, on which stands the gigantic black rocket with gold filigree and pink and cyan neon lines (as tall as a 20-storey building, taller than the spires), with the giant glowing golden ring standing behind it; beyond the rocket there are NO buildings - only open land and the horizon (as in the second reference). The plaza's axis lines up with the gate, the dome and the rocket in one straight line. Violet and navy dusk sky with gold-lit clouds, the first stars, glittering gold lights in the city. No people, no characters. Cinematic, same rendering and colours as the references. Vertical 9:16, edge to edge. No text, no letters, no watermark. CAMERA: high above and behind the front gate, looking forward along the axis: the gate and avenue in the foreground at the bottom, the dome in the middle, the launch plaza beyond it and the gigantic rocket with its golden ring at the top toward the horizon."
+  },
+  {
+   "id": "mvr/air-earth-b",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/headquarters-gate.webp",
+    "design/mv-art/out/mvr/p-out2-b.jpg",
+    "design/mv-art/out/mvr/k-reverse.jpg"
+   ],
+   "prompt": "AERIAL DRONE SHOT at dusk of the secret society's headquarters complex (the Earth temple). Keep the layout and shapes of the reference pictures: (a) the HEADQUARTERS from the first reference: a black-and-gold city of tall spires, the giant front gate with the ringed celestial globe on top, a black-and-gold avenue with a compass emblem leading to the gate, and behind the gate the huge glass-domed temple; (b) directly BEHIND the headquarters (on the far side of the dome, away from the front gate) lies the outdoor LAUNCH PLAZA from the second reference: a long reflective black-and-gold tiled plaza with gold lines, lined on both sides by tall black-and-gold obelisks and golden lanterns, leading to a grand staircase and a round black-and-gold launch platform at the far end, on which stands the gigantic black rocket with gold filigree and pink and cyan neon lines (as tall as a 20-storey building, taller than the spires), with the giant glowing golden ring standing behind it; beyond the rocket there are NO buildings - only open land and the horizon (as in the second reference). The plaza's axis lines up with the gate, the dome and the rocket in one straight line. Violet and navy dusk sky with gold-lit clouds, the first stars, glittering gold lights in the city. No people, no characters. Cinematic, same rendering and colours as the references. Vertical 9:16, edge to edge. No text, no letters, no watermark. CAMERA: a three-quarter aerial view from high up at the side, so the whole complex is seen at an angle: the spired headquarters with its dome on one side, the long obelisk-lined launch plaza stretching away behind it, the rocket on its platform with the golden ring at the end."
+  },
+  {
+   "id": "mvr/air-earth-c",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/headquarters-gate.webp",
+    "design/mv-art/out/mvr/p-out2-b.jpg",
+    "design/mv-art/out/mvr/k-reverse.jpg"
+   ],
+   "prompt": "AERIAL DRONE SHOT at dusk of the secret society's headquarters complex (the Earth temple). Keep the layout and shapes of the reference pictures: (a) the HEADQUARTERS from the first reference: a black-and-gold city of tall spires, the giant front gate with the ringed celestial globe on top, a black-and-gold avenue with a compass emblem leading to the gate, and behind the gate the huge glass-domed temple; (b) directly BEHIND the headquarters (on the far side of the dome, away from the front gate) lies the outdoor LAUNCH PLAZA from the second reference: a long reflective black-and-gold tiled plaza with gold lines, lined on both sides by tall black-and-gold obelisks and golden lanterns, leading to a grand staircase and a round black-and-gold launch platform at the far end, on which stands the gigantic black rocket with gold filigree and pink and cyan neon lines (as tall as a 20-storey building, taller than the spires), with the giant glowing golden ring standing behind it; beyond the rocket there are NO buildings - only open land and the horizon (as in the second reference). The plaza's axis lines up with the gate, the dome and the rocket in one straight line. Violet and navy dusk sky with gold-lit clouds, the first stars, glittering gold lights in the city. No people, no characters. Cinematic, same rendering and colours as the references. Vertical 9:16, edge to edge. No text, no letters, no watermark. CAMERA: very high bird's-eye view looking almost straight down at a steep angle: the geometric layout is clear - the gate, the round dome, the rectangular obelisk-lined plaza and the round launch platform with the rocket seen from above (its three fins like a star) and the golden ring, all on one axis, surrounded by the dark spired city."
   }
  ],
  "redo": []
