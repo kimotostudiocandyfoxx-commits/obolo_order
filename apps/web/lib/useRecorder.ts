@@ -125,7 +125,7 @@ export function useRecorder(maxSec = VOICE_MAX_SECONDS, path: MicPath = 'other',
       return fail(faultOfError(e), (e as Error)?.name, mime);
     }
     setRecording(true);
-    meterRef.current = micMeter(stream);
+    meterRef.current = micMeter(stream, { own: currentEnv().os === 'ios' });
     timerRef.current = setInterval(() => {
       const s = (Date.now() - startedRef.current) / 1000;
       setElapsed(Math.floor(s));

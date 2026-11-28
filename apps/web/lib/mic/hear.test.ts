@@ -5,7 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
  * to the recorder, the restart after a pause, the recording's container, and what is said when it fails.
  */
 const session: boolean[] = [];
-vi.mock('@/lib/onboarding/audio', () => ({ micSession: (on: boolean) => void session.push(on), unlockAudio: () => null }));
+const busy: boolean[] = [];
+vi.mock('@/lib/onboarding/audio', () => ({ micSession: (on: boolean) => void session.push(on), micBusy: (on: boolean) => void busy.push(on), unlockAudio: () => null }));
 const reports: { fault: string; name?: string; engine: string; path: string; os: string; browser: string }[] = [];
 const dictated: Blob[] = [];
 let dictateAnswer: () => Promise<{ text: string }> = async () => ({ text: 'こんにちは' });
@@ -19,7 +20,14 @@ vi.mock('@/lib/api', () => ({
   }),
 }));
 let meterLevel = 0.5;
-vi.mock('./meter', () => ({ micMeter: () => ({ level: () => meterLevel, live: () => true, close: () => undefined }) }));
+let meterLive = true;
+const meterOwn: (boolean | undefined)[] = [];
+vi.mock('./meter', () => ({
+  micMeter: (_s: unknown, o?: { own?: boolean }) => (meterOwn.push(o?.own), { level: () => meterLevel, live: () => meterLive, everLive: () => meterLive, close: () => undefined }),
+}));
+
+/** a store that outlives a module reload (the same phone, a later visit) */
+const local = new Map<string, string>();
 
 const UA = {
   iosSafari: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.1 Mobile/15E148 Safari/604.1',
@@ -112,6 +120,7 @@ let streams: FakeStream[] = [];
 function phone(ua: string, o: { recognizer?: boolean; recorder?: boolean } = {}) {
   const store = new Map<string, string>();
   vi.stubGlobal('sessionStorage', { getItem: (k: string) => store.get(k) ?? null, setItem: (k: string, v: string) => void store.set(k, v) });
+  vi.stubGlobal('localStorage', { getItem: (k: string) => local.get(k) ?? null, setItem: (k: string, v: string) => void local.set(k, v) });
   vi.stubGlobal('document', { addEventListener: () => undefined, visibilityState: 'visible' });
   vi.stubGlobal('window', {
     ...(o.recognizer === false ? {} : { webkitSpeechRecognition: FakeRec }),
@@ -156,6 +165,10 @@ const flush = async (ms = 0) => {
 beforeEach(() => {
   vi.useFakeTimers();
   session.length = 0;
+  busy.length = 0;
+  local.clear();
+  meterOwn.length = 0;
+  meterLive = true;
   reports.length = 0;
   dictated.length = 0;
   FakeRec.made = [];
@@ -188,7 +201,7 @@ describe('iPhone Chrome (client 2026-11-27: the mic that did not react)', () => 
     expect(l.got.phases).toContain('listening');
     // the record session is on while it listens
     expect(session[0]).toBe(true);
-    await flush(600);
+    await flush(900);
     expect(l.got.phases).toContain('hearing');
     h.stop();
     await flush(10);
@@ -210,7 +223,10 @@ describe('iPhone Chrome (client 2026-11-27: the mic that did not react)', () => 
     meterLevel = 0.5;
     await flush(900);
     meterLevel = 0.005;
-    await flush(2400);
+    await flush(2000);
+    // a pause to think is not the end (R21 playtest: 2.4 s now)
+    expect(dictated).toHaveLength(0);
+    await flush(1000);
     expect(dictated).toHaveLength(1);
     expect(l.got.end?.heard).toBe(true);
   });
@@ -239,7 +255,9 @@ describe('iPhone Chrome (client 2026-11-27: the mic that did not react)', () => 
     await flush(10);
     expect(dictated).toHaveLength(0);
     expect(l.got.end).toEqual({ fault: 'silent', heard: false, engine: 'record' });
-    expect(reports[0]).toMatchObject({ fault: 'silent', name: 'zero-level', mime: 'audio/mp4' });
+    expect(reports[0]).toMatchObject({ fault: 'silent', mime: 'audio/mp4' });
+    // what the take was like: the meter ran (l=1), peak 0, no voice, its length
+    expect(reports[0].name).toMatch(/^zero-level;l=1;p=0;v=0;ms=\d+$/);
   });
 
   it('the server has no words now: "stt", with the API code in the report', async () => {
@@ -313,7 +331,10 @@ describe('Safari on iPhone', () => {
     const l = listener();
     const h = hear(l.opts);
     FakeRec.made[0].onerror?.({ error: 'service-not-allowed' });
+    // iPhone: the recogniser's capture is let go first (IOS_HANDOVER_MS)
     await flush(10);
+    expect(FakeRecorder.made).toHaveLength(0);
+    await flush(300);
     expect(h.engine()).toBe('record');
     expect(FakeRecorder.made).toHaveLength(1);
     await flush(700);
@@ -340,7 +361,7 @@ describe('Safari on iPhone', () => {
     r.onend?.();
     expect(r.starts).toBe(3);
     r.onend?.();
-    await flush(10);
+    await flush(300);
     expect(h.engine()).toBe('record');
     expect(reports[0]).toMatchObject({ fault: 'fallback', name: 'ends-at-once' });
     h.abort();
@@ -440,5 +461,187 @@ describe('one stream for the page', () => {
     await flush(MIC_IDLE_MS + 10);
     expect(a.track.stopped).toBe(true);
     expect(session[session.length - 1]).toBe(false);
+  });
+});
+
+describe('R21 playtest (client 2026-11-28, iPhone Safari, day 2: both takes came back as 「00:00」 / noise)', () => {
+  it('the model’s 「00:00」 for a take with no voice is no words: "empty", nothing written, and reported with what the take was like', async () => {
+    phone(UA.iosChrome);
+    dictateAnswer = async () => ({ text: '00:00' });
+    const hear = await load();
+    const l = listener();
+    const h = hear(l.opts);
+    await flush(900);
+    h.stop();
+    await flush(10);
+    expect(dictated).toHaveLength(1);
+    expect(l.got.finals).toEqual([]);
+    expect(l.got.end).toEqual({ fault: 'empty', heard: false, engine: 'record' });
+    expect(reports[0]).toMatchObject({ fault: 'empty', engine: 'record', mime: 'audio/mp4' });
+    expect(reports[0].name).toMatch(/^nonspeech;l=1;p=500;v=\d+;ms=\d+$/);
+  });
+
+  it('words with the model’s marks around them: only the words', async () => {
+    phone(UA.iosChrome);
+    dictateAnswer = async () => ({ text: '[00:00] おにぎり' });
+    const hear = await load();
+    const l = listener();
+    const h = hear(l.opts);
+    await flush(900);
+    h.stop();
+    await flush(10);
+    expect(l.got.finals).toEqual(['おにぎり']);
+    expect(reports).toHaveLength(0);
+  });
+
+  it('a knock as the capture starts is no voice: the take is not cut two seconds in', async () => {
+    phone(UA.iosChrome);
+    const hear = await load();
+    const l = listener();
+    const h = hear(l.opts);
+    // the click / gain swell of a starting capture
+    meterLevel = 0.6;
+    await flush(240);
+    meterLevel = 0.004;
+    await flush(4000);
+    // before: 「a voice」 then 1.8 s quiet → stopped and sent; now it still listens
+    expect(dictated).toHaveLength(0);
+    expect(l.got.end).toBeNull();
+    // the member speaks now and is heard
+    meterLevel = 0.3;
+    await flush(800);
+    meterLevel = 0.004;
+    await flush(2600);
+    expect(dictated).toHaveLength(1);
+    expect(l.got.end?.heard).toBe(true);
+    h.abort();
+  });
+
+  it('a single loud frame later on is not "spoke" either', async () => {
+    phone(UA.iosChrome);
+    const hear = await load();
+    const l = listener();
+    hear(l.opts);
+    meterLevel = 0.004;
+    await flush(1000);
+    meterLevel = 0.6;
+    await flush(60);
+    meterLevel = 0.004;
+    await flush(3000);
+    expect(dictated).toHaveLength(0);
+    expect(l.got.end).toBeNull();
+  });
+
+  it('the page hears that a take is open (the story quiets its music) and that it is over', async () => {
+    phone(UA.iosChrome);
+    const hear = await load();
+    const l = listener();
+    const h = hear(l.opts);
+    await flush(900);
+    expect(busy).toEqual([true]);
+    h.stop();
+    await flush(10);
+    expect(busy).toEqual([true, false]);
+  });
+
+  it('Safari’s recogniser too: busy while it listens, let go after', async () => {
+    phone(UA.iosSafari);
+    const hear = await load();
+    const h = hear(listener().opts);
+    expect(busy[busy.length - 1]).toBe(true);
+    FakeRec.made[0].say('はい');
+    h.stop();
+    await flush(20);
+    expect(busy[busy.length - 1]).toBe(false);
+  });
+
+  it('iPhone: the level is read on a context of its own; Android Chrome: the page’s', async () => {
+    phone(UA.iosChrome);
+    let hear = await load();
+    hear(listener().opts).abort;
+    await flush(10);
+    expect(meterOwn).toEqual([true]);
+    phone(UA.androidChrome, { recognizer: false });
+    FakeRecorder.supports = ['audio/webm'];
+    hear = await load();
+    hear(listener().opts);
+    await flush(10);
+    expect(meterOwn).toEqual([true, false]);
+  });
+
+  it('a refusing recogniser is remembered on the phone: the next visit starts on the recorder (no take spent on it)', async () => {
+    phone(UA.iosSafari);
+    let hear = await load();
+    const h = hear(listener().opts);
+    FakeRec.made[0].onerror?.({ error: 'service-not-allowed' });
+    await flush(300);
+    h.abort();
+    // a new visit: a fresh page (module) and a fresh sessionStorage, the same phone
+    phone(UA.iosSafari);
+    hear = await load();
+    expect(hear(listener().opts).engine()).toBe('record');
+  });
+
+  it('stopped while the recorder takes over on iPhone: the take ends at once, nothing recorded', async () => {
+    phone(UA.iosSafari);
+    const hear = await load();
+    const l = listener();
+    const h = hear(l.opts);
+    FakeRec.made[0].onerror?.({ error: 'service-not-allowed' });
+    h.stop();
+    await flush(400);
+    expect(FakeRecorder.made).toHaveLength(0);
+    expect(l.got.end).toEqual({ fault: 'empty', heard: false, engine: 'record' });
+    expect(busy[busy.length - 1]).toBe(false);
+  });
+
+  it('a stream that comes up muted (the system still has the mic) is waited for before recording', async () => {
+    phone(UA.iosChrome);
+    let unmute: (() => void) | null = null;
+    gum = async () => {
+      const s = new FakeStream();
+      s.track.muted = true;
+      s.track.addEventListener = ((ev: string, f: () => void) => {
+        if (ev === 'unmute') unmute = f;
+      }) as never;
+      streams.push(s);
+      return s;
+    };
+    const hear = await load();
+    hear(listener().opts);
+    await flush(100);
+    expect(FakeRecorder.made).toHaveLength(0);
+    // (openMic asks once more for a stream that is not usable: the last one is the one in hand)
+    streams[streams.length - 1].track.muted = false;
+    unmute!();
+    await flush(10);
+    expect(FakeRecorder.made).toHaveLength(1);
+  });
+
+  it('a meter that never ran: the take is still sent (nothing to judge it by) and a 「00:00」 answer is reported with l=0', async () => {
+    phone(UA.iosChrome);
+    meterLive = false;
+    dictateAnswer = async () => ({ text: '00:00' });
+    const hear = await load();
+    const l = listener();
+    const h = hear(l.opts);
+    await flush(1500);
+    h.stop();
+    await flush(10);
+    expect(dictated).toHaveLength(1);
+    expect(reports[0].name).toMatch(/^nonspeech;l=0;/);
+    expect(l.got.end?.fault).toBe('empty');
+  });
+});
+
+describe('the remembered refusal', () => {
+  it('counts for SPEECH_FAILED_DAYS, and the old mark of a visit still counts', async () => {
+    const { failedMarkValid, SPEECH_FAILED_DAYS } = await import('./env');
+    const now = Date.UTC(2026, 10, 28);
+    expect(failedMarkValid(null, now)).toBe(false);
+    expect(failedMarkValid('1', now)).toBe(true);
+    expect(failedMarkValid(String(now - 86400_000), now)).toBe(true);
+    expect(failedMarkValid(String(now - SPEECH_FAILED_DAYS * 86400_000 - 1), now)).toBe(false);
+    expect(failedMarkValid('junk', now)).toBe(false);
   });
 });

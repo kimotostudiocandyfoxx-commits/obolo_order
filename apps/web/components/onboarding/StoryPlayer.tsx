@@ -7,6 +7,7 @@ import { MIKIE_DRILL } from '@/lib/onboarding/lap2';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { hasMotion, motionUrl, spriteUrl, STILL_MOUTH, stillMouthUrl, stillShows, stillUrl, type MotionId } from '@/lib/onboarding/media';
 import { Bgm } from '@/lib/onboarding/bgm';
+import { MIC_BUSY_EVENT } from '@/lib/onboarding/audio';
 import { DualVideo } from '@/lib/onboarding/dualVideo';
 import { nameCharsOk, neoForm } from '@obolo/shared';
 import { eggSvg } from '@/lib/look';
@@ -894,6 +895,18 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     window.addEventListener('obolo:bgm-duck', f);
     return () => window.removeEventListener('obolo:bgm-duck', f);
   }, []);
+  // R21 playtest (iPhone Safari, day 2's food: 「00:00」 / noise): while any mic take is open the music is silent and a
+  // line being read stops — the speaker must not play into the mic (lib/onboarding/audio.ts micBusy)
+  const [micOpen, setMicOpen] = useState(false);
+  useEffect(() => {
+    const f = (e: Event) => {
+      const on = !!(e as CustomEvent<boolean>).detail;
+      setMicOpen(on);
+      if (on) voice.current?.stop();
+    };
+    window.addEventListener(MIC_BUSY_EVENT, f);
+    return () => window.removeEventListener(MIC_BUSY_EVENT, f);
+  }, []);
   // a line that asks for the music lower while it is on screen (say.duck; playtest 2026-11-28: 「はい！ぜひ！」)
   const lineNow = steps[i];
   const lineDuck = lineNow?.t === 'say' ? lineNow.duck : undefined;
@@ -901,8 +914,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     saveMix(mix);
     voice.current?.setVolume(mix.voice);
     const dip = lineDuck ?? (talking ? VOICE_DIP : 1);
-    bgm.current?.setScale(mix.bgm * dip * duck, talking || lineDuck !== undefined ? 0.25 : 0.6);
-  }, [mix, talking, duck, lineDuck]);
+    bgm.current?.setScale(mix.bgm * dip * duck * (micOpen ? 0 : 1), micOpen ? 0.15 : talking || lineDuck !== undefined ? 0.25 : 0.6);
+  }, [mix, talking, duck, micOpen, lineDuck]);
   useEffect(() => {
     const vc = voice.current;
     if (!vc) return;

@@ -34,23 +34,56 @@ export function currentEnv(): MicEnv {
 
 export const canRecord = () => typeof navigator !== 'undefined' && !!navigator.mediaDevices?.getUserMedia && typeof MediaRecorder !== 'undefined';
 
-/** the recogniser failed on this phone during this visit: the recorder from now on */
+/**
+ * The recogniser failed on this phone: the recorder from now on. R21 playtest (client 2026-11-28, iPhone Safari):
+ * Safari's recogniser answered `service-not-allowed` (Siri and dictation off on that phone) on the first take of every
+ * visit, so that take was spent on it and the recorder only began after the member had already started to speak. It is
+ * remembered on the device for SPEECH_FAILED_DAYS now (it was the visit only), so a later visit starts on the recorder.
+ */
 const FAILED_KEY = 'obolo.mic.speechFailed';
+export const SPEECH_FAILED_DAYS = 7;
 let failedMem = false;
-export function speechFailed(): boolean {
-  if (failedMem) return true;
+type Store = Pick<Storage, 'getItem' | 'setItem'>;
+const local = (): Store | null => {
   try {
-    return sessionStorage.getItem(FAILED_KEY) === '1';
+    return typeof localStorage === 'undefined' ? null : localStorage;
   } catch {
-    return false;
+    return null;
   }
-}
-export function markSpeechFailed() {
-  failedMem = true;
+};
+const session = (): Store | null => {
   try {
-    sessionStorage.setItem(FAILED_KEY, '1');
+    return typeof sessionStorage === 'undefined' ? null : sessionStorage;
   } catch {
-    /* private mode: remembered for the page only */
+    return null;
+  }
+};
+/** whether a stored mark (a time in ms, or the old '1' of a visit) still counts */
+export function failedMarkValid(v: string | null, now: number): boolean {
+  if (!v) return false;
+  if (v === '1') return true;
+  const at = Number(v);
+  return Number.isFinite(at) && now - at < SPEECH_FAILED_DAYS * 86400_000 && at <= now + 60_000;
+}
+export function speechFailed(now = Date.now()): boolean {
+  if (failedMem) return true;
+  for (const s of [session(), local()]) {
+    try {
+      if (s && failedMarkValid(s.getItem(FAILED_KEY), now)) return true;
+    } catch {
+      /* blocked storage */
+    }
+  }
+  return false;
+}
+export function markSpeechFailed(now = Date.now()) {
+  failedMem = true;
+  for (const s of [session(), local()]) {
+    try {
+      s?.setItem(FAILED_KEY, String(now));
+    } catch {
+      /* private mode: remembered for the page only */
+    }
   }
 }
 

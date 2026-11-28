@@ -80,7 +80,7 @@ function Sheet({ onClose }: { onClose: () => void }) {
     openMic().then(
       (stream) => {
         if (over) return quietMic();
-        const meter = micMeter(stream);
+        const meter = micMeter(stream, { own: env.os === 'ios' });
         const gate = voiceGate();
         const t0 = Date.now();
         setState('listening');

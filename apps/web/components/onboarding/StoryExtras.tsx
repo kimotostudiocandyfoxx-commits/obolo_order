@@ -9,7 +9,7 @@ import { playPreset, type Preset } from '@/lib/story/sfx';
 import { IconButton } from '@/components/story/parts';
 import { TicketArt } from '@/components/story/Ticket';
 import { micTrouble, useDictation } from '@/lib/useDictation';
-import { RECORD_NOTICE_POLITE } from '@/lib/mic/core';
+import { RECORD_NOTICE_POLITE, TYPING_FALLBACK, nextMisses, offerTyping } from '@/lib/mic/core';
 import { useRecordNotice } from '@/lib/mic/useRecordNotice';
 import { useVoiceEdit, VoiceText } from '@/components/mic/VoiceText';
 import { nameCharsOk } from '@obolo/shared';
@@ -161,6 +161,15 @@ export function VoiceField({
   const withMic = useContext(MicAllowed);
   const [typing, setTyping] = useState(false);
   const [notice, setNotice] = useState(false);
+  // R21 playtest: takes that heard nothing, in a row — past MISSES_TO_TYPE (or a fault speaking again cannot fix) typing
+  // is offered in one line (lib/mic/core offerTyping)
+  const [misses, setMisses] = useState(0);
+  const wasListening = useRef(false);
+  useEffect(() => {
+    if (wasListening.current && !mic.listening) setMisses((m) => nextMisses(m, mic.code));
+    wasListening.current = mic.listening;
+  }, [mic.listening, mic.code]);
+  const typeInstead = !typing && !mic.listening && (offerTyping(misses, mic.code) || !mic.supported);
   // no recogniser on this phone: still the mic screen, with the reason in one line (never the keyboard by itself)
   const voiceFirst = withMic && !textFirst;
   const cls = light
@@ -223,8 +232,15 @@ export function VoiceField({
         </svg>
       </button>
       <p className={`mt-2 text-[15px] font-black ${light ? 'text-amber-700' : 'text-amber-100'}`}>{mic.listening ? '話しおわったら、もう一度タップ' : value ? 'もう一度、話してみる' : '話してみよう'}</p>
-      <p className={`mt-0.5 text-center text-[11px] ${sub}`}>{mic.listening ? mic.interim || (mic.phase === 'thinking' ? '文字にしています…' : mic.phase === 'hearing' ? '聞こえています…' : 'きいています…') : (micTrouble(mic.supported ? mic.code : 'unsupported') ?? (placeholder ? `例「${exampleOf(placeholder)}」` : ''))}</p>
+      <p className={`mt-0.5 text-center text-[11px] ${sub}`}>{mic.listening ? mic.interim || (mic.phase === 'thinking' ? '文字にしています…' : mic.phase === 'hearing' ? '聞こえています…' : 'きいています…') : ((typeInstead && mic.supported && !offerTyping(0, mic.code) ? TYPING_FALLBACK : micTrouble(mic.supported ? mic.code : 'unsupported')) ?? (placeholder ? `例「${exampleOf(placeholder)}」` : ''))}</p>
       {recordNote && <p className={`mt-0.5 text-center text-[11px] ${sub}`} data-testid="mic-record-notice">{RECORD_NOTICE_POLITE}</p>}
+      {typeInstead && (
+        <div className="mt-2 flex flex-col items-center" data-testid="mic-type-instead">
+          <button type="button" onClick={() => setTyping(true)} className={`rounded-full border px-4 py-1.5 text-[13px] ${light ? 'border-slate-300 text-slate-600' : 'border-amber-200/60 text-amber-50'}`}>
+            文字で入れる
+          </button>
+        </div>
+      )}
       {example}
       {/* the emergency exit: only when you cannot speak */}
       {!typing && (

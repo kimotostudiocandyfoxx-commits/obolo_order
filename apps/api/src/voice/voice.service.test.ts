@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { JOURNEY_DONE, MEDIA_CONSENT_VERSION } from '@obolo/shared';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { VoiceService } from './voice.service';
@@ -101,5 +102,38 @@ describe('M-R342: {bati}’s voice at 0 mana — one rule for everyone', () => {
       expect(await some.s.readByBati(U, { text: 'やっほー' }, 'http://api')).not.toBeNull();
       expect(some.sent[0].reference_id).toBe('boy');
     }
+  });
+});
+
+describe('POST /voice/dictate (R21 playtest, iPhone Safari: 「00:00」 and noise stood in the answer)', () => {
+  /** a short real recording made here (ffmpeg): a tone, or silence */
+  const take = (src: string) => execFileSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-f', 'lavfi', '-i', src, '-t', '1.2', '-c:a', 'aac', '-f', 'adts', 'pipe:1']);
+  const service = (answer: string) => {
+    const heard: Buffer[] = [];
+    const llm = { transcribe: async (b: Buffer) => (heard.push(b), answer) };
+    const s = new VoiceService({} as never, {} as never, {} as never, llm as never);
+    const warns: string[] = [];
+    (s as unknown as { log: { warn: (m: string) => void } }).log = { warn: (m: string) => void warns.push(m) };
+    return { s, heard, warns };
+  };
+
+  it('the model’s 「00:00」 for a silent take is no words (the web then says it did not hear) — logged with the loudness', async () => {
+    const w = service('00:00');
+    expect(await w.s.dictate('audio/mp4', take('anullsrc=r=44100:cl=mono'))).toEqual({ text: '' });
+    expect(w.heard).toHaveLength(1);
+    expect(w.warns[0]).toMatch(/^dictate no speech \(audio\/mp4, \d+ bytes, model "00:00", mean -9\d(\.\d)? dB, max -9\d(\.\d)? dB\)$/);
+  });
+
+  it('a sound tag around real words: only the words', async () => {
+    const w = service('[00:00] おにぎり');
+    expect(await w.s.dictate('audio/mp4', take('sine=f=440:r=44100'))).toEqual({ text: 'おにぎり' });
+    expect(w.warns).toHaveLength(0);
+  });
+
+  it('a tone (no voice) answered as 「（ノイズ）」: no words, and the log shows the take was loud', async () => {
+    const w = service('（ノイズ）');
+    expect(await w.s.dictate('audio/mp4', take('sine=f=440:r=44100'))).toEqual({ text: '' });
+    const max = Number(/max (-?[\d.]+) dB/.exec(w.warns[0])?.[1]);
+    expect(max).toBeGreaterThan(-30);
   });
 });

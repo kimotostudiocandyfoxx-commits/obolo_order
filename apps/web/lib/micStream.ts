@@ -1,6 +1,6 @@
 'use client';
 
-import { micSession } from '@/lib/onboarding/audio';
+import { micBusy, micSession } from '@/lib/onboarding/audio';
 
 /**
  * One microphone stream for the whole page (client 2026-11-24, iPad R7: "the mic is asked for on every visit"): a
@@ -54,6 +54,8 @@ export async function openMic(): Promise<MediaStream> {
   if (!canOpenMic()) throw new Error('unsupported');
   if (idle) clearTimeout(idle);
   idle = null;
+  // the story's music and lines go quiet first (they spoil the take: R21 playtest)
+  micBusy(true);
   micSession(true);
   const ask = () => {
     const p = navigator.mediaDevices.getUserMedia(CONSTRAINTS);
@@ -76,7 +78,10 @@ export async function openMic(): Promise<MediaStream> {
     return s;
   } catch (e) {
     if (shared === mine) shared = null;
-    if (holders === 0) micSession(false);
+    if (holders === 0) {
+      micSession(false);
+      micBusy(false);
+    }
     throw e;
   }
 }
@@ -85,6 +90,7 @@ export async function openMic(): Promise<MediaStream> {
 export function quietMic() {
   holders = Math.max(0, holders - 1);
   if (holders > 0) return;
+  micBusy(false);
   void shared?.then((s) => s.getAudioTracks().forEach((t) => (t.enabled = false))).catch(() => undefined);
   if (idle) clearTimeout(idle);
   idle = setTimeout(closeMic, MIC_IDLE_MS);
@@ -98,6 +104,7 @@ export function closeMic() {
   void shared?.then((s) => s.getTracks().forEach((t) => t.stop())).catch(() => undefined);
   shared = null;
   micSession(false);
+  micBusy(false);
 }
 
 /** test only: forget everything */

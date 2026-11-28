@@ -10,6 +10,7 @@ import {
   VOICE_TUNE_KEY,
   VOICE_VERSION_DEFAULT,
   VOICE_VERSION_KEY,
+  cleanHeard,
   voiceMixCapped,
   voiceTuneOf,
   voiceVersionOf,
@@ -127,7 +128,8 @@ export class DachiVoiceDraftService {
   private async words(heard: Buffer): Promise<string> {
     if (!this.llm?.transcribe) return '';
     return this.llm.transcribe(heard, 'audio/mp3').then(
-      (t) => t.replace(/\s+/g, ' ').trim().slice(0, 300),
+      // a take with no speech comes back as 「00:00」 / 「[ノイズ]」: no caption rather than that (shared heardText)
+      (t) => cleanHeard(t).slice(0, 300),
       (e: unknown) => (this.log.warn(`words failed: ${String(e)}`), ''),
     );
   }
