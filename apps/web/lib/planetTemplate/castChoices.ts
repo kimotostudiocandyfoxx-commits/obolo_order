@@ -59,7 +59,7 @@ export function toggled(c: CastChoices, change: { oshi: CastOshiKey; on: boolean
 /** the toasts (PROVISIONAL wording for the story session) */
 export const castToast = {
   oshiOff: (name: string) => `${name} の推しを、はずしたよ。もう、ホームには来ないよ`,
-  oshiOn: (name: string) => `💗 ${name} を、また推しにしたよ。ホームに来てくれるよ`,
-  saved: '⭐ ブルーナに保存したよ',
-  unsaved: '☆ ブルーナから、はずしたよ',
+  oshiOn: (name: string) => `${name} を、また推しにしたよ。ホームに来てくれるよ`,
+  saved: 'ブルーナに保存したよ',
+  unsaved: 'ブルーナから、はずしたよ',
 };
