@@ -131,6 +131,9 @@ const OTS = (obolon?: ShotLayer['anim']): ShotLayer[] => [
 
 export const SHOTS: Record<string, Shot> = {
   // A — the gate
+  // heading through the open gate toward the Earth temple (playtest 2026-11-28): a steady push past MONBAN; it is cut
+  // off by the black of 「待ちなさい。」 before it arrives anywhere
+  'gate-go': { from: C(1.0, 50, 52), to: C(1.32, 50, 47), dur: 3.2, cast: ['MONBAN'] },
   'reveal-whip': { from: C(1.0), to: C(1.06, 50, 46), dur: 5, enter: 'whip', fx: [{ k: 'glint', x: 47, y: 37, at: 0.55, size: 7 }], cast: ['KIMORIN'] },
   'gate-two': { from: C(1.05, 50, 50), to: C(1.0), dur: 6, cast: ['KIMORIN', 'MONBAN'] },
   'invite-hand': { from: C(1.0), to: C(1.12, 50, 52), dur: 4, cast: ['KIMORIN', 'MONBAN'] },

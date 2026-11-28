@@ -29,7 +29,7 @@ import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync 
 import { extname, join, resolve } from 'node:path';
 import { walk, type Scene } from '../lib/story/parse';
 import { idOf } from '../lib/story/sheets';
-import { nameRest, voiceKey, voiceable } from '../lib/story/voice';
+import { nameParts, nameRest, voiceKey, voiceable } from '../lib/story/voice';
 // by path: this runs without an install (the workflow), and the file has no imports of its own
 import { speakText, spokenChars, storyVoiceFilter, storyVoicePrompt, type NameLines } from '../../../packages/shared/src/storyVoice';
 import { BATI_FIXED_VOICES, batiStoryVoice } from '../../../packages/shared/src/batiFixedVoice';
@@ -44,6 +44,17 @@ const FISH = process.env.FISH_API_KEY;
 const NAMES_ONLY = process.argv.includes('--names-only');
 if (!KEY && !NAMES_ONLY) throw new Error('GEMINI_API_KEY is not set');
 const json = <T>(p: string, d: T): T => (existsSync(p) ? (JSON.parse(readFileSync(p, 'utf8')) as T) : d);
+/**
+ * STORY_VOICES_ONLY=design/<file>.json (the workflow's `only` input): make just the lines listed there
+ * ({ "lines": [{ who, text }] } — whole lines, or the fixed words of a line with names, nameParts) that have no file yet,
+ * in each speaker's chosen voice; no auditions, no re-timing, nothing removed. For a run limited to some days (playtest
+ * 2026-11-28: days 1–2; the list is written by scripts/voice-coverage.ts --days 1,2 --only <file>) without regenerating
+ * the rest, and without touching design/story-voices.json (a push to it starts the full run).
+ */
+const ONLY_FILE = process.env.STORY_VOICES_ONLY?.trim() || '';
+if (ONLY_FILE && !/^design\/[\w.-]+\.json$/.test(ONLY_FILE)) throw new Error('STORY_VOICES_ONLY must be design/<name>.json');
+const ONLY = ONLY_FILE ? json<{ lines: { who: string; text: string; act?: string }[] }>(join(ROOT, ONLY_FILE), { lines: [] }).lines : null;
+if (ONLY && !ONLY.length) throw new Error(`${ONLY_FILE}: no lines`);
 const MAX = Number(process.env.MAX_LINES ?? (json<{ batch?: number }>(join(ROOT, 'design/story-voices.json'), {}).batch ?? 400));
 
 interface Spec {
@@ -331,9 +342,9 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
     } else await gemini(tts, s, brief, act, text, out);
   };
 
-  // --- auditions ---
+  // --- auditions --- (not in a run limited to listed lines)
   const out = json<{ auditions: { name: string; line: string; takes: { voice: string; file: string; seconds: number }[] }[] }>(join(STORY, 'voices/auditions.json'), { auditions: [] });
-  for (const a of cfg.auditions) {
+  for (const a of ONLY ? [] : cfg.auditions) {
     const id = idOf(a.name, 'c');
     const own = (said.get(a.name) ?? []).filter((l) => voiceable(l.text) && l.text.length >= 8 && l.text.length <= 45).sort((x, y) => y.text.length - x.text.length)[0];
     const line = a.line ?? own?.text ?? '';
@@ -381,6 +392,9 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
     spoken.set(x.who, [...(spoken.get(x.who) ?? []), { act: x.act, text: x.text }]);
     said.set(x.who, [...(said.get(x.who) ?? []), { act: x.act, text: x.text }]);
   }
+  // a run limited to listed lines: a listed line the story parts do not have (yet) is said as it is listed
+  for (const x of ONLY ?? [])
+    if (!(spoken.get(x.who) ?? []).some((l) => l.text === x.text)) spoken.set(x.who, [...(spoken.get(x.who) ?? []), { act: x.act, text: x.text }]);
   const manifestPath = join(STORY, 'voices/manifest.json');
   const manifest = json<Record<string, string>>(manifestPath, {});
   const jobs: { name: string; s: Spec; brief: string; act?: string; text: string; key: string }[] = [];
@@ -400,6 +414,12 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
           const rk = rest && voiceKey(as, l.act, rest);
           if (rest && rk && (again || redoLines.some((r) => r && l.text.includes(r)) || !manifest[rk] || !existsSync(join(PUB, manifest[rk]))) && !jobs.some((j) => j.key === rk))
             jobs.push({ name: as, s, brief, act: l.act, text: rest, key: rk });
+          // playtest 2026-11-28: the line's fixed words, played while the member's own voice of the line is being made
+          // (lib/story/voice.ts nameParts; found by the player without the stage direction)
+          for (const p of nameParts(l.text)) {
+            const pk = voiceKey(as, undefined, p);
+            if ((again || !manifest[pk] || !existsSync(join(PUB, manifest[pk]))) && !jobs.some((j) => j.key === pk)) jobs.push({ name: as, s, brief, act: l.act, text: p, key: pk });
+          }
           continue;
         }
         const key = voiceKey(as, l.act, l.text);
@@ -409,11 +429,15 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
       }
     }
   }
+  // a run limited to listed lines: only those ({bati}'s under its egg voice, "バティ:moon", are listed as バティ)
+  const onlySet = ONLY && new Set(ONLY.map((x) => `${x.who}|${x.text}`));
+  const picked = onlySet ? jobs.filter((j) => onlySet.has(`${j.name.replace(/:.*$/, '')}|${j.text}`)) : jobs;
+  if (onlySet) log.push(`- 🎯 ${ONLY_FILE} の ${ONLY!.length}行だけ（声のない ${picked.length}個を作る）`);
   // a batch takes lines from everyone in turn, so each chosen voice can be heard early
   const byName = new Map<string, typeof jobs>();
-  for (const j of jobs) byName.set(j.name, [...(byName.get(j.name) ?? []), j]);
+  for (const j of picked) byName.set(j.name, [...(byName.get(j.name) ?? []), j]);
   const mixed: typeof jobs = [];
-  for (let k = 0; mixed.length < jobs.length; k++) for (const list of byName.values()) if (list[k]) mixed.push(list[k]);
+  for (let k = 0; mixed.length < picked.length; k++) for (const list of byName.values()) if (list[k]) mixed.push(list[k]);
   // without the Fish key, cloned voices wait (one note, not one per line)
   const waiting = FISH ? [] : [...new Set(mixed.filter((j) => j.s.fish).map((j) => j.name))];
   if (waiting.length) log.push(`- ⏸ ${waiting.join('・')}: 録音から作る声は Fish Audio のキー待ち（Secret Manager: obolo-fish-api-key）。${mixed.filter((j) => j.s.fish).length}行は後で作る`);
@@ -464,7 +488,7 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
   const tempoOf = json<Record<string, number>>(tempoPath, {});
   for (const j of todo) tempoOf[`/story/voices/lines/${j.key}.mp3`] = TEMPO;
   let retimed = 0;
-  for (const file of new Set(Object.values(manifest))) {
+  for (const file of ONLY ? [] : new Set(Object.values(manifest))) {
     const had = tempoOf[file] ?? 1;
     const path = join(PUB, file);
     if (Math.abs(had - TEMPO) < 0.001 || !existsSync(path)) continue;
@@ -490,11 +514,12 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
         const old = who === BATI && name === BATI;
         if (!(old && bothEggs(l.act, l.text))) alive.add(voiceKey(name, l.act, l.text)).add(voiceKey(name, undefined, l.text));
         if (rest && !(old && bothEggs(l.act, rest))) alive.add(voiceKey(name, l.act, rest)).add(voiceKey(name, undefined, rest));
+        for (const p of nameParts(l.text)) alive.add(voiceKey(name, undefined, p));
       }
     }
   let removed = 0;
   for (const [k, file] of Object.entries(manifest)) {
-    if (alive.has(k)) continue;
+    if (alive.has(k) || ONLY) continue;
     delete manifest[k];
     if (!Object.values(manifest).includes(file) && existsSync(join(PUB, file))) {
       rmSync(join(PUB, file));

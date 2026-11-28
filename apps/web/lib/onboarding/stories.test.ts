@@ -56,7 +56,7 @@ describe('day 1 (story 2026-10-14)', () => {
   });
   it('goes from the name straight on to 「ここは、宇宙秘密結社だ。」 (client 2026-10-15)', () => {
     const n = steps.findIndex((s) => s.t === 'name');
-    expect(steps.slice(n + 1, n + 3).map((s) => (s.t === 'say' ? s.text : s.t))).toEqual(['{name}か、いいな。', 'ここは、宇宙秘密結社だ。']);
+    expect(steps.slice(n + 1, n + 3).map((s) => (s.t === 'say' ? s.text : s.t))).toEqual(['そうか、いいな。', 'ここは、宇宙秘密結社だ。']);
   });
   it('the client corrections of 2026-10-20: the gate line while it opens, the temple title, MONBAN before the ticket', () => {
     const g = steps.findIndex((s) => s.t === 'bgvideo' && s.motion === 11);
@@ -85,7 +85,7 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
   it('the gate (M-R334): MONBAN out of the smoke, the ticket shown, the gate opens, 「地球の神殿に行け…」 — and only then 「待ちなさい。」', () => {
     const at = (f: (s: Step) => boolean) => steps.findIndex(f);
     const say = (text: string) => at((s) => s.t === 'say' && s.text === text);
-    const line = at((s) => s.t === 'still' && s.image === 's/d2-gate-near');
+    const line = at((s) => s.t === 'loop' && s.motion === 'd1-gate-loop');
     const monban = at((s) => s.t === 'video' && s.motion === 'd1-monban');
     const ask = say('来たか…切符は持ってきたか？');
     const show = at((s) => s.t === 'action' && s.label === '切符を見せる');

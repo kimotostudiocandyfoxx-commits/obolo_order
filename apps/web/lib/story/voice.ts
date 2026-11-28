@@ -41,3 +41,20 @@ export function nameRest(text: string): string | null {
   const r = text.replace(/^\{[a-z_]+\}(?:か?[、,，]+\s*\n?|\n)/, '').replace(/\{[a-z_]+\}から…*/, '');
   return r !== text && voiceable(r) ? r : null;
 }
+
+/**
+ * The fixed words of a line with names in it, in the order said — what plays at once while the member's own voice of the
+ * whole line is not there yet (client playtest 2026-11-28: 「{name}か、いいな。」 and 「{name}、\nお前は…」 played with no
+ * voice at all while the server was still making them). Each piece is pre-made like any line (story-voices.ts), under
+ * voiceKey(who, undefined, piece): 「{name}か、いいな。」→ ['か、いいな。']; 「{name}、\nお前は、宇宙に、…」→
+ * ['お前は、宇宙に、…']; 「次は、、、{name}だ。好きな食べ物は？」→ ['次は、、、', 'だ。好きな食べ物は？']. The inviter's name is
+ * left out with its 「から…」 as before (nameRest, client 2026-10-22). [] for a line without names, or nothing to say.
+ */
+export function nameParts(text: string): string[] {
+  if (!/\{[a-z_]+\}/.test(text)) return [];
+  return text
+    .replace(/\{inviter\}から…*/g, '')
+    .split(/\{[a-z_]+\}/)
+    .map((p) => p.replace(/^[、。,，！!？?\s]+/, '').replace(/\s+$/, ''))
+    .filter(voiceable);
+}

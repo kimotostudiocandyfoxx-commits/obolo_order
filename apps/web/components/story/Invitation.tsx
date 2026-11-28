@@ -10,7 +10,12 @@ import { useEffect, useState } from 'react';
  * off (`leaving`), the words glow and lift away (the title stays) and the card hands over to the motion in
  * which the paper folds into a crane.
  */
-/** the client's card with its words taken out (they are set below, in the same places) */
+/**
+ * the client's card with its words taken out (they are set below, in the same places). It covers the screen edge to edge
+ * like the motion before it (object-fit: cover on the card's own 9:16 box — playtest 2026-11-28: on a phone taller or
+ * wider than 9:16 the blurred backdrop showed as light strips at the sides); no glint runs over it (the client found it
+ * cheap).
+ */
 const CARD = '/onboarding/s/d1-invitation-card.jpg';
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 
@@ -28,11 +33,11 @@ export function Invitation({ inviter, message, onOpened, settled, leaving, fromM
   }, []);
 
   return (
-    <div className={`pointer-events-none absolute inset-0 z-[3] overflow-hidden transition-opacity duration-[900ms] ease-in ${leaving ? 'opacity-0 delay-500' : 'opacity-100'}`}>
+    <div className={`pointer-events-none absolute inset-0 z-[3] overflow-hidden transition-opacity duration-[900ms] ease-in ${leaving ? 'opacity-0 delay-500' : 'opacity-100'}`} style={{ containerType: 'size' }}>
       <div className="absolute inset-0 flex items-center justify-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={CARD} alt="" className={`absolute inset-0 h-full w-full scale-110 object-cover blur-2xl transition-opacity duration-1000 ${instant ? 'opacity-40' : 'animate-[fadeUp_1.2s_ease-out_both] opacity-40'}`} aria-hidden />
-        <div className={`relative aspect-[9/16] ${instant || fromMotion ? '' : 'animate-[cardOut_1.5s_cubic-bezier(.16,1,.3,1)_both]'}`} style={{ width: 'min(100%, calc(100dvh * 9 / 16))' }}>
+        <div className={`relative aspect-[9/16] ${instant || fromMotion ? '' : 'animate-[cardOut_1.5s_cubic-bezier(.16,1,.3,1)_both]'}`} style={{ width: 'max(100cqw, calc(100cqh * 9 / 16))' }}>
           {cardOk ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={CARD} alt="" className="absolute inset-0 h-full w-full object-cover" onError={() => setCardOk(false)} />
@@ -40,7 +45,6 @@ export function Invitation({ inviter, message, onOpened, settled, leaving, fromM
             <div className="absolute inset-x-[11%] inset-y-[8%] rounded-md bg-[#efe3c8] shadow-[0_0_60px_rgba(255,214,140,0.45)]" />
           )}
           <CardWords inviter={inviter} message={message} settled={instant} leaving={leaving} />
-          {!instant && <span className="absolute inset-0 animate-[cardShine_1.8s_0.7s_ease-out_both]" style={{ background: 'linear-gradient(115deg, transparent 30%, rgba(255,250,230,0.55) 48%, transparent 62%)', mixBlendMode: 'soft-light' }} />}
         </div>
       </div>
       {/* the burst of light the card comes out of (continuing the motion's own) */}

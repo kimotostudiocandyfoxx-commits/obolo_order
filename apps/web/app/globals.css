@@ -633,7 +633,6 @@ body {
 @keyframes sealRing { from { transform: scale(0.5); opacity: 0.9; } to { transform: scale(3.4); opacity: 0; } }
 @keyframes sealGlow { from { transform: scale(0.3); opacity: 0; } to { transform: scale(2.6); opacity: 1; } }
 @keyframes cardRise { from { transform: translateY(14%) scale(0.9); opacity: 0; filter: brightness(1.8) blur(4px); } to { transform: none; opacity: 1; filter: none; } }
-@keyframes cardShine { from { transform: translateX(-60%); opacity: 1; } to { transform: translateX(60%); opacity: 0; } }
 @keyframes inkIn { from { opacity: 0; filter: blur(3px); transform: translateY(3px); } to { opacity: 1; filter: none; transform: none; } }
 @keyframes cardOut { from { transform: translateY(20%) scale(0.52); opacity: 0; filter: brightness(2) blur(6px); } 35% { opacity: 1; } to { transform: none; opacity: 1; filter: none; } }
 @keyframes wordsOff { 0% { opacity: 1; filter: none; text-shadow: none; } 40% { opacity: 1; color: #fff3cf; text-shadow: 0 0 10px rgba(255, 220, 140, 0.95); } 100% { opacity: 0; transform: translate(-50%, -14px); filter: blur(4px); color: #fff3cf; text-shadow: 0 0 18px rgba(255, 220, 140, 0.9); } }
@@ -684,18 +683,6 @@ body {
   .divine-float, .divine-corona { animation: none; }
   .divine-corona { opacity: 0.8; }
   .divine-mote { display: none; }
-}
-/*
- * The Earth temple's mystical lights (client 2026-11-28; components/story/Stage.tsx TempleLights): far points twinkle as
- * they drift up, near out-of-focus discs float across and breathe. Transform and opacity only; gone with
- * prefers-reduced-motion.
- */
-@keyframes templeFar { 0% { opacity: 0; transform: translate(0, 0) scale(0.7); } 20% { opacity: var(--o, 0.7); } 45% { opacity: calc(var(--o, 0.7) * 0.45); } 65% { opacity: var(--o, 0.7); } 100% { opacity: 0; transform: translate(var(--dx, 0), var(--dy, -40px)) scale(1); } }
-@keyframes templeNear { 0% { opacity: 0; transform: translate(0, 0) scale(0.9); } 25% { opacity: var(--o, 0.18); } 75% { opacity: var(--o, 0.18); } 100% { opacity: 0; transform: translate(var(--dx, 40px), var(--dy, -20px)) scale(1.08); } }
-.temple-far { opacity: 0; animation: templeFar 20s ease-in-out infinite; will-change: transform, opacity; }
-.temple-near { opacity: 0; animation: templeNear 30s ease-in-out infinite; will-change: transform, opacity; }
-@media (prefers-reduced-motion: reduce) {
-  .temple-far, .temple-near { display: none; }
 }
 /*
  * MONBAN's golden halo (components/story/Halo.tsx, numbers in lib/story/motion.ts MOTION.poise.still.halo): a faint
