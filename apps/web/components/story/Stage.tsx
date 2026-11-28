@@ -643,7 +643,7 @@ export function Motes({ count = 40 }: { count?: number }) {
  * The Earth temple's mystical lights (client 2026-11-28): `far` — a few small soft points deep in the hall, drifting up
  * very slowly and twinkling (under the picture's camera, over the motion); `near` — a handful of large out-of-focus
  * discs close to the lens that float slowly across, faint, over everyone. Plain elements with radial gradients (no
- * blur filter), transform and opacity only, about 20 nodes: cheap on phones. Hidden with prefers-reduced-motion
+ * blur filter), transform and opacity only, 25 nodes: cheap on phones. Hidden with prefers-reduced-motion
  * (globals.css .temple-*).
  */
 export function TempleLights({ layer }: { layer: 'far' | 'near' }) {
@@ -651,14 +651,14 @@ export function TempleLights({ layer }: { layer: 'far' | 'near' }) {
   // placed after mounting (random places would differ between the server's HTML and the browser)
   const [lights, setLights] = useState<{ x: number; y: number; size: number; dur: number; delay: number; dx: number; dy: number; o: number; warm: boolean }[]>([]);
   useEffect(() => {
-    const n = far ? 14 : 6;
+    const n = far ? 18 : 7;
     setLights(
       Array.from({ length: n }, (_, k) => {
         // spread evenly across the width (a slot each), random within it
         const x = ((k + 0.15 + Math.random() * 0.7) / n) * 100;
         return far
-          ? { x, y: 12 + Math.random() * 70, size: 3 + Math.random() * 5, dur: 14 + Math.random() * 12, delay: -Math.random() * 26, dx: (Math.random() - 0.5) * 18, dy: -(30 + Math.random() * 60), o: 0.45 + Math.random() * 0.4, warm: Math.random() < 0.5 }
-          : { x, y: 8 + Math.random() * 80, size: 60 + Math.random() * 90, dur: 22 + Math.random() * 16, delay: -Math.random() * 38, dx: (Math.random() < 0.5 ? -1 : 1) * (30 + Math.random() * 50), dy: -(10 + Math.random() * 40), o: 0.1 + Math.random() * 0.14, warm: Math.random() < 0.6 };
+          ? { x, y: 10 + Math.random() * 75, size: 5 + Math.random() * 8, dur: 14 + Math.random() * 12, delay: -Math.random() * 26, dx: (Math.random() - 0.5) * 18, dy: -(30 + Math.random() * 60), o: 0.6 + Math.random() * 0.4, warm: Math.random() < 0.5 }
+          : { x, y: 8 + Math.random() * 80, size: 70 + Math.random() * 100, dur: 22 + Math.random() * 16, delay: -Math.random() * 38, dx: (Math.random() < 0.5 ? -1 : 1) * (30 + Math.random() * 50), dy: -(10 + Math.random() * 40), o: 0.22 + Math.random() * 0.2, warm: Math.random() < 0.6 };
       }),
     );
   }, [far]);
