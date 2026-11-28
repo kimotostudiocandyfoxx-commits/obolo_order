@@ -104,7 +104,9 @@ describe('story days 3–7 and the planet switch (M-R330)', () => {
       for (const n of [...there, ...came]) expect(['ユウキ', 'nana', 'れい', 'ショウ', 'ミオ']).not.toContain(n);
       expect(alone.own).toEqual([]);
       const invited = storyHome(planet, 'neo', { neo: 'ミナト', inviter: 'さくら', sent: true, own: { title: 'あさ', text: 'おはよう' } });
-      expect(invited.around[0].author).toMatchObject({ name: 'さくら', figure: null });
+      // story 2026-11-28: the inviter comes only with their REAL work of this planet (lib/planetTemplate/inviterWork.ts); none given: not there
+      expect(invited.around.map((w) => w.author.name)).not.toContain('さくら');
+      expect(invited.around[0].author.name).toBe('KIMORIN⭐︎');
       expect(invited.own).toHaveLength(1);
       expect(invited.own[0].author.name).toBe('ミナト');
     }

@@ -1,5 +1,6 @@
 'use client';
 
+import { castReadsToEnd } from '@/lib/planetTemplate/castWorks';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { PathPoint, PlanetTemplateConfig } from '@/lib/planetTemplate/config';
 import type { HomePerson } from '@/lib/planetTemplate/people';
@@ -115,7 +116,8 @@ export function PlayView({
           setMoveMs(450);
           setAt(path.front);
         }
-        if (cfg.play.untilDone) {
+        // a planet whose works play to their end (Mercury's song, Mars's MV) — and a cast member's picture book, read to its last page
+        if (cfg.play.untilDone || castReadsToEnd(people[i]?.works[0])) {
           let left = false;
           done.current = () => {
             if (left) return;

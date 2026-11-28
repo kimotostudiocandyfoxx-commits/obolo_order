@@ -56,7 +56,7 @@ describe('05 the five planets on the common template', () => {
     expect(waveBars()[1]).toEqual({ h: 22, delay: 0.08 });
     expect(SHELF_ASPECT).toMatchObject({ radio: 1.55, book: 0.72, game: 0.72 });
   });
-  it('the sample: ten of yours (the prototype’s five works per planet, never 「名前の〜」); around you the cast with their own one work each (M-R344), MIKIE⭐︎DRILL not there until she has works', () => {
+  it('the sample: ten of yours (the prototype’s five works per planet, never 「名前の〜」); around you the cast with their own one work each (M-R344); without a day the sample is an Obolo Order: MIKIE⭐︎DRILL is there', () => {
     for (const p of FIVE_PLANETS) {
       const v = templateSample(p, Date.parse('2026-11-25T12:00:00Z'));
       expect(v.own).toHaveLength(10);
@@ -65,8 +65,8 @@ describe('05 the five planets on the common template', () => {
         expect(w.title).not.toContain(`${w.author.name}の`);
       }
       const people = peopleOf(v);
-      expect(people).toHaveLength(19);
-      expect(people.map((x) => x.name)).not.toContain('MIKIE⭐︎DRILL');
+      expect(people).toHaveLength(20);
+      expect(people.map((x) => x.name)).toContain('MIKIE⭐︎DRILL');
       for (const x of people) {
         expect(x.works).toHaveLength(1);
         expect(castOfWork(x.works[0])?.cast.name).toBe(x.name);
@@ -74,11 +74,13 @@ describe('05 the five planets on the common template', () => {
       }
     }
     // Mars: the cast's song under their film; Pluto: the book opens on its own first page
-    const mars = templateSample('mars').around[0];
+    // (before Order: KIMORIN⭐︎ comes first; an Order's sample has MIKIE⭐︎DRILL first)
+    expect(templateSample('mars').around[0].author.name).toBe('MIKIE⭐︎DRILL');
+    const mars = templateSample('mars', Date.now(), { ordered: false }).around[0];
     expect(mars.author.name).toBe('KIMORIN⭐︎');
     expect(mars.url).toBe('/planets/cast/kimorin/song.mp3');
     expect(mars.title).toBe('ピンポン・ジーニアス');
-    expect(templateSample('pluto').around[0].text).toBe('KIMORINは、なんでも せいこうする はつめいかです。');
+    expect(templateSample('pluto', Date.now(), { ordered: false }).around[0].text).toBe('KIMORINは、なんでも せいこうする はつめいかです。');
   });
   it('story 2026-11-25 Uranus: each goods item on its own kind (its words, else its main tag, else a tote); the sample shows all six', () => {
     expect(goodsKindOfWork({ text: 'マグカップ' })).toBe('マグカップ');
@@ -92,3 +94,22 @@ describe('05 the five planets on the common template', () => {
     expect(cases.some((w) => !w.thumbUrl)).toBe(true);
   });
 });
+
+describe('a long title wraps to two lines, then shrinks (story 2026-11-28)', () => {
+  it('one line when it fits; two lines at the same size; smaller letters only past two lines — never under 13 px', async () => {
+    const { titleFit, titleBase } = await import('./five');
+    expect(titleBase(390)).toBeCloseTo(27.3);
+    expect(titleFit('ネオンの夜', 390)).toEqual({ lines: 1, size: null });
+    // 17 letters: two lines of nine at 27.3 px fit in 351 px
+    expect(titleFit('サーぽんのサーモンまめちしきラジオ', 390)).toEqual({ lines: 2, size: null });
+    const long = titleFit('あ'.repeat(40), 390);
+    expect(long.lines).toBe(2);
+    expect(long.size).toBeCloseTo(17.5);
+    expect(20 * long.size!).toBeLessThanOrEqual(351);
+    expect(titleFit('あ'.repeat(200), 390).size).toBe(13);
+    // every cast title on every planet fits a 320 px phone in two lines at 13 px or more
+    const { CAST_WORKS } = await import('./castWorks');
+    for (const c of CAST_WORKS) for (const t of [c.song, c.radio, c.goods, c.game]) expect(Math.ceil([...t].length / 2) * (titleFit(t, 320).size ?? titleBase(320)), t).toBeLessThanOrEqual(320 * 0.9 + 0.01);
+  });
+});
+

@@ -84,19 +84,22 @@
 .bub,
 .bubo {
   position: absolute;
-  font: 900 12px var(--font-sans);
+  /* the prototype's .bub: a long line wraps (never off the edge, never cut): at most 62% of the screen, centred */
+  font: 900 12px/1.45 var(--font-sans);
   background: rgba(255, 255, 255, 0.95);
   color: #2a1630;
   border-radius: 14px;
   padding: 6px 10px;
-  white-space: nowrap;
-  max-width: 86vw;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  text-wrap: balance;
+  width: max-content;
+  max-width: 62cqw;
+  text-align: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
   pointer-events: auto;
 }
 .bub {
+  max-width: 62%;
   transform: translate(-50%, -100%);
   animation: fadein 0.2s both;
 }
@@ -251,11 +254,12 @@
   left: 50%;
   top: calc(46% - 120px);
   transform: translate(-50%, -100%);
-  max-width: 86%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font: 900 13px var(--font-sans);
+  width: max-content;
+  max-width: 62%;
+  white-space: normal;
+  text-wrap: balance;
+  text-align: center;
+  font: 900 13px/1.45 var(--font-sans);
   background: rgba(255, 255, 255, 0.96);
   color: #2a1630;
   border-radius: 14px;

@@ -12,7 +12,8 @@ import { dachiOf, KIMORIN, MIKIE, oshiOn, ROSTER_FIRST_DAY, ROSTER_LAST_DAY, typ
  *
  * The cast are characters, not members: their works are not rows of any store. A home shows them as HomeWork items
  * (`demo`: no 〔推す〕〔外す〕〔通報〕, nothing is asked of the API) whose id says whose and where: `cast-<key>-<planet>`.
- * MIKIE⭐︎DRILL has no works (the story has not made any): she never comes to a home until she has.
+ * MIKIE⭐︎DRILL's works came with the story's f66e3a1e (res.json `mikie`): she is a ダチ ONLY once the member is an Obolo
+ * Order (M-R342 / M-R343 — `orderedAt` set, the same rule as the server's MIKIE ダチ thread); before that she never comes.
  */
 export type CastGameKind = 'wobble' | 'puff' | 'jump' | 'spin' | 'ink' | 'scatter' | 'snap';
 export interface CastWorks {
@@ -42,6 +43,8 @@ export interface CastWorks {
   hasJacket: boolean;
   hasRadioPic: boolean;
   hasMv: boolean;
+  /** Neptune: a flat anime picture of their own to tap (the Sushimon, cut from their reference picture); else their chibi */
+  hasGamePic?: boolean;
 }
 
 export const CAST_WORKS: readonly CastWorks[] = data as CastWorks[];
@@ -49,7 +52,7 @@ const BY_KEY = new Map(CAST_WORKS.map((c) => [c.key, c]));
 const BY_NAME = new Map(CAST_WORKS.map((c) => [c.name, c]));
 
 export const castByKey = (key: string): CastWorks | undefined => BY_KEY.get(key);
-/** the cast member of this name who has works (MIKIE⭐︎DRILL: none) */
+/** the cast member of this name who has works */
 export const castByName = (name: string): CastWorks | undefined => BY_NAME.get(name);
 
 /** a file of a cast member's works (public/planets/cast/<key>/) */
@@ -87,8 +90,11 @@ export function castPicture(c: CastWorks, planet: HomePlanet): string | null {
       return castAsset(c.key, 'art.webp');
   }
 }
-/** Neptune: who is tapped in the game (the cast member's chibi, handoff 08 §6) */
-export const castGamePicture = (c: CastWorks) => `/planets/sample/chibi-${c.key}.webp`;
+/**
+ * Neptune: who is tapped in the game. The seven Sushimon: their flat anime picture cut from the reference picture
+ * (story 2026-11-28: never the 3D jumping chibi). The residents and KIMORIN⭐︎: their chibi (handoff 08 §6).
+ */
+export const castGamePicture = (c: CastWorks) => (c.hasGamePic ? castAsset(c.key, 'game.webp') : `/planets/sample/chibi-${c.key}.webp`);
 
 /** the voice that starts with the tap (handoff 08 §3: 「声は、タップの瞬間に鳴らす」): Jupiter the title, Uranus the goods' line, Pluto the book's title, Neptune the game's name */
 export function castTapVoice(c: CastWorks, planet: HomePlanet): string | null {
@@ -146,9 +152,16 @@ export function castSong(w: Pick<HomeWork, 'id'>): PlanetSongView | null {
 export interface CastDay {
   /** the first journey's day whose roster comes (3–10; ≥ 10: all eighteen; < 3: nobody) */
   day: number;
-  /** an Obolo Order (MIKIE⭐︎DRILL is a ダチ then — once she has works) */
+  /** an Obolo Order (MIKIE⭐︎DRILL is a ダチ then, alongside KIMORIN⭐︎; never before) */
   ordered: boolean;
 }
+
+/**
+ * M-R342 / M-R343: is this member an Obolo Order — joined once (`orderedAt`), as the server's MIKIE ダチ thread rule reads
+ * it (dachi-voice.service mikieThreadShown: `!!u.orderedAt`). A lapsed subscription keeps her a ダチ; nobody: no.
+ */
+export const isOrderedMember = (me: { orderedAt?: string | null } | null | undefined): boolean => !!me?.orderedAt;
+
 
 /**
  * The day of the roster a member is on (M-R341): the residents of every planet whose day they have FINISHED — the
@@ -159,6 +172,11 @@ export function rosterDayOfMember(me: { journeyDay: number; journeyCompletedAt: 
   if (!me) return 0;
   if (me.journeyDay > JOURNEY_LAST_DAY) return ROSTER_LAST_DAY;
   return me.journeyCompletedAt ? me.journeyDay : me.journeyDay - 1;
+}
+
+/** the cast who come to a member's real home: the roster day they reached and whether they are an Obolo Order */
+export function castDayOfMember(me: { journeyDay: number; journeyCompletedAt: string | null; orderedAt?: string | null }): CastDay {
+  return { day: rosterDayOfMember(me), ordered: isOrderedMember(me) };
 }
 
 /** the cast who come on that day, in the order they come around: the ダチ first, then the day's oshi (roster.ts) */
@@ -180,7 +198,7 @@ export function castAround(planet: HomePlanet, o: CastDay, before = Date.now()):
 /**
  * A member's real feed with the cast in it (the live planet routes, the switch on): the real ダチ・推し keep their
  * place — their works first, as they were — and the cast come after them (their works dated just before the oldest
- * real one, so the order on screen is: real people, KIMORIN⭐︎, the day's oshi). A member a cast member shares a name
+ * real one, so the order on screen is: real people, KIMORIN⭐︎ (and MIKIE⭐︎DRILL for an Obolo Order), the day's oshi). A member a cast member shares a name
  * with is left alone (ids differ). The far scenery (real strangers) is untouched.
  */
 export function withCast(view: PlanetHomeView, o: CastDay, now = Date.now()): PlanetHomeView {
@@ -193,3 +211,9 @@ export function withCast(view: PlanetHomeView, o: CastDay, now = Date.now()): Pl
 export const CAST_WITH_WORKS: ReadonlySet<string> = new Set(CAST_WORKS.map((c) => c.name));
 /** in the roster but without works yet */
 export const CAST_WITHOUT_WORKS: readonly string[] = [KIMORIN, MIKIE].map((p) => p.name).filter((n) => !BY_NAME.has(n));
+
+/**
+ * ▶ (story 2026-11-28): a cast member's picture book is read to its last page — then it closes, flies away, and the next
+ * work comes. No 5.2 s cut for a book; every other work keeps the planet's own time.
+ */
+export const castReadsToEnd = (w: Pick<HomeWork, 'id'> | null | undefined): boolean => castOfWork(w)?.planet === 'pluto';

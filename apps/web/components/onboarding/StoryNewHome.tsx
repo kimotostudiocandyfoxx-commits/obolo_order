@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { PlanetTemplateHome, type HomeEvent, type TemplateMe } from '@/components/planetTemplate/PlanetTemplateHome';
 import { planetHooks } from '@/components/planetTemplate/planetHooks';
 import type { Work as AtelierWork } from '@/components/atelier/work';
+import { inviterWorkOn } from '@/lib/planetTemplate/inviterWork';
 import { getApi } from '@/lib/api';
 import { ownFigure } from '@/lib/planetTemplate/people';
 import { SAMPLE_OWN_FIGURE } from '@/lib/planetTemplate/sample';
@@ -56,7 +57,18 @@ export function StoryNewHome({
   own?: StoryCastInput['own'];
   onDone: () => void;
 }) {
-  const view = useMemo(() => storyHome(planet, place, { neo, inviter, sent, own }), [planet, place, neo, inviter, sent, own?.text, own?.title, own?.image]); // eslint-disable-line react-hooks/exhaustive-deps
+  // the inviter's real work of this planet (story 2026-11-28): they are a ダチ from day 3 on — their newest work flown
+  // here is asked for; none (or not a ダチ yet, or the demo): that spot stays empty. Never a sample in their name.
+  const [inviterWork, setInviterWork] = useState<HomeWork | null>(null);
+  useEffect(() => {
+    if (place !== 'neo') return;
+    let live = true;
+    void inviterWorkOn(getApi(), planet as HomePlanet, inviter).then((w) => live && setInviterWork(w));
+    return () => {
+      live = false;
+    };
+  }, [planet, place, inviter]);
+  const view = useMemo(() => storyHome(planet, place, { neo, inviter, inviterWork, sent, own }), [planet, place, neo, inviter, inviterWork, sent, own?.text, own?.title, own?.image]); // eslint-disable-line react-hooks/exhaustive-deps
   const [who, setWho] = useState<Me | null>(null);
   useEffect(() => {
     let live = true;

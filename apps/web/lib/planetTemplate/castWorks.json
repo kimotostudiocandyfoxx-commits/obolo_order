@@ -101,6 +101,7 @@
   "gameKind": "wobble",
   "hasJacket": true,
   "hasRadioPic": true,
+  "hasGamePic": true,
   "hasMv": true
  },
  {
@@ -233,6 +234,7 @@
   "gameKind": "puff",
   "hasJacket": true,
   "hasRadioPic": true,
+  "hasGamePic": true,
   "hasMv": true
  },
  {
@@ -365,6 +367,7 @@
   "gameKind": "jump",
   "hasJacket": true,
   "hasRadioPic": true,
+  "hasGamePic": true,
   "hasMv": true
  },
  {
@@ -449,6 +452,7 @@
   "gameKind": "spin",
   "hasJacket": true,
   "hasRadioPic": true,
+  "hasGamePic": true,
   "hasMv": true
  },
  {
@@ -549,6 +553,7 @@
   "gameKind": "ink",
   "hasJacket": true,
   "hasRadioPic": true,
+  "hasGamePic": true,
   "hasMv": true
  },
  {
@@ -633,6 +638,7 @@
   "gameKind": "scatter",
   "hasJacket": true,
   "hasRadioPic": true,
+  "hasGamePic": true,
   "hasMv": true
  },
  {
@@ -781,6 +787,7 @@
   "gameKind": "snap",
   "hasJacket": true,
   "hasRadioPic": true,
+  "hasGamePic": true,
   "hasMv": true
  },
  {
@@ -842,6 +849,7 @@
   "gameKind": "spin",
   "hasJacket": false,
   "hasRadioPic": false,
+  "hasGamePic": false,
   "hasMv": false
  },
  {
@@ -899,6 +907,7 @@
   "gameKind": "puff",
   "hasJacket": false,
   "hasRadioPic": false,
+  "hasGamePic": false,
   "hasMv": false
  },
  {
@@ -980,6 +989,7 @@
   "gameKind": "jump",
   "hasJacket": false,
   "hasRadioPic": false,
+  "hasGamePic": false,
   "hasMv": false
  },
  {
@@ -1037,6 +1047,7 @@
   "gameKind": "scatter",
   "hasJacket": false,
   "hasRadioPic": false,
+  "hasGamePic": false,
   "hasMv": false
  },
  {
@@ -1106,6 +1117,7 @@
   "gameKind": "jump",
   "hasJacket": false,
   "hasRadioPic": false,
+  "hasGamePic": false,
   "hasMv": false
  },
  {
@@ -1167,6 +1179,7 @@
   "gameKind": "snap",
   "hasJacket": false,
   "hasRadioPic": false,
+  "hasGamePic": false,
   "hasMv": false
  },
  {
@@ -1228,6 +1241,7 @@
   "gameKind": "puff",
   "hasJacket": false,
   "hasRadioPic": false,
+  "hasGamePic": false,
   "hasMv": false
  },
  {
@@ -1309,6 +1323,7 @@
   "gameKind": "scatter",
   "hasJacket": false,
   "hasRadioPic": false,
+  "hasGamePic": false,
   "hasMv": false
  },
  {
@@ -1366,6 +1381,7 @@
   "gameKind": "snap",
   "hasJacket": false,
   "hasRadioPic": false,
+  "hasGamePic": false,
   "hasMv": false
  },
  {
@@ -1447,6 +1463,7 @@
   "gameKind": "spin",
   "hasJacket": false,
   "hasRadioPic": false,
+  "hasGamePic": false,
   "hasMv": false
  },
  {
@@ -1504,6 +1521,7 @@
   "gameKind": "snap",
   "hasJacket": false,
   "hasRadioPic": false,
+  "hasGamePic": false,
   "hasMv": false
  },
  {
@@ -1581,6 +1599,85 @@
   "gameKind": "jump",
   "hasJacket": false,
   "hasRadioPic": false,
+  "hasGamePic": false,
+  "hasMv": false
+ },
+ {
+  "key": "mikie",
+  "group": "dachi",
+  "name": "MIKIE⭐︎DRILL",
+  "saturn": "人生はね、ドリルみたいに、まわしてナンボよ！",
+  "art": "若いころの、わたしよ。",
+  "song": "ドリル・マダム",
+  "lyrics": [
+   [
+    2.03,
+    "まわしてナンボよ！"
+   ],
+   [
+    4.07,
+    "マダム！"
+   ],
+   [
+    7.12,
+    "ドリル！"
+   ],
+   [
+    8.14,
+    "マダム！"
+   ],
+   [
+    11.19,
+    "ドリル！"
+   ],
+   [
+    12.2,
+    "マダム！"
+   ],
+   [
+    15.25,
+    "ドリル！"
+   ],
+   [
+    16.27,
+    "まわしてナンボよ！"
+   ],
+   [
+    20.34,
+    "マダム！"
+   ],
+   [
+    23.39,
+    "ドリル！"
+   ],
+   [
+    24.41,
+    "マダム！"
+   ],
+   [
+    27.46,
+    "ドリル！"
+   ],
+   [
+    28.47,
+    "マダム！"
+   ]
+  ],
+  "genre": "funk",
+  "bpm": 118,
+  "radio": "MIKIEの、人生まめちしき",
+  "goods": "MIKIEのまんまるサングラス",
+  "book": "MIKIEと ちいさな はつめいか",
+  "pages": [
+   "MIKIEの むすこは、まいにち へんな ものを つくっていたわ。",
+   "ばくはつしても、こげても、MIKIEは「すごいわね！」って いったのよ。",
+   "むすこは、いまでは てんさい はつめいか。MIKIEの じまんよ。 おしまい。"
+  ],
+  "game": "まわせ！MIKIE",
+  "gameKind": "spin",
+  "hasJacket": false,
+  "hasRadioPic": false,
+  "hasGamePic": false,
   "hasMv": false
  }
 ]

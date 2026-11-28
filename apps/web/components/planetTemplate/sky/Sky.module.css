@@ -117,6 +117,7 @@
   transform: translate(-50%, -50%) scale(0.55) !important;
   opacity: 0 !important;
   transition: transform 0.55s ease-in, opacity 0.45s !important;
+  pointer-events: none !important;
 }
 .tcloud {
   position: absolute;
@@ -795,6 +796,15 @@
 .estage.closing .repb {
   opacity: 0;
   transition: opacity 0.2s;
+}
+/* fading out: no touch (a faded button must not steal a tap meant for what is under it) */
+.estage.closing .auth,
+.estage.closing .acts,
+.estage.closing .repb,
+.estage.closing .auth *,
+.estage.closing .acts *,
+.estage.closing .repb * {
+  pointer-events: none !important;
 }
 
 /* Saturn: the kororin pops — the chibi jumps out with its words (prototype .skor / .sbub, 04 §1's drops) */

@@ -9,7 +9,8 @@ material), extracted to a folder:
   python3 scripts/planet-home/cast-works.py <folder holding design/>
 
   → apps/web/public/planets/cast/<key>/   the audio as it is (made with the M-R344 voices: mp3 32–64 kbps, nothing is
-                                          re-encoded), mv.mp4 (the Sushimon), the pictures as webp (768 px, q 80)
+                                          re-encoded), mv.mp4 (the Sushimon: made seamless at its loop point, mvloop.py), the pictures
+                                          as webp (768 px, q 80), game.webp (the Sushimon's flat picture for Neptune)
   → apps/web/lib/planetTemplate/castWorks.json   the words (titles, the Saturn line, the lyrics, the book's pages, the
                                           game's kind) — copied character for character, never reworded
 """
@@ -21,6 +22,10 @@ import sys
 
 from PIL import Image
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from cleancut import cleancut, floor_shadow  # noqa: E402
+from mvloop import seamless  # noqa: E402
+
 SRC = sys.argv[1]
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../..')
 OUT = os.path.join(ROOT, 'apps/web/public/planets/cast')
@@ -29,7 +34,11 @@ HOME = os.path.join(SRC, 'design/home')
 ART = os.path.join(SRC, 'design/mv-art/out')
 
 SUSHI = ['gari', 'ebi', 'uni', 'ika', 'shari', 'kani']
-RES = ['brother', 'sister', 'kaiser', 'freezy', 'hipokin', 'bossg', 'longg', 'hatg', 'croco', 'onimonk', 'monban', 'kimorin']
+# res.json's keys are read as they are (a new one — MIKIE's 'mikie', once the story has made her works — is picked up by
+# itself, as long as its sound folder and pictures are there); these are the ダチ among them, everyone else is a resident
+DACHI = ('kimorin', 'mikie')
+# the Sushimon whose reference picture stands on a painted grey floor shadow (cut away for the game: cleancut.floor_shadow)
+FLOOR_SHADOW = ('uni', 'shari')
 AUDIO = ['saturn', 'dadv', 'stitle', 'goodsv', 'bookv', 'gamev', 'song', 'radiov']
 
 
@@ -67,10 +76,22 @@ def one(key, d, audio_dir, art_dir, lyrics, group, goods_img='goods', goods_voic
         has[flag] = os.path.exists(p)
         if has[flag]:
             pic(p, os.path.join(out, extra + '.webp'))
+    # Neptune (story 2026-11-28): the Sushimon are tapped as their flat anime picture, cut from the reference picture with
+    # no white fringe (the prototype's cleancut: サーぽん salmon-ref2, the others <key>-ref); the others keep their chibi
+    ref = os.path.join(ART, 'sushi', ('salmon-ref2' if key == 'sapon' else key + '-ref') + '.jpg')
+    has['hasGamePic'] = group == 'sushimon' and os.path.exists(ref)
+    if has['hasGamePic']:
+        o = cleancut(Image.open(ref))
+        if key in FLOOR_SHADOW:
+            o = floor_shadow(o)
+        o.thumbnail((600, 600) if key == 'sapon' else (520, 520), Image.LANCZOS)
+        o.save(os.path.join(out, 'game.webp'), 'WEBP', quality=90, method=6)
     mv = os.path.join(audio_dir, 'mv.mp4')
     has['hasMv'] = os.path.exists(mv)
     if has['hasMv']:
-        shutil.copyfile(mv, os.path.join(out, 'mv.mp4'))
+        # the story's film jumps at its loop point: cross-faded there, still three seconds (mvloop.py)
+        before, after = seamless(mv, os.path.join(out, 'mv.mp4'))
+        print(f'{key} mv loop point: {before:.2f} -> {after:.2f} x an ordinary frame step')
     return {
         'key': key,
         'group': group,
@@ -100,9 +121,12 @@ def main():
         d = os.path.join(HOME, 'sushi', k)
         cast.append(one(k, sushi[k], d, os.path.join(ART, 'su', k), json.load(open(os.path.join(d, 'lyrics.json'), encoding='utf-8')), 'sushimon'))
     res = json.load(open(os.path.join(HOME, 'res/res.json'), encoding='utf-8'))
-    for k in RES:
+    for k in res:
         d = os.path.join(HOME, 'res', k)
-        cast.append(one(k, res[k], d, os.path.join(ART, 're', k), json.load(open(os.path.join(d, 'lyrics.json'), encoding='utf-8')), 'dachi' if k == 'kimorin' else 'resident'))
+        if not os.path.isdir(d):
+            print('skipped (no sound folder yet):', k)
+            continue
+        cast.append(one(k, res[k], d, os.path.join(ART, 're', k), json.load(open(os.path.join(d, 'lyrics.json'), encoding='utf-8')), 'dachi' if k in DACHI else 'resident'))
     json.dump(cast, open(JSON_OUT, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     open(JSON_OUT, 'a').write('\n')
     total = sum(os.path.getsize(os.path.join(dp, f)) for dp, _d, fs in os.walk(OUT) for f in fs)

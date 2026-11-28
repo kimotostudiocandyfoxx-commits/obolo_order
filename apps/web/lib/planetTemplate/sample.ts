@@ -16,7 +16,7 @@ import { dachiOf, oshiOn, ROSTER_LAST_DAY } from './roster';
  *
  * M-R344 (handoff planets-08 chapters 3 and 6): the cast bring their REAL works — one each per planet, the story
  * team's words, pictures and voices (lib/planetTemplate/castWorks.ts) — not sample works. A cast member without works
- * (MIKIE⭐︎DRILL: the story has made none yet) does not come. Only the preview's own 「you」 (ミナト★) still carries
+ * does not come (MIKIE⭐︎DRILL has hers since the story's f66e3a1e: she comes for an Obolo Order only). Only the preview's own 「you」 (ミナト★) still carries
  * the prototype's sample works, so the preview's own place and profile have something in them.
  */
 export interface SampleCast {
@@ -33,7 +33,7 @@ export function sampleCast(o: SampleCast = {}): [name: string, pic: string, rel:
 const WORDS = ['明日もがんばるZE', 'うまいラーメン見つけた', 'ねむい…でも楽しい', '新曲できたかも', '空がきれいだった', 'たこ焼き食べたい。', 'きょうは晴れ'];
 export const SAMPLE_OWN_FIGURE = (planet: HomePlanet) => `/planets/sample/fig-${planet}-user.webp`;
 
-/** one of the prototype's sample works (the preview's own 「you」, and the story's stand-in for an inviter's work) */
+/** one of the prototype's sample works (the preview's own 「you」; never in an inviter's name: the story shows their real work or none) */
 export function sampleWork(planet: HomePlanet, i: number, name: string, pic: string, rel: HomeRel, flownAt: string): HomeWork {
   const cfg = PLANET_HOMES[planet];
   const kind = cfg.store ?? 'saturn_post';

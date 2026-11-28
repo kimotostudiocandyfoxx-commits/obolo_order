@@ -30,7 +30,12 @@ function wobbleGl(cv: HTMLCanvasElement, im: HTMLImageElement): ((st: GameState)
   gl.vertexAttribPointer(lp, 2, gl.FLOAT, false, 0, 0);
   const tx = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, tx);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, im);
+  // the picture keeps its own shape: drawn whole in the middle of a square, which is the texture
+  const sq = document.createElement('canvas');
+  sq.width = sq.height = BOARD;
+  const k = Math.min(BOARD / im.naturalWidth, BOARD / im.naturalHeight) * 0.92;
+  sq.getContext('2d')?.drawImage(im, (BOARD - im.naturalWidth * k) / 2, (BOARD - im.naturalHeight * k) / 2, im.naturalWidth * k, im.naturalHeight * k);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, sq);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
