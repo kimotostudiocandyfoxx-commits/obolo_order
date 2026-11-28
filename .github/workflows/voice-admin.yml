@@ -1,0 +1,79 @@
+name: Voice admin
+
+# One-off voice housekeeping from the Actions tab (as Media to R2: a Cloud Run job with the API's own service
+# account, so the admin token stays in Google Cloud).
+#  - takes-cleanup: POST /admin/voice-takes-cleanup — the "last take" files kept for the voice-settings trial (R19 only)
+#  - models-remake: POST /admin/voice-models-remake — members' voice models made again from the unpitched recording
+#  Both go batch by batch (`after=<next>`) until the end or `minutes`.
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'takes-cleanup / models-remake'
+        default: 'takes-cleanup'
+        type: choice
+        options: [takes-cleanup, models-remake]
+      minutes:
+        description: 'how long to keep going (minutes, ≤ 55)'
+        default: '10'
+
+env:
+  REGION: asia-northeast1
+  WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER || format('projects/{0}/locations/global/workloadIdentityPools/github/providers/github', vars.GCP_PROJECT_NUMBER) }}
+  DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA || format('obolo-deployer@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+  RUNTIME_SA: ${{ vars.GCP_RUNTIME_SA || format('obolo-api-runtime@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+
+jobs:
+  voice:
+    if: ${{ vars.GCP_PROJECT_ID != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Run
+        env:
+          ACTION: ${{ inputs.action }}
+          MINUTES: ${{ inputs.minutes }}
+        run: |
+          API="https://obolo-api-${{ vars.GCP_PROJECT_NUMBER }}.${REGION}.run.app"
+          MIN=$(python3 -c 'import os; m=os.environ.get("MINUTES","10").strip() or "10"; print(max(1, min(55, int(float(m)))))')
+          IMAGE=$(gcloud run services describe obolo-api --region "$REGION" --format='value(spec.template.spec.containers[0].image)')
+          cat > script.mjs <<'JS'
+          const h = { 'x-admin-token': process.env.ADMIN_TOKEN };
+          const api = process.env.API;
+          const remake = process.env.ACTION === 'models-remake';
+          const path = remake ? '/admin/voice-models-remake?limit=20' : '/admin/voice-takes-cleanup?limit=500';
+          const until = Date.now() + Number(process.env.MIN) * 60_000;
+          const total = {};
+          let after = null;
+          for (;;) {
+            const r = await fetch(api + path + (after ? '&after=' + encodeURIComponent(after) : ''), { method: 'POST', headers: h });
+            const j = await r.json().catch(() => null);
+            if (r.status >= 300 || !j) { console.log('STOP ' + r.status + ' ' + JSON.stringify(j)); break; }
+            for (const [k, v] of Object.entries(j)) if (typeof v === 'number') total[k] = (total[k] ?? 0) + v;
+            console.log('LINE ' + JSON.stringify({ ...j, next: j.next ? 'more' : null }));
+            after = j.next;
+            if (!after || Date.now() > until) break;
+          }
+          console.log('TOTAL ' + JSON.stringify(total) + (after ? ' (not finished: run again)' : ' (finished)'));
+          JS
+          SCRIPT=$(base64 -w0 script.mjs)
+          gcloud run jobs deploy obolo-voice-admin --region "$REGION" --image "$IMAGE" --service-account "$RUNTIME_SA" \
+            --set-secrets ADMIN_TOKEN=obolo-admin-token:latest \
+            --set-env-vars "^##^API=$API##ACTION=$ACTION##MIN=$MIN##SCRIPT_B64=$SCRIPT" \
+            --command node --args "^##^--input-type=module##-e##await import('data:text/javascript;base64,' + process.env.SCRIPT_B64)" \
+            --memory 512Mi --task-timeout $(( MIN * 60 + 300 )) --max-retries 0 --quiet
+          gcloud run jobs execute obolo-voice-admin --region "$REGION" --wait || true
+          EXEC=$(gcloud run jobs executions list --job obolo-voice-admin --region "$REGION" --limit 1 --format='value(metadata.name)')
+          sleep 20
+          gcloud logging read "resource.type=cloud_run_job AND resource.labels.job_name=obolo-voice-admin AND labels.\"run.googleapis.com/execution_name\"=\"$EXEC\"" \
+            --order=asc --limit=500 --format='value(textPayload)' | tee log.txt
+          grep -E '^(LINE|TOTAL|STOP) ' log.txt | tail -20 | sed 's/^/    /' >> "$GITHUB_STEP_SUMMARY" || true
+          grep -q '^TOTAL ' log.txt || { echo "::error::the job did not report a total"; exit 1; }
