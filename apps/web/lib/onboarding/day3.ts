@@ -4,7 +4,7 @@ import { day3NewHomes, journeyNotes } from './newHomeScenes';
 
 /**
  * DAY 3 【月 → 土星】 — the simple version (M-R208〜M-R212; wip/P02/c02.md D04-S002〜S002b, c03.md D04-S003〜S007; the scene
- * ids say D04 but it is day 3). Starts after the email check 〔扉の合言葉〕 (DayAuth).
+ * ids say D04 but it is day 3).
  *  - the Moon morning: Obolo Neo, Bluena (f_d04_bluena), the Moon atelier, 「作るのは、月。しまうのは、Bluena。見せるのは、、、星だ。」,
  *    the gate's 88 minutes (MONBAN on Bluena's screen)
  *  - D04-S002b: OBOLON teaches the kororin; Bluena gains the sound-wave shelf; KIMORIN⭐︎'s 「うんち。」 kororin sings;

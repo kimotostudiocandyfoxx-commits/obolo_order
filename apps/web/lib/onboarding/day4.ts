@@ -5,7 +5,7 @@ import { D4_NEW, journeyNotes, withNewHomes } from './newHomeScenes';
 
 /**
  * DAY 4 【月 → 木星】 — the simple version (M-R208/M-R210/M-R211; wip/P03/c01.md D05-S001〜S007, c02.md D05-S002〜S009;
- * the scene ids say D05 but it is day 4). Starts after the email check 〔扉の合言葉〕 (DayAuth).
+ * the scene ids say D05 but it is day 4).
  *  - the Moon morning: OBOLON 「お前は、ついに、アートを、作れるようになる。」; Bluena gains the square-frame shelf
  *  - the Moon atelier: KIMORIN⭐︎'s 『プリプリ・ボカン』 in his chat (D05-S006, f_d05_kimorin_sticker = like / next), then
  *    {neo}'s art in {bati}'s chat (the 'atelier' step: one card, in Bluena at once) and 〔木星へ飛ばす〕 or 〔今は飛ばさない〕

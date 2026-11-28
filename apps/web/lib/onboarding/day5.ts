@@ -5,7 +5,7 @@ import { kimorinBack } from './kimorinBack';
 
 /**
  * DAY 5 【月 → 水星】 — the simple version (M-R208/M-R210/M-R211; wip/P03/c03.md D06-S001〜S007, c04.md D06-S002〜S008;
- * the scene ids say D06 but it is day 5). Starts after the email check 〔扉の合言葉〕 (DayAuth).
+ * the scene ids say D06 but it is day 5).
  *  - the Moon morning: OBOLON 「お前は、ついに、曲を、作れるようになる。」; Bluena gains the note shelf
  *  - the Moon atelier: KIMORIN⭐︎'s two songs on 『プリプリ・ボカン』 in his chat (D06-S006), then {neo}'s song in {bati}'s chat
  *    (the 'atelier' step: the card, 〔もう一回（1回だけ）〕, in Bluena at once) and 〔水星へ飛ばす〕 or 〔今は飛ばさない〕

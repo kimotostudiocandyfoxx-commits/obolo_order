@@ -11,7 +11,9 @@ import type { Step } from './script';
 
 /**
  * Scripted journey days (eleven-day first journey since M-R341: 8 Pluto, 9 Neptune, 10 Uranus, 11 the Sun). Days
- * without a script show the placeholder JourneyDayScreen.
+ * without a script show the placeholder JourneyDayScreen. No day starts with an email check: the 〔扉の合言葉〕 screen
+ * (retype the account's address + a 6-digit code) went from day 2 and then days 3–11 (client 2026-11-28); signing in
+ * on another device is the entry screen's email + code, unchanged.
  */
 export interface DayStory {
   steps: Step[];
@@ -20,12 +22,6 @@ export interface DayStory {
    * wait only while journeyDay ≤ 2); from day 3 the 24 hours are waited, so no label (HomeGate shows no button).
    */
   skipLabel?: string;
-  /**
-   * The day starts with the email check 〔扉の合言葉〕 (the account's own address again + the 6-digit code; DayAuth). Day 1
-   * starts from the invitation; day 2 starts at once since 2026-11-28 (the client: the email screen after the skipped 24
-   * hours must go — the address is the one the invitation came to, kept on the account for signing in elsewhere).
-   */
-  auth: boolean;
   /** The caption when the skip has rolled the clock to zero (instead of 「扉が開いた」). */
   skippedText?: string;
   /** 〔完了画面〕 words of the day's end, over the countdown (D08-S011: 「最初の旅、おわり。ここから先は、どの星へも自由に」) */
@@ -40,25 +36,24 @@ export const DEFAULT_SKIP_LABEL = '明日まで待てない';
 
 export const STORIES: Record<number, DayStory> = {
   // the script's telop (QA 14 R53); the countdown waits for the ticket MONBAN promised (client 2026-11-28)
-  1: { steps: DAY1, skipLabel: DEFAULT_SKIP_LABEL, auth: false, skippedText: '24時間スキップした', untilText: '宇宙行きの切符が届くまで' },
+  1: { steps: DAY1, skipLabel: DEFAULT_SKIP_LABEL, skippedText: '24時間スキップした', untilText: '宇宙行きの切符が届くまで' },
   // the end of day 2 (the Moon): D03-S009 — the 24 hours are waited (M-R269: no 〔明日まで待てない〕 after day 2; testers
   // still skip); they are {bati}'s (M-R223)
   2: {
     steps: DAY2,
-    auth: false,
     waitNote: '明日、星へ遊びに行くまでの24時間は、{bati}と好きなだけ話せます',
   },
-  3: { steps: DAY3, auth: true },
-  4: { steps: DAY4, auth: true },
-  5: { steps: DAY5, auth: true },
-  6: { steps: DAY6, auth: true },
-  7: { steps: DAY7, auth: true },
+  3: { steps: DAY3 },
+  4: { steps: DAY4 },
+  5: { steps: DAY5 },
+  6: { steps: DAY6 },
+  7: { steps: DAY7 },
   // M-R341: the three outer planets, before becoming Obolo Order (lib/onboarding/outer.ts)
-  8: { steps: DAY8, auth: true },
-  9: { steps: DAY9, auth: true },
-  10: { steps: DAY10, auth: true },
+  8: { steps: DAY8 },
+  9: { steps: DAY9 },
+  10: { steps: DAY10 },
   // the Sun: the Eclipse is a choice inside the story (pay → ORDER, or stay a resident); no countdown after it
-  11: { steps: DAY11, auth: true, doneText: '最初の旅、おわり。ここから先は、どの星へも自由に' },
+  11: { steps: DAY11, doneText: '最初の旅、おわり。ここから先は、どの星へも自由に' },
 };
 
 /**

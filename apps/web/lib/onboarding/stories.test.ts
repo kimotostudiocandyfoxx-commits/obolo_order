@@ -5,7 +5,7 @@ import { hasMotion, PLANNED_MOTIONS } from './media';
 import { DAY_TITLE, labelIndex, type Step } from './script';
 import { AFTER_DAYS } from './after';
 import { SYS002_ALONE } from './sys002';
-import { DEFAULT_SKIP_LABEL, PREVIEW_ONLY, STORIES } from './stories';
+import { DEFAULT_SKIP_LABEL, PREVIEW_ONLY, STORIES, STORIES_NEW_HOMES } from './stories';
 
 const all = { ...STORIES, ...PREVIEW_ONLY };
 const kinds = (steps: Step[]) => steps.map((s) => s.t);
@@ -238,8 +238,12 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
       if (s.t === 'choice') for (const o of s.options) expect(o.label).not.toMatch(/\d+日目/);
     }
   });
-  it('day 2 starts at once after the 24 hours, with no email check (client 2026-11-28)', () => {
-    expect(STORIES[2].auth).toBe(false);
+  it('no day starts with the email check 〔扉の合言葉〕 (client 2026-11-28: day 2, then days 3–11)', () => {
+    for (const st of [...Object.values(STORIES), ...Object.values(STORIES_NEW_HOMES)]) expect('auth' in st).toBe(false);
+    // the day's screen asks for no address or code; signing in elsewhere stays on the entry screen
+    const day = readFileSync('components/onboarding/StoryDay.tsx', 'utf8');
+    expect(day).not.toMatch(/requestCode|\.verify\(/);
+    expect(readFileSync('components/onboarding/EntryScreen.tsx', 'utf8')).toMatch(/requestCode[\s\S]*\.verify\(/);
   });
   it('KIMORIN wears the sunglasses look after the dragon', () => {
     const dragon = steps.findIndex((s) => s.t === 'video' && s.motion === 'd2-dragon');
