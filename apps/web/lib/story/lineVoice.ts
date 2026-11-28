@@ -2,7 +2,7 @@
 
 import { BATI_FIXED_VOICES, BATI_VOICE_DEFAULT_EGG, batiStoryVoice, type BatiEggKind } from '@obolo/shared';
 import { masterBus, unlockAudio } from '@/lib/onboarding/audio';
-import { voiceKey, voiceable } from './voice';
+import { nameParts, voiceKey, voiceable } from './voice';
 
 /** a line with a member's name in it ({name} {neo} {bati} …) */
 export const hasNames = (text: string) => /\{[a-z_]+\}/.test(text);
@@ -68,6 +68,9 @@ export function storyVoiceFile(m: Record<string, string>, who: string, text: str
   return own ?? m[voiceKey(who, act, text)] ?? null;
 }
 
+/** seconds of quiet between the pieces of a line with a name (where the name would be said) */
+const PIECE_GAP = 0.18;
+
 /** How much the music dips while someone speaks. */
 export const VOICE_DIP = 0.35;
 
@@ -92,6 +95,8 @@ export class LineVoice {
   private analyser: AnalyserNode | null = null;
   private wave: Float32Array<ArrayBuffer> | null = null;
   private src: AudioBufferSourceNode | null = null;
+  /** the line's pieces scheduled one after another (a line with a name: its fixed words) */
+  private queue: AudioBufferSourceNode[] = [];
   private el: HTMLAudioElement | null = null;
   private volume = DEFAULT_MIX.voice;
   private muted = false;
@@ -174,16 +179,21 @@ export class LineVoice {
     this.personal = voices;
   }
 
-  /** The file a line is spoken from: its own; for a line with names, the member's voice of it (none yet: text only). */
-  private async urlOf(who: string, text: string, act?: string): Promise<string | null> {
+  /**
+   * The files a line is spoken from, played one after another: its own; for a line with names, the member's voice of the
+   * whole line when it is made — until then (right after the name is given, or the server is slow) the line's fixed words
+   * (nameParts) at once, so it is never silent (client playtest 2026-11-28). [] = no voice.
+   */
+  private async urlsOf(who: string, text: string, act?: string): Promise<string[]> {
     const m = await loadManifest();
     if (hasNames(text)) {
       const own = this.personal[voiceKey(who, act, text)] ?? this.personal[voiceKey(who, undefined, text)];
-      // not made yet (e.g. right after the name is given): the caption alone (story chat 2026-10-29)
-      return own ?? null;
+      if (own) return [own];
+      return nameParts(text).flatMap((p) => storyVoiceFile(m, who, p) ?? []);
     }
-    if (!voiceable(text)) return null;
-    return storyVoiceFile(m, who, text, act);
+    if (!voiceable(text)) return [];
+    const f = storyVoiceFile(m, who, text, act);
+    return f ? [f] : [];
   }
 
   private buffer(url: string): Promise<AudioBuffer | null> {
@@ -203,41 +213,62 @@ export class LineVoice {
 
   /** Fetch and decode a line ahead of time, so it starts the moment it is shown. */
   async prefetch(who: string, text: string, act?: string) {
-    const url = await this.urlOf(who, text, act);
-    if (url && this.ctx) void this.buffer(url);
+    const urls = await this.urlsOf(who, text, act);
+    if (this.ctx) for (const u of urls) void this.buffer(u);
   }
 
   /** Speak this line if it has a voice. `who` / `text` as written in the story (before names are filled in). */
   async say(who: string, text: string, act?: string) {
     this.stop();
     const t = ++this.token;
-    const url = await this.urlOf(who, text, act);
-    if (!url || t !== this.token) return;
+    const urls = await this.urlsOf(who, text, act);
+    if (!urls.length || t !== this.token) return;
     this.onLoading(true);
     if (this.ctx && this.gain) {
-      const buf = await this.buffer(url);
+      const bufs = await Promise.all(urls.map((u) => this.buffer(u)));
       if (t !== this.token) return;
-      if (!buf) return this.onLoading(false);
+      const list = bufs.filter((b): b is AudioBuffer => !!b);
+      if (!list.length) return this.onLoading(false);
       if (this.ctx.state !== 'running') void this.ctx.resume();
-      const src = this.ctx.createBufferSource();
-      src.buffer = buf;
-      src.connect(this.gain);
-      src.onended = () => {
-        if (this.src === src) {
-          this.src = null;
-          this.onSpeaking(false);
-        }
-      };
-      src.start();
-      this.src = src;
       this.onLoading(false);
       this.onSpeaking(true);
+      // the pieces of a line with a name: a short breath where the name would be
+      let at = this.ctx.currentTime;
+      list.forEach((buf, k) => {
+        const src = this.ctx!.createBufferSource();
+        src.buffer = buf;
+        src.connect(this.gain!);
+        const last = k === list.length - 1;
+        src.onended = () => {
+          if (t !== this.token) return;
+          if (last) {
+            this.src = null;
+            this.queue = [];
+            this.onSpeaking(false);
+          } else this.src = this.queue[k + 1] ?? null;
+        };
+        src.start(at);
+        at += buf.duration + PIECE_GAP;
+        this.queue.push(src);
+      });
+      this.src = this.queue[0];
       return;
     }
     if (!this.el) return this.onLoading(false);
-    this.el.src = url;
+    // the <audio> fallback plays the pieces in turn
+    const el = this.el;
+    let k = 0;
+    const next = () => {
+      if (t !== this.token || ++k >= urls.length) return;
+      el.removeEventListener('ended', next);
+      el.src = urls[k];
+      if (k < urls.length - 1) el.addEventListener('ended', next, { once: true });
+      void el.play().catch(() => undefined);
+    };
+    if (urls.length > 1) el.addEventListener('ended', next, { once: true });
+    el.src = urls[0];
     this.applyLevel();
-    void this.el.play().catch(() => {
+    void el.play().catch(() => {
       this.onLoading(false);
       this.onSpeaking(false);
     });
@@ -246,14 +277,16 @@ export class LineVoice {
   stop() {
     this.token++;
     this.onLoading(false);
-    if (this.src) {
-      const s = this.src;
-      this.src = null;
-      try {
-        s.stop();
-      } catch {
-        /* already ended */
+    if (this.src || this.queue.length) {
+      for (const s of this.queue.length ? this.queue : [this.src!]) {
+        try {
+          s.stop();
+        } catch {
+          /* already ended */
+        }
       }
+      this.queue = [];
+      this.src = null;
       this.onSpeaking(false);
     }
     if (this.el && !this.el.paused) {

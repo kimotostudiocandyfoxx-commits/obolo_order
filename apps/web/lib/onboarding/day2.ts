@@ -48,14 +48,17 @@ export const DAY2: Step[] = [
   { t: 'video', motion: '5-f' }, // 鶴が空を飛んでいく
   { t: 'se', sound: 'whoosh' },
   { t: 'video', motion: 'd1-arrive' }, // 金の雲を抜けて都へ降り、本部の門の前へ
-  { t: 'bgm', track: 'city' }, // 金と黒の都へ（2026-10-25）。鶴が着いてから（QA 5 U1）
-  { t: 'still', image: 's/d2-gate-near' }, // 光の線をたどって、本部の門の前へ（床の光の筋が門まで続く絵）
-  { t: 'cam', move: 'in', focus: '50% 60%' },
+  // no city music here any more (playtest 2026-11-28: its intro is a run of plucked koto-like strings that rang out just as
+  // the crane reached the gate): the opening theme plays on until MONBAN's theme comes with him
+  // the descent flows straight into the gate (playtest 2026-11-28: the still s/d2-gate-near is framed closer than the
+  // film's last frame, and the camera pushed in on it and held — the gate seemed to jump bigger and freeze): the gate's
+  // own loop, which starts on the film's last frame and is where MONBAN's smoke film starts too, as on day 1
+  { t: 'loop', motion: 'd1-gate-loop' },
   { t: 'wait', s: 1.6 },
-  { t: 'cam', move: 'out' },
   { t: 'se', sound: 'smoke' },
   // 黒い煙が湧き、MONBANが現れる。金色の目が、こちらへ向く (the day-1 film of his arrival; his music comes with him)
-  { t: 'video', motion: 'd1-monban', bgmAt: { track: 'monban', at: 6.5 } },
+  // his music 2 s earlier than it was (client playtest 2026-11-28: 6.5 s → 4.5 s into the smoke)
+  { t: 'video', motion: 'd1-monban', bgmAt: { track: 'monban', at: 4.5 } },
   { t: 'loop', motion: '9-l' },
   { t: 'say', who: 'MONBAN', text: '来たか…切符は持ってきたか？' },
   { t: 'action', label: '切符を見せる' },
@@ -66,7 +69,12 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'MONBAN', text: '地球の神殿に行け…結社の奥の大広間に、ロケットがある' },
   // ── 「待ちなさい。」 to 〔ロケットに乗る〕 told with pictures (client 2026-11-28, design/refs/2026-11-28-rocket/storyboard.md):
   // no generated video any more — painted stills and plates moved by the stage (lib/onboarding/shots.ts), effects, sounds.
-  // A1 門をくぐろうとした、その時 — his voice from behind, over the open gate
+  // A1 門をくぐろうとした、その時 — we start through the open gate toward the Earth temple (a push past MONBAN), and in
+  // the middle of it his voice comes from behind: the picture cuts to pitch black, only his bubble (client playtest
+  // 2026-11-28, design/refs/2026-11-28-playtest/README.md 2)
+  { t: 'still', image: 's/d2-gate-open', shot: 'gate-go' },
+  { t: 'wait', s: 1.3 },
+  { t: 'black' },
   { t: 'say', who: 'KIMORIN', text: '待ちなさい。' }, // 後ろから
   // the client's KIMORIN theme (2026-11-28) from his appearance until just before the Earth temple: it crossfades from
   // MONBAN's theme as we look back, and replaces the pause, MONBAN's theme and the comedy theme that played here
@@ -75,7 +83,9 @@ export const DAY2: Step[] = [
   { t: 'se', sound: 'whip' },
   { t: 'still', image: 's/d2-reveal-end', shot: 'reveal-whip', clear: true },
   { t: 'se', sound: 'glint', after: 0.5 },
-  { t: 'wait', s: 0.9 },
+  { t: 'wait', s: 1 },
+  // A3 black again, only his mouth in a pool of light, moving with his voice — his eyes are not seen yet (playtest 3)
+  { t: 'still', image: 's/d2-kimorin-mouth-only', fade: 0.5 },
   { t: 'say', who: 'KIMORIN', text: 'なんですか、この怪しい建物は。' }, // こちらの横まで歩いてきて、本部の建物を、下から上まで、じろじろと見上げる
   // A4 MONBAN left, KIMORIN in his white coat right
   { t: 'still', image: 's/d2-gate-two-inside', shot: 'gate-two', fade: 0.35 },

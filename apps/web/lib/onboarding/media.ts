@@ -66,6 +66,7 @@ export const seUrl = (id: string) => `${MEDIA_BASE}/se-${id}.mp3`;
  */
 const STILL_CAST: Record<string, string[]> = {
   's/d2-gate-two-inside': ['KIMORIN', 'MONBAN'],
+  's/d2-gate-open': ['MONBAN'],
   's/d2-hall-run': ['KIMORIN', 'MONBAN', 'OBOLON'],
   's/d2-moon-bed': ['KIMORIN'],
   's/d2-launch-pit': [],
@@ -130,6 +131,7 @@ export const stillUrl = (name: string) => `${MEDIA_BASE}/${name}.jpg${ver(name)}
 export const STILL_MOUTH: Record<string, string> = Object.fromEntries(
   [
     's/d2-reveal-end',
+    's/d2-kimorin-mouth-only',
     's/d2-gate-two-inside',
     's/d2-gate-kimorin-face',
     's/d2-hall-kimorin-up',

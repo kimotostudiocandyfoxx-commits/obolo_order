@@ -33,7 +33,12 @@ describe('day 1 script', () => {
     for (const s of DAY1) if (s.t === 'bgm' && s.track) expect(fs.existsSync(`public/onboarding/bgm-${s.track}.m4a`)).toBe(true);
     expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'bgm') + 1)).toBe('opening');
     // the client's HQ music (2026-11-28): from just before the crane reaches HQ, through MONBAN, until the temple
-    expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'video' && s.motion === 'd1-arrive'))).toBe('d1-hq');
+    // …cued 2 s into the arrival (playtest 2026-11-28), not by a bgm step before it: the opening theme plays on until then
+    const arrive = DAY1.findIndex((s) => s.t === 'video' && s.motion === 'd1-arrive');
+    expect(DAY1[arrive]).toMatchObject({ bgmAt: { track: 'd1-hq', at: 2 } });
+    expect(DAY1.slice(0, arrive).some((s) => s.t === 'bgm' && s.track === 'd1-hq')).toBe(false);
+    expect(bgmAt(DAY1, arrive)).toBe('opening');
+    expect(bgmAt(DAY1, arrive + 1)).toBe('d1-hq');
     expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'video' && s.motion === 'd1-monban') + 1)).toBe('d1-hq');
     expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'video' && s.motion === 12))).toBe(null);
     expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'name'))).toBe('obolon');
@@ -65,6 +70,11 @@ describe('day 1 script', () => {
 describe('day 2 music (the client, 2026-11-28)', () => {
   const at = (pred: (s: (typeof DAY2)[number]) => boolean) => bgmAt(DAY2, DAY2.findIndex(pred));
   const say = (text: string) => (s: (typeof DAY2)[number]) => s.t === 'say' && s.text === text;
+  it("MONBAN's theme 4.5 s into his smoke (2 s earlier than before: playtest 2026-11-28)", () => {
+    const i = DAY2.findIndex((s) => s.t === 'video' && s.motion === 'd1-monban');
+    expect(DAY2[i]).toMatchObject({ bgmAt: { track: 'monban', at: 4.5 } });
+    expect(bgmAt(DAY2, i + 1)).toBe('monban');
+  });
   it("KIMORIN's theme from his appearance until just before the Earth temple", () => {
     expect(at(say('待ちなさい。'))).toBe('monban');
     expect(at((s) => s.t === 'still' && s.shot === 'reveal-whip')).toBe('d2-kimorin');

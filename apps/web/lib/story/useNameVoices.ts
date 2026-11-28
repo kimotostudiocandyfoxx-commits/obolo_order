@@ -28,8 +28,9 @@ export function useNameVoices(voice: LineVoice | null, steps: Step[], names: Sto
         const r = await getApi().lineVoices({ names: clean, keys: keys.slice(0, 120) });
         if (stop) return;
         voice.setPersonal(r.voices);
-        // a few minutes of asking at most (a day's lines are made in about that time)
-        if (r.pending > 0 && ++tries < 50) timer = setTimeout(() => void ask(), 6000);
+        // a few minutes of asking at most (a day's lines are made in about that time); often at first, so the voice of the
+        // line right after the name is there as soon as it is made (until then its fixed words play: LineVoice.urlsOf)
+        if (r.pending > 0 && ++tries < 50) timer = setTimeout(() => void ask(), tries <= 15 ? 2000 : 6000);
       } catch {
         // not signed in yet (Day 1 before the name), or offline: the lines stay silent
       }

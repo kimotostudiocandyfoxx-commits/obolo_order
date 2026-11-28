@@ -39,11 +39,11 @@ export const DAY1: Step[] = [
   { t: 'se', sound: 'whoosh' }, // the crane takes off (client 2026-11-22: the way to the gate wanted sound)
   { t: 'video', motion: '5-f' }, // 鶴が星空を飛ぶ
   // the client's own music (2026-11-28) from just before the crane reaches HQ until just before the Earth temple: it
-  // replaces the end of the opening theme and MONBAN's theme on day 1 (day 2 keeps MONBAN's theme)
-  { t: 'bgm', track: 'd1-hq' },
+  // replaces the end of the opening theme and MONBAN's theme on day 1 (day 2 keeps MONBAN's theme). It comes in 2 s into
+  // the arrival (client playtest 2026-11-28: 「2秒遅く」), the picture is not held back for it
   { t: 'se', sound: 'portal' },
   { t: 'se', sound: 'whoosh' },
-  { t: 'video', motion: 'd1-arrive' }, // 金の雲を抜けて都へ降り、門の光に飛びこむ
+  { t: 'video', motion: 'd1-arrive', bgmAt: { track: 'd1-hq', at: 2 } }, // 金の雲を抜けて都へ降り、門の光に飛びこむ
   { t: 'loop', motion: 'd1-gate-loop' },
   { t: 'caption', text: '本部に到着しました' },
   { t: 'action', label: '中に入る' },
@@ -79,9 +79,9 @@ export const DAY1: Step[] = [
   { t: 'say', who: 'OBOLON', text: '俺の名前はOBOLON、双子座だ。' },
   { t: 'say', who: 'OBOLON', text: 'お前の名前は？' },
   { t: 'name', placeholder: '名前', submit: '名乗る' },
-  { t: 'say', who: 'OBOLON', text: '{name}か、いいな。' },
+  { t: 'say', who: 'OBOLON', text: 'そうか、いいな。' }, // M-R347: no {name} — a written name not spoken looked wrong
   { t: 'say', who: 'OBOLON', text: 'ここは、宇宙秘密結社だ。' },
-  { t: 'say', who: 'OBOLON', text: '{name}、\nお前は、宇宙に、行ってみたいと思うか？' },
+  { t: 'say', who: 'OBOLON', text: 'お前は、宇宙に、行ってみたいと思うか？' },
   // answered by voice (M-R169): the voice note and the mic permission come once, here at the first 〔🎙〕
   { t: 'choice', key: 'choice1', voice: true, options: [{ label: '行きたい' }, { label: '行きたくない' }, { label: 'まだわかんない' }] },
   { t: 'say', who: 'OBOLON', text: 'そうか。' },

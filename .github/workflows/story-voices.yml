@@ -5,6 +5,11 @@ name: Story voices
 # saved to apps/web/public/story/voices/.
 on:
   workflow_dispatch:
+    inputs:
+      only:
+        description: 'make only the lines listed in this file (e.g. design/story-voices-days12.json, written by apps/web/scripts/voice-coverage.ts --days 1,2 --only …); empty = the full run'
+        required: false
+        default: ''
   push:
     branches: ['claude/**', main]
     paths: ['design/story-voices.json']
@@ -37,6 +42,8 @@ jobs:
         with:
           node-version: 22
       - name: Voices
+        env:
+          STORY_VOICES_ONLY: ${{ github.event.inputs.only }}
         run: |
           export GEMINI_API_KEY="$(gcloud secrets versions access latest --secret=obolo-gemini-api-key)"
           # KIMORIN is cloned from a recording with Fish Audio (if the key is in Secret Manager)

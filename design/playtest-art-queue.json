@@ -1,0 +1,140 @@
+{
+ "note": "依頼主の試遊（2026-11-28, design/refs/2026-11-28-playtest/README.md）の直し：2日目のピンポンボタンを押す瞬間の差し込み絵（手元・頭の機械の〇・月の神殿の全身）、うんちピンポンくんが卵から生まれる絵（依頼主のデザイン design/story/cast/うんちピンポンくん/99-original.jpg）、門の前と地球の神殿の切り返し（KIMORIN の正面、口あき版つき）。描いた絵は design/cast/playtest/<id>.jpg、scripts/playtest/build.py が apps/web/public/onboarding/s/ に書き出す（OBOLON は依頼主の絵をそのまま重ねる。描かない）。実行：Actions の「UI art」を、このブランチで queue=design/playtest-art-queue.json",
+ "dir": "../../../design/cast/playtest",
+ "png": true,
+ "always": "Vertical 9:16 frame for a premium Japanese anime feature film, in exactly the look of the reference pictures: cinematic photoreal-painterly 3DCG, soft plush and porcelain textures, physically plausible light, crisp detail, shallow depth of field, film-grade composition. No text, no letters, no numbers, no writing, no logos, no watermark anywhere.",
+ "redo": [],
+ "items": [
+  {
+   "id": "pp-hand",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "design/refs/2026-11-28-playtest/refs/kimorin-button-device.jpg",
+    "apps/web/public/onboarding/s/d2-pinpon.jpg"
+   ],
+   "prompt": "EXTREME CLOSE-UP INSERT SHOT of a hand pressing a button. Copy the device and the hand EXACTLY from the first picture: a chunky brushed-silver metal box with softly rounded corners (like a big metal pebble, about the size of a palm) with one large ROUND push button on top — a clear glass cap in a polished steel ring with a thin warm golden ring of light around it; the box rests on the open palm of a big fluffy WHITE PLUSH GLOVED PAW (rounded stubby plush fingers like a soft toy, one small blue oval pad). THE ACTION: the plush thumb of the same white paw comes down from above and PRESSES the round glass button firmly, the button pushed down into its ring; at the moment of the press the golden ring of light around the button flares brightly and a soft burst of warm light spills over the plush fingers and the steel. The box and the paw fill the middle of the frame, seen from slightly above and in front, very close. A sliver of the white lab-coat sleeve at the edge. Background: very dark, out of focus, deep black with a few soft round warm bokeh lights. No face in the picture."
+  },
+  {
+   "id": "pp-head",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "apps/web/public/onboarding/s/d2-pinpon-end.jpg",
+    "design/refs/2026-11-28-playtest/refs/kimorin-button-device.jpg"
+   ],
+   "prompt": "EXTREME CLOSE-UP INSERT SHOT of the little device on top of KIMORIN's head. Copy it EXACTLY from the reference pictures: a small retro brushed-silver box with rounded corners like a tiny old television, a dark glass screen in a raised silver frame and a small speaker grille below it, mounted on top of a white plush fox head between two big pointed white fox ears with deep blue insides (the ears frame the box on the left and right edges of the picture); the top edge of brass steampunk goggles is just visible at the bottom of the frame, with a thin coiled cable running down. ON THE SCREEN: one single big bright CIRCLE outline — the Japanese quiz-show 'correct answer' maru mark ○ — drawn as a thick glowing ring of warm white-gold light, centred, filling most of the screen, pure and simple (one ring only, NOT two rings, NOT the infinity sign, no text); it glows and casts a soft golden light on the silver frame and the white fur around it. Seen straight from the front, slightly below, very close: the box fills the middle third of the frame. Background: very dark and out of focus, a few soft warm bokeh lights."
+  },
+  {
+   "id": "pp-moon-kimorin",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "apps/web/public/onboarding/s/d2-moon-kimorin.jpg",
+    "apps/web/public/onboarding/kimorin-iu.webp",
+    "apps/web/public/onboarding/s/d2-pinpon-end.jpg"
+   ],
+   "prompt": "Inside the MOON TEMPLE exactly as in the first picture: a round hall of white marble columns and arches under a dome open to the starry night, a shallow round pool of glowing blue water in the floor, a thin vertical shaft of white light from the top, cool moonlit blue-white light. Remove the black orb from the shaft of light (no orb, no other character). KIMORIN stands in the middle distance just beyond the pool, FULL BODY, facing the camera, proud and smug, feet planted, chest out; in one paw he holds out the silver push-button box toward us (copy it from the third picture), the other paw on his hip. KIMORIN (copy him exactly from the second picture): a small chibi white fox-spirit about three heads tall; big pointed white fox ears with deep blue insides; a small retro silver box device on top of his head between the ears with a thin coiled cable; brass steampunk goggles over his eyes; a white, slightly worn laboratory coat over a black shirt with a leather tool belt and small brass gadgets; white plush paws with blue pads; behind him a large round fan of tail feathers growing from his body: white inside, black outside with red-orange tips; a smooth round pure-white porcelain fox face, a small blue three-petal mark on the forehead, a blue spiral on each cheek, a tiny ω mouth. ON THE SCREEN of the box on his head: one big glowing white-gold CIRCLE ○ (the quiz-show 'correct' mark, a single ring, no text), lighting the tips of his ears gold. He is small in the frame: his whole figure takes about the middle 40% of the picture's height, centred a little above the middle. The lower third of the picture is the empty marble floor and the near edge of the pool (it will be partly covered by a dark out-of-focus shape in the foreground), the top is the dome and columns."
+  },
+  {
+   "id": "hatch-pinpon-earth",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "design/story/cast/うんちピンポンくん/99-original.jpg",
+    "apps/web/public/onboarding/s/d2-egg-earth-gem.jpg",
+    "design/story/cast/うんちピンポンくん/01-main.png"
+   ],
+   "prompt": "The hatching moment in the Moon temple, exactly the place of the second picture: the marble altar under the shaft of light, the white columns and the starry night behind. The EGG of the second picture (half the blue Earth with clouds, half the grey cratered Moon, divided by a soft S-curve like a yin-yang) has just CRACKED OPEN on the altar: its top half broken into big glowing shell pieces tipping away to the sides, warm golden light pouring out of the crack lines, tiny sparkles in the air. Bouncing up out of the broken egg, in mid-air just above it, is the newborn character UNCHI PINPON-KUN — copy him EXACTLY from the first and third pictures, it must be the same design: a cute round spiral-shell creature shaped like a soft-serve swirl / conch shell standing upright: five stacked rounded tiers getting smaller towards a little pointed spiral tip on top, and a short spiral point at the bottom; glossy chocolate-brown with broad vertical GOLDEN-YELLOW stripes running over every tier, small golden stars sprinkled all over and a golden heart on the lower tier; on the middle tier a happy face: two big shiny round dark-brown eyes with white highlights, rosy pink cheeks, a small open smiling mouth. NO band, NO hat, NO arms, NO legs, NO feet, no gold belt (he is only the striped spiral shell with a face). He is the hero of the shot, centred, about a quarter of the picture's height, beaming with joy, lit by the golden light from the egg and the white light from above. Magical, warm, cute; the egg's two shell halves still clearly Earth and Moon."
+  },
+  {
+   "id": "hatch-pinpon-sun",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "design/story/cast/うんちピンポンくん/99-original.jpg",
+    "apps/web/public/onboarding/s/d2-egg-sun-gem.jpg",
+    "design/story/cast/うんちピンポンくん/01-main.png"
+   ],
+   "prompt": "The hatching moment in the Moon temple, exactly the place of the second picture: the marble altar under the shaft of light, the white columns and arches behind. The EGG of the second picture (half the fiery orange-gold Sun with swirling flames, half the grey cratered Moon, divided by a soft S-curve like a yin-yang) has just CRACKED OPEN on the altar: its top half broken into big glowing shell pieces tipping away to the sides, warm golden light pouring out of the crack lines, tiny sparkles in the air. Bouncing up out of the broken egg, in mid-air just above it, is the newborn character UNCHI PINPON-KUN — copy him EXACTLY from the first and third pictures, it must be the same design: a cute round spiral-shell creature shaped like a soft-serve swirl / conch shell standing upright: five stacked rounded tiers getting smaller towards a little pointed spiral tip on top, and a short spiral point at the bottom; glossy chocolate-brown with broad vertical GOLDEN-YELLOW stripes running over every tier, small golden stars sprinkled all over and a golden heart on the lower tier; on the middle tier a happy face: two big shiny round dark-brown eyes with white highlights, rosy pink cheeks, a small open smiling mouth. NO band, NO hat, NO arms, NO legs, NO feet, no gold belt (he is only the striped spiral shell with a face). He is the hero of the shot, centred, about a quarter of the picture's height, beaming with joy, lit by the golden light from the egg and the white light from above. Magical, warm, cute; the egg's two shell halves still clearly Sun and Moon."
+  },
+  {
+   "id": "rv-kimorin",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "apps/web/public/onboarding/s/d2-reveal-end.jpg",
+    "apps/web/public/onboarding/kimorin-iu.webp",
+    "apps/web/public/onboarding/s/d2-gate-kimorin-face.jpg"
+   ],
+   "prompt": "REVERSE SHOT at the gate of the secret society's headquarters at dusk: the camera stands in the open gateway looking back out along the grand avenue we came from — exactly the place of the first picture: tall dark gothic black-and-gold arcades on both sides, golden lanterns, a polished black stone floor with gold lines, the evening sun low and bright far down the avenue behind, warm hazy golden backlight. KIMORIN has walked up to the gate and stands close to the camera, facing us, looking straight into the lens with a smug, know-it-all little smile, one paw raised to his chest as if introducing himself ('I am the genius inventor'), the silver push-button box hanging from his belt by its cable. KIMORIN (copy him exactly from the second and third pictures): a small chibi white fox-spirit about three heads tall; big pointed white fox ears with deep blue insides; a small retro silver box device on top of his head between the ears (its dark screen shows nothing) with a thin coiled cable; brass steampunk goggles over his eyes; a white, patched and stained, slightly baggy laboratory coat over a black shirt with a leather tool belt with dangling wires and small brass gadgets; white plush paws with blue pads; behind him a large round fan of tail feathers growing from his body: white inside, black outside with red-orange tips; a smooth round pure-white porcelain fox face with no nose and no muzzle, a small blue three-petal leaf mark on the forehead, a blue spiral on each cheek, a tiny ω mouth, closed. FRAMING: medium shot from his knees to the tips of his ears, he stands a little RIGHT of centre and takes about 55% of the picture's height, his face in the upper third; the camera at his eye level. The LEFT third of the picture in the foreground is left as dark, out-of-focus shadow (something big and dark will stand there, close to the lens) — keep his face and body clear of it. The background is softly out of focus. He is lit warmly from the front by the gate's golden lights, rim-lit by the sunset behind."
+  },
+  {
+   "id": "rv-kimorin-open",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "design/cast/playtest/rv-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "Edit this picture: keep EVERYTHING exactly the same — the same character, pose, paws, coat, goggles, ears, tail, lighting, background, framing and every pixel outside his mouth. Change ONLY his mouth: the tiny ω mouth is now OPEN as if he is in the middle of speaking a word — a small open mouth, rounded, dark inside with a little pink tongue, just under where the ω was, the same size as a small coin on his face. Nothing else changes. No text, no letters, no watermark."
+  },
+  {
+   "id": "tk-kimorin",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "apps/web/public/onboarding/s/d2-hall-kimorin-up.jpg",
+    "apps/web/public/onboarding/kimorin-iu.webp",
+    "apps/web/public/onboarding/s/d2-hall.jpg"
+   ],
+   "prompt": "Inside the EARTH TEMPLE of the secret society, exactly the place of the first and third pictures: a vast dark hall of black stone and gold, huge golden armillary rings hanging in the dark, rows of tall carved pillars with small warm lights, a polished black floor with golden circles. The camera looks from the middle of the hall toward KIMORIN, who stands facing us, looking up a little at something floating just in front of the camera at the height of his eyes (a talking black orb, NOT in the picture), amazed and excited, both paws raised in front of his chest, ears perked up high. KIMORIN (copy him exactly from the reference pictures): a small chibi white fox-spirit about three heads tall; big pointed white fox ears with deep blue insides; a small retro silver box device on top of his head between the ears (its dark screen shows nothing) with a thin coiled cable; brass steampunk goggles PUSHED UP onto his forehead; a white, patched and stained, slightly baggy laboratory coat over a black shirt with a leather tool belt with dangling wires and small brass gadgets; white plush paws with blue pads; behind him a large round fan of tail feathers growing from his body: white inside, black outside with red-orange tips; a smooth round pure-white porcelain fox face with no nose and no muzzle, a small blue three-petal leaf mark on the forehead, two thin curved glowing light-blue eye slits, a blue spiral on each cheek, a tiny ω mouth, closed. FRAMING: medium shot from his knees to the tips of his ears, he stands a little LEFT of centre and takes about 55% of the picture's height, his face in the upper third; camera slightly above his eye level. The upper RIGHT of the picture in the foreground is left as dark, softly out-of-focus space (a big dark shape will float there close to the lens) — keep his face and body clear of it. The background hall is softly out of focus with round golden bokeh. He is lit warmly in gold from the front and above, a cool rim light behind."
+  },
+  {
+   "id": "tk-kimorin-open",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "design/cast/playtest/tk-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "Edit this picture: keep EVERYTHING exactly the same — the same character, pose, paws, coat, goggles, ears, tail, lighting, background, framing and every pixel outside his mouth. Change ONLY his mouth: the tiny ω mouth is now OPEN as if he is in the middle of speaking a word — a small open mouth, rounded, dark inside with a little pink tongue, just under where the ω was, the same size as a small coin on his face. Nothing else changes. No text, no letters, no watermark."
+  }
+ ]
+}
