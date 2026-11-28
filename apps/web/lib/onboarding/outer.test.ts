@@ -177,18 +177,20 @@ describe('M-R341: days 8–10 are the outer planets, before becoming Obolo Order
     for (const d of [1, 2, 3, 7, 8, 9, 10]) expect(STORIES[d].doneText).toBeUndefined();
   });
 
-  it('the ticket: the eight-slot picture, one table for its file, shape, slots and words', () => {
-    expect(TICKET.art).toBe('/onboarding/s/ticket-8stars.jpg');
+  it('the ticket: the tall picture of before (client 2026-11-28) with eight stamps; the eight-slot picture kept, unused', () => {
+    expect(TICKET.art).toBe('/onboarding/s/d2-ticket.jpg');
     expect(existsSync(`public${TICKET.art}`)).toBe(true);
-    // the slots in the visiting order, left to right, evenly spaced along the bottom
+    expect(existsSync('public/onboarding/s/ticket-8stars.jpg')).toBe(true);
+    expect(TICKET.aspect).toBeLessThan(1);
+    // the slots in the visiting order: the four painted along the bottom, then the four drawn in the stub's panel
     expect(TICKET.slots.map((s) => s.id)).toEqual(STAMPS.map((s) => s.id));
-    const xs = TICKET.slots.map((s) => s.x);
-    for (let k = 1; k < xs.length; k++) {
-      expect(xs[k] - xs[k - 1]).toBeGreaterThan(9.5);
-      expect(xs[k] - xs[k - 1]).toBeLessThan(11.5);
+    expect(TICKET.slots.filter((s) => s.painted).map((s) => s.id)).toEqual(['saturn', 'jupiter', 'mercury', 'mars']);
+    for (const s of TICKET.slots.filter((x) => !x.painted)) {
+      expect(s.x).toBeGreaterThan(26);
+      expect(s.x).toBeLessThan(46);
+      expect(s.y).toBeGreaterThan(68);
+      expect(s.y).toBeLessThan(80);
     }
-    expect(TICKET.row.y).toBeGreaterThan(70);
-    expect(TICKET.aspect).toBeGreaterThan(1.5);
   });
 
   it('M-R343: day 9 ends with オニモンク’s goodbye and the note that Uranus opens tomorrow', () => {
