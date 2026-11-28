@@ -124,8 +124,9 @@ jobs:
       - name: Upload the converted song to the private bucket (set=vcupload)
         if: ${{ inputs.set == 'vcupload' }}
         run: |
-          B=gs://obolo-order-models-asia-northeast1; DST=$B/story/rocket-song/
-          gcloud storage buckets describe "$B" --format='value(name)' || { echo "bucket not found"; exit 1; }
+          B=""; for c in gs://obolo-order-models-asia-northeast1 gs://obolo-order-models-asia-southeast1; do gcloud storage buckets describe "$c" --format='value(name)' >/dev/null 2>&1 && { B=$c; break; }; done
+          [ -n "$B" ] || { echo "bucket not found (tried asia-northeast1 and asia-southeast1)"; gcloud storage ls 2>&1 | head -20; exit 1; }
+          echo "bucket: $B"; DST=$B/story/rocket-song/
           K="$(jq -r '.inputs.key // ""' "$GITHUB_EVENT_PATH")"
           mkdir -p /tmp/vcup && K="$K" openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -pass env:K -in design/mv-art/vc-out.enc | tar -x -C /tmp/vcup
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
