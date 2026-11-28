@@ -152,6 +152,7 @@ function PreviewPlay() {
           completedAt={null}
           skipLabel={STORIES[day]?.skipLabel ?? DEFAULT_SKIP_LABEL}
           skippedText={STORIES[day]?.skippedText}
+          untilText={STORIES[day]?.untilText}
           canSkip
         onUnlocked={() => window.location.assign(nextDay)}
         />

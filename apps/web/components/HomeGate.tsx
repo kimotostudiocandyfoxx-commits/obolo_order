@@ -50,6 +50,7 @@ export function HomeGate({ children }: { children: ReactNode }) {
         skipLabel={STORIES[day]?.skipLabel}
         skippedText={STORIES[day]?.skippedText}
         doneText={STORIES[day]?.doneText}
+        untilText={STORIES[day]?.untilText}
         // the skip comes only after day 1 (M-R269, client 2026-11-24): from the end of day 2 (Bati's birth) the 24 hours are waited
         canSkip={day <= 1}
         // the wait is the time to talk with Bati (client 2026-11-22): its room is the Moon (P-BATI-ROOM)

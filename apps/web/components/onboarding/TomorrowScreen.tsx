@@ -25,7 +25,10 @@ export function TomorrowScreen({
   bati,
   note,
   doneText,
+  untilText,
 }: {
+  /** the words under the countdown (day 1: 「宇宙行きの切符が届くまで」, client 2026-11-28); default 「つぎの扉が ひらくまで」 */
+  untilText?: string;
   /** the day's 〔完了画面〕 words, over the countdown (D08-S011, after the Eclipse day) */
   doneText?: string;
   /** a line under the countdown (D03-S009: the 24 hours are for talking with {bati}) */
@@ -194,7 +197,7 @@ export function TomorrowScreen({
                 ))}
               </div>
             </div>
-            <p className="mt-6 text-[11px] tracking-[0.4em] text-amber-100/45">つぎの扉が ひらくまで</p>
+            <p data-testid="countdown-until" className="mt-6 text-[11px] tracking-[0.4em] text-amber-100/45">{untilText ?? 'つぎの扉が ひらくまで'}</p>
           </div>
 
           <div className="pb-safe absolute inset-x-0 bottom-0 flex flex-col items-center gap-4 pb-14">

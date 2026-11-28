@@ -28,12 +28,15 @@ export interface DayStory {
   doneText?: string;
   /** a line under the countdown when {bati} is there ({bati} = its name): D03-S009's note on the 24 hours with {bati} */
   waitNote?: string;
+  /** the words under the countdown (default 「つぎの扉が ひらくまで」) */
+  untilText?: string;
 }
 
 export const DEFAULT_SKIP_LABEL = '明日まで待てない';
 
 export const STORIES: Record<number, DayStory> = {
-  1: { steps: DAY1, skipLabel: DEFAULT_SKIP_LABEL, auth: false, skippedText: '24時間スキップした' }, // the script's telop (QA 14 R53)
+  // the script's telop (QA 14 R53); the countdown waits for the ticket MONBAN promised (client 2026-11-28)
+  1: { steps: DAY1, skipLabel: DEFAULT_SKIP_LABEL, auth: false, skippedText: '24時間スキップした', untilText: '宇宙行きの切符が届くまで' },
   // the end of day 2 (the Moon): D03-S009 — the 24 hours are waited (M-R269: no 〔明日まで待てない〕 after day 2; testers
   // still skip); they are {bati}'s (M-R223)
   2: {

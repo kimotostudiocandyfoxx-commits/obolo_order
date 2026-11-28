@@ -126,6 +126,7 @@ export function InviteStory({ code }: { code: string }) {
         completedAt={me.journeyCompletedAt}
         skipLabel={STORIES[1].skipLabel}
         skippedText={STORIES[1].skippedText}
+        untilText={STORIES[1].untilText}
         onUnlocked={async (skipped) => {
           try {
             setMe(await getApi().advanceJourney(skipped));

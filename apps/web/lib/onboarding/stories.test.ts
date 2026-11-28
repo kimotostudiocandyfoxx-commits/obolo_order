@@ -220,6 +220,10 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
     expect(wait).toBeGreaterThan(t.indexOf('batitalk'));
     expect(STORIES[2].waitNote).toBe('明日、星へ遊びに行くまでの24時間は、{bati}と好きなだけ話せます'); // M-R340: no look change before Order
   });
+  it("day 1's countdown waits for the ticket; the other days keep the default words (client 2026-11-28)", () => {
+    expect(STORIES[1].untilText).toBe('宇宙行きの切符が届くまで');
+    for (const d of Object.keys(STORIES).map(Number)) if (d !== 1) expect(STORIES[d].untilText).toBeUndefined();
+  });
   it('KIMORIN wears the sunglasses look after the dragon', () => {
     const dragon = steps.findIndex((s) => s.t === 'video' && s.motion === 'd2-dragon');
     expect(dragon).toBeGreaterThan(-1);
