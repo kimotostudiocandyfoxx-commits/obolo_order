@@ -20672,6 +20672,38 @@
     "docs/story-rewrite/design/refs/places/headquarters-gate.webp"
    ],
    "prompt": "REVERSE SHOT of the first reference picture: the camera now stands on the rocket's side of the outdoor launch plaza, looking back the other way at KIMORIN's FRONT. KIMORIN stands on the same reflective black-and-gold tiled floor with gold lines, in the same spot and at the same size as in the first reference, facing the camera and looking up past the camera at the gigantic rocket (which is behind the camera, out of frame; only its warm pink and cyan neon glow and golden ring light fall on him from the front-top). KIMORIN exactly as in the KIMORIN reference pictures: chibi white fox, white fox-mask face with blue leaf mark and blue spiral cheeks, tiny ω mouth, tall fox ears with blue insides, brass goggles over the eyes, a small silver box on the head, oversized patched WHITE LAB COAT with tool belt, white shoes with blue paw pads; his fan of white, black and vermilion feathers grows from his back, so from the front it spreads BEHIND him on both sides. White lab coat - NO red robe. BEHIND KIMORIN, in the background: the BACK SIDE of the secret society's headquarters from the headquarters reference picture - the black-and-gold city of tall spires, the huge glass dome and the great gate with the ringed celestial globe seen from behind, glittering gold lights, under the same dusk sky with gold-lit violet clouds; the plaza's tall black-and-gold obelisks and golden lanterns line both sides leading toward the headquarters. Exactly one character. Cinematic, same colours, light and rendering as the first reference. Vertical 9:16, edge to edge. No text, no watermark."
+  },
+  {
+   "id": "mvr/k-rev-trio-a",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "design/mv-art/out/mvr/k-reverse.jpg",
+    "docs/story-rewrite/design/refs/cast/obolon.jpg",
+    "docs/story-rewrite/design/refs/cast/monban.jpg"
+   ],
+   "prompt": "Edit the first reference picture: keep EXACTLY the same scene, camera, composition, KIMORIN (white lab coat, goggles, box on the head, feather fan behind him) in the foreground facing the camera, the back of the headquarters, the obelisks, lanterns, reflective floor, dusk sky, colours, light and rendering. ADD two figures standing BEHIND KIMORIN, a few metres further back on the plaza, between KIMORIN and the headquarters, silently watching, slightly eerie and mysterious: (1) OBOLON exactly as in the OBOLON reference picture: a floating pitch-black sphere with a thin glowing white corona ring around its edge like a solar eclipse and two white crescent closed eyes smiling, no mouth, floating in the air at about the height of a man's head inside a faint pillar of golden light; (2) MONBAN exactly as in the MONBAN reference picture: a tall adult figure in a long black hooded robe with gold lines and magic-circle patterns, a black masked face deep in the hood with ONE glowing golden eye on the forehead, a golden magic-circle halo disc behind the head, black gloves and boots with gold trim. KIMORIN does not notice them yet. Exactly these three characters, no others. Vertical 9:16. No text, no watermark. OBOLON floats behind KIMORIN on the left side, MONBAN stands behind KIMORIN on the right side; both are clearly visible, a little smaller than in the foreground because they are further back, MONBAN much taller than KIMORIN."
+  },
+  {
+   "id": "mvr/k-rev-trio-b",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "design/mv-art/out/mvr/k-reverse.jpg",
+    "docs/story-rewrite/design/refs/cast/obolon.jpg",
+    "docs/story-rewrite/design/refs/cast/monban.jpg"
+   ],
+   "prompt": "Edit the first reference picture: keep EXACTLY the same scene, camera, composition, KIMORIN (white lab coat, goggles, box on the head, feather fan behind him) in the foreground facing the camera, the back of the headquarters, the obelisks, lanterns, reflective floor, dusk sky, colours, light and rendering. ADD two figures standing BEHIND KIMORIN, a few metres further back on the plaza, between KIMORIN and the headquarters, silently watching, slightly eerie and mysterious: (1) OBOLON exactly as in the OBOLON reference picture: a floating pitch-black sphere with a thin glowing white corona ring around its edge like a solar eclipse and two white crescent closed eyes smiling, no mouth, floating in the air at about the height of a man's head inside a faint pillar of golden light; (2) MONBAN exactly as in the MONBAN reference picture: a tall adult figure in a long black hooded robe with gold lines and magic-circle patterns, a black masked face deep in the hood with ONE glowing golden eye on the forehead, a golden magic-circle halo disc behind the head, black gloves and boots with gold trim. KIMORIN does not notice them yet. Exactly these three characters, no others. Vertical 9:16. No text, no watermark. OBOLON and MONBAN stand side by side directly behind KIMORIN, centred, framed by the headquarters' gate; MONBAN towers behind KIMORIN's right shoulder, OBOLON floats behind his left shoulder at MONBAN's head height."
   }
  ],
  "redo": []
