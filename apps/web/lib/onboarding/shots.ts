@@ -233,8 +233,8 @@ export const SHOTS: Record<string, Shot> = {
       { src: 'obolon', x: 43, y: 56, h: 10, float: true },
       {
         src: 'kb-ots',
-        x: 86,
-        y: 116,
+        x: 70,
+        y: 118,
         h: 66,
         flip: true,
         blur: 4.5,

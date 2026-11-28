@@ -1139,7 +1139,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     if (lastClock?.t === 'clock') onClock?.(lastClock.on);
     const lastBack = before.find((s) => s.t === 'still' || s.t === 'video' || s.t === 'loop' || s.t === 'bgvideo' || s.t === 'black');
     const onStill = lastBack?.t === 'still';
-    if (lastBack?.t === 'still') {
+    // landing on a still step itself: that step puts its picture (and its shot) up — the one before, decoded late, must not
+    // come back over it (it did: the cut's shot was lost and a speaker's close-up covered the plate)
+    if (lastBack?.t === 'still' && cur?.t !== 'still') {
       // from black, once the picture is decoded (QA 12 R40: it came up in two or three frames); the motion behind is hidden
       const img = lastBack.image;
       if (lastBack.shot) setStillShots({ [img]: lastBack.shot });

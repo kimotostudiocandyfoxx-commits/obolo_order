@@ -34,7 +34,7 @@ def gate_open():
 
 # the part of s/d2-pinpon-end under his eyes: the cheeks' blue swirls, the mouth, the chin (x0, y0, x1, y1)
 CROP = (246, 550, 534, 680)
-SCALE = 2.5
+SCALE = 2.05
 CENTRE_Y = 0.47  # the pool of light a little above the middle (the speech bubble sits low)
 
 
