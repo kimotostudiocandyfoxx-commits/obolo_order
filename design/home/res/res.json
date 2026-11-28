@@ -516,5 +516,48 @@
   "voiceName": "KIMORIN（依頼主の録音から作った声。物語と同じ）",
   "semitones": -1,
   "speed": 0.85
+ },
+ "mikie": {
+  "name": "MIKIE⭐︎DRILL",
+  "voice": "a9b1d760c740482cbee9ff294ef1bdad",
+  "voiceName": "陽気なシニア女性",
+  "ref": "design/home/chibi-ref/mikie.jpg",
+  "end": "わよ",
+  "genre": "funk",
+  "bpm": 118,
+  "saturn": "人生はね、ドリルみたいに、まわしてナンボよ！",
+  "jupiter": "若いころの、わたしよ。",
+  "jupiterArt": "A beautiful retro 1980s city-pop style painting of a stylish young woman with a black bob haircut, round sunglasses and a bright pink blouse at a sunny seaside resort, palm trees and a vivid blue sky, glossy illustration poster. No text.",
+  "song": "ドリル・マダム",
+  "chops": [
+   "ドリル！",
+   "マダム！",
+   "まわしてナンボよ！"
+  ],
+  "radio": "MIKIEの、人生まめちしき",
+  "radioText": [
+   "はーい、MIKIE⭐︎DRILLよ！　人生まめちしき、いくわよ！",
+   "ひとつめ。いちばん古いドリルは、弓で棒をまわして、穴をあけたのよ。",
+   "ふたつめ。サングラスは、むかし、裁判官が表情をかくすために、使ったんですって。",
+   "みっつめ。うちの息子は天才発明家。……失敗も、ぜんぶ発明だって、言いはるのよ。",
+   "じゃあね、またまわしに来なさいよ！"
+  ],
+  "goods": "MIKIEのまんまるサングラス",
+  "goodsPrompt": "Product photo of stylish round black sunglasses with a small gold star on the hinge, on a pink silk scarf, soft daylight. Merchandise photo. No text.",
+  "goodsLine": "MIKIEのまんまるサングラスよ。かければ、あなたもスターよ！",
+  "book": "MIKIEと ちいさな はつめいか",
+  "pages": [
+   "MIKIEの むすこは、まいにち へんな ものを つくっていたわ。",
+   "ばくはつしても、こげても、MIKIEは「すごいわね！」って いったのよ。",
+   "むすこは、いまでは てんさい はつめいか。MIKIEの じまんよ。 おしまい。"
+  ],
+  "bookPrompts": [
+   "The character (a cheerful mother) watching a small white fox-faced child build a strange gadget at a kitchen table.",
+   "A comical puff of smoke from the gadget, the mother clapping and cheering, the child covered in soot but proud.",
+   "The mother hugging her grown son, a fox-faced inventor in a red robe with goggles, both smiling. Happy ending."
+  ],
+  "game": "まわせ！MIKIE",
+  "gameKind": "spin",
+  "gameLine": "まわせ！MIKIEよ！　タップで、くるくるまわるわよ！"
  }
 }

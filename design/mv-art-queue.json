@@ -19732,6 +19732,77 @@
    ],
    "always": false,
    "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The main character is a cute super-deformed chibi version of the character in the reference picture (KIMORIN⭐︎), friendly face, keep its look recognisable. No text, no letters. Page 3: The character still proudly posing with a thumbs up in the smoke, a ping-pong button glowing. Happy ending."
+  },
+  {
+   "id": "re/mikie/dad",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "always": false,
+   "prompt": "A beautiful retro 1980s city-pop style painting of a stylish young woman with a black bob haircut, round sunglasses and a bright pink blouse at a sunny seaside resort, palm trees and a vivid blue sky, glossy illustration poster. No text.",
+   "refs": []
+  },
+  {
+   "id": "re/mikie/goods",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "always": false,
+   "prompt": "Product photo of stylish round black sunglasses with a small gold star on the hinge, on a pink silk scarf, soft daylight. Merchandise photo. No text.",
+   "refs": [
+    "design/home/chibi-ref/mikie.jpg"
+   ]
+  },
+  {
+   "id": "re/mikie/book-1",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The mother is a cute super-deformed chibi version of the character in the reference picture (a cheerful woman with a black bob, round sunglasses and a pink blouse), keep her look recognisable. No text, no letters. Page 1: The character (a cheerful mother) watching a small white fox-faced child build a strange gadget at a kitchen table.",
+   "refs": [
+    "design/home/chibi-ref/mikie.jpg",
+    "design/home/chibi-ref/kimorin.jpg"
+   ]
+  },
+  {
+   "id": "re/mikie/book-2",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The mother is a cute super-deformed chibi version of the character in the reference picture (a cheerful woman with a black bob, round sunglasses and a pink blouse), keep her look recognisable. No text, no letters. Page 2: A comical puff of smoke from the gadget, the mother clapping and cheering, the child covered in soot but proud.",
+   "refs": [
+    "design/home/chibi-ref/mikie.jpg",
+    "design/home/chibi-ref/kimorin.jpg"
+   ]
+  },
+  {
+   "id": "re/mikie/book-3",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "always": false,
+   "prompt": "Children's picture book illustration, soft gentle watercolour and coloured pencil, warm pastel colours, simple, sweet and cute, rounded shapes, square composition, lots of white space at the edges. The mother is a cute super-deformed chibi version of the character in the reference picture (a cheerful woman with a black bob, round sunglasses and a pink blouse), keep her look recognisable. No text, no letters. Page 3: The mother hugging her grown son, a fox-faced inventor in a red robe with goggles, both smiling. Happy ending.",
+   "refs": [
+    "design/home/chibi-ref/mikie.jpg",
+    "design/home/chibi-ref/kimorin.jpg"
+   ]
   }
  ],
  "redo": []
