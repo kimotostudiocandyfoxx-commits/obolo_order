@@ -444,6 +444,177 @@
    "always": false,
    "cameraFixed": true,
    "prompt": "Snowflakes fall gently, the snow crab slowly moves its legs, small waves roll onto the snowy beach. Calm, seamless, the same painterly style, no cuts, no text."
+  },
+  {
+   "id": "mvr-r01-hq-aerial",
+   "image": "design/mv-art/out/mvr/r01-hq-aerial.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "always": false,
+   "model": "bytedance:2@2",
+   "prompt": "The camera glides slowly forward high above the city; fog drifts between the spires, gold lights flicker. Smooth, slow, cinematic motion in exactly the same 3DCG style. The camera stays fixed. Every character, face, body, costume and the composition stay exactly as in the first frame. No text."
+  },
+  {
+   "id": "mvr-r04-mutter",
+   "image": "design/mv-art/out/mvr/r04-mutter.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "always": false,
+   "model": "bytedance:2@2",
+   "prompt": "The character tilts its head slightly while thinking, hand at the chin; shadows shift subtly. Smooth, slow, cinematic motion in exactly the same 3DCG style. The camera stays fixed. Every character, face, body, costume and the composition stay exactly as in the first frame. No text."
+  },
+  {
+   "id": "mvr-r06-invite",
+   "image": "design/mv-art/out/mvr/r06-invite.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "always": false,
+   "model": "bytedance:2@2",
+   "prompt": "The hands slowly tilt the invitation card; dust floats in the candle light. Smooth, slow, cinematic motion in exactly the same 3DCG style. The camera stays fixed. Every character, face, body, costume and the composition stay exactly as in the first frame. No text."
+  },
+  {
+   "id": "mvr-r07-gate",
+   "image": "design/mv-art/out/mvr/r07-gate.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "always": false,
+   "model": "bytedance:2@2",
+   "prompt": "The small figure walks slowly through the gate; light rays shimmer. Smooth, slow, cinematic motion in exactly the same 3DCG style. The camera stays fixed. Every character, face, body, costume and the composition stay exactly as in the first frame. No text."
+  },
+  {
+   "id": "mvr-r08-turn",
+   "image": "design/mv-art/out/mvr/r08-turn.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "always": false,
+   "model": "bytedance:2@2",
+   "prompt": "The character turns its head toward the floating black sphere; golden light pulses softly. Smooth, slow, cinematic motion in exactly the same 3DCG style. The camera stays fixed. Every character, face, body, costume and the composition stay exactly as in the first frame. No text."
+  },
+  {
+   "id": "mvr-r08b-obolon",
+   "image": "design/mv-art/out/mvr/r08b-obolon.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "always": false,
+   "model": "bytedance:2@2",
+   "prompt": "The black sphere floats and bobs gently; golden dust swirls around it. Smooth, slow, cinematic motion in exactly the same 3DCG style. The camera stays fixed. Every character, face, body, costume and the composition stay exactly as in the first frame. No text."
+  },
+  {
+   "id": "mvr-r10-monban-cu",
+   "image": "design/mv-art/out/mvr/r10-monban-cu.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "always": false,
+   "model": "bytedance:2@2",
+   "prompt": "The single golden eye glows brighter; the halo disc behind slowly rotates; fog drifts. Smooth, slow, cinematic motion in exactly the same 3DCG style. The camera stays fixed. Every character, face, body, costume and the composition stay exactly as in the first frame. No text."
+  },
+  {
+   "id": "mvr-r11-shake",
+   "image": "design/mv-art/out/mvr/r11-shake.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "always": false,
+   "model": "bytedance:2@2",
+   "prompt": "The character shakes its head left and right firmly with hands raised. Smooth, slow, cinematic motion in exactly the same 3DCG style. The camera stays fixed. Every character, face, body, costume and the composition stay exactly as in the first frame. No text."
+  },
+  {
+   "id": "mvr-r14-launch",
+   "image": "design/mv-art/out/mvr/r14-launch.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "always": false,
+   "model": "bytedance:2@2",
+   "prompt": "The engines roar with fire; glowing smoke billows outward across the floor; sparks fly. Smooth, slow, cinematic motion in exactly the same 3DCG style. The camera stays fixed. Every character, face, body, costume and the composition stay exactly as in the first frame. No text."
+  },
+  {
+   "id": "mvr-r15-liftoff-pov",
+   "image": "design/mv-art/out/mvr/r15-liftoff-pov.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "always": false,
+   "model": "bytedance:2@2",
+   "prompt": "The rocket rises up and away into the sky on its pillar of fire; smoke drifts. Smooth, slow, cinematic motion in exactly the same 3DCG style. The camera stays fixed. Every character, face, body, costume and the composition stay exactly as in the first frame. No text."
+  },
+  {
+   "id": "mvr-r16-climb",
+   "image": "design/mv-art/out/mvr/r16-climb.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "always": false,
+   "model": "bytedance:2@2",
+   "prompt": "The rocket climbs higher through the clouds, its golden trail growing. Smooth, slow, cinematic motion in exactly the same 3DCG style. The camera stays fixed. Every character, face, body, costume and the composition stay exactly as in the first frame. No text."
+  },
+  {
+   "id": "mvr-r17-earth",
+   "image": "design/mv-art/out/mvr/r17-earth.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "always": false,
+   "model": "bytedance:2@2",
+   "prompt": "The Earth turns slowly below; the sunrise glow spreads along the horizon. Smooth, slow, cinematic motion in exactly the same 3DCG style. The camera stays fixed. Every character, face, body, costume and the composition stay exactly as in the first frame. No text."
+  },
+  {
+   "id": "mvr-r18-inside-awe",
+   "image": "design/mv-art/out/mvr/r18-inside-awe.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "always": false,
+   "model": "bytedance:2@2",
+   "prompt": "The character looks around slowly, moved; neon lights shimmer; the sushi plates glide along the lane. Smooth, slow, cinematic motion in exactly the same 3DCG style. The camera stays fixed. Every character, face, body, costume and the composition stay exactly as in the first frame. No text."
+  },
+  {
+   "id": "mvr-r19-inside-joy",
+   "image": "design/mv-art/out/mvr/r19-inside-joy.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "always": false,
+   "model": "bytedance:2@2",
+   "prompt": "The character spins happily with arms spread; the robe flares out. Smooth, slow, cinematic motion in exactly the same 3DCG style. The camera stays fixed. Every character, face, body, costume and the composition stay exactly as in the first frame. No text."
+  },
+  {
+   "id": "mvr-r20-sushi",
+   "image": "design/mv-art/out/mvr/r20-sushi.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "always": false,
+   "model": "bytedance:2@2",
+   "prompt": "The character lifts the sushi and takes a happy bite; plates glide along the lane. Smooth, slow, cinematic motion in exactly the same 3DCG style. The camera stays fixed. Every character, face, body, costume and the composition stay exactly as in the first frame. No text."
+  },
+  {
+   "id": "mvr-r21-smile",
+   "image": "design/mv-art/out/mvr/r21-smile.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "always": false,
+   "model": "bytedance:2@2",
+   "prompt": "The character smiles warmly and tilts its head; light particles float. Smooth, slow, cinematic motion in exactly the same 3DCG style. The camera stays fixed. Every character, face, body, costume and the composition stay exactly as in the first frame. No text."
+  },
+  {
+   "id": "mvr-r21b-window",
+   "image": "design/mv-art/out/mvr/r21b-window.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "always": false,
+   "model": "bytedance:2@2",
+   "prompt": "The character gazes at the Earth; the tail sways gently; stars twinkle. Smooth, slow, cinematic motion in exactly the same 3DCG style. The camera stays fixed. Every character, face, body, costume and the composition stay exactly as in the first frame. No text."
+  },
+  {
+   "id": "mvr-r22-moon",
+   "image": "design/mv-art/out/mvr/r22-moon.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "always": false,
+   "model": "bytedance:2@2",
+   "prompt": "The rocket glides slowly toward the Moon. Smooth, slow, cinematic motion in exactly the same 3DCG style. The camera stays fixed. Every character, face, body, costume and the composition stay exactly as in the first frame. No text."
+  },
+  {
+   "id": "mvr-r23-descent",
+   "image": "design/mv-art/out/mvr/r23-descent.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "always": false,
+   "model": "bytedance:2@2",
+   "prompt": "The rocket descends slowly toward the ground in front of the temple; dust swirls. Smooth, slow, cinematic motion in exactly the same 3DCG style. The camera stays fixed. Every character, face, body, costume and the composition stay exactly as in the first frame. No text."
   }
  ],
  "redo": []
