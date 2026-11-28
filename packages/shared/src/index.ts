@@ -23,6 +23,7 @@ export * from './cuteVoice';
 export * from './voiceTune';
 export * from './voiceVersion';
 export * from './micDiag';
+export * from './heardText';
 export * from './batiPersona';
 export * from './batiVariants';
 export * from './batiMemory';

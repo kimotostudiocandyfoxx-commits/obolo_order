@@ -33,3 +33,32 @@ export async function toMp3(input: Buffer, semitones = 0, maxSec = 30): Promise<
     await rm(dir, { recursive: true, force: true }).catch(() => undefined);
   }
 }
+
+/**
+ * How loud a recording is (ffmpeg volumedetect): the mean and the peak in dB (0 = full scale; −91 = digital silence).
+ * For the logs only (a dictated take that came back with no speech: was the recording itself silent?). Null when it
+ * cannot be read.
+ */
+export async function loudness(input: Buffer): Promise<{ meanDb: number; maxDb: number } | null> {
+  const dir = await mkdtemp(join(tmpdir(), 'obolo-vol-'));
+  const src = join(dir, 'in');
+  try {
+    await writeFile(src, input);
+    const err = await new Promise<string>((resolve) => {
+      const p = spawn('ffmpeg', ['-hide_banner', '-nostats', '-i', src, '-vn', '-af', 'volumedetect', '-f', 'null', '-']);
+      let e = '';
+      p.stderr.on('data', (d: Buffer) => (e += d.toString()));
+      p.on('error', () => resolve(''));
+      p.on('close', () => resolve(e));
+    });
+    const mean = /mean_volume:\s*(-?[\d.]+|-inf) dB/.exec(err)?.[1];
+    const max = /max_volume:\s*(-?[\d.]+|-inf) dB/.exec(err)?.[1];
+    if (mean === undefined || max === undefined) return null;
+    const n = (s: string) => (s === '-inf' ? -91 : Number(s));
+    return { meanDb: n(mean), maxDb: n(max) };
+  } catch {
+    return null;
+  } finally {
+    await rm(dir, { recursive: true, force: true }).catch(() => undefined);
+  }
+}

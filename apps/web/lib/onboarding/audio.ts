@@ -38,6 +38,27 @@ export function setAudioSession(type: 'ambient' | 'playback' = 'ambient'): boole
  * goes back to "ambient". No audioSession API (Android, older iOS): nothing to do.
  */
 let micOpen = false;
+/**
+ * R21 playtest (client 2026-11-28, iPhone Safari, day 2's favourite food): the story's music now plays on days 1 and 2,
+ * also under the mic — and both takes came back as 「00:00」 / noise. The phone's speaker playing into its own mic
+ * (and, on iPhone, Web Audio running while the capture starts) spoils the take, as on Saturn (QA 5 N14: the music is
+ * silent while the mic records). So every take is told to the page — from just before the mic is asked for until the
+ * take ends (lib/micStream.ts, lib/mic/hear.ts) — and the story quiets its music and stops a line being read meanwhile
+ * (components/onboarding/StoryPlayer.tsx).
+ */
+export const MIC_BUSY_EVENT = 'obolo:mic-busy';
+let busy = false;
+export function micBusy(on: boolean) {
+  if (busy === on) return;
+  busy = on;
+  if (typeof window === 'undefined' || typeof window.dispatchEvent !== 'function' || typeof CustomEvent === 'undefined') return;
+  try {
+    window.dispatchEvent(new CustomEvent(MIC_BUSY_EVENT, { detail: on }));
+  } catch {
+    /* nothing listens */
+  }
+}
+export const isMicBusy = () => busy;
 export function micSession(on: boolean) {
   micOpen = on;
   if (typeof navigator === 'undefined') return;

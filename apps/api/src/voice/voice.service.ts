@@ -1,7 +1,7 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { type LlmProvider, moderateText } from '@obolo/ai';
 import { LLM } from '../infra/tokens';
-import { batiSpeakSpeed, batiVoiceSilent, VOICE_MAX_BYTES, VOICE_MIME_TYPES, VOICE_SCRIPTS, VOICE_STYLES, type Me, type RegisterVoiceBody, type SpeakBody, type VoiceSlot } from '@obolo/shared';
+import { batiSpeakSpeed, batiVoiceSilent, cleanHeard, VOICE_MAX_BYTES, VOICE_MIME_TYPES, VOICE_SCRIPTS, VOICE_STYLES, type Me, type RegisterVoiceBody, type SpeakBody, type VoiceSlot } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { AppConfig, CONFIG } from '../config';
@@ -9,7 +9,7 @@ import { Database } from '../db/db';
 import { users, wallets } from '../db/schema';
 import { MediaService } from '../media/media.service';
 import { toMe } from '../users/users.service';
-import { toMp3 } from './audio';
+import { loudness, toMp3 } from './audio';
 import { canUseMedia } from './media-consent';
 import { activeBati } from '../look/batis';
 import { createVoiceModel, deleteVoiceModel, textToSpeech, type TtsOptions } from './fish.client';
@@ -119,7 +119,8 @@ export class VoiceService {
       throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'BAD_AUDIO', 'Could not read this recording');
     }
     try {
-      const text = (await this.llm.transcribe(mp3, 'audio/mp3')).replace(/\s+/g, ' ').trim().slice(0, 600);
+      // no speech in it: no words rather than the model's 「00:00」 / 「[ノイズ]」 (shared heardText)
+      const text = cleanHeard(await this.llm.transcribe(mp3, 'audio/mp3')).slice(0, 600);
       return { text };
     } catch (e) {
       this.log.warn(`stt failed: ${String(e)}`);
@@ -147,13 +148,22 @@ export class VoiceService {
       this.log.warn(`dictate convert failed (${mime}, ${body.length} bytes): ${String(e)}`);
       throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'BAD_AUDIO', 'Could not read this recording');
     }
+    let raw: string;
     try {
-      const text = (await this.llm.transcribe(mp3, 'audio/mp3')).replace(/\s+/g, ' ').trim().slice(0, 600);
-      return { text };
+      raw = await this.llm.transcribe(mp3, 'audio/mp3');
     } catch (e) {
       this.log.warn(`dictate failed: ${String(e)}`);
       throw apiError(HttpStatus.BAD_GATEWAY, 'STT_FAILED', 'Could not turn the voice into text');
     }
+    // R21 playtest (iPhone Safari): a take with no voice came back as 「00:00」 / noise and stood in the answer — the
+    // model's marks for "no speech" are taken out (shared heardText), and such a take is logged with its loudness, so
+    // the logs tell a silent recording (the phone gave no sound) from a voice the model could not hear
+    const text = cleanHeard(raw).slice(0, 600);
+    if (!text) {
+      const vol = await loudness(mp3);
+      this.log.warn(`dictate no speech (${mime}, ${body.length} bytes, model ${JSON.stringify(raw.trim().slice(0, 40))}, mean ${vol?.meanDb ?? '?'} dB, max ${vol?.maxDb ?? '?'} dB)`);
+    }
+    return { text };
   }
 
   async speak(userId: string, body: SpeakBody, origin: string): Promise<{ url: string; mediaId: string }> {

@@ -302,27 +302,45 @@ export const SILENT_PEAK = 0.012;
  * drifts up slowly (a loud room stops counting as a voice after a second or two) and down fast, speech is anything
  * clearly over it. `feed` returns whether a voice is heard now;
  * `quietFor` is how long it has been quiet since the last voice (ms), `spoke` whether any voice came at all.
+ *
+ * R21 playtest (client 2026-11-28, iPhone Safari): takes ended about two seconds after the mic opened, before a word —
+ * the click / gain swell of a capture starting (and the story's music in the speaker) counted as "a voice", and the
+ * quiet after it stopped the take. For a take (lib/mic/hear.ts TAKE_GATE): `warmMs` — the first moments only teach the
+ * gate the room, nothing counts as a voice; `minVoiceMs` — a voice is `spoke` only after this much of it in all (one
+ * loud frame is a knock, not a word). Both 0 by default (the mic check shows every sound).
  */
-export function voiceGate(opts: { ratio?: number; min?: number } = {}) {
+export function voiceGate(opts: { ratio?: number; min?: number; warmMs?: number; minVoiceMs?: number } = {}) {
   const ratio = opts.ratio ?? 2.2;
   const min = opts.min ?? 0.035;
+  const warmMs = opts.warmMs ?? 0;
+  const minVoiceMs = opts.minVoiceMs ?? 0;
   let floor = 0;
   let primed = false;
+  let firstAt = -1;
+  let lastAt = -1;
   let lastVoice = -1;
+  let voicedMs = 0;
   let peak = 0;
   let spoke = false;
   return {
     feed(level: number, now: number): boolean {
+      const step = lastAt < 0 ? 0 : Math.min(200, Math.max(0, now - lastAt));
+      lastAt = now;
+      if (firstAt < 0) firstAt = now;
       peak = Math.max(peak, level);
       if (!primed) {
         // never primed on a voice: someone who speaks the moment the mic opens is heard at once
         floor = Math.min(level, min);
         primed = true;
       } else floor = level < floor ? floor * 0.7 + level * 0.3 : floor * 0.99 + level * 0.01;
+      // the capture is still starting: it learns the room only
+      if (now - firstAt < warmMs) return false;
       const on = level > Math.max(min, floor * ratio);
       if (on) {
         lastVoice = now;
-        spoke = true;
+        // a frame's worth of voice (the first one counts as one tick of the meter)
+        voicedMs += step || 60;
+        if (voicedMs >= minVoiceMs) spoke = true;
       }
       return on;
     },
@@ -333,16 +351,50 @@ export function voiceGate(opts: { ratio?: number; min?: number } = {}) {
     get peak() {
       return peak;
     },
+    /** how long a voice was heard in all (ms) */
+    get voicedMs() {
+      return voicedMs;
+    },
   };
 }
 
-/** the recorder's take stops by itself: this long quiet after a voice, or this long with no voice at all, or the cap */
-export const AUTO_STOP = { afterVoiceMs: 1800, noVoiceMs: 8000, maxMs: 45000 } as const;
+/** the gate of a take that turns into words: a starting capture and a knock are no voice (R21 playtest) */
+export const TAKE_GATE = { warmMs: 400, minVoiceMs: 240 } as const;
+
+/**
+ * the recorder's take stops by itself: this long quiet after a voice, or this long with no voice at all, or the cap.
+ * R21 playtest: the quiet after a voice is 2.4 s (it was 1.8 s) — the story's mic says 「話しおわったら、もう一度タップ」,
+ * and a pause to think of the next word should not end the take.
+ */
+export const AUTO_STOP = { afterVoiceMs: 2400, noVoiceMs: 8000, maxMs: 45000 } as const;
 export function autoStop(s: { spoke: boolean; quietMs: number; ranMs: number }, o: { afterVoiceMs: number; noVoiceMs: number; maxMs: number } = AUTO_STOP): boolean {
   if (s.ranMs >= o.maxMs) return true;
   if (s.spoke) return s.quietMs >= o.afterVoiceMs;
   return s.ranMs >= o.noVoiceMs;
 }
+
+/* ───────────────────────── when the mic cannot be used: typing ───────────────────────── */
+
+/**
+ * R21 playtest (client 2026-11-28): both takes failed and the screen offered only the mic again. A voice field offers
+ * typing in one line (`TYPING_FALLBACK`) once the mic truly cannot be used: a fault the member cannot fix by speaking
+ * again (not allowed, no mic, busy, no recorder, no words from the server), or MISSES_TO_TYPE takes in a row that heard
+ * nothing (silent, no words, failed). A take with words starts the count again.
+ */
+export const MISSES_TO_TYPE = 2;
+const HARD: ReadonlySet<MicFault> = new Set(['denied', 'no-device', 'busy', 'unsupported', 'stt']);
+const SOFT: ReadonlySet<MicFault> = new Set(['silent', 'empty', 'failed', 'network']);
+/** the misses in a row after a take that ended with `fault` (null: words were heard) */
+export function nextMisses(misses: number, fault: MicFault | null): number {
+  if (!fault) return 0;
+  return SOFT.has(fault) || HARD.has(fault) ? misses + 1 : misses;
+}
+/** whether to offer typing now */
+export function offerTyping(misses: number, fault: MicFault | null): boolean {
+  return (!!fault && HARD.has(fault)) || misses >= MISSES_TO_TYPE;
+}
+/** PROVISIONAL wording (story chat to confirm): the one line beside 〔文字で入れる〕 */
+export const TYPING_FALLBACK = '声がうまく届かないみたい。文字で入れても大丈夫です';
 
 /* ───────────────────────── the mic check's verdict ───────────────────────── */
 

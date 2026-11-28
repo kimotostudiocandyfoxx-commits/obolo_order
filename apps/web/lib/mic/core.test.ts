@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest';
 import {
   AUTO_STOP,
   MAX_QUICK_ENDS,
+  MISSES_TO_TYPE,
+  TAKE_GATE,
+  nextMisses,
+  offerTyping,
   SILENT_PEAK,
   afterEmptyTake,
   allowSteps,
@@ -323,5 +327,49 @@ describe('story chat 2026-11-27: wording', () => {
     expect(recordNoticeOnce(store)).toBe(true);
     expect(recordNoticeOnce(store)).toBe(false);
     expect(recordNoticeOnce(null)).toBe(false);
+  });
+});
+
+describe('R21 playtest (client 2026-11-28): a take’s gate, and typing when the mic cannot be used', () => {
+  it('the take’s gate: the first moments only learn the room, and one loud frame is no voice', () => {
+    const g = voiceGate(TAKE_GATE);
+    let t = 0;
+    // the click / swell of a starting capture
+    for (let k = 0; k < 4; k++) expect(g.feed(0.6, (t += 60))).toBe(false);
+    expect(g.spoke).toBe(false);
+    for (let k = 0; k < 10; k++) g.feed(0.004, (t += 60));
+    // a knock: heard as loud, not as a voice yet
+    expect(g.feed(0.6, (t += 60))).toBe(true);
+    expect(g.spoke).toBe(false);
+    for (let k = 0; k < 10; k++) g.feed(0.004, (t += 60));
+    // a word: a quarter of a second of voice
+    for (let k = 0; k < 4; k++) g.feed(0.3, (t += 60));
+    expect(g.spoke).toBe(true);
+    expect(g.voicedMs).toBeGreaterThanOrEqual(TAKE_GATE.minVoiceMs);
+  });
+
+  it('the plain gate (the mic check) is unchanged: every sound shows', () => {
+    const g = voiceGate();
+    expect(g.feed(0.5, 60)).toBe(true);
+    expect(g.spoke).toBe(true);
+  });
+
+  it('a pause to think is not the end of a take', () => {
+    expect(AUTO_STOP.afterVoiceMs).toBeGreaterThanOrEqual(2400);
+    expect(autoStop({ spoke: true, quietMs: 2000, ranMs: 5000 })).toBe(false);
+  });
+
+  it('typing is offered after MISSES_TO_TYPE takes that heard nothing, or at once for a fault speaking again cannot fix', () => {
+    let m = 0;
+    m = nextMisses(m, 'empty');
+    expect(offerTyping(m, 'empty')).toBe(false);
+    m = nextMisses(m, 'silent');
+    expect(m).toBe(MISSES_TO_TYPE);
+    expect(offerTyping(m, 'silent')).toBe(true);
+    // words heard: the count starts again
+    expect(nextMisses(m, null)).toBe(0);
+    for (const f of ['denied', 'no-device', 'busy', 'unsupported', 'stt'] as MicFault[]) expect(offerTyping(0, f)).toBe(true);
+    for (const f of ['empty', 'silent', 'network', 'failed'] as MicFault[]) expect(offerTyping(0, f)).toBe(false);
+    expect(offerTyping(0, null)).toBe(false);
   });
 });

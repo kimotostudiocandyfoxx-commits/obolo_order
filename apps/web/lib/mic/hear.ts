@@ -1,7 +1,8 @@
 'use client';
 
 import { getApi } from '@/lib/api';
-import { micSession } from '@/lib/onboarding/audio';
+import { micBusy, micSession } from '@/lib/onboarding/audio';
+import { cleanHeard, heardNoSpeech } from '@obolo/shared';
 import { closeMic, openMic, quietMic } from '@/lib/micStream';
 import {
   AUTO_STOP,
@@ -14,6 +15,7 @@ import {
   pickMime,
   restartPlan,
   speechErrorAction,
+  TAKE_GATE,
   voiceGate,
   type HearEngine,
   type MicFault,
@@ -66,6 +68,33 @@ export type Hearing = {
 };
 
 const HEARING_HOLD_MS = 700;
+/**
+ * iPhone / iPad: after the recogniser refused, a moment before the recorder asks for the mic (R21 playtest: the
+ * recogniser's own capture must be let go first, or the new stream can come up muted)
+ */
+const IOS_HANDOVER_MS = 250;
+/** a stream that comes up muted (the system still has the mic) is waited for this long before recording */
+const UNMUTE_WAIT_MS = 1000;
+/** what a take was like, for the diagnostics (fits the report's `name`: letters, digits, ; = . only) */
+export function takeNote(o: { kind: string; live: boolean; peak: number; voicedMs: number; ms: number; muted?: boolean }): string {
+  return `${o.kind};l=${o.live ? 1 : 0};p=${Math.round(Math.min(1, o.peak) * 1000)};v=${Math.round(o.voicedMs / 10) * 10};ms=${Math.round(o.ms)}${o.muted ? ';m' : ''}`.slice(0, 40);
+}
+
+const anyMuted = (s: MediaStream) => s.getAudioTracks().some((t) => t.muted);
+/** resolves once every track is unmuted, or after `ms` whatever they are */
+function whenUnmuted(s: MediaStream, ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      resolve();
+    };
+    const timer = setTimeout(finish, ms);
+    for (const t of s.getAudioTracks()) t.addEventListener('unmute', () => !anyMuted(s) && finish(), { once: true });
+  });
+}
 
 /** takes in a row that ended without a word (the recogniser "listens" but hears nothing → the recorder) */
 let emptyTakes = 0;
@@ -101,9 +130,12 @@ export function hear(o: HearOpts): Hearing {
     let tick: ReturnType<typeof setInterval> | null = null;
     let wantStop = false;
     let dropped = false;
-    const startedAt = Date.now();
-    const gate = voiceGate();
+    let startedAt = Date.now();
+    // R21 playtest: a capture starting (a click, the gain coming up) is no voice
+    const gate = voiceGate(TAKE_GATE);
+    let mutedAtStart = false;
     let metered = 0;
+    let meterLive = false;
     const tidy = () => {
       if (tick) clearInterval(tick);
       tick = null;
@@ -121,86 +153,95 @@ export function hear(o: HearOpts): Hearing {
     };
     // asked for at once, inside the tap
     openMic().then(
-      (stream) => {
-        if (dropped || over) return quietMic();
-        const mime = pickMime(typeof MediaRecorder.isTypeSupported === 'function' ? (t) => MediaRecorder.isTypeSupported(t) : undefined);
-        try {
-          rec = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
-        } catch (e) {
-          quietMic();
-          return end(faultOfError(e), (e as Error)?.name);
-        }
-        const r = rec;
-        const chunks: Blob[] = [];
-        r.ondataavailable = (e) => e.data.size > 0 && chunks.push(e.data);
-        r.onerror = () => stopFn();
-        r.onstop = () => {
-          tidy();
-          quietMic();
-          if (dropped) return;
-          const ms = Date.now() - startedAt;
-          const type = blobType(r.mimeType, mime, currentEnv());
-          const blob = new Blob(chunks, { type });
-          // nothing came in at all (a muted mic, another app has it): say so, send nothing
-          if (blob.size === 0 || (metered > 5 && gate.peak < SILENT_PEAK)) {
-            reportMic({ path: o.path, fault: 'silent', engine: 'record', mime: type, name: blob.size === 0 ? 'empty-blob' : 'zero-level' });
-            over = true;
-            return o.onEnd({ fault: 'silent', heard: false, engine: 'record' });
-          }
-          // too short, or only the room's hush and never a voice: nothing to turn into words (and nothing sent)
-          if (ms < 350 || (metered > 5 && !gate.spoke && gate.peak < SILENT_PEAK * 4)) return end('empty');
-          o.onPhase?.('thinking');
-          const toWords = o.transcribe ?? (async (b: Blob) => (await getApi().dictate(b)).text);
-          toWords(blob).then(
-            (text) => {
-              if (dropped) return;
-              if (text.trim()) final(text.trim());
-              end(text.trim() ? null : 'empty');
-            },
-            (e) => {
-              if (dropped) return;
-              const f = faultOfApi(e);
-              reportMic({ path: o.path, fault: f, engine: 'record', mime: type, name: (e as { code?: string })?.code });
-              over = true;
-              o.onEnd({ fault: f, heard: false, engine: 'record' });
-            },
-          );
-        };
-        // the phone took the mic away in the middle (a call, the lock screen): the take ends with what it has
-        for (const t of stream.getAudioTracks()) t.addEventListener('ended', () => stopFn(), { once: true });
-        try {
-          r.start(250);
-        } catch (e) {
-          quietMic();
-          return end(faultOfError(e), (e as Error)?.name);
-        }
-        o.onPhase?.('listening');
-        meter = micMeter(stream);
-        const max = o.maxMs ?? AUTO_STOP.maxMs;
-        let was = false;
-        tick = setInterval(() => {
-          const now = Date.now();
-          const ran = now - startedAt;
-          if (meter?.live()) {
-            const lv = meter.level();
-            metered++;
-            gate.feed(lv, now);
-            // "hearing" holds a moment after the last sound, so the line does not flicker between syllables
-            const on = gate.spoke && gate.quietFor(now) < HEARING_HOLD_MS;
-            o.onLevel?.(lv);
-            if (on !== was) o.onPhase?.(on ? 'hearing' : 'listening');
-            was = on;
-            if (o.autoStop !== false && autoStop({ spoke: gate.spoke, quietMs: gate.quietFor(now), ranMs: ran }, { ...AUTO_STOP, maxMs: max })) return stopFn();
-          }
-          if (ran >= max) stopFn();
-        }, 60);
-        if (wantStop) stopFn();
-      },
+      (stream) => (anyMuted(stream) ? whenUnmuted(stream, UNMUTE_WAIT_MS).then(() => begin(stream)) : begin(stream)),
       (e) => {
         if (dropped) return;
         end(faultOfError(e), (e as Error)?.name ?? String((e as Error)?.message ?? ''));
       },
     );
+    function begin(stream: MediaStream) {
+      if (dropped || over) return quietMic();
+      mutedAtStart = anyMuted(stream);
+      startedAt = Date.now();
+      const mime = pickMime(typeof MediaRecorder.isTypeSupported === 'function' ? (t) => MediaRecorder.isTypeSupported(t) : undefined);
+      try {
+        rec = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+      } catch (e) {
+        quietMic();
+        return end(faultOfError(e), (e as Error)?.name);
+      }
+      const r = rec;
+      const chunks: Blob[] = [];
+      r.ondataavailable = (e) => e.data.size > 0 && chunks.push(e.data);
+      r.onerror = () => stopFn();
+      r.onstop = () => {
+        tidy();
+        quietMic();
+        if (dropped) return;
+        const ms = Date.now() - startedAt;
+        const type = blobType(r.mimeType, mime, currentEnv());
+        const blob = new Blob(chunks, { type });
+        // nothing came in at all (a muted mic, another app has it): say so, send nothing
+        const note = (kind: string) => takeNote({ kind, live: !!meterLive, peak: gate.peak, voicedMs: gate.voicedMs, ms, muted: mutedAtStart });
+        if (blob.size === 0 || (metered > 5 && gate.peak < SILENT_PEAK)) {
+          reportMic({ path: o.path, fault: 'silent', engine: 'record', mime: type, name: blob.size === 0 ? 'empty-blob' : note('zero-level') });
+          over = true;
+          return o.onEnd({ fault: 'silent', heard: false, engine: 'record' });
+        }
+        // too short, or only the room's hush and never a voice: nothing to turn into words (and nothing sent)
+        if (ms < 350 || (metered > 5 && !gate.spoke && gate.peak < SILENT_PEAK * 4)) return end('empty');
+        o.onPhase?.('thinking');
+        const toWords = o.transcribe ?? (async (b: Blob) => (await getApi().dictate(b)).text);
+        toWords(blob).then(
+          (raw) => {
+            if (dropped) return;
+            // R21 playtest: the model's 「00:00」 / 「[ノイズ]」 for a take with no voice is no words (shared heardText)
+            const text = cleanHeard(raw);
+            if (heardNoSpeech(raw)) reportMic({ path: o.path, fault: 'empty', engine: 'record', mime: type, name: note('nonspeech') });
+            if (text) final(text);
+            end(text ? null : 'empty');
+          },
+          (e) => {
+            if (dropped) return;
+            const f = faultOfApi(e);
+            reportMic({ path: o.path, fault: f, engine: 'record', mime: type, name: (e as { code?: string })?.code });
+            over = true;
+            o.onEnd({ fault: f, heard: false, engine: 'record' });
+          },
+        );
+      };
+      // the phone took the mic away in the middle (a call, the lock screen): the take ends with what it has
+      for (const t of stream.getAudioTracks()) t.addEventListener('ended', () => stopFn(), { once: true });
+      try {
+        r.start(250);
+      } catch (e) {
+        quietMic();
+        return end(faultOfError(e), (e as Error)?.name);
+      }
+      o.onPhase?.('listening');
+      // iPhone / iPad: a context of its own for the level (lib/mic/meter.ts)
+      meter = micMeter(stream, { own: currentEnv().os === 'ios' });
+      const max = o.maxMs ?? AUTO_STOP.maxMs;
+      let was = false;
+      tick = setInterval(() => {
+        const now = Date.now();
+        const ran = now - startedAt;
+        if (meter?.live()) {
+          meterLive = true;
+          const lv = meter.level();
+          metered++;
+          gate.feed(lv, now);
+          // "hearing" holds a moment after the last sound, so the line does not flicker between syllables
+          const on = gate.spoke && gate.quietFor(now) < HEARING_HOLD_MS;
+          o.onLevel?.(lv);
+          if (on !== was) o.onPhase?.(on ? 'hearing' : 'listening');
+          was = on;
+          if (o.autoStop !== false && autoStop({ spoke: gate.spoke, quietMs: gate.quietFor(now), ranMs: ran }, { ...AUTO_STOP, maxMs: max })) return stopFn();
+        }
+        if (ran >= max) stopFn();
+      }, 60);
+      if (wantStop) stopFn();
+    }
   };
 
   /* ── the browser's recogniser ── */
@@ -212,6 +253,8 @@ export function hear(o: HearOpts): Hearing {
     // one capture at a time: the stream kept from a recording would leave the recogniser deaf on iPhone
     closeMic();
     micSession(true);
+    // the story's music and lines go quiet while it listens (R21 playtest)
+    micBusy(true);
     let want = true;
     let quickEnds = 0;
     let startedAt = Date.now();
@@ -228,6 +271,7 @@ export function hear(o: HearOpts): Hearing {
       r.onerror = null;
       r.onresult = null;
       micSession(false);
+      micBusy(false);
       // words that never became final (iOS cuts the last ones on stop)
       if (interim.trim()) final(interim);
       interim = '';
@@ -260,8 +304,28 @@ export function hear(o: HearOpts): Hearing {
       interim = '';
       o.onInterim?.('');
       // the recorder says exactly what is wrong (not allowed, no mic, busy) — or simply works
-      if (canRecord()) return record();
+      if (canRecord()) {
+        if (currentEnv().os !== 'ios') return record();
+        // iPhone: the recogniser's capture is let go first; a stop or an abort meanwhile ends the take here
+        engine = 'record';
+        o.onPhase?.('opening');
+        const t = setTimeout(() => !over && record(), IOS_HANDOVER_MS);
+        stopFn = () => {
+          clearTimeout(t);
+          micSession(false);
+          micBusy(false);
+          end('empty');
+        };
+        abortFn = () => {
+          clearTimeout(t);
+          over = true;
+          micSession(false);
+          micBusy(false);
+        };
+        return;
+      }
       micSession(false);
+      micBusy(false);
       end(code === 'not-allowed' ? 'denied' : code === 'audio-capture' ? 'busy' : 'unsupported', code);
     };
     r.onresult = (e) => {
@@ -329,6 +393,7 @@ export function hear(o: HearOpts): Hearing {
         /* over */
       }
       micSession(false);
+      micBusy(false);
     };
     try {
       r.start();
