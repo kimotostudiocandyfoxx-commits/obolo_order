@@ -129,12 +129,55 @@ const OTS = (obolon?: ShotLayer['anim']): ShotLayer[] => [
   },
 ];
 
+/**
+ * Foregrounds laid over a background motion ('fore' steps): KIMORIN's back, large, soft and low in the frame, so the
+ * film reads as KIMORIN watching (client playtest 2026-11-28: day 2's universe in the Earth temple is the day-1 film).
+ */
+export const FOREGROUNDS: Record<string, ShotLayer[]> = {
+  'kimorin-watch': [
+    {
+      src: 'kb-back',
+      x: 24,
+      y: 122,
+      h: 62,
+      blur: 3,
+      drift: [-2, -1],
+      tone: 'brightness(0.62) contrast(1.05) saturate(0.9)',
+      key: 'linear-gradient(200deg, rgba(150,175,255,.55) 0%, rgba(255,205,140,.35) 45%, rgba(10,14,40,.6) 100%)',
+      rim: 'rgba(190,210,255,.55)',
+    },
+  ],
+};
+
 export const SHOTS: Record<string, Shot> = {
   // A — the gate
   // heading through the open gate toward the Earth temple (playtest 2026-11-28): a steady push past MONBAN; it is cut
   // off by the black of 「待ちなさい。」 before it arrives anywhere
   'gate-go': { from: C(1.0, 50, 52), to: C(1.32, 50, 47), dur: 3.2, cast: ['MONBAN'] },
   'reveal-whip': { from: C(1.0), to: C(1.06, 50, 46), dur: 5, enter: 'whip', fx: [{ k: 'glint', x: 47, y: 37, at: 0.55, size: 7 }], cast: ['KIMORIN'] },
+  // the gate exchange as shot / reverse shot (client playtest 2026-11-28, story M-R347): MONBAN over KIMORIN's shoulder —
+  // KIMORIN's back big and soft in the foreground, MONBAN before the open gate in focus; a slow push on MONBAN
+  'gate-ots-monban': {
+    from: C(1.08, 50, 62),
+    to: C(1.17, 52, 60),
+    dur: 7,
+    reframe: 0.9,
+    layers: [
+      { src: 'monban', x: 52, y: 86, h: 34, reflect: true, tone: 'brightness(0.86)', halo: true },
+      {
+        src: 'kb-ots',
+        x: 11,
+        y: 112,
+        h: 62,
+        blur: 4,
+        drift: [-3, 0],
+        tone: 'brightness(0.62) contrast(1.06) sepia(0.4) saturate(1.25)',
+        key: 'linear-gradient(250deg, rgba(255,190,110,.85) 0%, rgba(255,160,95,.3) 45%, rgba(30,30,60,.5) 100%)',
+        rim: 'rgba(255,205,140,.7)',
+      },
+    ],
+    cast: ['MONBAN'],
+  },
   'gate-two': { from: C(1.05, 50, 50), to: C(1.0), dur: 6, cast: ['KIMORIN', 'MONBAN'] },
   'invite-hand': { from: C(1.0), to: C(1.12, 50, 52), dur: 4, cast: ['KIMORIN', 'MONBAN'] },
   'kimorin-turn': { from: C(1.1, 50, 42), to: C(1.0), dur: 0.6, enter: 'settle', cast: ['KIMORIN'] },
@@ -142,6 +185,29 @@ export const SHOTS: Record<string, Shot> = {
 
   // B — the Earth temple
   'temple-dark': { from: C(1.0, 50, 55), to: C(1.05, 50, 55), dur: 4, fx: [{ k: 'beam', x: 50, y: 84, w: 8, at: 0.9 }] },
+  // the Earth temple exchange as shot / reverse shot (playtest 2026-11-28, story M-R347 addendum): OBOLON over KIMORIN's
+  // shoulder — OBOLON (the client's picture, laid over the painted orb in its place) floating in the hall, KIMORIN's back
+  // big and soft in the gold-lit foreground; a slow push on OBOLON
+  'tr-obolon': {
+    from: C(1.14, 55, 56),
+    to: C(1.26, 53, 56),
+    dur: 7,
+    layers: [
+      { src: 'obolon', x: 50.1, y: 62.5, h: 11.3, float: true },
+      {
+        src: 'kb-ots',
+        x: 7,
+        y: 116,
+        h: 68,
+        blur: 4.5,
+        drift: [-3, 0],
+        tone: 'brightness(0.5) contrast(1.08) sepia(0.45) saturate(1.3)',
+        key: 'linear-gradient(240deg, rgba(255,186,100,.85) 0%, rgba(230,150,70,.3) 45%, rgba(10,8,20,.6) 100%)',
+        rim: 'rgba(255,196,120,.7)',
+      },
+    ],
+    cast: ['OBOLON'],
+  },
   'temple-sky': { from: C(1.24, 50, 72), to: C(1.0, 50, 45), dur: 6.5, fx: [{ k: 'stars', n: 40, top: 0, bottom: 45 }] },
   'leave-gate': {
     from: C(1.0, 50, 55),

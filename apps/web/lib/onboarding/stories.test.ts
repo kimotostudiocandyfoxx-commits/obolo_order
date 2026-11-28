@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { hasMotion, PLANNED_MOTIONS } from './media';
 import { DAY_TITLE, labelIndex, type Step } from './script';
-import { SHOTS } from './shots';
+import { FOREGROUNDS, SHOTS } from './shots';
 import { AFTER_DAYS } from './after';
 import { SYS002_ALONE } from './sys002';
 import { DEFAULT_SKIP_LABEL, PREVIEW_ONLY, STORIES, STORIES_NEW_HOMES } from './stories';
@@ -116,7 +116,12 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
     const from = steps.findIndex((s) => s.t === 'say' && s.text === '待ちなさい。');
     const to = steps.findIndex((s) => s.t === 'action' && s.label === 'ロケットに乗る');
     const span = steps.slice(from, to + 1);
-    expect(span.filter((s) => s.t === 'video' || s.t === 'bgvideo' || s.t === 'loop')).toEqual([]);
+    // the one exception (client playtest 2026-11-28): the universe in the Earth temple is day 1's films 14 → 15, with
+    // KIMORIN's back in front
+    expect(span.filter((s) => s.t === 'video' || s.t === 'bgvideo' || s.t === 'loop')).toEqual([{ t: 'bgvideo', motion: 14, then: [15] }]);
+    const sky = span.findIndex((s) => s.t === 'bgvideo');
+    expect(span[sky - 1]).toEqual({ t: 'fore', layers: 'kimorin-watch' });
+    for (const l of Object.values(FOREGROUNDS).flat()) expect(existsSync(`public/onboarding/${l.src}.webp`), l.src).toBe(true);
     for (const s of span) if (s.t === 'still' && s.shot) expect(SHOTS[s.shot], s.shot).toBeDefined();
     for (const s of Object.values(SHOTS)) for (const l of s.layers ?? []) expect(existsSync(`public/onboarding/${l.src}.webp`), l.src).toBe(true);
     expect(JSON.stringify(span)).not.toMatch(/d2-floor-open|d2-descend|launch-pit|monban-pit|obolon-pit/);

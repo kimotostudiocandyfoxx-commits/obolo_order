@@ -37,7 +37,9 @@ export function Invitation({ inviter, message, onOpened, settled, leaving, fromM
       <div className="absolute inset-0 flex items-center justify-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={CARD} alt="" className={`absolute inset-0 h-full w-full scale-110 object-cover blur-2xl transition-opacity duration-1000 ${instant ? 'opacity-40' : 'animate-[fadeUp_1.2s_ease-out_both] opacity-40'}`} aria-hidden />
-        <div className={`relative aspect-[9/16] ${instant || fromMotion ? '' : 'animate-[cardOut_1.5s_cubic-bezier(.16,1,.3,1)_both]'}`} style={{ width: 'max(100cqw, calc(100cqh * 9 / 16))' }}>
+        {/* covers on a phone, contained on a wide screen — like the stage's stills (.story-fit) and the motion before it */}
+        <style>{'.inv-card{width:max(100cqw,calc(100cqh*9/16))}@media (min-aspect-ratio: 3/4){.inv-card{width:min(100cqw,calc(100cqh*9/16))}}'}</style>
+        <div className={`inv-card relative aspect-[9/16] ${instant || fromMotion ? '' : 'animate-[cardOut_1.5s_cubic-bezier(.16,1,.3,1)_both]'}`}>
           {cardOk ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={CARD} alt="" className="absolute inset-0 h-full w-full object-cover" onError={() => setCardOk(false)} />

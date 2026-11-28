@@ -87,9 +87,10 @@ export const DAY2: Step[] = [
   // A3 black again, only his mouth in a pool of light, moving with his voice — his eyes are not seen yet (playtest 3)
   { t: 'still', image: 's/d2-kimorin-mouth-only', fade: 0.5 },
   { t: 'say', who: 'KIMORIN', text: 'なんですか、この怪しい建物は。' }, // こちらの横まで歩いてきて、本部の建物を、下から上まで、じろじろと見上げる
-  // A4 MONBAN left, KIMORIN in his white coat right
-  { t: 'still', image: 's/d2-gate-two-inside', shot: 'gate-two', fade: 0.35 },
+  // A4 shot / reverse shot (playtest 2026-11-28, story M-R347): MONBAN over KIMORIN's shoulder, then KIMORIN
+  { t: 'still', image: 's/d2-gate-near', shot: 'gate-ots-monban', fade: 0.35 },
   { t: 'say', who: 'MONBAN', text: '誰だお前…。' },
+  { t: 'still', image: 's/d2-gate-two-inside', shot: 'gate-two', fade: 0.12 },
   { t: 'say', who: 'KIMORIN', text: '私ですか？私は、なんでもすぐに発明してしまう、天才発明家、KIMORINです。' },
   { t: 'say', who: 'MONBAN', text: 'この先はObolo Orderしか入れない…帰れ…。' },
   { t: 'say', who: 'KIMORIN', text: 'おやおや、帰れは失礼なのでは？　なぜなら、私は！招待客なんですよー？' },
@@ -143,16 +144,26 @@ export const DAY2: Step[] = [
   { t: 'sprite', image: null },
   { t: 'cam', move: 'shake' },
   { t: 'say', who: 'KIMORIN', text: 'うわ！なんやこの喋る黒い玉は！　宙に浮いとる！　どういう仕組み！？' },
-  { t: 'still', image: 's/d2-hall-kimorin-up' }, // ゴーグルを額に上げたKIMORIN
+  // KIMORIN ↔ OBOLON as shot / reverse shot (playtest 2026-11-28, story M-R347 addendum): OBOLON's lines over KIMORIN's
+  // shoulder, KIMORIN's facing us (goggles pushed up), a clean cut on each change of speaker
+  { t: 'still', image: 's/d2-hall', shot: 'tr-obolon', fade: 0.15 },
   { t: 'say', who: 'OBOLON', text: 'ここは、宇宙秘密結社だ。' },
+  { t: 'still', image: 's/d2-hall-kimorin-up', fade: 0.12 }, // ゴーグルを額に上げたKIMORIN
   { t: 'say', who: 'KIMORIN', text: '宇宙秘密結社?…すごそう...' },
+  { t: 'still', image: 's/d2-hall', shot: 'tr-obolon', fade: 0.12 },
   { t: 'say', who: 'OBOLON', text: 'お前は宇宙に行ってみたいと思うか？' },
+  { t: 'still', image: 's/d2-hall-kimorin-up', fade: 0.12 },
   { t: 'say', who: 'KIMORIN', text: 'え？宇宙、、、行ってみたい' },
+  { t: 'still', image: 's/d2-hall', shot: 'tr-obolon', fade: 0.12 },
   { t: 'say', who: 'OBOLON', text: '実はな、お前は、、、もう宇宙にいる。' },
   { t: 'sprite', image: null },
   // B6 神殿の天井が夜空になる。金の輪をまとった地球が浮かぶ: a slow dissolve while the camera tilts up to the Earth (replaces d2-sky)
+  // client playtest 2026-11-28: the SAME films as day 1 here (an exception to "no video in this span", asked for by the
+  // client) — 14 the ceiling becomes the night sky and the Earth comes up, 15 on from it (dissolving into each other,
+  // dualVideo) — with KIMORIN's back large and soft in front, watching
   { t: 'se', sound: 'star-sky' },
-  { t: 'still', image: 's/d2-hall-sky', shot: 'temple-sky', clear: true, fade: 2.5 },
+  { t: 'fore', layers: 'kimorin-watch' },
+  { t: 'bgvideo', motion: 14, then: [15] },
   { t: 'wait', s: 6.5 }, // 地球が浮かんでから、しばらく、見とれる間（client 2026-10-22／10-29）
   { t: 'say', who: 'KIMORIN', text: '……めちゃくちゃすごい！' }, // ゴーグルを額に押し上げる。目の切れ目が、青く光る
   // B8 MONBANが、入り口から歩いてくる (replaces d2-monban-walkin): out of the dark, he is there
@@ -160,13 +171,13 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'MONBAN', text: 'お前はObolo Orderに招待された...だから知る権利がある。' },
   { t: 'say', who: 'MONBAN', text: 'どうだ、宇宙へ行ってみるか？' },
   // ピンとくる → 咳払い: the 'it clicked' cut-in before the cough (client 2026-10-29)
-  { t: 'say', who: 'KIMORIN', text: 'はい！ぜひ！' },
+  { t: 'say', who: 'KIMORIN', text: 'はい！ぜひ！', duck: 0.2 }, // the music well down under it (playtest 2026-11-28), back after
   // KIMORIN catches on (勘付く): the client's Crimson Pulse (2026-11-28) from here until he goes home — it replaces the
   // comedy theme and its stop before 「…………。」
   { t: 'bgm', track: 'd2-crimson' },
   { t: 'spark', image: 's/d2-kimorin-pin-a', sound: 'pin' }, // 差し込み絵：ピンとくるKIMORIN
   { t: 'say', who: 'KIMORIN', text: '、、、は！、、ゴホンゴホン！' }, // 咳払い
-  { t: 'say', who: 'KIMORIN', text: 'これはこれは、、、とても手の込んだ手品ですね、、。' },
+  { t: 'say', who: 'KIMORIN', text: 'なるほどなるほど。わかりました。そういう手口ですか。' },
   { t: 'say', who: 'KIMORIN', text: '宇宙に行ってみたいかですって？ふふ、、' },
   { t: 'say', who: 'KIMORIN', text: 'もちろんそれには、、お金が、かかりますよねー？' },
   { t: 'say', who: 'MONBAN', text: 'かからない。' },

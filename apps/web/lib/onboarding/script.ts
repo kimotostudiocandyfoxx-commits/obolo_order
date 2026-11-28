@@ -149,6 +149,8 @@ export type Step =
   /** Cut to a black screen (until the next motion appears) and continue immediately. */
   /** fade: seconds to darken (〔暗くフェード〕), the story waits until it is black (QA 12 R39); none = a cut (〔暗転〕) */
   | { t: 'black'; fade?: number }
+  /** a foreground over the background motion (lib/onboarding/shots.ts FOREGROUNDS; null takes it away) */
+  | { t: 'fore'; layers: string | null }
   /** Start a looping background motion and continue immediately. */
   | { t: 'loop'; motion: MotionId }
   /** テロップ: a short line in the middle of the screen (e.g. "MONBANが現れた"). Never spoken. Tap to continue. */
@@ -178,6 +180,8 @@ export type Step =
       shot?: string;
       /** the directed scene: a move by hand — 'enter-left' | 'enter-right' | 'exit-left' | 'exit-right' | 'turn' | 'lean' | 'hop' | 'step-back', optionally ':WHO' */
       move?: string;
+      /** the music's level while this line is on screen (0–1 of the mix; instead of the usual dip under a voice): a line that must be heard clearly over loud music */
+      duck?: number;
     }
   /** A single button the visitor must press ("封を開く"). */
   | { t: 'action'; label: string }

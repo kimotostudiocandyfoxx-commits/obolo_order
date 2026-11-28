@@ -42,8 +42,8 @@ import { MercuryLesson } from '@/components/mercury/MercuryLesson';
 import type { LessonApi } from '@/lib/onboarding/lessonApi';
 import { madeFrom } from '@/lib/onboarding/made';
 import { Camera, Cast, CutIn, Motes, OFFSTAGE, Smoke, Spark, speakerSprite, StillMouth } from '@/components/story/Stage';
-import { ShotView } from '@/components/story/Shot';
-import { SHOTS, type Shot } from '@/lib/onboarding/shots';
+import { ForegroundView, ShotView } from '@/components/story/Shot';
+import { FOREGROUNDS, SHOTS, type Shot } from '@/lib/onboarding/shots';
 import { exprFor, reactFor } from '@/lib/story/expression';
 import { DialogueWindow, IconButton, MixerPanel, Telop } from '@/components/story/parts';
 import { filmWatched, markFilmWatched } from '@/lib/story/films';
@@ -352,6 +352,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   /** the shot each picture is moved with (lib/onboarding/shots.ts; client 2026-11-28): set by its still step, so a cut
    * that waits for its picture to decode keeps its shot, and a still step on the same picture reframes at once */
   const [stillShots, setStillShots] = useState<Record<string, string>>({});
+  /** a foreground over the background motion ('fore' steps, lib/onboarding/shots.ts FOREGROUNDS) */
+  const [fore, setFore] = useState<string | null>(null);
   const shotSpec = (img: string | null | undefined): Shot | null => (img && stillShots[img] ? SHOTS[stillShots[img]] ?? null : null);
   const underTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const clearStillOnShow = useRef(false);
@@ -563,7 +565,11 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           setReady(true);
           setBlackout(false);
           n++;
+        } else if (s.t === 'fore') {
+          setFore(s.layers);
+          n++;
         } else if (s.t === 'still') {
+          setFore(null);
           setWhite(false);
           setTicketArt(null);
           const shotId = s.shot ?? '';
@@ -655,6 +661,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           onPause?.();
           return;
         } else if (s.t === 'black') {
+          setFore(null);
           bgQueue.current = [];
           setTicketArt(null);
           setBlackFade(s.fade ?? 0);
@@ -887,11 +894,15 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     window.addEventListener('obolo:bgm-duck', f);
     return () => window.removeEventListener('obolo:bgm-duck', f);
   }, []);
+  // a line that asks for the music lower while it is on screen (say.duck; playtest 2026-11-28: 「はい！ぜひ！」)
+  const lineNow = steps[i];
+  const lineDuck = lineNow?.t === 'say' ? lineNow.duck : undefined;
   useEffect(() => {
     saveMix(mix);
     voice.current?.setVolume(mix.voice);
-    bgm.current?.setScale(mix.bgm * (talking ? VOICE_DIP : 1) * duck, talking ? 0.25 : 0.6);
-  }, [mix, talking, duck]);
+    const dip = lineDuck ?? (talking ? VOICE_DIP : 1);
+    bgm.current?.setScale(mix.bgm * dip * duck, talking || lineDuck !== undefined ? 0.25 : 0.6);
+  }, [mix, talking, duck, lineDuck]);
   useEffect(() => {
     const vc = voice.current;
     if (!vc) return;
@@ -1147,7 +1158,10 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     let q = i - 1;
     while (steps[q]?.t === 'label' || steps[q]?.t === 'scene') q--;
     addLine(chatLine(cur, `s${i}`) ?? (steps[q] ? chatLine(steps[q], `s${q}`) : null));
-    if (['video', 'bgvideo', 'black', 'bgm', 'loop', 'label', 'scene', 'set', 'magic', 'goto', 'still', 'sprite', 'whiteout', 'wait', 'vanish', 'se', 'spark', 'fx', 'screen', 'pause', 'clock', 'branch', 'invitation'].includes(cur.t)) {
+    // a foreground over the motion behind (a 'fore' step since the last still or black)
+    const lastFore = before.find((s) => s.t === 'fore' || s.t === 'still' || s.t === 'black' || s.t === 'arrive');
+    setFore(lastFore?.t === 'fore' ? lastFore.layers : null);
+    if (['video', 'bgvideo', 'black', 'bgm', 'loop', 'label', 'scene', 'set', 'magic', 'goto', 'still', 'sprite', 'fore', 'whiteout', 'wait', 'vanish', 'se', 'spark', 'fx', 'screen', 'pause', 'clock', 'branch', 'invitation'].includes(cur.t)) {
       run(i);
       return;
     }
@@ -1416,6 +1430,11 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           level={voiceLevel}
           className="story-fit pointer-events-none absolute inset-0 z-[2] h-full w-full"
         />
+      )}
+      {fore && !still && FOREGROUNDS[fore] && (
+        <div className="pointer-events-none absolute inset-0 z-[3]" aria-hidden>
+          <ForegroundView layers={FOREGROUNDS[fore]} />
+        </div>
       )}
       <style>{'@keyframes stillIn{from{opacity:0}to{opacity:1}}'}</style>
       </Camera>

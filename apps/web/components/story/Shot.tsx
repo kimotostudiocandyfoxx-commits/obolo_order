@@ -86,6 +86,25 @@ export function ShotView({ src, spec, mouth, under, reduced: forced }: { src: st
   );
 }
 
+/**
+ * Cut-outs over a MOTION (not a still): the foreground of a background film, in the same picture coordinates as a shot
+ * (9:16, covering the screen on a phone). Day 2's universe in the Earth temple (client playtest 2026-11-28): the day-1
+ * films 14 → 15 with KIMORIN's back large and out of focus in front, watching. Fades in; still with reduced motion.
+ */
+export function ForegroundView({ layers, dur = 8 }: { layers: ShotLayer[]; dur?: number }) {
+  const reduced = useReducedMotion();
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" style={{ containerType: 'size', animation: reduced ? undefined : 'shotFade 0.9s ease-out both' } as CSSProperties} aria-hidden>
+      <style>{SHOT_CSS}</style>
+      <div className="shot-box absolute left-1/2 top-1/2" style={{ translate: '-50% -50%' }}>
+        {layers.map((l, k) => (
+          <Layer key={`${l.src}-${k}`} l={l} dur={dur} reduced={reduced} epoch={0} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 const ENTER: Record<NonNullable<ShotSpec['enter']>, string> = {
   whip: 'shotWhip 0.38s cubic-bezier(.2,.8,.2,1) both',
   bloom: 'shotFade 0.2s linear both',
