@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { DAY1 } from './day1';
+import { DAY2 } from './day2';
+import { BGM_LEVELS, BGM_LOOPS } from './media';
 import { bgmAt, fill, labelIndex, mediaAt } from './script';
 
 describe('day 1 script', () => {
@@ -57,5 +59,36 @@ describe('day 1 script', () => {
     expect(DAY1[i + 2]).toEqual({ t: 'loop', motion: 13 });
     const name = DAY1.findIndex((s) => s.t === 'name');
     expect(mediaAt(DAY1, name)).toEqual({ motion: 13, loop: true });
+  });
+});
+
+describe('day 2 music (the client, 2026-11-28)', () => {
+  const at = (pred: (s: (typeof DAY2)[number]) => boolean) => bgmAt(DAY2, DAY2.findIndex(pred));
+  const say = (text: string) => (s: (typeof DAY2)[number]) => s.t === 'say' && s.text === text;
+  it("KIMORIN's theme from his appearance until just before the Earth temple", () => {
+    expect(at(say('待ちなさい。'))).toBe('monban');
+    expect(at((s) => s.t === 'video' && s.motion === 'd2-look-back')).toBe('d2-kimorin');
+    expect(at(say('誰だお前…。'))).toBe('d2-kimorin');
+    expect(at(say('気をつけなさい。'))).toBe('d2-kimorin');
+    expect(at((s) => s.t === 'video' && s.motion === '12-a')).toBe(null);
+  });
+  it('the temple music from the dark hall until KIMORIN catches on, then Crimson Pulse until he goes home', () => {
+    expect(at((s) => s.t === 'still' && s.image === 's/d2-hall-dark-kimorin')).toBe('d2-temple');
+    expect(at(say('……めちゃくちゃすごい！'))).toBe('d2-temple');
+    expect(at(say('はい！ぜひ！'))).toBe('d2-temple');
+    expect(at((s) => s.t === 'spark' && s.image === 's/d2-kimorin-pin-a')).toBe('d2-crimson');
+    expect(at(say('…………。'))).toBe('d2-crimson');
+    expect(at(say('宇宙行きの切符、私の家に、送っといてください。'))).toBe('d2-crimson');
+    expect(at((s) => s.t === 'bgvideo' && s.motion === 'd2-kimorin-leave')).toBe(null);
+    expect(at((s) => s.t === 'video' && s.motion === 'd2-descend')).toBe('launch');
+  });
+  it('every day-2 track has a file; the new ones have a level and loop points inside the file', () => {
+    const fs = require('node:fs') as typeof import('node:fs');
+    for (const s of DAY2) if (s.t === 'bgm' && s.track) expect(fs.existsSync(`public/onboarding/bgm-${s.track}.m4a`), s.track).toBe(true);
+    for (const t of ['d2-kimorin', 'd2-temple', 'd2-crimson']) {
+      expect(BGM_LEVELS[t]).toBeGreaterThan(0);
+      const [a, b] = BGM_LOOPS[t];
+      expect(b - a).toBeGreaterThan(40);
+    }
   });
 });

@@ -149,6 +149,33 @@ export const bgmUrl = (track: string) => `${MEDIA_BASE}/bgm-${track}.m4a`;
  */
 export const BGM_VOLUME = 0.9;
 
-/** Per-track level (client: the MONBAN music must be clearly audible). */
-export const BGM_LEVELS: Record<string, number> = { opening: 0.9, monban: 1, obolon: 0.9, comedy: 0.6, suspect: 0.75 };
+/**
+ * Per-track level (client: the MONBAN music must be clearly audible). Client 2026-11-28 (the lines must be clearly heard
+ * over all the music): the voices are about −16 LUFS while they speak (mono lines on both speakers), and under a line the
+ * music plays at level × the mixer (0.8) × VOICE_DIP (0.35), i.e. level − 11 dB. A track's loud parts (short-term
+ * loudness, 98th percentile) then sit ≥ 10 dB under the voice with: d1-hq 0.8 (its loud parts −13.4 LUFS; it was 0.9),
+ * d2-kimorin 1 (−15.2), d2-temple 0.85 (−13.8), d2-crimson 0.9 (−14.4).
+ */
+export const BGM_LEVELS: Record<string, number> = {
+  opening: 0.9,
+  monban: 1,
+  obolon: 0.9,
+  comedy: 0.6,
+  suspect: 0.75,
+  'd1-hq': 0.8,
+  'd2-kimorin': 1,
+  'd2-temple': 0.85,
+  'd2-crimson': 0.9,
+};
 export const bgmLevel = (track: string) => BGM_LEVELS[track] ?? BGM_VOLUME;
+/**
+ * Tracks that loop inside the file (seconds: [start, end]): the client's day-2 music (2026-11-28) ends in a fade or stops
+ * short, so its loop version (design/bgm/*-source.mp3 → bgm-<track>.m4a) crossfades the bars before `end` into the bars
+ * before `start`, and after `end` the file carries on with what follows `start` for 0.5 s — the jump end → start is
+ * seamless, and the first time through the whole opening is heard. Other tracks loop from their end to their start.
+ */
+export const BGM_LOOPS: Record<string, readonly [number, number]> = {
+  'd2-kimorin': [50.1574, 101.07],
+  'd2-temple': [66.1089, 154.78],
+  'd2-crimson': [82.9066, 168.44],
+};

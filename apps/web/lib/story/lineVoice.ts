@@ -131,6 +131,10 @@ export class LineVoice {
       el.preload = 'auto';
       el.setAttribute('playsinline', '');
       el.addEventListener('ended', () => this.onSpeaking(false));
+      el.addEventListener('error', () => {
+        this.onLoading(false);
+        this.onSpeaking(false);
+      });
       el.addEventListener('playing', () => {
         this.onLoading(false);
         this.onSpeaking(true);
@@ -252,7 +256,11 @@ export class LineVoice {
       }
       this.onSpeaking(false);
     }
-    if (this.el && !this.el.paused) this.el.pause();
+    if (this.el && !this.el.paused) {
+      this.el.pause();
+      // the <audio> fallback: a line cut short never fires 'ended' — without this the music stayed dipped
+      this.onSpeaking(false);
+    }
   }
 
   dispose() {

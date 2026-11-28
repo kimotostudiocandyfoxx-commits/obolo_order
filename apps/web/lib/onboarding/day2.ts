@@ -57,14 +57,15 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'MONBAN', text: '地球の神殿に行け…地下にロケット場がある' },
   // 門をくぐろうとした、その時
   { t: 'say', who: 'KIMORIN', text: '待ちなさい。' }, // 後ろから
-  { t: 'bgm', track: null, fade: 1.5 },
+  // the client's KIMORIN theme (2026-11-28) from his appearance until just before the Earth temple: it crossfades from
+  // MONBAN's theme as we look back, and replaces the pause, MONBAN's theme and the comedy theme that played here
+  { t: 'bgm', track: 'd2-kimorin' },
   { t: 'se', sound: 'whoosh' },
   { t: 'video', motion: 'd2-look-back' }, // ふり返る：来た道のほうを見た景色
   // 止め絵：来た道の逆光の中の人影（立っているだけの間は短く、すぐ話しはじめる） — the still with a mouth layer
   { t: 'still', image: 's/d2-reveal-end' },
   { t: 'wait', s: 0.6 },
   { t: 'say', who: 'KIMORIN', text: 'なんですか、この怪しい建物は。' }, // こちらの横まで歩いてきて、本部の建物を、下から上まで、じろじろと見上げる
-  { t: 'bgm', track: 'monban' },
   // the clip d2-monban-smoke showed KIMORIN already in the order's robe (client 2026-10-28: on day 2 he wears the white
   // coat and goggles until he changes on the Moon) — a still until the new cut is made (art/review)
   { t: 'still', image: 's/d2-gate-two-inside' }, // MONBANが左、白衣のKIMORINが右
@@ -76,7 +77,6 @@ export const DAY2: Step[] = [
   { t: 'still', image: 's/d2-invite-hand' }, // KIMORINが白衣のポケットから招待状を出して、MONBANに渡す
   { t: 'se', sound: 'pop' },
   { t: 'say', who: 'MONBAN', text: '……なんだ、招待か。' },
-  { t: 'bgm', track: 'comedy' }, // KIMORINの「気をつけなさい」「詐欺グループに違いありません」
   { t: 'video', motion: 'd2-kimorin-face' }, // KIMORINが門をくぐろうとして、止まる。こちらに向き直る
   // the film's last frame with a mouth layer, so he talks with a moving mouth (client 2026-10-29)
   { t: 'still', image: 's/d2-gate-kimorin-face' },
@@ -98,12 +98,13 @@ export const DAY2: Step[] = [
   { t: 'video', motion: '12-a' }, // 門をくぐり、神殿の奥へ
 
   { t: 'scene', id: 'D02-S004' }, // お金は、かからない（M-R207：削る前の形に戻した）
-  { t: 'bgm', track: null, fade: 5 },
+  // the client's day-2 temple music (2026-11-28) from the dark hall until KIMORIN catches on (the 〔ピンとくる〕 after
+  // 「はい！ぜひ！」): it replaces OBOLON's theme and its pause under 「……めちゃくちゃすごい！」
+  { t: 'bgm', track: 'd2-temple' },
   // d2-walk-in walked toward the gate and then swapped to the temple (client 2026-10-28) — a still of KIMORIN in the
   // dark hall until the new cut (walking into the temple) is made
   { t: 'still', image: 's/d2-hall-dark-kimorin' }, // 天球儀の大広間（暗い）
   { t: 'wait', s: 1.2 }, // the dark hall is seen before the light comes down (QA 12 R41)
-  { t: 'bgm', track: 'obolon' },
   { t: 'se', sound: 'portal' },
   { t: 'video', motion: 'd2-obolon-appear' }, // 光の柱の中に、黒い球のOBOLON
   { t: 'still', image: 's/d2-hall-kimorin' }, // 天球儀の大広間。光の柱の中にOBOLON、右手前に白衣のKIMORIN（QA 5 N7）
@@ -128,18 +129,18 @@ export const DAY2: Step[] = [
   { t: 'sprite', image: null },
   { t: 'bgvideo', motion: 'd2-sky' }, // 神殿の天井が夜空になる。金の輪をまとった地球が浮かぶ。KIMORINの横顔ごしに
   { t: 'wait', s: 6.5 }, // 地球が浮かんでから、しばらく、見とれる間（client 2026-10-22／10-29）
-  { t: 'bgm', track: null, fade: 0.8 }, // the music goes quiet for his wonder (client 2026-10-29)
   { t: 'say', who: 'KIMORIN', text: '……めちゃくちゃすごい！' }, // ゴーグルを額に押し上げる。目の切れ目が、青く光る
-  { t: 'bgm', track: 'obolon' },
   { t: 'bgvideo', motion: 'd2-monban-walkin' }, // MONBANが、入り口から歩いてくる
   { t: 'say', who: 'MONBAN', text: 'お前はObolo Orderに招待された...だから知る権利がある。' },
   { t: 'say', who: 'MONBAN', text: 'どうだ、宇宙へ行ってみるか？' },
   { t: 'still', image: 's/d2-hall-sky-monban' }, // 星空の大広間。MONBANが左、OBOLONが真ん中、KIMORINが右（QA 5 N8）
   // ピンとくる → 咳払い: the 'it clicked' cut-in before the cough (client 2026-10-29)
   { t: 'say', who: 'KIMORIN', text: 'はい！ぜひ！' },
+  // KIMORIN catches on (勘付く): the client's Crimson Pulse (2026-11-28) from here until he goes home — it replaces the
+  // comedy theme and its stop before 「…………。」
+  { t: 'bgm', track: 'd2-crimson' },
   { t: 'spark', image: 's/d2-kimorin-pin-a', sound: 'pin' }, // 差し込み絵：ピンとくるKIMORIN
   { t: 'say', who: 'KIMORIN', text: '、、、は！、、ゴホンゴホン！' }, // 咳払い
-  { t: 'bgm', track: 'comedy' }, // お金の話から、KIMORINの調子が戻る
   { t: 'say', who: 'KIMORIN', text: 'これはこれは、、、とても手の込んだ手品ですね、、。' },
   { t: 'say', who: 'KIMORIN', text: '宇宙に行ってみたいかですって？ふふ、、' },
   { t: 'say', who: 'KIMORIN', text: 'もちろんそれには、、お金が、かかりますよねー？' },
@@ -148,11 +149,12 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'MONBAN', text: '本当だ' },
   { t: 'say', who: 'KIMORIN', text: '後から請求書を送ってきたりしない？' },
   { t: 'say', who: 'OBOLON', text: 'しない。' },
-  { t: 'bgm', track: null, fade: 0.8 }, // 曲が、すっと止まる
   { t: 'say', who: 'KIMORIN', text: '…………。' },
   { t: 'say', who: 'KIMORIN', text: '、、、そうですか！それではめちゃくちゃ宇宙に行かせていただきます！' },
   { t: 'say', who: 'KIMORIN', text: '宇宙行きの切符、私の家に、送っといてください。' },
   { t: 'sprite', image: null },
+  // he goes home: the music fades as he leaves, his humming alone (quiet as before until the rocket pit's music)
+  { t: 'bgm', track: null, fade: 2.5 },
   { t: 'bgvideo', motion: 'd2-kimorin-leave' }, // 咳払いして、白衣の裾をひるがえし、門の外へ。扇の尾をぱたぱた、光の点になって空へ
   { t: 'say', who: 'KIMORIN', text: 'ふんふ、ふーん♪　宇宙、宇宙♪　うっちゅう、うっちゅう〜♪' }, // 鼻歌
   { t: 'se', sound: 'whoosh' },

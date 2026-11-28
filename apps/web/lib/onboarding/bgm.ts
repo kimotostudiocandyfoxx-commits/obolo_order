@@ -1,7 +1,7 @@
 'use client';
 
 import { hasPlaybackSession, masterBus, unlockAudio } from './audio';
-import { bgmLevel, bgmUrl } from './media';
+import { BGM_LOOPS, bgmLevel, bgmUrl } from './media';
 
 /**
  * Background music for the story.
@@ -62,6 +62,12 @@ export class Bgm {
       });
       el.addEventListener('error', () => {
         if (this.track && this.mode === 'element') this.toBuffer();
+      });
+      // a track that loops inside its file (BGM_LOOPS): back to its loop start once past the loop end (the file carries
+      // on past the end with the music after the start, so the time-update's lateness is not heard as a jump)
+      el.addEventListener('timeupdate', () => {
+        const lp = this.track ? BGM_LOOPS[this.track] : undefined;
+        if (lp && this.mode === 'element' && el.currentTime >= lp[1]) el.currentTime = lp[0] + (el.currentTime - lp[1]);
       });
       this.el = el;
     }
@@ -260,12 +266,17 @@ export class Bgm {
     const src = ctx.createBufferSource();
     src.buffer = buf;
     src.loop = true;
+    const lp = BGM_LOOPS[track];
+    if (lp && lp[1] <= buf.duration) {
+      src.loopStart = lp[0];
+      src.loopEnd = lp[1];
+    }
     src.connect(this.gain);
     const t = ctx.currentTime;
     this.gain.gain.cancelScheduledValues(t);
     this.gain.gain.setValueAtTime(0, t);
     this.gain.gain.linearRampToValueAtTime(this.muted ? 0 : bgmLevel(track) * this.scale, t + fadeIn);
-    src.start(t, offset % buf.duration);
+    src.start(t, lp && lp[1] <= buf.duration && offset >= lp[1] ? lp[0] + ((offset - lp[1]) % (lp[1] - lp[0])) : offset % buf.duration);
     this.source = src;
   }
 
