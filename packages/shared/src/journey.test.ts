@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { JOURNEY, JOURNEY_DONE, JOURNEY_LAST_DAY, JOURNEY_PAYMENT, journeyMeta, nextJourneyDay, planetIsOpen, planetOpenDay } from './journey';
+import { JOURNEY, JOURNEY_DONE, JOURNEY_LAST_DAY, JOURNEY_PAYMENT, journeyMeta, journeyWaitSkippable, nextJourneyDay, NO_SKIP_INTO_DAYS, planetIsOpen, planetOpenDay } from './journey';
 
 describe('journey (eleven days, story M-R341)', () => {
   it('days 1..10 visit Earth, the Moon, Saturn, Jupiter, Mercury, Mars, Venus, Pluto, Neptune, Uranus; day 11 is the Sun', () => {
@@ -28,5 +28,17 @@ describe('journey (eleven days, story M-R341)', () => {
     for (const p of ['pluto', 'neptune', 'uranus']) expect(planetIsOpen(p, JOURNEY_DONE)).toBe(true);
     expect(planetIsOpen('saturn', 1)).toBe(true);
     expect(planetIsOpen('uranus', null)).toBe(true);
+  });
+});
+
+describe('the wait between days (client 2026-11-28)', () => {
+  it('can be skipped after every day except 3 → 4 and 7 → 8', () => {
+    expect(NO_SKIP_INTO_DAYS).toEqual([4, 8]);
+    const skippable = Array.from({ length: JOURNEY_PAYMENT }, (_, i) => i + 1).filter(journeyWaitSkippable);
+    expect(skippable).toEqual([1, 2, 4, 5, 6, 8, 9, 10, 11]);
+    expect(journeyWaitSkippable(3)).toBe(false);
+    expect(journeyWaitSkippable(7)).toBe(false);
+    expect(journeyWaitSkippable(JOURNEY_DONE)).toBe(false);
+    expect(journeyWaitSkippable(0)).toBe(false);
   });
 });

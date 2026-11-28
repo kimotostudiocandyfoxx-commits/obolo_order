@@ -18,8 +18,9 @@ import type { Step } from './script';
 export interface DayStory {
   steps: Step[];
   /**
-   * Label of the skip button on that day's "また明日" countdown. Only days 1 and 2 have one (M-R207: the server skips the
-   * wait only while journeyDay ≤ 2); from day 3 the 24 hours are waited, so no label (HomeGate shows no button).
+   * Label of the skip button on that day's "また明日" countdown (default DEFAULT_SKIP_LABEL). Whether there is a button
+   * is the shared rule journeyWaitSkippable (client 2026-11-28: after every day but into days 4 and 8 — their words are
+   * lib/onboarding/waitWords.ts), not this field.
    */
   skipLabel?: string;
   /** The caption when the skip has rolled the clock to zero (instead of 「扉が開いた」). */

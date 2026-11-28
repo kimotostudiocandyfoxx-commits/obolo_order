@@ -8,6 +8,7 @@ import {
   nextJourneyDay,
   JOURNEY_PAYMENT,
   JOURNEY_WAIT_MS,
+  journeyWaitSkippable,
   MONTHLY_GRANT_MANA,
   type AtelierLayout,
   type CompleteJourneyDayBody,
@@ -329,15 +330,16 @@ export class UsersService {
   }
 
   /**
-   * Start the next day: allowed 24 h after the current day was finished. 〔明日まで待てない〕 skips only after day 1 (M-R269, client 2026-11-24; before: days 1 and
-   * 2, client 2026-11-22); from the end of day 2 the wait is kept. A couple of minutes' grace covers a phone clock that runs fast.
+   * Start the next day: allowed 24 h after the current day was finished. 〔明日まで待てない〕 skips the wait after every day
+   * except into days 4 and 8 (client 2026-11-28, `journeyWaitSkippable` / NO_SKIP_INTO_DAYS in @obolo/shared; before:
+   * only after day 1, M-R269). A couple of minutes' grace covers a phone clock that runs fast.
    */
   async advanceJourney(userId: string, skip: boolean): Promise<Me> {
     const cur = await this.load(userId);
     if (!cur.journeyCompletedAt || cur.journeyDay >= JOURNEY_DONE) return toMe(cur);
     mustHaveBirthYear(cur);
     // the tester entrance: a tester never waits (users/tester.ts; nobody else)
-    if (!isTester(cur) && !(skip && cur.journeyDay <= 1) && Date.now() < cur.journeyCompletedAt.getTime() + JOURNEY_WAIT_MS - 120_000) {
+    if (!isTester(cur) && !(skip && journeyWaitSkippable(cur.journeyDay)) && Date.now() < cur.journeyCompletedAt.getTime() + JOURNEY_WAIT_MS - 120_000) {
       throw apiError(HttpStatus.CONFLICT, 'NOT_YET', 'The next day has not opened yet');
     }
     const [u] = await this.db.write

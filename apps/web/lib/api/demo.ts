@@ -75,6 +75,7 @@ import {
   JOURNEY_EIGHT_KEY,
   JOURNEY_PAYMENT,
   JOURNEY_WAIT_MS,
+  journeyWaitSkippable,
   MEMBERS_DAYS,
   type MembersDay,
   MAKE_COST,
@@ -1990,7 +1991,8 @@ export class DemoApi implements Api {
   async advanceJourney(skip: boolean) {
     return this.patchMe((u) => {
       if (!u.journeyCompletedAt || u.journeyDay >= JOURNEY_DONE) return {};
-      if (!skip && Date.now() < Date.parse(u.journeyCompletedAt) + JOURNEY_WAIT_MS) throw new ApiError(409, 'NOT_YET', 'not yet');
+      // like the API: the skip works after every day but into days 4 and 8 (client 2026-11-28)
+      if (!(skip && journeyWaitSkippable(u.journeyDay)) && Date.now() < Date.parse(u.journeyCompletedAt) + JOURNEY_WAIT_MS) throw new ApiError(409, 'NOT_YET', 'not yet');
       return { journeyDay: nextJourneyDay(u.journeyDay), journeyCompletedAt: null };
     });
   }
