@@ -1,6 +1,7 @@
-# UI art — 2026-11-28T08:07:16.574Z
+# UI art — 2026-11-28T08:14:18.571Z
 
-Seedream 5.0 Pro / 2枚 / 約31円
+Seedream 5.0 Pro / 3枚 / 約46円
 
-- ✅ mvr/k-rev-trio-a
-- ✅ mvr/k-rev-trio-b
+- ✅ mvr/air-earth-a
+- ✅ mvr/air-earth-b
+- ✅ mvr/air-earth-c
