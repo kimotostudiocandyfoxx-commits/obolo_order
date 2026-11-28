@@ -20243,6 +20243,38 @@
     "docs/story-rewrite/design/refs/places/rocket.jpg"
    ],
    "prompt": "Edit the first reference picture (the golden hall): keep the place EXACTLY as it is - the same tall black-and-gold columns, the same giant glowing golden ring disc with the star points on the far wall, the same wide stairs, the same lanterns on both sides, the same polished reflective tiled floor, the same dome at the top, the same colours, light, camera and photographic style. Add ONE thing: the rocket from the second reference picture, EXACTLY its design (a long slender black hull with gold filigree, a pink neon line and cyan neon lines, an orange glowing emblem near the nose, sharp swept-back fins, three bronze engine nozzles), standing perfectly upright on the floor, nose pointing straight up, NOT tilted. The rocket is GIGANTIC, as tall as a 20-storey building (about 60 metres): the hall is scaled up to a colossal size to hold it. No people. No text, no letters, no watermark. Vertical 9:16, filled edge to edge, no white background. The rocket stands on a large round black-and-gold launch pad set into the reflective floor in front of the stairs; the golden ring glows behind the rocket; the rocket is so big that its nose nearly touches the dome at the top of the picture."
+  },
+  {
+   "id": "mvr/p-impact-a",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "design/mv-art/out/mvr/ref-impact.jpg",
+    "docs/story-rewrite/design/refs/places/rocket.jpg",
+    "docs/story-rewrite/design/refs/places/earth-temple-hall.jpg"
+   ],
+   "prompt": "Edit the first reference picture: keep EXACTLY the same dramatic low-angle composition, camera, lighting, colours, the golden hall (tall black-and-gold columns, the giant glowing golden ring disc behind the rocket, the dome, the stairs, the lanterns, the polished reflective floor) and the same rocket design (black hull with gold filigree, pink and cyan neon lines, orange emblem, sharp swept-back fins, three bronze engine nozzles). Change two things: (1) remove the small fox character completely - no characters, no people at all, fill that floor area with the matching reflective tiles; (2) the rocket must NOT float: it stands firmly ON THE GROUND - its long fin tips and the three engine nozzles rest on the floor (or on a low round black-and-gold launch pad on the floor), with contact shadows and its reflection in the tiles. The rocket is gigantic, as tall as a 20-storey building, towering over the tiny lanterns. Vertical 9:16, edge to edge. No text, no letters, no watermark. The rocket stands directly on the reflective floor in front of the stairs; the camera looks up steeply from near the floor so the rocket feels enormous and powerful."
+  },
+  {
+   "id": "mvr/p-impact-b",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "design/mv-art/out/mvr/ref-impact.jpg",
+    "docs/story-rewrite/design/refs/places/rocket.jpg",
+    "docs/story-rewrite/design/refs/places/earth-temple-hall.jpg"
+   ],
+   "prompt": "Edit the first reference picture: keep EXACTLY the same dramatic low-angle composition, camera, lighting, colours, the golden hall (tall black-and-gold columns, the giant glowing golden ring disc behind the rocket, the dome, the stairs, the lanterns, the polished reflective floor) and the same rocket design (black hull with gold filigree, pink and cyan neon lines, orange emblem, sharp swept-back fins, three bronze engine nozzles). Change two things: (1) remove the small fox character completely - no characters, no people at all, fill that floor area with the matching reflective tiles; (2) the rocket must NOT float: it stands firmly ON THE GROUND - its long fin tips and the three engine nozzles rest on the floor (or on a low round black-and-gold launch pad on the floor), with contact shadows and its reflection in the tiles. The rocket is gigantic, as tall as a 20-storey building, towering over the tiny lanterns. Vertical 9:16, edge to edge. No text, no letters, no watermark. The rocket stands on a low round black-and-gold launch pad set into the floor in front of the stairs; the camera looks up steeply from near the floor so the rocket feels enormous and powerful."
   }
  ],
  "redo": []
