@@ -67,14 +67,15 @@ export const SYS002: Step[] = [
 
   { t: 'label', id: 'sys-price' },
   { t: 'notice', text: '月額88円（毎月88マナの代金）。値上げはしません。いつでもやめられます。やめ方は、支払いの画面に書いてあります' },
-  { t: 'notice', text: 'Obolo Orderにならなくても、11日目まで旅は同じように続きます。旅の途中でマナジェムのマナを使い切ると、新しく作れなくなることがあります' },
+  // no day numbers shown (client 2026-11-28): the 11th day is the Sun (MONBAN's own lines keep their words)
+  { t: 'notice', text: 'Obolo Orderにならなくても、太陽に着くまで旅は同じように続きます。旅の途中でマナジェムのマナを使い切ると、新しく作れなくなることがあります' },
   { t: 'say', who: 'MONBAN', text: '……決めるのは、お前だ…。11日目まで待っても、いい…。' },
   {
     t: 'choice',
     key: 'f_join_choice',
     options: [
       { label: 'いま、Obolo Orderになる', goto: 'sys-now' },
-      { label: '11日目に決める', goto: 'sys-later' },
+      { label: '太陽で決める', goto: 'sys-later' },
     ],
   },
   { t: 'label', id: 'sys-now' },

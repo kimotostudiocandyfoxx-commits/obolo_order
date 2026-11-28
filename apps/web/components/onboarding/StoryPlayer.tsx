@@ -52,7 +52,7 @@ import { FilmReel } from './FilmReel';
 import { SaturnLesson } from '@/components/saturn/SaturnLesson';
 import { SealGate, sealGateSeen } from './SealGate';
 import { VenusLesson } from '@/components/venus/VenusLesson';
-import { bgmAt, fill, labelIndex, mediaAt, sayText, speakerName, type PictureFx, type Speaker, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
+import { bgmAt, DAY_TITLE, fill, labelIndex, mediaAt, sayText, speakerName, type PictureFx, type Speaker, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
 import { ChatLog, MessageBar, ReplyChips, SysLine, type Avatar, type ChatEntry, type ChatReveal } from '@/components/story/Chat';
 import { linesOf, stageOf } from '@/lib/onboarding/stage';
 import { plateFor, plateUrl, STILL_CLEAN } from '@/lib/onboarding/plates';
@@ -181,8 +181,6 @@ const AVATARS: Partial<Record<Speaker, Avatar>> = {
   ハットG: { src: '/onboarding/hatg-face.webp' },
   ボスG: { src: '/onboarding/bossg-face.webp' },
 };
-/** the day's title (「1日目」) stays a quiet title over the picture, not a line of the thread */
-const DAY_TITLE = /^\d+日目$/;
 /** a step that goes into the thread when it is reached */
 function chatLine(s: Step, id: string): ChatRaw | null {
   if (s.t === 'say') return { id, kind: 'them', who: s.who, text: s.text };
@@ -541,6 +539,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           n++;
         }
         else if (s.t === 'caption' && s.when && !varsRef.current[s.when]) n++;
+        else if (s.t === 'caption' && DAY_TITLE.test(s.text)) n++;
         else if (s.t === 'bgm') {
           clearTimeout(bgmLater.current);
           const go = () => (s.track === null && s.fade ? bgm.current?.fadeOut(s.fade) : bgm.current?.set(s.track));
@@ -2200,7 +2199,6 @@ function TapLine({ step, vars, onNext }: { step: Step; vars: StoryVars; onNext: 
   }
 
   // the day's title (「1日目」) goes on by itself: right after the opening film nobody knew a tap was wanted (client 2026-10-26)
-  if (step.t === 'caption' && DAY_TITLE.test(text)) return <DayTitle text={text} onNext={onNext} />;
   if (step.t === 'caption' || step.t === 'arrive') {
     return (
       <button className="absolute inset-0 z-10 flex items-end justify-center pb-[calc(18vh+env(safe-area-inset-bottom))]" {...fastTap(onNext)}>
@@ -2230,21 +2228,6 @@ function TapLine({ step, vars, onNext }: { step: Step; vars: StoryVars; onNext: 
 function NameNote({ value, extra }: { value: string; extra?: string }) {
   const bad = !!value.trim() && !nameCharsOk(value);
   return <p className={`text-[11px] tracking-wide ${bad ? 'text-amber-200' : 'text-white/45'}`}>{bad ? 'ひらがな・カタカナ・英語で入れてね' : `ひらがな・カタカナ・英語で${extra ? `　${extra}` : ''}`}</p>;
-}
-
-function DayTitle({ text, onNext }: { text: string; onNext: () => void }) {
-  useEffect(() => {
-    const t = setTimeout(onNext, 2600);
-    return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  return (
-    <button className="absolute inset-0 z-10 flex items-center justify-center" {...fastTap(onNext)}>
-      <span className="animate-[subIn_2.6s_ease-out_both] text-3xl tracking-[0.5em] text-amber-100 drop-shadow-[0_0_18px_rgba(255,210,120,0.6)]" style={{ fontFamily: '"Shippori Mincho", serif' }}>
-        {text}
-      </span>
-    </button>
-  );
 }
 
 function Cue() {

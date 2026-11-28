@@ -433,6 +433,12 @@ export function mediaAt(steps: Step[], i: number): { motion: MotionId; loop: boo
 }
 
 /** The BGM track that should be playing at step i (for resuming mid-story). */
+/**
+ * A day's number as a title (「2日目」, 「会員になって、1日目」): never shown to members (client 2026-11-28) — the story
+ * goes past it; the testers see the day on the review bar and the scene ids.
+ */
+export const DAY_TITLE = /^(?:会員になって、)?\d+日目$/;
+
 export function bgmAt(steps: Step[], i: number): string | null {
   for (let k = Math.min(i, steps.length - 1); k >= 0; k--) {
     const s = steps[k];

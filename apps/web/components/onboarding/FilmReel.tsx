@@ -36,7 +36,8 @@ export function FilmReel({ made, neo, muted, onDone }: { made: Made; neo: string
     };
   }, [reel, made.song, muted]);
 
-  const day = (n: number, place: string) => <p className="mb-3 text-center text-xs tracking-[0.3em] text-amber-200/70">{n}日目　{place}</p>;
+  // the planet only: no day numbers in the story (client 2026-11-28)
+  const day = (_n: number, place: string) => <p className="mb-3 text-center text-xs tracking-[0.3em] text-amber-200/70">{place}</p>;
 
   return (
     <div className="absolute inset-0 z-[12] flex flex-col items-center justify-center bg-black/85 px-4" onClick={next}>

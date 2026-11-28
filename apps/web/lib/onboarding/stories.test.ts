@@ -2,7 +2,9 @@ import { formatMana, JOURNEY_PAYMENT, MAKE_COST } from '@obolo/shared';
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { hasMotion, PLANNED_MOTIONS } from './media';
-import { labelIndex, type Step } from './script';
+import { DAY_TITLE, labelIndex, type Step } from './script';
+import { AFTER_DAYS } from './after';
+import { SYS002_ALONE } from './sys002';
 import { DEFAULT_SKIP_LABEL, PREVIEW_ONLY, STORIES } from './stories';
 
 const all = { ...STORIES, ...PREVIEW_ONLY };
@@ -223,6 +225,14 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
   it("day 1's countdown waits for the ticket; the other days keep the default words (client 2026-11-28)", () => {
     expect(STORIES[1].untilText).toBe('宇宙行きの切符が届くまで');
     for (const d of Object.keys(STORIES).map(Number)) if (d !== 1) expect(STORIES[d].untilText).toBeUndefined();
+  });
+  it('shows no day numbers to members: day titles are passed by, no notice or answer names a day (client 2026-11-28)', () => {
+    const all = [...Object.values(STORIES), ...Object.values(PREVIEW_ONLY)].flatMap((d) => d.steps).concat(...AFTER_DAYS, SYS002_ALONE);
+    for (const s of all) {
+      if (s.t === 'caption' && /\d+日目/.test(s.text)) expect(s.text).toMatch(DAY_TITLE);
+      if (s.t === 'notice') expect(s.text).not.toMatch(/\d+日目/);
+      if (s.t === 'choice') for (const o of s.options) expect(o.label).not.toMatch(/\d+日目/);
+    }
   });
   it('day 2 starts at once after the 24 hours, with no email check (client 2026-11-28)', () => {
     expect(STORIES[2].auth).toBe(false);
