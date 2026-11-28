@@ -20375,6 +20375,66 @@
     "docs/story-rewrite/design/refs/places/rocket.jpg"
    ],
    "prompt": "Redraw the rocket of the reference picture standing perfectly upright on a flat white floor, keeping EXACTLY its hull design, materials, colours and rendering (black hull with gold filigree, pink and cyan neon lines, orange emblem and pink ring near the nose, blue slits, three bronze engine nozzles). FINS: exactly THREE fins, evenly spaced around the hull, spread wide outward. IMPORTANT: the lowest point of every fin is EXACTLY level with the bottom rims of the engine nozzles. The fins do NOT hang down below the nozzles and do NOT end in long downward spikes: each fin's bottom edge is cut flat and horizontal at the nozzle level, like the flat feet of a lunar lander. The three fin bottoms and the three nozzles all stand together on the same flat floor line, with a soft shadow, the rocket sitting stable and natural. Plain white background, the whole rocket in frame. Vertical 9:16. No text, no letters, no watermark. Front view; the fins are broad, swept back and flare out far to the sides near the base, ending flat at the nozzle level."
+  },
+  {
+   "id": "mvr/p-hall-low",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/earth-temple-hall.jpg",
+    "design/mv-art/out/mvr/p-rocket3f-front.jpg"
+   ],
+   "prompt": "The place is EXACTLY the golden hall of the first reference picture: the same tall black-and-gold columns, the giant glowing golden ring disc with star points on the far wall, the wide stairs, the lanterns on both sides, the polished reflective tiled floor and the dome, the same colours, light and cinematic photographic style. In the hall stands the rocket of the second reference picture, EXACTLY its design: black hull with gold filigree, pink and cyan neon lines, orange emblem and pink ring near the nose, blue slits, three bronze engine nozzles, and swept-back fins whose bottoms are level with the nozzles. The rocket stands perfectly upright on the floor in the middle of the hall in front of the stairs, its nozzles and fin bottoms resting firmly ON the floor with contact shadows and reflections - it never floats. The rocket is GIGANTIC, as tall as a 20-storey building (about 60 metres), towering over the tiny lanterns and stairs; the hall is scaled up to a colossal size to hold it. No people, no characters. Vertical 9:16, filled edge to edge. No text, no letters, no watermark. LOW-ANGLE SHOT from near the floor looking steeply up at the rocket: the base and fins huge in the foreground, the hull soaring up toward the dome, the golden ring glowing behind it like a halo; overwhelming and powerful."
+  },
+  {
+   "id": "mvr/p-hall-front",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/earth-temple-hall.jpg",
+    "design/mv-art/out/mvr/p-rocket3f-front.jpg"
+   ],
+   "prompt": "The place is EXACTLY the golden hall of the first reference picture: the same tall black-and-gold columns, the giant glowing golden ring disc with star points on the far wall, the wide stairs, the lanterns on both sides, the polished reflective tiled floor and the dome, the same colours, light and cinematic photographic style. In the hall stands the rocket of the second reference picture, EXACTLY its design: black hull with gold filigree, pink and cyan neon lines, orange emblem and pink ring near the nose, blue slits, three bronze engine nozzles, and swept-back fins whose bottoms are level with the nozzles. The rocket stands perfectly upright on the floor in the middle of the hall in front of the stairs, its nozzles and fin bottoms resting firmly ON the floor with contact shadows and reflections - it never floats. The rocket is GIGANTIC, as tall as a 20-storey building (about 60 metres), towering over the tiny lanterns and stairs; the hall is scaled up to a colossal size to hold it. No people, no characters. Vertical 9:16, filled edge to edge. No text, no letters, no watermark. FRONT SHOT at eye level from the middle of the hall: the rocket centred and symmetrical, the golden ring glowing directly behind its upper hull, the stairs and lanterns at its feet, its reflection in the floor."
+  },
+  {
+   "id": "mvr/p-hall-top",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/earth-temple-hall.jpg",
+    "design/mv-art/out/mvr/p-rocket3f-front.jpg"
+   ],
+   "prompt": "The place is EXACTLY the golden hall of the first reference picture: the same tall black-and-gold columns, the giant glowing golden ring disc with star points on the far wall, the wide stairs, the lanterns on both sides, the polished reflective tiled floor and the dome, the same colours, light and cinematic photographic style. In the hall stands the rocket of the second reference picture, EXACTLY its design: black hull with gold filigree, pink and cyan neon lines, orange emblem and pink ring near the nose, blue slits, three bronze engine nozzles, and swept-back fins whose bottoms are level with the nozzles. The rocket stands perfectly upright on the floor in the middle of the hall in front of the stairs, its nozzles and fin bottoms resting firmly ON the floor with contact shadows and reflections - it never floats. The rocket is GIGANTIC, as tall as a 20-storey building (about 60 metres), towering over the tiny lanterns and stairs; the hall is scaled up to a colossal size to hold it. No people, no characters. Vertical 9:16, filled edge to edge. No text, no letters, no watermark. HIGH-ANGLE SHOT looking down from high up near the dome: the rocket's nose close to the camera at the top, the long hull receding down to its fins standing on the shining floor far below, the tiny lanterns and stairs around its base, the golden ring on the wall."
+  },
+  {
+   "id": "mvr/p-hall-wide",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/earth-temple-hall.jpg",
+    "design/mv-art/out/mvr/p-rocket3f-front.jpg"
+   ],
+   "prompt": "The place is EXACTLY the golden hall of the first reference picture: the same tall black-and-gold columns, the giant glowing golden ring disc with star points on the far wall, the wide stairs, the lanterns on both sides, the polished reflective tiled floor and the dome, the same colours, light and cinematic photographic style. In the hall stands the rocket of the second reference picture, EXACTLY its design: black hull with gold filigree, pink and cyan neon lines, orange emblem and pink ring near the nose, blue slits, three bronze engine nozzles, and swept-back fins whose bottoms are level with the nozzles. The rocket stands perfectly upright on the floor in the middle of the hall in front of the stairs, its nozzles and fin bottoms resting firmly ON the floor with contact shadows and reflections - it never floats. The rocket is GIGANTIC, as tall as a 20-storey building (about 60 metres), towering over the tiny lanterns and stairs; the hall is scaled up to a colossal size to hold it. No people, no characters. Vertical 9:16, filled edge to edge. No text, no letters, no watermark. EXTREMELY WIDE SHOT from far back at the entrance of the hall: the whole colossal hall with rows of columns, the rocket standing in the centre in front of the stairs and the golden ring, the vast reflective floor in the foreground making everything feel enormous."
   }
  ],
  "redo": []
