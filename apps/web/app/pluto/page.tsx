@@ -10,5 +10,6 @@ import { showsNewHome } from '@/lib/planetHomes';
  */
 export default function PlutoPage() {
   if (!showsNewHome('pluto')) notFound();
-  return <NewPlanetScreen planet="pluto" />;
+  // the journey lock of the other outer planets: Pluto opens on day 8 of the first journey (M-R341)
+  return <NewPlanetScreen planet="pluto" gate="冥王星" />;
 }

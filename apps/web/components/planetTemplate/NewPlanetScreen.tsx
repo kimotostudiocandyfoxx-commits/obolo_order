@@ -16,7 +16,6 @@ import { LivePlanetHome } from './LivePlanetHome';
  */
 export function NewPlanetScreen({ planet, auth = false, gate }: { planet: HomePlanet; auth?: boolean; gate?: string }) {
   const home = <LivePlanetHome planet={planet} emptyAsSample={false} hrefOf={(p) => `/${p}`} className="relative h-full w-full overflow-hidden bg-[#04050d]" />;
-  if (planet === 'pluto') return <div className="h-svh">{home}</div>;
   const wall = (x: ReactNode) => (auth ? <RequireAuth>{x}</RequireAuth> : x);
   const lock = (x: ReactNode) =>
     gate ? (
@@ -26,6 +25,8 @@ export function NewPlanetScreen({ planet, auth = false, gate }: { planet: HomePl
     ) : (
       x
     );
+  // Pluto has no header (it is not in the planet list): the same wall and journey lock (day 8, M-R341), full height
+  if (planet === 'pluto') return wall(lock(<div className="h-svh">{home}</div>));
   return (
     <PlanetShell id={planet} bare>
       <DemoBanner />
