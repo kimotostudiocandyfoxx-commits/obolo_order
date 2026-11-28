@@ -1,0 +1,116 @@
+"""Day 2's rewrite with pictures (client 2026-11-28, design/refs/2026-11-28-rocket/storyboard.md): writes
+design/rocket-art-queue.json — the great hall's background plates (no characters) and KIMORIN's back views on chroma
+green — painted by the "UI art" workflow (queue=design/rocket-art-queue.json) into design/cast/rocket/.
+
+    python3 scripts/rocket/queue.py design/rocket-art-queue.json
+"""
+import json, sys
+R = 'design/refs/2026-11-28-rocket/refs/'
+STYLE = ("Vertical 9:16 frame for a premium Japanese anime feature film, in exactly the look of the reference pictures: "
+         "cinematic photoreal-painterly 3DCG dark fantasy, deep blacks, polished black stone with fine real-gold inlay, warm golden lantern light "
+         "against a deep evening sky (indigo above, a thin band of amber and rose at the horizon, gold-lit clouds), crisp detail, "
+         "physically plausible light, gentle atmospheric haze for depth, film-grade composition. "
+         "No text, no letters, no numbers, no writing, no logos, no watermark anywhere.")
+HALL = ("THE GREAT HALL OF THE SOCIETY (結社大広間) deep inside the Earth temple: a vast ceremonial hall OPEN TO THE EVENING SKY (no roof). "
+        "Its floor is polished black stone like a dark mirror, inlaid with thin gold lines in large geometric star patterns, reflecting every light. "
+        "Along both sides stand rows of tall black obelisks carved with fine gold ornament, and between them ornate golden lanterns on black stone posts glow warmly. "
+        "At the far end, a broad flight of black-and-gold steps rises to a ROUND PLATFORM, and on it stands THE ROCKET, towering like a 20-storey building: "
+        "a slender black rocket with an elegant pointed nose, its hull engraved with gold filigree and an eye emblem, glowing neon lines running along it "
+        "(one bright magenta-pink line down the centre with a pink ring-and-dot near the nose, thin teal-cyan lines beside it, small blue panels), "
+        "EXACTLY THREE swept fins whose lower tips are level with the bronze engine nozzles (copy the rocket of the rocket reference picture exactly), "
+        "a small arched glowing door at its base reached by the steps. Behind the rocket floats an enormous ring of golden light, engraved with faint runes, "
+        "with four small star-like glints on it.")
+PLATE = "This is an EMPTY background plate: no people, no characters, no creatures, no figures, no animals anywhere in the picture."
+KIM = ("KIMORIN (copy him exactly from the character reference pictures): a small chibi white fox-spirit about three heads tall; big pointed white fox ears "
+       "with deep blue insides; a small silver box-shaped device on top of his head between the ears with a thin coiled cable; brass steampunk goggles "
+       "pushed up onto his forehead; a white, slightly worn laboratory coat over a black shirt with a leather tool belt and small brass gadgets; white paws "
+       "with blue paw pads; behind him a large round fan of tail feathers growing from his body: white inside, black outside with red-orange tips.")
+GREEN = ("Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no ground shadow, "
+         "no light spill, no other objects. Nothing on the character is green. Clean sharp outline. The whole figure is in the picture with a small margin.")
+
+def plate(i, prompt, refs, w=1152, h=2048):
+    return {"id": i, "w": w, "h": h, "size": [1080, 1920], "refs": refs, "prompt": prompt + " " + STYLE}
+
+items = [
+    plate("gh-wall-open",
+          "Edit the first picture: keep the place EXACTLY the same — the same dark temple hall, the same camera, framing, perspective, golden armillary rings "
+          "and the vertical beam of light in the middle, the same floor circles and colours. Change only this: the tall back wall straight behind the beam of light "
+          "has split down the middle and its two huge carved black-and-gold stone doors have slid open to the left and right, revealing behind them a long, "
+          "straight corridor that leads far away into the depth, lined with black obelisk pillars and golden lanterns, warm golden light pouring out of it "
+          "onto the floor of the hall. Remove the black orb that floats in the beam of light: the beam is empty. " + PLATE,
+          ["apps/web/public/onboarding/s/d2-hall.jpg"]),
+    plate("gh-corridor",
+          "A long, straight, majestic corridor deeper into the secret society's temple, seen from the middle of its floor at the height of a small child, "
+          "one-point perspective, perfectly symmetrical: high black stone walls with gold filigree, a row of tall black obelisk pillars on each side, golden "
+          "lanterns on black posts between them glowing warmly, the polished black floor with a gold line running straight down its centre reflecting the lanterns. "
+          "Far away at the end, a tall arched opening glows with bright warm evening light and a glimpse of a golden ring of light — the great hall beyond. "
+          "Fine dust floating in the shafts of light. The lower 35% of the picture is plain floor. " + PLATE,
+          [R + "ok-look.jpg", R + "plate-base-wide.jpg"]),
+    plate("gh-hall-wide",
+          HALL + " CAMERA: a grand establishing shot from the entrance end of the hall, low camera at the height of a small child, looking straight down the "
+          "central axis toward the rocket, perfectly symmetrical. The rocket and its ring stand in the upper middle, the nose reaching about 8% below the top edge; "
+          "the round platform and steps sit at about 62% of the picture's height; the long polished floor fills the lower third, empty, its gold lines leading the eye "
+          "to the steps. The rows of obelisks and lanterns frame both sides. " + PLATE,
+          [R + "ok-look.jpg", R + "p-rocket3f-front.jpg", R + "plate-base-wide.jpg"]),
+    plate("gh-hall-low",
+          HALL + " CAMERA: a dramatic low-angle shot from the foot of the steps looking UP at the rocket towering into the sky: the bronze nozzles and the three fins "
+          "fill the lower part above the steps, the hull rises and narrows with strong perspective, the nose at the very top of the picture against gold-lit clouds, "
+          "the enormous golden ring of light behind the hull. The glowing door and the steps at the bottom. " + PLATE,
+          [R + "plate-base-low.jpg", R + "p-rocket3f-front.jpg", R + "ok-look.jpg"]),
+    plate("gh-ots-base",
+          HALL + " CAMERA: a medium shot at the eye height of a small child standing on the hall floor about 15 metres from the steps: the steps and the round "
+          "platform across the middle of the picture, the base of the rocket with its three fins, nozzles and glowing arched door rising out of the top of the frame "
+          "(the nose is not visible), part of the golden ring behind it, two golden lanterns at the foot of the steps left and right. In front of the steps a wide empty "
+          "area of polished black floor (the lower 45% of the picture) where people will stand. " + PLATE,
+          [R + "plate-base-low.jpg", R + "ok-gate.jpg", R + "p-rocket3f-front.jpg"]),
+    plate("gh-reverse",
+          "THE GREAT HALL OF THE SOCIETY seen in the REVERSE direction: from the foot of the rocket's steps looking back across the vast hall toward its entrance. "
+          "The hall is open to the evening sky (deep indigo with gold-lit clouds, a band of amber at the horizon). The polished black mirror floor with gold star "
+          "patterns, the rows of black obelisks with gold ornament and the golden lanterns run away from the camera on both sides toward a colossal black-and-gold "
+          "arched gateway at the far end, from which the long corridor glows warmly; beyond the walls the spires and the glass dome of the Earth temple rise against the sky. "
+          "Warm golden light from behind the camera (from the rocket's ring) rakes across the floor. Low camera at the height of a small child. The lower 45% is empty "
+          "floor in the middle ground. " + PLATE,
+          [R + "k-reverse.jpg", R + "ok-trio.jpg", R + "ok-aerial.jpg"]),
+    plate("gh-gem-monban",
+          "Close-up, from the viewer's point of view: MONBAN's gloved hand (copy MONBAN, the hooded gatekeeper, from the second reference picture: black gloves with fine "
+          "gold trim at the knuckles and cuffs, a heavy black sleeve with gold embroidery along its hem) is held out toward the viewer, palm up, and on the palm lies "
+          "a small MANA GEM (copy it from the first reference picture): an egg-shaped clear crystal pebble, inside it swirling threads of golden light with flecks of blue, "
+          "glowing softly and lighting the glove from below. The hand and gem in the lower middle, sharp; behind, out of focus, the great hall at dusk: golden lanterns as "
+          "round bokeh, the black rocket's teal and pink lines as soft streaks, a part of the golden ring. Only the hand and sleeve of MONBAN are seen, no face.",
+          ["design/story/refs/client/managem.jpg", "design/cast/monban.jpg", R + "ok-look.jpg"]),
+    plate("gh-gem-kimorin",
+          "Medium close-up of KIMORIN, " + KIM + " He holds a small MANA GEM (copy it from the gem reference picture: an egg-shaped clear crystal pebble with swirling "
+          "golden light inside) in both paws in front of his chest and stares down at it in amazement, ears up, his face lit warmly from below by the gem's golden glow, "
+          "his glowing light-blue eye slits wide. Copy his face exactly: a smooth round pure-white porcelain fox face with no nose and no muzzle, a small blue three-petal "
+          "leaf mark on the forehead, two thin curved glowing light-blue eye slits with no pupils, a blue spiral on each cheek, a tiny ω-shaped mouth. Behind him, out of "
+          "focus: the great hall at dusk, golden lanterns as bokeh, the black rocket with teal and pink lines and the golden ring, soft and dark. Framed from the top of his "
+          "ears to his waist, the tail feathers fanning behind his shoulders.",
+          ["apps/web/public/onboarding/kimorin-iu.webp", R + "kimorin-face-eyes.jpg", "design/story/refs/client/managem.jpg", R + "ok-look.jpg"]),
+]
+
+cast = [
+    {"id": "kb-back", "w": 1536, "h": 2048, "size": [1152, 1536],
+     "refs": [R + "ok-look.jpg", "apps/web/public/onboarding/kimorin-iu.webp"],
+     "prompt": "Copy the small white character seen from behind in the first picture exactly (his back view, the box device, the coat, the tail), and his costume from the second picture. "
+               + KIM + " POSE: seen from BEHIND, a three-quarter back view (we see his back and a little of the right side of his head), standing on both feet, looking UP and a little "
+               "to the right at something enormous, head tilted back; arms down at his sides; the tail fan spread behind him, seen from its back (black outside with red-orange tips "
+               "and white feathers). We do NOT see his face (only the edge of his right cheek and ear). Lit warmly from the front-right (golden light) with a cool blue rim light. " + GREEN},
+    {"id": "kb-ots", "w": 1536, "h": 2048, "size": [1152, 1536],
+     "refs": [R + "ok-look.jpg", "apps/web/public/onboarding/kimorin-iu.webp"],
+     "prompt": "Copy the small white character seen from behind in the first picture exactly, and his costume from the second picture. " + KIM +
+               " FRAMING: an over-the-shoulder close view from BEHIND him: the back of his head with the big white ears (blue insides seen from behind, white fur outside), the silver "
+               "box device and its cable on top, the brass goggles strap around the back of his head, his shoulders and upper back in the white lab coat, and the top half of the tail fan rising "
+               "behind his shoulders. His head turned a little to the right, three-quarter back, so only the edge of his right cheek shows; no face. Cropped at the waist at the bottom edge "
+               "of the picture. Lit warmly from the front-right with a cool blue rim light along the edges. " + GREEN.replace('The whole figure is in the picture with a small margin.', 'The figure is cut by the bottom edge only.')},
+    {"id": "kb-walk", "w": 1536, "h": 2048, "size": [1152, 1536],
+     "refs": [R + "ok-look.jpg", "apps/web/public/onboarding/kimorin-iu.webp"],
+     "prompt": "Copy the small white character seen from behind in the first picture exactly, and his costume from the second picture. " + KIM +
+               " POSE: seen from straight BEHIND, he is walking away from the viewer with a jaunty, happy step (one foot lifted behind him), swinging his arms, the hem of the white coat "
+               "flaring, the tail fan spread wide and bouncing; his head slightly tilted as if humming a tune. We do not see his face. Soft warm light from the front (beyond him) making a thin golden "
+               "rim along his outline. " + GREEN},
+]
+
+json.dump({"note": "2日目「待ちなさい」〜ロケットに乗る前（依頼主 2026-11-28）: 結社大広間の背景（人なし）と、KIMORINの後ろ姿の切り抜き用（緑）。design/refs/2026-11-28-rocket/storyboard.md。背景は確認後 apps/web/public/onboarding/s/<id>.jpg (720×1280) に書き出す。切り抜きは scripts/rocket/cut.py。ロケット・大広間は物語の歌の絵（ok-*.jpg、p-rocket3f-front.jpg）に合わせる。実行：Actions の「UI art」を、このブランチで queue=design/rocket-art-queue.json",
+           "dir": "../../../design/cast/rocket", "png": True, "always": "", "redo": [],
+           "items": items + cast}, open(sys.argv[1], 'w'), ensure_ascii=False, indent=1)
+print(len(items + cast))

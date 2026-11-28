@@ -494,6 +494,66 @@
       "kind": "se",
       "duration": 4,
       "prompt": "A soft, low, shimmering magical tone as a thin veil of golden light slowly unravels and fades: a deep gentle bell hum with a faint glassy shimmer, fading in softly and dying away slowly, calm and quiet, never loud, no sharp attack. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "whip",
+      "kind": "se",
+      "prompt": "A very short, crisp cinematic whip-pan swish, like a camera turning around fast: one tight airy swoosh with a soft tail, under half a second. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "glint",
+      "kind": "se",
+      "prompt": "A tiny bright metallic glint of light on polished brass: a single delicate high shimmer, very short and clean, anime sparkle-glint sound design. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "stone-door",
+      "kind": "se",
+      "prompt": "Two colossal ancient stone temple doors slowly sliding apart: a deep heavy grinding rumble of stone on stone with a low resonant boom, faint dust trickling, and a soft rush of air as they open, in a huge echoing hall. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "steps-hall",
+      "kind": "se",
+      "prompt": "The light, soft footsteps of a small creature walking unhurriedly on polished stone in a vast echoing hall, about eight steps, with a long natural reverb, quiet and clean. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "hall-reveal",
+      "kind": "se",
+      "prompt": "A vast space opening up: a slow, deep, airy swell of wind and low resonance with a faint high golden shimmer, like walking out into an immense open-air hall at dusk; cinematic reveal sound design, calm and majestic, fading softly. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "beam",
+      "kind": "se",
+      "prompt": "A pillar of golden light descending from high above and touching the floor: a bright rising shimmer that falls in pitch, ending in a soft deep resonant impact and a warm humming glow that fades. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "star-sky",
+      "kind": "se",
+      "prompt": "A ceiling dissolving into a starry night sky: a slow, gentle wash of soft glassy twinkles and a deep airy hum widening out, magical and calm, fading slowly. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "streak-up",
+      "kind": "se",
+      "prompt": "A tiny glowing ball of light shooting up into the sky and away: a quick bright magical fizz-whoosh that rises in pitch and fades into the distance with a faint twinkle. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "zoom-back",
+      "kind": "se",
+      "prompt": "A small glowing ball of light rushing back toward the camera at great speed with a growing whoosh, then braking suddenly with a short comic screech of air and a soft puff, anime comedy sound design. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "gem-hum",
+      "kind": "se",
+      "prompt": "A small magical crystal glowing in a hand: a soft warm resonant crystal hum with gentle glassy glints that swirl slowly, intimate and precious, fading out. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "dissolve",
+      "kind": "se",
+      "prompt": "A being of light slowly dissolving into countless tiny golden particles that drift upward: an airy, glittering shimmer rising softly and thinning into silence, mysterious and calm. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "into-light",
+      "kind": "se",
+      "prompt": "Stepping through a great gate into blinding warm light: a smooth rising swell of soft air and a bright golden shimmer that blooms and then settles, cinematic transition sound design. High quality, realistic and rich, clean recording, no music, no voices."
     }
   ],
   "listen": []
