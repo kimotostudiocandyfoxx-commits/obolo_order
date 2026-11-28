@@ -1,3 +1,5 @@
 # one Cloud Logging filter per line (comment lines start with #); freshness in FRESHNESS below
-FRESHNESS=1d
-timestamp>="2026-11-28T10:15:00Z" AND resource.type="cloud_run_revision" AND resource.labels.service_name="obolo-api" AND NOT textPayload:"RouterExplorer" AND NOT textPayload:"RoutesResolver" AND NOT textPayload:"InstanceLoader" AND (textPayload:"media storage" OR textPayload:"igrat" OR textPayload:"ERROR" OR textPayload:"WARN" OR textPayload:"successfully started" OR textPayload:"mic-diag" OR textPayload:"rubberband" OR textPayload:"voice" OR textPayload:"Email" OR severity>=ERROR)
+FRESHNESS=2d
+timestamp>="2026-11-28T09:00:00Z" AND resource.type="cloud_run_revision" AND resource.labels.service_name="obolo-api" AND (textPayload:"mic-diag" OR textPayload:"dictate" OR textPayload:"stt")
+timestamp>="2026-11-28T09:00:00Z" AND resource.type="cloud_run_revision" AND resource.labels.service_name="obolo-api" AND httpRequest.requestUrl:"/voice/dictate"
+timestamp>="2026-11-28T09:00:00Z" AND resource.type="cloud_run_revision" AND resource.labels.service_name="obolo-api" AND httpRequest.requestUrl:"/diag/mic"
