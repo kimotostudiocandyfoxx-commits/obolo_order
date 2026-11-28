@@ -10,7 +10,8 @@ import type { Step } from './script';
  */
 export const SYS003: Step[] = [
   { t: 'scene', id: 'SYS-S003' },
-  { t: 'still', image: 's/moon-temple' },
+  // the Moon temple's water bowl (story M-R347: the small egg grew over the bowl — the place of the Bati chat)
+  { t: 'still', image: 's/moon-bowl' },
   // 親指くらいだった小さなたまごが、両手で抱えるほどの大きさになって、ゆっくり光っている
   { t: 'fx', fx: 'grown-egg' },
   { t: 'sprite', image: 'obolon' },
@@ -66,7 +67,7 @@ export const SYS003: Step[] = [
   { t: 'se', sound: 'boing' }, // {bati}（1体目）が、新しい相方と、ぴょんぴょん跳ねる
   { t: 'branch', key: 'sys3.nth', cases: { '3': 'sys3-last' }, otherwise: 'sys3-egg' },
   { t: 'label', id: 'sys3-egg' },
-  // 割れた殻が、また光って集まり、祭壇の上で、小さなたまごになる
+  // 割れた殻が、また光って集まり、水の器の上で、小さなたまごになる
   { t: 'fx', fx: 'shell-egg' },
   { t: 'wait', s: 3 },
   { t: 'fx', fx: null },

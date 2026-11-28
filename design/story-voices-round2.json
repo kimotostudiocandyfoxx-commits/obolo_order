@@ -1,0 +1,17 @@
+{
+ "note": "声のない 1・2日目の台詞（scripts/voice-coverage.ts --days 1,2 --only design/story-voices-round2.json）。Actions の「Story voices」を only=design/story-voices-round2.json で回すと、これだけを作る。",
+ "lines": [
+  {
+   "who": "KIMORIN",
+   "text": "うんちピンポンくん！"
+  },
+  {
+   "who": "KIMORIN",
+   "text": "……これは....すごい発明品ですね。まぁ私の発明の方がすごいですけど。ね？うんちピンポンくん？"
+  },
+  {
+   "who": "KIMORIN",
+   "text": "うんちピンポンくんも、めちゃくちゃ月に帰ってください。"
+  }
+ ]
+}

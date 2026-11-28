@@ -1,5 +1,5 @@
 {
- "note": "依頼主の試遊（2026-11-28, design/refs/2026-11-28-playtest/README.md）の直し：2日目のピンポンボタンを押す瞬間の差し込み絵（手元・頭の機械の〇・月の神殿の全身）、うんちピンポンくんが卵から生まれる絵（依頼主のデザイン design/story/cast/うんちピンポンくん/99-original.jpg）、門の前と地球の神殿の切り返し（KIMORIN の正面、口あき版つき）。描いた絵は design/cast/playtest/<id>.jpg、scripts/playtest/build.py が apps/web/public/onboarding/s/ に書き出す（OBOLON は依頼主の絵をそのまま重ねる。描かない）。実行：Actions の「UI art」を、このブランチで queue=design/playtest-art-queue.json",
+ "note": "依頼主の試遊（2026-11-28, design/refs/2026-11-28-playtest/README.md）の直し：2日目のピンポンボタンを押す瞬間の差し込み絵（手元・頭の機械の〇・月の神殿の全身）、うんちピンポンくんが卵から生まれる絵（依頼主のデザイン design/story/cast/うんちピンポンくん/99-original.jpg）、門の前・地球の神殿・月の神殿の器のテラス（バティのチャットと同じ場所 /talk/moon/temple-bati.webp）の切り返し（KIMORIN の正面、口あき版つき）。描いた絵は design/cast/playtest/<id>.jpg、scripts/playtest/build.py が apps/web/public/onboarding/s/ に書き出す（OBOLON は依頼主の絵をそのまま重ねる。描かない）。実行：Actions の「UI art」を、このブランチで queue=design/playtest-art-queue.json",
  "dir": "../../../design/cast/playtest",
  "png": true,
  "always": "Vertical 9:16 frame for a premium Japanese anime feature film, in exactly the look of the reference pictures: cinematic photoreal-painterly 3DCG, soft plush and porcelain textures, physically plausible light, crisp detail, shallow depth of field, film-grade composition. No text, no letters, no numbers, no writing, no logos, no watermark anywhere.",
@@ -135,6 +135,136 @@
    ],
    "always": false,
    "prompt": "Edit this picture: keep EVERYTHING exactly the same — the same character, pose, paws, coat, goggles, ears, tail, lighting, background, framing and every pixel outside his mouth. Change ONLY his mouth: the tiny ω mouth is now OPEN as if he is in the middle of speaking a word — a small open mouth, rounded, dark inside with a little pink tongue, just under where the ω was, the same size as a small coin on his face. Nothing else changes. No text, no letters, no watermark."
+  },
+  {
+   "id": "kimorin-holds-pinpon",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "design/story/cast/うんちピンポンくん/99-original.jpg",
+    "apps/web/public/onboarding/kimorin-iu.webp",
+    "apps/web/public/onboarding/s/d2-moon-in.jpg",
+    "design/story/cast/うんちピンポンくん/01-main.png"
+   ],
+   "prompt": "Inside the MOON TEMPLE exactly as in the third picture: white marble columns and arches, the dome open to the deep blue starry night, a shaft of soft white light from above, the shallow round pool of glowing blue water behind, cool silver-blue moonlight with a warm glow on the characters. KIMORIN holds the newborn UNCHI PINPON-KUN up in both paws in front of his chest, gently, like a precious treasure, and gazes down at him, deeply moved: his brass goggles have slid down to the tip of his face and small glowing light-blue tears drop from his thin eye slits, his ears tilted softly. KIMORIN (copy him exactly from the second picture): a small chibi white fox-spirit about three heads tall; big pointed white fox ears with deep blue insides; a small retro silver box device on top of his head between the ears (its dark screen shows nothing) with a thin coiled cable; brass steampunk goggles; a white, slightly worn laboratory coat over a black shirt with a leather tool belt and small brass gadgets; white plush paws with blue pads; behind him a large round fan of tail feathers growing from his body: white inside, black outside with red-orange tips; a smooth round pure-white porcelain fox face with no nose and no muzzle, a small blue three-petal leaf mark on the forehead, a blue spiral on each cheek, a tiny ω mouth. UNCHI PINPON-KUN — copy him EXACTLY from the first and fourth pictures, the same design: a cute round spiral-shell creature like a soft-serve swirl / conch shell standing upright, five stacked rounded tiers getting smaller toward a little pointed spiral tip on top and a short spiral point at the bottom; glossy chocolate-brown with broad vertical GOLDEN-YELLOW stripes over every tier, small golden stars sprinkled all over and a golden heart on the lower tier; on the middle tier a happy face: two big shiny round dark-brown eyes with white highlights, rosy pink cheeks, a small open smiling mouth; NO band, NO hat, NO arms, NO legs. He is about the size of KIMORIN's head, beaming up at KIMORIN. FRAMING: medium shot from KIMORIN's waist to the tips of his ears, both characters in the middle of the frame, the feather tail fanning behind him; camera at his chest height, slightly to the side. The background softly out of focus."
+  },
+  {
+   "id": "bw-kimorin",
+   "refs": [
+    "apps/web/public/talk/moon/temple-bati.webp",
+    "apps/web/public/onboarding/kimorin-iu.webp"
+   ],
+   "prompt": "THE MOON TEMPLE'S WATER-BOWL TERRACE, the SAME place as the first picture (copy its look exactly: a floor of deep lapis-blue stone inlaid with fine gold magic circles and star points, white marble balustrades and columns, small white pavilions with blue domes, a wide shallow white marble bowl of glowing water, the black starry night sky, grey lunar mountains beyond, cool moonlight with a soft blue glow from the bowl's water) — but seen from the OPPOSITE direction: the camera stands on the far side of the bowl looking back toward the temple's tall white arched entrance and columns, the edge of the glowing bowl in the lower left foreground. KIMORIN (copy him exactly from the second picture): a small chibi white fox-spirit about three heads tall; big pointed white fox ears with deep blue insides; a small retro silver box device on top of his head between the ears with a thin coiled cable; brass steampunk goggles pushed up on his forehead; a white, slightly worn laboratory coat over a black shirt with a leather tool belt; white plush paws with blue pads; behind him a large round fan of tail feathers: white inside, black outside with red-orange tips; a smooth round pure-white porcelain fox face with no nose and no muzzle, a small blue three-petal leaf mark on the forehead, two thin curved glowing light-blue eye slits, a blue spiral on each cheek, a tiny ω mouth, closed. He looks pleased with himself, one paw on his chest. FRAMING: medium shot from his knees to the tips of his ears, he stands a little LEFT of centre facing the camera and takes about 55% of the picture's height, his face in the upper third, talking toward someone floating just in front of the camera at his eye level (NOT in the picture). The upper RIGHT of the picture in the foreground is left as dark, softly out-of-focus space (a big dark round shape will float there close to the lens) — keep his face and body clear of it. The background softly out of focus.",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1080,
+    1920
+   ]
+  },
+  {
+   "id": "bw-kimorin-open",
+   "refs": [
+    "design/cast/playtest/bw-kimorin.jpg"
+   ],
+   "always": false,
+   "prompt": "Edit this picture: keep EVERYTHING exactly the same — the same character, pose, paws, coat, goggles, ears, tail, lighting, background, framing and every pixel outside his mouth. Change ONLY his mouth: the tiny ω mouth is now OPEN as if he is in the middle of speaking a word — a small open mouth, rounded, dark inside with a little pink tongue, just under where the ω was, the same size as a small coin on his face. Nothing else changes. No text, no letters, no watermark.",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1080,
+    1920
+   ]
+  },
+  {
+   "id": "bw-kimorin-robe",
+   "refs": [
+    "apps/web/public/talk/moon/temple-bati.webp",
+    "apps/web/public/onboarding/kimorin-sun.webp"
+   ],
+   "prompt": "THE MOON TEMPLE'S WATER-BOWL TERRACE, the SAME place as the first picture (copy its look exactly: a floor of deep lapis-blue stone inlaid with fine gold magic circles and star points, white marble balustrades and columns, small white pavilions with blue domes, a wide shallow white marble bowl of glowing water, the black starry night sky, grey lunar mountains beyond, cool moonlight with a soft blue glow from the bowl's water) — but seen from the OPPOSITE direction: the camera stands on the far side of the bowl looking back toward the temple's tall white arched entrance and columns, the edge of the glowing bowl in the lower left foreground. KIMORIN in his NEW LOOK (copy him exactly from the second picture): a small chibi white fox-spirit about three heads tall; big pointed white fox ears with deep blue insides poking out of a deep-red velvet HOODED ROBE with white-and-silver embroidered borders, a round blue gem clasp with two blue tassels at the chest; ROUND BLACK SUNGLASSES; a smooth round pure-white porcelain fox face, a small blue three-petal leaf mark on the forehead, a blue spiral on each cheek, a tiny ω mouth, closed; white paws with blue pads; a small white dragon wing behind one shoulder; behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. He stands calm and dignified, paws folded in front of the robe. FRAMING: medium shot from his knees to the tips of his ears, he stands a little LEFT of centre facing the camera and takes about 55% of the picture's height, his face in the upper third, talking toward someone floating just in front of the camera at his eye level (NOT in the picture). The upper RIGHT of the picture in the foreground is left as dark, softly out-of-focus space (a big dark round shape will float there close to the lens) — keep his face and body clear of it. The background softly out of focus.",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1080,
+    1920
+   ]
+  },
+  {
+   "id": "bw-kimorin-robe-open",
+   "refs": [
+    "design/cast/playtest/bw-kimorin-robe.jpg"
+   ],
+   "always": false,
+   "prompt": "Edit this picture: keep EVERYTHING exactly the same — the same character, pose, paws, coat, sunglasses, hood, robe, ears, tail, lighting, background, framing and every pixel outside his mouth. Change ONLY his mouth: the tiny ω mouth is now OPEN as if he is in the middle of speaking a word — a small open mouth, rounded, dark inside with a little pink tongue, just under where the ω was, the same size as a small coin on his face. Nothing else changes. No text, no letters, no watermark.",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1080,
+    1920
+   ]
+  },
+  {
+   "id": "kb-ots-robe",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    1152,
+    1536
+   ],
+   "refs": [
+    "apps/web/public/onboarding/kb-ots.webp",
+    "apps/web/public/onboarding/kimorin-sun.webp"
+   ],
+   "always": false,
+   "prompt": "Copy the view from behind of the first picture exactly (the same pose and angle: his head and shoulders seen from behind and a little to the side, big, the tail feathers spreading below), but dress him in the costume of the second picture: a deep-red velvet HOODED ROBE with white-and-silver embroidered borders, the hood up with his big pointed white fox ears with deep blue insides poking out through it, the earpiece of round black sunglasses just visible at the side, a small white dragon wing behind one shoulder, the large round fan of tail feathers (white inside, black outside with red-orange tips) behind. We do NOT see his face. Lit softly from the front with a cool blue rim light. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. Clean sharp outline. No text, no letters, no watermark."
+  },
+  {
+   "id": "egg-bowl-stir",
+   "refs": [
+    "apps/web/public/talk/moon/temple-bati.webp"
+   ],
+   "prompt": "THE MOON TEMPLE'S WATER-BOWL TERRACE exactly as in the first picture (the same place, the same camera direction): the floor of deep lapis-blue stone inlaid with fine gold magic circles and star points, white marble balustrades and columns, small white pavilions with blue domes, the black starry night sky, grey lunar mountains. The camera is closer to the wide shallow white marble BOWL OF WATER, which is in the middle of the frame, seen slightly from above, at about the lower middle of the picture. THE MOMENT: the water in the bowl has begun to stir by itself — slow concentric ripples spreading from the centre, the surface glowing from below with a soft swirl of white and gold light, a few tiny motes of light lifting off the water into the air, a faint mist. Nothing is in the bowl yet. No characters, no people, no creatures, no eggs.",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1080,
+    1920
+   ]
+  },
+  {
+   "id": "egg-bowl-rise",
+   "refs": [
+    "apps/web/public/talk/moon/temple-bati.webp",
+    "apps/web/public/onboarding/egg-pick-earth.webp",
+    "apps/web/public/onboarding/egg-pick-sun.webp"
+   ],
+   "prompt": "THE MOON TEMPLE'S WATER-BOWL TERRACE exactly as in the first picture (the same place, the same camera direction): the floor of deep lapis-blue stone inlaid with fine gold magic circles and star points, white marble balustrades and columns, small white pavilions with blue domes, the black starry night sky, grey lunar mountains. The camera is closer to the wide shallow white marble BOWL OF WATER, which is in the middle of the frame, seen slightly from above, at about the lower middle of the picture. THE MOMENT: two eggs are RISING UP OUT OF THE WATER of the bowl side by side, half emerged, water streaming off their shells and falling back in sparkling drops, rings of ripples around them, light pouring up from the water. THE TWO EGGS (copy their designs exactly from the second and third pictures): the MOON EGG — an egg whose shell is half the blue Earth with white clouds and half the grey cratered Moon, divided by a soft S-curve like a yin-yang, glowing with calm WHITE MOONLIGHT; the SUN EGG — an egg whose shell is half the fiery orange-gold Sun with swirling flames and half the grey cratered Moon, divided by a soft S-curve, glowing with warm GOLD SUNLIGHT. The moon egg on the left, the sun egg on the right, each about the size of a melon. No characters, no people, no creatures.",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1080,
+    1920
+   ]
+  },
+  {
+   "id": "egg-bowl-float",
+   "refs": [
+    "apps/web/public/talk/moon/temple-bati.webp",
+    "apps/web/public/onboarding/egg-pick-earth.webp",
+    "apps/web/public/onboarding/egg-pick-sun.webp"
+   ],
+   "prompt": "THE MOON TEMPLE'S WATER-BOWL TERRACE exactly as in the first picture (the same place, the same camera direction): the floor of deep lapis-blue stone inlaid with fine gold magic circles and star points, white marble balustrades and columns, small white pavilions with blue domes, the black starry night sky, grey lunar mountains. The camera is closer to the wide shallow white marble BOWL OF WATER, which is in the middle of the frame, seen slightly from above, at about the lower middle of the picture. THE MOMENT: the two eggs FLOAT in the air just above the calm glowing water of the bowl, side by side with a little space between them, slowly turning, each wrapped in its own soft light and casting its colour on the water and the rim (white on the left, gold on the right), a few drops of water still falling from them. THE TWO EGGS (copy their designs exactly from the second and third pictures): the MOON EGG — an egg whose shell is half the blue Earth with white clouds and half the grey cratered Moon, divided by a soft S-curve like a yin-yang, glowing with calm WHITE MOONLIGHT; the SUN EGG — an egg whose shell is half the fiery orange-gold Sun with swirling flames and half the grey cratered Moon, divided by a soft S-curve, glowing with warm GOLD SUNLIGHT. The moon egg on the left, the sun egg on the right, each about the size of a melon, large and clear in the middle of the frame. No characters, no people, no creatures.",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1080,
+    1920
+   ]
   }
  ]
 }

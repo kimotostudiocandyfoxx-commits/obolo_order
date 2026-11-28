@@ -178,6 +178,15 @@ export const SHOTS: Record<string, Shot> = {
     ],
     cast: ['MONBAN'],
   },
+  // …and the reverse: KIMORIN at the gate facing us (painted, his mouth moving with the voice), MONBAN's back big and
+  // soft on the left; a slow push on KIMORIN
+  'gate-rv-kimorin': {
+    from: C(1.05, 58, 46),
+    to: C(1.13, 59, 43),
+    dur: 7,
+    layers: [{ src: 'monban-back', x: 6, y: 135, h: 110, blur: 6, drift: [-2, 0], tone: 'brightness(0.5) contrast(1.05)' }],
+    cast: ['KIMORIN'],
+  },
   'gate-two': { from: C(1.05, 50, 50), to: C(1.0), dur: 6, cast: ['KIMORIN', 'MONBAN'] },
   'invite-hand': { from: C(1.0), to: C(1.12, 50, 52), dur: 4, cast: ['KIMORIN', 'MONBAN'] },
   'kimorin-turn': { from: C(1.1, 50, 42), to: C(1.0), dur: 0.6, enter: 'settle', cast: ['KIMORIN'] },
@@ -208,6 +217,21 @@ export const SHOTS: Record<string, Shot> = {
     ],
     cast: ['OBOLON'],
   },
+  // the ping-pong press (playtest 2026-11-28): the paw on the button, the ○ on the box on his head, KIMORIN in the Moon
+  // temple with the ○ while OBOLON watches — his back (the client's picture, its face hidden), soft in front
+  'pp-hand': { from: C(1.0, 50, 50), to: C(1.08, 46, 47), dur: 1.4, enter: 'settle', fx: [{ k: 'glow', x: 38, y: 44, r: 12, color: 'rgba(255,210,130,.75)' }] },
+  'pp-head': { from: C(1.14, 52, 46), to: C(1.02, 52, 46), dur: 1.4, enter: 'settle', fx: [{ k: 'glow', x: 52, y: 46, r: 18, color: 'rgba(255,220,150,.7)' }] },
+  'pp-moon': {
+    from: C(1.0, 50, 50),
+    to: C(1.08, 50, 44),
+    dur: 7,
+    layers: [{ src: 'obolon-back', x: 26, y: 126, h: 48, blur: 9, drift: [-3, 0] }],
+    fx: [{ k: 'glow', x: 50, y: 32.5, r: 3, color: 'rgba(255,225,160,.8)' }],
+    cast: ['KIMORIN', 'OBOLON'],
+  },
+  // うんちピンポンくん hatches (playtest 2026-11-28): the cracked egg's burst, then him popping out
+  'egg-crack': { from: C(1.0, 50, 52), to: C(1.06, 50, 50), dur: 1.4, enter: 'flash' },
+  'hatch-pinpon': { from: C(1.1, 50, 46), to: C(1.0, 50, 44), dur: 3.4, enter: 'flash', fx: [{ k: 'glow', x: 50, y: 36, r: 20, color: 'rgba(255,214,140,.6)' }, { k: 'dust', n: 22 }], cast: ['うんちピンポンくん'] },
   'temple-sky': { from: C(1.24, 50, 72), to: C(1.0, 50, 45), dur: 6.5, fx: [{ k: 'stars', n: 40, top: 0, bottom: 45 }] },
   'leave-gate': {
     from: C(1.0, 50, 55),

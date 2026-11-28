@@ -97,6 +97,8 @@ export class LineVoice {
   private src: AudioBufferSourceNode | null = null;
   /** the line's pieces scheduled one after another (a line with a name: its fixed words) */
   private queue: AudioBufferSourceNode[] = [];
+  /** the line's own level (under the voices' gain): a line let go fades out on it without touching the next line */
+  private lineGain: GainNode | null = null;
   private el: HTMLAudioElement | null = null;
   private volume = DEFAULT_MIX.voice;
   private muted = false;
@@ -232,18 +234,23 @@ export class LineVoice {
       if (this.ctx.state !== 'running') void this.ctx.resume();
       this.onLoading(false);
       this.onSpeaking(true);
+      const line = this.ctx.createGain();
+      line.connect(this.gain);
+      this.lineGain = line;
       // the pieces of a line with a name: a short breath where the name would be
       let at = this.ctx.currentTime;
       list.forEach((buf, k) => {
         const src = this.ctx!.createBufferSource();
         src.buffer = buf;
-        src.connect(this.gain!);
+        src.connect(line);
         const last = k === list.length - 1;
         src.onended = () => {
           if (t !== this.token) return;
           if (last) {
             this.src = null;
             this.queue = [];
+            if (this.lineGain === line) this.lineGain = null;
+            line.disconnect();
             this.onSpeaking(false);
           } else this.src = this.queue[k + 1] ?? null;
         };
@@ -274,17 +281,39 @@ export class LineVoice {
     });
   }
 
-  stop() {
+  /**
+   * Stop the line now. `fade` seconds (default a few ms, no click): the voice fades out on its own level and the speaking
+   * state ends at once, so the music comes back up while it fades — a tap that goes on mid-line (client 2026-11-28) uses
+   * 0.2 s. The next line can start meanwhile: it has its own level.
+   */
+  stop(fade = 0.03) {
     this.token++;
     this.onLoading(false);
     if (this.src || this.queue.length) {
-      for (const s of this.queue.length ? this.queue : [this.src!]) {
+      const list = this.queue.length ? this.queue : [this.src!];
+      const g = this.lineGain;
+      const end = this.ctx ? this.ctx.currentTime + fade : 0;
+      if (g && this.ctx) {
+        g.gain.cancelScheduledValues(this.ctx.currentTime);
+        g.gain.setValueAtTime(g.gain.value, this.ctx.currentTime);
+        g.gain.linearRampToValueAtTime(0, end);
+      }
+      for (const s of list) {
+        s.onended = null;
         try {
-          s.stop();
+          if (g && this.ctx) s.stop(end + 0.02);
+          else s.stop();
         } catch {
-          /* already ended */
+          /* already ended, or not started yet */
+          try {
+            s.stop();
+          } catch {
+            /* already ended */
+          }
         }
       }
+      if (g) setTimeout(() => g.disconnect(), (fade + 0.1) * 1000);
+      this.lineGain = null;
       this.queue = [];
       this.src = null;
       this.onSpeaking(false);

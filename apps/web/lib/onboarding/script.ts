@@ -172,6 +172,8 @@ export type Step =
       voice?: Speaker;
       /** a line that is never tapped through before its voice ends, even heard before (OBOLON's core lines, M-R102) */
       hold?: boolean;
+      /** must be heard: a tap while its voice plays does nothing until it ends (client 2026-11-28 — every other line is let go on a tap; lib/onboarding/tap.ts). No line is marked yet */
+      listen?: boolean;
       /** the speaker's picture for this line by hand ('stand' = the standing picture, facing us) instead of one picked from the words */
       expr?: string;
       /** the speaker's picture mirrored for this line (a pose that would face away from the one they talk to) */

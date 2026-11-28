@@ -132,6 +132,7 @@ export const STILL_MOUTH: Record<string, string> = Object.fromEntries(
   [
     's/d2-reveal-end',
     's/d2-kimorin-mouth-only',
+    's/rv-kimorin',
     's/d2-gate-two-inside',
     's/d2-gate-kimorin-face',
     's/d2-hall-kimorin-up',

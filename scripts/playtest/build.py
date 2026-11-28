@@ -92,8 +92,67 @@ def obolon_back():
     Image.fromarray(np.clip(a, 0, 255).astype(np.uint8), 'RGBA').save('apps/web/public/onboarding/obolon-back.webp', 'WEBP', quality=90, method=6, exact=True)
 
 
+SRC = 'design/cast/playtest'
+# the painted pictures shown as they are (design/playtest-art-queue.json)
+PLATES = ['pp-hand', 'pp-head', 'pp-moon-kimorin', 'hatch-pinpon-earth', 'hatch-pinpon-sun', 'kimorin-holds-pinpon']
+# KIMORIN facing us, painted twice (the second an edit with the mouth open): the box around his mouth in the painting
+# (x0, y0, x1, y1 at 1080×1920) where the open mouth is cut out as the still's mouth patch (media.ts STILL_MOUTH)
+MOUTHS = {'rv-kimorin': (622, 892, 734, 962), 'tk-kimorin': None}
+
+
+def moon_bowl():
+    """the Moon temple's water-bowl terrace as the Bati chat shows it (talk/moon/temple-bati.webp, lib/talk/zones.ts): the
+    story's conversations by the bowl are set there too (client playtest 2026-11-28)"""
+    Image.open('apps/web/public/talk/moon/temple-bati.webp').convert('RGB').resize((W, H), Image.LANCZOS).save(f'{OUT}/moon-bowl.jpg', quality=88, optimize=True, progressive=True)
+
+
+def plates():
+    moon_bowl()
+    done = []
+    for i in PLATES:
+        if os.path.exists(f'{SRC}/{i}.jpg'):
+            Image.open(f'{SRC}/{i}.jpg').convert('RGB').resize((W, H), Image.LANCZOS).save(f'{OUT}/{i}.jpg', quality=88, optimize=True, progressive=True)
+            done.append(i)
+    return done
+
+
+def mouth_box(closed, opened):
+    """where the two paintings differ most in the face's lower middle: the mouth (when no box is given)"""
+    d = np.abs(closed - opened).sum(-1)
+    h, w = d.shape
+    sub = d[int(h * 0.3):int(h * 0.7), int(w * 0.25):int(w * 0.8)]
+    ys, xs = np.nonzero(sub > 120)
+    if not len(ys):
+        return None
+    cy, cx = int(np.median(ys)) + int(h * 0.3), int(np.median(xs)) + int(w * 0.25)
+    return (cx - 56, cy - 36, cx + 56, cy + 36)
+
+
+def talking(i):
+    """the closed-mouth painting as the still, the open mouth (feathered, from the edit) as its -mouth.webp"""
+    if not (os.path.exists(f'{SRC}/{i}.jpg') and os.path.exists(f'{SRC}/{i}-open.jpg')):
+        return False
+    closed = np.asarray(Image.open(f'{SRC}/{i}.jpg').convert('RGB')).astype(np.float32)
+    opened = np.asarray(Image.open(f'{SRC}/{i}-open.jpg').convert('RGB').resize((closed.shape[1], closed.shape[0]))).astype(np.float32)
+    box = MOUTHS.get(i) or mouth_box(closed, opened)
+    x0, y0, x1, y1 = box
+    h, w = closed.shape[:2]
+    y, x = np.mgrid[0:h, 0:w].astype(np.float32)
+    # a soft oval over the box: the open mouth fully inside, fading out at the edge (no seam on the fur)
+    nx = (x - (x0 + x1) / 2) / ((x1 - x0) / 2)
+    ny = (y - (y0 + y1) / 2) / ((y1 - y0) / 2)
+    r = np.sqrt(nx ** 2 + ny ** 2)
+    a = np.clip((1.15 - r) / 0.35, 0, 1)
+    out = np.dstack([opened, a * 255]).astype(np.uint8)
+    Image.fromarray(closed.astype(np.uint8), 'RGB').resize((W, H), Image.LANCZOS).save(f'{OUT}/{i}.jpg', quality=88, optimize=True, progressive=True)
+    Image.fromarray(out, 'RGBA').resize((W, H), Image.LANCZOS).save(f'{OUT}/{i}-mouth.webp', 'WEBP', quality=90, method=6, exact=True)
+    return True
+
+
 if __name__ == '__main__':
     gate_open()
     mouth_only()
     obolon_back()
     print('wrote', f'{OUT}/d2-gate-open.jpg', f'{OUT}/d2-kimorin-mouth-only.jpg', f'{OUT}/d2-kimorin-mouth-only-mouth.webp')
+    print('plates', plates())
+    print('talking', [i for i in MOUTHS if talking(i)])

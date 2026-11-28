@@ -90,9 +90,11 @@ export const DAY2: Step[] = [
   // A4 shot / reverse shot (playtest 2026-11-28, story M-R347): MONBAN over KIMORIN's shoulder, then KIMORIN
   { t: 'still', image: 's/d2-gate-near', shot: 'gate-ots-monban', fade: 0.35 },
   { t: 'say', who: 'MONBAN', text: '誰だお前…。' },
-  { t: 'still', image: 's/d2-gate-two-inside', shot: 'gate-two', fade: 0.12 },
+  { t: 'still', image: 's/rv-kimorin', shot: 'gate-rv-kimorin', fade: 0.1 },
   { t: 'say', who: 'KIMORIN', text: '私ですか？私は、なんでもすぐに発明してしまう、天才発明家、KIMORINです。' },
+  { t: 'still', image: 's/d2-gate-near', shot: 'gate-ots-monban', fade: 0.1 },
   { t: 'say', who: 'MONBAN', text: 'この先はObolo Orderしか入れない…帰れ…。' },
+  { t: 'still', image: 's/rv-kimorin', shot: 'gate-rv-kimorin', fade: 0.1 },
   { t: 'say', who: 'KIMORIN', text: 'おやおや、帰れは失礼なのでは？　なぜなら、私は！招待客なんですよー？' },
   { t: 'sprite', image: null },
   // A5 KIMORINが白衣のポケットから招待状を出して、MONBANに渡す
@@ -305,8 +307,15 @@ export const DAY2: Step[] = [
   { t: 'bgm', track: null, fade: 0.3 },
   // the music only 5 s after the pinpon has rung out (7 s), a little quieter (client 2026-10-29)
   { t: 'bgm', track: 'comedy', after: 12 }, // ピンポン2.5の発表
-  { t: 'video', motion: 'd2-pinpon' }, // 手のひらにのせた銀色の押しボタンを、ゆっくりこちらに見せる
-  { t: 'still', image: 's/d2-pinpon-end' }, // the film's last frame with a mouth layer (client 2026-10-29)
+  // ポチッ (client playtest 2026-11-28: stills instead of the film, both presses): three cut-ins on the ring — the paw
+  // pressing the button, the ○ on the box on his head, KIMORIN in the Moon temple with the ○ while OBOLON watches (his
+  // back, soft, in front)
+  { t: 'still', image: 's/pp-hand', shot: 'pp-hand', fade: 0.08 },
+  { t: 'wait', s: 1.2, keepChat: true },
+  { t: 'still', image: 's/pp-head', shot: 'pp-head', fade: 0.08 },
+  { t: 'wait', s: 1.4, keepChat: true },
+  { t: 'still', image: 's/pp-moon-kimorin', shot: 'pp-moon', fade: 0.12 },
+  { t: 'wait', s: 2.6, keepChat: true },
   { t: 'say', who: 'KIMORIN', text: '気になりますか？　これが。' },
   { t: 'still', image: 's/d2-moon-kimorin' }, // KIMORINの大写し。台詞ごとに、表情が変わる
   { t: 'sprite', image: 'kimorin-iu' },
@@ -333,7 +342,16 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'そう、私たちは、試されていたのです！' },
   { t: 'bgm', track: null, fade: 0.4 },
   { t: 'se', sound: 'pinpon' }, // ポチッ。ピンポンピンポン♪
-  { t: 'wait', s: 7.1, keepChat: true }, // ピンポンが鳴り終わるまで、待つ
+  // ピンポンが鳴り終わるまで — the same three cut-ins as the first press (playtest 2026-11-28), then back to him
+  { t: 'sprite', image: null },
+  { t: 'still', image: 's/pp-hand', shot: 'pp-hand', fade: 0.08 },
+  { t: 'wait', s: 1.2, keepChat: true },
+  { t: 'still', image: 's/pp-head', shot: 'pp-head', fade: 0.08 },
+  { t: 'wait', s: 1.4, keepChat: true },
+  { t: 'still', image: 's/pp-moon-kimorin', shot: 'pp-moon', fade: 0.12 },
+  { t: 'wait', s: 4.3, keepChat: true },
+  { t: 'still', image: 's/d2-moon-kimorin', fade: 0.3 },
+  { t: 'sprite', image: 'kimorin-iu' },
   { t: 'say', who: 'KIMORIN', text: 'ふ、、、また大正解してしまった。ですよね？OBOLONさん' },
   { t: 'sprite', image: null },
   { t: 'say', who: 'OBOLON', text: '、、、Obolo Orderは、完全招待制だ。' },
@@ -367,7 +385,6 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'OBOLON', text: 'うん。魔法を唱えられる、と言ったが。' },
   { t: 'say', who: 'OBOLON', text: '厳密には、一人では、魔法は使えない。相方と、力を合わせて、魔法を唱えるんだ。' },
   { t: 'say', who: 'OBOLON', text: 'お前たちの新しい姿も、、、相方が、魔法で、作る。' },
-  { t: 'say', who: 'OBOLON', text: 'こっちに、来い。' },
   // M-R209: {bati} is born first — the egg, the mana gem, KIMORIN's food (うんちピンポンくん), then {name}'s food and {bati}
   { t: 'scene', id: 'D03-S005' }, // 相方の誕生
   { t: 'sprite', image: null },
@@ -426,11 +443,21 @@ export const DAY2: Step[] = [
   { t: 'se', sound: 'magic' }, // KIMORIN⭐︎のマナジェムが光る。体からも、あたたかい光がにじみ出て、たまごの中へ
   { t: 'se', sound: 'egg-crack' },
   { t: 'branch', key: 'f_egg', cases: { sun: 'unpon-earth' }, otherwise: 'unpon-sun' },
+  // the egg cracks into light, and うんちピンポンくん pops out — in the client's own design (playtest 2026-11-28: the films
+  // showed another one; design/story/cast/うんちピンポンくん/99-original.jpg)
   { t: 'label', id: 'unpon-earth' },
-  { t: 'video', motion: 'd2-pinpon-earth' }, // たまごが割れて、てっぺんがくるりと渦を巻いた、つやつやの丸い子が跳ね出る
+  { t: 'still', image: 's/d2-egg-earth-cracked', shot: 'egg-crack', fade: 0.2 },
+  { t: 'wait', s: 1.1 },
+  { t: 'se', sound: 'sparkle' },
+  { t: 'still', image: 's/hatch-pinpon-earth', shot: 'hatch-pinpon', fade: 0.1 },
+  { t: 'wait', s: 3.2 },
   { t: 'goto', id: 'unpon' },
   { t: 'label', id: 'unpon-sun' },
-  { t: 'video', motion: 'd2-pinpon-sun' },
+  { t: 'still', image: 's/d2-egg-sun-cracked', shot: 'egg-crack', fade: 0.2 },
+  { t: 'wait', s: 1.1 },
+  { t: 'se', sound: 'sparkle' },
+  { t: 'still', image: 's/hatch-pinpon-sun', shot: 'hatch-pinpon', fade: 0.1 },
+  { t: 'wait', s: 3.2 },
   { t: 'label', id: 'unpon' },
   { t: 'still', image: 's/d2-moon-in' }, // 生まれる映像の最後の絵を残さない（立ち絵と見た目がちがう：QA 5 N26）
   { t: 'sprite', image: ['kimorin-iu', 'unchi-pinpon'] },
@@ -440,8 +467,7 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'どんな時も、私のことを肯定してくれてましたね、、、' },
   { t: 'say', who: 'KIMORIN', text: 'やっと、会えましたね。' },
   { t: 'say', who: 'OBOLON', text: '名前を、つけろ' },
-  { t: 'say', who: 'KIMORIN', text: 'うんちピンポンくん、、、いや、うんぽん' },
-  { t: 'say', who: 'うんちピンポンくん', text: 'うんポーン！' }, // KIMORIN⭐︎のまわりを、ぴょんぴょん跳ねる
+  { t: 'say', who: 'KIMORIN', text: 'うんちピンポンくん！' }, // M-R347: the name as it is (「…いや、うんぽん」 and the cry after it cut)
   // 黒い球が、くるりと、こちらへ向く
   { t: 'sprite', image: 'obolon' },
   { t: 'say', who: 'OBOLON', text: '次は、、、{name}だ。好きな食べ物は？' },
@@ -463,9 +489,10 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'バティ', text: '……やぁ！' },
   { t: 'se', sound: 'sparkle' },
   { t: 'caption', text: '相方が誕生した' },
-  // 画面に、{neo}の{bati}だけが映る (client 2026-10-29)
+  // 画面に、{neo}の{bati}だけが映る (client 2026-10-29) — by the water bowl (story M-R347: the small egg forms over the bowl)
+  { t: 'still', image: 's/moon-bowl', fade: 0.6 },
   { t: 'sprite', image: '@bati' },
-  // M-R218: the broken shell glows, gathers and becomes a small egg on the altar (drawn over the chat; no number is said)
+  // M-R218: the broken shell glows, gathers and becomes a small egg over the water bowl (drawn over the chat; no number is said)
   { t: 'fx', fx: 'shell-egg' },
   { t: 'say', who: 'OBOLON', text: '、、、殻は、、、また、たまごになる。' },
   { t: 'fx', fx: null },

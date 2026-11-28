@@ -549,6 +549,12 @@
       "id": "into-light",
       "kind": "se",
       "prompt": "Stepping through a great gate into blinding warm light: a smooth rising swell of soft air and a bright golden shimmer that blooms and then settles, cinematic transition sound design. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "water-rise",
+      "kind": "se",
+      "duration": 4,
+      "prompt": "A shallow bowl of still magical water begins to stir: a soft liquid swirl and gentle bubbling, then a slow, airy, rising shimmer of crystalline light as something lifts up out of the water, calm and mysterious, ending in a soft glassy sparkle. High quality, realistic and rich, clean recording, no music, no voices."
     }
   ],
   "listen": []

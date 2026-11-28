@@ -55,6 +55,7 @@ import { FilmReel } from './FilmReel';
 import { SaturnLesson } from '@/components/saturn/SaturnLesson';
 import { SealGate, sealGateSeen } from './SealGate';
 import { VenusLesson } from '@/components/venus/VenusLesson';
+import { tapAction, TAP_FADE } from '@/lib/onboarding/tap';
 import { bgmAt, DAY_TITLE, fill, labelIndex, mediaAt, sayText, speakerName, type PictureFx, type Speaker, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
 import { ChatLog, MessageBar, ReplyChips, SysLine, type Avatar, type ChatEntry, type ChatReveal } from '@/components/story/Chat';
 import { linesOf, stageOf } from '@/lib/onboarding/stage';
@@ -1195,12 +1196,13 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
 
 
   const next = () => {
-    voice.current?.stop();
+    // a voice still playing fades out quickly (no click) and its dip of the music ends with it (lib/onboarding/tap.ts)
+    voice.current?.stop(TAP_FADE);
     fadeLongSfx();
     run(iRef.current + 1);
   };
-  // a spoken line is always heard to the end (client 2026-10-28, replacing M-R102's skip for lines heard before):
-  // a tap meanwhile only shows the rest of the words; the voices turned down or the sound off lift the wait
+  // a tap on a line (client 2026-11-28, replacing 2026-10-28's "always heard to the end"): the first tap shows the rest
+  // of the words, the next goes on even while the voice plays — only a line marked `listen` (or `hold`) waits for it
   const sayStep = step?.t === 'say' ? step : null;
   // never stuck behind a voice that did not come or did not end: a voice that never starts lets the tap through after
   // 4 s + 0.26 s a character, one that started after its own length + 1 s
@@ -1220,12 +1222,13 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     clearTimeout(waitTimer.current);
     waitTimer.current = setTimeout(() => setWaitOver(true), (d + 1) * 1000);
   }, [talking, steps]);
-  const mustWait = !!sayStep && (talking || voiceLoading) && !waitOver && !muted && (!!sayStep.hold || mix.voice > 0);
+  const mustWait = !!sayStep && (talking || voiceLoading) && !waitOver && !muted && mix.voice > 0 && !!(sayStep.listen || sayStep.hold);
   const tapLine = () => {
     // only a line types in: a caption in the thread goes on at once (the typing state of the line before stayed
     // behind and swallowed every tap after 「OBOLONが現れた」, client 2026-10-28)
-    if (sayStep && !reveal.current.done) return reveal.current.finish();
-    if (mustWait) return;
+    const act = tapAction({ say: !!sayStep, revealing: !!sayStep && !reveal.current.done, voice: (talking || voiceLoading) && !muted && mix.voice > 0, listen: !!(sayStep?.listen || sayStep?.hold), waitOver });
+    if (act === 'reveal') return reveal.current.finish();
+    if (act === 'wait') return;
     next();
   };
 
