@@ -91,6 +91,7 @@
   border-radius: 14px;
   padding: 6px 10px;
   white-space: normal;
+  text-wrap: balance;
   width: max-content;
   max-width: 62cqw;
   text-align: center;
@@ -256,6 +257,7 @@
   width: max-content;
   max-width: 62%;
   white-space: normal;
+  text-wrap: balance;
   text-align: center;
   font: 900 13px/1.45 var(--font-sans);
   background: rgba(255, 255, 255, 0.96);

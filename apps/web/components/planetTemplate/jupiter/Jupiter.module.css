@@ -180,6 +180,9 @@
   letter-spacing: 0.03em;
   color: #fff;
   word-break: keep-all;
+  /* two lines of about the same length, never one letter left alone (story session 2026-11-28: 「若いころの、わたしよ。」
+     left 「よ。」 alone; balanced it reads 「若いころの、／わたしよ。」) */
+  text-wrap: balance;
   pointer-events: none;
 }
 .ot span {

@@ -99,6 +99,8 @@
   width: 90vw;
   line-height: 1.2;
   overflow-wrap: anywhere;
+  /* the two lines about the same length (story session 2026-11-28: 「若いころの、わたしよ。」 left 「よ。」 alone) */
+  text-wrap: balance;
 }
 .ttl span {
   display: inline-block;
