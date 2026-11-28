@@ -74,7 +74,7 @@ Durations are the feel; the lines are tapped through as always.
 | C10 | MONBAN「そうだ、{inviter}からこれを預かっている。受け取れ」 | OTS, closer on MONBAN | push | cut | — |
 | C11 | MONBAN「マナジェムだ…。」 / 〔テロップ：マナジェムを手に入れた〕 | **gh-gem-monban**: MONBAN's gloved hand offering the gem to us | slow push 1.0→1.1, the gem's glow breathes, sparkles | cut | `sparkle`, `gem-hum` |
 | C12 | MONBAN「キモリンのもある」 | OTS on MONBAN | — | cut | — |
-| C13 | KIMORIN「なんやこれ！　光っとる！　どういう仕組み！？」 | **gh-gem-kimorin-b**: KIMORIN staring at the gem in his paws, lit from below | small punch-in, glow breathes | cut | `gem-hum` |
+| C13 | KIMORIN「なんやこれ！　光っとる！　どういう仕組み！？」 | **gh-gem-kimorin-c**: KIMORIN staring at the gem in his paws, lit from below | small punch-in, glow breathes | cut | `gem-hum` |
 | C14 | MONBAN「使い方は…そのうち、わかる…。」 | OTS on MONBAN | — | cut | — |
 | C15 | KIMORIN「いや今教えてくださいよ。」 | reverse + close | — | cut | — |
 | C16 | OBOLON「それでは、先に月に行ってる」 | OTS on OBOLON | push | cut | — |
@@ -91,7 +91,7 @@ Durations are the feel; the lines are tapped through as always.
 
 ## Pictures (design/rocket-art-queue.json → design/cast/rocket/, published as onboarding/s/gh-*.jpg and gh-*.webp cut-outs)
 - Plates: gh-wall-open-b (edit of s/d2-hall, the doors open onto the plaza), gh-hall-wide, gh-hall-low-b, gh-ots-base, gh-reverse.
-- Inserts (painted with the character): gh-gem-monban, gh-gem-kimorin-b (-b: the repaints of round 2).
+- Inserts (painted with the character): gh-gem-monban, gh-gem-kimorin-c (-b / -c: the repaints).
 - KIMORIN cut-outs (green → scripts/rocket/cut.py): kb-back (three-quarter back, looking up), kb-ots (shoulder and
   head from behind), kb-walk (walking away).
 - OBOLON is the client's own picture (onboarding/obolon.webp), never repainted; MONBAN is his repainted cut-out

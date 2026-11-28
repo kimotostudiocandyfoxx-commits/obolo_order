@@ -230,7 +230,7 @@ export const DAY2: Step[] = [
   { t: 'still', image: 's/gh-ots-base', shot: 'ots-monban', fade: 0.25 },
   { t: 'say', who: 'MONBAN', text: 'キモリンのもある' }, // MONBANが、KIMORINの手のひらにも、小さな石をのせる（M-R334）
   // C13 KIMORIN staring at the stone in his paws, lit from below
-  { t: 'still', image: 's/gh-gem-kimorin-b', shot: 'gem-kimorin', clear: true, fade: 0.15 },
+  { t: 'still', image: 's/gh-gem-kimorin-c', shot: 'gem-kimorin', clear: true, fade: 0.15 },
   { t: 'se', sound: 'gem-hum' },
   { t: 'say', who: 'KIMORIN', text: 'なんやこれ！　光っとる！　どういう仕組み！？' },
   { t: 'still', image: 's/gh-ots-base', shot: 'ots-monban', fade: 0.2 },

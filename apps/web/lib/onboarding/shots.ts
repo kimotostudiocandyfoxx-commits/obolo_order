@@ -43,6 +43,10 @@ export interface ShotLayer {
   reflect?: boolean;
   /** darken / tint to sit in the plate's light (CSS filter after the blur) */
   tone?: string;
+  /** the plate's key light on the figure: a warm gradient laid over the cut-out only (soft-light), e.g. from the ring */
+  key?: string;
+  /** a thin warm rim of light around the silhouette (the light behind it) */
+  rim?: string;
   /** the halo layer behind MONBAN's head, as on the stage */
   halo?: boolean;
   anim?: ShotLayerAnim;
@@ -96,12 +100,33 @@ const C = (s: number, x = 50, y = 50): ShotCam => ({ s, x, y });
 const OBOLON_FAR: ShotLayer = { src: 'obolon', x: 43, y: 69, h: 5.5, float: true };
 const MONBAN_FAR: ShotLayer = { src: 'monban', x: 58, y: 75.5, h: 11, reflect: true, tone: 'brightness(0.85)', halo: true };
 /** KIMORIN from behind on the plaza, warmed to the dusk light */
-const KIMORIN_BACK: ShotLayer = { src: 'kb-back', x: 27, y: 106, h: 40, drift: [-4, -2], tone: 'brightness(0.86) sepia(0.12)' };
+// graded to the plate (client 2026-11-28: it read darker and greyer than the evening light): warmer, a touch of
+// contrast, the ring's and lanterns' warm key from his right, a thin gold rim
+const KIMORIN_BACK: ShotLayer = {
+  src: 'kb-back',
+  x: 27,
+  y: 106,
+  h: 40,
+  drift: [-4, -2],
+  tone: 'brightness(1.0) contrast(1.08) sepia(0.32) saturate(1.3)',
+  key: 'linear-gradient(255deg, rgba(255,190,110,.85) 0%, rgba(255,170,100,.35) 40%, rgba(40,50,110,.35) 100%)',
+  rim: 'rgba(255,205,140,.75)',
+};
 /** the over-the-shoulder shot: KIMORIN's shoulder soft in front, OBOLON and MONBAN before the rocket's steps */
 const OTS = (obolon?: ShotLayer['anim']): ShotLayer[] => [
   { src: 'obolon', x: 47, y: 49, h: 8.5, float: !obolon, anim: obolon, animDur: 2.2 },
   { src: 'monban', x: 68, y: 72, h: 30, reflect: true, tone: 'brightness(0.88)', halo: true },
-  { src: 'kb-ots', x: 11, y: 106, h: 58, blur: 2.5, drift: [-3, 0], tone: 'brightness(0.72) sepia(0.12)' },
+  {
+    src: 'kb-ots',
+    x: 11,
+    y: 106,
+    h: 58,
+    blur: 2.5,
+    drift: [-3, 0],
+    tone: 'brightness(0.86) contrast(1.06) sepia(0.34) saturate(1.3)',
+    key: 'linear-gradient(260deg, rgba(255,186,105,.8) 0%, rgba(255,160,95,.3) 45%, rgba(30,40,95,.45) 100%)',
+    rim: 'rgba(255,200,130,.6)',
+  },
 ];
 
 export const SHOTS: Record<string, Shot> = {
@@ -119,7 +144,7 @@ export const SHOTS: Record<string, Shot> = {
     from: C(1.0, 50, 55),
     to: C(1.04, 50, 50),
     dur: 6,
-    layers: [{ src: 'kb-walk', x: 50, y: 98, h: 46, anim: 'walk-away', animDur: 3.2 }],
+    layers: [{ src: 'kb-walk', x: 50, y: 98, h: 46, anim: 'walk-away', animDur: 3.2, tone: 'contrast(1.05) sepia(0.3) saturate(1.2)', rim: 'rgba(255,214,150,.8)' }],
     fx: [{ k: 'streak', x: 50, y: 73, x2: 55, y2: 2, at: 3.0, dur: 1.1 }],
     cast: ['KIMORIN'],
   },

@@ -116,8 +116,10 @@ function Layer({ l, dur, reduced, epoch }: { l: ShotLayer; dur: number; reduced:
     height: '100%',
     width: 'auto',
     transform: l.flip ? 'scaleX(-1)' : undefined,
-    filter: [l.blur ? `blur(${l.blur}px)` : '', l.tone ?? ''].join(' ').trim() || undefined,
+    filter: [l.blur ? `blur(${l.blur}px)` : '', l.tone ?? '', l.rim ? `drop-shadow(0 0 1.5px ${l.rim})` : ''].join(' ').trim() || undefined,
   };
+  // the plate's key light, laid over the figure only (masked by the cut-out itself)
+  const mask = `url("${url}") center / 100% 100% no-repeat`;
   return (
     <div key={epoch} className="absolute" style={{ ...box, animation: anim, transformOrigin: '50% 100%' }}>
       <div className="relative h-full" style={{ animation: !reduced && l.float ? 'shotFloat 6s ease-in-out infinite' : !reduced && l.anim === 'walk-away' ? `shotStep 0.4s ease-in-out ${Math.round((l.animDur ?? 3.2) / 0.4)}` : undefined }}>
@@ -127,6 +129,9 @@ function Layer({ l, dur, reduced, epoch }: { l: ShotLayer; dur: number; reduced:
         )}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={url} alt="" draggable={false} className="relative block" style={img} />
+        {l.key && (
+          <div className="absolute inset-0" style={{ background: l.key, mixBlendMode: 'soft-light', mask, WebkitMask: mask, transform: img.transform, filter: l.blur ? `blur(${l.blur}px)` : undefined }} />
+        )}
         {l.reflect && (
           <div className="absolute left-1/2 top-full h-[7%] w-[90%] rounded-full" style={{ translate: '-50% -60%', background: 'radial-gradient(closest-side, rgba(0,0,0,.55), transparent)' }} />
         )}
