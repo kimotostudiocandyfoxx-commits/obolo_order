@@ -1,7 +1,7 @@
 import type { HomePlanet, HomeWork, PlanetHomeView } from '@obolo/shared';
 import { castAround, castByKey, castWork } from './castWorks';
 import { KIMORIN, rosterDayOf } from './roster';
-import { sampleWork, templateSample } from './sample';
+import { templateSample } from './sample';
 
 /**
  * The new planet homes inside the story (days 3–7, story session M-R330): the people the script names, on the sample
@@ -9,7 +9,7 @@ import { sampleWork, templateSample } from './sample';
  *  - `host` (Saturn: `takoyaki`): the resident's own place — たこ焼き兄妹's record, 大根カイザー's tree, フリージー's island,
  *    ヒポキン's studio, ボスG's booth. Around it: KIMORIN⭐︎ (whom the resident pushes: 『プリプリ・ボカン』 / 「うんち。」 /
  *    すね毛) and the story's cast met so far (the day's oshi roster without the hosts themselves).
- *  - `neo`: {neo}'s own place — the inviter's work (nobody in that spot when nobody invited: M-R343, no MIKIE⭐︎DRILL
+ *  - `neo`: {neo}'s own place — the inviter's REAL work of this planet (nobody in that spot when they have none here, or when nobody invited: M-R343, no MIKIE⭐︎DRILL
  *    stand-in before Order) and KIMORIN⭐︎'s come around, then the oshi of that day (M-R341: 9 on Saturn … 15 on Venus); {neo}'s own work of
  *    this morning is in the place when it flew (`sent`).
  * M-R342: nobody else — the sample people and the hosts' 「見本の住人」 of before are gone. MONBAN stays on the takoyaki
@@ -41,6 +41,8 @@ export interface StoryCastInput {
   neo: string;
   /** the inviter's name ('' / '…' / the old stand-in's name: nobody invited → nobody in that spot, M-R343) */
   inviter?: string;
+  /** the inviter's real work on this planet (GET /planet-home/<planet>/person/<inviter>: the newest), none: nobody in that spot */
+  inviterWork?: HomeWork | null;
   /** {neo}'s work of this morning flew */
   sent?: boolean;
   /** {neo}'s own work: its words (Saturn), title and picture (the others) */
@@ -90,11 +92,9 @@ export function storyHome(planet: StoryPlanet, place: StoryPlace, o: StoryCastIn
       far: [],
     };
   }
-  const real = !!o.inviter && o.inviter !== '…' && o.inviter !== 'MIKIE⭐︎DRILL';
-  // the inviter (a real member, whose work the story cannot know): the planet's plain figure with their name and a
-  // stand-in work — on Saturn the script's own welcome; nobody invited → nobody (M-R343)
-  const inviter = real ? as(sampleWork(planet as HomePlanet, 0, o.inviter!, 'mikie', 'dachi', new Date(now - 1800_000).toISOString()), `st-${planet}-inviter`, { name: o.inviter!, rel: 'dachi', ...(planet === 'saturn' ? { text: SATURN_WORDS['MIKIE⭐︎DRILL'] } : {}) }) : null;
-  if (inviter) inviter.author = { ...inviter.author, figure: null, ball: null, pic: null };
+  // the inviter is a real member (story 2026-11-28): their REAL work of this planet comes (the page loads it — the newest
+  // one they flew here); when they have none here, or nobody invited (M-R343), nobody is in that spot. Never a sample.
+  const inviter: HomeWork | null = o.inviterWork ? { ...o.inviterWork, rel: 'dachi', flownAt: new Date(now - 1800_000).toISOString() } : null;
   const mine = sample.own[0];
   const own: HomeWork[] =
     o.sent && mine

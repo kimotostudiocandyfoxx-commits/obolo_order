@@ -33,7 +33,7 @@ export function sampleCast(o: SampleCast = {}): [name: string, pic: string, rel:
 const WORDS = ['明日もがんばるZE', 'うまいラーメン見つけた', 'ねむい…でも楽しい', '新曲できたかも', '空がきれいだった', 'たこ焼き食べたい。', 'きょうは晴れ'];
 export const SAMPLE_OWN_FIGURE = (planet: HomePlanet) => `/planets/sample/fig-${planet}-user.webp`;
 
-/** one of the prototype's sample works (the preview's own 「you」, and the story's stand-in for an inviter's work) */
+/** one of the prototype's sample works (the preview's own 「you」; never in an inviter's name: the story shows their real work or none) */
 export function sampleWork(planet: HomePlanet, i: number, name: string, pic: string, rel: HomeRel, flownAt: string): HomeWork {
   const cfg = PLANET_HOMES[planet];
   const kind = cfg.store ?? 'saturn_post';
