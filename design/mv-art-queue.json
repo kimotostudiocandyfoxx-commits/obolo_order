@@ -20623,6 +20623,38 @@
     "design/mv-art/out/mvr/k-base-wide.jpg"
    ],
    "prompt": "Edit the reference picture: remove the small white fox character completely, filling the place where he stood with the matching floor, stairs and reflections. Keep EVERYTHING else exactly as it is - the rocket with its open hatch and boarding staircase, the platform, stairs, obelisks, lanterns, golden ring, sky, colours, light and composition. No characters, no people. No text, no watermark."
+  },
+  {
+   "id": "mvr/plate-gate-a",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "design/mv-art/out/mvr/p-rocket3f-front.jpg",
+    "design/mv-art/out/mvr/plate-base-low.jpg",
+    "design/mv-art/out/mvr/p-out2-b.jpg"
+   ],
+   "prompt": "A cinematic close-up of the BASE of the gigantic rocket from the reference pictures (black hull with gold filigree, pink and cyan neon lines, three huge bronze engine nozzles, swept-back fins), standing on its launch platform in the outdoor black-and-gold plaza at dusk (reflective tiled floor with gold lines, golden lanterns, gold-lit violet clouds). The rocket is as big as a skyscraper: ONLY its lower part is in the frame - the hull rises out of the TOP of the picture, the nose is NOT visible. The fins and engine nozzles are colossal, like the walls and pillars of a cathedral, and rest firmly on the platform. In the middle of the lower hull, between the fins and above the nozzles, a huge hatch has OPENED like a great mouth / tall arched gate, bright warm white-gold light pouring out from a long glowing corridor inside; from the hatch a long, wide boarding staircase with glowing edges and handrails has slid out and runs diagonally straight down toward the camera to the plaza floor, light reflecting on the wet-looking floor, a little mist at the ground. Scale: each step of the staircase is tiny compared to the rocket; the hatch is several storeys tall. No people, no characters. Vertical 9:16, edge to edge, low camera on the plaza floor looking up. No text, no watermark. The camera is on the plaza floor about 40 metres in front of the bottom of the staircase, looking up; the staircase fills the lower middle of the frame and leads the eye up into the glowing hatch."
+  },
+  {
+   "id": "mvr/plate-gate-b",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "design/mv-art/out/mvr/p-rocket3f-front.jpg",
+    "design/mv-art/out/mvr/plate-base-low.jpg",
+    "design/mv-art/out/mvr/p-out2-b.jpg"
+   ],
+   "prompt": "A cinematic close-up of the BASE of the gigantic rocket from the reference pictures (black hull with gold filigree, pink and cyan neon lines, three huge bronze engine nozzles, swept-back fins), standing on its launch platform in the outdoor black-and-gold plaza at dusk (reflective tiled floor with gold lines, golden lanterns, gold-lit violet clouds). The rocket is as big as a skyscraper: ONLY its lower part is in the frame - the hull rises out of the TOP of the picture, the nose is NOT visible. The fins and engine nozzles are colossal, like the walls and pillars of a cathedral, and rest firmly on the platform. In the middle of the lower hull, between the fins and above the nozzles, a huge hatch has OPENED like a great mouth / tall arched gate, bright warm white-gold light pouring out from a long glowing corridor inside; from the hatch a long, wide boarding staircase with glowing edges and handrails has slid out and runs diagonally straight down toward the camera to the plaza floor, light reflecting on the wet-looking floor, a little mist at the ground. Scale: each step of the staircase is tiny compared to the rocket; the hatch is several storeys tall. No people, no characters. Vertical 9:16, edge to edge, low camera on the plaza floor looking up. No text, no watermark. The camera is closer, right at the bottom of the staircase, looking steeply up along the steps into the glowing hatch; the giant fins and nozzles tower on both sides like canyon walls."
   }
  ],
  "redo": []
