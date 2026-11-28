@@ -2,7 +2,7 @@ import { HttpException } from '@nestjs/common';
 import { demoGame, MAKE_COST, NOVEL_CHAPTERS_PER_DAY, spellEdit, spellFrom, spellKey, spellOfAnswers, type JobView, type MakeConfirm } from '@obolo/shared';
 import { describe, expect, it } from 'vitest';
 import type { Database } from '../db/db';
-import { books, games } from '../db/schema';
+import { books, games, storyFirstWorks } from '../db/schema';
 import { startConfirmed } from '../wallet/confirmed';
 import { LedgerService, type ManaEntryInput, type Tx } from '../wallet/ledger.service';
 import { checkGameCode, GameService, wordsInCode, type GameJobInput } from './game.service';
@@ -13,6 +13,7 @@ function fakeDb() {
   const tables = new Map<unknown, Record<string, unknown>[]>([
     [books, []],
     [games, []],
+    [storyFirstWorks, []],
   ]);
   let n = 0;
   const rows = (t: unknown) => tables.get(t)!;

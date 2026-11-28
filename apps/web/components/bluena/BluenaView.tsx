@@ -1,7 +1,7 @@
 'use client';
 
 import { BatiShelf } from '@/components/bati/BatiShelf';
-import { SATURN_LIFETIME_HOURS, type BluenaKeptView, type JupiterRootView, type MarsBackstageVideo, type PlanetId, type RadioShowView, type SaturnPostView, type SongView } from '@obolo/shared';
+import { SATURN_LIFETIME_HOURS, type BluenaKeptView, type CastChoicesView, type JupiterRootView, type MarsBackstageVideo, type PlanetId, type RadioShowView, type SaturnPostView, type SongView } from '@obolo/shared';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
@@ -12,6 +12,7 @@ import { ShowArt } from '@/components/venus/radio/ShowArt';
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { Glyph, GLYPH_NAMES, type GlyphId } from './glyphs';
+import { castOfWork, castWork } from '@/lib/planetTemplate/castWorks';
 
 type FolderId = 'saturn' | 'jupiter' | 'mercury' | 'mars' | 'venus' | 'uranus' | 'neptune' | 'pluto';
 
@@ -208,16 +209,15 @@ function Works({ folder, onFolder }: { folder: FolderId; onFolder: (f: FolderId)
                 <path d="M15.5 3.5a8.5 8.5 0 1 0 5 13.6A7 7 0 0 1 15.5 3.5z" />
               </svg>
             </Link>
-            {(folder === 'mercury' || folder === 'mars') && (
-              <button
-                onClick={() => setKept((v) => !v)}
-                aria-label={kept ? '自分の作品を見る' : 'しまった作品を見る'}
-                aria-pressed={kept}
-                className={`flex h-8 w-8 items-center justify-center rounded-full ${kept ? 'bg-amber-300 text-slate-950' : 'bg-white/10 text-white/70'}`}
-              >
-                <Glyph id="kept" label={false} className="h-4 w-4" />
-              </button>
-            )}
+            {/* しまった作品: someone else's works kept here (Mercury / Mars: members' songs and films; every planet: the cast's ☆) */}
+            <button
+              onClick={() => setKept((v) => !v)}
+              aria-label={kept ? '自分の作品を見る' : 'しまった作品を見る'}
+              aria-pressed={kept}
+              className={`flex h-8 w-8 items-center justify-center rounded-full ${kept ? 'bg-amber-300 text-slate-950' : 'bg-white/10 text-white/70'}`}
+            >
+              <Glyph id="kept" label={false} className="h-4 w-4" />
+            </button>
           </span>
         </div>
         <Folder id={folder} kept={kept} empty={f.empty} />
@@ -265,7 +265,7 @@ function FolderIcon({ f, on, onPick }: { f: (typeof FOLDERS)[number]; on: boolea
 }
 
 function Folder({ id, kept, empty }: { id: FolderId; kept: boolean; empty: string }) {
-  if (kept && (id === 'mercury' || id === 'mars')) return <KeptList planet={id} />;
+  if (kept) return id === 'mercury' || id === 'mars' ? <KeptList planet={id} /> : <CastKept planet={id} />;
   if (id === 'mercury') return <SongsFolder empty={empty} />;
   if (id === 'mars') return <MarsFolder empty={empty} />;
   if (id === 'jupiter') return <JupiterFolder empty={empty} />;
@@ -518,9 +518,10 @@ function KeptList({ planet }: { planet: 'mercury' | 'mars' }) {
   const [list, reload] = useLoad<BluenaKeptView[]>(() => getApi().bluenaKept());
   if (list === null) return <Empty text="読みこみ中…" />;
   const mine = list.filter((k) => k.planet === planet);
-  if (!mine.length) return <Empty text={planet === 'mercury' ? '水星で気に入った曲を〔ブルーナにしまう〕と、ここに入る。' : 'まだ、しまった映像はない。'} />;
+  if (!mine.length) return <CastKept planet={planet} empty={planet === 'mercury' ? '水星で気に入った曲を〔ブルーナにしまう〕と、ここに入る。' : 'まだ、しまった映像はない。'} />;
   return (
     <div className="space-y-2">
+      <CastKept planet={planet} empty="" />
       {mine.map((k) => (
         <Row
           key={k.postId}
@@ -530,6 +531,35 @@ function KeptList({ planet }: { planet: 'mercury' | 'mars' }) {
         >
           {k.available && k.url && <Play url={k.url} />}
           <Remove onRemove={() => getApi().keepInBluena(k.postId, false).then(reload)} />
+        </Row>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * client 2026-11-28: the cast's works ☆-saved on the planet homes (GET /me/cast: the app's own characters, their works
+ * are the app's files) — the picture, the title, whose; ✕ takes it out of Bluena
+ */
+function CastKept({ planet, empty = 'まだ、しまった作品はない。星のホームで、住人の作品の☆をおすと、ここに入る。' }: { planet: FolderId; empty?: string }) {
+  const [view, reload] = useLoad<CastChoicesView | null>(() => getApi().castChoices().catch(() => null));
+  const rows = (view?.saved ?? []).flatMap((s) => {
+    const m = castOfWork({ id: s.id });
+    return m && m.planet === planet ? [{ id: s.id, w: castWork(m.planet, m.cast, 'oshi', s.savedAt), name: m.cast.name }] : [];
+  });
+  if (view === null && empty) return <Empty text="読みこみ中…" />;
+  if (!rows.length) return empty ? <Empty text={empty} /> : null;
+  return (
+    <div className="space-y-2" data-testid="cast-kept">
+      {rows.map(({ id, w, name }) => (
+        <Row
+          key={id}
+          // eslint-disable-next-line @next/next/no-img-element
+          art={w.thumbUrl ? <img src={w.thumbUrl} alt="" className="h-full w-full object-cover" /> : <Glyph id="kept" label={false} className="m-3 h-6 w-6 text-amber-200" />}
+          title={w.title || w.text || name}
+          sub={name}
+        >
+          <Remove onRemove={() => getApi().saveCastWork(id, false).then(reload)} />
         </Row>
       ))}
     </div>

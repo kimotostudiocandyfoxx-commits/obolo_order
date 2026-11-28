@@ -124,6 +124,7 @@ describe('migration 0064: nobody goes back', () => {
     expect(mark).toBeGreaterThan(0);
     expect(move).toBeGreaterThan(mark);
     const journal = JSON.parse(readFileSync(join(__dirname, '../../drizzle/meta/_journal.json'), 'utf8')) as { entries: { idx: number; tag: string }[] };
-    expect(journal.entries[journal.entries.length - 1]).toMatchObject({ idx: 64, tag: '0064_journey_eleven_days' });
+    // in the journal (later migrations come after it: 0065 the story-first works and the cast choices)
+    expect(journal.entries.find((e) => e.idx === 64)).toMatchObject({ idx: 64, tag: '0064_journey_eleven_days' });
   });
 });

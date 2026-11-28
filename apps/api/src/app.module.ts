@@ -56,6 +56,9 @@ import { CraftController } from './craft/craft.controller';
 import { GameService } from './craft/game.service';
 import { GoodsService } from './craft/goods.service';
 import { NovelService } from './craft/novel.service';
+import { StoryFirstController } from './craft/story-first.controller';
+import { StoryFirstService } from './craft/story-first.service';
+import { CastChoicesController, CastChoicesService } from './planets/cast-choices.service';
 import { InfraModule } from './infra/infra.module';
 import { LinksController } from './links/links.controller';
 import { LinksService } from './links/links.service';
@@ -166,6 +169,8 @@ import { StorageWorksService } from './storage/storage-works.service';
     SpellController,
     SpellToolsController,
     CraftController,
+    StoryFirstController,
+    CastChoicesController,
     LinksController,
     ManaPricesController,
     StorageController,
@@ -240,6 +245,8 @@ import { StorageWorksService } from './storage/storage-works.service';
     NovelService,
     GameService,
     GoodsService,
+    StoryFirstService,
+    CastChoicesService,
     LinksService,
   ],
 })

@@ -10,6 +10,7 @@ import { getApi } from '@/lib/api';
 import { realLessonApi, type LessonApi } from '@/lib/onboarding/lessonApi';
 import type { StoryVars } from '@/lib/onboarding/script';
 import { publishStoryGoods, storyGoodsNote, type StoryGoodsResult } from '@/lib/onboarding/storyGoods';
+import { publishStoryBook, publishStoryGame, storyBookNote, storyGameNote, writeStoryBook, type StoryFlightResult } from '@/lib/onboarding/storyFirst';
 import { Glyph } from '@/components/bluena/glyphs';
 import { LineIcon } from '@/components/LineIcon';
 
@@ -17,13 +18,16 @@ import { LineIcon } from '@/components/LineIcon';
  * The making screens of the outer planets' days — days 8–10 of the first journey since M-R341 (lib/onboarding/outer.ts),
  * and the days after joining of the eight-day journey's accounts (lib/onboarding/after.ts); script P05m: goods on Uranus, a story on
  * Pluto, a little game on Neptune — made in the Moon atelier (AtelierScreen), kept in Bluena, shown on the planet.
- * The real makers are not built yet, so these are the simplest honest versions with what exists:
- * - goods: one of your own works from the journey on a goods mock-up (no new picture, no order, no payment);
- * - a story: your own words become the spell cards; members get the feather pen's story from the existing story
- *   writer (getApi().writeStory, mana asked first by the story), the review pages your own words as the pages;
- * - a game: your art as the background, your song as the BGM, your kororin catching notes (made here, no server).
- * What is kept stays on this device (「Bluena」 below = this device's drawer) until the server keeps these folders;
- * 〔公開する〕 is shown, and says plainly that nobody else sees it yet. No character lines here: they are the story's.
+ * On the first journey all three become REAL works of the member and fly to their planet from the Moon:
+ * - goods (day 10): one of your own arts on a goods kind — the Moon's free maker (lib/onboarding/storyGoods.ts);
+ * - a story (day 8, client 2026-11-28): your own words become the spell cards; the server writes the feather pen's story
+ *   and keeps it as your book, free and once (lib/onboarding/storyFirst.ts); its pictures stay on this device. On the
+ *   days after joining of the eight-day journey the story writer of before (getApi().writeStory, mana asked first);
+ *   the review pages your own words as the pages;
+ * - a game (day 9, client 2026-11-28): your art as the background, your song as the BGM, your kororin catching notes
+ *   (the story's toy, here); 〔公開する〕 makes it a real catch game on the server, free and once, and flies it.
+ * What is not real stays on this device (「Bluena」 below = this device's drawer) and 〔公開する〕 says plainly that
+ * nobody else sees it yet. No character lines here: they are the story's.
  */
 export type AfterWhat =
   | 'm-goods' | 'm-publish-goods' | 'm-shop' | 'm-shop-locked'
@@ -34,7 +38,7 @@ type Done = (a: Record<string, string>) => void;
 type Art = { text: string; url: string | null };
 
 const BLUENA_KEY = 'obolo.bluena.after';
-type Kept = { goods?: { shape: string; art: Art; /** the real goods item it became (day 10, lib/onboarding/storyGoods.ts) */ sentId?: string }; game?: { title: string; cards: string[] } };
+type Kept = { goods?: { shape: string; art: Art; /** the real goods item it became (day 10, lib/onboarding/storyGoods.ts) */ sentId?: string }; game?: { title: string; cards: string[]; /** the real game it became (day 9, lib/onboarding/storyFirst.ts) */ sentId?: string } };
 function loadKept(): Kept {
   try {
     return JSON.parse(localStorage.getItem(BLUENA_KEY) ?? '{}') as Kept;
@@ -457,7 +461,9 @@ function StoryWrite({ v, answers, lessonApi, onDone }: { v: StoryVars; answers: 
     };
     const live = lessonApi === realLessonApi;
     const t0 = Date.now();
-    (live ? getApi().writeStory(cards).then((r): Book => ({ id: `${Date.now()}`, title: r.title, pages: r.pages, cards, made: Date.now() })) : Promise.reject(new Error('preview')))
+    // client 2026-11-28: on day 8 the server writes it and keeps it as the member's real book (free, once —
+    // lib/onboarding/storyFirst.ts); on the days after joining of the eight-day journey, the writer of before
+    (live ? writeStoryBook(getApi(), cards, answers.story_seed).then((r): Book => ({ id: `${Date.now()}`, title: r.title, pages: r.pages, cards, made: Date.now(), ...(r.at === 'real' ? { realId: r.bookId } : {}) })) : Promise.reject(new Error('preview')))
       .catch((e: unknown) => {
         setNote(live ? ((e as { code?: string })?.code === 'NO_MANA' ? 'マナジェムが、光らなかった。話した言葉を、そのままページにしました' : '羽ペンが、止まってしまった……。話した言葉を、そのままページにしました') : '（確認用：AIは動かさず、話した言葉をそのままページにしています）');
         return own();
@@ -564,10 +570,21 @@ function PictureBookMini({ v, onDone }: { v: StoryVars; onDone: Done }) {
   );
 }
 
-function PublishBook({ v, onDone }: { v: StoryVars; onDone: Done }) {
-  const book = loadDrawer().at(-1);
+function PublishBook({ v, lessonApi, onDone }: { v: StoryVars; lessonApi?: LessonApi; onDone: Done }) {
+  const [book] = useState(() => loadDrawer().at(-1));
+  // day 8 (client 2026-11-28): the real book flies to Pluto (the Moon's own call); the previews keep it on the device
+  const live = lessonApi === realLessonApi;
+  const [sent, setSent] = useState<StoryFlightResult | 'preview' | null>(live ? null : 'preview');
+  useEffect(() => {
+    if (!live) return;
+    let off = false;
+    void publishStoryBook(getApi(), book?.realId).then((r) => !off && setSent(r));
+    return () => {
+      off = true;
+    };
+  }, [live, book]);
   return (
-    <Moment bg="bg-gradient-to-b from-[#020414]/90 via-[#0b1838]/70 to-black/30" note="（図書館の棚と空の灯りは、いまはこの端末の中だけです。ダチには、まだ届きません）" onDone={() => onDone({})}>
+    <Moment bg="bg-gradient-to-b from-[#020414]/90 via-[#0b1838]/70 to-black/30" note={storyBookNote(sent).replace('{neo}', v.neo || v.name || '')} onDone={() => onDone({})}>
       {/* the light in the dark sky */}
       <span className="absolute left-[24%] top-[6%] h-2.5 w-2.5 animate-[fadeIn_1s_1.6s_both] rounded-full bg-amber-100 shadow-[0_0_18px_6px_rgba(255,236,170,0.7)]" />
       <div className="flex items-end gap-3">
@@ -778,11 +795,27 @@ function GamePlay({ v, answers, onDone }: { v: StoryVars; answers: Record<string
   );
 }
 
-function PublishGame({ v, onDone }: { v: StoryVars; onDone: Done }) {
-  const g = loadKept().game;
+function PublishGame({ v, lessonApi, onDone }: { v: StoryVars; lessonApi?: LessonApi; onDone: Done }) {
+  const [g] = useState(() => loadKept().game);
+  // day 9 (client 2026-11-28): the story's game becomes a real game (free, once) and flies to Neptune; its id is kept
+  // on the device so a replay flies the same game; the previews keep it on the device
+  const live = lessonApi === realLessonApi;
+  const [sent, setSent] = useState<StoryFlightResult | 'preview' | null>(live ? null : 'preview');
+  useEffect(() => {
+    if (!live) return;
+    let off = false;
+    void publishStoryGame(getApi(), g, g?.sentId).then((r) => {
+      if (off) return;
+      if (r.at === 'planet' && g) keep({ game: { ...g, sentId: r.id } });
+      setSent(r);
+    });
+    return () => {
+      off = true;
+    };
+  }, [live, g]);
   const dots = Array.from({ length: 12 }, (_, k) => k);
   return (
-    <Moment bg="bg-gradient-to-b from-[#010812]/90 to-[#04213a]/80" note="（深海の都の館は、いまはこの端末の中だけに灯ります。ほかの人には、まだ見えません）" onDone={() => onDone({})}>
+    <Moment bg="bg-gradient-to-b from-[#010812]/90 to-[#04213a]/80" note={storyGameNote(sent).replace('{neo}', v.neo || v.name || '')} onDone={() => onDone({})}>
       <div className="relative flex h-44 w-44 items-center justify-center">
         {/* the shell house, its rim lighting up in neon, one by one */}
         <div className="absolute inset-0 rounded-[50%_50%_45%_45%] border-2 border-slate-600 bg-slate-800/70" />
@@ -824,7 +857,7 @@ export function AfterStep({ what, vars: v, answers, lessonApi, onDone }: { what:
     case 'm-picturebook':
       return <PictureBookMini v={v} onDone={onDone} />;
     case 'm-publish-book':
-      return <PublishBook v={v} onDone={onDone} />;
+      return <PublishBook v={v} lessonApi={lessonApi} onDone={onDone} />;
     case 'm-nagare':
       return <Nagare v={v} onDone={onDone} />;
     case 'm-game-seed':
@@ -834,6 +867,6 @@ export function AfterStep({ what, vars: v, answers, lessonApi, onDone }: { what:
     case 'm-game-play':
       return <GamePlay v={v} answers={answers} onDone={onDone} />;
     case 'm-publish-game':
-      return <PublishGame v={v} onDone={onDone} />;
+      return <PublishGame v={v} lessonApi={lessonApi} onDone={onDone} />;
   }
 }

@@ -3,7 +3,7 @@
  * the server keeps my places. Nothing in here is sent to anyone; the shelf of my図書館 shows what is put on it.
  */
 export type BookPage = { text: string; scene: string; pic?: string | null; how?: 'book' | 'bati' | 'photo' | 'words' };
-export type Book = { id: string; title: string; pages: BookPage[]; cards: string[]; picture?: boolean; made: number };
+export type Book = { id: string; title: string; pages: BookPage[]; cards: string[]; picture?: boolean; made: number; /** client 2026-11-28: the member's real book it is (day 8, lib/onboarding/storyFirst.ts) */ realId?: string };
 
 export const DRAWER_KEY = 'obolo.drawer';
 

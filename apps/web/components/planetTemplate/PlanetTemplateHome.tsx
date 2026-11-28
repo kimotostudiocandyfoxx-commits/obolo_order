@@ -1,6 +1,6 @@
 'use client';
 
-import type { HomePlanet, HomeWork, PlanetHomeView } from '@obolo/shared';
+import { isCastWorkId, type CastOshiKey, type HomePlanet, type HomeWork, type PlanetHomeView } from '@obolo/shared';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { tapVoice } from '@/lib/planetTemplate/castAudio';
 import { storedBookSpeed } from '@/lib/planetTemplate/castBook';
@@ -14,6 +14,7 @@ import { pinchGoes, PinchTracker, WheelPinch } from '@/lib/planetTemplate/pinch'
 import { armPlanetSound, clubBeat, soundScope } from '@/lib/planetTemplate/sfx';
 import { PlayView, type PlayStage } from './PlayView';
 import { Profile, type ProfileMiddleSlot, type ProfilePerson } from './Profile';
+import { castToast, residentOf, type CastChoices } from '@/lib/planetTemplate/castChoices';
 import { Shades } from './saturn/Shades';
 import { TopBar } from './TopBar';
 import { defaultOpener, type FigureSlot, type WorkOpener } from './WorkView';
@@ -56,6 +57,17 @@ export interface TemplateHooks {
 
 export type HomeEvent = 'open' | 'play' | 'sky' | 'profile';
 
+/**
+ * client 2026-11-28 (lib/planetTemplate/castChoices.ts): the member's ♡ for the residents (oshi from the start) and ☆
+ * for the cast's works. `resting`: the residents with the ♡ off (not on the home; on the profile's row, dimmed).
+ */
+export interface HomeCast {
+  choices: CastChoices;
+  resting: HomePerson[];
+  setOshi: (key: CastOshiKey, on: boolean) => void;
+  setSaved: (workId: string, on: boolean) => void;
+}
+
 /** the 9:16 picture's box covering a W×H screen */
 function coverBox(W: number, H: number) {
   const k = Math.max(W / 9, H / 16);
@@ -79,11 +91,14 @@ export function PlanetTemplateHome({
   hooks = {},
   onSwitchPlanet,
   onEvent,
+  cast,
 }: {
   planet: HomePlanet;
   view: PlanetHomeView | null;
   me: TemplateMe;
   hooks?: TemplateHooks;
+  /** the member's ♡ / ☆ for the cast (a signed-in member's homes; none: the cast have neither, as before) */
+  cast?: HomeCast;
   onSwitchPlanet?: (p: HomePlanet) => void;
   /** what the visitor did (the story's steps wait for these; nobody else listens): a work opened, ▶, the sky, a profile (`id`: whose) */
   onEvent?: (e: HomeEvent, id?: string) => void;
@@ -404,7 +419,25 @@ export function PlanetTemplateHome({
         chibi: p.chibi ?? null,
         works: p.works,
       })),
+    ...(cast?.resting ?? []).map((p) => ({ id: p.id, name: p.name, figure: p.figure ?? cfg.standIn?.(p.id) ?? null, chibi: p.chibi ?? null, works: p.works, rest: true })),
   ];
+  // client 2026-11-28: a resident's ♡ on their profile — off: they leave the home (still on the row); on again: back
+  const heart = cast
+    ? (p: ProfilePerson) => {
+        const key = residentOf(p.id);
+        if (!key) return null;
+        const on = !cast.choices.unoshi.has(key);
+        return {
+          on,
+          toggle: () => {
+            cast.setOshi(key, !on);
+            snd.current.cue(planet, on ? 'tap' : 'skyOshi');
+            toast(on ? castToast.oshiOff(p.name) : castToast.oshiOn(p.name));
+          },
+        };
+      }
+    : undefined;
+  const castSaved = cast && opened && isCastWorkId(opened.work.id) ? cast.choices.saved.has(opened.work.id) : null;
   const openProfile = useCallback(
     (id: string) => {
       snd.current.cue(planet, 'profile');
@@ -585,6 +618,7 @@ export function PlanetTemplateHome({
           middle={hooks.profileMiddle}
           full={hooks.profileFull}
           openedId={opened && opened.seatN == null ? opened.work.id : null}
+          heart={heart}
           onOpen={(p, w) => {
             const person = people.find((x) => x.id === p.id) ?? {
               id: p.id,
@@ -614,6 +648,27 @@ export function PlanetTemplateHome({
             openProfile,
           })}
         </div>
+      )}
+      {/* client 2026-11-28: ☆ a cast work into Bluena (as any member's work in the sky); no report for the cast */}
+      {opened && cast && castSaved !== null && (
+        <button
+          type="button"
+          className={`${s.castStar} ${castSaved ? s.on : ''}`}
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            cast.setSaved(opened.work.id, !castSaved);
+            if (!castSaved) snd.current.cue(planet, 'skyKeep');
+            toast(castSaved ? castToast.unsaved : castToast.saved);
+          }}
+          aria-label={castSaved ? 'ブルーナからはずす' : 'お気に入り（ブルーナに保存）'}
+          aria-pressed={castSaved}
+          data-testid="cast-save"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden>
+            <path d="M12 3.2l2.6 5.5 6 .8-4.4 4.1 1.1 5.9L12 16.6l-5.3 2.9 1.1-5.9L3.4 9.5l6-.8z" />
+          </svg>
+        </button>
       )}
       {sky && hooks.sky?.({ close: () => setSky(false), toast })}
       {toastText && (

@@ -210,6 +210,16 @@ export interface Api {
   setGameCover(id: string, rootId: string | null): Promise<GameView>;
   /** story 2026-11-25 (グッズ): a kind + one of your own arts (free, made at once) */
   makeGoods(body: GoodsMakeBody): Promise<GoodsView>;
+  /**
+   * client 2026-11-28: the first journey's own book (day 8) / game (day 9) made a real work — free, once (asked again:
+   * the same work, `again`); NOT_STORY_DAY on any other day. Flown afterwards with flyBook / flyGame.
+   */
+  storyFirstBook(body: import('@obolo/shared').StoryFirstBookBody): Promise<import('@obolo/shared').StoryFirstBookView>;
+  storyFirstGame(body: import('@obolo/shared').StoryFirstGameBody): Promise<import('@obolo/shared').StoryFirstGameView>;
+  /** client 2026-11-28: the residents taken off oshi (♡) and the cast works ☆-saved to Bluena */
+  castChoices(): Promise<import('@obolo/shared').CastChoicesView>;
+  setCastOshi(key: import('@obolo/shared').CastOshiKey, on: boolean): Promise<import('@obolo/shared').CastChoicesView>;
+  saveCastWork(id: string, on: boolean): Promise<import('@obolo/shared').CastChoicesView>;
   goodsList(): Promise<GoodsView[]>;
   goodsOne(id: string): Promise<GoodsView>;
   /** to the Uranus home ({on: false}: back to the Moon) */

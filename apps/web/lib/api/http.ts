@@ -269,6 +269,21 @@ export class HttpApi implements Api {
   makeGoods(body: Parameters<Api['makeGoods']>[0]) {
     return this.req<Awaited<ReturnType<Api['makeGoods']>>>('POST', '/moon/goods', body);
   }
+  storyFirstBook(body: Parameters<Api['storyFirstBook']>[0]) {
+    return this.req<Awaited<ReturnType<Api['storyFirstBook']>>>('POST', '/moon/story-first/book', body);
+  }
+  storyFirstGame(body: Parameters<Api['storyFirstGame']>[0]) {
+    return this.req<Awaited<ReturnType<Api['storyFirstGame']>>>('POST', '/moon/story-first/game', body);
+  }
+  castChoices() {
+    return this.req<Awaited<ReturnType<Api['castChoices']>>>('GET', '/me/cast');
+  }
+  setCastOshi(key: Parameters<Api['setCastOshi']>[0], on: boolean) {
+    return this.req<Awaited<ReturnType<Api['setCastOshi']>>>('PUT', '/me/cast/oshi', { key, on });
+  }
+  saveCastWork(id: string, on: boolean) {
+    return this.req<Awaited<ReturnType<Api['saveCastWork']>>>('PUT', '/me/cast/save', { id, on });
+  }
   goodsList() {
     return this.req<Awaited<ReturnType<Api['goodsList']>>>('GET', '/moon/goods');
   }

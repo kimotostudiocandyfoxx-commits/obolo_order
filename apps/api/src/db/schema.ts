@@ -689,6 +689,44 @@ export const bluenaSaves = pgTable(
   (t) => [primaryKey({ columns: [t.userId, t.kind, t.postId] }), index('bluena_saves_user_idx').on(t.userId, t.createdAt)],
 );
 
+/**
+ * Client 2026-11-28 (@obolo/shared storyFirst.ts): the first journey's own book (day 8) and game (day 9), made real for
+ * free — one row per member and kind, so the free path is taken once. `workId` is null while it is being written (a
+ * claim); the books / games row it became once done.
+ */
+export const storyFirstWorks = pgTable(
+  'story_first_works',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    /** 'book' | 'game' */
+    kind: text('kind').notNull(),
+    workId: uuid('work_id'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.kind] })],
+);
+
+/**
+ * Client 2026-11-28: the member's own choices about the homes' cast (the app's characters, not accounts — their works
+ * are static files of the web app): `what` 'unoshi' = a resident the member took the ♡ from (`key`: the resident's key,
+ * CAST_OSHI_KEYS); 'save' = a cast work ☆-saved to Bluena (`key`: its home id cast-<key>-<planet>). Kept apart from
+ * bluena_saves on purpose: the homecoming / ★ counters there assume a member's work and a member who saved it.
+ */
+export const castChoices = pgTable(
+  'cast_choices',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    what: text('what').notNull(),
+    key: text('key').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.what, t.key] })],
+);
+
 /** Venus radio: a recorded show (or the recording a live show left). private = Bluena's Venus folder. */
 export const radioShows = pgTable(
   'radio_shows',

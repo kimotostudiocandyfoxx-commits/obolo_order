@@ -1,5 +1,12 @@
 import {
   GOODS_PER_DAY,
+  isCastWorkId,
+  STORY_FIRST_DAY,
+  type StoryFirstKind,
+  type CastChoicesView,
+  type CastOshiKey,
+  type StoryFirstBookView,
+  type StoryFirstGameView,
   goodsTitle,
   type GoodsView,
   SPELL_BOOK_MAX,
@@ -309,6 +316,10 @@ interface DemoState {
   books?: (BookView & { owner: string; flownAt?: string | null })[];
   /** story 2026-11-25: グッズ (a kind + one of your arts) */
   goods?: (GoodsView & { owner: string })[];
+  /** client 2026-11-28: the residents taken off oshi and the cast works ☆-saved (this browser) */
+  cast?: { unoshi: CastOshiKey[]; saved: { id: string; savedAt: string }[] };
+  /** client 2026-11-28: the story-first book / game of each member (made once) */
+  storyFirst?: Record<string, Partial<Record<StoryFirstKind, string>>>;
   /** R18: the demo's ふくろの魔法 (a tier, the month paid, 「やめて」) and the notices said */
   storagePlans?: Record<string, { gb: number | null; paidMonth: string | null; cancelled: boolean; told?: { near?: boolean } }>;
   games?: (GameView & { owner: string; flownAt?: string | null; versions: { tags: SpellTag[]; code: string; title: string; howTo: string }[]; /** R17: each version's making and price */ kinds?: MakeKind[]; prices?: number[] })[];
@@ -1226,6 +1237,79 @@ export class DemoApi implements Api {
     this.save();
     const { owner: _o, ...view } = g;
     return view;
+  }
+  /** client 2026-11-28: as the server — free, once per kind (asked again: the same work), on its journey day only */
+  private storyFirstOnce<T>(kind: StoryFirstKind, existing: (id: string) => T | null, make: () => { id: string; out: T }): { out: T; again: boolean } {
+    const me = this.uid();
+    const done = (this.s.storyFirst ??= {})[me]?.[kind];
+    if (done) {
+      const out = existing(done);
+      if (!out) throw new ApiError(409, 'STORY_FIRST_USED', 'これは、もう作ったよ');
+      return { out, again: true };
+    }
+    if (this.s.users[me]?.journeyDay !== STORY_FIRST_DAY[kind]) throw new ApiError(409, 'NOT_STORY_DAY', 'これは、物語のその日だけ');
+    const made = make();
+    this.s.storyFirst[me] = { ...(this.s.storyFirst[me] ?? {}), [kind]: made.id };
+    this.save();
+    return { out: made.out, again: false };
+  }
+  async storyFirstBook(body: Parameters<Api['storyFirstBook']>[0]): Promise<StoryFirstBookView> {
+    const me = this.uid();
+    const pagesOf = (b: BookView) => (b.chapters[0]?.text ?? '').split(/\n{2,}/).filter(Boolean).map((text) => ({ text, scene: '' }));
+    const list = (this.s.books ??= []);
+    const story = this.s.users[me]?.journeyDay === STORY_FIRST_DAY.book && !this.s.storyFirst?.[me]?.book ? await this.cannedStory(body.cards) : null;
+    const r = this.storyFirstOnce(
+      'book',
+      (id) => {
+        const b = list.find((x) => x.id === id && x.owner === me);
+        return b ? { book: b, pages: pagesOf(b) } : null;
+      },
+      () => {
+        const at = now();
+        const s = story ?? { title: 'わたしのお話', pages: [] };
+        const tags = spellFrom('novel', body.cards.join('、'));
+        const b: BookView & { owner: string } = { id: uid(), owner: me, title: s.title, tags, cover: null, chapters: [{ n: 1, title: s.title, text: s.pages.map((p) => p.text).join('\n\n'), tags, at }], done: false, home: KIND_HOME_PLANET.novel, createdAt: at, updatedAt: at };
+        list.unshift(b);
+        return { id: b.id, out: { book: b, pages: s.pages } };
+      },
+    );
+    const { owner: _o, ...book } = r.out.book as BookView & { owner?: string };
+    return { book, pages: r.out.pages, again: r.again };
+  }
+  async storyFirstGame(body: Parameters<Api['storyFirstGame']>[0]): Promise<StoryFirstGameView> {
+    const me = this.uid();
+    const list = (this.s.games ??= []);
+    const r = this.storyFirstOnce(
+      'game',
+      (id) => (list.some((g) => g.id === id && g.owner === me) ? this.gameOf(id) : null),
+      () => {
+        const tags = spellFrom('game', body.cards.join('、'));
+        const g = demoGame(tags);
+        const title = body.title?.slice(0, 12) || g.title;
+        const at = now();
+        list.unshift({ id: uid(), owner: me, title, howTo: g.howTo, tags, version: 0, code: g.code, home: KIND_HOME_PLANET.game, cover: null, createdAt: at, updatedAt: at, versions: [{ tags, code: g.code, title, howTo: g.howTo }], kinds: ['gameTrial'], prices: [0] });
+        return { id: list[0].id, out: this.gameOf(list[0].id) };
+      },
+    );
+    return { game: r.out, again: r.again };
+  }
+  async castChoices(): Promise<CastChoicesView> {
+    const c = this.s.cast ?? { unoshi: [], saved: [] };
+    return { unoshi: [...c.unoshi], saved: [...c.saved] };
+  }
+  async setCastOshi(key: CastOshiKey, on: boolean): Promise<CastChoicesView> {
+    const c = (this.s.cast ??= { unoshi: [], saved: [] });
+    c.unoshi = on ? c.unoshi.filter((k) => k !== key) : [...new Set([...c.unoshi, key])];
+    this.save();
+    return this.castChoices();
+  }
+  async saveCastWork(id: string, on: boolean): Promise<CastChoicesView> {
+    if (!isCastWorkId(id)) throw new ApiError(400, 'VALIDATION', 'not a cast work');
+    const c = (this.s.cast ??= { unoshi: [], saved: [] });
+    c.saved = c.saved.filter((x) => x.id !== id);
+    if (on) c.saved.unshift({ id, savedAt: now() });
+    this.save();
+    return this.castChoices();
   }
   async goodsList(): Promise<GoodsView[]> {
     const me = this.uid();
@@ -2857,6 +2941,10 @@ export class DemoApi implements Api {
   }
   async writeStory(cards: string[]) {
     this.charge('story');
+    return this.cannedStory(cards);
+  }
+  /** the demo's short story (no model): the hero from the cards */
+  private async cannedStory(cards: string[]) {
     await sleep(1600);
     const hero = (cards.find((c) => c.startsWith('主人公：')) ?? '主人公：たこ焼き').slice(4);
     return {

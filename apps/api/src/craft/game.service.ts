@@ -5,7 +5,7 @@ import { Script } from 'node:vm';
 import { and, desc, eq, isNull } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
-import { games, type GameVersionRow } from '../db/schema';
+import { games, storyFirstWorks, type GameVersionRow } from '../db/schema';
 import type { KvStore } from '../infra/kv';
 import { GAME_CHEAP_LLM, GAME_LLM, GAME_TRIAL_LLM, KV, LLM } from '../infra/tokens';
 import { LedgerService } from '../wallet/ledger.service';
@@ -67,10 +67,14 @@ export class GameService {
     return tier === 'trial' ? (this.trialLlm ?? this.cheapLlm ?? this.llm) : tier === 'cheap' ? (this.cheapLlm ?? this.llm) : this.llm;
   }
 
-  /** the member has made no game yet (the trial is for the first one) */
+  /**
+   * the member has made no game yet (the trial is for the first one). The first journey's own game (day 9, made free:
+   * story_first_works) does not count — the Moon's trial is still theirs afterwards.
+   */
   async firstGame(userId: string): Promise<boolean> {
-    const [row] = await this.db.write.select({ id: games.id }).from(games).where(eq(games.userId, userId)).limit(1);
-    return !row;
+    const [story] = await this.db.write.select({ id: storyFirstWorks.workId }).from(storyFirstWorks).where(and(eq(storyFirstWorks.userId, userId), eq(storyFirstWorks.kind, 'game'))).limit(1);
+    const rows = await this.db.write.select({ id: games.id }).from(games).where(eq(games.userId, userId)).limit(2);
+    return !rows.some((r) => r.id !== story?.id);
   }
 
   private async clean(text: string) {
@@ -161,6 +165,23 @@ export class GameService {
       .returning();
     await this.works?.tag('game', r.id, gameFacts(r));
     return gameView(r);
+  }
+
+  /**
+   * Client 2026-11-28 (storyFirst.ts): the first journey's own game (day 9) as a real game — the catch template (the
+   * story's game is a catch game: notes falling, your kororin catching them), its values from the trial chain like the
+   * Moon's trial, the story's title kept. No yes and no mana: the version says so (confirm 'story-first', price 0 — a
+   * broken report gives nothing back, as nothing was paid). The caller (StoryFirstService) runs it in the absorbed scope.
+   */
+  async makeStoryFirst(userId: string, tags: SpellTag[], said: string | undefined, title: string | undefined): Promise<GameRow> {
+    await this.precheck(userId, { tags, said: [title, said].filter(Boolean).join('、') || undefined });
+    const made = await this.fromTemplate('catch', tags, said);
+    const name = title?.trim().slice(0, 12) || made.title;
+    await this.clean(`${name}\n${made.howTo}\n${wordsInCode(made.code)}`);
+    const v: GameVersionRow = { ...made, title: name, tags, at: new Date().toISOString(), confirmId: 'story-first', kind: 'gameTrial', price: 0 };
+    const [r] = await this.db.write.insert(games).values({ userId, title: name, versionsJson: [v], active: 0, homePlanet: KIND_HOME_PLANET.game }).returning();
+    await this.works?.tag('game', r.id, gameFacts(r));
+    return r;
   }
 
   /**

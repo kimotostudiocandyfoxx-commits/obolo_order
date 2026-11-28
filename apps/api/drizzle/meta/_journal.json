@@ -456,6 +456,13 @@
       "when": 1795623907997,
       "tag": "0064_journey_eleven_days",
       "breakpoints": true
+    },
+    {
+      "idx": 65,
+      "version": "7",
+      "when": 1795856254881,
+      "tag": "0065_story_first_cast_choices",
+      "breakpoints": true
     }
   ]
 }

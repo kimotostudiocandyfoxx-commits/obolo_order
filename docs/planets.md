@@ -155,7 +155,7 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 ## 09 キャラの投稿・絵本・ゲーム・場面ごとの音・本当の星の道（引き継ぎ 08 の 3・4・6・7章、09 の確認表。M-R337・M-R344）
 物語のブランチ（claude/hopeful-pascal-udqkh2、この中身は b1fafb64。確認表は 2e279cfa）から入れた。スクリーンショットは `docs/handoff/shots/<星>-cast-day10.jpg`（10日目の顔ぶれ）・`<星>-cast-<作品>.jpg`・`pluto-cast-book*.jpg`・`neptune-cast-game.jpg`・`pluto-profile-back.jpg`（390×844）。
 - **投稿（見本ではなく本物）**：スシモン7体・住人11体・KIMORIN⭐︎・MIKIE⭐︎DRILL の20人が、8惑星に1つずつ（20×8＝160作品。MIKIE はオーダー後だけ）。言葉は `apps/web/lib/planetTemplate/castWorks.json`（sushi.json・res.json・試作の SAPON／SAPLY から1字も変えずに写す）、音と絵は `apps/web/public/planets/cast/<key>/`（音は試作の mp3 をそのまま＝M-R344 の声、絵は webp 768px。合わせて約25MB）。取り込みは `python3 scripts/planet-home/cast-works.py <物語のブランチを取り出したフォルダ>`（声を作り直したら、同じコマンドで入れかえる）。決まりは `lib/planetTemplate/castWorks.ts`（`castWorks.test.ts`）。
-  - キャラは会員ではない：作品はどの表にも入れない（DB・API・backfill なし）。ホームには `cast-<key>-<星>` という id の作品として出る（`demo`：〔推す〕〔外す〕〔通報〕なし、API に何も聞かない）。
+  - キャラは会員ではない：作品はどの表にも入れない（DB・API・backfill なし）。ホームには `cast-<key>-<星>` という id の作品として出る（`demo`：〔外す〕〔通報〕なし、作品は API に何も聞かない）。会員の♡（推しを外す）と☆（ブルーナ）だけはサーバーに覚える（下の「住人は最初から推し」）。
   - **MIKIE⭐︎DRILL の投稿**（物語のブランチ f66e3a1e：音 `design/home/res/mikie/`、絵 `design/mv-art/out/re/mikie/`、言葉 res.json の `mikie`）も `cast-works.py` で入れた（20人×8＝160作品。絵にすかしが無いことを確かめた）。**オーダーになってから**（`orderedAt` がある＝一度でも入った。サーバーの MIKIE のダチのスレッドと同じ決まり：`isOrderedMember`・`castDayOfMember`）だけ、KIMORIN⭐︎ と並ぶダチとして8惑星すべてに来る。オーダー前は、ホームにも、物語の中の住人の場所・{neo}の場所にも出ない（M-R342・M-R343）。見本のホームは、ログインしている会員ならその会員の本当の状態、だれもいなければ今までどおり（日の指定なし＝オーダーの姿で2人、`&day=` あり＝KIMORIN⭐︎ だけ）。スクリーンショット：`docs/handoff/shots/mikie-after-order.jpg`。
   - **KIMORIN⭐︎ の音は KIMORIN の声**（本番の KIMORIN_VOICE。物語のブランチ f943f6f2 で作り直された mp3 を `cast-works.py` で入れかえた。res.json の `mikie` は f66e3a1e で音のフォルダが来たので入った）。
   - 開き方：土星＝ひとこと＋本人の声。木星＝アート＋題（タップと同時に題を本人の声で）。水星＝曲・ジャケット・曲名の読み上げ・歌詞（時間つき）。火星＝スシモンは短い動画がつなぎ目なくくり返し＋曲（物語の3秒の動画は、くり返す所で光・太陽・カニのはさみが跳んでいた（ふつうの1コマの約3倍）→ 取りこむ時に最後の8コマを最初の8コマへ重ねてつなぎ、2.67秒・24コマ/秒に。キーフレームだけくっきりするのも継ぎ目に見えたので画質をそろえて作る：`scripts/planet-home/mvloop.py`。ブラウザで、くり返す前後のコマの差がふだんの1コマの差と同じことを確かめた）、住人と KIMORIN はアートがゆっくり動く＋曲（閉じるまで。▶では曲の終わりまで）。金星＝豆知識ラジオ（スシモンはラジオの絵、ほかはアート）。天王星＝グッズの絵そのもの＋本人の声（マグはカップの音も）。冥王星＝絵本。海王星＝タップのゲーム＋本人の声でゲーム名。
@@ -169,7 +169,17 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 - **8〜10日目の朝**（台本 a2bbf47b）：OBOLON「お前は、ついに、〜を、作れるようになる。」「その魔法を、今日は、教える。」と、Bluena の新しい棚の知らせ（物語・ゲーム・グッズ）。前の画面の版・新しい家の版の両方。`story-sync` 0件。
 - **8〜10日目に物語の中で作るもの**：
   - 10日目のグッズ：本物になる。選ぶ絵は会員の本当のアート（木星のアートがあればそれを並べる）。〔公開する〕で月の工房と同じ無料の作り方（`POST /moon/goods`）→ 天王星へ（`/moon/goods/:id/fly`）。1回だけ（id を端末に覚える）。選んだ絵が本当のアートでない時（字だけ・前の画面の日のステッカー）は作らず、「この端末の中だけ」と出す（`lib/onboarding/storyGoods.ts`）。
-  - 8日目の本・9日目のゲーム：**まだ端末の中だけ**（画面にもそう出る）。理由：物語の中の本は前からある別の書き手（`writeStory`：数ページの短いお話）、ゲームは端末の中で作るおもちゃで、本番の本（章ごとに書く・マナ）とゲーム（AIが書くコード・おためし0.3マナ）の入れものと形が合わない。会員があとで見るもの：冥王星・海王星の自分の場所は空のまま。月の工房で作って〔星へ飛ばす〕と出る（依頼主に決めてほしいこと）。
+  - 8日目の本・9日目のゲーム（2026-11-28 依頼主決定）：**本物になる**（10日目のグッズと同じ考え方、`lib/onboarding/storyFirst.ts`）。サーバーが無料で1回だけ作る（`POST /moon/story-first/book`・`/game`、`StoryFirstService`。原価は運営が吸収 `storyFirst`：1人 約¥0.45、`docs/マナの値段.md`）。1人1種類1回（`story_first_works`、migration `0065`）、その旅の日だけ（`journey_day` 8／9、ほかの日は `NOT_STORY_DAY`）。もう一度だと同じ作品が返る。消した後は作らない（`STORY_FIRST_USED`）。
+    - 本：羽ペンのお話を、サーバーが書いて（`StoryService.write` をマナを引かずに）会員の本にする（1章：ページを段落に）。〔公開する〕で月の呼び方（`POST /moon/books/:id/fly`）→ 冥王星の自分の場所・ダチと推してくれている人のホームに88時間・里帰りの知らせ。絵本の絵は端末の中だけ（本は字の表紙）。8日の旅の人のオーダー後の日（l2）は前のまま（お話は 0.3 を聞いてから、端末の中）。
+    - ゲーム：端末の音符のゲームは物語のおもちゃのまま。〔公開する〕で、物語の題とカードから型 `catch` の本物のゲーム（月のおためしと同じ型、値はおためしの書き手。`GameService.makeStoryFirst`。version は `confirmId: 'story-first'`・price 0：動かない知らせでマナは返らない＝払っていない）を作り、海王星へ（`/moon/games/:id/fly`）。id は端末に覚える。月の「はじめてのゲーム」（おためし0.3）は残る（`firstGame` は物語のゲームを数えない）。
+    - 画面の字（仮）：「（冥王星の{neo}の図書館に並びました。ダチと、推してくれている人のホームにも、88時間とどきます）」「（海王星の{neo}の館に灯りました。ダチと、推してくれている人のホームにも、88時間とどきます）」「（図書館の棚に、並べています……）」「（深海の都の館に、灯りをともしています……）」。本物にならなかった時は前の「この端末の中だけ」の字。
+- **住人は最初から推し・♡を外せる・☆でブルーナへ**（2026-11-28 依頼主決定、`lib/planetTemplate/castChoices.ts`）：会員のロスター（M-R341 の日ごと、旅のあとは18人）の住人（スシモン7・住人11）は最初から推し（♡）。ダチ（KIMORIN⭐︎、オーダー後の MIKIE⭐︎DRILL）は推しではないので♡は出さない。
+  - ♡：ホームで住人の作品を開いて〔by 名前〕→ その住人のプロフィール、下の名前の右に〔♡ 推し〕。押すと〔♡ 推す〕（白抜き）になり、その住人はどの星のホームにも来なくなる（▶ にも出ない）。プロフィールの上の列には、うすく残る（自分の場所→プロフィール→列から選べる）ので、そこで〔♡ 推す〕を押すと戻る。空にはキャラは出ない（空の知らない人は本当の会員だけ）。
+  - ☆：ホーム・プロフィールで開いたキャラの作品の右下に☆（KIMORIN⭐︎・MIKIE⭐︎DRILL の作品も）。押すと★になりブルーナに入る、もう一度で外す。ブルーナの各星のフォルダの〔しまった作品〕に出る（✕で外す）。
+  - 保存はサーバー（`cast_choices`：`unoshi`＝♡を外した住人の key、`save`＝`cast-<key>-<星>`。`GET /me/cast`・`PUT /me/cast/oshi {key,on}`・`PUT /me/cast/save {id,on}`、migration `0065`）。キャラは今までどおり Web のファイル（アカウントなし）。会員の作品の `bluena_saves` には入れない：里帰りの知らせ・★の数は会員の作品と会員の保存だけを数えるので、変わらない。
+  - 通報はキャラには無い（アプリのキャラなので）。8つの枠は本当のダチ・推しが先、そのあと住人（変えていない）。
+  - スクリーンショット（390×844、Web の中の見本の会員で、物語の8日目の本の作り方そのまま）：`docs/handoff/shots/pluto-story-book.jpg`（冥王星の自分の場所に物語の本）・`resident-oshi-on.jpg`・`resident-oshi-off.jpg`・`resident-work-saved.jpg`・`bluena-cast-saved.jpg`。
+  - 画面の字（仮）：「{名前} の推しを、はずしたよ。もう、ホームには来ないよ」「💗 {名前} を、また推しにしたよ。ホームに来てくれるよ」「⭐ ブルーナに保存したよ」「☆ ブルーナから、はずしたよ」、ボタン〔推し〕〔推す〕、ブルーナの空の時「まだ、しまった作品はない。星のホームで、住人の作品の☆をおすと、ここに入る。」
 - **2日目のロケットの映像**（M-R345）：曲と歌声がまだ届いていないので入れていない。`day2.ts` に入れる場所の印だけ（P01 の台本も前の取り込みのまま：入れると `story-sync` が21件になる）。
 
 ### スイッチを入れる時の確認表（1つずつ）
@@ -340,6 +350,8 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 | `GET /planet-home/:planet` | 前から。作品に `tags`、自分の作品に `visibility`・`heldReason` が付いた |
 | `POST /moon/books/:id/fly` ・ `POST /moon/games/:id/fly` `{on}` | 05：本を冥王星へ・ゲームを海王星へ飛ばす（`on:false` で月へ） |
 | `POST /moon/goods` `{kind, rootId, title?}` ・ `GET /moon/goods` ・ `GET /moon/goods/:id` ・ `POST /moon/goods/:id/fly` `{on}` | グッズ：自分のアートで作る（無料）・一覧・開く・天王星へ飛ばす |
+| `POST /moon/story-first/book` `{cards, said?}` ・ `POST /moon/story-first/game` `{cards, title?, said?}` | 2026-11-28：はじめの旅の8日目の本・9日目のゲームを本物の作品に（無料・1人1回・その日だけ。2回目は同じ作品 `again: true`） |
+| `GET /me/cast` ・ `PUT /me/cast/oshi` `{key, on}` ・ `PUT /me/cast/save` `{id, on}` | 2026-11-28：住人の♡（外した住人）・キャラの作品の☆（ブルーナ） |
 | `PUT /moon/games/:id/cover` `{rootId \| null}` | ゲームのケースの絵（自分のアート、null でネオンの顔） |
 | `GET /moon/games/:id` ・ `GET /moon/books/:id` | 05：飛んだゲーム・本は、その星のホームに届く人も開ける |
 | `PATCH /compose/songs/:id/title` `{title}` | 曲の題を言葉で変える（水星の投稿の題・曲名の読み上げも）。2026-11-27 |

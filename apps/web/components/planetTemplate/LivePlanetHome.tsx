@@ -1,13 +1,14 @@
 'use client';
 
-import { demoGame, figureFor, spellFrom, type GameView, type HomePlanet, type HomeWork, type Me, type PlanetHomeView } from '@obolo/shared';
+import { demoGame, figureFor, spellFrom, type CastChoicesView, type GameView, type HomePlanet, type HomeWork, type Me, type PlanetHomeView } from '@obolo/shared';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { PlanetTemplateHome, type TemplateMe } from '@/components/planetTemplate/PlanetTemplateHome';
+import { PlanetTemplateHome, type HomeCast, type TemplateMe } from '@/components/planetTemplate/PlanetTemplateHome';
+import { choicesOf, NO_CHOICES, toggled, unoshiAround, withoutUnoshi, type CastChoices } from '@/lib/planetTemplate/castChoices';
 import { planetHooks } from '@/components/planetTemplate/planetHooks';
 import { getApi } from '@/lib/api';
 import { castDayOfMember, isCastPerson, isOrderedMember, withCast } from '@/lib/planetTemplate/castWorks';
-import { ownFigure } from '@/lib/planetTemplate/people';
+import { ownFigure, peopleOf } from '@/lib/planetTemplate/people';
 import { emptyHome, liveHomeShows, SAMPLE_OWN_FIGURE, templateSample } from '@/lib/planetTemplate/sample';
 import { samplePast } from '@/lib/planetTemplate/saturn';
 import { apiSky, sampleSky, songOf } from '@/lib/planetTemplate/sky';
@@ -55,7 +56,9 @@ export function LivePlanetHome({
   className?: string;
 }) {
   const router = useRouter();
-  const [data, setData] = useState<{ view: PlanetHomeView; me: TemplateMe; sample: boolean } | null>(null);
+  const [data, setData] = useState<{ view: PlanetHomeView; me: TemplateMe; sample: boolean; signedIn: boolean } | null>(null);
+  // client 2026-11-28: the member's ♡ for the residents (oshi from the start) and ☆ for the cast's works (GET /me/cast)
+  const [choices, setChoices] = useState<CastChoices>(NO_CHOICES);
 
   useEffect(() => {
     let live = true;
@@ -65,10 +68,12 @@ export function LivePlanetHome({
       view: templateSample(planet, Date.now(), { ...(sampleDay ? { day: sampleDay } : {}), ...(me ? { ordered: isOrderedMember(me) } : {}) }),
       me: { name: me?.displayName || 'ミナト★', figure: ownFigure(me?.planetFigures, planet) ?? SAMPLE_OWN_FIGURE(planet), back: backOf(me), dance: me?.chibiPic ?? SAMPLE_DANCE, chibi: chibiOf(me, true) },
       sample: true,
+      signedIn: !!me,
     });
     (async () => {
       const api = getApi();
       const me = await api.me().catch(() => null);
+      if (me) void api.castChoices().then((c) => live && setChoices(choicesOf(c))).catch(() => undefined);
       if (forced) return sample(me);
       const view = await api.planetHome(planet).catch(() => null);
       // story 2026-11-25: your own flown works alone are real too (a member's first goods / books / games)
@@ -82,9 +87,9 @@ export function LivePlanetHome({
       const cast = (v: PlanetHomeView) => (me ? withCast(v, castDayOfMember(me)) : v);
       if (real === 'empty' || !view) {
         const empty = emptyHome(planet, me?.id ?? 'me', me?.displayName ?? '');
-        return { view: cast(view?.live ? view : empty), me: { name: me?.displayName || empty.owner.name, figure: ownFigure(me?.planetFigures, planet), back: backOf(me), dance: me?.chibiPic ?? null, chibi: chibiOf(me, false) }, sample: false };
+        return { view: cast(view?.live ? view : empty), me: { name: me?.displayName || empty.owner.name, figure: ownFigure(me?.planetFigures, planet), back: backOf(me), dance: me?.chibiPic ?? null, chibi: chibiOf(me, false) }, sample: false, signedIn: !!me };
       }
-      return { view: cast(view), me: { name: me?.displayName || view.owner.name, figure: ownFigure(me?.planetFigures, planet), back: backOf(me), dance: me?.chibiPic ?? null, chibi: chibiOf(me, false) }, sample: false };
+      return { view: cast(view), me: { name: me?.displayName || view.owner.name, figure: ownFigure(me?.planetFigures, planet), back: backOf(me), dance: me?.chibiPic ?? null, chibi: chibiOf(me, false) }, sample: false, signedIn: !!me };
     })().then((d) => live && setData(d));
     return () => {
       live = false;
@@ -113,13 +118,35 @@ export function LivePlanetHome({
     });
   }, [data, planet]);
 
+  // client 2026-11-28: a resident with the ♡ off leaves the home (every planet) and waits on the profile's row; ♡ / ☆
+  // change on the screen at once and are kept on the server (PUT /me/cast/oshi, /me/cast/save)
+  const shown = useMemo(() => (data ? withoutUnoshi(data.view, choices.unoshi) : null), [data, choices.unoshi]);
+  const homeCast = useMemo<HomeCast | undefined>(() => {
+    if (!data?.signedIn) return undefined;
+    const api = getApi();
+    const keep = (p: Promise<CastChoicesView>) => void p.then((c) => setChoices(choicesOf(c))).catch(() => undefined);
+    return {
+      choices,
+      resting: peopleOf({ ...data.view, around: unoshiAround(data.view, choices.unoshi) }),
+      setOshi: (key, on) => {
+        setChoices((c) => toggled(c, { oshi: key, on }));
+        keep(api.setCastOshi(key, on));
+      },
+      setSaved: (id, on) => {
+        setChoices((c) => toggled(c, { save: id, on }));
+        keep(api.saveCastWork(id, on));
+      },
+    };
+  }, [data, choices]);
+
   return (
     <main className={className} data-planet-home="new" data-sample={data?.sample ? '1' : '0'}>
-      {data && (
+      {data && shown && (
         <PlanetTemplateHome
           key={planet}
           planet={planet}
-          view={data.view}
+          view={shown}
+          cast={homeCast}
           me={data.me}
           hooks={hooks}
           onSwitchPlanet={(p) => router.replace(hrefOf(p))}

@@ -46,6 +46,8 @@ export function featureOfPath(path: string): UsageFeature {
     // story 2026-11-25: a picture's title is booked as a song's name is (it comes with the lyrics)
     [/^\/moon\/art-title/, 'lyrics'],
     [/^\/moon\/novel/, 'novel'],
+    // client 2026-11-28: the first journey's own book and game made real — the operator's (ABSORBED_FEATURES)
+    [/^\/moon\/story-first\//, 'storyFirst'],
     [/^\/buddy\/picture/, 'draw'],
     [/^\/buddy\/story/, 'story'],
     [/^\/buddy\//, 'chat'],
