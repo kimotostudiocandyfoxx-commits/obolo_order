@@ -1,3 +1,4 @@
+import { castOfWork } from './castWorks';
 import { HOME_PLANETS } from '@obolo/shared';
 import { describe, expect, it } from 'vitest';
 import { templateConfig } from './config';
@@ -55,31 +56,38 @@ describe('05 the five planets on the common template', () => {
     expect(waveBars()[1]).toEqual({ h: 22, delay: 0.08 });
     expect(SHELF_ASPECT).toMatchObject({ radio: 1.55, book: 0.72, game: 0.72 });
   });
-  it('the sample: the prototype’s five works per planet, never 「名前の〜」, ten of yours and a shelf for every one of the cast (2 ダチ + 18 推し, M-R341)', () => {
+  it('the sample: ten of yours (the prototype’s five works per planet, never 「名前の〜」); around you the cast with their own one work each (M-R344), MIKIE⭐︎DRILL not there until she has works', () => {
     for (const p of FIVE_PLANETS) {
       const v = templateSample(p, Date.parse('2026-11-25T12:00:00Z'));
       expect(v.own).toHaveLength(10);
-      for (const w of [...v.own, ...v.around]) {
+      for (const w of v.own) {
         expect(FIVE[p].titles).toContain(w.title);
         expect(w.title).not.toContain(`${w.author.name}の`);
       }
       const people = peopleOf(v);
-      expect(people).toHaveLength(20);
-      for (const x of people) expect(x.works.length).toBeGreaterThanOrEqual(5);
+      expect(people).toHaveLength(19);
+      expect(people.map((x) => x.name)).not.toContain('MIKIE⭐︎DRILL');
+      for (const x of people) {
+        expect(x.works).toHaveLength(1);
+        expect(castOfWork(x.works[0])?.cast.name).toBe(x.name);
+        expect(FIVE[p].titles).not.toContain(x.works[0].title);
+      }
     }
+    // Mars: the cast's song under their film; Pluto: the book opens on its own first page
     const mars = templateSample('mars').around[0];
-    expect(mars.url).toMatch(/song-\d\.mp3$/);
-    expect(mars.thumbUrl).toBe(`/planets/sample/art-${sampleArtIndex(0, 'MIKIE⭐︎DRILL')}.webp`);
-    expect(templateSample('pluto').around[0].text).toContain('むかしむかし、MIKIE⭐︎DRILLが');
+    expect(mars.author.name).toBe('KIMORIN⭐︎');
+    expect(mars.url).toBe('/planets/cast/kimorin/song.mp3');
+    expect(mars.title).toBe('ピンポン・ジーニアス');
+    expect(templateSample('pluto').around[0].text).toBe('KIMORINは、なんでも せいこうする はつめいかです。');
   });
   it('story 2026-11-25 Uranus: each goods item on its own kind (its words, else its main tag, else a tote); the sample shows all six', () => {
     expect(goodsKindOfWork({ text: 'マグカップ' })).toBe('マグカップ');
     expect(goodsKindOfWork({ text: '', tags: { main: '缶バッジ', moods: [], bpm: null } })).toBe('缶バッジ');
     expect(goodsKindOfWork({ text: 'なにか' })).toBe('トート');
-    const kinds = new Set(templateSample('uranus').around.map((w) => goodsKindOfWork(w)));
+    // the preview's own shop shows all six kinds; its own game shelf has cases with a picture and with the neon face
+    const kinds = new Set(templateSample('uranus').own.map((w) => goodsKindOfWork(w)));
     expect(kinds.size).toBe(6);
-    // Neptune's sample: some cases with a member's art, some with the neon face
-    const cases = templateSample('neptune').around;
+    const cases = templateSample('neptune').own;
     expect(cases.some((w) => w.thumbUrl)).toBe(true);
     expect(cases.some((w) => !w.thumbUrl)).toBe(true);
   });

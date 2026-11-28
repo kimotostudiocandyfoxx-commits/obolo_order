@@ -3,6 +3,7 @@
 import type { GameView, HomeWork, WorkTags } from '@obolo/shared';
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { GameFull } from '@/components/atelier/GamePlay';
+import { castOfWork } from '@/lib/planetTemplate/castWorks';
 import { templateConfig } from '@/lib/planetTemplate/config';
 import {
   bookOpening,
@@ -22,6 +23,7 @@ import {
   type FivePlanet,
 } from '@/lib/planetTemplate/five';
 import { letterKind } from '@/lib/planetTemplate/mercury';
+import { CastViewer } from '../cast/CastViewer';
 import { useTitleFont } from '../mercury/SongStage';
 import type { TemplateHooks } from '../PlanetTemplateHome';
 import type { ProfileMiddleSlot } from '../Profile';
@@ -71,6 +73,7 @@ export function FiveViewer({
   closing = false,
   onDone,
   onStart,
+  onFinish,
   top,
 }: {
   planet: FivePlanet;
@@ -80,6 +83,8 @@ export function FiveViewer({
   onDone?: () => void;
   /** Neptune: PRESS START (none: it only blinks) */
   onStart?: () => void;
+  /** the cast's picture book has closed and flown away (handoff 08 §3): the work closes */
+  onFinish?: () => void;
   /** where it opens instead of the planet's own place (the sky: lower, under the maker's name, 07 §3) */
   top?: number;
 }) {
@@ -98,6 +103,10 @@ export function FiveViewer({
   }, [def.kind, work.url]);
   const style = { top: `${(top ?? def.top) * 100}%`, ['--glow' as string]: def.glow } as CSSProperties;
   const cls = `${f.vw} ${f[def.kind]} ${on && !closing ? f.on : ''}`;
+  // the cast's own works (handoff 08 §3 / §6): the film under the song, the goods' picture, the picture book, the tap game
+  const cast = castOfWork(work)?.cast;
+  if (cast && planet !== 'venus')
+    return <CastViewer planet={planet} cast={cast} className={`${f.vw} ${on && !closing ? f.on : ''}`} screenClass={f.scr} style={style} playing={playing} onDone={() => done.current?.()} onFinish={onFinish} title={<FiveTitle kind={def.kind} title={title} tags={work.tags} />} />;
   if (def.kind === 'mv') {
     const audio = isAudioUrl(work.url);
     return (
@@ -230,7 +239,7 @@ function HomeOpen({ planet, o, deps }: { planet: FivePlanet; o: OpenWork; deps: 
   const pos = c.closing ? `${at(place)} scale(0.25)` : moved ? `${at(WHO_CORNER)} scale(${WHO_CORNER.size})` : from;
   return (
     <div className={f.open} onClick={c.close} data-testid="work-view" data-planet={planet} data-closing={c.closing ? '1' : '0'}>
-      <FiveViewer planet={planet} work={o.work} closing={c.closing} onStart={g.start} />
+      <FiveViewer planet={planet} work={o.work} closing={c.closing} onStart={g.start} onFinish={c.close} />
       {o.figure && (
         <div className={`${f.fly} ${c.closing ? f.gone : ''}`} style={{ transform: pos }} data-testid="front-figure">
           <img src={o.figure} alt="" draggable={false} />
@@ -261,7 +270,7 @@ function ProfileOpen({ planet, o, deps }: { planet: FivePlanet; o: OpenWork; dep
   const g = useGame(planet, deps, o.work);
   return (
     <div className={`${f.open} ${f.clear}`} onClick={c.close} data-testid="work-view" data-planet={planet}>
-      <FiveViewer planet={planet} work={o.work} closing={c.closing} onStart={g.start} />
+      <FiveViewer planet={planet} work={o.work} closing={c.closing} onStart={g.start} onFinish={c.close} />
       {g.full}
     </div>
   );

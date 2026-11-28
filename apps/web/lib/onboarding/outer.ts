@@ -102,7 +102,15 @@ export const DAY8_BEFORE: Step[] = [
   { t: 'sprite', image: 'kimorin-sun' },
   ...kimorinBack(8), // SYS-S002: once, if he walked out
   { t: 'say', who: 'KIMORIN', text: 'おはようございます。……今日は、冥王星だそうです。' },
+  // 月の神殿。光の柱の中に、黒い球のOBOLON (script a2bbf47b: the morning's magic, as on days 3–7)
+  { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
+  { t: 'say', who: 'OBOLON', text: '、、、{neo}。お前は、ついに、物語を、作れるようになる。' },
+  { t: 'say', who: 'OBOLON', text: 'その魔法を、今日は、教える。' },
   { t: 'sprite', image: null },
+  { t: 'still', image: 's/bluena' }, // {neo}のBluenaの上の青い光の球に、小さな棚が一つ、ふわりと浮かぶ。棚の右下に、本の形の記号
+  { t: 'se', sound: 'sparkle' },
+  { t: 'notice', text: 'Bluenaに、新しい棚（物語）が増えた。作った物語は、できたらすぐ、ここにしまわれます' },
+  { t: 'still', image: 's/moon-temple' },
   // {neo}のBluenaが光る。正方形のスクリーンに、切符の裏の星図。錠の印のついた三つの星のうち、白い小さな星の錠が、かちり、と外れる
   { t: 'se', sound: 'blip' },
   { t: 'ticket', flip: true, unlock: 'pluto' },
@@ -242,7 +250,15 @@ export const DAY9_BEFORE: Step[] = [
   { t: 'sprite', image: 'kimorin-sun' },
   ...kimorinBack(9), // SYS-S002: once, if he walked out
   { t: 'say', who: 'KIMORIN', text: 'おはようございます。……今日は、海王星。海の底だそうです。' },
+  // 月の神殿。光の柱の中に、黒い球のOBOLON (script a2bbf47b: the morning's magic, as on days 3–7)
+  { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
+  { t: 'say', who: 'OBOLON', text: '、、、{neo}。お前は、ついに、ゲームを、作れるようになる。' },
+  { t: 'say', who: 'OBOLON', text: 'その魔法を、今日は、教える。' },
   { t: 'sprite', image: null },
+  { t: 'still', image: 's/bluena' }, // {neo}のBluenaの上の青い光の球に、小さな棚が一つ、ふわりと浮かぶ。棚の右下に、コントローラーの形の記号
+  { t: 'se', sound: 'sparkle' },
+  { t: 'notice', text: 'Bluenaに、新しい棚（ゲーム）が増えた。作ったゲームは、できたらすぐ、ここにしまわれます' },
+  { t: 'still', image: 's/moon-temple' },
   // {neo}のBluenaが光る。切符の裏の星図で、深い青の星の錠が、かちり、と外れる
   { t: 'se', sound: 'blip' },
   { t: 'ticket', flip: true, unlock: 'neptune' },
@@ -380,7 +396,15 @@ export const DAY10_BEFORE: Step[] = [
   { t: 'sprite', image: 'kimorin-sun' },
   ...kimorinBack(10), // SYS-S002: once, if he walked out
   { t: 'say', who: 'KIMORIN', text: 'おはようございます。……今日は、天王星。最後の星だそうです。' },
+  // 月の神殿。光の柱の中に、黒い球のOBOLON (script a2bbf47b: the morning's magic, as on days 3–7)
+  { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
+  { t: 'say', who: 'OBOLON', text: '、、、{neo}。お前は、ついに、グッズを、作れるようになる。' },
+  { t: 'say', who: 'OBOLON', text: 'その魔法を、今日は、教える。' },
   { t: 'sprite', image: null },
+  { t: 'still', image: 's/bluena' }, // {neo}のBluenaの上の青い光の球に、小さな棚が一つ、ふわりと浮かぶ。棚の右下に、Tシャツの形の記号
+  { t: 'se', sound: 'sparkle' },
+  { t: 'notice', text: 'Bluenaに、新しい棚（グッズ）が増えた。作ったグッズは、できたらすぐ、ここにしまわれます' },
+  { t: 'still', image: 's/moon-temple' },
   // {neo}のBluenaが光る。正方形のスクリーンに、切符の裏の星図。錠の印のついた三つの星のうち、青緑の星の錠が、かちり、と外れる
   { t: 'se', sound: 'blip' },
   { t: 'ticket', flip: true, unlock: 'uranus' },

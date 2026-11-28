@@ -1,6 +1,7 @@
 import type { HomePlanet, HomeWork, PlanetHomeView } from '@obolo/shared';
-import { oshiOn, rosterDayOf } from './roster';
-import { templateSample } from './sample';
+import { castAround, castByKey, castWork } from './castWorks';
+import { KIMORIN, rosterDayOf } from './roster';
+import { sampleWork, templateSample } from './sample';
 
 /**
  * The new planet homes inside the story (days 3–7, story session M-R330): the people the script names, on the sample
@@ -46,30 +47,33 @@ export interface StoryCastInput {
   own?: { text?: string; title?: string; image?: string | null };
 }
 
-const by = (v: PlanetHomeView, name: string): HomeWork | undefined => v.around.find((w) => w.author.name === name);
 const as = (w: HomeWork, id: string, o: Partial<HomeWork> & { name?: string; rel?: HomeWork['rel'] } = {}): HomeWork => {
   const { name, ...rest } = o;
   return { ...w, ...rest, id, author: { ...w.author, ...(name ? { id: `story-${name}`, name } : {}) } };
 };
 
+/**
+ * M-R344: the cast come with their real works (lib/planetTemplate/castWorks.ts — one per planet, opened the cast's
+ * way: their voice, the picture book, the tap game). Where the SCRIPT names a work of its own for someone — KIMORIN⭐︎'s
+ * 『プリプリ・ボカン』 / 「うんち。」 / すね毛 / 『天才の一生』, MONBAN's 「……今日も、異常なし…。」 — the script's words are
+ * shown as written, on that person's figure, and their recorded line (which says something else) is not played over it.
+ */
+function scripted(planet: StoryPlanet, key: string, id: string, rel: HomeWork['rel'], o: { title?: string; text?: string }, now: number): HomeWork {
+  const c = castByKey(key)!;
+  const w = castWork(planet as HomePlanet, c, rel, new Date(now - 3600_000).toISOString());
+  if (!o.title && !o.text) return w;
+  // the script's own words: a Saturn line has no voice of its own yet; Pluto's three lines are not his picture book
+  return { ...w, id, ...o, ...(planet === 'saturn' ? { url: null } : {}), ...(planet === 'pluto' ? { thumbUrl: null } : {}) };
+}
+
 export function storyHome(planet: StoryPlanet, place: StoryPlace, o: StoryCastInput, now = Date.now()): PlanetHomeView {
-  // the day this planet is visited on: its roster (M-R341); MIKIE⭐︎DRILL is in the sample only to lend the inviter a work
+  // the day this planet is visited on: its roster (M-R341)
   const day = rosterDayOf(planet as HomePlanet);
-  const sample = templateSample(planet as HomePlanet, now, { day, ordered: true });
-  // MONBAN's own figure and work (he is an oshi only from day 10: taken from the full roster's sample)
-  const monban = planet === 'saturn' ? by(templateSample('saturn', now), 'MONBAN') : undefined;
-  const kimorin = by(sample, 'KIMORIN⭐︎')!;
-  const mikie = by(sample, 'MIKIE⭐︎DRILL')!;
+  const sample = templateSample(planet as HomePlanet, now, { day, ordered: false });
   const k = KIMORIN_WORK[planet];
-  /** one work each of the day's oshi, in the roster's order */
-  const oshi = (skip: string[] = []) =>
-    oshiOn(day)
-      .filter((p) => !skip.includes(p.name))
-      .flatMap((p, i) => {
-        const w = by(sample, p.name);
-        return w ? [as(w, `st-${planet}-o${i}`, { rel: 'oshi' })] : [];
-      });
-  const words = (w: HomeWork, name: string) => (planet === 'saturn' && SATURN_WORDS[name] ? { text: SATURN_WORDS[name] } : {});
+  const kimorin = (rel: HomeWork['rel'], n = '') => scripted(planet, KIMORIN.pic, `st-${planet}-kimorin${n}`, rel, k, now);
+  /** one work each of the day's oshi, in the roster's order (their own) */
+  const oshi = (skip: string[] = []) => castAround(planet as HomePlanet, { day, ordered: false }, now - 2 * 3600_000).filter((w) => w.rel === 'oshi' && !skip.includes(w.author.name));
   if (place !== 'neo') {
     // the resident's place: KIMORIN⭐︎ (pushed), and the story's cast met so far (never the hosts themselves)
     return {
@@ -77,18 +81,19 @@ export function storyHome(planet: StoryPlanet, place: StoryPlace, o: StoryCastIn
       owner: { id: `story-host-${planet}`, name: STORY_HOSTS[planet] },
       own: [],
       around: [
-        as(kimorin, `st-${planet}-kimorin`, { ...k, rel: 'oshi' }),
-        // D04-S005: MONBAN's kororin, the siblings' ダチ (the script's own)
-        ...(monban ? [as(monban, `st-${planet}-monban`, { ...words(monban, 'MONBAN'), rel: 'dachi' })] : []),
-        ...(planet === 'saturn' ? [as(kimorin, `st-${planet}-kimorin-2`, { ...k, rel: 'oshi' })] : []),
+        kimorin('oshi'),
+        // D04-S005: MONBAN's kororin, the siblings' ダチ (the script's own words)
+        ...(planet === 'saturn' ? [scripted(planet, 'monban', `st-${planet}-monban`, 'dachi', { text: SATURN_WORDS.MONBAN }, now)] : []),
+        ...(planet === 'saturn' ? [kimorin('oshi', '-2')] : []),
         ...oshi(HOST_NAMES[planet]),
       ],
       far: [],
     };
   }
   const real = !!o.inviter && o.inviter !== '…' && o.inviter !== 'MIKIE⭐︎DRILL';
-  // the inviter: the planet's plain figure with their name (never MIKIE's face); nobody invited → nobody (M-R343)
-  const inviter = real ? as(mikie, `st-${planet}-inviter`, { name: o.inviter!, rel: 'dachi', ...words(mikie, 'MIKIE⭐︎DRILL') }) : null;
+  // the inviter (a real member, whose work the story cannot know): the planet's plain figure with their name and a
+  // stand-in work — on Saturn the script's own welcome; nobody invited → nobody (M-R343)
+  const inviter = real ? as(sampleWork(planet as HomePlanet, 0, o.inviter!, 'mikie', 'dachi', new Date(now - 1800_000).toISOString()), `st-${planet}-inviter`, { name: o.inviter!, rel: 'dachi', ...(planet === 'saturn' ? { text: SATURN_WORDS['MIKIE⭐︎DRILL'] } : {}) }) : null;
   if (inviter) inviter.author = { ...inviter.author, figure: null, ball: null, pic: null };
   const mine = sample.own[0];
   const own: HomeWork[] =
@@ -108,7 +113,7 @@ export function storyHome(planet: StoryPlanet, place: StoryPlace, o: StoryCastIn
     ...sample,
     owner: { id: 'story-neo', name: o.neo || 'あなた' },
     own,
-    around: [...(inviter ? [inviter] : []), as(kimorin, `st-${planet}-kimorin`, { ...k, rel: 'dachi' }), ...oshi()],
+    around: [...(inviter ? [inviter] : []), kimorin('dachi'), ...oshi()],
     far: [],
   };
 }

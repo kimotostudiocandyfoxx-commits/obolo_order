@@ -25,6 +25,7 @@ import {
   type Kakejiku,
 } from '@/lib/planetTemplate/jupiter';
 import { letterKind } from '@/lib/planetTemplate/mercury';
+import { useCastVoice } from '../cast/CastViewer';
 import { useTitleFont } from '../mercury/SongStage';
 import type { TemplateHooks } from '../PlanetTemplateHome';
 import type { ProfileMiddleSlot } from '../Profile';
@@ -138,6 +139,7 @@ function useScroll(onClosed: () => void, closedAfter: number) {
 
 /** §2 a butterfly tapped on the home: it goes to the bottom left with its name, the scroll opens; a tap rolls it up and the butterfly flies to your tree */
 function HomeOpen({ o }: { o: OpenWork }) {
+  useCastVoice('jupiter', o.work);
   const s = useScroll(o.close, SCROLL_MS.toTree);
   const moved = useNextFrame();
   const [named, setNamed] = useState(false);
@@ -166,6 +168,7 @@ function HomeOpen({ o }: { o: OpenWork }) {
 
 /** §3 in the play view: the butterfly is the play view's own; the scroll opens and rolls up just before it flies off */
 function PlayOpen({ o }: { o: OpenWork }) {
+  useCastVoice('jupiter', o.work);
   const [closing, setClosing] = useState(false);
   useEffect(() => {
     const id = setTimeout(() => setClosing(true), PORCH_HOLD_MS - 250);
@@ -185,6 +188,7 @@ function PlayOpen({ o }: { o: OpenWork }) {
 
 /** §4 a frame tapped in the atelier: the same scroll over the atelier; a tap rolls it up */
 function ProfileOpen({ o }: { o: OpenWork }) {
+  useCastVoice('jupiter', o.work);
   const s = useScroll(o.close, SCROLL_MS.roll);
   return (
     <div className={`${j.open} ${j.clear}`} onClick={s.close} data-testid="work-view">

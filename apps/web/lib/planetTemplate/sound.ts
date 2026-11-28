@@ -9,7 +9,33 @@ import { isFivePlanet } from './five';
  * the pure part (which event plays what, the music's patterns, the ducking rules); lib/planetTemplate/sfx.ts plays them.
  */
 
-export type Sfx = 'chime' | 'pop' | 'splash' | 'whoosh' | 'chip' | 'thump';
+export type Sfx =
+  | 'chime'
+  | 'pop'
+  | 'splash'
+  | 'whoosh'
+  | 'chip'
+  | 'thump'
+  // M-R337 (handoff planets-08 chapter 4, the prototype's SFX): each scene its own sound, no more one chime for everything
+  | 'page' // a page turned (paper)
+  | 'tick' // the reading-speed buttons (カチッ)
+  | 'bookFly' // the book flies away (wind and sparkles)
+  | 'bookOpen' // Pluto: a book opened
+  | 'projector' // Mars: a film projector
+  | 'tuning' // Venus: a radio tuned in
+  | 'bell' // Uranus: the shop's bell
+  | 'cup' // a mug set down
+  | 'bubble' // Neptune: bubbles
+  | 'flutter' // Jupiter: wings
+  | 'heart' // ♡: two gentle notes
+  // the cast's tap games (the prototype's poyo / kidSfx)
+  | 'poyo'
+  | 'puff'
+  | 'jump'
+  | 'spin'
+  | 'ink'
+  | 'scatter'
+  | 'snap';
 /** a sound `at` ms after the event */
 export interface Cue {
   sfx: Sfx;
@@ -27,7 +53,7 @@ export interface Cue {
  * - profile: a profile opens (openProfS); profileWork: a work opened there (profArt / pastPop / the five's viewer)
  * - sky*: the sky (06) — up to the sky (expOpen), down onto a continent (expLand), travel (tripGo) and back, the shore
  *   on ▶ (autoStart), a stranger reaching the shore (autoNext's bob), a stranger's work opening (expShow + SKYV.show),
- *   ☆ / ♡ / an island added or swapped (chime)
+ *   ☆ / an island added or swapped (chime), ♡ (skyOshi: the two gentle notes, M-R337)
  */
 export type SoundEvent =
   | 'tap'
@@ -45,7 +71,8 @@ export type SoundEvent =
   | 'skyShore'
   | 'skyArrive'
   | 'skyShow'
-  | 'skyKeep';
+  | 'skyKeep'
+  | 'skyOshi';
 
 /** the eight planets with the new homes */
 export const SOUND_PLANETS: HomePlanet[] = ['saturn', 'jupiter', 'mercury', 'mars', 'venus', 'uranus', 'pluto', 'neptune'];
@@ -58,6 +85,11 @@ export const SATURN_LAND_MS = 560;
 
 const c = (sfx: Sfx, at = 0): Cue => ({ sfx, at });
 
+/** M-R337: the five's own sound when a work opens — Mars the projector, Venus the radio tuning in, Uranus the shop's bell, Pluto a book opening, Neptune bubbles */
+export const SCENE_SFX: Readonly<Partial<Record<HomePlanet, Sfx>>> = { mars: 'projector', venus: 'tuning', uranus: 'bell', pluto: 'bookOpen', neptune: 'bubble' };
+/** a mug's own sound comes a moment after the shop's bell (the prototype's 420 ms) */
+export const CUP_MS = 420;
+
 /** the sounds of `event` on `planet` (none: no sound) */
 export function cuesFor(planet: HomePlanet, event: SoundEvent): Cue[] {
   if (!hasHome(planet)) return [];
@@ -66,9 +98,10 @@ export function cuesFor(planet: HomePlanet, event: SoundEvent): Cue[] {
   switch (event) {
     case 'tap':
       if (planet === 'saturn') return [c('pop')];
-      if (planet === 'jupiter') return [c('chime'), c('pop', JUPITER_ART_POP_MS)];
+      // M-R337: Jupiter the wings (then the scroll's pop), the five each their own scene
+      if (planet === 'jupiter') return [c('flutter'), c('pop', JUPITER_ART_POP_MS)];
       if (planet === 'mercury') return [c('splash')];
-      return game ? [c('chime'), c('chip')] : [c('chime')];
+      return [c(SCENE_SFX[planet] ?? 'chime')];
     case 'playDance':
       return [c('pop', planet === 'saturn' ? SATURN_LAND_MS : 0)];
     case 'playTurn':
@@ -78,14 +111,14 @@ export function cuesFor(planet: HomePlanet, event: SoundEvent): Cue[] {
     case 'playOpen':
       if (planet === 'jupiter') return [c('pop')];
       if (planet === 'mercury') return [c('splash')];
-      return game ? [c('chip')] : [];
+      return SCENE_SFX[planet] ? [c(SCENE_SFX[planet]!)] : [];
     case 'groovePop':
       return planet === 'saturn' ? [c('pop')] : [];
     case 'profile':
       return [c('whoosh')];
     case 'profileWork':
       if (planet === 'saturn' || planet === 'jupiter') return [c('pop')];
-      return game ? [c('chip')] : [];
+      return SCENE_SFX[planet] ? [c(SCENE_SFX[planet]!)] : [];
     case 'skyOpen':
     case 'skyLand':
     case 'skyTrip':
@@ -101,6 +134,8 @@ export function cuesFor(planet: HomePlanet, event: SoundEvent): Cue[] {
       return game ? [c('splash'), c('chip')] : [c('splash')];
     case 'skyKeep':
       return [c('chime')];
+    case 'skyOshi':
+      return [c('heart')];
   }
 }
 

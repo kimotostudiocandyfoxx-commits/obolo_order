@@ -129,9 +129,10 @@ describe('the planet sound player', () => {
     s.armPlanetSound();
     tap();
     const sc = s.soundScope();
+    // Jupiter's tap (M-R337): the wings at once — six beats and three notes — and the scroll's pop 120 ms later (stopped below)
     sc.cue('jupiter', 'tap');
     const afterChime = ctx.started;
-    expect(afterChime).toBe(3);
+    expect(afterChime).toBe(9);
     sc.stop();
     vi.advanceTimersByTime(500);
     expect(ctx.started).toBe(afterChime);

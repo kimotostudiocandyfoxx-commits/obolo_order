@@ -53,10 +53,11 @@ describe('02 §1 Mercury’s ships: the sea lanes of MSLOT (back 2, middle 3, fr
     expect(cfg.motion.max).toBe(7);
     expect(templateConfig('jupiter').motion).toBe(driftMotion);
     const people = peopleOf(templateSample('mercury'));
-    expect(people.length).toBe(20);
+    // KIMORIN⭐︎ and the 18 oshi (MIKIE⭐︎DRILL has no works yet: M-R344)
+    expect(people.length).toBe(19);
     const c = seat(people, cfg.motion.max);
     expect(c.seats).toHaveLength(7);
-    expect(c.queue).toHaveLength(13);
+    expect(c.queue).toHaveLength(12);
   });
 
   it('a ship starts in its lane at the prototype’s place, sails left or right (odd slots left), faster when nearer', () => {
@@ -189,15 +190,20 @@ describe('02 §2 the title: its own font and entrance (M-R283 / M-R284)', () => 
   });
 });
 
-describe('the sample cast plays the prototype’s songs', () => {
-  it('every sample ship carries one of the five songs and its jacket', () => {
+describe('the preview’s own records play the prototype’s songs; the cast sail with their own', () => {
+  it('each of your sample records carries one of the five songs and its jacket; a cast ship its own song (M-R344)', () => {
     const v = templateSample('mercury');
-    for (const w of [...v.own, ...v.around]) {
+    for (const w of v.own) {
       expect(sampleSongOf(w.url)).toBeGreaterThan(0);
       expect(w.thumbUrl).toMatch(/art-\d\.webp$/);
       expect(w.title).toBeTruthy();
     }
     expect(v.own).toHaveLength(8);
+    for (const w of v.around) {
+      expect(sampleSongOf(w.url)).toBeNull();
+      expect(w.url).toMatch(/^\/planets\/cast\/[a-z]+\/song\.mp3$/);
+      expect(w.title).toBeTruthy();
+    }
   });
 });
 

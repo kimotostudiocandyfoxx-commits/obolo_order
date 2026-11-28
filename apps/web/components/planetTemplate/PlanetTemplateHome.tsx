@@ -2,6 +2,8 @@
 
 import type { HomePlanet, HomeWork, PlanetHomeView } from '@obolo/shared';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { tapVoice } from '@/lib/planetTemplate/castAudio';
+import { storedBookSpeed } from '@/lib/planetTemplate/castBook';
 import { templateConfig, type PlanetTemplateConfig } from '@/lib/planetTemplate/config';
 import { clamp, isDrag, replace, seat, type Crowd } from '@/lib/planetTemplate/layout';
 import type { Body } from '@/lib/planetTemplate/motion';
@@ -242,6 +244,8 @@ export function PlanetTemplateHome({
     const work = p.works[0];
     const b = seatN != null ? mo.current.get(seatN) : null;
     if (work) snd.current.cue(planet, 'tap');
+    // the cast's voice starts inside the tap itself (handoff 08 §3: a moment later a phone would not let it sound)
+    if (work) tapVoice(planet, work, planet === 'pluto' ? storedBookSpeed() : 1);
     if (work)
       setOpened({
         person: p,
@@ -586,6 +590,7 @@ export function PlanetTemplateHome({
               works: p.works,
             };
             snd.current.cue(planet, 'profileWork');
+            tapVoice(planet, w, planet === 'pluto' ? storedBookSpeed() : 1);
             setOpened({ person, work: w, seatN: null, from: null });
           }}
         />

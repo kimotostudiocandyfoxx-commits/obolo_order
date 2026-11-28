@@ -199,7 +199,231 @@ function thump(c: AudioContext, out: AudioNode) {
   g.connect(out);
   n.start(t0);
 }
-const SFX: Record<Sfx, (c: AudioContext, out: AudioNode) => void> = { chime, pop, splash, whoosh, chip, thump };
+// --- M-R337: each scene its own sound (the prototype's SFX / kidSfx / poyo, as they were) ----------------------
+
+/** tone(): one oscillator with a quick attack, sliding to `f2` when given */
+function tone(c: AudioContext, out: AudioNode, t0: number, f: number, dur: number, vol: number, type: OscillatorType = 'sine', f2?: number) {
+  const o = c.createOscillator();
+  const g = c.createGain();
+  o.type = type;
+  o.frequency.setValueAtTime(f, t0);
+  if (f2) o.frequency.exponentialRampToValueAtTime(f2, t0 + dur);
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(vol, t0 + 0.008);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  o.connect(g);
+  g.connect(out);
+  o.start(t0);
+  o.stop(t0 + dur + 0.02);
+}
+const flat = () => 1;
+/** a burst of white noise through one filter and an envelope */
+function hiss(c: AudioContext, out: AudioNode, t0: number, dur: number, type: BiquadFilterType, set: (f: BiquadFilterNode, g: GainNode) => void) {
+  const n = noise(c, dur, flat);
+  const f = c.createBiquadFilter();
+  const g = c.createGain();
+  f.type = type;
+  set(f, g);
+  n.connect(f);
+  f.connect(g);
+  g.connect(out);
+  n.start(t0);
+}
+/** page(): paper turned — a swish through a moving band, then the flick of the edge */
+function page(c: AudioContext, out: AudioNode) {
+  const t0 = c.currentTime + 0.005;
+  hiss(c, out, t0, 0.42, 'bandpass', (f, g) => {
+    f.Q.value = 0.8;
+    f.frequency.setValueAtTime(1200, t0);
+    f.frequency.exponentialRampToValueAtTime(4200, t0 + 0.22);
+    f.frequency.exponentialRampToValueAtTime(1800, t0 + 0.4);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(0.32, t0 + 0.12);
+    g.gain.exponentialRampToValueAtTime(0.08, t0 + 0.28);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.42);
+  });
+  hiss(c, out, t0 + 0.36, 0.03, 'highpass', (f, g) => {
+    f.frequency.value = 2500;
+    g.gain.setValueAtTime(0.25, t0 + 0.36);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.39);
+  });
+}
+/** tick(): the speed buttons (カチッ) */
+function tick(c: AudioContext, out: AudioNode) {
+  tone(c, out, c.currentTime + 0.003, 1800, 0.04, 0.12, 'triangle');
+}
+/** SFX.whoosh(): the book flying away — wind, then four rising sparkles */
+function bookFly(c: AudioContext, out: AudioNode) {
+  const t0 = c.currentTime + 0.005;
+  hiss(c, out, t0, 0.9, 'bandpass', (f, g) => {
+    f.Q.value = 1.2;
+    f.frequency.setValueAtTime(500, t0);
+    f.frequency.exponentialRampToValueAtTime(3000, t0 + 0.7);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(0.35, t0 + 0.35);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.9);
+  });
+  [1568, 2093, 2637, 3136].forEach((fr, i) => tone(c, out, t0 + 0.45 + i * 0.07, fr, 0.35, 0.05));
+}
+/** bookopen(): the cover's low thud, then the page */
+function bookOpen(c: AudioContext, out: AudioNode) {
+  tone(c, out, c.currentTime + 0.005, 140, 0.18, 0.25, 'sine', 70);
+  page(c, out);
+}
+/** mars(): a film projector — ten clicks over a low hum */
+function projector(c: AudioContext, out: AudioNode) {
+  const t0 = c.currentTime + 0.005;
+  for (let i = 0; i < 10; i++)
+    hiss(c, out, t0 + i * 0.055, 0.012, 'bandpass', (f, g) => {
+      f.frequency.value = 2200;
+      g.gain.value = 0.22;
+    });
+  tone(c, out, t0, 55, 0.7, 0.12, 'sawtooth');
+}
+/** venus(): a radio tuned in — noise swept up through a narrow band, then the station's note */
+function tuning(c: AudioContext, out: AudioNode) {
+  const t0 = c.currentTime + 0.005;
+  hiss(c, out, t0, 0.4, 'bandpass', (f, g) => {
+    f.Q.value = 6;
+    f.frequency.setValueAtTime(300, t0);
+    f.frequency.exponentialRampToValueAtTime(2600, t0 + 0.35);
+    g.gain.setValueAtTime(0.18, t0);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.4);
+  });
+  tone(c, out, t0 + 0.38, 988, 0.16, 0.12);
+}
+/** uranus(): the shop's bell — two notes, each with its bright overtone */
+function bell(c: AudioContext, out: AudioNode) {
+  const t0 = c.currentTime + 0.005;
+  for (const [fr, d] of [
+    [2093, 0],
+    [2637, 0.13],
+  ]) {
+    tone(c, out, t0 + d, fr, 0.9, 0.12);
+    tone(c, out, t0 + d, fr * 2.76, 0.4, 0.04);
+  }
+}
+/** mug(): a cup set down — three high partials */
+function cup(c: AudioContext, out: AudioNode) {
+  const t0 = c.currentTime + 0.005;
+  [2650, 3950, 5300].forEach((fr, i) => tone(c, out, t0, fr, 0.35 - i * 0.08, 0.08 / (i + 1)));
+}
+/** neptune(): three bubbles rising */
+function bubble(c: AudioContext, out: AudioNode) {
+  const t0 = c.currentTime + 0.005;
+  tone(c, out, t0, 260, 0.14, 0.25, 'sine', 900);
+  tone(c, out, t0 + 0.12, 420, 0.12, 0.18, 'sine', 1200);
+  tone(c, out, t0 + 0.22, 620, 0.1, 0.12, 'sine', 1500);
+}
+/** jupiter(): wings — six soft beats, then three light notes */
+function flutter(c: AudioContext, out: AudioNode) {
+  const t0 = c.currentTime + 0.005;
+  for (let i = 0; i < 6; i++) {
+    const t = t0 + i * 0.07;
+    hiss(c, out, t, 0.05, 'lowpass', (f, g) => {
+      f.frequency.value = 1200;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.16, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
+    });
+  }
+  [1175, 1568, 1976].forEach((fr, i) => tone(c, out, t0 + 0.3 + i * 0.09, fr, 0.5, 0.05));
+}
+/** heart(): ♡ — two gentle notes */
+function heart(c: AudioContext, out: AudioNode) {
+  const t0 = c.currentTime + 0.005;
+  tone(c, out, t0, 784, 0.18, 0.12, 'triangle');
+  tone(c, out, t0 + 0.12, 1175, 0.3, 0.12, 'triangle');
+}
+/** poyo(): サーぽん wobbles (ぽよよん) — a falling sine with a vibrato that dies away */
+function poyo(c: AudioContext, out: AudioNode) {
+  const k = 0.8 + Math.random() * 0.4;
+  const t0 = c.currentTime + 0.005;
+  const o = c.createOscillator();
+  const g = c.createGain();
+  const lf = c.createOscillator();
+  const lg = c.createGain();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(520 * k, t0);
+  o.frequency.exponentialRampToValueAtTime(260 * k, t0 + 0.45);
+  lf.frequency.value = 14;
+  lg.gain.setValueAtTime(70 * k, t0);
+  lg.gain.exponentialRampToValueAtTime(4, t0 + 0.5);
+  lf.connect(lg);
+  lg.connect(o.frequency);
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(0.35, t0 + 0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.55);
+  o.connect(g);
+  g.connect(out);
+  o.start(t0);
+  lf.start(t0);
+  o.stop(t0 + 0.6);
+  lf.stop(t0 + 0.6);
+}
+/** kidSfx('puff'): a soft opening breath and two high notes */
+function puff(c: AudioContext, out: AudioNode) {
+  const t0 = c.currentTime + 0.005;
+  hiss(c, out, t0, 0.35, 'lowpass', (f, g) => {
+    f.frequency.setValueAtTime(600, t0);
+    f.frequency.exponentialRampToValueAtTime(2400, t0 + 0.3);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(0.25, t0 + 0.06);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.35);
+  });
+  tone(c, out, t0 + 0.05, 1320, 0.25, 0.06);
+  tone(c, out, t0 + 0.12, 1760, 0.25, 0.05);
+}
+/** kidSfx('jump'): a square boing */
+function jump(c: AudioContext, out: AudioNode) {
+  const t0 = c.currentTime + 0.005;
+  tone(c, out, t0, 300, 0.25, 0.25, 'square', 900);
+  tone(c, out, t0 + 0.02, 600, 0.2, 0.06, 'sine', 1800);
+}
+/** kidSfx('spin'): a triangle that winds up and down */
+function spin(c: AudioContext, out: AudioNode) {
+  const t0 = c.currentTime + 0.005;
+  const o = c.createOscillator();
+  const g = c.createGain();
+  o.type = 'triangle';
+  o.frequency.setValueAtTime(300, t0);
+  o.frequency.linearRampToValueAtTime(900, t0 + 0.35);
+  o.frequency.linearRampToValueAtTime(400, t0 + 0.6);
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(0.15, t0 + 0.05);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.6);
+  o.connect(g);
+  g.connect(out);
+  o.start(t0);
+  o.stop(t0 + 0.62);
+}
+/** kidSfx('ink'): a squirt */
+function ink(c: AudioContext, out: AudioNode) {
+  const t0 = c.currentTime + 0.005;
+  hiss(c, out, t0, 0.25, 'bandpass', (f, g) => {
+    f.frequency.setValueAtTime(900, t0);
+    f.frequency.exponentialRampToValueAtTime(250, t0 + 0.2);
+    g.gain.setValueAtTime(0.35, t0);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.25);
+  });
+}
+/** kidSfx('scatter'): nine grains of rice */
+function scatter(c: AudioContext, out: AudioNode) {
+  const t0 = c.currentTime + 0.005;
+  for (let i = 0; i < 9; i++) tone(c, out, t0 + i * 0.025 + Math.random() * 0.02, 2500 + Math.random() * 2500, 0.04, 0.06, 'triangle');
+}
+/** kidSfx('snap'): two clicks of the claws */
+function snap(c: AudioContext, out: AudioNode) {
+  const t0 = c.currentTime + 0.005;
+  for (const d of [0, 0.09])
+    hiss(c, out, t0 + d, 0.03, 'highpass', (f, g) => {
+      f.frequency.value = 3000;
+      g.gain.setValueAtTime(0.4, t0 + d);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + d + 0.03);
+    });
+}
+
+const SFX: Record<Sfx, (c: AudioContext, out: AudioNode) => void> = { chime, pop, splash, whoosh, chip, thump, page, tick, bookFly, bookOpen, projector, tuning, bell, cup, bubble, flutter, heart, poyo, puff, jump, spin, ink, scatter, snap };
 
 /** play one effect now (nothing before the first tap, when muted, or without Web Audio) */
 export function playSfx(s: Sfx): void {

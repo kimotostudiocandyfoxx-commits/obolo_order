@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { PlanetTemplateHome, type TemplateMe } from '@/components/planetTemplate/PlanetTemplateHome';
 import { planetHooks } from '@/components/planetTemplate/planetHooks';
 import { getApi } from '@/lib/api';
+import { isCastPerson, rosterDayOfMember, withCast } from '@/lib/planetTemplate/castWorks';
 import { ownFigure } from '@/lib/planetTemplate/people';
 import { emptyHome, liveHomeShows, SAMPLE_OWN_FIGURE, templateSample } from '@/lib/planetTemplate/sample';
 import { samplePast } from '@/lib/planetTemplate/saturn';
@@ -72,11 +73,15 @@ export function LivePlanetHome({
       const real = liveHomeShows(view, emptyAsSample);
       if (real === 'sample') return sample(me);
       // a live route with nothing to show yet (or the feed could not be read): the member's own place, nobody around
+      // M-R341 / M-R344: the cast come to the member's real home too — KIMORIN⭐︎ (ダチ) and the oshi of the journey day
+      // they have reached (after the journey: all eighteen), each with their one real work of this planet, after the
+      // member's real ダチ・推し. Nobody signed in: nobody comes.
+      const cast = (v: PlanetHomeView) => (me ? withCast(v, { day: rosterDayOfMember(me), ordered: !!me.orderedAt }) : v);
       if (real === 'empty' || !view) {
         const empty = emptyHome(planet, me?.id ?? 'me', me?.displayName ?? '');
-        return { view: view?.live ? view : empty, me: { name: me?.displayName || empty.owner.name, figure: ownFigure(me?.planetFigures, planet), back: backOf(me), dance: me?.chibiPic ?? null, chibi: chibiOf(me, false) }, sample: false };
+        return { view: cast(view?.live ? view : empty), me: { name: me?.displayName || empty.owner.name, figure: ownFigure(me?.planetFigures, planet), back: backOf(me), dance: me?.chibiPic ?? null, chibi: chibiOf(me, false) }, sample: false };
       }
-      return { view, me: { name: me?.displayName || view.owner.name, figure: ownFigure(me?.planetFigures, planet), back: backOf(me), dance: me?.chibiPic ?? null, chibi: chibiOf(me, false) }, sample: false };
+      return { view: cast(view), me: { name: me?.displayName || view.owner.name, figure: ownFigure(me?.planetFigures, planet), back: backOf(me), dance: me?.chibiPic ?? null, chibi: chibiOf(me, false) }, sample: false };
     })().then((d) => live && setData(d));
     return () => {
       live = false;
@@ -93,8 +98,10 @@ export function LivePlanetHome({
       me: data.me,
       // 04 §3: a person's past kororins (GET /planet-home/<planet>/person/:id; the sample: 18 of yours, 10–13 of a dachi)
       past: data.sample
-        ? async (p) => samplePast(p)
+        ? async (p) => (isCastPerson(p.id) ? p.works : samplePast(p))
         : async (p) => {
+            // the cast are not members: their one kororin is what the home has
+            if (isCastPerson(p.id)) return p.works;
             const v = await api.planetPerson(planet, p.id).catch(() => null);
             return v?.works.length ? v.works : p.works;
           },

@@ -113,10 +113,11 @@ describe('03 §2 the hanging scroll', () => {
     expect(artTitleOf({ title: '', text: '夜の森\nきれいだった' })).toBe('夜の森');
     expect(artTitleOf({})).toBe('');
     const view = templateSample('jupiter');
-    for (const w of [...view.around, ...view.own]) {
-      expect(w.title).not.toMatch(/のアート$/);
-      expect(SAMPLE_ARTS).toContain(w.title);
-    }
+    for (const w of view.own) expect(SAMPLE_ARTS).toContain(w.title);
+    // M-R344: the cast's arts carry their own titles (「お父さんだポン。」), never a sample's
+    for (const w of [...view.around, ...view.own]) expect(w.title).not.toMatch(/のアート$/);
+    for (const w of view.around) expect(SAMPLE_ARTS).not.toContain(w.title);
+    expect(view.around.find((w) => w.author.name === 'サーぽん')?.title).toBe('お父さんだポン。');
   });
 
   it("gives each art its own font and entrance: the prototype's five by title, the rest by style, steady per art", () => {

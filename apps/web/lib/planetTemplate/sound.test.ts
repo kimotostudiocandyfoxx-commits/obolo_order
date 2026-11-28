@@ -26,34 +26,41 @@ import {
 const sfx = (p: Parameters<typeof cuesFor>[0], e: SoundEvent) => cuesFor(p, e).map((c) => (c.at ? `${c.sfx}@${c.at}` : c.sfx));
 
 describe('which event plays what (the prototype’s call sites)', () => {
-  it('a tap on the home: Saturn pops, Jupiter rings then pops as the scroll opens, Mercury splashes, the five ring', () => {
+  it('a tap on the home (M-R337, each scene its own): Saturn pops, Jupiter’s wings then the scroll’s pop, Mercury splashes, Mars a projector, Venus a radio tuning, Uranus the shop’s bell, Pluto a book opening, Neptune bubbles', () => {
     expect(sfx('saturn', 'tap')).toEqual(['pop']);
-    expect(sfx('jupiter', 'tap')).toEqual(['chime', `pop@${JUPITER_ART_POP_MS}`]);
+    expect(sfx('jupiter', 'tap')).toEqual(['flutter', `pop@${JUPITER_ART_POP_MS}`]);
     expect(sfx('mercury', 'tap')).toEqual(['splash']);
-    for (const p of ['mars', 'venus', 'uranus', 'pluto'] as const) expect(sfx(p, 'tap')).toEqual(['chime']);
-    expect(sfx('neptune', 'tap')).toEqual(['chime', 'chip']);
+    expect(sfx('mars', 'tap')).toEqual(['projector']);
+    expect(sfx('venus', 'tap')).toEqual(['tuning']);
+    expect(sfx('uranus', 'tap')).toEqual(['bell']);
+    expect(sfx('pluto', 'tap')).toEqual(['bookOpen']);
+    expect(sfx('neptune', 'tap')).toEqual(['bubble']);
+    // no planet falls back to the one chime for everything
+    for (const p of SOUND_PLANETS) expect(sfx(p, 'tap')).not.toContain('chime');
   });
   it('▶: you jump out with a pop (Saturn: on landing), the view turns with a whoosh on every planet', () => {
     expect(sfx('saturn', 'playDance')).toEqual([`pop@${SATURN_LAND_MS}`]);
     expect(sfx('mercury', 'playDance')).toEqual(['pop']);
     for (const p of SOUND_PLANETS) expect(sfx(p, 'playTurn')).toEqual(['whoosh']);
   });
-  it('▶ visitors: Jupiter and the five ring as each comes; Jupiter pops as the scroll opens, Mercury splashes at the pier, Neptune chips', () => {
+  it('▶ visitors: Jupiter and the five ring as each comes; Jupiter pops as the scroll opens, Mercury splashes at the pier, the five their own scene', () => {
     expect(sfx('jupiter', 'playVisit')).toEqual(['chime']);
     expect(sfx('venus', 'playVisit')).toEqual(['chime']);
     expect(sfx('mercury', 'playVisit')).toEqual([]);
     expect(sfx('jupiter', 'playOpen')).toEqual(['pop']);
     expect(sfx('mercury', 'playOpen')).toEqual(['splash']);
-    expect(sfx('neptune', 'playOpen')).toEqual(['chip']);
-    expect(sfx('mars', 'playOpen')).toEqual([]);
+    expect(sfx('neptune', 'playOpen')).toEqual(['bubble']);
+    expect(sfx('mars', 'playOpen')).toEqual(['projector']);
+    expect(sfx('pluto', 'playOpen')).toEqual(['bookOpen']);
     expect(sfx('saturn', 'groovePop')).toEqual(['pop']);
     expect(sfx('jupiter', 'groovePop')).toEqual([]);
   });
-  it('the profile whooshes open; its works: Saturn / Jupiter pop, Neptune chips', () => {
+  it('the profile whooshes open; its works: Saturn / Jupiter pop, the five their own scene', () => {
     for (const p of SOUND_PLANETS) expect(sfx(p, 'profile')).toEqual(['whoosh']);
     expect(sfx('saturn', 'profileWork')).toEqual(['pop']);
     expect(sfx('jupiter', 'profileWork')).toEqual(['pop']);
-    expect(sfx('neptune', 'profileWork')).toEqual(['chip']);
+    expect(sfx('neptune', 'profileWork')).toEqual(['bubble']);
+    expect(sfx('uranus', 'profileWork')).toEqual(['bell']);
     expect(sfx('mercury', 'profileWork')).toEqual([]);
   });
   it('the sky: whooshes for moving about, a splash at the shore, the work’s own sound, a chime for what is kept', () => {
@@ -64,6 +71,8 @@ describe('which event plays what (the prototype’s call sites)', () => {
     expect(sfx('jupiter', 'skyShow')).toEqual(['splash', 'chime']);
     expect(sfx('neptune', 'skyShow')).toEqual(['splash', 'chip']);
     expect(sfx('saturn', 'skyKeep')).toEqual(['chime']);
+    // M-R337: ♡ is two gentle notes, not the chime
+    for (const p of SOUND_PLANETS) expect(sfx(p, 'skyOshi')).toEqual(['heart']);
     // 07: the five skies follow the same rules (Neptune's work also bleeps)
     for (const p of ['mars', 'venus', 'uranus', 'pluto', 'neptune'] as const) {
       for (const e of ['skyOpen', 'skyLand', 'skyTrip', 'skyTripBack', 'skyShore'] as const) expect(sfx(p, e)).toEqual(['whoosh']);

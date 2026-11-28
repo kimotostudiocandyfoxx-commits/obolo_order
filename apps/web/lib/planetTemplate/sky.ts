@@ -1,3 +1,4 @@
+import { castSong } from './castWorks';
 import {
   DRIFT_MIN_SCORE,
   PLANET_HOMES,
@@ -87,8 +88,11 @@ export function sampleSong(w: HomeWork): PlanetSongView | null {
 
 /** a work's song: the sample's, or the API's (a song with no lyrics, or an error, plays as it is: no lyrics) */
 export async function songOf(api: Pick<Api, 'planetSong'> | null, w: HomeWork): Promise<PlanetSongView | null> {
-  const s = sampleSong(w);
-  if (s || w.demo || !api) return s;
+  // the cast's own song (M-R344): its sound, jacket, title in their voice and words in time — nothing is asked of the API
+  const s = castSong(w) ?? sampleSong(w);
+  if (s) return s;
+  // a scripted work with a sound of its own (the story's KIMORIN⭐︎): it plays as it is, nothing is asked of the API
+  if (w.demo || !api) return w.demo && w.url ? { kind: 'planet_post', id: w.id, title: w.title ?? '', url: w.url, art: w.thumbUrl ?? null, seconds: w.seconds ?? null, titleVoice: null, lyrics: [] } : null;
   try {
     return await api.planetSong(w.id);
   } catch {

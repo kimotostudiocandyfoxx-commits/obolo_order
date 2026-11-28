@@ -832,7 +832,7 @@ function WorkOpen({
               if (oshi) return;
               await source.oshi(w.author.id, true).catch(() => undefined);
               setOshi(true);
-              snd.cue(planet, 'skyKeep');
+              snd.cue(planet, 'skyOshi');
               setHearts((n) => n + 1);
               toast(`💗 ${w.author.name} を推しにしたよ。これから${sp.home}にも来てくれるよ`);
             }}

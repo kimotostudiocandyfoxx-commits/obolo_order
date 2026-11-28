@@ -197,6 +197,11 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'それでは私たちも行きましょう。。。月へ！' }, // M-R334 (MONBAN's 「月だ」 is gone)
   { t: 'action', label: 'ロケットに乗る' },
   { t: 'sprite', image: null },
+  // SLOT (M-R345, D02-S009 — not brought in yet): from here to 〔月に着いた〕 becomes ONE film of about 73 s that KIMORIN
+  // sings (script a2bbf47b+: 18 sung lines 「♪待て　秘密結社？♪」…「♪ほんとは宝物♪」 in place of the three spoken lines
+  // below). The song and the sung voice are not delivered yet (the story session hands them over encrypted), so the
+  // steps and public/story/P01.json stay as they were imported before; when the audio arrives: import P01, replace the
+  // steps between this comment and the caption with the film + its sung lines, and story-sync must read 0 again.
   { t: 'film', id: 'launch', parts: 4 }, // 豪華映像 #3 ロケットの発射（M-R90）：扉が閉まる → 炎と白い煙 → 雲の上、黒くなっていく空
   { t: 'bgm', track: 'space' },
   { t: 'bgvideo', motion: 'd2-rocket-in' }, // ロケットの中。がらんとした客室に、二人だけ。KIMORINが、窓の外の地球を見ている
