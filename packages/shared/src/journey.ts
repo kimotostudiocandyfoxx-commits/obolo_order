@@ -51,6 +51,17 @@ export const JOURNEY_DONE = 12;
  */
 export const JOURNEY_EIGHT_KEY = 'j.eight';
 export const JOURNEY_WAIT_MS = 24 * 3600_000;
+/**
+ * Client 2026-11-28: the 24-hour wait after a day can be skipped (〔明日まで待てない〕) after every day except the
+ * ones that lead INTO these days — day 3 → 4 and day 7 → 8 are waited out. The fastest path is days 1–3, wait,
+ * 4–7, wait, 8–11. One rule for the wait screen (web) and the server (advanceJourney); testers jump past it as before.
+ */
+export const NO_SKIP_INTO_DAYS: readonly number[] = [4, 8];
+/** whether the wait after finishing `day` may be skipped (false past the journey's end) */
+export function journeyWaitSkippable(day: number): boolean {
+  if (!Number.isInteger(day) || day < 1 || day >= JOURNEY_DONE) return false;
+  return !NO_SKIP_INTO_DAYS.includes(nextJourneyDay(day));
+}
 
 export interface JourneyDayMeta {
   day: number;

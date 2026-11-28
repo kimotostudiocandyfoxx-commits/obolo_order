@@ -32,7 +32,7 @@ describe('all day scripts', () => {
     });
   }
 
-  it('the first journey is eleven days (M-R341: 8 Pluto, 9 Neptune, 10 Uranus, 11 the Sun); only day 1 can skip the wait (明日まで待てない; M-R269: not D03-S009 any more)', () => {
+  it('the first journey is eleven days (M-R341: 8 Pluto, 9 Neptune, 10 Uranus, 11 the Sun); only day 1 has its own skip label (the button itself: journeyWaitSkippable, client 2026-11-28)', () => {
     expect(Object.keys(STORIES).map(Number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
     expect(JOURNEY_PAYMENT).toBe(11);
     const labels = Object.fromEntries(Object.entries(STORIES).map(([d, s]) => [d, s.skipLabel]));

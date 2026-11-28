@@ -1,6 +1,6 @@
 'use client';
 
-import { isActiveMember, JOURNEY_DONE, JOURNEY_WAIT_MS, LAP2_DONE, lap2Done } from '@obolo/shared';
+import { isActiveMember, JOURNEY_DONE, JOURNEY_WAIT_MS, journeyWaitSkippable, LAP2_DONE, lap2Done } from '@obolo/shared';
 import Link from 'next/link';
 import { useEffect, useState, type ReactNode } from 'react';
 import { Lap2Story } from '@/components/lap2/Lap2Story';
@@ -16,6 +16,7 @@ import { useAuth } from '@/lib/auth';
 import { useI18n } from '@/lib/i18n/client';
 import { loadDay1 } from '@/lib/onboarding/progress';
 import { STORIES } from '@/lib/onboarding/stories';
+import { noSkipWaitWords, WAIT_SKIP_LABEL, WAIT_SKIPPED_TEXT } from '@/lib/onboarding/waitWords';
 
 const SERIF = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 
@@ -23,7 +24,7 @@ const SERIF = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
  * Everything in front of the solar system (client decision 2026-10-04):
  *   guest            → email entry (invited → Day 1, member → continue)
  *   day 1–10, playing → that day's story (Day 1 = /invite story; 8–10 the outer planets, M-R341)
- *   day finished      → "〇〇、また明日。" 24 h countdown (or 明日まで待てない)
+ *   day finished      → "〇〇、また明日。" 24 h countdown (or 明日まで待てない — not into days 4 and 8)
  *   day 11            → the Eclipse day: story with the ¥88/month payment inside, then "また明日" too
  *   day 12 (done), ORDER of the eight-day journey → its days after joining (once per visit, until they are done;
  *                        components/lap2 — lap2Done is "all" for everyone else) → the solar system
@@ -42,20 +43,24 @@ export function HomeGate({ children }: { children: ReactNode }) {
     return <>{children}</>;
   }
   if (me.journeyCompletedAt) {
+    const batiName = me.bati?.name || 'バティ';
+    const noSkip = noSkipWaitWords(day, batiName);
     return (
       <TomorrowScreen
         key={`${day}-${me.journeyCompletedAt}`}
         name={me.displayName}
         completedAt={me.journeyCompletedAt}
-        skipLabel={STORIES[day]?.skipLabel}
-        skippedText={STORIES[day]?.skippedText}
+        skipLabel={STORIES[day]?.skipLabel ?? WAIT_SKIP_LABEL}
+        skippedText={STORIES[day]?.skippedText ?? WAIT_SKIPPED_TEXT}
         doneText={STORIES[day]?.doneText}
         untilText={STORIES[day]?.untilText}
-        // the skip comes only after day 1 (M-R269, client 2026-11-24): from the end of day 2 (Bati's birth) the 24 hours are waited
-        canSkip={day <= 1}
+        // client 2026-11-28: the skip after every day but into days 4 and 8 (the server keeps the same rule); those two
+        // waits show their own words and 〔{bati}と話す〕〔ダチのホームへ〕
+        canSkip={journeyWaitSkippable(day)}
+        noSkip={noSkip && { ...noSkip, bati: batiName }}
         // the wait is the time to talk with Bati (client 2026-11-22): its room is the Moon (P-BATI-ROOM)
         bati={me.bati?.imageUrl ? { name: me.bati.name || 'バティ', image: me.bati.faces?.smile ?? me.bati.imageUrl } : undefined}
-        note={STORIES[day]?.waitNote?.replaceAll('{bati}', me.bati?.name || 'バティ')}
+        note={STORIES[day]?.waitNote?.replaceAll('{bati}', batiName)}
         onUnlocked={async (skipped) => {
           const elapsed = Date.now() >= Date.parse(me.journeyCompletedAt!) + JOURNEY_WAIT_MS;
           // tried again on a bad line; never left on the opened door (story chat 2026-10-29)

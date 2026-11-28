@@ -6,14 +6,22 @@ import { useI18n } from '@/lib/i18n/client';
 import { unlockAudio } from '@/lib/onboarding/audio';
 import { JOURNEY_WAIT_MS } from '@obolo/shared';
 import { playTimeSkip, startDrone, tick } from '@/lib/onboarding/sfx';
+import { WAIT_BATI_HREF, WAIT_DACHI_HREF, type NoSkipWaitWords } from '@/lib/onboarding/waitWords';
 
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 const SKIP_SECONDS = 4.8;
 
+/** the buttons under the countdown: 〔明日まで待てない〕 where it can be skipped; on a no-skip wait 〔{bati}と話す〕〔ダチのホームへ〕 */
+export function waitButtons({ canSkip, noSkip, bati }: { canSkip: boolean; noSkip: boolean; bati: boolean }): ('skip' | 'bati' | 'dachi')[] {
+  if (noSkip) return ['bati', 'dachi'];
+  return [...(bati ? (['bati'] as const) : []), ...(canSkip ? (['skip'] as const) : [])];
+}
+
 /**
  * End of every journey day: "〇〇、また明日。" + a 24-hour countdown with ticking sound.
- * No skipping in the members' app (M-R199, simple version): the countdown only. The review pages pass `canSkip`, and
- * their button skips the wait with the spinning mystical clock.
+ * The skip button (`canSkip`) skips the wait with the spinning mystical clock: in the members' app after every day but
+ * into days 4 and 8 (journeyWaitSkippable, client 2026-11-28 — those two show `noSkip`'s words instead); always on the
+ * review pages.
  */
 export function TomorrowScreen({
   name,
@@ -26,7 +34,13 @@ export function TomorrowScreen({
   note,
   doneText,
   untilText,
+  noSkip,
 }: {
+  /**
+   * A wait that cannot be skipped (into day 4 / day 8, client 2026-11-28; lib/onboarding/waitWords.ts): its words under
+   * the countdown, and 〔{bati}と話す〕 + 〔ダチのホームへ〕 instead of the skip button. `bati` = the name.
+   */
+  noSkip?: NoSkipWaitWords & { bati: string };
   /** the words under the countdown (day 1: 「宇宙行きの切符が届くまで」, client 2026-11-28); default 「つぎの扉が ひらくまで」 */
   untilText?: string;
   /** the day's 〔完了画面〕 words, over the countdown (D08-S011, after the Eclipse day) */
@@ -35,7 +49,7 @@ export function TomorrowScreen({
   note?: string;
   /** the hatched Bati: a calm way into Bati's room (the Moon) to talk while the day waits (P-BATI-ROOM) */
   bati?: { name: string; image?: string };
-  /** the review pages only: the skip button (never in the members' app, M-R199) */
+  /** the skip button (members: journeyWaitSkippable(day); the review pages: always) */
   canSkip?: boolean;
   /** The caption after a skip (default: the door opened). */
   skippedText?: string;
@@ -129,6 +143,7 @@ export function TomorrowScreen({
     [String(Math.floor((sec % 3600) / 60)).padStart(2, '0'), '分'],
     [String(sec % 60).padStart(2, '0'), '秒'],
   ];
+  const buttons = waitButtons({ canSkip, noSkip: !!noSkip, bati: !!bati });
   const R = 118;
   const C = 2 * Math.PI * R;
   return (
@@ -197,11 +212,34 @@ export function TomorrowScreen({
                 ))}
               </div>
             </div>
-            <p data-testid="countdown-until" className="mt-6 text-[11px] tracking-[0.4em] text-amber-100/45">{untilText ?? 'つぎの扉が ひらくまで'}</p>
+            <p data-testid="countdown-until" className="mt-6 text-[11px] tracking-[0.4em] text-amber-100/45">
+              {noSkip ? noSkip.until.replaceAll('{残り時間}', parts.map(([n, unit]) => n + unit).join('')) : (untilText ?? 'つぎの扉が ひらくまで')}
+            </p>
+            {noSkip && (
+              <p data-testid="no-skip-text" className="mt-5 max-w-xs animate-[fadeUp_1.6s_ease-out] text-[13px] leading-relaxed tracking-[0.12em] text-amber-50/80">
+                {noSkip.text}
+              </p>
+            )}
           </div>
 
           <div className="pb-safe absolute inset-x-0 bottom-0 flex flex-col items-center gap-4 pb-14">
-            {phase === 'wait' && showButton && bati && (
+            {phase === 'wait' && showButton && noSkip && buttons.includes('dachi') && (
+              <div data-testid="no-skip-buttons" className="flex animate-[fadeUp_0.8s_ease-out] flex-col items-center gap-3">
+                <Link href={WAIT_BATI_HREF} className="flex items-center gap-3 rounded-full border border-amber-100/25 bg-white/[0.04] py-2 pl-2 pr-7 text-[14px] tracking-[0.2em] text-amber-50/90 backdrop-blur active:scale-95">
+                  {bati?.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={bati.image} alt="" className="h-9 w-9 rounded-full bg-amber-50/10 object-contain" />
+                  ) : (
+                    <span className="h-9 w-9 rounded-full border border-amber-100/30" aria-hidden />
+                  )}
+                  {noSkip.bati}と話す
+                </Link>
+                <Link href={WAIT_DACHI_HREF} className="rounded-full border border-amber-100/25 bg-white/[0.04] px-8 py-3 text-[14px] tracking-[0.2em] text-amber-50/90 backdrop-blur active:scale-95">
+                  ダチのホームへ
+                </Link>
+              </div>
+            )}
+            {phase === 'wait' && showButton && !noSkip && bati && buttons.includes('bati') && (
               <Link
                 href="/moon"
                 className="flex animate-[fadeUp_0.8s_ease-out] items-center gap-3 rounded-full border border-amber-100/25 bg-white/[0.04] py-2 pl-2 pr-7 text-[14px] tracking-[0.2em] text-amber-50/90 backdrop-blur active:scale-95"
@@ -215,8 +253,8 @@ export function TomorrowScreen({
                 {bati.name}と話す
               </Link>
             )}
-            {phase === 'wait' && showButton && bati && note && <p className="max-w-xs animate-[fadeUp_0.8s_ease-out] text-[11px] leading-relaxed tracking-wider text-amber-100/55">{note}</p>}
-            {phase === 'wait' && showButton && canSkip && (
+            {phase === 'wait' && showButton && !noSkip && bati && note && <p className="max-w-xs animate-[fadeUp_0.8s_ease-out] text-[11px] leading-relaxed tracking-wider text-amber-100/55">{note}</p>}
+            {phase === 'wait' && showButton && buttons.includes('skip') && (
               <button
                 onClick={skip}
                 className="relative animate-[fadeUp_0.8s_ease-out] overflow-hidden rounded-full border border-amber-200/50 bg-black/40 px-9 py-3.5 text-[15px] tracking-[0.3em] text-amber-50 backdrop-blur active:scale-95"

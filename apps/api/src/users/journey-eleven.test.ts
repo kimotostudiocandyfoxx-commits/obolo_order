@@ -56,8 +56,8 @@ describe('the eleven-day journey on the server (M-R341)', () => {
     expect(done.story?.['d8.f_m_pluto_done']).toBe('true');
     // no day after the journey yet (the 2nd egg's morning counts from the Sun day, not from Pluto)
     expect(state.u.batiEggAt).toBeNull();
-    // the 24 hours are waited (no skip after day 1)
-    await expect(s.advanceJourney('u1', true)).rejects.toMatchObject({ response: { error: { code: 'NOT_YET' } } });
+    // without a skip the 24 hours are waited (the skip rule: journey-wait-skip.test.ts)
+    await expect(s.advanceJourney('u1', false)).rejects.toMatchObject({ response: { error: { code: 'NOT_YET' } } });
     state.u = { ...state.u, journeyCompletedAt: new Date(Date.now() - 25 * 3_600_000) };
     expect((await s.advanceJourney('u1', false)).journeyDay).toBe(9);
     state.u = { ...state.u, journeyDay: 10, journeyCompletedAt: new Date(Date.now() - 25 * 3_600_000) };
