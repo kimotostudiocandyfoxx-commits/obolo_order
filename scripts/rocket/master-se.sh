@@ -13,7 +13,6 @@ declare -A F=(
   [whip]="atrim=0.35:1.25,asetpts=N/SR/TB,afade=t=in:d=0.02,afade=t=out:st=0.6:d=0.3"
   [glint]="atrim=0:1.0,asetpts=N/SR/TB,afade=t=out:st=0.75:d=0.25"
   [stone-door]="atrim=0:9,asetpts=N/SR/TB,afade=t=in:d=0.05,afade=t=out:st=6.8:d=2.2"
-  [steps-hall]="atrim=0:6,asetpts=N/SR/TB,afade=t=in:d=0.05,afade=t=out:st=4.8:d=1.2"
   [hall-reveal]="atrim=0:8,asetpts=N/SR/TB,afade=t=in:d=0.3,afade=t=out:st=5.5:d=2.5"
   [star-sky]="atrim=0:8,asetpts=N/SR/TB,afade=t=in:d=0.3,afade=t=out:st=5:d=3"
   [streak-up]="atrim=0:2.6,asetpts=N/SR/TB,afade=t=in:d=0.02,afade=t=out:st=1.6:d=1"
@@ -25,7 +24,7 @@ declare -A F=(
 # the pillar of light: the shimmer of the first take, then the impact of the second (the gap between them cut out)
 BEAM="[0:a]atrim=0:2.8,asetpts=N/SR/TB,afade=t=out:st=2.4:d=0.4[a];[0:a]atrim=8.35:13,asetpts=N/SR/TB,afade=t=in:d=0.03[b];[a][b]acrossfade=d=0.15[o]"
 ids=("$@")
-[ ${#ids[@]} -gt 0 ] || ids=(whip glint stone-door steps-hall hall-reveal beam star-sky streak-up zoom-back gem-hum dissolve into-light)
+[ ${#ids[@]} -gt 0 ] || ids=(whip glint stone-door hall-reveal beam star-sky streak-up zoom-back gem-hum dissolve into-light)
 for i in "${ids[@]}"; do
   out="$O/se-$i.mp3"; src="design/sfx-src/se-$i.mp3"
   [ -f "$out" ] || { echo "$i: no file yet"; continue; }

@@ -37,7 +37,7 @@ Durations are the feel; the lines are tapped through as always.
 | A6 | 「おや、そこのあなた…」〜「…『あなたも来なさい』と。」 | **s/d2-gate-kimorin-face** (he turns to us — he speaks to the visitor, so facing the camera is right here) | "turn" settle: 1.10→1.0 in 0.6 s, then still | quick cut (replaces the generated turn) | `whip` (soft) |
 | A7 | (MONBAN's eye narrows) | s/d2-gate-two-inside | push to MONBAN's eye (as now) | dissolve 0.5 s | — |
 | A8 | 「母が悪徳商法に…暴いてみせましょう。」 | s/d2-gate-kimorin-face | — | cut | — |
-| A9 | 〔地球の神殿に向かう〕 | **s/d2-gate-inside** (the open gate from inside, light beyond) | push through the arch 1.0→1.35 (2.2 s), warm bloom to white-gold | bloom → the dark hall (replaces m12-a) | `steps-hall`, `into-light` |
+| A9 | 〔地球の神殿に向かう〕 | **s/d2-gate-inside** (the open gate from inside, light beyond) | push through the arch 1.0→1.35 (2.2 s), warm bloom to white-gold | bloom → the dark hall (replaces m12-a) | `into-light` |
 
 ## B. The Earth temple (D02-S004)
 
@@ -50,21 +50,21 @@ Durations are the feel; the lines are tapped through as always.
 | B5 | OBOLON「ここは、宇宙秘密結社だ。」… 「実はな、お前は、、、もう宇宙にいる。」 | **s/d2-hall-kimorin-up** (goggles up) | slow drift | cut | — |
 | B6 | (the ceiling becomes the night sky; 6.5 s) | → **s/d2-hall-sky** | 2.5 s dissolve while the camera tilts up from the floor to the Earth (scale 1.22 focus low → 1.0 focus high), stars twinkle | slow dissolve (replaces d2-sky) | `star-sky` |
 | B7 | 「……めちゃくちゃすごい！」 | same | — | — | — |
-| B8 | MONBAN「お前はObolo Orderに招待された…」「どうだ、宇宙へ行ってみるか？」 | → **s/d2-hall-sky-monban** | dissolve 1.2 s as MONBAN is there (replaces d2-monban-walkin) | dissolve | `steps-hall` |
+| B8 | MONBAN「お前はObolo Orderに招待された…」「どうだ、宇宙へ行ってみるか？」 | → **s/d2-hall-sky-monban** | dissolve 1.2 s as MONBAN is there (replaces d2-monban-walkin) | dissolve | — (no footsteps: see Sounds) |
 | B9 | 「はい！ぜひ！」〜「…私の家に、送っといてください。」 | as now (pin cut-in, close-ups) | — | — | BGM d2-crimson at the 〔ピンとくる〕 (unchanged) |
 | B10 | 鼻歌「ふんふ、ふーん♪…」 | **s/d2-gate-inside** + layer **kb-walk** (KIMORIN from behind) | he walks away out through the arch: scale 1→0.32, rises to the arch's floor line, small bob each step (3.2 s); then a point of light shoots up into the sky (replaces d2-kimorin-leave) | cut | BGM fades (as now), `streak-up` |
 | B11 | — | same plate | the point of light comes back down out of the sky straight at the camera, flash (replaces d2-kimorin-back) | flash → cut | `zoom-back` |
 | B12 | 「どういう仕組みかわからんけど……24時間、スキップできた！」 | **s/d2-hall-run** | hit shake on the cut | cut | `thud` |
 | B13 | OBOLON「、、、では、、、宇宙へ、行こう。」 | s/d2-hall-run | — | — | — |
-| B14 | 〔光の柱の奥の壁が開き、まっすぐ外のロケット場が見える〕 | **s/d2-hall** → **gh-wall-open** (OBOLON laid over at the same place) | push 1.0→1.08 toward the wall; the doors' dissolve 1.4 s, evening light spilling in across the floor, dust motes; the rocket and its ring visible far ahead through the opening | dissolve (replaces d2-floor-open) | `magic`, `stone-door` |
+| B14 | 〔光の柱の奥の壁が開き、まっすぐ外のロケット場が見える〕 | **s/d2-hall** → **gh-wall-open-b** (OBOLON laid over at the same place) | push 1.0→1.08 toward the wall; the doors' dissolve 1.4 s, evening light spilling in across the floor, dust motes; the rocket and its ring visible far ahead through the opening | dissolve (replaces d2-floor-open) | `magic`, `stone-door` |
 
 ## C. The rocket plaza (D02-S009)
 
 | # | Line(s) | Picture | Movement / effects | Transition | Sound |
 |---|---|---|---|---|---|
-| C1 | — | gh-wall-open held | walking straight out: push through the doors toward the rocket 1.08→1.5 (2.4 s) into a warm bloom (no corridor) | bloom | `steps-hall`; BGM launch starts here |
+| C1 | — | gh-wall-open-b held | walking straight out: push through the doors toward the rocket 1.08→1.5 (2.4 s) into a warm bloom (no corridor) | bloom | BGM launch starts here |
 | C2 | 〔テロップ：（場所の名前は物語の担当が直す。いまの台本は「結社大広間に着いた」）〕 | **gh-hall-wide** + layer **kb-back** (KIMORIN from behind, lower left-centre, looking up) + OBOLON and MONBAN small at the foot of the steps | open on the floor (1.35, focus low) and tilt/pull up to the whole rocket and the ring (5 s); KIMORIN moves less than the plate (parallax); a slow light sweep along the rocket's lines; the ring breathes and flares; dust motes | from the bloom | `hall-reveal` |
-| C3 | OBOLON「これがロケットだ。月に行く。乗れ。」 | **gh-hall-low**: the rocket from the foot of the steps | tilt up the hull 1.25 (focus low) → 1.0 (focus top), 5 s; light sweep on the lines; his voice over the rocket | cut | — |
+| C3 | OBOLON「これがロケットだ。月に行く。乗れ。」 | **gh-hall-low-b**: the rocket from the foot of the steps | tilt up the hull 1.25 (focus low) → 1.0 (focus top), 5 s; light sweep on the lines; his voice over the rocket | cut | — |
 | C4 | MONBAN「では、いってこい。」 | **gh-ots-base** + **kb-ots** (KIMORIN's shoulder and head, big, soft, lower left) + OBOLON (left) and MONBAN (right) before the steps | OTS; slow push toward MONBAN; foreground drifts against the plate | cut | — |
 | C5 | KIMORIN「え？あなた達は乗らないのですか？」 | **gh-reverse** (the plaza looking back toward the Earth temple's open doors) + KIMORIN close | reverse shot | cut | — |
 | C6 | MONBAN「俺は…門を、守る必要がある…。」 | OTS, reframed on MONBAN | 0.8 s reframe | cut | — |
@@ -74,7 +74,7 @@ Durations are the feel; the lines are tapped through as always.
 | C10 | MONBAN「そうだ、{inviter}からこれを預かっている。受け取れ」 | OTS, closer on MONBAN | push | cut | — |
 | C11 | MONBAN「マナジェムだ…。」 / 〔テロップ：マナジェムを手に入れた〕 | **gh-gem-monban**: MONBAN's gloved hand offering the gem to us | slow push 1.0→1.1, the gem's glow breathes, sparkles | cut | `sparkle`, `gem-hum` |
 | C12 | MONBAN「キモリンのもある」 | OTS on MONBAN | — | cut | — |
-| C13 | KIMORIN「なんやこれ！　光っとる！　どういう仕組み！？」 | **gh-gem-kimorin**: KIMORIN staring at the gem in his paws, lit from below | small punch-in, glow breathes | cut | `gem-hum` |
+| C13 | KIMORIN「なんやこれ！　光っとる！　どういう仕組み！？」 | **gh-gem-kimorin-b**: KIMORIN staring at the gem in his paws, lit from below | small punch-in, glow breathes | cut | `gem-hum` |
 | C14 | MONBAN「使い方は…そのうち、わかる…。」 | OTS on MONBAN | — | cut | — |
 | C15 | KIMORIN「いや今教えてくださいよ。」 | reverse + close | — | cut | — |
 | C16 | OBOLON「それでは、先に月に行ってる」 | OTS on OBOLON | push | cut | — |
@@ -90,8 +90,8 @@ Durations are the feel; the lines are tapped through as always.
   `streak-up` / `zoom-back` the point of light; `vanish` a layer dissolving into particles.
 
 ## Pictures (design/rocket-art-queue.json → design/cast/rocket/, published as onboarding/s/gh-*.jpg and gh-*.webp cut-outs)
-- Plates: gh-wall-open (edit of s/d2-hall, the doors open onto the plaza), gh-hall-wide, gh-hall-low, gh-ots-base, gh-reverse.
-- Inserts (painted with the character): gh-gem-monban, gh-gem-kimorin.
+- Plates: gh-wall-open-b (edit of s/d2-hall, the doors open onto the plaza), gh-hall-wide, gh-hall-low-b, gh-ots-base, gh-reverse.
+- Inserts (painted with the character): gh-gem-monban, gh-gem-kimorin-b (-b: the repaints of round 2).
 - KIMORIN cut-outs (green → scripts/rocket/cut.py): kb-back (three-quarter back, looking up), kb-ots (shoulder and
   head from behind), kb-walk (walking away).
 - OBOLON is the client's own picture (onboarding/obolon.webp), never repainted; MONBAN is his repainted cut-out
@@ -114,3 +114,12 @@ Durations are the feel; the lines are tapped through as always.
 | video d2-descend / s/d2-launch-pit / s/d2-monban-pit / obolon-pit | the underground pit | story change: the open-air rocket plaza instead; old banners and candles do not match the approved rocket design |
 | video d2-gem | a gem on a HUMAN hand | wrong: MONBAN wears black gloves; a bare pink human hand |
 | (the hall exchange) | MONBAN still with OBOLON laid over, close-ups facing us | KIMORIN stood beside OBOLON talking to the camera (client: wrong) |
+
+## Sounds
+Made with Seed Audio through the repo's "Story audio" workflow (design/story-audio-queue.json, scripts/rocket/sfx-queue.py),
+then cut to their cue, faded and peak-set to −1.5 dBFS by scripts/rocket/master-se.sh (the made takes kept in
+design/sfx-src): `whip`, `glint`, `stone-door`, `hall-reveal`, `beam` (the shimmer of the first take + the impact of the
+second), `star-sky`, `streak-up`, `zoom-back`, `gem-hum`, `dissolve`, `into-light`. Reused from before (measured clean):
+`sparkle`, `magic`, `boing`, `thud`, `pop`, `pin`. Footsteps were tried three times (thin clicks over hiss, then a silent
+file) and dropped — no footsteps rather than cheap ones; the old `footsteps` file (0 dBFS peaks, high noise floor) is
+not used here either.

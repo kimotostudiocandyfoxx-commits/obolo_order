@@ -511,11 +511,6 @@
       "prompt": "Two colossal ancient stone temple doors slowly sliding apart: a deep heavy grinding rumble of stone on stone with a low resonant boom, faint dust trickling, and a soft rush of air as they open, in a huge echoing hall. High quality, realistic and rich, clean recording, no music, no voices."
     },
     {
-      "id": "steps-hall",
-      "kind": "se",
-      "prompt": "Close-miked footsteps of a small, light child-sized creature walking briskly across polished marble in a quiet open-air plaza at dusk: about ten soft, quick, evenly spaced steps over four seconds, light heel-and-toe taps with a short natural echo, very clean and low noise. High quality, realistic and rich, clean recording, no music, no voices."
-    },
-    {
       "id": "hall-reveal",
       "kind": "se",
       "prompt": "A vast space opening up: a slow, deep, airy swell of wind and low resonance with a faint high golden shimmer, like walking out into an immense open-air hall at dusk; cinematic reveal sound design, calm and majestic, fading softly. High quality, realistic and rich, clean recording, no music, no voices."

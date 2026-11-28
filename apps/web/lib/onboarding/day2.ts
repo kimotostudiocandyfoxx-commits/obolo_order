@@ -107,7 +107,6 @@ export const DAY2: Step[] = [
   { t: 'action', label: '地球の神殿に向かう' },
   { t: 'bgm', track: null, fade: 2 },
   // A9 門をくぐり、神殿の奥へ: through the arch into a warm bloom (replaces the motion 12-a)
-  { t: 'se', sound: 'steps-hall' },
   { t: 'still', image: 's/d2-gate-inside', shot: 'gate-through', clear: true, fade: 0.4 },
   { t: 'se', sound: 'into-light', after: 1.2 },
   { t: 'wait', s: 2.4 },
@@ -146,8 +145,7 @@ export const DAY2: Step[] = [
   { t: 'still', image: 's/d2-hall-sky', shot: 'temple-sky', clear: true, fade: 2.5 },
   { t: 'wait', s: 6.5 }, // 地球が浮かんでから、しばらく、見とれる間（client 2026-10-22／10-29）
   { t: 'say', who: 'KIMORIN', text: '……めちゃくちゃすごい！' }, // ゴーグルを額に押し上げる。目の切れ目が、青く光る
-  // B8 MONBANが、入り口から歩いてくる (replaces d2-monban-walkin): his steps, and he is there
-  { t: 'se', sound: 'steps-hall' },
+  // B8 MONBANが、入り口から歩いてくる (replaces d2-monban-walkin): out of the dark, he is there
   { t: 'still', image: 's/d2-hall-sky-monban', fade: 1.2 }, // 星空の大広間。MONBANが左、OBOLONが真ん中、KIMORINが右（QA 5 N8）
   { t: 'say', who: 'MONBAN', text: 'お前はObolo Orderに招待された...だから知る権利がある。' },
   { t: 'say', who: 'MONBAN', text: 'どうだ、宇宙へ行ってみるか？' },
@@ -192,14 +190,13 @@ export const DAY2: Step[] = [
   { t: 'still', image: 's/d2-hall', shot: 'wall-push', clear: true, fade: 0.5 },
   { t: 'se', sound: 'stone-door', after: 0.6 },
   { t: 'wait', s: 1.4 },
-  { t: 'still', image: 's/gh-wall-open', shot: 'wall-open', fade: 1.4 },
+  { t: 'still', image: 's/gh-wall-open-b', shot: 'wall-open', fade: 1.4 },
   { t: 'wait', s: 2.6 },
 
   { t: 'scene', id: 'D02-S009' }, // ロケット場／マナジェム（client 2026-11-28: the rocket stands on an open-air plaza straight beyond the temple）
   { t: 'bgm', track: 'launch' },
   // C1 まっすぐ外へ: through the open doors toward the rocket, into the evening light
-  { t: 'se', sound: 'steps-hall' },
-  { t: 'still', image: 's/gh-wall-open', shot: 'wall-through' },
+  { t: 'still', image: 's/gh-wall-open-b', shot: 'wall-through' },
   { t: 'wait', s: 2.4 },
   // C2 the plaza: KIMORIN (and we) in front, looking up at the rocket; OBOLON and MONBAN beyond, before it
   { t: 'se', sound: 'hall-reveal' },
@@ -207,7 +204,7 @@ export const DAY2: Step[] = [
   { t: 'wait', s: 3.2 },
   { t: 'caption', text: 'ロケット発射場に着いた' },
   // C3 the rocket from the foot of its steps; OBOLON's voice over it
-  { t: 'still', image: 's/gh-hall-low', shot: 'plaza-low', fade: 0.3 },
+  { t: 'still', image: 's/gh-hall-low-b', shot: 'plaza-low', fade: 0.3 },
   { t: 'say', who: 'OBOLON', text: 'これがロケットだ。月に行く。乗れ。' },
   // C4– over KIMORIN's shoulder to OBOLON and MONBAN; KIMORIN's lines are the reverse (the plaza behind him, his close-up)
   { t: 'still', image: 's/gh-ots-base', shot: 'ots-monban', fade: 0.25 },
@@ -233,7 +230,7 @@ export const DAY2: Step[] = [
   { t: 'still', image: 's/gh-ots-base', shot: 'ots-monban', fade: 0.25 },
   { t: 'say', who: 'MONBAN', text: 'キモリンのもある' }, // MONBANが、KIMORINの手のひらにも、小さな石をのせる（M-R334）
   // C13 KIMORIN staring at the stone in his paws, lit from below
-  { t: 'still', image: 's/gh-gem-kimorin', shot: 'gem-kimorin', clear: true, fade: 0.15 },
+  { t: 'still', image: 's/gh-gem-kimorin-b', shot: 'gem-kimorin', clear: true, fade: 0.15 },
   { t: 'se', sound: 'gem-hum' },
   { t: 'say', who: 'KIMORIN', text: 'なんやこれ！　光っとる！　どういう仕組み！？' },
   { t: 'still', image: 's/gh-ots-base', shot: 'ots-monban', fade: 0.2 },

@@ -32,7 +32,7 @@ def plate(i, prompt, refs, w=1152, h=2048):
     return {"id": i, "w": w, "h": h, "size": [1080, 1920], "refs": refs, "prompt": prompt + " " + STYLE}
 
 items = [
-    plate("gh-wall-open",
+    plate("gh-wall-open-b",
           "Edit the first picture: keep the temple hall EXACTLY the same — the same dark hall, the same camera, framing, perspective, golden armillary rings and the vertical "
           "beam of light in the middle, the same floor circles and colours. Change only this: the tall back wall straight behind the beam of light has split down the middle and "
           "its two huge carved black-and-gold stone doors have swung open to the left and right, and through the opening we look STRAIGHT OUT of the temple into the open air: "
@@ -46,7 +46,7 @@ items = [
           "the round platform and steps sit at about 62% of the picture's height; the long polished floor fills the lower third, empty, its gold lines leading the eye "
           "to the steps. The rows of obelisks and lanterns frame both sides, the wide open sky above. " + PLATE,
           [R + "ok-look.jpg", R + "p-rocket3f-front.jpg", R + "plate-base-wide.jpg"]),
-    plate("gh-hall-low",
+    plate("gh-hall-low-b",
           "THE ROCKET of the society on its open-air plaza at dusk, seen from a WORM'S-EYE VIEW: an extreme low angle with a wide 16 mm lens from right at the bottom of "
           "its steps, the camera tilted steeply up. The black-and-gold steps start big and close at the bottom edge and fill the lower quarter; from the top of the steps the "
           "rocket soars up, hugely foreshortened, its vertical lines converging toward the top: first the bronze engine nozzles and the glowing arched door, then EXACTLY THREE "
@@ -76,7 +76,7 @@ items = [
           "glowing softly and lighting the glove from below. The hand and gem in the lower middle, sharp; behind, out of focus, the open-air rocket plaza at dusk: golden lanterns as "
           "round bokeh, the black rocket's teal and pink lines as soft streaks, a part of the golden ring. Only the hand and sleeve of MONBAN are seen, no face.",
           ["design/story/refs/client/managem.jpg", "design/cast/monban.jpg", R + "ok-look.jpg"]),
-    plate("gh-gem-kimorin",
+    plate("gh-gem-kimorin-b",
           "Medium close-up of KIMORIN. Picture 1 shows his EXACT FACE: copy the face design faithfully (only the face — not the red hood and not the sunglasses of picture 1). "
           "Picture 2 shows his costume and body for this scene. " + KIM + " HIS FACE: a smooth round pure-white porcelain fox face with no nose and no muzzle; a small blue "
           "three-petal leaf mark on the forehead; his eyes are NOT round and have no eyeballs: they are two thin curved glowing light-blue slits shaped like gently closed, "
@@ -111,6 +111,6 @@ cast = [
 ]
 
 json.dump({"note": "2日目「待ちなさい」〜ロケットに乗る前（依頼主 2026-11-28）: ロケット場の背景（人なし）と、KIMORINの後ろ姿の切り抜き用（緑）。design/refs/2026-11-28-rocket/storyboard.md。背景は確認後 apps/web/public/onboarding/s/<id>.jpg (720×1280) に書き出す。切り抜きは scripts/rocket/cut.py。ロケット・ロケット場は物語の歌の絵（ok-*.jpg、p-rocket3f-front.jpg）に合わせる。実行：Actions の「UI art」を、このブランチで queue=design/rocket-art-queue.json",
-           "dir": "../../../design/cast/rocket", "png": True, "always": "", "redo": ["gh-wall-open", "gh-hall-low", "gh-gem-kimorin"],
+           "dir": "../../../design/cast/rocket", "png": True, "always": "", "redo": [],
            "items": items + cast}, open(sys.argv[1], 'w'), ensure_ascii=False, indent=1)
 print(len(items + cast))
