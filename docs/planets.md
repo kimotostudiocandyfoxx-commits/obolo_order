@@ -183,14 +183,32 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 - **2日目のロケットの映像**（M-R345）：曲と歌声がまだ届いていないので入れていない。`day2.ts` に入れる場所の印だけ（P01 の台本も前の取り込みのまま：入れると `story-sync` が21件になる）。
 
 ### スイッチを入れる時の確認表（1つずつ）
-**今は全部「空」（切）。**
-1. **データの準備**（GitHub の Actions「Planets backfill」`.github/workflows/planets-backfill.yml`、`action` を順に）：`works`（0 になるまで）→ `figures`（少し待ってもう一度）→ `recut`（`members` が 0 まで）→ `mars-repaint` → `wings` → `title-voice` → `readiness`（`ready: true` で緑）。`all` はこの順でまとめて。`figures`・`mars-repaint`・`title-voice` はお金がかかる（運営がかぶる）。キャラの投稿には準備は要らない（Web の中のファイル）。
-2. **API**（Cloud Run の変数。新しいリビジョン、ビルドなし）：全部なら `PLANET_HOMES=new`。星ごとなら `PLANET_HOMES_NEW=pluto,neptune,uranus` のように。残す星は `PLANET_HOMES_OLD=venus`。→ その星の前の投稿の入口が 403 `MADE_ON_MOON` になる。
-3. **すぐ続けて Web**（Vercel の変数 → ビルド）：`NEXT_PUBLIC_PLANET_HOMES=new`／`NEXT_PUBLIC_PLANET_HOMES_NEW=…`／`NEXT_PUBLIC_PLANET_HOMES_OLD=…` を **API と同じ星で**。→ その星の道が新しい家になり、物語のその星の日も新しい家の版になる。
-   - 2 と 3 の間は、前の画面から投稿できないだけ。逆の順にしない（開いたままの前の画面から投稿が入る）。
-   - 星ごとに入れるなら、順番は旅と同じ 土星→木星→水星→火星→金星→冥王星→海王星→天王星 がよい（冥王星は前の画面が無いので、いちばん危なくない：`/pluto` が「見つかりません」から新しい家になるだけ）。
-4. **もどす**：Web の変数を空にしてビルド → API の変数を空に。データは何も変わっていないので、前の画面がそのまま出る（スイッチの間に月から飛ばした作品も、前の画面で読める。冥王星は道が無くなる）。
-5. **確かめ（機械）**：`TEST_DATABASE_URL=… npx vitest run src/planets/moon-to-planet.pg.test.ts src/planets/moon-to-planet-switch.pg.test.ts`（8種類：入口が閉じる・自分の場所に1つだけ出る・ダチに届く・88時間で帰る・知らせ・星ごとの切り替え）。Web は `NEXT_PUBLIC_PLANET_HOMES=new` で `next build` が通ること。
+**今入っているのは冥王星だけ**（2026-11-28 依頼主決定：1つずつ、冥王星から）。ほかの7つは前の画面のまま。変数はどこにも入れない。
+
+**入れる星はコードの中の1つの決まり**：`PLANET_HOMES_ON_BY_DEFAULT`（`packages/shared/src/planetHomesSwitch.ts`、今は `['pluto']`）。Web（`apps/web/lib/planetHomes.ts`）と API（`apps/api/src/planets/moon-only.ts`）が同じものを読むので、いつもそろう（依頼主は Google Cloud・Vercel の画面に入れない。Cloud Run の変数は `deploy-api.yml` からしか入らない）。変数（下の「新しい家への切り替え」）は今までどおりその上から効く：`…_NEW` は足す、`…_OLD` は戻す（冥王星も）、`…=new` は全部。
+
+1. **データの準備**（GitHub の Actions「Planets backfill」`.github/workflows/planets-backfill.yml`）。どれも全部の星・全部の会員をまとめて扱う（星ごとには選べない）。**冥王星に要るもの**：
+   1. `readiness`（無料・数えるだけ）：`worksWithoutTags.book`（タグとチェックの無い本）と `figures.membersMissing`／`membersWithNone`（星の姿が足りない人）を見る。`ready` は火星・木星・水星の数も入るので、冥王星だけなら `false`（赤）のままでよい。
+   2. `works`（`worksWithoutTags` が 0 まで。言葉のモデルで1作品 1円未満、運営）：タグの前に作った本にタグとチェックを付ける。付いていない本も、自分の場所・ダチ・推しのホームには出るが、空（大陸）には出ず、知らない人にも届かない（`isPublicWork` はチェック済みの公開の本だけ）。今の本（月・物語の8日目）は作った時に付くので、残りは古い本だけのはず。ほかの種類（土星・木星…）の古い作品にも同じ時に付く。
+   3. （任意・お金がかかる）`figures`：星の姿が無い人に描く。描かなくても冥王星は動く（下の「準備していない人」）。1つの姿の**足りない姿を全部**描く（冥王星だけは選べない）：冥王星だけ足りない人 約 $0.0148（約¥2.4）、9つとも無い人 約 $0.12（約¥19：klein 1枚 $0.0019＋Qwen 8枚 $0.113＋確かめ9回 $0.006、160円/ドル）。3回までの描き直しで最大その約3倍。合計 ≒ `membersWithNone` × ¥19 ＋（`membersMissing` − `membersWithNone`）× 足りない枚数 × ¥2.4。実際の額は毎日の原価の見直し「星の姿の原価（最初の姿・作り直し。吸収・引かない）」に出る。ほかの星を入れる時にも要る絵なので、むだにはならない。描くのは裏の仕事：少し待ってから `readiness` でもう一度数える。
+   4. （任意）`recut`：前に切り抜いた姿を描かずに切り直す（1人 約¥1、運営）。冥王星の姿の白いふちがきれいになるだけ。
+   5. 要らない：`mars-repaint`（火星の姿だけ）・`wings`（木星の蝶だけ）・`title-voice`（水星の曲名だけ）。`all` はこれらも回すので、冥王星だけなら使わない。
+   - キャラの投稿・絵本には準備は要らない（Web の中のファイル）。
+   - **準備していない人の冥王星**：姿が無い人は、ほかの人のホームでは冥王星の見本の絵に顔をのせた姿、自分の場所は姿なし（名前と本だけ）。タグの無い本は空・知らない人には出ない（自分・ダチ・推しには出る）。住人・KIMORIN⭐︎・MIKIE⭐︎DRILL は準備なしで来る。
+2. **リリース**（冥王星は済み）：その星を `PLANET_HOMES_ON_BY_DEFAULT` に足して、ふつうのリリース（API と Web が同じコミットで出る）。→ その星の道が新しい家になり、物語のその星の日も新しい家の版になり、API が前の投稿の入口を 403 `MADE_ON_MOON` で閉じる。
+   - 順番は旅と同じ 土星→木星→水星→火星→金星→（冥王星）→海王星→天王星 がよい。次は依頼主が決める。
+   - 前の画面がある星は、API と Web がずれると、開いたままの前の画面から投稿が入るかもしれない（数分。入っても前の作品として残るだけ）。冥王星には前の入口が無いので関係ない。
+3. **もどす**：その星を `PLANET_HOMES_ON_BY_DEFAULT` から外してリリース。データは何も変わっていないので、前の画面がそのまま出る（スイッチの間に月から飛ばした作品も、前の画面で読める。冥王星は道が無くなり「見つかりません」に戻る。飛ばした本は月・ブルーナに残る）。急ぐ時は変数でも戻せる：Cloud Run は `deploy-api.yml` で `PLANET_HOMES_OLD=pluto`、Web は Vercel の `NEXT_PUBLIC_PLANET_HOMES_OLD=pluto` ＋ビルド（Web から先に）。
+4. **確かめ（機械）**：`TEST_DATABASE_URL=… npx vitest run src/planets/moon-to-planet.pg.test.ts src/planets/moon-to-planet-switch.pg.test.ts`（8種類：入口が閉じる・自分の場所に1つだけ出る・ダチに届く・88時間で帰る・知らせ・星ごとの切り替え）。決まりのテスト：`packages/shared/src/planetHomesSwitch.test.ts`・`apps/web/lib/planetHomes.test.ts`・`apps/api/src/planets/moon-only.test.ts`（何も入れない時＝冥王星だけ新しい家、ほかの7つは前のまま）。Web は `NEXT_PUBLIC_PLANET_HOMES=new` でも `next build` が通ること。
+
+**冥王星を入れた時に見たこと**（2026-11-28、`next build`＋`next start`、Web の中の見本の会員、390×844：`docs/handoff/shots/pluto-on-*.jpg`）：
+- 旅の鍵：7日目の人は「冥王星は、まだひらいていない／旅の8日目にひらく」（`locked-day7`）。8日目は遊んでいる途中から開く。
+- 8日目を終えた人（オーダー前）：自分の場所、KIMORIN⭐︎（ダチ）、その日までの住人16人が推し（8つの枠＋▶・ぜんぶ見る）、MIKIE⭐︎DRILL はいない（`home-day8`）。自分の場所→プロフィールに物語の本が並ぶ（`own-place`）。
+- 住人の絵本が開く（`book`）。☆→★でブルーナへ（`star`）、ブルーナの冥王星の〔しまった作品〕に出る（`bluena-kept`）。
+- 列から住人のプロフィール→〔♡ 推し〕（`profile-resident`）→ 外すと〔推す〕（`unoshi`）→〔←〕1回でホームへ、その住人はもう来ない（`home-unoshi`）。KIMORIN⭐︎ のプロフィールには♡が無い。2本の指でつまむとプロフィールからホームへ戻る。
+- オーダー後・旅のあと：MIKIE⭐︎DRILL が KIMORIN⭐︎ と並ぶダチとして来る（`after-order`）。
+- 物語の8日目（新しい家の版）：朝の OBOLON「お前は、ついに、物語を、作れるようになる。」（`story-obolon`）、クロコパトラの書庫は〔次へ〕、{neo}の図書館は「〜の場所をタップ」で、開くと〔次へ〕が出る（`story-door`・`story-door-open`）。物語の本は `POST /moon/story-first/book` → `/moon/books/:id/fly`（月の道なので閉じない）。
+- 本当のダチ・推しが先・住人はそのあと（見本の会員には本当のダチがいないので、`castWorks.test.ts`・`castChoices.test.ts` で確かめ）。前の投稿の入口は冥王星には無い（`/planets/:planet/posts` は水星・火星だけ）。
 
 **本物のスマホで人が見ること**（iPhone の Safari と Android の Chrome。マナーモードを切って）：
 - どの星でも：その会員の日の推しの数と顔ぶれ（3日目を終えた人 9 … 10日目を終えた人・旅のあと 18、＋KIMORIN⭐︎）。見本の人がいない。自分の場所をタップ→プロフィール→〔←〕が1回で戻る／2本指でつまんで戻る。▶で1人ずつ来て、■で音が全部止まる。2本指でつまんで空→広げて戻る。星の切り替え（左上のアイコンを横にすべらせる）。
@@ -274,21 +292,21 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 
 ## 新しい家への切り替え（準備だけ、M-R326）
 
-今の星の画面を、新しい家（共通の型。今は `/planets-preview/<星>` だけ）に替えるためのスイッチ。**切ったまま**（進め方は依頼主と確認中）。前の画面のコードは残す。スイッチは **Web と API の2か所**（同じ決まり `planetHomeIsNew`、@obolo/shared）。必ず両方を同じに入れる。
+今の星の画面を、新しい家（共通の型）に替えるためのスイッチ。**2026-11-28 から冥王星だけ入っている**（コードの `PLANET_HOMES_ON_BY_DEFAULT`。上の「スイッチを入れる時の確認表（1つずつ）」）。前の画面のコードは残す。決まりは1つ（`planetHomeIsNew`、@obolo/shared）を Web と API が読む。下の変数は、コードの決まりの上から変えたい時だけ（必ず両方を同じに）。
 
 | 変数（Vercel、ビルドの時に入る） | 意味 | 今 |
 |---|---|---|
-| `NEXT_PUBLIC_PLANET_HOMES` | `new` で全部の星が新しい家。ほかの値・空は前の画面 | 空 |
-| `NEXT_PUBLIC_PLANET_HOMES_NEW` | ここに書いた星だけ新しい家（例 `saturn,jupiter`）。上が空でも効く | 空 |
-| `NEXT_PUBLIC_PLANET_HOMES_OLD` | ここに書いた星は前の画面のまま（上が `new` でも）。両方に書いた星は前の画面 | 空 |
+| `NEXT_PUBLIC_PLANET_HOMES` | `new` で全部の星が新しい家。ほかの値・空はコードの決まり（今は冥王星だけ） | 空 |
+| `NEXT_PUBLIC_PLANET_HOMES_NEW` | ここに書いた星も新しい家（例 `saturn,jupiter`。コードの決まりに足す）。上が空でも効く | 空 |
+| `NEXT_PUBLIC_PLANET_HOMES_OLD` | ここに書いた星は前の画面のまま（上が `new` でも、コードの決まりの星でも）。両方に書いた星は前の画面 | 空 |
 
 | API（Cloud Run の変数、入れると新しいリビジョン。ビルドは要らない） | 意味 | 今 |
 |---|---|---|
 | `PLANET_HOMES` | `new` で全部の星。Web の `NEXT_PUBLIC_PLANET_HOMES` と同じ | 空 |
-| `PLANET_HOMES_NEW` | ここに書いた星だけ。Web の `…_NEW` と同じ | 空 |
+| `PLANET_HOMES_NEW` | ここに書いた星も。Web の `…_NEW` と同じ | 空 |
 | `PLANET_HOMES_OLD` | ここに書いた星は前のまま。Web の `…_OLD` と同じ | 空 |
 
-効く道：`/saturn` `/jupiter` `/mercury` `/mars` `/venus` `/uranus` `/neptune`、それと `/pluto`（冥王星には前の画面がないので、スイッチが入った時だけある。切っている間は今までどおり「見つかりません」）。太陽系の入口（`/` の `SolarSystem`）は道を変えない（冥王星は入口に無い：新しい家の星の切り替えから行く）。わくは前のまま：上の帯、ログインの壁、旅の鍵（`PlanetGate`。M-R341 から：冥王星は旅の8日目・海王星 9日目・天王星 10日目に、オーダーでなくても開く）。
+効く道：`/saturn` `/jupiter` `/mercury` `/mars` `/venus` `/uranus` `/neptune`、それと `/pluto`（冥王星には前の画面がないので、スイッチが入った時だけある。今は入っている。外すと「見つかりません」）。太陽系の入口（`/` の `SolarSystem`）は道を変えない（冥王星は入口に無い：新しい家の星の切り替えから行く）。わくは前のまま：上の帯、ログインの壁、旅の鍵（`PlanetGate`。M-R341 から：冥王星は旅の8日目・海王星 9日目・天王星 10日目に、オーダーでなくても開く）。
 
 **スイッチを入れた星は、前の投稿の入口を閉じる**（物語の部屋 2026-11-27。切っている間は何も変わらない）：
 - Web：その星の道は新しい家だけを出す。土星の〔つぶやく〕〔器〕〔広場〕、木星・水星・火星の星の上の投稿、金星のブース（`?dj=1`・`?booth=1` も新しい家になる）は、画面に出ない。
@@ -311,11 +329,7 @@ API は `apps/api/src/planets/planet-works.service.ts`・`continents.service.ts`
 - 場面の対応とスクリーンショット：`docs/handoff/shots/story-<日>-<星>[-neo][-door|-play].jpg`（390×844。`npx tsx apps/web/scripts/story-home-steps.ts` が場面の番号を出す → `/kakunin-…/play?day=N&i=<番号>`）。
 - まだ：新しい台詞の声（`public/story/voices/lines`、声の仕事はまだ回していない）。旅のあとの案内（`AfterScreens`）・2周目（`lap2`：`AtelierVisit`・`IslandWorks` が前の部品）・練習（`SaturnLesson` など。3〜7日目はもう呼ばない）は前のまま。
 
-**スイッチを入れる時の順番**：
-1. データの準備（下の「今あるデータの準備」）：`works` → `figures` → `recut` → `mars-repaint` → `wings` → `title-voice` → `readiness` が `ready: true`。
-2. API の変数（`PLANET_HOMES` か `PLANET_HOMES_NEW`）を入れる → 前の入口が閉じる。
-3. すぐ続けて Web の変数（`NEXT_PUBLIC_PLANET_HOMES…`、同じ星）を入れてビルド → 新しい家が出る。（2 と 3 の間は、前の画面から投稿できないだけ。逆の順だと、開いたままの前の画面から投稿が入る）
-4. もどす時：Web → API の順に空にする。
+**スイッチを入れる時の順番**：上の「スイッチを入れる時の確認表（1つずつ）」（データの準備 → `PLANET_HOMES_ON_BY_DEFAULT` に足してリリース。もどす時は外してリリース）。全部の星を入れる時のデータの準備は下の順（`all`）：`works` → `figures` → `recut` → `mars-repaint` → `wings` → `title-voice` → `readiness` が `ready: true`。
 
 **今あるデータの準備**：`GET /admin/planets-readiness`（数えるだけ）と、GitHub の Actions「Planets backfill」（`.github/workflows/planets-backfill.yml`。Cloud Run の一度きりのジョブ、管理トークンは Google Cloud の中）。`action` で選ぶ。順番（`all` はこの順）：
 

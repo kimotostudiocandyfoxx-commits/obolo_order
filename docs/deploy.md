@@ -94,7 +94,7 @@ Vercel → Project → **Settings → Environment Variables**
 - `NEXT_PUBLIC_API_URL` = Cloud Run の URL（Preview と Production の両方にチェック）
 - **Redeploy** すると、デモモードの黄色い帯が消え、本物のログイン・バティ・土星になります
 
-星の画面の切り替え（M-R326。**今は入れない**。進め方が決まるまで空のまま）：
+星の画面の切り替え（M-R326。**変数は入れない**：2026-11-28 から、新しい家にする星はコードの `PLANET_HOMES_ON_BY_DEFAULT`（今は冥王星だけ）で決まる。下の変数は、その上から変えたい時だけ）：
 - `NEXT_PUBLIC_PLANET_HOMES` = `new` で、全部の星の画面が新しい家になる（空・ほかの値は今の画面）
 - `NEXT_PUBLIC_PLANET_HOMES_NEW` = `saturn,jupiter` のように書くと、その星だけ新しい家（1つずつ試す時）
 - `NEXT_PUBLIC_PLANET_HOMES_OLD` = 書いた星は今の画面のまま（全部を切り替えたあと、1つだけ戻す時）

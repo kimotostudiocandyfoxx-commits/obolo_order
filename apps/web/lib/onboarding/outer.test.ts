@@ -24,15 +24,16 @@ describe('M-R341: days 8–10 are the outer planets, before becoming Obolo Order
     expect(scenes(STORIES[11].steps).slice(0, 1)).toEqual(['D08-S001']);
     expect(scenes(STORIES[11].steps).slice(-2)).toEqual(['D08-S011', 'M-END-S001']);
     expect(STORIES[11].steps).toBe(DAY11);
-    // switch off (this build): the stills-versions; the Eclipse day has one version
-    expect([STORIES[8].steps, STORIES[9].steps, STORIES[10].steps]).toEqual([DAY8_BEFORE, DAY9_BEFORE, DAY10_BEFORE]);
-    expect([DAY8, DAY9, DAY10]).toEqual([DAY8_BEFORE, DAY9_BEFORE, DAY10_BEFORE]);
+    // this build (client 2026-11-28, PLANET_HOMES_ON_BY_DEFAULT: Pluto on): day 8 is the new-home version, days 9 and 10
+    // keep the stills-versions; the Eclipse day has one version
+    expect([STORIES[8].steps, STORIES[9].steps, STORIES[10].steps]).toEqual([DAY8_NEW_HOME, DAY9_BEFORE, DAY10_BEFORE]);
+    expect([DAY8, DAY9, DAY10]).toEqual([DAY8_NEW_HOME, DAY9_BEFORE, DAY10_BEFORE]);
     expect([STORIES_NEW_HOMES[8].steps, STORIES_NEW_HOMES[9].steps, STORIES_NEW_HOMES[10].steps]).toEqual([DAY8_NEW_HOME, DAY9_NEW_HOME, DAY10_NEW_HOME]);
     expect(STORIES_NEW_HOMES[11].steps).toBe(STORIES[11].steps);
     expect([SCENE_DAY('M-PLUTO-S002'), SCENE_DAY('M-NEPTUNE-S001'), SCENE_DAY('M-URANUS-S002'), SCENE_DAY('M-END-S001'), SCENE_DAY('D08-S003'), SCENE_DAY('D07V-S004')]).toEqual([8, 9, 10, 11, 11, 7]);
   });
 
-  for (const [day, steps] of [[8, DAY8], [9, DAY9], [10, DAY10], [11, DAY11]] as const) {
+  for (const [day, steps] of [[8, DAY8], [8, DAY8_BEFORE], [9, DAY9], [10, DAY10], [11, DAY11]] as const) {
     it(`day ${day}: labels resolve, pictures, sprites and music exist, the caption says the day, ends with end`, () => {
       for (const s of steps) {
         if (s.t === 'goto') expect(() => labelIndex(steps, s.id)).not.toThrow();

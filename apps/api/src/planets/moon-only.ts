@@ -8,11 +8,13 @@ import { apiError } from '../common/errors';
  * before (Saturn's 〔つぶやく〕 / 〔器〕 / 〔広場〕, Jupiter's / Mercury's / Mars's own posting, Venus's booth and live
  * broadcast) answer 403 MADE_ON_MOON. Reading what was posted before stays as it is.
  *
- * The server's flag mirrors the web's (docs/planets.md 「新しい家への切り替え」) and is OFF by default:
+ * The server's flag mirrors the web's (docs/planets.md 「新しい家への切り替え」). With nothing set, the planets of
+ * PLANET_HOMES_ON_BY_DEFAULT (@obolo/shared — the web's own list; client 2026-11-28: Pluto, which has no door of before)
+ * are on, the others off. On top of it:
  *   PLANET_HOMES=new            every planet           (web: NEXT_PUBLIC_PLANET_HOMES)
- *   PLANET_HOMES_NEW=saturn,…   only these             (web: NEXT_PUBLIC_PLANET_HOMES_NEW)
+ *   PLANET_HOMES_NEW=saturn,…   these too              (web: NEXT_PUBLIC_PLANET_HOMES_NEW)
  *   PLANET_HOMES_OLD=venus,…    these stay as before   (web: NEXT_PUBLIC_PLANET_HOMES_OLD)
- * Read from the environment at each call (a Cloud Run variable: a new revision, no build).
+ * Read from the environment at each call (a Cloud Run variable: only through .github/workflows/deploy-api.yml).
  */
 export const serverPlanetHomes = (env: NodeJS.ProcessEnv = process.env): PlanetHomesEnv => ({ all: env.PLANET_HOMES, only: env.PLANET_HOMES_NEW, except: env.PLANET_HOMES_OLD });
 

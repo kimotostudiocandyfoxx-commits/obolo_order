@@ -11,15 +11,20 @@ const code = (fn: () => void): string | null => {
   }
 };
 
-describe('story 2026-11-27: the posting doors of before close when a planet has its new home (the server flag, off by default)', () => {
-  it('nothing set: nothing is refused (production today)', () => {
+describe('story 2026-11-27: the posting doors of before close when a planet has its new home (client 2026-11-28: Pluto only, from the code)', () => {
+  it('nothing set: no door of before is refused (Pluto, on by the code, never had one)', () => {
     expect(serverPlanetHomes({})).toEqual({ all: undefined, only: undefined, except: undefined });
     for (const p of ['saturn', 'jupiter', 'mercury', 'mars', 'venus'] as const) {
       expect(planetIsMoonOnly(p, serverPlanetHomes({}))).toBe(false);
       expect(code(() => moonOnly(p, false, serverPlanetHomes({})))).toBeNull();
     }
-    // this process (the tests, and production until the flag is set)
+    // the web's own list (PLANET_HOMES_ON_BY_DEFAULT): Pluto is on on the server too, the other two outer planets are not
+    expect(planetIsMoonOnly('pluto', serverPlanetHomes({}))).toBe(true);
+    expect(planetIsMoonOnly('neptune', serverPlanetHomes({}))).toBe(false);
+    expect(planetIsMoonOnly('uranus', serverPlanetHomes({}))).toBe(false);
+    // this process (the tests, and production: no variable is set)
     expect(code(() => moonOnly('saturn'))).toBeNull();
+    expect(planetIsMoonOnly('pluto')).toBe(true);
   });
 
   it('PLANET_HOMES=new: a post made on the planet is refused with MADE_ON_MOON; the Moon’s own call passes', () => {
@@ -36,5 +41,7 @@ describe('story 2026-11-27: the posting doors of before close when a planet has 
     const back = serverPlanetHomes({ PLANET_HOMES: 'new', PLANET_HOMES_OLD: 'venus' });
     expect(planetIsMoonOnly('venus', back)).toBe(false);
     expect(planetIsMoonOnly('mars', back)).toBe(true);
+    // Pluto taken back without a release of the code
+    expect(planetIsMoonOnly('pluto', serverPlanetHomes({ PLANET_HOMES_OLD: 'pluto' }))).toBe(false);
   });
 });

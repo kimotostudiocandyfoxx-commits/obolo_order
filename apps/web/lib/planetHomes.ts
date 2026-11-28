@@ -1,19 +1,19 @@
-import { HOME_PLANETS, planetHomeIsNew, type HomePlanet, type PlanetHomesEnv } from '@obolo/shared';
+import { HOME_PLANETS, PLANET_HOMES_ON_BY_DEFAULT, planetHomeIsNew, type HomePlanet, type PlanetHomesEnv } from '@obolo/shared';
 
 /**
- * M-R326 (preparation only — the rollout is still being agreed with the client): which screen a live planet route
- * (/saturn, /jupiter, /mercury, /mars, /venus, /uranus, /neptune, and /pluto) shows — the planet's screen of before, or
- * the new common home (components/planetTemplate, until now only at /planets-preview/<planet>).
+ * M-R326: which screen a live planet route (/saturn, /jupiter, /mercury, /mars, /venus, /uranus, /neptune, and /pluto)
+ * shows — the planet's screen of before, or the new common home (components/planetTemplate).
  *
- *   NEXT_PUBLIC_PLANET_HOMES       new   every planet shows the new home
- *                                  (unset / anything else: every planet shows its screen of before — the default)
- *   NEXT_PUBLIC_PLANET_HOMES_NEW   saturn,jupiter   these show the new home even while the switch is off
- *   NEXT_PUBLIC_PLANET_HOMES_OLD   venus            these keep the screen of before even while the switch is on
+ * Client 2026-11-28: one planet at a time, from the code — PLANET_HOMES_ON_BY_DEFAULT (@obolo/shared planetHomesSwitch.ts,
+ * the API reads the same list) names the planets on with nothing set: Pluto now. The variables still work on top:
+ *   NEXT_PUBLIC_PLANET_HOMES       new   every planet shows the new home (unset / anything else: the code's list)
+ *   NEXT_PUBLIC_PLANET_HOMES_NEW   saturn,jupiter   these show the new home too
+ *   NEXT_PUBLIC_PLANET_HOMES_OLD   venus            these keep the screen of before (a planet of the code's list too)
  *
  * A planet named in both lists keeps the screen of before (the careful side). The values are read when the web app is
- * built (NEXT_PUBLIC_*): changing one needs a new build. With nothing set, nothing changes anywhere.
+ * built (NEXT_PUBLIC_*): changing one needs a new build.
  */
-export { planetHomeIsNew, type PlanetHomesEnv };
+export { PLANET_HOMES_ON_BY_DEFAULT, planetHomeIsNew, type PlanetHomesEnv };
 
 /** the build's own values (each named in full: Next.js inlines NEXT_PUBLIC_* only when written out) */
 export const PLANET_HOMES_ENV: PlanetHomesEnv = {

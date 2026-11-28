@@ -251,14 +251,18 @@ describe.skipIf(!URL)('月で作る → 星 with the switch on: all eight kinds 
     });
   }
 
-  it('per planet: PLANET_HOMES_NEW opens only the planets named, PLANET_HOMES_OLD keeps one back; nothing set: no door is closed', () => {
+  it('per planet: PLANET_HOMES_NEW opens the planets named (with the code’s Pluto), PLANET_HOMES_OLD keeps one back; nothing set: no door is closed', () => {
     setSwitch({ PLANET_HOMES_NEW: 'pluto,neptune,uranus' });
     for (const p of HOME_PLANETS) expect(planetIsMoonOnly(p), p).toBe(['pluto', 'neptune', 'uranus'].includes(p));
     expect(() => moonOnly('saturn')).not.toThrow();
     setSwitch({ PLANET_HOMES: 'new', PLANET_HOMES_OLD: 'venus' });
     for (const p of HOME_PLANETS) expect(planetIsMoonOnly(p), p).toBe(p !== 'venus');
+    // nothing set (client 2026-11-28): only the code's list, PLANET_HOMES_ON_BY_DEFAULT — Pluto, which has no door of before
     setSwitch({});
-    for (const p of HOME_PLANETS) expect(() => moonOnly(p)).not.toThrow();
+    for (const p of HOME_PLANETS) expect(planetIsMoonOnly(p), p).toBe(p === 'pluto');
+    for (const p of HOME_PLANETS.filter((x) => x !== 'pluto')) expect(() => moonOnly(p)).not.toThrow();
+    setSwitch({ PLANET_HOMES_OLD: 'pluto' });
+    for (const p of HOME_PLANETS) expect(() => moonOnly(p), p).not.toThrow();
   });
 
   it('the switch changes no data: with it off again, every home still shows the eight works in their makers’ places', async () => {
