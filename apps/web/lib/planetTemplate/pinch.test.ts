@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { PINCH_IN, PINCH_OUT, PinchTracker, pinchOf, WHEEL_REST_MS, WheelPinch } from './pinch';
 
 describe('two-finger pinch (06 §1)', () => {
@@ -74,5 +74,35 @@ describe('a trackpad pinch (ctrl + wheel)', () => {
     expect(w.of({ ctrlKey: true, deltaY: -20 }, 1100)).toBeNull();
     expect(w.of({ ctrlKey: true, deltaY: -20 }, 1600)).toBeNull();
     expect(w.of({ ctrlKey: true, deltaY: 20 }, 1600 + WHEEL_REST_MS + 1)).toBe('in');
+  });
+});
+
+describe('M-R344: a profile always lets you back', () => {
+  it('two fingers closing on a profile go back to the home — on every planet, sky or not; on the home they go up to the sky', async () => {
+    const { pinchGoes } = await import('./pinch');
+    expect(pinchGoes('in', { profile: true, sky: false, skyOn: true })).toBe('home');
+    expect(pinchGoes('in', { profile: true, sky: false, skyOn: false })).toBe('home');
+    expect(pinchGoes('in', { profile: false, sky: false, skyOn: true })).toBe('sky');
+    expect(pinchGoes('in', { profile: false, sky: false, skyOn: false })).toBeNull();
+    // the sky listens for itself; opening fingers and no pinch do nothing here
+    expect(pinchGoes('in', { profile: false, sky: true, skyOn: true })).toBeNull();
+    expect(pinchGoes('out', { profile: true, sky: false, skyOn: true })).toBeNull();
+    expect(pinchGoes(null, { profile: true, sky: false, skyOn: true })).toBeNull();
+  });
+  it('the click that follows the first touch on 〔←〕 is swallowed once, and only for a moment', async () => {
+    const { swallowNextClick } = await import('./pinch');
+    vi.useFakeTimers();
+    const ls = new Set<(e: Event) => void>();
+    const target = { addEventListener: (_t: string, f: unknown) => void ls.add(f as (e: Event) => void), removeEventListener: (_t: string, f: unknown) => void ls.delete(f as (e: Event) => void) } as unknown as Window;
+    swallowNextClick(600, target);
+    expect(ls.size).toBe(1);
+    const e = { stopPropagation: vi.fn(), preventDefault: vi.fn() };
+    [...ls][0](e as unknown as Event);
+    expect(e.stopPropagation).toHaveBeenCalledOnce();
+    expect(ls.size).toBe(0);
+    swallowNextClick(600, target);
+    vi.advanceTimersByTime(601);
+    expect(ls.size).toBe(0);
+    vi.useRealTimers();
   });
 });

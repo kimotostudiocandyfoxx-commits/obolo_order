@@ -606,6 +606,15 @@
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   cursor: pointer;
+  position: relative;
+  z-index: 2;
+  touch-action: manipulation;
+}
+/* M-R344: the reach is wider than the circle (to the screen's corner, and 14 px around) */
+.profBack::before {
+  content: '';
+  position: absolute;
+  inset: -14px;
 }
 .profList {
   display: flex;

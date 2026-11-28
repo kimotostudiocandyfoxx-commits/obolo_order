@@ -10,7 +10,7 @@ import type { Body } from '@/lib/planetTemplate/motion';
 import { dancerOf, peopleOf, type HomePerson } from '@/lib/planetTemplate/people';
 import { SAMPLE_OWN_FIGURE } from '@/lib/planetTemplate/sample';
 import { nameFont, shadesOf } from '@/lib/planetTemplate/saturn';
-import { PinchTracker, WheelPinch } from '@/lib/planetTemplate/pinch';
+import { pinchGoes, PinchTracker, WheelPinch } from '@/lib/planetTemplate/pinch';
 import { armPlanetSound, clubBeat, soundScope } from '@/lib/planetTemplate/sfx';
 import { PlayView, type PlayStage } from './PlayView';
 import { Profile, type ProfileMiddleSlot, type ProfilePerson } from './Profile';
@@ -414,6 +414,11 @@ export function PlanetTemplateHome({
     },
     [planet],
   );
+  // M-R344: back from a profile always lands on the home — the work opened over it closes with it
+  const closeProfile = useCallback(() => {
+    setOpened(null);
+    setProfile(null);
+  }, []);
   const playOrder = () => [...crowd.seats.map((x) => x.person), ...crowd.queue].filter((p) => p.rel !== 'own');
 
   const box = coverBox(size.W, size.H);
@@ -431,14 +436,18 @@ export function PlanetTemplateHome({
       style={vars}
       onPointerDownCapture={(e) => pinch.current.down(e.pointerId, e.clientX, e.clientY)}
       onPointerMoveCapture={(e) => {
-        // two fingers closing (0.72×) go up to the sky; a drag already going lets go (figureHandlers)
-        if (pinch.current.move(e.pointerId, e.clientX, e.clientY) === 'in' && skyOn && !sky && !profile) openSky();
+        // two fingers closing (0.72×) go up to the sky — or, on a profile, back to the home (M-R344); a drag already going lets go (figureHandlers)
+        const to = pinchGoes(pinch.current.move(e.pointerId, e.clientX, e.clientY), { profile: !!profile, sky, skyOn });
+        if (to === 'sky') openSky();
+        else if (to === 'home') closeProfile();
       }}
       onPointerUpCapture={(e) => pinch.current.up(e.pointerId)}
       onPointerCancelCapture={(e) => pinch.current.up(e.pointerId)}
       onWheel={(e) => {
         // a trackpad pinch on a computer arrives as ctrl + wheel (once per gesture)
-        if (wheel.current.of(e, performance.now()) === 'in' && skyOn && !sky && !profile) openSky();
+        const to = pinchGoes(wheel.current.of(e, performance.now()), { profile: !!profile, sky, skyOn });
+        if (to === 'sky') openSky();
+        else if (to === 'home') closeProfile();
       }}
       onDragStart={(e) => e.preventDefault()}
       data-testid="planet-template"
@@ -572,10 +581,7 @@ export function PlanetTemplateHome({
           people={profilePeople}
           current={profile}
           onPick={setProfile}
-          onBack={() => {
-            setOpened(null);
-            setProfile(null);
-          }}
+          onBack={closeProfile}
           middle={hooks.profileMiddle}
           full={hooks.profileFull}
           openedId={opened && opened.seatN == null ? opened.work.id : null}

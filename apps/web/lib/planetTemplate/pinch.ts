@@ -71,3 +71,33 @@ export class WheelPinch {
     return e.deltaY > 0 ? 'in' : 'out';
   }
 }
+
+/**
+ * M-R344 (handoff planets-08 chapter 7): where two fingers closing take you on a planet home. On a profile they always
+ * go back to the home (whatever is open over it closes too) — on every planet, with or without a sky. On the home they
+ * go up to the sky when the planet has one. In the sky the sky itself listens (SkyExplore). Opening fingers: nothing here.
+ */
+export function pinchGoes(pinch: Pinch | null, at: { profile: boolean; sky: boolean; skyOn: boolean }): 'home' | 'sky' | null {
+  if (pinch !== 'in' || at.sky) return null;
+  if (at.profile) return 'home';
+  return at.skyOn ? 'sky' : null;
+}
+
+/**
+ * The profile's 〔←〕 answers the first touch (pointer down), not the click that follows it. That click would land on
+ * whatever is under the button once the profile is gone (the planet's icon is right there): swallow it, once, for a moment.
+ */
+export function swallowNextClick(ms = 600, target: Pick<Window, 'addEventListener' | 'removeEventListener'> | null = typeof window === 'undefined' ? null : window): void {
+  if (!target) return;
+  const stop = (e: Event) => {
+    e.stopPropagation();
+    e.preventDefault();
+    off();
+  };
+  const off = () => {
+    clearTimeout(id);
+    target.removeEventListener('click', stop, true);
+  };
+  const id = setTimeout(off, ms);
+  target.addEventListener('click', stop, true);
+}

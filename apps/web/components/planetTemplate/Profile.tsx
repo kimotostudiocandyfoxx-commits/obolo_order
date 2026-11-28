@@ -3,6 +3,7 @@
 import type { HomePlanet, HomeWork } from '@obolo/shared';
 import type { ReactNode } from 'react';
 import { templateConfig } from '@/lib/planetTemplate/config';
+import { swallowNextClick } from '@/lib/planetTemplate/pinch';
 import s from './PlanetTemplate.module.css';
 
 /** one person on the profile's top row (the first is always じぶん) */
@@ -76,7 +77,21 @@ export function Profile({
   return (
     <div className={s.prof} style={{ backgroundImage: `url(${cfg.art.profile})` }} data-testid="profile" data-planet={planet}>
       <div className={s.profTop}>
-        <button type="button" className={s.profBack} onClick={onBack} aria-label="もどる">
+        {/* M-R344: one press always goes back — it answers the first touch (the click after it is swallowed so it cannot
+            land on the home underneath), and the button's reach is wider than its circle; the click stays for keyboards */}
+        <button
+          type="button"
+          className={s.profBack}
+          onPointerDown={(e) => {
+            if (e.button > 0) return;
+            e.stopPropagation();
+            swallowNextClick();
+            onBack();
+          }}
+          onClick={onBack}
+          aria-label="もどる"
+          data-testid="profile-back"
+        >
           ←
         </button>
         <div className={s.profList}>
