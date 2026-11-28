@@ -20513,6 +20513,54 @@
     "design/mv-art/out/mvr/p-rocket3f-front.jpg"
    ],
    "prompt": "Edit the first reference picture: keep EXACTLY the same scene, camera, composition, dusk sky with gold-lit clouds, reflective black-and-gold floor with gold lines, the lanterns, the tall black-and-gold obelisks in the foreground on both sides, the round platform with the staircase, the giant glowing golden ring, the colours, light and rendering. Change: (1) make the rocket noticeably BIGGER - about 1.4 times taller and wider, its nose rising high into the sky, still exactly the same rocket design (as in the second reference) standing upright on the platform at the top of the stairs, nozzles and fins resting on the platform; the golden ring scaled up with it so it still frames the rocket's upper hull. (2) REMOVE all the distant city buildings, spires and towers behind the rocket - behind the rocket there is only the open dusk sky with clouds down to a low clear horizon. No people. No text, no watermark. Vertical 9:16. Also remove the smaller obelisks in the middle distance behind the lanterns, keeping only the big foreground obelisks on both sides, so the rocket stands alone against the sky."
+  },
+  {
+   "id": "mvr/k-stand",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "design/mv-art/out/mvr/p-out2-b.jpg",
+    "design/mv-art/refs-mv/kimorin-lab-body.jpg",
+    "design/mv-art/refs-mv/kimorin-lab-joy.jpg"
+   ],
+   "prompt": "Edit the first reference picture: keep EXACTLY the same place, camera, composition, sky, floor, obelisks, lanterns, staircase, platform, the gigantic rocket and the golden ring, the same colours, light and rendering. Add ONE character on the reflective floor of the plaza in the lower part of the picture: KIMORIN exactly as in the KIMORIN reference pictures: a small chibi white fox about three heads tall with a white fox-mask face (blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny ω cat mouth), tall fox ears with blue insides, brass steampunk goggles worn OVER THE EYES (eyes hidden, no glow), a small silver box with a screen on the head between the ears, an oversized patched, stained WHITE LAB COAT with rolled-up sleeves, a tool belt with dangling wires, white gloves, white shoes with blue paw pads, and a huge fan of white, black and vermilion-tipped feathers behind him. He wears the white lab coat - NO red robe, NO hood. He is SMALL compared to the gigantic rocket (the rocket is as tall as a 20-storey building). Exactly one character, no other people. No text, no watermark. Vertical 9:16. He just stands on the plaza floor in the lower middle of the frame, a little in front of the stairs, relaxed, full body visible, three-quarter view."
+  },
+  {
+   "id": "mvr/k-front",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "design/mv-art/out/mvr/p-out2-b.jpg",
+    "design/mv-art/refs-mv/kimorin-lab-body.jpg",
+    "design/mv-art/refs-mv/kimorin-lab-joy.jpg"
+   ],
+   "prompt": "Edit the first reference picture: keep EXACTLY the same place, camera, composition, sky, floor, obelisks, lanterns, staircase, platform, the gigantic rocket and the golden ring, the same colours, light and rendering. Add ONE character on the reflective floor of the plaza in the lower part of the picture: KIMORIN exactly as in the KIMORIN reference pictures: a small chibi white fox about three heads tall with a white fox-mask face (blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny ω cat mouth), tall fox ears with blue insides, brass steampunk goggles worn OVER THE EYES (eyes hidden, no glow), a small silver box with a screen on the head between the ears, an oversized patched, stained WHITE LAB COAT with rolled-up sleeves, a tool belt with dangling wires, white gloves, white shoes with blue paw pads, and a huge fan of white, black and vermilion-tipped feathers behind him. He wears the white lab coat - NO red robe, NO hood. He is SMALL compared to the gigantic rocket (the rocket is as tall as a 20-storey building). Exactly one character, no other people. No text, no watermark. Vertical 9:16. He stands in the lower middle of the frame facing the camera directly (front view), full body, looking straight at the viewer, the rocket towering behind him."
+  },
+  {
+   "id": "mvr/k-look",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "design/mv-art/out/mvr/p-out2-b.jpg",
+    "design/mv-art/refs-mv/kimorin-lab-body.jpg",
+    "design/mv-art/refs-mv/kimorin-lab-joy.jpg"
+   ],
+   "prompt": "Edit the first reference picture: keep EXACTLY the same place, camera, composition, sky, floor, obelisks, lanterns, staircase, platform, the gigantic rocket and the golden ring, the same colours, light and rendering. Add ONE character on the reflective floor of the plaza in the lower part of the picture: KIMORIN exactly as in the KIMORIN reference pictures: a small chibi white fox about three heads tall with a white fox-mask face (blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny ω cat mouth), tall fox ears with blue insides, brass steampunk goggles worn OVER THE EYES (eyes hidden, no glow), a small silver box with a screen on the head between the ears, an oversized patched, stained WHITE LAB COAT with rolled-up sleeves, a tool belt with dangling wires, white gloves, white shoes with blue paw pads, and a huge fan of white, black and vermilion-tipped feathers behind him. He wears the white lab coat - NO red robe, NO hood. He is SMALL compared to the gigantic rocket (the rocket is as tall as a 20-storey building). Exactly one character, no other people. No text, no watermark. Vertical 9:16. He stands in the lower middle of the frame seen from BEHIND, his back and feather tail toward the camera, looking up at the gigantic rocket on top of the stairs, his head tilted up."
   }
  ],
  "redo": []
