@@ -474,7 +474,7 @@
  },
  "kimorin": {
   "name": "KIMORIN⭐︎",
-  "voice": "23d9324f0b434ab299fc36455b5d5f90",
+  "voice": "84b27f575dba40e4bc7cabe20ac11b0f",
   "ref": "design/home/chibi-ref/kimorin.jpg",
   "end": "です",
   "genre": "funk",
@@ -513,6 +513,8 @@
   "game": "ピンポンKIMORIN",
   "gameKind": "jump",
   "gameLine": "ピンポンKIMORINです。タップで、跳びます。大正解です。",
-  "voiceName": "少年2"
+  "voiceName": "KIMORIN（依頼主の録音から作った声。物語と同じ）",
+  "semitones": -1,
+  "speed": 0.85
  }
 }
