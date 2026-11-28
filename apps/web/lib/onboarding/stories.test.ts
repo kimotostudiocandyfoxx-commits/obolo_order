@@ -224,6 +224,9 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
     expect(STORIES[1].untilText).toBe('宇宙行きの切符が届くまで');
     for (const d of Object.keys(STORIES).map(Number)) if (d !== 1) expect(STORIES[d].untilText).toBeUndefined();
   });
+  it('day 2 starts at once after the 24 hours, with no email check (client 2026-11-28)', () => {
+    expect(STORIES[2].auth).toBe(false);
+  });
   it('KIMORIN wears the sunglasses look after the dragon', () => {
     const dragon = steps.findIndex((s) => s.t === 'video' && s.motion === 'd2-dragon');
     expect(dragon).toBeGreaterThan(-1);

@@ -20,7 +20,11 @@ export interface DayStory {
    * wait only while journeyDay ≤ 2); from day 3 the 24 hours are waited, so no label (HomeGate shows no button).
    */
   skipLabel?: string;
-  /** Day 2+ start with the email check (the 6-digit code). Day 1 starts from the invitation. */
+  /**
+   * The day starts with the email check 〔扉の合言葉〕 (the account's own address again + the 6-digit code; DayAuth). Day 1
+   * starts from the invitation; day 2 starts at once since 2026-11-28 (the client: the email screen after the skipped 24
+   * hours must go — the address is the one the invitation came to, kept on the account for signing in elsewhere).
+   */
   auth: boolean;
   /** The caption when the skip has rolled the clock to zero (instead of 「扉が開いた」). */
   skippedText?: string;
@@ -41,7 +45,7 @@ export const STORIES: Record<number, DayStory> = {
   // still skip); they are {bati}'s (M-R223)
   2: {
     steps: DAY2,
-    auth: true,
+    auth: false,
     waitNote: '明日、星へ遊びに行くまでの24時間は、{bati}と好きなだけ話せます',
   },
   3: { steps: DAY3, auth: true },

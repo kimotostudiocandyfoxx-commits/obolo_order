@@ -25,7 +25,7 @@ import type { Step } from './script';
  */
 export const DAY2: Step[] = [
   { t: 'bgm', track: 'opening' },
-  { t: 'scene', id: 'D02-S001' }, // 宇宙行きの切符（扉の合言葉は、この日を開く前の画面で）
+  { t: 'scene', id: 'D02-S001' }, // 宇宙行きの切符（no email check before it since 2026-11-28: stories.ts）
   { t: 'caption', text: '2日目' },
   { t: 'se', sound: 'sparkle' },
   { t: 'video', motion: 'd2-ticket' }, // 光の粒が集まって、細長い金色の切符になる
