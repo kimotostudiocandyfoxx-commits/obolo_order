@@ -19803,6 +19803,402 @@
     "design/home/chibi-ref/mikie.jpg",
     "design/home/chibi-ref/kimorin.jpg"
    ]
+  },
+  {
+   "id": "mvr/r01-hq-aerial",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/headquarters-gate.webp"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. Mood: slightly eerie, secretive and mysterious: low-key lighting, deep shadows, cool violet and teal haze, thin drifting fog. AERIAL DRONE SHOT high above at dusk: the secret society's headquarters city from the reference picture, black and gold spires, the giant gate with the ringed celestial globe, a huge glass dome; long shadows, a violet twilight sky with gold-lit clouds, fog creeping between the towers. No people visible."
+  },
+  {
+   "id": "mvr/r02-plaza-walk",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/rocket.jpg",
+    "docs/story-rewrite/design/refs/places/earth-temple-hall.jpg",
+    "docs/story-rewrite/design/refs/cast/kimorin-normal.jpg"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. Mood: slightly eerie, secretive and mysterious: low-key lighting, deep shadows, cool violet and teal haze, thin drifting fog. The launch plaza is the enormous golden hall of the hall reference picture, scaled up to a colossal cathedral-like space: towering black-and-gold columns, a polished reflective floor, lanterns, the giant glowing golden ring disc high on the far wall, a vast domed ceiling. The rocket is GIGANTIC: as tall as a 20-storey building (about 60 metres), its nose far overhead, the people tiny at its base. The rocket looks exactly like the rocket reference picture (a long slender black hull with gold filigree, pink and cyan neon lines, an orange glowing emblem, sharp swept-back fins, three engine nozzles). Exactly these characters and no others, no duplicates: KIMORIN. Very wide shot from behind and low: tiny KIMORIN exactly as in the KIMORIN reference picture: a small, cute, chibi-proportioned fox-like inventor in a dark red hooded robe with silver trim, fox ears with blue insides, a white mask face with glowing blue curved slit eyes and blue swirls on the cheeks, a small cat mouth, round dark sunglasses pushed up on the forehead over the hood, a blue gem brooch with two blue tassels, white gloves and white shoes with blue paw pads, a big fan-shaped tail of white, black and vermilion feathers walks alone across the vast reflective floor toward the gigantic rocket standing upright in the middle of the hall on a round launch pad, the rocket towering far above into the shadows of the dome. KIMORIN is very small in the frame."
+  },
+  {
+   "id": "mvr/r03-stop",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/earth-temple-hall.jpg",
+    "docs/story-rewrite/design/refs/cast/kimorin-normal.jpg"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. Mood: slightly eerie, secretive and mysterious: low-key lighting, deep shadows, cool violet and teal haze, thin drifting fog. Exactly these characters and no others, no duplicates: KIMORIN. LOW-ANGLE CLOSE-UP at floor level on the polished golden-black floor of the hall: the white shoes with blue paw pads of KIMORIN exactly as in the KIMORIN reference picture: a small, cute, chibi-proportioned fox-like inventor in a dark red hooded robe with silver trim, fox ears with blue insides, a white mask face with glowing blue curved slit eyes and blue swirls on the cheeks, a small cat mouth, round dark sunglasses pushed up on the forehead over the hood, a blue gem brooch with two blue tassels, white gloves and white shoes with blue paw pads, a big fan-shaped tail of white, black and vermilion feathers come to an abrupt stop, the hem of the red robe swaying, the feather tail visible behind; in the blurred background the base of a gigantic black rocket with neon lines glows. Reflection on the floor."
+  },
+  {
+   "id": "mvr/r04-mutter",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/earth-temple-hall.jpg",
+    "docs/story-rewrite/design/refs/cast/kimorin-normal.jpg"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. Mood: slightly eerie, secretive and mysterious: low-key lighting, deep shadows, cool violet and teal haze, thin drifting fog. Exactly these characters and no others, no duplicates: KIMORIN. MEDIUM CLOSE-UP, slight Dutch angle: KIMORIN exactly as in the KIMORIN reference picture: a small, cute, chibi-proportioned fox-like inventor in a dark red hooded robe with silver trim, fox ears with blue insides, a white mask face with glowing blue curved slit eyes and blue swirls on the cheeks, a small cat mouth, round dark sunglasses pushed up on the forehead over the hood, a blue gem brooch with two blue tassels, white gloves and white shoes with blue paw pads, a big fan-shaped tail of white, black and vermilion feathers stands still and looks down, one white-gloved hand raised to the chin near the mouth, muttering to itself, thinking hard; half of the face in shadow, cool rim light, the dim golden hall and the giant rocket base blurred behind."
+  },
+  {
+   "id": "mvr/r05-suspicious",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/earth-temple-hall.jpg",
+    "docs/story-rewrite/design/refs/cast/kimorin-normal.jpg"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. Mood: slightly eerie, secretive and mysterious: low-key lighting, deep shadows, cool violet and teal haze, thin drifting fog. Exactly these characters and no others, no duplicates: KIMORIN. EXTREME CLOSE-UP of the white mask face of KIMORIN exactly as in the KIMORIN reference picture: a small, cute, chibi-proportioned fox-like inventor in a dark red hooded robe with silver trim, fox ears with blue insides, a white mask face with glowing blue curved slit eyes and blue swirls on the cheeks, a small cat mouth, round dark sunglasses pushed up on the forehead over the hood, a blue gem brooch with two blue tassels, white gloves and white shoes with blue paw pads, a big fan-shaped tail of white, black and vermilion feathers: the glowing blue slit eyes narrowed into a doubtful sideways glance, a suspicious look, a drop of sweat on the cheek; dark violet shadows, the golden ring light glinting in the round sunglasses on the forehead."
+  },
+  {
+   "id": "mvr/r06-invite",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/props/invitation.webp",
+    "docs/story-rewrite/design/refs/cast/kimorin-normal.jpg"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. A FLASHBACK MEMORY, warm faded sepia film tones, soft vignette, dust in the air. Exactly these characters and no others, no duplicates: KIMORIN. CLOSE-UP: the white-gloved hands of KIMORIN exactly as in the KIMORIN reference picture: a small, cute, chibi-proportioned fox-like inventor in a dark red hooded robe with silver trim, fox ears with blue insides, a white mask face with glowing blue curved slit eyes and blue swirls on the cheeks, a small cat mouth, round dark sunglasses pushed up on the forehead over the hood, a blue gem brooch with two blue tassels, white gloves and white shoes with blue paw pads, a big fan-shaped tail of white, black and vermilion feathers hold a black and gold invitation card exactly like the invitation reference picture (its writing blurred and unreadable), a broken wax seal; KIMORIN peers at it curiously; candle light."
+  },
+  {
+   "id": "mvr/r07-gate",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/headquarters-gate.webp",
+    "docs/story-rewrite/design/refs/cast/kimorin-normal.jpg"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. A FLASHBACK MEMORY, warm faded sepia film tones, soft vignette. Exactly these characters and no others, no duplicates: KIMORIN. Wide shot from behind: tiny KIMORIN exactly as in the KIMORIN reference picture: a small, cute, chibi-proportioned fox-like inventor in a dark red hooded robe with silver trim, fox ears with blue insides, a white mask face with glowing blue curved slit eyes and blue swirls on the cheeks, a small cat mouth, round dark sunglasses pushed up on the forehead over the hood, a blue gem brooch with two blue tassels, white gloves and white shoes with blue paw pads, a big fan-shaped tail of white, black and vermilion feathers walks timidly through the gigantic gate of the strange headquarters from the reference picture, the ringed globe on top, the domed temple glowing beyond, long shadows on the black and gold floor; KIMORIN holds the invitation."
+  },
+  {
+   "id": "mvr/r08-turn",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/earth-temple-hall.jpg",
+    "docs/story-rewrite/design/refs/cast/obolon.jpg",
+    "docs/story-rewrite/design/refs/cast/kimorin-normal.jpg"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. Mood: slightly eerie, secretive and mysterious: low-key lighting, deep shadows, cool violet and teal haze, thin drifting fog. The launch plaza is the enormous golden hall of the hall reference picture, scaled up to a colossal cathedral-like space: towering black-and-gold columns, a polished reflective floor, lanterns, the giant glowing golden ring disc high on the far wall, a vast domed ceiling. Exactly these characters and no others, no duplicates: KIMORIN, OBOLON. OVER-THE-SHOULDER SHOT: in the foreground KIMORIN exactly as in the KIMORIN reference picture: a small, cute, chibi-proportioned fox-like inventor in a dark red hooded robe with silver trim, fox ears with blue insides, a white mask face with glowing blue curved slit eyes and blue swirls on the cheeks, a small cat mouth, round dark sunglasses pushed up on the forehead over the hood, a blue gem brooch with two blue tassels, white gloves and white shoes with blue paw pads, a big fan-shaped tail of white, black and vermilion feathers has just turned around, seen from behind and the side, startled; far ahead, in front of the giant golden ring at the top of the stairs, OBOLON exactly as in the OBOLON reference picture: a floating pitch-black sphere with a thin glowing white corona ring around its edge like a solar eclipse, two white crescent closed eyes smiling, no mouth floats inside a pillar of golden light, watching."
+  },
+  {
+   "id": "mvr/r08b-obolon",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/cast/obolon.jpg",
+    "docs/story-rewrite/design/refs/places/earth-temple-hall.jpg"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. Mood: slightly eerie, secretive and mysterious: low-key lighting, deep shadows, cool violet and teal haze, thin drifting fog. Exactly these characters and no others, no duplicates: OBOLON. CLOSE-UP: OBOLON exactly as in the OBOLON reference picture: a floating pitch-black sphere with a thin glowing white corona ring around its edge like a solar eclipse, two white crescent closed eyes smiling, no mouth, floating silently in a pillar of golden light in the dark golden hall, the white crescent eyes smiling in an unreadable, slightly eerie way, golden dust swirling around it."
+  },
+  {
+   "id": "mvr/r09-monban",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/rocket.jpg",
+    "docs/story-rewrite/design/refs/places/earth-temple-hall.jpg",
+    "docs/story-rewrite/design/refs/cast/monban.jpg",
+    "docs/story-rewrite/design/refs/cast/kimorin-normal.jpg"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. Mood: slightly eerie, secretive and mysterious: low-key lighting, deep shadows, cool violet and teal haze, thin drifting fog. The launch plaza is the enormous golden hall of the hall reference picture, scaled up to a colossal cathedral-like space: towering black-and-gold columns, a polished reflective floor, lanterns, the giant glowing golden ring disc high on the far wall, a vast domed ceiling. The rocket is GIGANTIC: as tall as a 20-storey building (about 60 metres), its nose far overhead, the people tiny at its base. The rocket looks exactly like the rocket reference picture (a long slender black hull with gold filigree, pink and cyan neon lines, an orange glowing emblem, sharp swept-back fins, three engine nozzles). Exactly these characters and no others, no duplicates: KIMORIN, MONBAN. Medium-wide shot: MONBAN exactly as in the MONBAN reference picture: a tall figure in a long black hooded robe with gold lines and magic-circle patterns, a black masked face deep in the hood with ONE glowing golden eye on the forehead, a golden magic-circle halo disc behind the head, black gloves and boots with gold trim stands tall beside the boarding stairs at the foot of the gigantic rocket and holds one gloved hand out toward the open glowing hatch, inviting; in the foreground KIMORIN exactly as in the KIMORIN reference picture: a small, cute, chibi-proportioned fox-like inventor in a dark red hooded robe with silver trim, fox ears with blue insides, a white mask face with glowing blue curved slit eyes and blue swirls on the cheeks, a small cat mouth, round dark sunglasses pushed up on the forehead over the hood, a blue gem brooch with two blue tassels, white gloves and white shoes with blue paw pads, a big fan-shaped tail of white, black and vermilion feathers looks up at MONBAN, small and wary."
+  },
+  {
+   "id": "mvr/r10-monban-cu",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/cast/monban.jpg"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. Mood: slightly eerie, secretive and mysterious: low-key lighting, deep shadows, cool violet and teal haze, thin drifting fog. Exactly these characters and no others, no duplicates: MONBAN. DRAMATIC LOW-ANGLE CLOSE-UP of MONBAN exactly as in the MONBAN reference picture: a tall figure in a long black hooded robe with gold lines and magic-circle patterns, a black masked face deep in the hood with ONE glowing golden eye on the forehead, a golden magic-circle halo disc behind the head, black gloves and boots with gold trim: the hood hides everything in black shadow except the single golden eye glowing on the forehead; the golden halo disc slowly glowing behind the head; violet fog; deeply suspicious and ominous."
+  },
+  {
+   "id": "mvr/r11-shake",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/earth-temple-hall.jpg",
+    "docs/story-rewrite/design/refs/cast/kimorin-normal.jpg"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. Mood: slightly eerie, secretive and mysterious: low-key lighting, deep shadows, cool violet and teal haze, thin drifting fog. Exactly these characters and no others, no duplicates: KIMORIN. MEDIUM SHOT: KIMORIN exactly as in the KIMORIN reference picture: a small, cute, chibi-proportioned fox-like inventor in a dark red hooded robe with silver trim, fox ears with blue insides, a white mask face with glowing blue curved slit eyes and blue swirls on the cheeks, a small cat mouth, round dark sunglasses pushed up on the forehead over the hood, a blue gem brooch with two blue tassels, white gloves and white shoes with blue paw pads, a big fan-shaped tail of white, black and vermilion feathers firmly shakes its head with the eyes shut tight, both gloved hands raised palm-out in front of the chest saying 'no way', the robe and ears swinging with motion, comically stubborn; the dark golden hall behind."
+  },
+  {
+   "id": "mvr/r12-run",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/rocket.jpg",
+    "docs/story-rewrite/design/refs/places/earth-temple-hall.jpg",
+    "docs/story-rewrite/design/refs/cast/kimorin-normal.jpg"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. Mood: a sudden burst of energy, warm light breaking through. The launch plaza is the enormous golden hall of the hall reference picture, scaled up to a colossal cathedral-like space: towering black-and-gold columns, a polished reflective floor, lanterns, the giant glowing golden ring disc high on the far wall, a vast domed ceiling. The rocket is GIGANTIC: as tall as a 20-storey building (about 60 metres), its nose far overhead, the people tiny at its base. The rocket looks exactly like the rocket reference picture (a long slender black hull with gold filigree, pink and cyan neon lines, an orange glowing emblem, sharp swept-back fins, three engine nozzles). Exactly these characters and no others, no duplicates: KIMORIN. Dynamic three-quarter view: KIMORIN exactly as in the KIMORIN reference picture: a small, cute, chibi-proportioned fox-like inventor in a dark red hooded robe with silver trim, fox ears with blue insides, a white mask face with glowing blue curved slit eyes and blue swirls on the cheeks, a small cat mouth, round dark sunglasses pushed up on the forehead over the hood, a blue gem brooch with two blue tassels, white gloves and white shoes with blue paw pads, a big fan-shaped tail of white, black and vermilion feathers suddenly dashes at full speed toward the gigantic rocket, the robe flying, the feather tail streaming, speed lines of light on the reflective floor, a big grin under the mask."
+  },
+  {
+   "id": "mvr/r13-board",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/rocket.jpg",
+    "docs/story-rewrite/design/refs/places/earth-temple-hall.jpg",
+    "docs/story-rewrite/design/refs/cast/kimorin-normal.jpg"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. Mood: excited, bright neon and gold. The rocket is GIGANTIC: as tall as a 20-storey building (about 60 metres), its nose far overhead, the people tiny at its base. The rocket looks exactly like the rocket reference picture (a long slender black hull with gold filigree, pink and cyan neon lines, an orange glowing emblem, sharp swept-back fins, three engine nozzles). Exactly these characters and no others, no duplicates: KIMORIN. LOW ANGLE from the boarding stairs: KIMORIN exactly as in the KIMORIN reference picture: a small, cute, chibi-proportioned fox-like inventor in a dark red hooded robe with silver trim, fox ears with blue insides, a white mask face with glowing blue curved slit eyes and blue swirls on the cheeks, a small cat mouth, round dark sunglasses pushed up on the forehead over the hood, a blue gem brooch with two blue tassels, white gloves and white shoes with blue paw pads, a big fan-shaped tail of white, black and vermilion feathers leaps happily up the last steps into the open round hatch on the side of the gigantic rocket, warm light pouring out of the hatch, the hull with gold filigree and pink and cyan neon lines curving up out of frame."
+  },
+  {
+   "id": "mvr/r14-launch",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/rocket.jpg",
+    "docs/story-rewrite/design/refs/places/earth-temple-hall.jpg"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. Mood: emotional, uplifting and dreamy: warm golden backlight, soft bloom, gentle lens flare, sparkling light particles. The launch plaza is the enormous golden hall of the hall reference picture, scaled up to a colossal cathedral-like space: towering black-and-gold columns, a polished reflective floor, lanterns, the giant glowing golden ring disc high on the far wall, a vast domed ceiling. The rocket is GIGANTIC: as tall as a 20-storey building (about 60 metres), its nose far overhead, the people tiny at its base. The rocket looks exactly like the rocket reference picture (a long slender black hull with gold filigree, pink and cyan neon lines, an orange glowing emblem, sharp swept-back fins, three engine nozzles). The domed ceiling of the hall has opened wide like an iris onto a starry twilight sky. The gigantic rocket ignites: three engines blasting white-gold fire, a vast billowing ring of glowing smoke flooding across the reflective floor, golden sparks everywhere, the lanterns blown aside; awe-inspiring. No people visible."
+  },
+  {
+   "id": "mvr/r15-liftoff-pov",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/rocket.jpg",
+    "docs/story-rewrite/design/refs/places/earth-temple-hall.jpg",
+    "docs/story-rewrite/design/refs/cast/obolon.jpg",
+    "docs/story-rewrite/design/refs/cast/monban.jpg"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. Mood: emotional, uplifting and dreamy: warm golden backlight, soft bloom, gentle lens flare, sparkling light particles. The launch plaza is the enormous golden hall of the hall reference picture, scaled up to a colossal cathedral-like space: towering black-and-gold columns, a polished reflective floor, lanterns, the giant glowing golden ring disc high on the far wall, a vast domed ceiling. Exactly these characters and no others, no duplicates: OBOLON, MONBAN. VIEW FROM THE FLOOR OF THE HALL looking up through the opened dome: the gigantic rocket rises away into the starry sky on a long pillar of golden fire; in the foreground at the bottom, small and seen from behind, MONBAN exactly as in the MONBAN reference picture: a tall figure in a long black hooded robe with gold lines and magic-circle patterns, a black masked face deep in the hood with ONE glowing golden eye on the forehead, a golden magic-circle halo disc behind the head, black gloves and boots with gold trim and OBOLON exactly as in the OBOLON reference picture: a floating pitch-black sphere with a thin glowing white corona ring around its edge like a solar eclipse, two white crescent closed eyes smiling, no mouth watch it go, glowing smoke drifting."
+  },
+  {
+   "id": "mvr/r16-climb",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/rocket.jpg",
+    "docs/story-rewrite/design/refs/places/headquarters-gate.webp"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. Mood: emotional, uplifting and dreamy: warm golden backlight, soft bloom, gentle lens flare, sparkling light particles. The rocket is GIGANTIC: as tall as a 20-storey building (about 60 metres), its nose far overhead, the people tiny at its base. The rocket looks exactly like the rocket reference picture (a long slender black hull with gold filigree, pink and cyan neon lines, an orange glowing emblem, sharp swept-back fins, three engine nozzles). AERIAL WIDE SHOT at twilight: the gigantic rocket soars up high above the black and gold spires of the headquarters city, a bright golden trail curving behind it through pink and violet clouds, the first stars appearing, the setting sun on the horizon. No people visible."
+  },
+  {
+   "id": "mvr/r17-earth",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/rocket-inside-b.webp"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. Mood: emotional, uplifting and dreamy: warm golden backlight, soft bloom, gentle lens flare, sparkling light particles. POINT OF VIEW from the rocket high in space looking down: the whole curved blue Earth below, glittering city lights on the night side, a golden sunrise blooming on the horizon, thin clouds, a bright trail of the rocket's glow at the edge of the frame; breathtakingly beautiful and tender. No people visible."
+  },
+  {
+   "id": "mvr/r18-inside-awe",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/rocket-inside-b.webp",
+    "docs/story-rewrite/design/refs/cast/kimorin-normal.jpg"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. Mood: emotional, uplifting and dreamy: warm golden backlight, soft bloom, gentle lens flare, sparkling light particles. Inside the rocket: exactly the neon space sushi bar of the interior reference picture (purple and cyan neon, a big window on the left showing the Earth at night, a sushi conveyor lane with domed plates under the window, a glowing dance floor and bar in the back, sofa seats). Exactly these characters and no others, no duplicates: KIMORIN. Wide shot: KIMORIN exactly as in the KIMORIN reference picture: a small, cute, chibi-proportioned fox-like inventor in a dark red hooded robe with silver trim, fox ears with blue insides, a white mask face with glowing blue curved slit eyes and blue swirls on the cheeks, a small cat mouth, round dark sunglasses pushed up on the forehead over the hood, a blue gem brooch with two blue tassels, white gloves and white shoes with blue paw pads, a big fan-shaped tail of white, black and vermilion feathers stands in the middle of the room looking all around with both hands clasped at the chest, deeply moved, sparkles in the glowing blue eyes, neon reflections on the robe."
+  },
+  {
+   "id": "mvr/r19-inside-joy",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/rocket-inside-b.webp",
+    "docs/story-rewrite/design/refs/cast/kimorin-normal.jpg"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. Mood: emotional, uplifting and dreamy: warm golden backlight, soft bloom, gentle lens flare, sparkling light particles. Inside the rocket: the neon space sushi bar of the interior reference picture (purple and cyan neon, the Earth in the big window, a glowing dance floor). Exactly these characters and no others, no duplicates: KIMORIN. MEDIUM SHOT: KIMORIN exactly as in the KIMORIN reference picture: a small, cute, chibi-proportioned fox-like inventor in a dark red hooded robe with silver trim, fox ears with blue insides, a white mask face with glowing blue curved slit eyes and blue swirls on the cheeks, a small cat mouth, round dark sunglasses pushed up on the forehead over the hood, a blue gem brooch with two blue tassels, white gloves and white shoes with blue paw pads, a big fan-shaped tail of white, black and vermilion feathers spins happily on the glowing dance floor with both arms spread wide, laughing, the robe and feather tail flaring out in a circle, colourful light flecks around."
+  },
+  {
+   "id": "mvr/r20-sushi",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/rocket-inside-b.webp",
+    "docs/story-rewrite/design/refs/cast/kimorin-normal.jpg"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. Mood: emotional, uplifting and dreamy: warm golden backlight, soft bloom, gentle lens flare, sparkling light particles. Inside the rocket at the conveyor counter under the big window, exactly like the interior reference picture (domed sushi plates gliding along a cyan-lit lane, the Earth glowing through the window). Exactly these characters and no others, no duplicates: KIMORIN. MEDIUM CLOSE-UP: KIMORIN exactly as in the KIMORIN reference picture: a small, cute, chibi-proportioned fox-like inventor in a dark red hooded robe with silver trim, fox ears with blue insides, a white mask face with glowing blue curved slit eyes and blue swirls on the cheeks, a small cat mouth, round dark sunglasses pushed up on the forehead over the hood, a blue gem brooch with two blue tassels, white gloves and white shoes with blue paw pads, a big fan-shaped tail of white, black and vermilion feathers sits at the counter and holds up one piece of salmon nigiri sushi with both gloved hands, about to take a happy bite, eyes curved in delight."
+  },
+  {
+   "id": "mvr/r21-smile",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/rocket-inside-b.webp",
+    "docs/story-rewrite/design/refs/cast/kimorin-normal.jpg"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. Mood: emotional, uplifting and dreamy: warm golden backlight, soft bloom, gentle lens flare, sparkling light particles. Exactly these characters and no others, no duplicates: KIMORIN. CLOSE-UP, chest up: KIMORIN exactly as in the KIMORIN reference picture: a small, cute, chibi-proportioned fox-like inventor in a dark red hooded robe with silver trim, fox ears with blue insides, a white mask face with glowing blue curved slit eyes and blue swirls on the cheeks, a small cat mouth, round dark sunglasses pushed up on the forehead over the hood, a blue gem brooch with two blue tassels, white gloves and white shoes with blue paw pads, a big fan-shaped tail of white, black and vermilion feathers beside the big window of the neon rocket interior turns to the camera with a warm, happy smile, the glowing blue eyes curved into gentle arcs, the blue Earth glowing softly behind, warm golden backlight, floating light particles."
+  },
+  {
+   "id": "mvr/r21b-window",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/rocket-inside-b.webp",
+    "docs/story-rewrite/design/refs/cast/kimorin-normal.jpg"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. Mood: emotional, uplifting and dreamy: warm golden backlight, soft bloom, gentle lens flare, sparkling light particles. Exactly these characters and no others, no duplicates: KIMORIN. VIEW FROM BEHIND: small KIMORIN exactly as in the KIMORIN reference picture: a small, cute, chibi-proportioned fox-like inventor in a dark red hooded robe with silver trim, fox ears with blue insides, a white mask face with glowing blue curved slit eyes and blue swirls on the cheeks, a small cat mouth, round dark sunglasses pushed up on the forehead over the hood, a blue gem brooch with two blue tassels, white gloves and white shoes with blue paw pads, a big fan-shaped tail of white, black and vermilion feathers stands at the big round-cornered window of the rocket interior, one gloved paw pressed to the glass, gazing at the beautiful blue Earth and the stars outside, the feather tail spread, the neon room glowing purple and cyan around; quiet and emotional."
+  },
+  {
+   "id": "mvr/r22-moon",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/rocket.jpg",
+    "docs/story-rewrite/design/refs/places/moon-temple-aerial-2.jpg"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. Mood: emotional, uplifting and dreamy: warm golden backlight, soft bloom, gentle lens flare, sparkling light particles. The rocket is GIGANTIC: as tall as a 20-storey building (about 60 metres), its nose far overhead, the people tiny at its base. The rocket looks exactly like the rocket reference picture (a long slender black hull with gold filigree, pink and cyan neon lines, an orange glowing emblem, sharp swept-back fins, three engine nozzles). Deep space: the gigantic rocket glides toward a huge silver-grey Moon that fills half of the frame, craters sharply lit by the sun, the small blue Earth behind in the black starry sky, the rocket's neon lines glowing. No people visible."
+  },
+  {
+   "id": "mvr/r23-descent",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/moon-temple-aerial-2.jpg",
+    "docs/story-rewrite/design/refs/places/rocket.jpg"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. Mood: emotional, uplifting and dreamy: warm golden backlight, soft bloom, gentle lens flare, sparkling light particles. The rocket is GIGANTIC: as tall as a 20-storey building (about 60 metres), its nose far overhead, the people tiny at its base. The rocket looks exactly like the rocket reference picture (a long slender black hull with gold filigree, pink and cyan neon lines, an orange glowing emblem, sharp swept-back fins, three engine nozzles). AERIAL VIEW high above the Moon, the same place as the Moon temple reference picture: the white marble temple with blue domes and the huge blue and silver magic-circle floor among the craters, the Earth in the black sky; the gigantic rocket descends upright toward the open ground right in front of the temple's grand front stairs on a soft column of white-gold landing fire, dust swirling. No people visible."
+  },
+  {
+   "id": "mvr/r24-landed",
+   "always": false,
+   "w": 1440,
+   "h": 2560,
+   "size": [
+    1080,
+    1920
+   ],
+   "refs": [
+    "docs/story-rewrite/design/refs/places/moon-temple-aerial-1.jpg",
+    "docs/story-rewrite/design/refs/places/rocket.jpg",
+    "docs/story-rewrite/design/refs/cast/kimorin-normal.jpg"
+   ],
+   "prompt": "Cinematic dark-fantasy 3DCG illustration in exactly the same style, rendering and colour palette as the reference pictures (semi-realistic, highly detailed, glossy black stone and gold filigree, soft volumetric light, film still quality). Vertical 9:16 frame filled edge to edge. No text, no letters, no numbers, no logo, no watermark, no border. Mood: emotional, uplifting and dreamy: warm golden backlight, soft bloom, gentle lens flare, sparkling light particles. The rocket is GIGANTIC: as tall as a 20-storey building (about 60 metres), its nose far overhead, the people tiny at its base. The rocket looks exactly like the rocket reference picture (a long slender black hull with gold filigree, pink and cyan neon lines, an orange glowing emblem, sharp swept-back fins, three engine nozzles). Exactly these characters and no others, no duplicates: KIMORIN. Wide shot on the Moon's surface: the gigantic rocket has landed upright right in front of the grand stairs of the white marble Moon temple from the reference picture (blue domes, arches, glowing blue magic-circle floor), the big blue Earth in the starry sky; tiny KIMORIN exactly as in the KIMORIN reference picture: a small, cute, chibi-proportioned fox-like inventor in a dark red hooded robe with silver trim, fox ears with blue insides, a white mask face with glowing blue curved slit eyes and blue swirls on the cheeks, a small cat mouth, round dark sunglasses pushed up on the forehead over the hood, a blue gem brooch with two blue tassels, white gloves and white shoes with blue paw pads, a big fan-shaped tail of white, black and vermilion feathers has just stepped down onto the grey moon dust at the foot of the rocket and looks up at the temple, lunar dust settling, magical and hopeful."
   }
  ],
  "redo": []
