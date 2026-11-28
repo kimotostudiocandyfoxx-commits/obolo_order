@@ -40,6 +40,9 @@ export const DAY1: Step[] = [
   { t: 'video', motion: 'd1-fold' }, // 白紙になった招待状が、折り鶴に折りたたまれる
   { t: 'se', sound: 'whoosh' }, // the crane takes off (client 2026-11-22: the way to the gate wanted sound)
   { t: 'video', motion: '5-f' }, // 鶴が星空を飛ぶ
+  // the client's own music (2026-11-28) from just before the crane reaches HQ until just before the Earth temple: it
+  // replaces the end of the opening theme and MONBAN's theme on day 1 (day 2 keeps MONBAN's theme)
+  { t: 'bgm', track: 'd1-hq' },
   { t: 'se', sound: 'portal' },
   { t: 'se', sound: 'whoosh' },
   { t: 'video', motion: 'd1-arrive' }, // 金の雲を抜けて都へ降り、門の光に飛びこむ
@@ -49,8 +52,8 @@ export const DAY1: Step[] = [
   { t: 'motes', count: 0 },
   { t: 'se', sound: 'veil' }, // the gate's veil of light (M-R180: no doors), a low soft tone, never loud
   // 門へ進みながら、門が閉まる → 門の前に黒い煙が湧いて、MONBANが現れる; the telop shows over his arrival and goes (QA 6 N18: it stayed in the chat)
-  // MONBAN's music comes with MONBAN (QA 7 U1: it started 6 s early, on 〔中に入る〕)
-  { t: 'video', motion: 'd1-monban', captions: [{ text: 'MONBANが現れた', from: 7, to: 9.8 }], bgmAt: { track: 'monban', at: 6.5 } },
+  // day 1: the client's HQ music keeps playing through MONBAN (2026-11-28; MONBAN's own theme used to start here)
+  { t: 'video', motion: 'd1-monban', captions: [{ text: 'MONBANが現れた', from: 7, to: 9.8 }] },
   { t: 'loop', motion: '9-l' }, // no camera shake here: it looked cheap (client 2026-10-22)
   { t: 'cam', move: 'in', focus: '50% 30%' }, // 喋るMONBANに寄る
   { t: 'say', who: 'MONBAN', text: '誰だお前…。\nここは秘密結社だ…。' },
@@ -69,7 +72,7 @@ export const DAY1: Step[] = [
   { t: 'scene', id: 'D01-S006' },
 
   // D01-S006 OBOLON
-  // MONBAN's theme fades slowly while we walk in, gone before OBOLON's light falls (client 2026-10-20)
+  // the HQ music fades slowly while we walk in, gone before OBOLON's light falls (client 2026-10-20 / 2026-11-28)
   { t: 'bgm', track: null, fade: 6 },
   { t: 'video', motion: 12, captions: [{ text: '地球の神殿に着いた', from: 6, to: 10 }] }, // 門をくぐり、神殿の中へ → 光の柱
   { t: 'bgm', track: 'obolon' },

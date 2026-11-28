@@ -18,6 +18,12 @@
 .exp.on {
   opacity: 1;
 }
+/* closed, the sky is invisible but still mounted: nothing in it may take a touch (its 〔←〕 sat over the profile's
+   〔←〕 at opacity 0 and stole the tap — the story session's prototype fa0a2db0, 2026-11-28) */
+.exp:not(.on),
+.exp:not(.on) * {
+  pointer-events: none !important;
+}
 .exp img {
   -webkit-user-drag: none;
 }

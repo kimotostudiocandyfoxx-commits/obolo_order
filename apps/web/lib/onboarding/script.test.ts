@@ -30,7 +30,10 @@ describe('day 1 script', () => {
     const fs = require('node:fs') as typeof import('node:fs');
     for (const s of DAY1) if (s.t === 'bgm' && s.track) expect(fs.existsSync(`public/onboarding/bgm-${s.track}.m4a`)).toBe(true);
     expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'bgm') + 1)).toBe('opening');
-    expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'video' && s.motion === 'd1-monban') + 1)).toBe('monban');
+    // the client's HQ music (2026-11-28): from just before the crane reaches HQ, through MONBAN, until the temple
+    expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'video' && s.motion === 'd1-arrive'))).toBe('d1-hq');
+    expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'video' && s.motion === 'd1-monban') + 1)).toBe('d1-hq');
+    expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'video' && s.motion === 12))).toBe(null);
     expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'name'))).toBe('obolon');
     expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'say' && s.text === 'おい待て、そこまでだ。'))).toBe('monban');
     expect(bgmAt(DAY1, DAY1.length - 1)).toBe('monban');

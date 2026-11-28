@@ -71,8 +71,13 @@
   opacity: 1;
   transform: translate(-50%, 0) scale(1);
 }
-.vw button {
+.vw.on button {
   pointer-events: auto;
+}
+/* hidden, its buttons take no touch (an invisible button over the profile's 〔←〕 stole the tap — 2026-11-28) */
+.vw:not(.on),
+.vw:not(.on) * {
+  pointer-events: none !important;
 }
 
 /* the title under the work, in its own font */
