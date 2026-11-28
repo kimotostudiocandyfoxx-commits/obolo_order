@@ -168,7 +168,7 @@ function Fx({ f, still }: { f: ShotFx; still?: boolean }) {
   if (f.k === 'sweep')
     return (
       <div className="absolute overflow-hidden" style={{ left: `${f.x}%`, top: `${f.y}%`, width: `${f.w}%`, height: `${f.h}%`, mixBlendMode: 'screen' }}>
-        <div className="absolute inset-x-0 h-[22%]" style={{ top: '100%', background: 'linear-gradient(to bottom, transparent, rgba(255,200,240,.28) 45%, rgba(170,255,250,.22) 55%, transparent)', animation: `shotSweep ${f.period ?? 5}s ease-in-out 0.8s infinite` }} />
+        <div className="absolute inset-x-0 h-[22%]" style={{ top: '100%', background: 'linear-gradient(to bottom, transparent, rgba(255,200,240,.16) 45%, rgba(170,255,250,.13) 55%, transparent)', animation: `shotSweep ${f.period ?? 5}s ease-in-out 0.8s infinite` }} />
       </div>
     );
   if (f.k === 'ring')

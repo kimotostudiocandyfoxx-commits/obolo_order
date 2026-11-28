@@ -76,16 +76,17 @@ items = [
           "glowing softly and lighting the glove from below. The hand and gem in the lower middle, sharp; behind, out of focus, the open-air rocket plaza at dusk: golden lanterns as "
           "round bokeh, the black rocket's teal and pink lines as soft streaks, a part of the golden ring. Only the hand and sleeve of MONBAN are seen, no face.",
           ["design/story/refs/client/managem.jpg", "design/cast/monban.jpg", R + "ok-look.jpg"]),
-    plate("gh-gem-kimorin-b",
-          "Medium close-up of KIMORIN. Picture 1 shows his EXACT FACE: copy the face design faithfully (only the face — not the red hood and not the sunglasses of picture 1). "
-          "Picture 2 shows his costume and body for this scene. " + KIM + " HIS FACE: a smooth round pure-white porcelain fox face with no nose and no muzzle; a small blue "
-          "three-petal leaf mark on the forehead; his eyes are NOT round and have no eyeballs: they are two thin curved glowing light-blue slits shaped like gently closed, "
-          "smiling eyelids (thin crescent arcs), exactly as in picture 1; a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth. "
-          "He holds a small MANA GEM (copy it from picture 3: an egg-shaped clear crystal pebble with swirling golden light inside) in both paws in front of his chest and gazes "
-          "down at it in wonder, ears pricked up, his face lit warmly from below by the gem's golden glow. Behind him, out of focus with a shallow depth of field: the open-air "
-          "rocket plaza at dusk, golden lanterns as round bokeh, the black rocket's teal and pink lines and the golden ring as soft glows. Framed from the top of his ears to "
-          "his waist, the tail feathers fanning behind his shoulders.",
-          [R + "kimorin-face-eyes.jpg", "apps/web/public/onboarding/kimorin-iu.webp", "design/story/refs/client/managem.jpg"]),
+    plate("gh-gem-kimorin-c",
+          "Medium close-up of KIMORIN. Picture 1 shows his EXACT FACE and picture 2 his look in this scene (white lab coat, brass goggles pushed up on the forehead, "
+          "the silver box device on his head): copy both faithfully, exactly like picture 2. " + KIM + " His face as in picture 1: a smooth round pure-white porcelain fox "
+          "face with no nose and no muzzle, a small blue three-petal leaf mark on the forehead, two thin curved glowing light-blue eye slits (thin arcs, no eyeballs), "
+          "a blue spiral on each cheek, a tiny ω mouth. POSE AND ACTING: his head is bowed and tilted forward, LOOKING DOWN at a small MANA GEM held in both paws "
+          "close under his chin (copy the gem of picture 3: an egg-shaped clear crystal pebble with swirling golden light inside, glowing strongly); his ears perked "
+          "up high in astonishment, shoulders raised, the whole face lit warmly from below by the gem's golden glow, a little sparkle of light dancing on the "
+          "goggles. Camera slightly above his eye level, close. Background: very out of focus, dark — the open-air plaza at dusk, only round bokeh of golden lanterns "
+          "and the deep indigo evening sky; NO rocket, no buildings in the background. Framed from the top of his ears to his chest, the tail feathers fanning "
+          "softly behind his shoulders.",
+          [R + "kimorin-face-eyes.jpg", "design/cast/rocket/gh-gem-kimorin-b.jpg", "design/story/refs/client/managem.jpg"]),
 ]
 
 cast = [

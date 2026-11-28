@@ -129,11 +129,11 @@ export const SHOTS: Record<string, Shot> = {
     from: C(1.08, 50, 46),
     to: C(1.12, 50, 46),
     dur: 3,
-    layers: [{ src: 'obolon', x: 50, y: 66, h: 9, float: true }],
+    layers: [{ src: 'obolon', x: 50.1, y: 62.5, h: 11.3, float: true }],
     fx: [{ k: 'spill', x: 50, y: 52, at: 0.2 }, { k: 'dust', n: 26 }],
     cast: ['OBOLON'],
   },
-  'wall-through': { from: C(1.12, 50, 46), to: C(1.55, 50, 44), dur: 2.4, bloomOut: 1.7, layers: [{ src: 'obolon', x: 50, y: 66, h: 9, float: true }] },
+  'wall-through': { from: C(1.12, 50, 46), to: C(1.55, 50, 44), dur: 2.4, bloomOut: 1.7, layers: [{ src: 'obolon', x: 50.1, y: 62.5, h: 11.3, float: true }] },
 
   // C — the rocket plaza
   'plaza-wide': {
@@ -149,7 +149,7 @@ export const SHOTS: Record<string, Shot> = {
     from: C(1.25, 50, 78),
     to: C(1.0, 50, 50),
     dur: 5,
-    fx: [{ k: 'ring', x: 50, y: 40, r: 40 }, { k: 'sweep', x: 38, y: 0, w: 24, h: 80 }],
+    fx: [{ k: 'sweep', x: 42, y: 4, w: 16, h: 66 }],
     cast: ['OBOLON'],
   },
   'ots-monban': {
