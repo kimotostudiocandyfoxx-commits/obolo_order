@@ -1,6 +1,7 @@
-# UI art — 2026-11-28T08:50:48.941Z
+# UI art — 2026-11-28T08:56:15.209Z
 
-Seedream 5.0 Pro / 2枚 / 約33円
+Seedream 5.0 Pro / 3枚 / 約46円
 
-- ✅ mv2/s15-stare
-- ✅ mv2/s16-uturn
+- ✅ mv2/s05-lens
+- ✅ mv2/s06-sus
+- ✅ mv2/s07-invite
