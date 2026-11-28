@@ -121,8 +121,20 @@ jobs:
           K="$(jq -r '.inputs.key // ""' "$GITHUB_EVENT_PATH")"
           tar -cf - kimorin-vocals.mp3 instrumental.mp3 kimorin-song.mp3 | K="$K" openssl enc -aes-256-cbc -pbkdf2 -iter 200000 -pass env:K -out "$GITHUB_WORKSPACE/design/mv-art/vc-out.enc"
           ls -la "$GITHUB_WORKSPACE/design/mv-art/vc-out.enc"
+      - name: Upload the converted song to the private bucket (set=vcupload)
+        if: ${{ inputs.set == 'vcupload' }}
+        run: |
+          B=gs://obolo-order-models-asia-northeast1; DST=$B/story/rocket-song/
+          gcloud storage buckets describe "$B" --format='value(name)' || { echo "bucket not found"; exit 1; }
+          K="$(jq -r '.inputs.key // ""' "$GITHUB_EVENT_PATH")"
+          mkdir -p /tmp/vcup && K="$K" openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -pass env:K -in design/mv-art/vc-out.enc | tar -x -C /tmp/vcup
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          for f in /tmp/vcup/*.mp3; do echo "$(basename $f) $(ffprobe -v error -show_entries format=duration -of csv=p=0 $f)s"; done
+          gcloud storage cp /tmp/vcup/*.mp3 "$DST"
+          gcloud storage ls -l "$DST"
+          git rm -q design/mv-art/vc-out.enc
       - name: Paint
-        if: ${{ inputs.set != 'kimorinvc' }}
+        if: ${{ inputs.set != 'kimorinvc' && inputs.set != 'vcupload' }}
         run: |
           export SEEDREAM_API_KEY="$(gcloud secrets versions access latest --secret=obolo-seedream-api-key)"
           command -v ffmpeg >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
